@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useSpring, animated, config } from '@react-spring/web'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -271,76 +271,34 @@ function NavGroup({
 }
 
 // ============================================================================
-// BACK BUTTON
+// UNIFIED HOME NAV BUTTON
+// Consolidates Home and Back to Home into a single smart component
 // ============================================================================
 
-function BackButton({ 
-  to, 
-  label, 
-  collapsed 
+function HomeNavButton({ 
+  collapsed, 
+  isSubModule 
 }: { 
-  to: string
-  label: string
   collapsed: boolean
+  isSubModule: boolean 
 }) {
-  const navigate = useNavigate()
+  const location = useLocation()
   const [hovered, setHovered] = useState(false)
   
-  const spring = useSpring({
-    x: hovered ? -3 : 0,
-    config: { tension: 400, friction: 20 },
-  })
-
-  const handleClick = () => {
-    navigate({ to })
-  }
-
-  const buttonContent = (
-    <motion.button
-      onClick={handleClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        'flex items-center gap-2 w-full rounded-xl transition-colors',
-        'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
-        'hover:bg-[rgb(var(--interactive-hover))]',
-        collapsed ? 'justify-center p-2.5' : 'px-3 py-2'
-      )}
-    >
-      <animated.div style={{ transform: spring.x.to(x => `translateX(${x}px)`) }}>
-        <ArrowLeft className="w-4 h-4" />
-      </animated.div>
-      {!collapsed && (
-        <span className="text-sm font-medium">{label}</span>
-      )}
-    </motion.button>
-  )
-
-  if (collapsed) {
-    return (
-      <Tooltip content={label} side="right" sideOffset={12}>
-        {buttonContent}
-      </Tooltip>
-    )
-  }
-
-  return buttonContent
-}
-
-// ============================================================================
-// PERSISTENT HOME BUTTON
-// ============================================================================
-
-function PersistentHomeButton({ collapsed }: { collapsed: boolean }) {
-  const location = useLocation()
-  const isActive = location.pathname === '/home' || location.pathname === '/'
-  const [hovered, setHovered] = useState(false)
-
+  // Determine state based on context
+  const isAtHome = location.pathname === '/home' || location.pathname === '/'
+  const isActive = !isSubModule && isAtHome
+  const showBackMode = isSubModule
+  
+  // Dynamic icon and label
+  const CurrentIcon = showBackMode ? ArrowLeft : Home
+  const label = showBackMode ? 'Back to Home' : 'Home'
+  
+  // Hover animation - arrow moves left when in back mode
   const hoverSpring = useSpring({
-    backgroundColor: hovered && !isActive ? 'rgba(100, 116, 139, 0.06)' : 'rgba(0, 0, 0, 0)',
-    config: { tension: 300, friction: 30 },
+    x: showBackMode && hovered ? -4 : 0,
+    backgroundColor: hovered && !isActive ? 'rgba(100, 116, 139, 0.08)' : 'rgba(0, 0, 0, 0)',
+    config: { tension: 400, friction: 25 },
   })
 
   const linkContent = (
@@ -351,14 +309,16 @@ function PersistentHomeButton({ collapsed }: { collapsed: boolean }) {
       className="block relative"
     >
       <animated.div
-        style={hoverSpring}
+        style={{ backgroundColor: hoverSpring.backgroundColor }}
         className={cn(
           'relative flex items-center rounded-xl transition-colors duration-200',
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
         )}
       >
+        {/* Active indicator - only show when on Home module at Home page */}
         {isActive && (
           <motion.div
+            layoutId="homeActiveIndicator"
             className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/12 to-cyan-500/8 dark:from-teal-500/15 dark:to-cyan-500/10"
           />
         )}
@@ -366,15 +326,49 @@ function PersistentHomeButton({ collapsed }: { collapsed: boolean }) {
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500" />
         )}
         
-        <AnimatedNavIcon icon={Home} isActive={isActive} isHovered={hovered} />
+        {/* Animated icon container */}
+        <animated.div
+          style={{ transform: hoverSpring.x.to(x => `translateX(${x}px)`) }}
+          className="relative z-10 flex-shrink-0"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={showBackMode ? 'back' : 'home'}
+              initial={{ opacity: 0, scale: 0.8, rotate: showBackMode ? 90 : -90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.8, rotate: showBackMode ? -90 : 90 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <CurrentIcon 
+                className={cn(
+                  'w-[18px] h-[18px] transition-colors duration-200',
+                  isActive && 'text-teal-600 dark:text-cyan-400',
+                  !isActive && showBackMode && 'text-[rgb(var(--text-secondary))]',
+                  !isActive && !showBackMode && 'text-[rgb(var(--text-tertiary))]'
+                )} 
+              />
+            </motion.div>
+          </AnimatePresence>
+        </animated.div>
         
+        {/* Label */}
         {!collapsed && (
-          <span className={cn(
-            'text-sm font-medium relative z-10',
-            isActive ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-secondary))]'
-          )}>
-            Home
-          </span>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={label}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.15 }}
+              className={cn(
+                'text-sm font-medium relative z-10 whitespace-nowrap',
+                isActive && 'text-teal-700 dark:text-cyan-300',
+                !isActive && 'text-[rgb(var(--text-secondary))]'
+              )}
+            >
+              {label}
+            </motion.span>
+          </AnimatePresence>
         )}
       </animated.div>
     </Link>
@@ -382,7 +376,7 @@ function PersistentHomeButton({ collapsed }: { collapsed: boolean }) {
 
   if (collapsed) {
     return (
-      <Tooltip content="Home" side="right" sideOffset={12}>
+      <Tooltip content={label} side="right" sideOffset={12}>
         {linkContent}
       </Tooltip>
     )
@@ -484,13 +478,12 @@ function LogoIcon() {
 // ============================================================================
 
 export function Sidebar() {
-  const location = useLocation()
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
   const setModule = useSidebarStore((s) => s.setModule)
   
   // Get current module based on route
-  const { moduleId, config, isSubModule, backTo } = useSidebarModule()
+  const { moduleId, config, isSubModule } = useSidebarModule()
   const activeItemId = useActiveNavItem()
   
   // Filter groups based on permissions
@@ -574,22 +567,13 @@ export function Sidebar() {
             transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 30 }}
             className="space-y-1"
           >
-            {/* Persistent Home - only show when not in home module */}
-            {isSubModule && (
-              <div className="mb-2">
-                <PersistentHomeButton collapsed={collapsed} />
-              </div>
-            )}
-
-            {/* Back button for sub-modules */}
-            {isSubModule && backTo && (
-              <div className="mb-3 pb-2 border-b border-[rgb(var(--border-secondary))]">
-                <BackButton to={backTo.path} label={backTo.label} collapsed={collapsed} />
-              </div>
-            )}
+            {/* Unified Home/Back button - Always visible, adapts to context */}
+            <div className="mb-3 pb-2 border-b border-[rgb(var(--border-secondary))]">
+              <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} />
+            </div>
 
             {/* Module navigation groups */}
-            {filteredGroups.map((group, groupIdx) => {
+            {filteredGroups.map((group) => {
               const groupStartIndex = itemIndex
               itemIndex += group.items.length
               

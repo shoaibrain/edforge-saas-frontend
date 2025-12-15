@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback, Fragment, useRef } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useSpring, useSprings, animated, config } from '@react-spring/web'
+import { useState, useMemo, useCallback, Fragment } from 'react'
+import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
+import { motion } from 'framer-motion'
+import { useSpring, animated, config } from '@react-spring/web'
 import {
   useReactTable,
   getCoreRowModel,
@@ -16,7 +16,7 @@ import {
   type VisibilityState,
   type ColumnOrderState,
 } from '@tanstack/react-table'
-import { Dialog, Transition, Menu, MenuButton, MenuItems, MenuItem, Switch } from '@headlessui/react'
+import { Transition, Menu, MenuButton, MenuItems, MenuItem, Switch } from '@headlessui/react'
 import {
   Users,
   GraduationCap,
@@ -30,7 +30,6 @@ import {
   ChevronsRight,
   ArrowUpDown,
   MoreHorizontal,
-  UserPlus,
   Mail,
   Phone,
   Eye,
@@ -58,8 +57,25 @@ import {
 } from '@/lib/mock-data'
 
 export const Route = createFileRoute('/_protected/people')({
-  component: PeoplePage,
+  component: PeopleLayout,
 })
+
+// ============================================================================
+// LAYOUT - Handles routing between list and child routes (e.g., /people/new)
+// ============================================================================
+
+function PeopleLayout() {
+  const matches = useMatches()
+  // Check if we're at exactly /people (not a child route like /people/new)
+  const isExactPeopleRoute = matches[matches.length - 1]?.routeId === '/_protected/people'
+  
+  if (isExactPeopleRoute) {
+    return <PeoplePage />
+  }
+  
+  // Render child routes (wizard, details, etc.)
+  return <Outlet />
+}
 
 const columnHelper = createColumnHelper<Person>()
 
@@ -257,7 +273,7 @@ function TypeBadge({ type }: { type: PersonType }) {
 // ACTIONS MENU
 // ============================================================================
 
-function ActionsMenu({ person }: { person: Person }) {
+function ActionsMenu({ person: _person }: { person: Person }) {
   return (
     <Menu as="div" className="relative">
       <MenuButton className="p-2 rounded-lg hover:bg-[rgb(var(--interactive-hover))] transition-colors">
@@ -330,7 +346,6 @@ interface DraggableColumnItemProps {
 }
 
 function DraggableColumnItem({
-  id,
   label,
   index,
   isVisible,
@@ -338,7 +353,6 @@ function DraggableColumnItem({
   onDragStart,
   onDragOver,
   onDragEnd,
-  isDragging,
   draggedIndex,
 }: DraggableColumnItemProps) {
   const isBeingDragged = draggedIndex === index
@@ -935,10 +949,7 @@ function PeoplePage() {
             Manage students, teachers, staff, and guardians
           </p>
         </div>
-        <AnimatedButton
-          icon={UserPlus}
-          label="Add Person"
-        />
+        {/* Add Person button removed - use global "Add New" dropdown in header */}
       </motion.div>
 
       {/* Stats */}
@@ -1064,8 +1075,8 @@ function PeoplePage() {
                     </td>
                   </tr>
                 ) : (
-                  table.getRowModel().rows.map((row, index) => (
-                    <TableRow key={row.id} row={row} index={index} />
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} row={row} />
                   ))
                 )}
               </tbody>
@@ -1171,30 +1182,6 @@ function PeoplePage() {
 // ANIMATED COMPONENTS
 // ============================================================================
 
-function AnimatedButton({ icon: Icon, label }: { icon: typeof UserPlus; label: string }) {
-  const [hovered, setHovered] = useState(false)
-  
-  const spring = useSpring({
-    scale: hovered ? 1.03 : 1,
-    y: hovered ? -2 : 0,
-    config: config.wobbly,
-  })
-
-  return (
-    <animated.button
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        transform: spring.scale.to(s => `scale(${s}) translateY(${spring.y.get()}px)`),
-      }}
-      className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white brand-gradient-warm rounded-xl shadow-md shadow-golden-500/20 hover:opacity-90 transition-opacity"
-    >
-      <Icon className="w-4 h-4" />
-      {label}
-    </animated.button>
-  )
-}
-
 function AnimatedIconButton({ 
   icon: Icon, 
   label, 
@@ -1240,7 +1227,7 @@ function AnimatedIconButton({
   )
 }
 
-function TableRow({ row, index }: { row: any; index: number }) {
+function TableRow({ row }: { row: any }) {
   const [hovered, setHovered] = useState(false)
   
   const spring = useSpring({

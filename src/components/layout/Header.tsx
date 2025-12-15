@@ -1,13 +1,13 @@
-import { useState, Fragment } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useState, Fragment, useMemo, useCallback } from 'react'
+import { useNavigate, useLocation } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition, Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react'
+import { useSpring, animated } from '@react-spring/web'
 import {
   Search,
   Bell,
   ChevronDown,
   Check,
   Plus,
-  Building2,
   Users,
   User,
   GraduationCap,
@@ -19,19 +19,38 @@ import {
   Monitor,
   LogOut,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react'
 import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { useThemeStore, type Theme } from '@/stores/theme.store'
+import { useQuickAddPersonModal, useInviteTeamModal, useAddClassroomModal, useAddGradeLevelModal } from '@/stores/modal.store'
 import { Avatar } from '@/components/ui/Avatar'
 import { getSchoolAvatar } from '@/lib/avatar'
 import { CommandPalette, useCommandPalette } from '@/components/ui/CommandPalette'
+import { 
+  ADD_NEW_OPTIONS, 
+  ADD_NEW_CATEGORIES,
+  getOptionsGroupedByCategory,
+  getContextAwareOptions,
+  type AddNewOption,
+} from '@/config/add-new-options'
+import { can, type Action, type Resource } from '@/lib/abac'
+import { cn } from '@/lib/utils'
 
 // ============================================================================
 // MOCK PEOPLE DATA
 // ============================================================================
 
-const MOCK_PEOPLE = [
+interface MockPerson {
+  id: string
+  name: string
+  type: 'student' | 'staff'
+  grade?: string
+  role?: string
+}
+
+const MOCK_PEOPLE: MockPerson[] = [
   { id: 'std-001', name: 'Emma Thompson', type: 'student', grade: '10th' },
   { id: 'std-002', name: 'Liam Anderson', type: 'student', grade: '11th' },
   { id: 'std-003', name: 'Sophia Martinez', type: 'student', grade: '9th' },
@@ -342,68 +361,225 @@ function GlobalSearchButton({ onClick }: { onClick: () => void }) {
 }
 
 // ============================================================================
-// ADD NEW DROPDOWN
+// ADD NEW DROPDOWN - ENHANCED WITH CONTEXT AWARENESS
 // ============================================================================
 
+function AddNewOptionItem({ 
+  option, 
+  isHighlighted,
+  onSelect 
+}: { 
+  option: AddNewOption
+  isHighlighted?: boolean
+  onSelect: (option: AddNewOption) => void 
+}) {
+  const [hovered, setHovered] = useState(false)
+  
+  const springProps = useSpring({
+    x: hovered ? 4 : 0,
+    scale: hovered ? 1.02 : 1,
+    config: { tension: 400, friction: 25 },
+  })
+
+  const Icon = option.icon
+
+  return (
+    <MenuItem>
+      {({ active }) => (
+        <animated.button
+          style={{
+            transform: springProps.x.to(x => `translateX(${x}px) scale(${springProps.scale.get()})`),
+          }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onClick={() => onSelect(option)}
+          className={cn(
+            'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
+            active && 'bg-[rgb(var(--interactive-hover))]',
+            isHighlighted && 'bg-teal-500/5 dark:bg-cyan-500/5'
+          )}
+        >
+          <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0', option.iconBg)}>
+            <Icon className={cn('w-4.5 h-4.5', option.iconColor)} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{option.label}</p>
+              {isHighlighted && (
+                <Sparkles className="w-3 h-3 text-golden-500" />
+              )}
+            </div>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">{option.description}</p>
+          </div>
+          {option.shortcut && (
+            <kbd className="hidden lg:flex items-center px-2 py-1 text-[10px] font-semibold bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-md text-[rgb(var(--text-tertiary))]">
+              {option.shortcut}
+            </kbd>
+          )}
+        </animated.button>
+      )}
+    </MenuItem>
+  )
+}
+
 function AddNewDropdown() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+  
+  // Modal hooks
+  const quickAddModal = useQuickAddPersonModal()
+  const inviteModal = useInviteTeamModal()
+  const classroomModal = useAddClassroomModal()
+  const gradeLevelModal = useAddGradeLevelModal()
+
+  // Check permission helper
+  const hasPermission = useCallback((action: Action, resource: Resource) => {
+    return can(user, { action, resource, schoolId: activeSchoolId || undefined })
+  }, [user, activeSchoolId])
+
+  // Filter options based on permissions and active school
+  const filteredOptions = useMemo(() => {
+    return ADD_NEW_OPTIONS.filter((option) => {
+      // Check permission
+      if (option.permission) {
+        if (!hasPermission(option.permission.action, option.permission.resource)) {
+          return false
+        }
+      }
+      // Check if requires active school
+      if (option.requiresActiveSchool && !activeSchoolId) {
+        return false
+      }
+      return true
+    })
+  }, [hasPermission, activeSchoolId])
+
+  // Get context-aware options
+  const { highlighted, other } = useMemo(() => {
+    return getContextAwareOptions(filteredOptions, location.pathname)
+  }, [filteredOptions, location.pathname])
+
+  // Group remaining options by category
+  const groupedOptions = useMemo(() => {
+    return getOptionsGroupedByCategory(other)
+  }, [other])
+
+  // Handle option selection
+  const handleSelect = (option: AddNewOption) => {
+    switch (option.actionType) {
+      case 'quick-add-person':
+        quickAddModal.open({
+          personType: option.actionData?.personType as any,
+        })
+        break
+      case 'invite':
+        inviteModal.open()
+        break
+      case 'modal':
+        if (option.id === 'new-classroom') {
+          classroomModal.open()
+        } else if (option.id === 'new-grade-level') {
+          gradeLevelModal.open()
+        }
+        // TODO: Handle other modal types
+        break
+      case 'wizard':
+        navigate({ 
+          to: '/people/new', 
+          search: { 
+            type: option.actionData?.personType as 'student' | 'teacher' | 'staff' | 'guardian' 
+          } 
+        })
+        break
+    }
+  }
+
   return (
     <Menu as="div" className="relative">
-      <MenuButton className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white brand-gradient-warm hover:opacity-90 rounded-xl transition-all duration-200 shadow-md shadow-golden-500/20">
-        <Plus className="w-4 h-4" />
-        <span className="hidden sm:inline">Add New</span>
-      </MenuButton>
+      {({ open }) => (
+        <>
+          <MenuButton className={cn(
+            'flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200',
+            'brand-gradient-warm hover:opacity-90',
+            'shadow-md shadow-golden-500/20 hover:shadow-lg hover:shadow-golden-500/30',
+            open && 'ring-2 ring-golden-400/50 ring-offset-2 ring-offset-[rgb(var(--surface-secondary))]'
+          )}>
+            <Plus className={cn('w-4 h-4 transition-transform duration-200', open && 'rotate-45')} />
+            <span className="hidden sm:inline">Add New</span>
+          </MenuButton>
 
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-150"
-        enterFrom="opacity-0 scale-95 translate-y-1"
-        enterTo="opacity-100 scale-100 translate-y-0"
-        leave="transition ease-in duration-100"
-        leaveFrom="opacity-100 scale-100 translate-y-0"
-        leaveTo="opacity-0 scale-95 translate-y-1"
-      >
-        <MenuItems className="absolute right-0 mt-2 w-52 origin-top-right rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden py-2">
-          <MenuItem>
-            {({ active }) => (
-              <button className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}>
-                <div className="w-8 h-8 rounded-lg bg-golden-400/20 flex items-center justify-center">
-                  <GraduationCap className="w-4 h-4 text-golden-600 dark:text-golden-400" />
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 scale-95 translate-y-2"
+            enterTo="opacity-100 scale-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 scale-100 translate-y-0"
+            leaveTo="opacity-0 scale-95 translate-y-2"
+          >
+            <MenuItems className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/15 dark:shadow-black/30 z-50 overflow-hidden">
+              {/* Highlighted Options (Context-Aware) */}
+              {highlighted.length > 0 && (
+                <div className="py-2">
+                  <div className="px-4 py-2 flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-golden-500" />
+                    <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                      Suggested
+                    </span>
+                  </div>
+                  {highlighted.map((option) => (
+                    <AddNewOptionItem
+                      key={option.id}
+                      option={option}
+                      isHighlighted
+                      onSelect={handleSelect}
+                    />
+                  ))}
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">New Student</p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))]">Enroll a student</p>
+              )}
+
+              {/* Categorized Options */}
+              {Array.from(groupedOptions.entries()).map(([category, options]) => {
+                if (options.length === 0) return null
+                
+                return (
+                  <div key={category} className="py-2 border-t border-[rgb(var(--border-secondary))] first:border-t-0">
+                    <div className="px-4 py-2">
+                      <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                        {ADD_NEW_CATEGORIES[category as keyof typeof ADD_NEW_CATEGORIES]?.label || category}
+                      </span>
+                    </div>
+                    {options.map((option) => (
+                      <AddNewOptionItem
+                        key={option.id}
+                        option={option}
+                        onSelect={handleSelect}
+                      />
+                    ))}
+                  </div>
+                )
+              })}
+
+              {/* Empty State */}
+              {filteredOptions.length === 0 && (
+                <div className="px-4 py-8 text-center">
+                  <div className="w-12 h-12 rounded-xl bg-[rgb(var(--surface-tertiary))] flex items-center justify-center mx-auto mb-3">
+                    <Plus className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
+                  </div>
+                  <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                    {activeSchoolId 
+                      ? 'No actions available for your role'
+                      : 'Select a school to add items'
+                    }
+                  </p>
                 </div>
-              </button>
-            )}
-          </MenuItem>
-          <MenuItem>
-            {({ active }) => (
-              <button className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}>
-                <div className="w-8 h-8 rounded-lg bg-teal-500/20 flex items-center justify-center">
-                  <User className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">New Staff</p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))]">Add staff member</p>
-                </div>
-              </button>
-            )}
-          </MenuItem>
-          <MenuItem>
-            {({ active }) => (
-              <button className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}>
-                <div className="w-8 h-8 rounded-lg bg-aqua-400/20 flex items-center justify-center">
-                  <Building2 className="w-4 h-4 text-aqua-700 dark:text-aqua-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">New Class</p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))]">Create a class</p>
-                </div>
-              </button>
-            )}
-          </MenuItem>
-        </MenuItems>
-      </Transition>
+              )}
+            </MenuItems>
+          </Transition>
+        </>
+      )}
     </Menu>
   )
 }
@@ -507,7 +683,7 @@ function UserMenu() {
             <MenuItem>
               {({ active }) => (
                 <button
-                  onClick={() => navigate({ to: '/settings' })}
+                  onClick={() => navigate({ to: '/settings', search: { tab: 'account' } })}
                   className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] flex items-center justify-center">

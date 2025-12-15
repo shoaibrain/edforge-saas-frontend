@@ -6,7 +6,6 @@
  */
 
 import {
-  Home,
   GraduationCap,
   DollarSign,
   Users,
@@ -21,11 +20,12 @@ import {
   Zap,
   Database,
   Trash2,
-  BookOpen,
+  MapPinHouse,
   Calendar,
   ClipboardList,
   BarChart3,
   type LucideIcon,
+  AlignVerticalSpaceAround,
 } from 'lucide-react'
 import type { Action, Resource } from '@/lib/abac'
 import type { GlobalRole } from '@/types/auth'
@@ -89,13 +89,8 @@ const homeModule: ModuleConfig = {
     {
       id: 'main',
       items: [
-        {
-          id: 'home',
-          label: 'Home',
-          icon: Home,
-          href: '/home',
-          permission: { action: 'view', resource: 'dashboard' },
-        },
+        // Note: Home is now rendered by the unified HomeNavButton component
+        // and is no longer part of the module items
         {
           id: 'academics',
           label: 'Academics',
@@ -277,9 +272,17 @@ const academicsModule: ModuleConfig = {
           requiresActiveSchool: true,
         },
         {
-          id: 'classes',
-          label: 'Classes',
-          icon: BookOpen,
+          id: 'gradelevels',
+          label: 'Grade Levels',
+          icon: AlignVerticalSpaceAround,
+          href: '/academics/gradelevels',
+          permission: { action: 'view', resource: 'students' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'classrooms',
+          label: 'Classrooms',
+          icon: MapPinHouse,
           href: '/academics/classes',
           permission: { action: 'view', resource: 'classes' },
           requiresActiveSchool: true,

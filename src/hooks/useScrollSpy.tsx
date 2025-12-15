@@ -205,10 +205,7 @@ export function ScrollSpyNav({
               )}
             >
               {isActive && (
-                <animated.div
-                  layoutId="activeNavPill"
-                  className="absolute inset-0 bg-[rgb(var(--surface-secondary))] rounded-full shadow-sm"
-                />
+                <div className="absolute inset-0 bg-[rgb(var(--surface-secondary))] rounded-full shadow-sm" />
               )}
               <span className="relative flex items-center gap-2">
                 {Icon && <Icon className="w-4 h-4" />}

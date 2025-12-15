@@ -44,7 +44,6 @@ export const useSidebarStore = create<SidebarStore>()((set, get) => ({
   },
   
   startTransition: (to) => {
-    const current = get().currentModule
     const isGoingHome = to === 'home'
     
     set({
