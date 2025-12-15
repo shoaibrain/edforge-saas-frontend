@@ -11,21 +11,35 @@ import {
   Users,
   Settings,
   User,
-  Palette,
-  Bell,
-  Shield,
+  SlidersHorizontal,
+  ContactRound,
+  BellDot,
+  Component,
+  Landmark,
+  Layers,
+  ShieldCheck,
   Link2,
-  Building2,
+  School,
+  HandCoins,
+  UsersRound,
   CreditCard,
   Zap,
   Database,
-  Trash2,
+  TriangleAlert,
   MapPinHouse,
   Calendar,
   ClipboardList,
   BarChart3,
   type LucideIcon,
-  AlignVerticalSpaceAround,
+  BrickWallShield,
+  Calendars,
+  Atom,
+  ChartNoAxesGantt,
+  BanknoteArrowDown,
+  BanknoteArrowUp,
+  ChartNoAxesCombined,
+  ClipboardPlus,
+  UserStar,
 } from 'lucide-react'
 import type { Action, Resource } from '@/lib/abac'
 import type { GlobalRole } from '@/types/auth'
@@ -89,8 +103,6 @@ const homeModule: ModuleConfig = {
     {
       id: 'main',
       items: [
-        // Note: Home is now rendered by the unified HomeNavButton component
-        // and is no longer part of the module items
         {
           id: 'academics',
           label: 'Academics',
@@ -99,16 +111,16 @@ const homeModule: ModuleConfig = {
           permission: { action: 'view', resource: 'students' },
         },
         {
-          id: 'finance',
-          label: 'Finance',
-          icon: DollarSign,
+          id: 'human-resource',
+          label: 'Financials',
+          icon: HandCoins,
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
         {
           id: 'people',
-          label: 'People',
-          icon: Users,
+          label: 'My People',
+          icon: UsersRound,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
         },
@@ -148,19 +160,19 @@ const settingsModule: ModuleConfig = {
         {
           id: 'preferences',
           label: 'Preferences',
-          icon: Palette,
+          icon: SlidersHorizontal,
           href: '/settings?tab=preferences',
         },
         {
           id: 'notifications',
           label: 'Notifications',
-          icon: Bell,
+          icon: BellDot,
           href: '/settings?tab=notifications',
         },
         {
           id: 'security',
           label: 'Security',
-          icon: Shield,
+          icon: ShieldCheck,
           href: '/settings?tab=security',
         },
         {
@@ -177,22 +189,22 @@ const settingsModule: ModuleConfig = {
       items: [
         {
           id: 'general',
-          label: 'General',
+          label: 'General Settings',
           icon: Settings,
           href: '/settings?tab=general',
           permission: { action: 'view', resource: 'settings' },
         },
         {
-          id: 'people-settings',
-          label: 'People',
-          icon: Users,
+          id: 'system-access-policy',
+          label: 'Access Policy',
+          icon: BrickWallShield,
           href: '/settings?tab=people',
           permission: { action: 'view', resource: 'staff' },
         },
         {
           id: 'schools',
           label: 'Schools',
-          icon: Building2,
+          icon: School,
           href: '/settings?tab=schools',
           permission: { action: 'view', resource: 'settings:school' },
         },
@@ -226,9 +238,9 @@ const settingsModule: ModuleConfig = {
       id: 'danger',
       items: [
         {
-          id: 'delete-account',
-          label: 'Delete Account',
-          icon: Trash2,
+          id: 'danger-zone',
+          label: 'Danger Zone',
+          icon: TriangleAlert,
           href: '/settings?tab=danger',
           variant: 'danger',
         },
@@ -266,24 +278,46 @@ const academicsModule: ModuleConfig = {
         {
           id: 'students',
           label: 'Students',
-          icon: Users,
+          icon: UsersRound,
           href: '/academics/students',
+          permission: { action: 'view', resource: 'students' },
+          requiresActiveSchool: true,
+        },
+        // TODO: review and complete the implementation.
+        // For Enrollment
+        // Review and make sure all the routing, navigation and pages implementation is complete. 
+        {
+          id: 'enrollment',
+          label: 'Enrollment',
+          icon: Atom,
+          href: '/academics/enrollment',
+          permission: { action: 'view', resource: 'curriculum' },
+          requiresActiveSchool: true,
+        },
+        //TODO: Review this url and application path and make sure the 
+        // routing and navigation is correctly and completly implemented.
+        {
+          id: 'teachers',
+          label: 'Teachers',
+          icon: ContactRound,
+          href: '/academics/teachers',
           permission: { action: 'view', resource: 'students' },
           requiresActiveSchool: true,
         },
         {
           id: 'gradelevels',
           label: 'Grade Levels',
-          icon: AlignVerticalSpaceAround,
+          icon: Layers,
           href: '/academics/gradelevels',
           permission: { action: 'view', resource: 'students' },
           requiresActiveSchool: true,
         },
+        // TODO: Implement routing and navigation
         {
-          id: 'classrooms',
+          id: '',
           label: 'Classrooms',
           icon: MapPinHouse,
-          href: '/academics/classes',
+          href: '/academics/classrooms',
           permission: { action: 'view', resource: 'classes' },
           requiresActiveSchool: true,
         },
@@ -292,6 +326,19 @@ const academicsModule: ModuleConfig = {
           label: 'Curriculum',
           icon: ClipboardList,
           href: '/academics/curriculum',
+          permission: { action: 'view', resource: 'curriculum' },
+          requiresActiveSchool: true,
+        },
+        // TODO: review and complete the implementation.
+        // this is the page for user to view, manage the academic calendars for each academic year
+        // that will apply to their school in edforge. here, user should be able to securely and effectively 
+        // manage and ogranize their school academic calendar - like academic year window, terms.
+        // Review and make sure all the routing, navigation and pages implementation is complete. 
+        {
+          id: 'school-calendar',
+          label: 'School Calendar',
+          icon: Calendars,
+          href: '/academics/schoolcalendar',
           permission: { action: 'view', resource: 'curriculum' },
           requiresActiveSchool: true,
         },
@@ -304,21 +351,22 @@ const academicsModule: ModuleConfig = {
         {
           id: 'attendance',
           label: 'Attendance',
-          icon: Calendar,
+          icon: ClipboardPlus,
           href: '/academics/attendance',
           permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
-        {
-          id: 'grades',
-          label: 'Grades',
-          icon: BarChart3,
-          href: '/academics/grades',
-          permission: { action: 'view', resource: 'grades' },
+                {
+          id: 'reporting',
+          label: 'Reporting',
+          icon: ChartNoAxesCombined,
+          href: '/academics/attendance',
+          permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
       ],
     },
+    
   ],
 }
 
@@ -338,29 +386,42 @@ const financeModule: ModuleConfig = {
         {
           id: 'finance-home',
           label: 'Overview',
-          icon: DollarSign,
+          icon: ChartNoAxesGantt,
+          // TODO: Refactor for the path and page and routing /hr instead of /finance
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
       ],
     },
+
     {
       id: 'management',
       label: 'MANAGEMENT',
       items: [
+        // TODO: Refactor and compelte the implementation for /hr
         {
-          id: 'billing',
-          label: 'Billing',
-          icon: CreditCard,
-          href: '/finance/billing',
+          id: 'financials',
+          label: 'Financials',
+          icon: Landmark,
+          href: '/finance/financials',
           permission: { action: 'view', resource: 'billing' },
           requiresActiveSchool: true,
         },
+        // TODO /hr from /finance
         {
           id: 'payroll',
           label: 'Payroll',
-          icon: Users,
+          icon: BanknoteArrowDown,
           href: '/finance/payroll',
+          permission: { action: 'view', resource: 'payroll' },
+          requiresActiveSchool: true,
+        },
+        // TODO: Complete the implementation routing and pages navigation
+        {
+          id: 'tuitionsandfees',
+          label: 'Tuition Fees',
+          icon: BanknoteArrowUp,
+          href: '/finance/tuitionandfees',
           permission: { action: 'view', resource: 'payroll' },
           requiresActiveSchool: true,
         },
@@ -406,7 +467,7 @@ const peopleModule: ModuleConfig = {
       items: [
         {
           id: 'people-home',
-          label: 'All People',
+          label: 'My People',
           icon: Users,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
@@ -419,9 +480,26 @@ const peopleModule: ModuleConfig = {
       items: [
         {
           id: 'staff',
-          label: 'Staff',
-          icon: User,
+          label: 'Colleague',
+          icon: UsersRound,
           href: '/people/staff',
+          permission: { action: 'view', resource: 'staff' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'department',
+          label: 'Department',
+          icon: Component,
+          href: '/people/department',
+          permission: { action: 'view', resource: 'staff' },
+          requiresActiveSchool: true,
+        },
+        //TODO: Complete the implementation for routing and navigation
+        {
+          id: 'parents',
+          label: 'Parents',
+          icon: UserStar,
+          href: '/people/parents',
           permission: { action: 'view', resource: 'staff' },
           requiresActiveSchool: true,
         },
@@ -431,6 +509,28 @@ const peopleModule: ModuleConfig = {
           icon: ClipboardList,
           href: '/people/assignments',
           permission: { action: 'view', resource: 'staff:assignments' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'tracking',
+      label: 'TRACKING',
+      items: [
+        {
+          id: 'attendance',
+          label: 'Attendance',
+          icon: ClipboardPlus,
+          href: '/academics/attendance',
+          permission: { action: 'view', resource: 'attendance' },
+          requiresActiveSchool: true,
+        },
+                {
+          id: 'reporting',
+          label: 'Reporting',
+          icon: ChartNoAxesCombined,
+          href: '/academics/attendance',
+          permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
       ],
