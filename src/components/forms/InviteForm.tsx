@@ -5,26 +5,23 @@
  * Supports role assignment and bulk invitations.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { z } from 'zod'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSpring, animated, config } from '@react-spring/web'
 import {
-  Mail,
   Users,
   Briefcase,
   X,
   Send,
   UserPlus,
   Check,
-  AlertCircle,
-  type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { TextField, SelectField, TextareaField, ToggleField } from './fields'
+import { SelectField, TextareaField, ToggleField } from './fields'
 import { inviteSchema, type InviteFormValues } from '@/schemas/person.schema'
-import { cn } from '@/lib/utils'
 
 // ============================================================================
 // ROLE OPTIONS
@@ -85,9 +82,9 @@ export function InviteForm({
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [emailCount, setEmailCount] = useState(0)
 
-  // Form setup
-  const methods = useForm<InviteFormValues>({
-    resolver: zodResolver(inviteSchema),
+  // Form setup with z.input type for form values (pre-transform)
+  const methods = useForm<z.input<typeof inviteSchema>>({
+    resolver: zodResolver(inviteSchema) as any,
     defaultValues: {
       emails: '',
       role: 'teacher',
@@ -98,17 +95,18 @@ export function InviteForm({
     },
   })
 
-  const { handleSubmit, watch, reset, formState: { errors } } = methods
+  const { handleSubmit, watch, reset } = methods
 
   // Watch emails to count them
-  const emailsValue = watch('emails')
-
-  // Update email count
-  const parseEmails = (value: string) => {
-    const emails = value.split(',').map(e => e.trim()).filter(Boolean)
-    setEmailCount(emails.length)
-    return emails
-  }
+  const emailsWatch = watch('emails')
+  
+  // Update email count when emails change
+  useEffect(() => {
+    if (typeof emailsWatch === 'string') {
+      const count = emailsWatch.split(',').map(e => e.trim()).filter(Boolean).length
+      setEmailCount(count)
+    }
+  }, [emailsWatch])
 
   // Handle form submission
   const handleFormSubmit = async (data: InviteFormValues) => {
@@ -183,7 +181,7 @@ export function InviteForm({
 
         {/* Form */}
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-5">
+          <form onSubmit={handleSubmit(handleFormSubmit as any)} className="p-6 space-y-5">
             {/* Email Input */}
             <div>
               <TextareaField
@@ -339,14 +337,14 @@ export function InviteForm({
 export interface InviteButtonProps {
   schoolName?: string
   className?: string
-  variant?: 'default' | 'outline' | 'ghost'
+  variant?: 'primary' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
 }
 
 export function InviteButton({
   schoolName,
   className,
-  variant = 'default',
+  variant = 'primary',
   size = 'md',
 }: InviteButtonProps) {
   const [isOpen, setIsOpen] = useState(false)

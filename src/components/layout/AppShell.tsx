@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import { useSpring, animated, config } from '@react-spring/web'
+import { useSpring, animated } from '@react-spring/web'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { QuickAddPersonModal, InviteTeamModal } from '@/components/modals'
 import { useAppStore } from '@/stores/app.store'
 import { useAuthStore } from '@/stores/auth.store'
 
@@ -63,6 +64,10 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </animated.div>
+
+      {/* Global Modals */}
+      <QuickAddPersonModal />
+      <InviteTeamModal />
     </div>
   )
 }

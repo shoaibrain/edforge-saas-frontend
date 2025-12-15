@@ -11,12 +11,10 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  User, 
   Mail, 
   Camera,
   Shield,
   Key,
-  Bell,
   Globe,
   Save,
   Check,

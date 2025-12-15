@@ -95,8 +95,9 @@ export function useActiveNavItem(): string | null {
       }
     }
 
-    // Default to first item in first group if no match
-    return config.groups[0]?.items[0]?.id ?? null
+    // Return null when no match found - this is expected when at /home
+    // since "Home" is now handled by the unified HomeNavButton component
+    return null
   }, [location.pathname, location.search, config])
 }
 

@@ -19,6 +19,7 @@ import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedFinanceRouteImport } from './routes/_protected/finance'
 import { Route as ProtectedAcademicsRouteImport } from './routes/_protected/academics'
 import { Route as ProtectedSettingsIndexRouteImport } from './routes/_protected/settings/index'
+import { Route as ProtectedPeopleNewRouteImport } from './routes/_protected/people/new'
 
 const MissingTenantRoute = MissingTenantRouteImport.update({
   id: '/missing-tenant',
@@ -69,6 +70,11 @@ const ProtectedSettingsIndexRoute = ProtectedSettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedPeopleNewRoute = ProtectedPeopleNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ProtectedPeopleRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/forbidden': typeof ForbiddenRoute
@@ -77,8 +83,9 @@ export interface FileRoutesByFullPath {
   '/academics': typeof ProtectedAcademicsRoute
   '/finance': typeof ProtectedFinanceRoute
   '/home': typeof ProtectedHomeRoute
-  '/people': typeof ProtectedPeopleRoute
+  '/people': typeof ProtectedPeopleRouteWithChildren
   '/': typeof ProtectedIndexRoute
+  '/people/new': typeof ProtectedPeopleNewRoute
   '/settings': typeof ProtectedSettingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -88,8 +95,9 @@ export interface FileRoutesByTo {
   '/academics': typeof ProtectedAcademicsRoute
   '/finance': typeof ProtectedFinanceRoute
   '/home': typeof ProtectedHomeRoute
-  '/people': typeof ProtectedPeopleRoute
+  '/people': typeof ProtectedPeopleRouteWithChildren
   '/': typeof ProtectedIndexRoute
+  '/people/new': typeof ProtectedPeopleNewRoute
   '/settings': typeof ProtectedSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -101,8 +109,9 @@ export interface FileRoutesById {
   '/_protected/academics': typeof ProtectedAcademicsRoute
   '/_protected/finance': typeof ProtectedFinanceRoute
   '/_protected/home': typeof ProtectedHomeRoute
-  '/_protected/people': typeof ProtectedPeopleRoute
+  '/_protected/people': typeof ProtectedPeopleRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
+  '/_protected/people/new': typeof ProtectedPeopleNewRoute
   '/_protected/settings/': typeof ProtectedSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/people'
     | '/'
+    | '/people/new'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/people'
     | '/'
+    | '/people/new'
     | '/settings'
   id:
     | '__root__'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/_protected/home'
     | '/_protected/people'
     | '/_protected/'
+    | '/_protected/people/new'
     | '/_protected/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -221,14 +233,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedSettingsIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/people/new': {
+      id: '/_protected/people/new'
+      path: '/new'
+      fullPath: '/people/new'
+      preLoaderRoute: typeof ProtectedPeopleNewRouteImport
+      parentRoute: typeof ProtectedPeopleRoute
+    }
   }
 }
+
+interface ProtectedPeopleRouteChildren {
+  ProtectedPeopleNewRoute: typeof ProtectedPeopleNewRoute
+}
+
+const ProtectedPeopleRouteChildren: ProtectedPeopleRouteChildren = {
+  ProtectedPeopleNewRoute: ProtectedPeopleNewRoute,
+}
+
+const ProtectedPeopleRouteWithChildren = ProtectedPeopleRoute._addFileChildren(
+  ProtectedPeopleRouteChildren,
+)
 
 interface ProtectedRouteChildren {
   ProtectedAcademicsRoute: typeof ProtectedAcademicsRoute
   ProtectedFinanceRoute: typeof ProtectedFinanceRoute
   ProtectedHomeRoute: typeof ProtectedHomeRoute
-  ProtectedPeopleRoute: typeof ProtectedPeopleRoute
+  ProtectedPeopleRoute: typeof ProtectedPeopleRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
   ProtectedSettingsIndexRoute: typeof ProtectedSettingsIndexRoute
 }
@@ -237,7 +268,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAcademicsRoute: ProtectedAcademicsRoute,
   ProtectedFinanceRoute: ProtectedFinanceRoute,
   ProtectedHomeRoute: ProtectedHomeRoute,
-  ProtectedPeopleRoute: ProtectedPeopleRoute,
+  ProtectedPeopleRoute: ProtectedPeopleRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
   ProtectedSettingsIndexRoute: ProtectedSettingsIndexRoute,
 }

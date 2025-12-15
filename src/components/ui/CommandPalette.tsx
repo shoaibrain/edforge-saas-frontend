@@ -1,7 +1,7 @@
-import { Fragment, useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Dialog, Combobox } from '@headlessui/react'
 import { useNavigate } from '@tanstack/react-router'
-import { useSpring, useTransition, animated, config } from '@react-spring/web'
+import { useSpring, animated, config } from '@react-spring/web'
 import {
   Search,
   LayoutDashboard,
@@ -106,7 +106,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       description: 'Configure your preferences',
       icon: Settings,
       category: 'navigation',
-      action: () => { navigate({ to: '/settings' }); onClose() },
+      action: () => { navigate({ to: '/settings', search: { tab: 'account' } }); onClose() },
       shortcut: 'G ,',
     },
     // Actions
@@ -217,8 +217,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/30 dark:shadow-black/50"
           >
             <Combobox
-              onChange={(command: CommandItem) => {
-                command.action()
+              onChange={(command: CommandItem | null) => {
+                if (command) {
+                  command.action()
+                }
               }}
             >
               {/* Search Input */}
