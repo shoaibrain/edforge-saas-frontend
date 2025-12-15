@@ -20,9 +20,11 @@ import { Route as ProtectedFinanceRouteImport } from './routes/_protected/financ
 import { Route as ProtectedAcademicsRouteImport } from './routes/_protected/academics'
 import { Route as ProtectedSettingsIndexRouteImport } from './routes/_protected/settings/index'
 import { Route as ProtectedPeopleStaffRouteImport } from './routes/_protected/people/staff'
+import { Route as ProtectedPeopleReportingRouteImport } from './routes/_protected/people/reporting'
 import { Route as ProtectedPeopleParentsRouteImport } from './routes/_protected/people/parents'
 import { Route as ProtectedPeopleNewRouteImport } from './routes/_protected/people/new'
 import { Route as ProtectedPeopleDepartmentRouteImport } from './routes/_protected/people/department'
+import { Route as ProtectedPeopleAttendanceRouteImport } from './routes/_protected/people/attendance'
 import { Route as ProtectedPeopleAssignmentsRouteImport } from './routes/_protected/people/assignments'
 import { Route as ProtectedFinanceTuitionandfeesRouteImport } from './routes/_protected/finance/tuitionandfees'
 import { Route as ProtectedFinanceReportsRouteImport } from './routes/_protected/finance/reports'
@@ -32,6 +34,7 @@ import { Route as ProtectedFinanceExpensesRouteImport } from './routes/_protecte
 import { Route as ProtectedAcademicsTeachersRouteImport } from './routes/_protected/academics/teachers'
 import { Route as ProtectedAcademicsStudentsRouteImport } from './routes/_protected/academics/students'
 import { Route as ProtectedAcademicsSchoolcalendarRouteImport } from './routes/_protected/academics/schoolcalendar'
+import { Route as ProtectedAcademicsReportingRouteImport } from './routes/_protected/academics/reporting'
 import { Route as ProtectedAcademicsGradelevelsRouteImport } from './routes/_protected/academics/gradelevels'
 import { Route as ProtectedAcademicsEnrollmentRouteImport } from './routes/_protected/academics/enrollment'
 import { Route as ProtectedAcademicsCurriculumRouteImport } from './routes/_protected/academics/curriculum'
@@ -92,6 +95,12 @@ const ProtectedPeopleStaffRoute = ProtectedPeopleStaffRouteImport.update({
   path: '/staff',
   getParentRoute: () => ProtectedPeopleRoute,
 } as any)
+const ProtectedPeopleReportingRoute =
+  ProtectedPeopleReportingRouteImport.update({
+    id: '/reporting',
+    path: '/reporting',
+    getParentRoute: () => ProtectedPeopleRoute,
+  } as any)
 const ProtectedPeopleParentsRoute = ProtectedPeopleParentsRouteImport.update({
   id: '/parents',
   path: '/parents',
@@ -106,6 +115,12 @@ const ProtectedPeopleDepartmentRoute =
   ProtectedPeopleDepartmentRouteImport.update({
     id: '/department',
     path: '/department',
+    getParentRoute: () => ProtectedPeopleRoute,
+  } as any)
+const ProtectedPeopleAttendanceRoute =
+  ProtectedPeopleAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
     getParentRoute: () => ProtectedPeopleRoute,
   } as any)
 const ProtectedPeopleAssignmentsRoute =
@@ -160,6 +175,12 @@ const ProtectedAcademicsSchoolcalendarRoute =
     path: '/schoolcalendar',
     getParentRoute: () => ProtectedAcademicsRoute,
   } as any)
+const ProtectedAcademicsReportingRoute =
+  ProtectedAcademicsReportingRouteImport.update({
+    id: '/reporting',
+    path: '/reporting',
+    getParentRoute: () => ProtectedAcademicsRoute,
+  } as any)
 const ProtectedAcademicsGradelevelsRoute =
   ProtectedAcademicsGradelevelsRouteImport.update({
     id: '/gradelevels',
@@ -205,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/academics/curriculum': typeof ProtectedAcademicsCurriculumRoute
   '/academics/enrollment': typeof ProtectedAcademicsEnrollmentRoute
   '/academics/gradelevels': typeof ProtectedAcademicsGradelevelsRoute
+  '/academics/reporting': typeof ProtectedAcademicsReportingRoute
   '/academics/schoolcalendar': typeof ProtectedAcademicsSchoolcalendarRoute
   '/academics/students': typeof ProtectedAcademicsStudentsRoute
   '/academics/teachers': typeof ProtectedAcademicsTeachersRoute
@@ -214,9 +236,11 @@ export interface FileRoutesByFullPath {
   '/finance/reports': typeof ProtectedFinanceReportsRoute
   '/finance/tuitionandfees': typeof ProtectedFinanceTuitionandfeesRoute
   '/people/assignments': typeof ProtectedPeopleAssignmentsRoute
+  '/people/attendance': typeof ProtectedPeopleAttendanceRoute
   '/people/department': typeof ProtectedPeopleDepartmentRoute
   '/people/new': typeof ProtectedPeopleNewRoute
   '/people/parents': typeof ProtectedPeopleParentsRoute
+  '/people/reporting': typeof ProtectedPeopleReportingRoute
   '/people/staff': typeof ProtectedPeopleStaffRoute
   '/settings': typeof ProtectedSettingsIndexRoute
 }
@@ -234,6 +258,7 @@ export interface FileRoutesByTo {
   '/academics/curriculum': typeof ProtectedAcademicsCurriculumRoute
   '/academics/enrollment': typeof ProtectedAcademicsEnrollmentRoute
   '/academics/gradelevels': typeof ProtectedAcademicsGradelevelsRoute
+  '/academics/reporting': typeof ProtectedAcademicsReportingRoute
   '/academics/schoolcalendar': typeof ProtectedAcademicsSchoolcalendarRoute
   '/academics/students': typeof ProtectedAcademicsStudentsRoute
   '/academics/teachers': typeof ProtectedAcademicsTeachersRoute
@@ -243,9 +268,11 @@ export interface FileRoutesByTo {
   '/finance/reports': typeof ProtectedFinanceReportsRoute
   '/finance/tuitionandfees': typeof ProtectedFinanceTuitionandfeesRoute
   '/people/assignments': typeof ProtectedPeopleAssignmentsRoute
+  '/people/attendance': typeof ProtectedPeopleAttendanceRoute
   '/people/department': typeof ProtectedPeopleDepartmentRoute
   '/people/new': typeof ProtectedPeopleNewRoute
   '/people/parents': typeof ProtectedPeopleParentsRoute
+  '/people/reporting': typeof ProtectedPeopleReportingRoute
   '/people/staff': typeof ProtectedPeopleStaffRoute
   '/settings': typeof ProtectedSettingsIndexRoute
 }
@@ -265,6 +292,7 @@ export interface FileRoutesById {
   '/_protected/academics/curriculum': typeof ProtectedAcademicsCurriculumRoute
   '/_protected/academics/enrollment': typeof ProtectedAcademicsEnrollmentRoute
   '/_protected/academics/gradelevels': typeof ProtectedAcademicsGradelevelsRoute
+  '/_protected/academics/reporting': typeof ProtectedAcademicsReportingRoute
   '/_protected/academics/schoolcalendar': typeof ProtectedAcademicsSchoolcalendarRoute
   '/_protected/academics/students': typeof ProtectedAcademicsStudentsRoute
   '/_protected/academics/teachers': typeof ProtectedAcademicsTeachersRoute
@@ -274,9 +302,11 @@ export interface FileRoutesById {
   '/_protected/finance/reports': typeof ProtectedFinanceReportsRoute
   '/_protected/finance/tuitionandfees': typeof ProtectedFinanceTuitionandfeesRoute
   '/_protected/people/assignments': typeof ProtectedPeopleAssignmentsRoute
+  '/_protected/people/attendance': typeof ProtectedPeopleAttendanceRoute
   '/_protected/people/department': typeof ProtectedPeopleDepartmentRoute
   '/_protected/people/new': typeof ProtectedPeopleNewRoute
   '/_protected/people/parents': typeof ProtectedPeopleParentsRoute
+  '/_protected/people/reporting': typeof ProtectedPeopleReportingRoute
   '/_protected/people/staff': typeof ProtectedPeopleStaffRoute
   '/_protected/settings/': typeof ProtectedSettingsIndexRoute
 }
@@ -296,6 +326,7 @@ export interface FileRouteTypes {
     | '/academics/curriculum'
     | '/academics/enrollment'
     | '/academics/gradelevels'
+    | '/academics/reporting'
     | '/academics/schoolcalendar'
     | '/academics/students'
     | '/academics/teachers'
@@ -305,9 +336,11 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/tuitionandfees'
     | '/people/assignments'
+    | '/people/attendance'
     | '/people/department'
     | '/people/new'
     | '/people/parents'
+    | '/people/reporting'
     | '/people/staff'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
@@ -325,6 +358,7 @@ export interface FileRouteTypes {
     | '/academics/curriculum'
     | '/academics/enrollment'
     | '/academics/gradelevels'
+    | '/academics/reporting'
     | '/academics/schoolcalendar'
     | '/academics/students'
     | '/academics/teachers'
@@ -334,9 +368,11 @@ export interface FileRouteTypes {
     | '/finance/reports'
     | '/finance/tuitionandfees'
     | '/people/assignments'
+    | '/people/attendance'
     | '/people/department'
     | '/people/new'
     | '/people/parents'
+    | '/people/reporting'
     | '/people/staff'
     | '/settings'
   id:
@@ -355,6 +391,7 @@ export interface FileRouteTypes {
     | '/_protected/academics/curriculum'
     | '/_protected/academics/enrollment'
     | '/_protected/academics/gradelevels'
+    | '/_protected/academics/reporting'
     | '/_protected/academics/schoolcalendar'
     | '/_protected/academics/students'
     | '/_protected/academics/teachers'
@@ -364,9 +401,11 @@ export interface FileRouteTypes {
     | '/_protected/finance/reports'
     | '/_protected/finance/tuitionandfees'
     | '/_protected/people/assignments'
+    | '/_protected/people/attendance'
     | '/_protected/people/department'
     | '/_protected/people/new'
     | '/_protected/people/parents'
+    | '/_protected/people/reporting'
     | '/_protected/people/staff'
     | '/_protected/settings/'
   fileRoutesById: FileRoutesById
@@ -457,6 +496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPeopleStaffRouteImport
       parentRoute: typeof ProtectedPeopleRoute
     }
+    '/_protected/people/reporting': {
+      id: '/_protected/people/reporting'
+      path: '/reporting'
+      fullPath: '/people/reporting'
+      preLoaderRoute: typeof ProtectedPeopleReportingRouteImport
+      parentRoute: typeof ProtectedPeopleRoute
+    }
     '/_protected/people/parents': {
       id: '/_protected/people/parents'
       path: '/parents'
@@ -476,6 +522,13 @@ declare module '@tanstack/react-router' {
       path: '/department'
       fullPath: '/people/department'
       preLoaderRoute: typeof ProtectedPeopleDepartmentRouteImport
+      parentRoute: typeof ProtectedPeopleRoute
+    }
+    '/_protected/people/attendance': {
+      id: '/_protected/people/attendance'
+      path: '/attendance'
+      fullPath: '/people/attendance'
+      preLoaderRoute: typeof ProtectedPeopleAttendanceRouteImport
       parentRoute: typeof ProtectedPeopleRoute
     }
     '/_protected/people/assignments': {
@@ -541,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAcademicsSchoolcalendarRouteImport
       parentRoute: typeof ProtectedAcademicsRoute
     }
+    '/_protected/academics/reporting': {
+      id: '/_protected/academics/reporting'
+      path: '/reporting'
+      fullPath: '/academics/reporting'
+      preLoaderRoute: typeof ProtectedAcademicsReportingRouteImport
+      parentRoute: typeof ProtectedAcademicsRoute
+    }
     '/_protected/academics/gradelevels': {
       id: '/_protected/academics/gradelevels'
       path: '/gradelevels'
@@ -585,6 +645,7 @@ interface ProtectedAcademicsRouteChildren {
   ProtectedAcademicsCurriculumRoute: typeof ProtectedAcademicsCurriculumRoute
   ProtectedAcademicsEnrollmentRoute: typeof ProtectedAcademicsEnrollmentRoute
   ProtectedAcademicsGradelevelsRoute: typeof ProtectedAcademicsGradelevelsRoute
+  ProtectedAcademicsReportingRoute: typeof ProtectedAcademicsReportingRoute
   ProtectedAcademicsSchoolcalendarRoute: typeof ProtectedAcademicsSchoolcalendarRoute
   ProtectedAcademicsStudentsRoute: typeof ProtectedAcademicsStudentsRoute
   ProtectedAcademicsTeachersRoute: typeof ProtectedAcademicsTeachersRoute
@@ -596,6 +657,7 @@ const ProtectedAcademicsRouteChildren: ProtectedAcademicsRouteChildren = {
   ProtectedAcademicsCurriculumRoute: ProtectedAcademicsCurriculumRoute,
   ProtectedAcademicsEnrollmentRoute: ProtectedAcademicsEnrollmentRoute,
   ProtectedAcademicsGradelevelsRoute: ProtectedAcademicsGradelevelsRoute,
+  ProtectedAcademicsReportingRoute: ProtectedAcademicsReportingRoute,
   ProtectedAcademicsSchoolcalendarRoute: ProtectedAcademicsSchoolcalendarRoute,
   ProtectedAcademicsStudentsRoute: ProtectedAcademicsStudentsRoute,
   ProtectedAcademicsTeachersRoute: ProtectedAcademicsTeachersRoute,
@@ -625,17 +687,21 @@ const ProtectedFinanceRouteWithChildren =
 
 interface ProtectedPeopleRouteChildren {
   ProtectedPeopleAssignmentsRoute: typeof ProtectedPeopleAssignmentsRoute
+  ProtectedPeopleAttendanceRoute: typeof ProtectedPeopleAttendanceRoute
   ProtectedPeopleDepartmentRoute: typeof ProtectedPeopleDepartmentRoute
   ProtectedPeopleNewRoute: typeof ProtectedPeopleNewRoute
   ProtectedPeopleParentsRoute: typeof ProtectedPeopleParentsRoute
+  ProtectedPeopleReportingRoute: typeof ProtectedPeopleReportingRoute
   ProtectedPeopleStaffRoute: typeof ProtectedPeopleStaffRoute
 }
 
 const ProtectedPeopleRouteChildren: ProtectedPeopleRouteChildren = {
   ProtectedPeopleAssignmentsRoute: ProtectedPeopleAssignmentsRoute,
+  ProtectedPeopleAttendanceRoute: ProtectedPeopleAttendanceRoute,
   ProtectedPeopleDepartmentRoute: ProtectedPeopleDepartmentRoute,
   ProtectedPeopleNewRoute: ProtectedPeopleNewRoute,
   ProtectedPeopleParentsRoute: ProtectedPeopleParentsRoute,
+  ProtectedPeopleReportingRoute: ProtectedPeopleReportingRoute,
   ProtectedPeopleStaffRoute: ProtectedPeopleStaffRoute,
 }
 
