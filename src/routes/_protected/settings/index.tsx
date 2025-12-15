@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute, redirect, useSearch } from '@tanstack/react-router'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -33,17 +33,90 @@ import { TextField, PhoneField, ToggleField } from '@/components/forms/fields'
 import { AddressSection } from '@/components/forms/sections'
 import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
+import { can } from '@/lib/abac'
+import type { GlobalRole } from '@/types/auth'
 import { profileUpdateSchema, type ProfileUpdateFormValues } from '@/schemas/person.schema'
 import { getUserAvatar } from '@/lib/avatar'
 
 // Route search params validation
+const SETTINGS_TABS = [
+  'account',
+  'preferences',
+  'notifications',
+  'security',
+  'connections',
+  'general',
+  'people',
+  'schools',
+  'billing',
+  'integrations',
+  'data',
+  'danger',
+] as const
+
+type SettingsTab = (typeof SETTINGS_TABS)[number]
+
 const settingsSearchSchema = {
   parse: (search: Record<string, unknown>) => ({
-    tab: (search.tab as string) || 'account',
+    tab: (SETTINGS_TABS.includes((search.tab as SettingsTab) ?? 'account') ? (search.tab as SettingsTab) : 'account') as SettingsTab,
   }),
 }
 
+const SETTINGS_TAB_RULES: Partial<
+  Record<
+    SettingsTab,
+    {
+      tenantRoles?: GlobalRole[]
+      permission?: { action: Parameters<typeof can>[1]['action']; resource: Parameters<typeof can>[1]['resource'] }
+    }
+  >
+> = {
+  general: { permission: { action: 'view', resource: 'settings' } },
+  people: { permission: { action: 'view', resource: 'staff' } },
+  schools: { permission: { action: 'view', resource: 'settings:school' } },
+  billing: {
+    tenantRoles: ['TenantAdmin'],
+    permission: { action: 'manage', resource: 'settings:tenant' },
+  },
+  integrations: {
+    tenantRoles: ['TenantAdmin'],
+    permission: { action: 'manage', resource: 'settings:tenant' },
+  },
+  data: {
+    tenantRoles: ['TenantAdmin'],
+    permission: { action: 'manage', resource: 'settings:tenant' },
+  },
+}
+
 export const Route = createFileRoute('/_protected/settings/')({
+  beforeLoad: ({ search }) => {
+    const { user } = useAuthStore.getState()
+    if (!user) {
+      throw redirect({ to: '/login' })
+    }
+
+    const tab = (search as { tab: SettingsTab }).tab
+    const rule = SETTINGS_TAB_RULES[tab]
+    if (!rule) return
+
+    if (rule.tenantRoles && rule.tenantRoles.length > 0) {
+      if (!rule.tenantRoles.includes(user.globalRole)) {
+        throw redirect({ to: '/forbidden' })
+      }
+    }
+
+    if (rule.permission) {
+      const { activeSchoolId } = useAppStore.getState()
+      const ok = can(user, {
+        action: rule.permission.action,
+        resource: rule.permission.resource,
+        schoolId: activeSchoolId ?? undefined,
+      })
+      if (!ok) {
+        throw redirect({ to: '/forbidden' })
+      }
+    }
+  },
   component: SettingsPage,
   validateSearch: settingsSearchSchema,
 })

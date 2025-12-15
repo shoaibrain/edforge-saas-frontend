@@ -313,7 +313,7 @@ const academicsModule: ModuleConfig = {
         },
         // TODO: Implement routing and navigation
         {
-          id: '',
+          id: 'classrooms',
           label: 'Classrooms',
           icon: MapPinHouse,
           href: '/academics/classrooms',
