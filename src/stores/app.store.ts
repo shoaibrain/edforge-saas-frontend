@@ -6,6 +6,7 @@ import { persist } from 'zustand/middleware'
 // ============================================================================
 
 interface AppStore {
+  
   // School context - which school the user is currently viewing
   activeSchoolId: string | null
   
