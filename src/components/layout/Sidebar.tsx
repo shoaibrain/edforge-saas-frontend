@@ -19,6 +19,12 @@ import {
 } from 'lucide-react'
 import { useAppStore } from '@/stores/app.store'
 import { useSidebarStore } from '@/stores/sidebar.store'
+import { 
+  SIDEBAR_NAV_ICON_SIZE, 
+  SIDEBAR_HEADER_ICON_SIZE, 
+  SIDEBAR_TOGGLE_ICON_SIZE,
+  SIDEBAR_BADGE_ICON_SIZE 
+} from '@/config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '@/hooks/useSidebarModule'
 import { useSecureNavGroups } from '@/hooks/useSecureNavItems'
 import type { NavItem, NavItemGroup } from '@/config/sidebar-modules'
@@ -60,11 +66,12 @@ function AnimatedNavIcon({
       className="relative flex items-center justify-center flex-shrink-0"
     >
       <Icon 
+        size={SIDEBAR_NAV_ICON_SIZE}
         className={cn(
-          'w-[18px] h-[18px] transition-colors duration-200 relative z-10',
+          'transition-colors duration-200 relative z-10',
           isActive && !isDanger && 'text-teal-600 dark:text-cyan-400',
           isActive && isDanger && 'text-rust-500',
-          !isActive && 'text-[rgb(var(--text-tertiary))]'
+          !isActive && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
         )} 
       />
       {/* Glow effect */}
@@ -340,11 +347,12 @@ function HomeNavButton({
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <CurrentIcon 
+                size={SIDEBAR_NAV_ICON_SIZE}
                 className={cn(
-                  'w-[18px] h-[18px] transition-colors duration-200',
+                  'transition-colors duration-200',
                   isActive && 'text-teal-600 dark:text-cyan-400',
                   !isActive && showBackMode && 'text-[rgb(var(--text-secondary))]',
-                  !isActive && !showBackMode && 'text-[rgb(var(--text-tertiary))]'
+                  !isActive && !showBackMode && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
                 )} 
               />
             </motion.div>
@@ -424,11 +432,11 @@ function CollapseToggle({ collapsed, onToggle }: { collapsed: boolean; onToggle:
           transform: rotateSpring.rotate.to(r => `rotate(${r}deg)`),
         }}
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft size={SIDEBAR_TOGGLE_ICON_SIZE} />
       </animated.div>
       {!collapsed && (
         <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded text-[rgb(var(--text-tertiary))]">
-          <Command className="w-2.5 h-2.5" />
+          <Command size={SIDEBAR_BADGE_ICON_SIZE} />
           <span>B</span>
         </kbd>
       )}
@@ -468,7 +476,7 @@ function LogoIcon() {
       }}
       className="w-9 h-9 rounded-xl brand-gradient flex items-center justify-center shadow-lg shadow-teal-500/20 flex-shrink-0"
     >
-      <Building2 className="w-[18px] h-[18px] text-white" />
+      <Building2 size={SIDEBAR_HEADER_ICON_SIZE} className="text-white" />
     </animated.div>
   )
 }

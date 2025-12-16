@@ -133,6 +133,10 @@
   --brand-primary: 0 95 115; /* teal-500 */
   --brand-secondary: 10 147 150; /* cyan-500 */
   --brand-accent: 238 155 0; /* golden-400 */
+  
+  /* Icon colors - subtle brand tint for warmth */
+  --icon-inactive: 71 85 105; /* slate-600 with slight warmth */
+  --icon-inactive-hover: 51 65 85; /* slate-700 - darker on hover */
 }
 
 .dark {
@@ -160,6 +164,10 @@
   --brand-primary: 10 147 150; /* cyan-500 */
   --brand-secondary: 148 210 189; /* aqua-400 */
   --brand-accent: 238 155 0; /* golden-400 */
+  
+  /* Icon colors - subtle aqua tint for dark mode warmth */
+  --icon-inactive: 125 164 152; /* muted aqua-ish gray */
+  --icon-inactive-hover: 148 210 189; /* aqua-400 */
 }
 
 /* Base layer styles */

@@ -16,6 +16,7 @@ import {
   BellDot,
   Component,
   Landmark,
+  View,
   Layers,
   ShieldCheck,
   Link2,
@@ -151,7 +152,7 @@ const settingsModule: ModuleConfig = {
         {
           id: 'settings-home',
           label: 'Overview',
-          icon: Settings,
+          icon: View,
           href: '/settings',
         },
       ],
