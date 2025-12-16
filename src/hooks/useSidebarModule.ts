@@ -58,6 +58,11 @@ export function useIsInModule(targetModule: SidebarModule): boolean {
 
 /**
  * Hook to get the active nav item ID based on current path
+ * 
+ * Matching priority:
+ * 1. Exact path + query param match (e.g., /settings?tab=account)
+ * 2. Exact path match (e.g., /academics/teachers)
+ * 3. Prefix match for nested routes (e.g., /academics for /academics/teachers/123)
  */
 export function useActiveNavItem(): string | null {
   const location = useLocation()
@@ -71,27 +76,43 @@ export function useActiveNavItem(): string | null {
       Object.entries(searchObj).map(([k, v]) => [k, String(v)])
     ).toString()
 
-    // Check all items in all groups for a match
+    // Collect all items from all groups for multi-pass matching
+    const allItems: { id: string; href: string }[] = []
     for (const group of config.groups) {
       for (const item of group.items) {
-        if (!item.href) continue
-
-        // Handle query param matching (e.g., /settings?tab=account)
-        if (item.href.includes('?')) {
-          const [itemPath, itemQuery] = item.href.split('?')
-          if (pathname === itemPath && searchString.includes(itemQuery)) {
-            return item.id
-          }
-        } else {
-          // Exact match or starts with (for nested routes)
-          if (pathname === item.href) {
-            return item.id
-          }
-          // For nested routes like /academics/students
-          if (item.href !== '/home' && pathname.startsWith(item.href + '/')) {
-            return item.id
-          }
+        if (item.href) {
+          allItems.push({ id: item.id, href: item.href })
         }
+      }
+    }
+
+    // PASS 1: Check for exact query param matches (e.g., /settings?tab=account)
+    for (const item of allItems) {
+      if (item.href.includes('?')) {
+        const [itemPath, itemQuery] = item.href.split('?')
+        if (pathname === itemPath && searchString.includes(itemQuery)) {
+          return item.id
+        }
+      }
+    }
+
+    // PASS 2: Check for exact path matches (most specific first)
+    // Sort by href length descending to match most specific paths first
+    const sortedItems = [...allItems]
+      .filter(item => !item.href.includes('?'))
+      .sort((a, b) => b.href.length - a.href.length)
+
+    for (const item of sortedItems) {
+      if (pathname === item.href) {
+        return item.id
+      }
+    }
+
+    // PASS 3: Check for prefix matches (for deeply nested routes)
+    // Already sorted by length descending, so most specific prefix wins
+    for (const item of sortedItems) {
+      if (item.href !== '/home' && pathname.startsWith(item.href + '/')) {
+        return item.id
       }
     }
 
@@ -100,4 +121,3 @@ export function useActiveNavItem(): string | null {
     return null
   }, [location.pathname, location.search, config])
 }
-

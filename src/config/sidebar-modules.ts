@@ -146,6 +146,17 @@ const settingsModule: ModuleConfig = {
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
+      id: 'overview',
+      items: [
+        {
+          id: 'settings-home',
+          label: 'Overview',
+          icon: Settings,
+          href: '/settings',
+        },
+      ],
+    },
+    {
       id: 'account',
       label: 'ACCOUNT',
       items: [

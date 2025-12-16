@@ -24,14 +24,24 @@ export type Resource =
   | 'dashboard'
   // Academics
   | 'students'
+  | 'teachers'
   | 'grades'
+  | 'gradelevels'
   | 'curriculum'
   | 'classes'
+  | 'classrooms'
+  | 'calendar'
   | 'attendance'
+  | 'enrollment'
+  // People
+  | 'guardians'
+  | 'parents'
+  | 'departments'
   // Finance
   | 'billing'
   | 'payroll'
   | 'expenses'
+  | 'tuition'
   | 'reports:finance'
   // Staff
   | 'staff'
@@ -55,13 +65,22 @@ const ROLE_PERMISSIONS: PermissionMap = {
   Principal: {
     dashboard: ['view'],
     students: ['view', 'create', 'edit', 'delete', 'manage'],
+    teachers: ['view', 'create', 'edit', 'delete', 'manage'],
     grades: ['view', 'create', 'edit', 'approve'],
+    gradelevels: ['view', 'create', 'edit', 'delete', 'manage'],
     curriculum: ['view', 'create', 'edit', 'manage'],
     classes: ['view', 'create', 'edit', 'delete', 'manage'],
+    classrooms: ['view', 'create', 'edit', 'delete', 'manage'],
+    calendar: ['view', 'create', 'edit', 'manage'],
     attendance: ['view', 'create', 'edit', 'manage'],
+    enrollment: ['view', 'create', 'edit', 'delete', 'manage', 'approve'],
+    guardians: ['view', 'create', 'edit', 'delete', 'manage'],
+    parents: ['view', 'create', 'edit', 'delete', 'manage'],
+    departments: ['view', 'create', 'edit', 'delete', 'manage'],
     billing: ['view', 'approve'],
     payroll: ['view', 'approve'],
     expenses: ['view', 'create', 'approve'],
+    tuition: ['view', 'create', 'edit', 'manage'],
     'reports:finance': ['view'],
     staff: ['view', 'create', 'edit', 'manage'],
     'staff:assignments': ['view', 'create', 'edit', 'delete'],
@@ -72,13 +91,22 @@ const ROLE_PERMISSIONS: PermissionMap = {
   Teacher: {
     dashboard: ['view'],
     students: ['view'],
+    teachers: ['view'],
     grades: ['view', 'create', 'edit'],
+    gradelevels: ['view'],
     curriculum: ['view'],
     classes: ['view'],
+    classrooms: ['view'],
+    calendar: ['view'],
     attendance: ['view', 'create', 'edit'],
+    enrollment: ['view'],
+    guardians: ['view'],
+    parents: ['view'],
+    departments: ['view'],
     billing: [],
     payroll: [],
     expenses: [],
+    tuition: [],
     'reports:finance': [],
     staff: ['view'],
     'staff:assignments': [],
@@ -89,13 +117,22 @@ const ROLE_PERMISSIONS: PermissionMap = {
   Accountant: {
     dashboard: ['view'],
     students: ['view'],
+    teachers: ['view'],
     grades: [],
+    gradelevels: [],
     curriculum: [],
     classes: [],
+    classrooms: [],
+    calendar: ['view'],
     attendance: [],
+    enrollment: ['view'],
+    guardians: ['view'],
+    parents: ['view'],
+    departments: ['view'],
     billing: ['view', 'create', 'edit', 'manage'],
     payroll: ['view', 'create', 'edit', 'manage'],
     expenses: ['view', 'create', 'edit', 'approve'],
+    tuition: ['view', 'create', 'edit', 'manage'],
     'reports:finance': ['view', 'create'],
     staff: ['view'],
     'staff:assignments': [],
@@ -106,13 +143,22 @@ const ROLE_PERMISSIONS: PermissionMap = {
   Staff: {
     dashboard: ['view'],
     students: ['view'],
+    teachers: ['view'],
     grades: [],
+    gradelevels: ['view'],
     curriculum: [],
     classes: ['view'],
+    classrooms: ['view'],
+    calendar: ['view'],
     attendance: ['view'],
+    enrollment: ['view'],
+    guardians: ['view'],
+    parents: ['view'],
+    departments: ['view'],
     billing: [],
     payroll: [],
     expenses: [],
+    tuition: [],
     'reports:finance': [],
     staff: ['view'],
     'staff:assignments': [],
@@ -229,4 +275,3 @@ export function useResourcePermissions(
     return acc
   }, {} as Record<Action, boolean>)
 }
-

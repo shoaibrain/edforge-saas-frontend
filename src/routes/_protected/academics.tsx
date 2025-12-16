@@ -1,123 +1,173 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { GraduationCap, Users, BookOpen, ClipboardList } from 'lucide-react'
-import { Card } from '@/components/ui/Card'
-import { RequirePermission } from '@/components/secure'
+/**
+ * Academics Module Layout
+ * 
+ * Provides nested routing support for the Academics module.
+ * Renders the overview page at /academics and child routes via Outlet.
+ */
+
+import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
+import {
+  GraduationCap,
+  Users,
+  BookOpen,
+  Calendar,
+  Layers,
+  MapPinHouse,
+  ContactRound,
+  ClipboardCheck,
+  TrendingUp,
+  Atom,
+} from 'lucide-react'
+import { ModuleOverviewPage } from '@/components/layout/ModuleOverviewPage'
+import type { ModuleStat, ModuleActionCard } from '@/components/layout/ModuleOverviewPage'
 
 export const Route = createFileRoute('/_protected/academics')({
-  component: AcademicsPage,
+  component: AcademicsLayout,
 })
 
-function AcademicsPage() {
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-semibold text-slate-900"
-        >
-          Academics
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-slate-500 mt-1"
-        >
-          Manage students, classes, curriculum, and grades
-        </motion.p>
-      </div>
+// ============================================================================
+// LAYOUT COMPONENT
+// ============================================================================
 
-      {/* Module Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <RequirePermission action="view" resource="students">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-blue-500/10 w-fit mb-4 group-hover:bg-blue-500/20 transition-colors">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Students</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Enrollment, profiles, and records
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-
-        <RequirePermission action="view" resource="classes">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-emerald-500/10 w-fit mb-4 group-hover:bg-emerald-500/20 transition-colors">
-                <GraduationCap className="w-6 h-6 text-emerald-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Classes</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Class schedules and assignments
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-
-        <RequirePermission action="view" resource="curriculum">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-purple-500/10 w-fit mb-4 group-hover:bg-purple-500/20 transition-colors">
-                <BookOpen className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Curriculum</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Subjects, syllabi, and plans
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-
-        <RequirePermission action="view" resource="grades">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-amber-500/10 w-fit mb-4 group-hover:bg-amber-500/20 transition-colors">
-                <ClipboardList className="w-6 h-6 text-amber-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Grades</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Assessments and report cards
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-      </div>
-
-      {/* Placeholder content */}
-      <Card className="p-8 text-center">
-        <GraduationCap className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-slate-900 mb-2">
-          Academics Module
-        </h3>
-        <p className="text-slate-500 max-w-md mx-auto">
-          This is a placeholder for the Academics feature module. 
-          Full implementation will include student management, 
-          class scheduling, curriculum planning, and grade tracking.
-        </p>
-      </Card>
-    </div>
-  )
+function AcademicsLayout() {
+  const matches = useMatches()
+  // Check if we're at exactly /academics (not a child route)
+  const isExactRoute = matches[matches.length - 1]?.routeId === '/_protected/academics'
+  
+  if (isExactRoute) {
+    return <AcademicsOverviewPage />
+  }
+  
+  // Render child routes (students, teachers, etc.)
+  return <Outlet />
 }
 
+// ============================================================================
+// OVERVIEW PAGE
+// ============================================================================
+
+function AcademicsOverviewPage() {
+  // Stats for the academics module
+  const stats: ModuleStat[] = [
+    {
+      label: 'Total Students',
+      value: '1,247',
+      change: '+12%',
+      changeType: 'positive',
+      icon: Users,
+      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
+      iconColor: 'text-teal-600 dark:text-cyan-400',
+    },
+    {
+      label: 'Active Classes',
+      value: '48',
+      change: '+3',
+      changeType: 'positive',
+      icon: GraduationCap,
+      iconBg: 'bg-aqua-400/20',
+      iconColor: 'text-aqua-700 dark:text-aqua-400',
+    },
+    {
+      label: 'Attendance Rate',
+      value: '94.2%',
+      change: '+1.2%',
+      changeType: 'positive',
+      icon: ClipboardCheck,
+      iconBg: 'bg-golden-400/20',
+      iconColor: 'text-golden-600 dark:text-golden-400',
+    },
+    {
+      label: 'Curriculum Progress',
+      value: '78%',
+      change: '+5%',
+      changeType: 'positive',
+      icon: TrendingUp,
+      iconBg: 'bg-vanilla-400/30 dark:bg-vanilla-400/20',
+      iconColor: 'text-vanilla-700 dark:text-vanilla-500',
+    },
+  ]
+
+  // Action cards linking to sub-routes
+  const actionCards: ModuleActionCard[] = [
+    {
+      id: 'students',
+      title: 'Students',
+      description: 'Enrollment, profiles, and student records',
+      icon: Users,
+      href: '/academics/students',
+      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20 group-hover:bg-teal-500/25 dark:group-hover:bg-cyan-500/30',
+      iconColor: 'text-teal-600 dark:text-cyan-400',
+      permission: { action: 'view', resource: 'students' },
+    },
+    {
+      id: 'enrollment',
+      title: 'Enrollment',
+      description: 'Student enrollment and registration',
+      icon: Atom,
+      href: '/academics/enrollment',
+      iconBg: 'bg-purple-500/15 dark:bg-purple-500/20 group-hover:bg-purple-500/25 dark:group-hover:bg-purple-500/30',
+      iconColor: 'text-purple-600 dark:text-purple-400',
+      permission: { action: 'view', resource: 'curriculum' },
+    },
+    {
+      id: 'teachers',
+      title: 'Teachers',
+      description: 'Faculty profiles and assignments',
+      icon: ContactRound,
+      href: '/academics/teachers',
+      iconBg: 'bg-aqua-400/20 group-hover:bg-aqua-400/30',
+      iconColor: 'text-aqua-700 dark:text-aqua-400',
+      permission: { action: 'view', resource: 'students' },
+    },
+    {
+      id: 'gradelevels',
+      title: 'Grade Levels',
+      description: 'Manage grade levels and progressions',
+      icon: Layers,
+      href: '/academics/gradelevels',
+      iconBg: 'bg-golden-400/20 group-hover:bg-golden-400/30',
+      iconColor: 'text-golden-600 dark:text-golden-400',
+      permission: { action: 'view', resource: 'students' },
+    },
+    {
+      id: 'classrooms',
+      title: 'Classrooms',
+      description: 'Room assignments and schedules',
+      icon: MapPinHouse,
+      href: '/academics/classrooms',
+      iconBg: 'bg-caramel-400/20 group-hover:bg-caramel-400/30',
+      iconColor: 'text-caramel-600 dark:text-caramel-400',
+      permission: { action: 'view', resource: 'classes' },
+    },
+    {
+      id: 'curriculum',
+      title: 'Curriculum',
+      description: 'Subjects, syllabi, and lesson plans',
+      icon: BookOpen,
+      href: '/academics/curriculum',
+      iconBg: 'bg-rust-400/20 group-hover:bg-rust-400/30',
+      iconColor: 'text-rust-600 dark:text-rust-400',
+      permission: { action: 'view', resource: 'curriculum' },
+    },
+    {
+      id: 'calendar',
+      title: 'School Calendar',
+      description: 'Academic year and term schedules',
+      icon: Calendar,
+      href: '/academics/schoolcalendar',
+      iconBg: 'bg-vanilla-400/25 dark:bg-vanilla-400/20 group-hover:bg-vanilla-400/35 dark:group-hover:bg-vanilla-400/30',
+      iconColor: 'text-vanilla-700 dark:text-vanilla-500',
+      permission: { action: 'view', resource: 'curriculum' },
+    },
+  ]
+
+  return (
+    <ModuleOverviewPage
+      title="Academics"
+      description="Manage students, classes, curriculum, and grades"
+      icon={GraduationCap}
+      stats={stats}
+      actionCards={actionCards}
+    />
+  )
+}

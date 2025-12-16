@@ -3,13 +3,15 @@
  * 
  * Navigation is now handled by the dynamic sidebar.
  * This page only renders the content for the active tab.
+ * Features a Google Account-inspired overview when no tab is selected.
  */
 
 import { useState } from 'react'
-import { createFileRoute, redirect, useSearch } from '@tanstack/react-router'
+import { createFileRoute, redirect, useSearch, Link } from '@tanstack/react-router'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSpring, animated, config } from '@react-spring/web'
 import { 
   Mail, 
   Camera,
@@ -26,6 +28,10 @@ import {
   Zap,
   Link2,
   ChevronRight,
+  User,
+  Bell,
+  School,
+  Search,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -40,6 +46,7 @@ import { getUserAvatar } from '@/lib/avatar'
 
 // Route search params validation
 const SETTINGS_TABS = [
+  'overview',
   'account',
   'preferences',
   'notifications',
@@ -57,9 +64,17 @@ const SETTINGS_TABS = [
 type SettingsTab = (typeof SETTINGS_TABS)[number]
 
 const settingsSearchSchema = {
-  parse: (search: Record<string, unknown>) => ({
-    tab: (SETTINGS_TABS.includes((search.tab as SettingsTab) ?? 'account') ? (search.tab as SettingsTab) : 'account') as SettingsTab,
-  }),
+  parse: (search: Record<string, unknown>) => {
+    const tab = search.tab as string | undefined
+    // If no tab specified, show overview
+    if (!tab) return { tab: 'overview' as SettingsTab }
+    // If valid tab, use it
+    if (SETTINGS_TABS.includes(tab as SettingsTab)) {
+      return { tab: tab as SettingsTab }
+    }
+    // Fallback to overview
+    return { tab: 'overview' as SettingsTab }
+  },
 }
 
 const SETTINGS_TAB_RULES: Partial<
@@ -172,6 +187,14 @@ function SettingsPage() {
                 transition={{ duration: 0.2 }}
               >
                 {/* Render content based on active tab */}
+                {tab === 'overview' && (
+                  <SettingsOverviewContent 
+                    avatarUrl={avatarUrl}
+                    userName={user?.name}
+                    userEmail={user?.email}
+                    userRole={user?.globalRole}
+                  />
+                )}
                 {tab === 'account' && (
                   <AccountTabContent 
                     avatarUrl={avatarUrl} 
@@ -198,6 +221,217 @@ function SettingsPage() {
           </form>
         </FormProvider>
       </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// SETTINGS OVERVIEW - Google Account Inspired
+// ============================================================================
+
+interface QuickActionProps {
+  label: string
+  icon: LucideIcon
+  href: SettingsTab
+  delay?: number
+}
+
+function QuickActionPill({ label, icon: Icon, href, delay = 0 }: QuickActionProps) {
+  const [hovered, setHovered] = useState(false)
+
+  const spring = useSpring({
+    scale: hovered ? 1.02 : 1,
+    y: hovered ? -2 : 0,
+    config: config.wobbly,
+  })
+
+  const iconSpring = useSpring({
+    rotate: hovered ? 5 : 0,
+    scale: hovered ? 1.1 : 1,
+    config: { tension: 400, friction: 20 },
+  })
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: delay * 0.05, duration: 0.3 }}
+    >
+      <Link
+        to="/settings"
+        search={{ tab: href }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <animated.div
+          style={{
+            transform: spring.scale.to(s => `scale(${s}) translateY(${spring.y.get()}px)`),
+          }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] hover:border-teal-500/30 transition-colors cursor-pointer"
+        >
+          <animated.div
+            style={{
+              transform: iconSpring.scale.to(s => `scale(${s}) rotate(${iconSpring.rotate.get()}deg)`),
+            }}
+          >
+            <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+          </animated.div>
+          <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">{label}</span>
+        </animated.div>
+      </Link>
+    </motion.div>
+  )
+}
+
+function SettingsOverviewContent({
+  avatarUrl,
+  userName,
+  userEmail,
+  userRole,
+}: {
+  avatarUrl: string
+  userName?: string
+  userEmail?: string
+  userRole?: string
+}) {
+  const [searchFocused, setSearchFocused] = useState(false)
+  const [photoHovered, setPhotoHovered] = useState(false)
+
+  const searchSpring = useSpring({
+    scale: searchFocused ? 1.01 : 1,
+    shadow: searchFocused ? 12 : 0,
+    config: config.gentle,
+  })
+
+  const photoSpring = useSpring({
+    scale: photoHovered ? 1.05 : 1,
+    config: config.wobbly,
+  })
+
+  // Quick action items
+  const quickActions: QuickActionProps[] = [
+    { label: 'My Account', icon: User, href: 'account' },
+    { label: 'Security', icon: Shield, href: 'security' },
+    { label: 'Notifications', icon: Bell, href: 'notifications' },
+    { label: 'Schools', icon: School, href: 'schools' },
+    { label: 'Billing', icon: CreditCard, href: 'billing' },
+  ]
+
+  return (
+    <div className="space-y-8">
+      {/* Profile Header - Google Account Style */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col items-center text-center pt-4 pb-6"
+      >
+        {/* Avatar with camera overlay */}
+        <animated.div
+          style={{ transform: photoSpring.scale.to(s => `scale(${s})`) }}
+          onMouseEnter={() => setPhotoHovered(true)}
+          onMouseLeave={() => setPhotoHovered(false)}
+          className="relative group cursor-pointer mb-4"
+        >
+          <img
+            src={avatarUrl}
+            alt={userName}
+            className="w-24 h-24 rounded-full object-cover ring-4 ring-[rgb(var(--surface-tertiary))] group-hover:ring-teal-500/30 transition-all"
+          />
+          <motion.div
+            initial={false}
+            animate={{ opacity: photoHovered ? 1 : 0 }}
+            className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50"
+          >
+            <Camera className="w-6 h-6 text-white" />
+          </motion.div>
+          {/* Camera badge */}
+          <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[rgb(var(--surface-secondary))] border-2 border-[rgb(var(--surface-primary))] shadow-lg">
+            <Camera className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+          </div>
+        </animated.div>
+
+        {/* Name and Email */}
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-2xl font-bold text-[rgb(var(--text-primary))]"
+        >
+          {userName || 'Your Name'}
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="text-sm text-[rgb(var(--text-tertiary))] mt-1"
+        >
+          {userEmail || 'your@email.com'}
+        </motion.p>
+
+        {/* Role Badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-3"
+        >
+          <span className="px-3 py-1 text-xs font-medium rounded-full bg-teal-500/10 text-teal-600 dark:text-cyan-400 border border-teal-500/20">
+            {userRole || 'User'}
+          </span>
+        </motion.div>
+      </motion.div>
+
+      {/* Search Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.4 }}
+      >
+        <animated.div
+          style={{
+            transform: searchSpring.scale.to(s => `scale(${s})`),
+            boxShadow: searchSpring.shadow.to(s => `0 ${s}px ${s * 2}px rgba(0, 0, 0, 0.08)`),
+          }}
+          className="relative"
+        >
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--text-tertiary))]" />
+          <input
+            type="text"
+            placeholder="Search settings..."
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all"
+          />
+        </animated.div>
+      </motion.div>
+
+      {/* Quick Actions - Pill Buttons */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="flex flex-wrap justify-center gap-2"
+      >
+        {quickActions.map((action, idx) => (
+          <QuickActionPill key={action.label} {...action} delay={idx} />
+        ))}
+      </motion.div>
+
+      {/* Privacy Note */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="text-center pt-4"
+      >
+        <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-md mx-auto">
+          Only you can see your settings. Edforge keeps your data private, safe, and secure.{' '}
+          <a href="#" className="text-teal-600 dark:text-cyan-400 hover:underline">
+            Learn more
+          </a>
+        </p>
+      </motion.div>
     </div>
   )
 }

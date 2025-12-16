@@ -1,123 +1,152 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { DollarSign, CreditCard, Receipt, BarChart3 } from 'lucide-react'
-import { Card } from '@/components/ui/Card'
-import { RequirePermission } from '@/components/secure'
+/**
+ * Finance Module Layout
+ * 
+ * Provides nested routing support for the Finance module.
+ * Renders the overview page at /finance and child routes via Outlet.
+ */
+
+import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
+import {
+  DollarSign,
+  Landmark,
+  CreditCard,
+  Receipt,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  BanknoteIcon,
+} from 'lucide-react'
+import { ModuleOverviewPage } from '@/components/layout/ModuleOverviewPage'
+import type { ModuleStat, ModuleActionCard } from '@/components/layout/ModuleOverviewPage'
 
 export const Route = createFileRoute('/_protected/finance')({
-  component: FinancePage,
+  component: FinanceLayout,
 })
 
-function FinancePage() {
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-semibold text-slate-900"
-        >
-          Finance
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-slate-500 mt-1"
-        >
-          Manage billing, payroll, expenses, and financial reports
-        </motion.p>
-      </div>
+// ============================================================================
+// LAYOUT COMPONENT
+// ============================================================================
 
-      {/* Module Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <RequirePermission action="view" resource="billing">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-emerald-500/10 w-fit mb-4 group-hover:bg-emerald-500/20 transition-colors">
-                <DollarSign className="w-6 h-6 text-emerald-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Billing</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Invoices and fee collection
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-
-        <RequirePermission action="view" resource="payroll">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-blue-500/10 w-fit mb-4 group-hover:bg-blue-500/20 transition-colors">
-                <CreditCard className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Payroll</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Salary and compensation
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-
-        <RequirePermission action="view" resource="expenses">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-amber-500/10 w-fit mb-4 group-hover:bg-amber-500/20 transition-colors">
-                <Receipt className="w-6 h-6 text-amber-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Expenses</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Track and approve expenses
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-
-        <RequirePermission action="view" resource="reports:finance">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-              <div className="p-3 rounded-xl bg-purple-500/10 w-fit mb-4 group-hover:bg-purple-500/20 transition-colors">
-                <BarChart3 className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900">Reports</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Financial analytics
-              </p>
-            </Card>
-          </motion.div>
-        </RequirePermission>
-      </div>
-
-      {/* Placeholder content */}
-      <Card className="p-8 text-center">
-        <DollarSign className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-slate-900 mb-2">
-          Finance Module
-        </h3>
-        <p className="text-slate-500 max-w-md mx-auto">
-          This is a placeholder for the Finance feature module. 
-          Full implementation will include billing management, 
-          payroll processing, expense tracking, and financial reporting.
-        </p>
-      </Card>
-    </div>
-  )
+function FinanceLayout() {
+  const matches = useMatches()
+  // Check if we're at exactly /finance (not a child route)
+  const isExactRoute = matches[matches.length - 1]?.routeId === '/_protected/finance'
+  
+  if (isExactRoute) {
+    return <FinanceOverviewPage />
+  }
+  
+  // Render child routes (financials, payroll, etc.)
+  return <Outlet />
 }
 
+// ============================================================================
+// OVERVIEW PAGE
+// ============================================================================
+
+function FinanceOverviewPage() {
+  // Stats for the finance module
+  const stats: ModuleStat[] = [
+    {
+      label: 'Revenue (MTD)',
+      value: '$145,230',
+      change: '+18%',
+      changeType: 'positive',
+      icon: TrendingUp,
+      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
+      iconColor: 'text-teal-600 dark:text-cyan-400',
+    },
+    {
+      label: 'Outstanding Fees',
+      value: '$23,450',
+      change: '-12%',
+      changeType: 'positive',
+      icon: Wallet,
+      iconBg: 'bg-golden-400/20',
+      iconColor: 'text-golden-600 dark:text-golden-400',
+    },
+    {
+      label: 'Payroll Due',
+      value: '$89,200',
+      change: 'Due in 5 days',
+      changeType: 'neutral',
+      icon: CreditCard,
+      iconBg: 'bg-aqua-400/20',
+      iconColor: 'text-aqua-700 dark:text-aqua-400',
+    },
+    {
+      label: 'Total Expenses',
+      value: '$34,780',
+      change: '+8%',
+      changeType: 'negative',
+      icon: TrendingDown,
+      iconBg: 'bg-rust-400/20',
+      iconColor: 'text-rust-600 dark:text-rust-400',
+    },
+  ]
+
+  // Action cards linking to sub-routes
+  const actionCards: ModuleActionCard[] = [
+    {
+      id: 'financials',
+      title: 'Financials',
+      description: 'Overview of all financial transactions',
+      icon: Landmark,
+      href: '/finance/financials',
+      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20 group-hover:bg-teal-500/25 dark:group-hover:bg-cyan-500/30',
+      iconColor: 'text-teal-600 dark:text-cyan-400',
+      permission: { action: 'view', resource: 'billing' },
+    },
+    {
+      id: 'payroll',
+      title: 'Payroll',
+      description: 'Salary and compensation management',
+      icon: CreditCard,
+      href: '/finance/payroll',
+      iconBg: 'bg-aqua-400/20 group-hover:bg-aqua-400/30',
+      iconColor: 'text-aqua-700 dark:text-aqua-400',
+      permission: { action: 'view', resource: 'payroll' },
+    },
+    {
+      id: 'tuitionfees',
+      title: 'Tuition & Fees',
+      description: 'Fee structures and collections',
+      icon: BanknoteIcon,
+      href: '/finance/tuitionandfees',
+      iconBg: 'bg-golden-400/20 group-hover:bg-golden-400/30',
+      iconColor: 'text-golden-600 dark:text-golden-400',
+      permission: { action: 'view', resource: 'billing' },
+    },
+    {
+      id: 'expenses',
+      title: 'Expenses',
+      description: 'Track and approve expenses',
+      icon: Receipt,
+      href: '/finance/expenses',
+      iconBg: 'bg-caramel-400/20 group-hover:bg-caramel-400/30',
+      iconColor: 'text-caramel-600 dark:text-caramel-400',
+      permission: { action: 'view', resource: 'expenses' },
+    },
+    {
+      id: 'reports',
+      title: 'Reports',
+      description: 'Financial analytics and insights',
+      icon: BarChart3,
+      href: '/finance/reports',
+      iconBg: 'bg-vanilla-400/25 dark:bg-vanilla-400/20 group-hover:bg-vanilla-400/35 dark:group-hover:bg-vanilla-400/30',
+      iconColor: 'text-vanilla-700 dark:text-vanilla-500',
+      permission: { action: 'view', resource: 'reports:finance' },
+    },
+  ]
+
+  return (
+    <ModuleOverviewPage
+      title="Finance"
+      description="Manage billing, payroll, expenses, and financial reports"
+      icon={DollarSign}
+      stats={stats}
+      actionCards={actionCards}
+    />
+  )
+}
