@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
+import { Route as ProtectedStudentPortalRouteImport } from './routes/_protected/student-portal'
 import { Route as ProtectedPeopleRouteImport } from './routes/_protected/people'
 import { Route as ProtectedParentPortalRouteImport } from './routes/_protected/parent-portal'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
@@ -22,6 +23,10 @@ import { Route as ProtectedCommunicationsRouteImport } from './routes/_protected
 import { Route as ProtectedAnalyticsRouteImport } from './routes/_protected/analytics'
 import { Route as ProtectedAcademicsRouteImport } from './routes/_protected/academics'
 import { Route as ProtectedSettingsIndexRouteImport } from './routes/_protected/settings/index'
+import { Route as ProtectedStudentPortalScheduleRouteImport } from './routes/_protected/student-portal/schedule'
+import { Route as ProtectedStudentPortalGradesRouteImport } from './routes/_protected/student-portal/grades'
+import { Route as ProtectedStudentPortalAttendanceRouteImport } from './routes/_protected/student-portal/attendance'
+import { Route as ProtectedStudentPortalAssignmentsRouteImport } from './routes/_protected/student-portal/assignments'
 import { Route as ProtectedPeopleStaffRouteImport } from './routes/_protected/people/staff'
 import { Route as ProtectedPeopleReportingRouteImport } from './routes/_protected/people/reporting'
 import { Route as ProtectedPeopleParentsRouteImport } from './routes/_protected/people/parents'
@@ -82,6 +87,11 @@ const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedStudentPortalRoute = ProtectedStudentPortalRouteImport.update({
+  id: '/student-portal',
+  path: '/student-portal',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedPeopleRoute = ProtectedPeopleRouteImport.update({
   id: '/people',
   path: '/people',
@@ -122,6 +132,30 @@ const ProtectedSettingsIndexRoute = ProtectedSettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedStudentPortalScheduleRoute =
+  ProtectedStudentPortalScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => ProtectedStudentPortalRoute,
+  } as any)
+const ProtectedStudentPortalGradesRoute =
+  ProtectedStudentPortalGradesRouteImport.update({
+    id: '/grades',
+    path: '/grades',
+    getParentRoute: () => ProtectedStudentPortalRoute,
+  } as any)
+const ProtectedStudentPortalAttendanceRoute =
+  ProtectedStudentPortalAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => ProtectedStudentPortalRoute,
+  } as any)
+const ProtectedStudentPortalAssignmentsRoute =
+  ProtectedStudentPortalAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => ProtectedStudentPortalRoute,
+  } as any)
 const ProtectedPeopleStaffRoute = ProtectedPeopleStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
@@ -339,6 +373,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof ProtectedHomeRoute
   '/parent-portal': typeof ProtectedParentPortalRouteWithChildren
   '/people': typeof ProtectedPeopleRouteWithChildren
+  '/student-portal': typeof ProtectedStudentPortalRouteWithChildren
   '/': typeof ProtectedIndexRoute
   '/academics/attendance': typeof ProtectedAcademicsAttendanceRoute
   '/academics/classrooms': typeof ProtectedAcademicsClassroomsRouteWithChildren
@@ -369,6 +404,10 @@ export interface FileRoutesByFullPath {
   '/people/parents': typeof ProtectedPeopleParentsRouteWithChildren
   '/people/reporting': typeof ProtectedPeopleReportingRoute
   '/people/staff': typeof ProtectedPeopleStaffRouteWithChildren
+  '/student-portal/assignments': typeof ProtectedStudentPortalAssignmentsRoute
+  '/student-portal/attendance': typeof ProtectedStudentPortalAttendanceRoute
+  '/student-portal/grades': typeof ProtectedStudentPortalGradesRoute
+  '/student-portal/schedule': typeof ProtectedStudentPortalScheduleRoute
   '/settings': typeof ProtectedSettingsIndexRoute
   '/academics/classrooms/$classroomId': typeof ProtectedAcademicsClassroomsClassroomIdRoute
   '/academics/grades/$classId': typeof ProtectedAcademicsGradesClassIdRoute
@@ -388,6 +427,7 @@ export interface FileRoutesByTo {
   '/home': typeof ProtectedHomeRoute
   '/parent-portal': typeof ProtectedParentPortalRouteWithChildren
   '/people': typeof ProtectedPeopleRouteWithChildren
+  '/student-portal': typeof ProtectedStudentPortalRouteWithChildren
   '/': typeof ProtectedIndexRoute
   '/academics/attendance': typeof ProtectedAcademicsAttendanceRoute
   '/academics/classrooms': typeof ProtectedAcademicsClassroomsRouteWithChildren
@@ -418,6 +458,10 @@ export interface FileRoutesByTo {
   '/people/parents': typeof ProtectedPeopleParentsRouteWithChildren
   '/people/reporting': typeof ProtectedPeopleReportingRoute
   '/people/staff': typeof ProtectedPeopleStaffRouteWithChildren
+  '/student-portal/assignments': typeof ProtectedStudentPortalAssignmentsRoute
+  '/student-portal/attendance': typeof ProtectedStudentPortalAttendanceRoute
+  '/student-portal/grades': typeof ProtectedStudentPortalGradesRoute
+  '/student-portal/schedule': typeof ProtectedStudentPortalScheduleRoute
   '/settings': typeof ProtectedSettingsIndexRoute
   '/academics/classrooms/$classroomId': typeof ProtectedAcademicsClassroomsClassroomIdRoute
   '/academics/grades/$classId': typeof ProtectedAcademicsGradesClassIdRoute
@@ -439,6 +483,7 @@ export interface FileRoutesById {
   '/_protected/home': typeof ProtectedHomeRoute
   '/_protected/parent-portal': typeof ProtectedParentPortalRouteWithChildren
   '/_protected/people': typeof ProtectedPeopleRouteWithChildren
+  '/_protected/student-portal': typeof ProtectedStudentPortalRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
   '/_protected/academics/attendance': typeof ProtectedAcademicsAttendanceRoute
   '/_protected/academics/classrooms': typeof ProtectedAcademicsClassroomsRouteWithChildren
@@ -469,6 +514,10 @@ export interface FileRoutesById {
   '/_protected/people/parents': typeof ProtectedPeopleParentsRouteWithChildren
   '/_protected/people/reporting': typeof ProtectedPeopleReportingRoute
   '/_protected/people/staff': typeof ProtectedPeopleStaffRouteWithChildren
+  '/_protected/student-portal/assignments': typeof ProtectedStudentPortalAssignmentsRoute
+  '/_protected/student-portal/attendance': typeof ProtectedStudentPortalAttendanceRoute
+  '/_protected/student-portal/grades': typeof ProtectedStudentPortalGradesRoute
+  '/_protected/student-portal/schedule': typeof ProtectedStudentPortalScheduleRoute
   '/_protected/settings/': typeof ProtectedSettingsIndexRoute
   '/_protected/academics/classrooms/$classroomId': typeof ProtectedAcademicsClassroomsClassroomIdRoute
   '/_protected/academics/grades/$classId': typeof ProtectedAcademicsGradesClassIdRoute
@@ -490,6 +539,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/parent-portal'
     | '/people'
+    | '/student-portal'
     | '/'
     | '/academics/attendance'
     | '/academics/classrooms'
@@ -520,6 +570,10 @@ export interface FileRouteTypes {
     | '/people/parents'
     | '/people/reporting'
     | '/people/staff'
+    | '/student-portal/assignments'
+    | '/student-portal/attendance'
+    | '/student-portal/grades'
+    | '/student-portal/schedule'
     | '/settings'
     | '/academics/classrooms/$classroomId'
     | '/academics/grades/$classId'
@@ -539,6 +593,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/parent-portal'
     | '/people'
+    | '/student-portal'
     | '/'
     | '/academics/attendance'
     | '/academics/classrooms'
@@ -569,6 +624,10 @@ export interface FileRouteTypes {
     | '/people/parents'
     | '/people/reporting'
     | '/people/staff'
+    | '/student-portal/assignments'
+    | '/student-portal/attendance'
+    | '/student-portal/grades'
+    | '/student-portal/schedule'
     | '/settings'
     | '/academics/classrooms/$classroomId'
     | '/academics/grades/$classId'
@@ -589,6 +648,7 @@ export interface FileRouteTypes {
     | '/_protected/home'
     | '/_protected/parent-portal'
     | '/_protected/people'
+    | '/_protected/student-portal'
     | '/_protected/'
     | '/_protected/academics/attendance'
     | '/_protected/academics/classrooms'
@@ -619,6 +679,10 @@ export interface FileRouteTypes {
     | '/_protected/people/parents'
     | '/_protected/people/reporting'
     | '/_protected/people/staff'
+    | '/_protected/student-portal/assignments'
+    | '/_protected/student-portal/attendance'
+    | '/_protected/student-portal/grades'
+    | '/_protected/student-portal/schedule'
     | '/_protected/settings/'
     | '/_protected/academics/classrooms/$classroomId'
     | '/_protected/academics/grades/$classId'
@@ -670,6 +734,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/student-portal': {
+      id: '/_protected/student-portal'
+      path: '/student-portal'
+      fullPath: '/student-portal'
+      preLoaderRoute: typeof ProtectedStudentPortalRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/people': {
@@ -727,6 +798,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof ProtectedSettingsIndexRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/student-portal/schedule': {
+      id: '/_protected/student-portal/schedule'
+      path: '/schedule'
+      fullPath: '/student-portal/schedule'
+      preLoaderRoute: typeof ProtectedStudentPortalScheduleRouteImport
+      parentRoute: typeof ProtectedStudentPortalRoute
+    }
+    '/_protected/student-portal/grades': {
+      id: '/_protected/student-portal/grades'
+      path: '/grades'
+      fullPath: '/student-portal/grades'
+      preLoaderRoute: typeof ProtectedStudentPortalGradesRouteImport
+      parentRoute: typeof ProtectedStudentPortalRoute
+    }
+    '/_protected/student-portal/attendance': {
+      id: '/_protected/student-portal/attendance'
+      path: '/attendance'
+      fullPath: '/student-portal/attendance'
+      preLoaderRoute: typeof ProtectedStudentPortalAttendanceRouteImport
+      parentRoute: typeof ProtectedStudentPortalRoute
+    }
+    '/_protected/student-portal/assignments': {
+      id: '/_protected/student-portal/assignments'
+      path: '/assignments'
+      fullPath: '/student-portal/assignments'
+      preLoaderRoute: typeof ProtectedStudentPortalAssignmentsRouteImport
+      parentRoute: typeof ProtectedStudentPortalRoute
     }
     '/_protected/people/staff': {
       id: '/_protected/people/staff'
@@ -1180,6 +1279,28 @@ const ProtectedPeopleRouteWithChildren = ProtectedPeopleRoute._addFileChildren(
   ProtectedPeopleRouteChildren,
 )
 
+interface ProtectedStudentPortalRouteChildren {
+  ProtectedStudentPortalAssignmentsRoute: typeof ProtectedStudentPortalAssignmentsRoute
+  ProtectedStudentPortalAttendanceRoute: typeof ProtectedStudentPortalAttendanceRoute
+  ProtectedStudentPortalGradesRoute: typeof ProtectedStudentPortalGradesRoute
+  ProtectedStudentPortalScheduleRoute: typeof ProtectedStudentPortalScheduleRoute
+}
+
+const ProtectedStudentPortalRouteChildren: ProtectedStudentPortalRouteChildren =
+  {
+    ProtectedStudentPortalAssignmentsRoute:
+      ProtectedStudentPortalAssignmentsRoute,
+    ProtectedStudentPortalAttendanceRoute:
+      ProtectedStudentPortalAttendanceRoute,
+    ProtectedStudentPortalGradesRoute: ProtectedStudentPortalGradesRoute,
+    ProtectedStudentPortalScheduleRoute: ProtectedStudentPortalScheduleRoute,
+  }
+
+const ProtectedStudentPortalRouteWithChildren =
+  ProtectedStudentPortalRoute._addFileChildren(
+    ProtectedStudentPortalRouteChildren,
+  )
+
 interface ProtectedRouteChildren {
   ProtectedAcademicsRoute: typeof ProtectedAcademicsRouteWithChildren
   ProtectedAnalyticsRoute: typeof ProtectedAnalyticsRouteWithChildren
@@ -1188,6 +1309,7 @@ interface ProtectedRouteChildren {
   ProtectedHomeRoute: typeof ProtectedHomeRoute
   ProtectedParentPortalRoute: typeof ProtectedParentPortalRouteWithChildren
   ProtectedPeopleRoute: typeof ProtectedPeopleRouteWithChildren
+  ProtectedStudentPortalRoute: typeof ProtectedStudentPortalRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
   ProtectedSettingsIndexRoute: typeof ProtectedSettingsIndexRoute
 }
@@ -1200,6 +1322,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedHomeRoute: ProtectedHomeRoute,
   ProtectedParentPortalRoute: ProtectedParentPortalRouteWithChildren,
   ProtectedPeopleRoute: ProtectedPeopleRouteWithChildren,
+  ProtectedStudentPortalRoute: ProtectedStudentPortalRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
   ProtectedSettingsIndexRoute: ProtectedSettingsIndexRoute,
 }

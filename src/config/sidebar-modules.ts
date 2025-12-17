@@ -3,6 +3,14 @@
  * 
  * Defines navigation items for each module/context with ABAC permissions.
  * The sidebar dynamically renders items based on the active module and user permissions.
+ * 
+ * Role-Based Navigation:
+ * - Administrators (TenantAdmin, Principal, Staff, Accountant) see the full admin navigation
+ * - Teachers see educator-focused navigation
+ * - Students see student portal navigation (grades, schedule, assignments)
+ * - Parents see parent portal navigation (children's data, fees)
+ * 
+ * The home module is dynamically selected based on the user's role in their active school.
  */
 
 import {
@@ -53,9 +61,15 @@ import {
   Video,
   CalendarPlus,
   CalendarCheck,
+  // Student Portal
+  BookOpen,
+  Calendar,
+  FileText,
+  // Additional icons
+  Baby,
 } from 'lucide-react'
 import type { Action, Resource } from '@/lib/abac'
-import type { GlobalRole } from '@/types/auth'
+import type { GlobalRole, RoleCategory, SchoolRole } from '@/types/auth'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -103,10 +117,23 @@ export interface ModuleConfig {
   groups: NavItemGroup[]
 }
 
-export type SidebarModule = 'home' | 'settings' | 'academics' | 'finance' | 'people' | 'communications' | 'analytics' | 'parent-portal'
+export type SidebarModule = 
+  | 'home' 
+  | 'home-student' 
+  | 'home-parent' 
+  | 'settings' 
+  | 'academics' 
+  | 'finance' 
+  | 'people' 
+  | 'communications' 
+  | 'analytics' 
+  | 'parent-portal'
+  | 'student-portal'
 
 // ============================================================================
-// HOME MODULE - Main dashboard navigation
+// HOME MODULE - Admin/Staff/Teacher dashboard navigation
+// This is the default home module for administrative and educator roles.
+// Students and Parents have their own tailored home modules below.
 // ============================================================================
 
 const homeModule: ModuleConfig = {
@@ -151,13 +178,210 @@ const homeModule: ModuleConfig = {
           href: '/communications',
           permission: { action: 'view', resource: 'communications' },
         },
+        // Note: Parent Portal is NOT listed here - parents get their own home module
+        // that renders the parent portal navigation directly
         {
-          id: 'parent-portal',
-          label: 'Parent Portal',
-          icon: Home,
+          id: 'settings',
+          label: 'Settings',
+          icon: Settings,
+          href: '/settings',
+          permission: { action: 'view', resource: 'settings' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
+// STUDENT HOME MODULE - Student-specific dashboard navigation
+// Students see their own academic data: grades, schedule, assignments
+// ============================================================================
+
+const studentHomeModule: ModuleConfig = {
+  id: 'home-student',
+  title: 'My Portal',
+  groups: [
+    {
+      id: 'academics',
+      label: 'MY ACADEMICS',
+      items: [
+        {
+          id: 'my-grades',
+          label: 'My Grades',
+          icon: GraduationCap,
+          href: '/student-portal/grades',
+          permission: { action: 'view', resource: 'student-portal:grades' },
+        },
+        {
+          id: 'my-attendance',
+          label: 'My Attendance',
+          icon: ClipboardPlus,
+          href: '/student-portal/attendance',
+          permission: { action: 'view', resource: 'student-portal:attendance' },
+        },
+        {
+          id: 'my-schedule',
+          label: 'My Schedule',
+          icon: Calendar,
+          href: '/student-portal/schedule',
+          permission: { action: 'view', resource: 'student-portal:schedule' },
+        },
+        {
+          id: 'my-assignments',
+          label: 'Assignments',
+          icon: FileText,
+          href: '/student-portal/assignments',
+          permission: { action: 'view', resource: 'student-portal:assignments' },
+        },
+      ],
+    },
+    {
+      id: 'resources',
+      label: 'RESOURCES',
+      items: [
+        {
+          id: 'curriculum',
+          label: 'Curriculum',
+          icon: BookOpen,
+          href: '/academics/curriculum',
+          permission: { action: 'view', resource: 'curriculum' },
+        },
+        {
+          id: 'calendar',
+          label: 'School Calendar',
+          icon: Calendars,
+          href: '/academics/schoolcalendar',
+          permission: { action: 'view', resource: 'calendar' },
+        },
+      ],
+    },
+    {
+      id: 'communication',
+      label: 'COMMUNICATION',
+      items: [
+        {
+          id: 'messages',
+          label: 'Messages',
+          icon: Mail,
+          href: '/communications/messages',
+          permission: { action: 'view', resource: 'messages' },
+        },
+        {
+          id: 'announcements',
+          label: 'Announcements',
+          icon: Megaphone,
+          href: '/communications/announcements',
+          permission: { action: 'view', resource: 'announcements' },
+        },
+      ],
+    },
+    {
+      id: 'account',
+      items: [
+        {
+          id: 'settings',
+          label: 'Settings',
+          icon: Settings,
+          href: '/settings',
+          permission: { action: 'view', resource: 'settings' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
+// PARENT HOME MODULE - Parent-specific dashboard navigation
+// Parents see their children's academic data, fees, and school communications
+// ============================================================================
+
+const parentHomeModule: ModuleConfig = {
+  id: 'home-parent',
+  title: 'Family Portal',
+  groups: [
+    {
+      id: 'children',
+      label: 'MY CHILDREN',
+      items: [
+        {
+          id: 'children-overview',
+          label: 'Overview',
+          icon: Baby,
           href: '/parent-portal',
           permission: { action: 'view', resource: 'parent-portal' },
         },
+        {
+          id: 'children-grades',
+          label: 'Grades',
+          icon: GraduationCap,
+          href: '/parent-portal/grades',
+          permission: { action: 'view', resource: 'parent-portal:grades' },
+        },
+        {
+          id: 'children-attendance',
+          label: 'Attendance',
+          icon: ClipboardPlus,
+          href: '/parent-portal/attendance',
+          permission: { action: 'view', resource: 'parent-portal:attendance' },
+        },
+        {
+          id: 'children-schedule',
+          label: 'Schedule',
+          icon: Calendar,
+          href: '/parent-portal/schedule',
+          permission: { action: 'view', resource: 'parent-portal:schedule' },
+        },
+      ],
+    },
+    {
+      id: 'payments',
+      label: 'PAYMENTS',
+      items: [
+        {
+          id: 'fees',
+          label: 'Fee Payments',
+          icon: CreditCard,
+          href: '/parent-portal/fees',
+          permission: { action: 'view', resource: 'parent-portal:fees' },
+        },
+      ],
+    },
+    {
+      id: 'school',
+      label: 'SCHOOL',
+      items: [
+        {
+          id: 'calendar',
+          label: 'School Calendar',
+          icon: Calendars,
+          href: '/academics/schoolcalendar',
+          permission: { action: 'view', resource: 'calendar' },
+        },
+      ],
+    },
+    {
+      id: 'communication',
+      label: 'COMMUNICATION',
+      items: [
+        {
+          id: 'messages',
+          label: 'Messages',
+          icon: Mail,
+          href: '/communications/messages',
+          permission: { action: 'view', resource: 'messages' },
+        },
+        {
+          id: 'announcements',
+          label: 'Announcements',
+          icon: Megaphone,
+          href: '/communications/announcements',
+          permission: { action: 'view', resource: 'announcements' },
+        },
+      ],
+    },
+    {
+      id: 'account',
+      items: [
         {
           id: 'settings',
           label: 'Settings',
@@ -737,13 +961,92 @@ const analyticsModule: ModuleConfig = {
 }
 
 // ============================================================================
-// PARENT PORTAL MODULE - For parents/guardians
+// STUDENT PORTAL MODULE - For navigating from sub-pages back to student home
+// ============================================================================
+
+const studentPortalModule: ModuleConfig = {
+  id: 'student-portal',
+  title: 'Student Portal',
+  icon: GraduationCap,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'portal-home',
+          label: 'Dashboard',
+          icon: Home,
+          href: '/student-portal',
+          permission: { action: 'view', resource: 'student-portal' },
+        },
+      ],
+    },
+    {
+      id: 'academics',
+      label: 'MY ACADEMICS',
+      items: [
+        {
+          id: 'my-grades',
+          label: 'My Grades',
+          icon: GraduationCap,
+          href: '/student-portal/grades',
+          permission: { action: 'view', resource: 'student-portal:grades' },
+        },
+        {
+          id: 'my-attendance',
+          label: 'My Attendance',
+          icon: ClipboardPlus,
+          href: '/student-portal/attendance',
+          permission: { action: 'view', resource: 'student-portal:attendance' },
+        },
+        {
+          id: 'my-schedule',
+          label: 'My Schedule',
+          icon: Calendar,
+          href: '/student-portal/schedule',
+          permission: { action: 'view', resource: 'student-portal:schedule' },
+        },
+        {
+          id: 'my-assignments',
+          label: 'Assignments',
+          icon: FileText,
+          href: '/student-portal/assignments',
+          permission: { action: 'view', resource: 'student-portal:assignments' },
+        },
+      ],
+    },
+    {
+      id: 'communication',
+      label: 'COMMUNICATION',
+      items: [
+        {
+          id: 'messages-portal',
+          label: 'Messages',
+          icon: Mail,
+          href: '/communications/messages',
+          permission: { action: 'view', resource: 'messages' },
+        },
+        {
+          id: 'announcements-portal',
+          label: 'Announcements',
+          icon: Megaphone,
+          href: '/communications/announcements',
+          permission: { action: 'view', resource: 'announcements' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
+// PARENT PORTAL MODULE - For navigating from sub-pages back to parent home
 // ============================================================================
 
 const parentPortalModule: ModuleConfig = {
   id: 'parent-portal',
-  title: 'Parent Portal',
-  icon: Home,
+  title: 'Family Portal',
+  icon: Baby,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
@@ -781,7 +1084,7 @@ const parentPortalModule: ModuleConfig = {
           label: 'Schedule',
           icon: Calendars,
           href: '/parent-portal/schedule',
-          permission: { action: 'view', resource: 'parent-portal' },
+          permission: { action: 'view', resource: 'parent-portal:schedule' },
         },
       ],
     },
@@ -827,12 +1130,15 @@ const parentPortalModule: ModuleConfig = {
 
 export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   home: homeModule,
+  'home-student': studentHomeModule,
+  'home-parent': parentHomeModule,
   settings: settingsModule,
   academics: academicsModule,
   finance: financeModule,
   people: peopleModule,
   communications: communicationsModule,
   analytics: analyticsModule,
+  'student-portal': studentPortalModule,
   'parent-portal': parentPortalModule,
 }
 
@@ -844,7 +1150,50 @@ export function getModuleConfig(moduleId: SidebarModule): ModuleConfig {
 }
 
 /**
- * Detect which module should be active based on pathname
+ * Get the appropriate home module based on user role category.
+ * This enables role-based navigation where different user types
+ * see different sidebar items on the home page.
+ * 
+ * @param roleCategory - The user's role category in their active school
+ * @returns The module ID for the appropriate home experience
+ */
+export function getHomeModuleForRole(roleCategory: RoleCategory | null): SidebarModule {
+  switch (roleCategory) {
+    case 'student':
+      return 'home-student'
+    case 'parent':
+      return 'home-parent'
+    case 'administrator':
+    case 'educator':
+    default:
+      return 'home'
+  }
+}
+
+/**
+ * Get the home module for a specific school role.
+ * Convenience wrapper around getHomeModuleForRole.
+ * 
+ * @param schoolRole - The user's role in a specific school
+ * @returns The module ID for the appropriate home experience
+ */
+export function getHomeModuleForSchoolRole(schoolRole: SchoolRole | null): SidebarModule {
+  if (!schoolRole) return 'home'
+  
+  switch (schoolRole) {
+    case 'Student':
+      return 'home-student'
+    case 'Parent':
+      return 'home-parent'
+    default:
+      return 'home'
+  }
+}
+
+/**
+ * Detect which module should be active based on pathname.
+ * Note: This returns the base module ID. For home routes,
+ * the actual module to use depends on the user's role.
  */
 export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/settings')) return 'settings'
@@ -853,7 +1202,16 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/people')) return 'people'
   if (pathname.startsWith('/communications')) return 'communications'
   if (pathname.startsWith('/analytics')) return 'analytics'
+  if (pathname.startsWith('/student-portal')) return 'student-portal'
   if (pathname.startsWith('/parent-portal')) return 'parent-portal'
   return 'home'
+}
+
+/**
+ * Check if a module ID represents a home module variant.
+ * Used to determine if we're on a "home" context even with role-specific modules.
+ */
+export function isHomeModule(moduleId: SidebarModule): boolean {
+  return moduleId === 'home' || moduleId === 'home-student' || moduleId === 'home-parent'
 }
 
