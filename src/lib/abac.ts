@@ -65,11 +65,18 @@ export type Resource =
   | 'analytics:academic'
   | 'analytics:financial'
   | 'analytics:attendance'
-  // Parent Portal
+  // Student Portal - resources for student self-service
+  | 'student-portal'
+  | 'student-portal:grades'
+  | 'student-portal:attendance'
+  | 'student-portal:schedule'
+  | 'student-portal:assignments'
+  // Parent Portal - resources for parent access to children's data
   | 'parent-portal'
   | 'parent-portal:grades'
   | 'parent-portal:attendance'
   | 'parent-portal:fees'
+  | 'parent-portal:schedule'
   // Settings
   | 'settings'
   | 'settings:school'
@@ -120,11 +127,18 @@ const ROLE_PERMISSIONS: PermissionMap = {
     'analytics:academic': ['view', 'export'],
     'analytics:financial': ['view', 'export'],
     'analytics:attendance': ['view', 'export'],
+    // Student Portal - Principals can manage student portal
+    'student-portal': ['view', 'manage'],
+    'student-portal:grades': ['view', 'manage'],
+    'student-portal:attendance': ['view', 'manage'],
+    'student-portal:schedule': ['view', 'manage'],
+    'student-portal:assignments': ['view', 'manage'],
     // Parent Portal
     'parent-portal': ['view', 'manage'],
     'parent-portal:grades': ['view'],
     'parent-portal:attendance': ['view'],
     'parent-portal:fees': ['view'],
+    'parent-portal:schedule': ['view'],
     // Settings
     settings: ['view', 'edit'],
     'settings:school': ['view', 'edit', 'manage'],
@@ -164,11 +178,18 @@ const ROLE_PERMISSIONS: PermissionMap = {
     'analytics:academic': ['view'],
     'analytics:financial': [],
     'analytics:attendance': ['view'],
+    // Student Portal - Teachers can view student data
+    'student-portal': ['view'],
+    'student-portal:grades': ['view'],
+    'student-portal:attendance': ['view'],
+    'student-portal:schedule': ['view'],
+    'student-portal:assignments': ['view'],
     // Parent Portal
     'parent-portal': [],
     'parent-portal:grades': [],
     'parent-portal:attendance': [],
     'parent-portal:fees': [],
+    'parent-portal:schedule': [],
     // Settings
     settings: ['view'],
     'settings:school': [],
@@ -208,11 +229,18 @@ const ROLE_PERMISSIONS: PermissionMap = {
     'analytics:academic': [],
     'analytics:financial': ['view', 'export'],
     'analytics:attendance': [],
-    // Parent Portal
+    // Student Portal - No access
+    'student-portal': [],
+    'student-portal:grades': [],
+    'student-portal:attendance': [],
+    'student-portal:schedule': [],
+    'student-portal:assignments': [],
+    // Parent Portal - Fee management only
     'parent-portal': [],
     'parent-portal:grades': [],
     'parent-portal:attendance': [],
     'parent-portal:fees': ['view', 'manage'],
+    'parent-portal:schedule': [],
     // Settings
     settings: ['view'],
     'settings:school': [],
@@ -252,13 +280,136 @@ const ROLE_PERMISSIONS: PermissionMap = {
     'analytics:academic': [],
     'analytics:financial': [],
     'analytics:attendance': [],
+    // Student Portal
+    'student-portal': [],
+    'student-portal:grades': [],
+    'student-portal:attendance': [],
+    'student-portal:schedule': [],
+    'student-portal:assignments': [],
     // Parent Portal
     'parent-portal': [],
     'parent-portal:grades': [],
     'parent-portal:attendance': [],
     'parent-portal:fees': [],
+    'parent-portal:schedule': [],
     // Settings
     settings: [],
+    'settings:school': [],
+    'settings:tenant': [],
+  },
+
+  // ==========================================================================
+  // STUDENT ROLE
+  // Students have view-only access to their own academic data.
+  // They can view their grades, attendance, schedule, and assignments.
+  // Students can send messages to teachers but cannot access administrative functions.
+  // ==========================================================================
+  Student: {
+    dashboard: ['view'],
+    students: [], // Cannot view other students
+    teachers: ['view'], // Can see their teachers
+    grades: [], // No direct access to grades resource (use student-portal)
+    gradelevels: ['view'],
+    curriculum: ['view'], // Can view curriculum/syllabus
+    classes: ['view'], // Can view their enrolled classes
+    classrooms: ['view'],
+    calendar: ['view'], // Can view school calendar
+    attendance: [], // No direct access (use student-portal)
+    enrollment: [], // Cannot access enrollment
+    assessments: ['view'], // Can view assessments/assignments
+    gradebook: [], // No direct gradebook access
+    guardians: [], // Cannot view guardians
+    parents: [], // Cannot view parents
+    departments: ['view'],
+    billing: [],
+    payroll: [],
+    expenses: [],
+    tuition: [],
+    'reports:finance': [],
+    staff: [],
+    'staff:assignments': [],
+    // Communications - Students can view announcements and message teachers
+    communications: ['view'],
+    announcements: ['view'],
+    messages: ['view', 'create', 'send'],
+    notifications: ['view'],
+    // Analytics - Limited to own academic analytics
+    analytics: [],
+    'analytics:academic': [],
+    'analytics:financial': [],
+    'analytics:attendance': [],
+    // Student Portal - Full access to own academic data
+    'student-portal': ['view'],
+    'student-portal:grades': ['view'],
+    'student-portal:attendance': ['view'],
+    'student-portal:schedule': ['view'],
+    'student-portal:assignments': ['view'],
+    // Parent Portal - Not accessible
+    'parent-portal': [],
+    'parent-portal:grades': [],
+    'parent-portal:attendance': [],
+    'parent-portal:fees': [],
+    'parent-portal:schedule': [],
+    // Settings - Can view own profile settings only
+    settings: ['view'],
+    'settings:school': [],
+    'settings:tenant': [],
+  },
+
+  // ==========================================================================
+  // PARENT ROLE
+  // Parents have view access to their linked children's academic data.
+  // They can view grades, attendance, schedules, and pay fees.
+  // Parents can communicate with teachers and staff.
+  // ==========================================================================
+  Parent: {
+    dashboard: ['view'],
+    students: [], // Cannot view all students (only via parent-portal for their children)
+    teachers: ['view'], // Can see teachers
+    grades: [], // No direct access (use parent-portal)
+    gradelevels: ['view'],
+    curriculum: ['view'], // Can view curriculum
+    classes: [], // No direct class access
+    classrooms: [],
+    calendar: ['view'], // Can view school calendar
+    attendance: [], // No direct access (use parent-portal)
+    enrollment: [], // Cannot access enrollment
+    assessments: ['view'], // Can view children's assessments
+    gradebook: [], // No direct gradebook access
+    guardians: [], // Cannot view other guardians
+    parents: [], // Cannot view other parents
+    departments: ['view'],
+    billing: [], // No direct billing (use parent-portal:fees)
+    payroll: [],
+    expenses: [],
+    tuition: [],
+    'reports:finance': [],
+    staff: [],
+    'staff:assignments': [],
+    // Communications - Parents can communicate with school
+    communications: ['view'],
+    announcements: ['view'],
+    messages: ['view', 'create', 'send'],
+    notifications: ['view'],
+    // Analytics - No access
+    analytics: [],
+    'analytics:academic': [],
+    'analytics:financial': [],
+    'analytics:attendance': [],
+    // Student Portal - Not accessible (parents use parent-portal)
+    'student-portal': [],
+    'student-portal:grades': [],
+    'student-portal:attendance': [],
+    'student-portal:schedule': [],
+    'student-portal:assignments': [],
+    // Parent Portal - Full access to children's data
+    'parent-portal': ['view'],
+    'parent-portal:grades': ['view'],
+    'parent-portal:attendance': ['view'],
+    'parent-portal:fees': ['view', 'create'], // Can view and pay fees
+    'parent-portal:schedule': ['view'],
+    // Settings - Can view own profile settings only
+    settings: ['view'],
     'settings:school': [],
     'settings:tenant': [],
   },

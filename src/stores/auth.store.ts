@@ -1,9 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { UserIdentity, SchoolRole } from '@/types/auth'
+import type { UserIdentity, SchoolRole, RoleCategory } from '@/types/auth'
+import { getRoleCategory } from '@/types/auth'
 
 // ============================================================================
 // MOCK DATA - Replace with real Cognito integration later
+// 
+// These mock users represent the different user personas in EdForge EMIS:
+// - TenantAdmin: District-level administrator with access to all schools
+// - Principal: School administrator with full school-level permissions
+// - Teacher: Educator with academic management permissions
+// - Accountant: Financial staff with billing/payroll permissions
+// - Student: Enrolled student viewing their own academic data
+// - Parent: Guardian viewing linked children's academic data
+// 
+// TODO: Replace with AWS Cognito integration for production
 // ============================================================================
 
 const MOCK_USERS: Record<string, UserIdentity> = {
@@ -47,6 +58,28 @@ const MOCK_USERS: Record<string, UserIdentity> = {
       'school-002': 'Accountant',
       'school-003': 'Accountant',
     },
+  },
+  'student': {
+    id: 'user-005',
+    email: 'alex.chen@student.lincoln.edu',
+    name: 'Alex Chen',
+    globalRole: 'StandardUser',
+    assignments: {
+      'school-001': 'Student',
+    },
+  },
+  'parent': {
+    id: 'user-006',
+    email: 'robert.thompson@email.com',
+    name: 'Robert Thompson',
+    globalRole: 'StandardUser',
+    assignments: {
+      // Parent has children at Lincoln High (Emma) and Washington Elementary (Lucas)
+      'school-001': 'Parent',
+      'school-002': 'Parent',
+    },
+    // Links to student records - will be used to fetch children's data
+    childrenIds: ['STU-0001', 'STU-0002'],
   },
 }
 
@@ -123,12 +156,50 @@ export const useAuthStore = create<AuthStore>()(
   )
 )
 
-// Export mock users for the login page
-export const mockUserOptions = Object.entries(MOCK_USERS).map(([key, user]) => ({
-  id: key,
-  name: user.name,
-  email: user.email,
-  globalRole: user.globalRole,
-  schoolCount: Object.keys(user.assignments).length,
-}))
+// ============================================================================
+// MOCK USER OPTIONS FOR LOGIN PAGE
+// ============================================================================
+
+/**
+ * Get the primary role for a user (first assignment's role).
+ * Used for display purposes on the login page.
+ */
+function getPrimaryRole(user: UserIdentity): SchoolRole {
+  const assignments = Object.values(user.assignments)
+  return assignments[0] ?? 'Staff'
+}
+
+/**
+ * Export mock users for the login page with enhanced metadata.
+ * Includes role category for visual differentiation in the UI.
+ */
+export const mockUserOptions = Object.entries(MOCK_USERS).map(([key, user]) => {
+  const primaryRole = getPrimaryRole(user)
+  const roleCategory = getRoleCategory(primaryRole)
+  
+  return {
+    id: key,
+    name: user.name,
+    email: user.email,
+    globalRole: user.globalRole,
+    primaryRole,
+    roleCategory,
+    schoolCount: Object.keys(user.assignments).length,
+    childrenCount: user.childrenIds?.length ?? 0,
+  }
+})
+
+/**
+ * Helper to get role category for the current user in a specific school.
+ * Used by navigation and UI components to determine what to render.
+ */
+export function getUserRoleCategory(
+  user: UserIdentity | null,
+  schoolId: string | null
+): RoleCategory | null {
+  if (!user || !schoolId) return null
+  const role = user.assignments[schoolId]
+  if (!role) return null
+  return getRoleCategory(role)
+}
 

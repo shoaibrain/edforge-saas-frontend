@@ -1,8 +1,16 @@
 /**
  * Sidebar Module Detection Hook
  * 
- * Detects which sidebar module should be active based on the current route.
- * Returns the module configuration for dynamic sidebar rendering.
+ * Detects which sidebar module should be active based on the current route
+ * AND the user's role in their active school context.
+ * 
+ * Role-Based Home Module Selection:
+ * - Students see student portal navigation
+ * - Parents see family portal navigation  
+ * - Admins/Teachers see standard admin navigation
+ * 
+ * This enables a unified login experience where different user types
+ * land on /home but see navigation appropriate to their role.
  */
 
 import { useMemo } from 'react'
@@ -12,7 +20,11 @@ import {
   type ModuleConfig,
   detectModuleFromPath,
   getModuleConfig,
+  getHomeModuleForSchoolRole,
+  isHomeModule,
 } from '@/config/sidebar-modules'
+import { useAuthStore } from '@/stores/auth.store'
+import { useAppStore } from '@/stores/app.store'
 
 export interface UseSidebarModuleReturn {
   /** Current active module ID */
@@ -30,14 +42,38 @@ export interface UseSidebarModuleReturn {
 
 /**
  * Hook to detect and provide the current sidebar module based on route
+ * and user role context.
+ * 
+ * When on home routes (/home, /), the module is determined by the user's
+ * role in their active school:
+ * - Student role → student home module
+ * - Parent role → parent home module
+ * - Other roles → standard admin home module
  */
 export function useSidebarModule(): UseSidebarModuleReturn {
   const location = useLocation()
+  const user = useAuthStore((s) => s.user)
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
 
   return useMemo(() => {
-    const moduleId = detectModuleFromPath(location.pathname)
+    // First, detect base module from path
+    const baseModuleId = detectModuleFromPath(location.pathname)
+    
+    // If we're on a home route, determine the role-specific home module
+    let moduleId: SidebarModule = baseModuleId
+    
+    if (baseModuleId === 'home' && user && activeSchoolId) {
+      // Get the user's role in the active school
+      const schoolRole = user.assignments[activeSchoolId]
+      if (schoolRole) {
+        moduleId = getHomeModuleForSchoolRole(schoolRole)
+      }
+    }
+    
     const config = getModuleConfig(moduleId)
-    const isSubModule = moduleId !== 'home'
+    
+    // Consider all home module variants as "not a sub-module"
+    const isSubModule = !isHomeModule(moduleId)
 
     return {
       moduleId,
@@ -45,7 +81,7 @@ export function useSidebarModule(): UseSidebarModuleReturn {
       isSubModule,
       backTo: config.backTo,
     }
-  }, [location.pathname])
+  }, [location.pathname, user, activeSchoolId])
 }
 
 /**
