@@ -142,6 +142,7 @@ function FinanceOverviewPage() {
 
   return (
     <ModuleOverviewPage
+      moduleId="finance"
       title="Finance"
       description="Manage billing, payroll, expenses, and financial reports"
       icon={DollarSign}

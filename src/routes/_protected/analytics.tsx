@@ -151,6 +151,7 @@ function AnalyticsOverviewPage() {
 
   return (
     <ModuleOverviewPage
+      moduleId="analytics"
       title="Analytics"
       description="Data-driven insights for informed decision making"
       icon={BarChart3}

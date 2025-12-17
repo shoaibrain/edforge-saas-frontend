@@ -163,6 +163,7 @@ function AcademicsOverviewPage() {
 
   return (
     <ModuleOverviewPage
+      moduleId="academics"
       title="Academics"
       description="Manage students, classes, curriculum, and grades"
       icon={GraduationCap}

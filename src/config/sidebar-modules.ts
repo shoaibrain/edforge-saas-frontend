@@ -16,6 +16,7 @@
 import {
   GraduationCap,
   DollarSign,
+  GalleryVerticalEnd,
   Users,
   Settings,
   MessageCircleMore,
@@ -25,7 +26,6 @@ import {
   BellDot,
   Component,
   Landmark,
-  View,
   Layers,
   ShieldCheck,
   Link2,
@@ -43,7 +43,6 @@ import {
   BrickWallShield,
   Calendars,
   Atom,
-  ChartNoAxesGantt,
   BanknoteArrowDown,
   BanknoteArrowUp,
   ChartNoAxesCombined,
@@ -410,7 +409,7 @@ const settingsModule: ModuleConfig = {
         {
           id: 'settings-home',
           label: 'Overview',
-          icon: View,
+          icon: GalleryVerticalEnd,
           href: '/settings',
         },
       ],
@@ -534,7 +533,7 @@ const academicsModule: ModuleConfig = {
         {
           id: 'academics-home',
           label: 'Overview',
-          icon: GraduationCap,
+          icon: GalleryVerticalEnd,
           href: '/academics',
           permission: { action: 'view', resource: 'students' },
         },
@@ -663,7 +662,7 @@ const financeModule: ModuleConfig = {
         {
           id: 'finance-home',
           label: 'Overview',
-          icon: ChartNoAxesGantt,
+          icon: GalleryVerticalEnd,
           // TODO: Refactor for the path and page and routing /hr instead of /finance
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
@@ -831,7 +830,7 @@ const communicationsModule: ModuleConfig = {
         {
           id: 'meeting-hub-home',
           label: 'Overview',
-          icon: Video,
+          icon: GalleryVerticalEnd,
           href: '/communications',
           permission: { action: 'view', resource: 'communications' },
         },
@@ -891,7 +890,7 @@ const analyticsModule: ModuleConfig = {
         {
           id: 'analytics-home',
           label: 'Overview',
-          icon: BarChart3,
+          icon: GalleryVerticalEnd,
           href: '/analytics',
           permission: { action: 'view', resource: 'analytics' },
         },

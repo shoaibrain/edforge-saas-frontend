@@ -1,10 +1,11 @@
 /**
- * ModuleOverviewPage - Reusable module landing page component
+ * ModuleOverviewPage - Notion-Inspired Module Landing Page
  * 
- * Provides a consistent layout for module overview pages with:
- * - Header with title and description
- * - Stats grid with animated cards
+ * Provides a consistent, customizable layout for module overview pages with:
+ * - Header with module title + "Overview" label combined
+ * - Stats carousel (Notion-style cards)
  * - Quick action cards linking to sub-routes
+ * - Widget visibility controls (three-dot menu in top right)
  * - ABAC-aware visibility controls
  */
 
@@ -12,12 +13,20 @@ import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { useSpring, animated, config } from '@react-spring/web'
+import { useSpring, animated } from '@react-spring/web'
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, GalleryVerticalEnd } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { RequirePermission } from '@/components/secure'
 import type { Action, Resource } from '@/lib/abac'
+import {
+  DynamicPageProvider,
+  WidgetSection,
+  WidgetVisibilityMenu,
+  CarouselWidget,
+  ModuleTipWidget,
+  type CarouselCard,
+} from '@/components/dynamic-page'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -49,78 +58,32 @@ export interface ModuleActionCard {
 }
 
 export interface ModuleOverviewPageProps {
+  /** Module identifier for widget preferences */
+  moduleId?: string
   title: string
   description: string
   icon: LucideIcon
   stats: ModuleStat[]
   actionCards: ModuleActionCard[]
+  /** Show tip widget */
+  showTip?: boolean
   children?: ReactNode
 }
 
 // ============================================================================
-// STAT CARD COMPONENT
+// HELPER - Convert Stats to Carousel Cards
 // ============================================================================
 
-function StatCard({ 
-  stat, 
-  delay = 0 
-}: { 
-  stat: ModuleStat
-  delay?: number
-}) {
-  const [hovered, setHovered] = useState(false)
-  
-  const springProps = useSpring({
-    scale: hovered ? 1.02 : 1,
-    y: hovered ? -4 : 0,
-    shadow: hovered ? 20 : 8,
-    config: config.wobbly,
-  })
-
-  return (
-    <animated.div
-      style={{
-        transform: springProps.scale.to(s => `scale(${s}) translateY(${springProps.y.get()}px)`),
-        boxShadow: springProps.shadow.to(s => `0 ${s}px ${s * 2}px -${s/2}px rgba(0,0,0,0.1)`),
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay }}
-      >
-        <Card className="p-5 cursor-default">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-[rgb(var(--text-tertiary))]">{stat.label}</p>
-              <p className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">
-                {stat.value}
-              </p>
-            </div>
-            <div className={`p-3 rounded-xl ${stat.iconBg}`}>
-              <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.iconColor}`} />
-            </div>
-          </div>
-          {stat.change && (
-            <div className="flex items-center gap-1.5 mt-4 pt-4 border-t border-[rgb(var(--border-secondary))]">
-              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                stat.changeType === 'positive' 
-                  ? 'bg-aqua-400/20 text-aqua-700 dark:text-aqua-400' 
-                  : stat.changeType === 'negative'
-                    ? 'bg-rust-100 text-rust-600 dark:bg-rust-900/30 dark:text-rust-400'
-                    : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'
-              }`}>
-                {stat.change}
-              </div>
-              <span className="text-xs text-[rgb(var(--text-tertiary))]">vs last period</span>
-            </div>
-          )}
-        </Card>
-      </motion.div>
-    </animated.div>
-  )
+function statsToCarouselCards(stats: ModuleStat[]): CarouselCard[] {
+  return stats.map((stat, index) => ({
+    id: `stat-${index}`,
+    title: stat.label,
+    value: stat.value,
+    icon: stat.icon,
+    change: stat.change,
+    changeType: stat.changeType,
+    module: stat.changeType || 'neutral',
+  }))
 }
 
 // ============================================================================
@@ -201,74 +164,133 @@ function ActionCard({
 }
 
 // ============================================================================
-// MAIN COMPONENT
+// QUICK ACCESS WIDGET
 // ============================================================================
 
-export function ModuleOverviewPage({
+interface QuickAccessWidgetProps {
+  actionCards: ModuleActionCard[]
+}
+
+function QuickAccessWidget({ actionCards }: QuickAccessWidgetProps) {
+  return (
+    <WidgetSection
+      widgetId="quick-access"
+      label="Quick access"
+      animationDelay={0.35}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {actionCards.map((card, index) => (
+          <ActionCard
+            key={card.id}
+            card={card}
+            delay={0.35 + index * 0.05}
+          />
+        ))}
+      </div>
+    </WidgetSection>
+  )
+}
+
+// ============================================================================
+// STATS CAROUSEL WIDGET
+// ============================================================================
+
+interface StatsCarouselWidgetProps {
+  stats: ModuleStat[]
+}
+
+function StatsCarouselWidget({ stats }: StatsCarouselWidgetProps) {
+  const carouselCards = statsToCarouselCards(stats)
+  
+  return (
+    <WidgetSection
+      widgetId="quick-stats"
+      label="Quick stats"
+      animationDelay={0.1}
+    >
+      <CarouselWidget cards={carouselCards} cardType="stat" />
+    </WidgetSection>
+  )
+}
+
+// ============================================================================
+// INNER CONTENT (Within Context)
+// ============================================================================
+
+interface ModuleOverviewInnerProps {
+  moduleId: string
+  title: string
+  description: string
+  stats: ModuleStat[]
+  actionCards: ModuleActionCard[]
+  showTip: boolean
+  children?: ReactNode
+}
+
+function ModuleOverviewInner({
+  moduleId,
   title,
   description,
-  icon: Icon,
   stats,
   actionCards,
+  showTip,
   children,
-}: ModuleOverviewPageProps) {
+}: ModuleOverviewInnerProps) {
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header */}
+    <div className="space-y-10 max-w-6xl mx-auto pb-12 relative">
+      {/* Three-dot menu in top right corner */}
       <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="absolute top-4 right-0 z-10"
+      >
+        <WidgetVisibilityMenu />
+      </motion.div>
+      
+      {/* Header */}
+      <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        className="pt-4 pr-12"
       >
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/15 to-cyan-500/10 dark:from-teal-500/20 dark:to-cyan-500/15 border border-teal-500/20 dark:border-cyan-500/25">
-            <Icon className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
-          </div>
+          {/* Animated Module Icon */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="p-3 rounded-xl bg-gradient-to-br from-brand-500/15 to-brand-600/15 dark:from-brand-400/20 dark:to-brand-500/20 border border-brand-500/20 dark:border-brand-400/25 flex-shrink-0"
+          >
+            <GalleryVerticalEnd className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+          </motion.div>
+          
+          {/* Title and description - Combined format */}
           <div>
+            
             <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">
-              {title}
+              {title} Overview
             </h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-1">
+            <p className="text-[rgb(var(--text-secondary))] mt-1 max-w-2xl">
               {description}
             </p>
           </div>
         </div>
-      </motion.div>
+      </motion.header>
 
-      {/* Stats Grid */}
+      {/* Stats Carousel */}
       {stats.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {stats.map((stat, index) => (
-            <StatCard
-              key={stat.label}
-              stat={stat}
-              delay={0.1 + index * 0.05}
-            />
-          ))}
-        </div>
+        <StatsCarouselWidget stats={stats} />
       )}
 
-      {/* Action Cards Grid */}
+      {/* Quick Access Cards */}
       {actionCards.length > 0 && (
-        <div>
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-4"
-          >
-            Quick Access
-          </motion.h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {actionCards.map((card, index) => (
-              <ActionCard
-                key={card.id}
-                card={card}
-                delay={0.35 + index * 0.05}
-              />
-            ))}
-          </div>
-        </div>
+        <QuickAccessWidget actionCards={actionCards} />
+      )}
+
+      {/* Module-specific Tip */}
+      {showTip && (
+        <ModuleTipWidget moduleId={moduleId} />
       )}
 
       {/* Additional content slot */}
@@ -285,3 +307,34 @@ export function ModuleOverviewPage({
   )
 }
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export function ModuleOverviewPage({
+  moduleId,
+  title,
+  description,
+  stats,
+  actionCards,
+  showTip = true,
+  children,
+}: ModuleOverviewPageProps) {
+  // Generate moduleId from title if not provided
+  const pageId = moduleId || `${title.toLowerCase().replace(/\s+/g, '-')}-overview`
+  
+  return (
+    <DynamicPageProvider pageId={pageId} pageType="module-overview">
+      <ModuleOverviewInner
+        moduleId={pageId}
+        title={title}
+        description={description}
+        stats={stats}
+        actionCards={actionCards}
+        showTip={showTip}
+      >
+        {children}
+      </ModuleOverviewInner>
+    </DynamicPageProvider>
+  )
+}
