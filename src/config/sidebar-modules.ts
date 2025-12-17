@@ -10,6 +10,7 @@ import {
   DollarSign,
   Users,
   Settings,
+  MessageCircleMore,
   User,
   SlidersHorizontal,
   ContactRound,
@@ -40,17 +41,18 @@ import {
   ChartNoAxesCombined,
   ClipboardPlus,
   UserStar,
-  // New imports for Communications & Analytics
-  MessageSquare,
+  // New imports for Analytics
   Megaphone,
   Mail,
-  Send,
-  Inbox,
   TrendingUp,
   PieChart,
   LineChart,
   // Parent Portal
   Home,
+  // Meeting Hub
+  Video,
+  CalendarPlus,
+  CalendarCheck,
 } from 'lucide-react'
 import type { Action, Resource } from '@/lib/abac'
 import type { GlobalRole } from '@/types/auth'
@@ -144,8 +146,8 @@ const homeModule: ModuleConfig = {
         },
         {
           id: 'communications',
-          label: 'Communications',
-          icon: MessageSquare,
+          label: 'Communication',
+          icon: MessageCircleMore,
           href: '/communications',
           permission: { action: 'view', resource: 'communications' },
         },
@@ -590,75 +592,59 @@ const peopleModule: ModuleConfig = {
 }
 
 // ============================================================================
-// COMMUNICATIONS MODULE - Messaging and announcements
+// COMMUNICATIONS MODULE - Meeting Hub (Video Conferencing Integrations)
 // ============================================================================
 
 const communicationsModule: ModuleConfig = {
   id: 'communications',
-  title: 'Communications',
-  icon: MessageSquare,
+  title: 'Meeting Hub',
+  icon: Video,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
       id: 'overview',
       items: [
         {
-          id: 'communications-home',
+          id: 'meeting-hub-home',
           label: 'Overview',
-          icon: MessageSquare,
+          icon: Video,
           href: '/communications',
           permission: { action: 'view', resource: 'communications' },
         },
       ],
     },
     {
-      id: 'channels',
-      label: 'CHANNELS',
+      id: 'integrations',
+      label: 'INTEGRATIONS',
       items: [
         {
-          id: 'announcements',
-          label: 'Announcements',
-          icon: Megaphone,
-          href: '/communications/announcements',
-          permission: { action: 'view', resource: 'announcements' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'messages',
-          label: 'Messages',
-          icon: Mail,
-          href: '/communications/messages',
-          permission: { action: 'view', resource: 'messages' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'inbox',
-          label: 'Inbox',
-          icon: Inbox,
-          href: '/communications/inbox',
-          permission: { action: 'view', resource: 'messages' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'sent',
-          label: 'Sent',
-          icon: Send,
-          href: '/communications/sent',
-          permission: { action: 'view', resource: 'messages' },
-          requiresActiveSchool: true,
+          id: 'integrations-manage',
+          label: 'Manage Integrations',
+          icon: Link2,
+          href: '/communications/integrations',
+          permission: { action: 'view', resource: 'communications' },
         },
       ],
     },
     {
-      id: 'notifications',
-      label: 'NOTIFICATIONS',
+      id: 'meetings',
+      label: 'MEETINGS',
       items: [
         {
-          id: 'notifications-list',
-          label: 'Notifications',
-          icon: BellDot,
-          href: '/communications/notifications',
-          permission: { action: 'view', resource: 'notifications' },
+          id: 'schedule-meeting',
+          label: 'Schedule Meeting',
+          icon: CalendarPlus,
+          href: '/communications/schedule',
+          permission: { action: 'create', resource: 'communications' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'my-meetings',
+          label: 'My Meetings',
+          icon: CalendarCheck,
+          href: '/communications/meetings',
+          permission: { action: 'view', resource: 'communications' },
+          requiresActiveSchool: true,
         },
       ],
     },
