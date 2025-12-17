@@ -40,6 +40,17 @@ import {
   ChartNoAxesCombined,
   ClipboardPlus,
   UserStar,
+  // New imports for Communications & Analytics
+  MessageSquare,
+  Megaphone,
+  Mail,
+  Send,
+  Inbox,
+  TrendingUp,
+  PieChart,
+  LineChart,
+  // Parent Portal
+  Home,
 } from 'lucide-react'
 import type { Action, Resource } from '@/lib/abac'
 import type { GlobalRole } from '@/types/auth'
@@ -90,7 +101,7 @@ export interface ModuleConfig {
   groups: NavItemGroup[]
 }
 
-export type SidebarModule = 'home' | 'settings' | 'academics' | 'finance' | 'people'
+export type SidebarModule = 'home' | 'settings' | 'academics' | 'finance' | 'people' | 'communications' | 'analytics' | 'parent-portal'
 
 // ============================================================================
 // HOME MODULE - Main dashboard navigation
@@ -106,7 +117,7 @@ const homeModule: ModuleConfig = {
         {
           id: 'academics',
           label: 'Academics',
-          icon: GraduationCap,
+          icon: School,
           href: '/academics',
           permission: { action: 'view', resource: 'students' },
         },
@@ -123,6 +134,27 @@ const homeModule: ModuleConfig = {
           icon: UsersRound,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
+        },
+        {
+          id: 'analytics',
+          label: 'Analytics',
+          icon: BarChart3,
+          href: '/analytics',
+          permission: { action: 'view', resource: 'analytics' },
+        },
+        {
+          id: 'communications',
+          label: 'Communications',
+          icon: MessageSquare,
+          href: '/communications',
+          permission: { action: 'view', resource: 'communications' },
+        },
+        {
+          id: 'parent-portal',
+          label: 'Parent Portal',
+          icon: Home,
+          href: '/parent-portal',
+          permission: { action: 'view', resource: 'parent-portal' },
         },
         {
           id: 'settings',
@@ -340,6 +372,14 @@ const academicsModule: ModuleConfig = {
           permission: { action: 'view', resource: 'curriculum' },
           requiresActiveSchool: true,
         },
+        {
+          id: 'gradebook',
+          label: 'Gradebook',
+          icon: GraduationCap,
+          href: '/academics/grades',
+          permission: { action: 'view', resource: 'grades' },
+          requiresActiveSchool: true,
+        },
         // TODO: review and complete the implementation.
         // this is the page for user to view, manage the academic calendars for each academic year
         // that will apply to their school in edforge. here, user should be able to securely and effectively 
@@ -550,6 +590,252 @@ const peopleModule: ModuleConfig = {
 }
 
 // ============================================================================
+// COMMUNICATIONS MODULE - Messaging and announcements
+// ============================================================================
+
+const communicationsModule: ModuleConfig = {
+  id: 'communications',
+  title: 'Communications',
+  icon: MessageSquare,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'communications-home',
+          label: 'Overview',
+          icon: MessageSquare,
+          href: '/communications',
+          permission: { action: 'view', resource: 'communications' },
+        },
+      ],
+    },
+    {
+      id: 'channels',
+      label: 'CHANNELS',
+      items: [
+        {
+          id: 'announcements',
+          label: 'Announcements',
+          icon: Megaphone,
+          href: '/communications/announcements',
+          permission: { action: 'view', resource: 'announcements' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'messages',
+          label: 'Messages',
+          icon: Mail,
+          href: '/communications/messages',
+          permission: { action: 'view', resource: 'messages' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'inbox',
+          label: 'Inbox',
+          icon: Inbox,
+          href: '/communications/inbox',
+          permission: { action: 'view', resource: 'messages' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'sent',
+          label: 'Sent',
+          icon: Send,
+          href: '/communications/sent',
+          permission: { action: 'view', resource: 'messages' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'notifications',
+      label: 'NOTIFICATIONS',
+      items: [
+        {
+          id: 'notifications-list',
+          label: 'Notifications',
+          icon: BellDot,
+          href: '/communications/notifications',
+          permission: { action: 'view', resource: 'notifications' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
+// ANALYTICS MODULE - Data insights and reports
+// ============================================================================
+
+const analyticsModule: ModuleConfig = {
+  id: 'analytics',
+  title: 'Analytics',
+  icon: BarChart3,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'analytics-home',
+          label: 'Overview',
+          icon: BarChart3,
+          href: '/analytics',
+          permission: { action: 'view', resource: 'analytics' },
+        },
+      ],
+    },
+    {
+      id: 'insights',
+      label: 'INSIGHTS',
+      items: [
+        {
+          id: 'academic-analytics',
+          label: 'Academic Performance',
+          icon: GraduationCap,
+          href: '/analytics/academic',
+          permission: { action: 'view', resource: 'analytics:academic' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'attendance-analytics',
+          label: 'Attendance',
+          icon: ClipboardPlus,
+          href: '/analytics/attendance',
+          permission: { action: 'view', resource: 'analytics:attendance' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'financial-analytics',
+          label: 'Financial',
+          icon: DollarSign,
+          href: '/analytics/financial',
+          permission: { action: 'view', resource: 'analytics:financial' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'enrollment-analytics',
+          label: 'Enrollment Trends',
+          icon: TrendingUp,
+          href: '/analytics/enrollment',
+          permission: { action: 'view', resource: 'enrollment' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'reports',
+      label: 'REPORTS',
+      items: [
+        {
+          id: 'comparisons',
+          label: 'Comparative Analysis',
+          icon: LineChart,
+          href: '/analytics/comparisons',
+          permission: { action: 'view', resource: 'analytics' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'custom-reports',
+          label: 'Custom Reports',
+          icon: PieChart,
+          href: '/analytics/custom',
+          permission: { action: 'view', resource: 'reports:finance' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
+// PARENT PORTAL MODULE - For parents/guardians
+// ============================================================================
+
+const parentPortalModule: ModuleConfig = {
+  id: 'parent-portal',
+  title: 'Parent Portal',
+  icon: Home,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'portal-home',
+          label: 'Dashboard',
+          icon: Home,
+          href: '/parent-portal',
+          permission: { action: 'view', resource: 'parent-portal' },
+        },
+      ],
+    },
+    {
+      id: 'children',
+      label: 'MY CHILDREN',
+      items: [
+        {
+          id: 'view-grades',
+          label: 'Grades',
+          icon: GraduationCap,
+          href: '/parent-portal/grades',
+          permission: { action: 'view', resource: 'parent-portal:grades' },
+        },
+        {
+          id: 'view-attendance',
+          label: 'Attendance',
+          icon: ClipboardPlus,
+          href: '/parent-portal/attendance',
+          permission: { action: 'view', resource: 'parent-portal:attendance' },
+        },
+        {
+          id: 'view-schedule',
+          label: 'Schedule',
+          icon: Calendars,
+          href: '/parent-portal/schedule',
+          permission: { action: 'view', resource: 'parent-portal' },
+        },
+      ],
+    },
+    {
+      id: 'payments',
+      label: 'PAYMENTS',
+      items: [
+        {
+          id: 'fees',
+          label: 'Fee Payments',
+          icon: CreditCard,
+          href: '/parent-portal/fees',
+          permission: { action: 'view', resource: 'parent-portal:fees' },
+        },
+      ],
+    },
+    {
+      id: 'communication',
+      label: 'COMMUNICATION',
+      items: [
+        {
+          id: 'messages-portal',
+          label: 'Messages',
+          icon: Mail,
+          href: '/communications/messages',
+          permission: { action: 'view', resource: 'messages' },
+        },
+        {
+          id: 'announcements-portal',
+          label: 'Announcements',
+          icon: Megaphone,
+          href: '/communications/announcements',
+          permission: { action: 'view', resource: 'announcements' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
 // MODULE REGISTRY
 // ============================================================================
 
@@ -559,6 +845,9 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   academics: academicsModule,
   finance: financeModule,
   people: peopleModule,
+  communications: communicationsModule,
+  analytics: analyticsModule,
+  'parent-portal': parentPortalModule,
 }
 
 /**
@@ -576,6 +865,9 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/academics')) return 'academics'
   if (pathname.startsWith('/finance')) return 'finance'
   if (pathname.startsWith('/people')) return 'people'
+  if (pathname.startsWith('/communications')) return 'communications'
+  if (pathname.startsWith('/analytics')) return 'analytics'
+  if (pathname.startsWith('/parent-portal')) return 'parent-portal'
   return 'home'
 }
 
