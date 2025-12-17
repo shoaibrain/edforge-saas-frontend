@@ -69,7 +69,7 @@ function AnimatedNavIcon({
         size={SIDEBAR_NAV_ICON_SIZE}
         className={cn(
           'transition-colors duration-200 relative z-10',
-          isActive && !isDanger && 'text-teal-600 dark:text-cyan-400',
+          isActive && !isDanger && 'text-teal-700 dark:text-white',
           isActive && isDanger && 'text-rust-500',
           !isActive && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
         )} 
@@ -136,7 +136,7 @@ function NavItemLink({
               'absolute inset-0 rounded-xl',
               isDanger
                 ? 'bg-rust-500/10'
-                : 'bg-gradient-to-r from-teal-500/12 to-cyan-500/8 dark:from-teal-500/15 dark:to-cyan-500/10'
+                : 'bg-[rgb(var(--interactive-active))]'
             )}
             initial={false}
             transition={{
@@ -182,7 +182,7 @@ function NavItemLink({
               transition={{ duration: 0.15 }}
               className={cn(
                 'text-sm font-medium whitespace-nowrap overflow-hidden relative z-10',
-                isActive && !isDanger && 'text-teal-700 dark:text-cyan-300',
+                isActive && !isDanger && 'text-teal-700 dark:text-white',
                 isActive && isDanger && 'text-rust-600 dark:text-rust-400',
                 !isActive && !isDanger && 'text-[rgb(var(--text-secondary))]',
                 !isActive && isDanger && 'text-rust-500/80'
@@ -326,7 +326,7 @@ function HomeNavButton({
         {isActive && (
           <motion.div
             layoutId="homeActiveIndicator"
-            className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/12 to-cyan-500/8 dark:from-teal-500/15 dark:to-cyan-500/10"
+            className="absolute inset-0 rounded-xl bg-[rgb(var(--interactive-active))]"
           />
         )}
         {isActive && (
@@ -350,7 +350,7 @@ function HomeNavButton({
                 size={SIDEBAR_NAV_ICON_SIZE}
                 className={cn(
                   'transition-colors duration-200',
-                  isActive && 'text-teal-600 dark:text-cyan-400',
+                  isActive && 'text-teal-700 dark:text-white',
                   !isActive && showBackMode && 'text-[rgb(var(--text-secondary))]',
                   !isActive && !showBackMode && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
                 )} 
@@ -370,7 +370,7 @@ function HomeNavButton({
               transition={{ duration: 0.15 }}
               className={cn(
                 'text-sm font-medium relative z-10 whitespace-nowrap',
-                isActive && 'text-teal-700 dark:text-cyan-300',
+                isActive && 'text-teal-700 dark:text-white',
                 !isActive && 'text-[rgb(var(--text-secondary))]'
               )}
             >
