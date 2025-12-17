@@ -1,232 +1,244 @@
 /**
- * Home Page - Main Dashboard
+ * Home Page - Notion-Inspired Dashboard
  * 
- * The landing page after authentication with overview stats,
- * recent activity, and quick actions.
+ * A minimal, elegant landing page with:
+ * - Time-based personalized greeting
+ * - Recently visited pages carousel
+ * - Upcoming events calendar
+ * - Subtle quick actions
  */
 
-import { createFileRoute } from '@tanstack/react-router'
-import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
-import { useAppStore } from '@/stores/app.store'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth.store'
 import { motion } from 'framer-motion'
 import {
   Users,
-  GraduationCap,
-  DollarSign,
   Calendar,
-  TrendingUp,
-  Building2,
-  ArrowUpRight,
-  Clock,
+  Video,
+  BarChart3,
+  Plus,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react'
-import { Card } from '@/components/ui/Card'
+import { getGreeting } from '@/lib/greeting'
+import { RecentlyVisitedCarousel, UpcomingEventsSection } from '@/components/home'
 
 export const Route = createFileRoute('/_protected/home')({
   component: HomePage,
 })
 
-function HomePage() {
-  const user = useAuthStore((s) => s.user)
-  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+// ============================================================================
+// QUICK ACTIONS CONFIG
+// ============================================================================
 
-  const activeSchool = activeSchoolId ? MOCK_SCHOOLS[activeSchoolId] : null
-
-  const stats = [
-    {
-      label: 'Total Students',
-      value: '1,247',
-      change: '+12%',
-      changeType: 'positive',
-      icon: Users,
-      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
-      iconColor: 'text-teal-600 dark:text-cyan-400',
-    },
-    {
-      label: 'Active Classes',
-      value: '48',
-      change: '+3',
-      changeType: 'positive',
-      icon: GraduationCap,
-      iconBg: 'bg-aqua-400/20',
-      iconColor: 'text-aqua-700 dark:text-aqua-400',
-    },
-    {
-      label: 'Revenue (MTD)',
-      value: '$45,230',
-      change: '+8%',
-      changeType: 'positive',
-      icon: DollarSign,
-      iconBg: 'bg-golden-400/20',
-      iconColor: 'text-golden-600 dark:text-golden-400',
-    },
-    {
-      label: 'Attendance Rate',
-      value: '94.2%',
-      change: '+1.2%',
-      changeType: 'positive',
-      icon: Calendar,
-      iconBg: 'bg-vanilla-400/30 dark:bg-vanilla-400/20',
-      iconColor: 'text-vanilla-700 dark:text-vanilla-500',
-    },
-  ]
-
-  const recentActivity = [
-    { text: 'New student enrollment processed', time: '2 hours ago', type: 'success' },
-    { text: 'Grade report submitted for Class 10-A', time: '4 hours ago', type: 'info' },
-    { text: 'Attendance marked for 12 classes', time: '5 hours ago', type: 'info' },
-    { text: 'Fee collection completed', time: 'Yesterday', type: 'success' },
-    { text: 'New staff member onboarded', time: 'Yesterday', type: 'info' },
-  ]
-
-  const quickActions = [
-    { label: 'Add Student', icon: Users, color: 'teal' },
-    { label: 'Record Attendance', icon: Calendar, color: 'golden' },
-    { label: 'Create Class', icon: GraduationCap, color: 'aqua' },
-    { label: 'View Reports', icon: TrendingUp, color: 'caramel' },
-  ]
-
-  const colorMap: Record<string, { bg: string; text: string }> = {
-    teal: { bg: 'bg-teal-500/15 hover:bg-teal-500/25 dark:bg-cyan-500/20 dark:hover:bg-cyan-500/30', text: 'text-teal-700 dark:text-cyan-400' },
-    golden: { bg: 'bg-golden-400/20 hover:bg-golden-400/30', text: 'text-golden-700 dark:text-golden-400' },
-    aqua: { bg: 'bg-aqua-400/20 hover:bg-aqua-400/30', text: 'text-aqua-700 dark:text-aqua-400' },
-    caramel: { bg: 'bg-caramel-400/20 hover:bg-caramel-400/30', text: 'text-caramel-600 dark:text-caramel-300' },
+interface QuickAction {
+  id: string
+  label: string
+  description: string
+  icon: React.ElementType
+  href: string
+  color: {
+    bg: string
+    icon: string
+    hover: string
   }
+}
 
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    id: 'add-student',
+    label: 'Add Student',
+    description: 'Enroll new student',
+    icon: Users,
+    href: '/academics/students',
+    color: {
+      bg: 'bg-teal-500/10 dark:bg-cyan-500/15',
+      icon: 'text-teal-600 dark:text-cyan-400',
+      hover: 'hover:bg-teal-500/15 dark:hover:bg-cyan-500/20',
+    },
+  },
+  {
+    id: 'record-attendance',
+    label: 'Attendance',
+    description: 'Mark daily attendance',
+    icon: Calendar,
+    href: '/academics/attendance',
+    color: {
+      bg: 'bg-golden-400/15',
+      icon: 'text-golden-600 dark:text-golden-400',
+      hover: 'hover:bg-golden-400/20',
+    },
+  },
+  {
+    id: 'schedule-meeting',
+    label: 'New Meeting',
+    description: 'Schedule a meeting',
+    icon: Video,
+    href: '/communications',
+    color: {
+      bg: 'bg-violet-500/10 dark:bg-violet-400/15',
+      icon: 'text-violet-600 dark:text-violet-400',
+      hover: 'hover:bg-violet-500/15 dark:hover:bg-violet-400/20',
+    },
+  },
+  {
+    id: 'view-reports',
+    label: 'Analytics',
+    description: 'View reports',
+    icon: BarChart3,
+    href: '/analytics',
+    color: {
+      bg: 'bg-aqua-400/15',
+      icon: 'text-aqua-700 dark:text-aqua-400',
+      hover: 'hover:bg-aqua-400/20',
+    },
+  },
+]
+
+// ============================================================================
+// QUICK ACTION CARD
+// ============================================================================
+
+function QuickActionCard({ action, index }: { action: QuickAction; index: number }) {
+  const Icon = action.icon
+  
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.4 + index * 0.05 }}
+    >
+      <Link
+        to={action.href}
+        className={`
+          group flex items-center gap-3 p-3 rounded-xl
+          bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]
+          transition-all duration-200 cursor-pointer
+          hover:shadow-md hover:border-[rgb(var(--border-tertiary))]
+          hover:-translate-y-0.5
+        `}
       >
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">
-            Welcome back, {user?.name?.split(' ')[0]}
-          </h1>
-          <p className="text-[rgb(var(--text-secondary))] mt-1 flex items-center gap-2">
-            <Building2 className="w-4 h-4" />
-            {activeSchool?.name || "Here's what's happening today"}
+        {/* Icon */}
+        <div className={`
+          w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+          ${action.color.bg} ${action.color.hover} transition-colors
+        `}>
+          <Icon className={`w-5 h-5 ${action.color.icon}`} />
+        </div>
+        
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-sm text-[rgb(var(--text-primary))] truncate">
+            {action.label}
+          </h3>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">
+            {action.description}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-[rgb(var(--text-tertiary))]">
-          <Clock className="w-4 h-4" />
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-        </div>
-      </motion.div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + index * 0.05 }}
-          >
-            <Card className="p-5 sm:p-6 hover:shadow-lg transition-shadow duration-300">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-[rgb(var(--text-tertiary))]">{stat.label}</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">
-                    {stat.value}
-                  </p>
-                </div>
-                <div className={`p-3 rounded-xl ${stat.iconBg}`}>
-                  <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.iconColor}`} />
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 mt-4 pt-4 border-t border-[rgb(var(--border-secondary))]">
-                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                  stat.changeType === 'positive' 
-                    ? 'bg-aqua-400/20 text-aqua-700 dark:text-aqua-400' 
-                    : 'bg-rust-100 text-rust-600 dark:bg-rust-900/30 dark:text-rust-400'
-                }`}>
-                  <TrendingUp className="w-3 h-3" />
-                  {stat.change}
-                </div>
-                <span className="text-xs text-[rgb(var(--text-tertiary))]">vs last month</span>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Recent Activity */}
-        <motion.div
-          className="lg:col-span-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="h-full">
-            <div className="p-5 sm:p-6 border-b border-[rgb(var(--border-secondary))]">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-                  Recent Activity
-                </h2>
-                <button className="text-sm text-teal-600 dark:text-cyan-400 hover:underline font-medium flex items-center gap-1">
-                  View all
-                  <ArrowUpRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <div className="divide-y divide-[rgb(var(--border-secondary))]">
-              {recentActivity.map((activity, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between px-5 sm:px-6 py-4 hover:bg-[rgb(var(--interactive-hover))] transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      activity.type === 'success' ? 'bg-aqua-500' : 'bg-teal-500 dark:bg-cyan-500'
-                    }`} />
-                    <span className="text-sm text-[rgb(var(--text-primary))]">{activity.text}</span>
-                  </div>
-                  <span className="text-xs text-[rgb(var(--text-tertiary))] whitespace-nowrap ml-4">{activity.time}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
-          className="lg:col-span-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card className="h-full">
-            <div className="p-5 sm:p-6 border-b border-[rgb(var(--border-secondary))]">
-              <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-                Quick Actions
-              </h2>
-            </div>
-            <div className="p-4 sm:p-5 grid grid-cols-2 gap-3">
-              {quickActions.map((action) => {
-                const colors = colorMap[action.color]
-                return (
-                  <button
-                    key={action.label}
-                    className={`flex flex-col items-center gap-3 p-4 sm:p-5 rounded-xl ${colors.bg} transition-all duration-200`}
-                  >
-                    <div className="p-3 rounded-xl bg-[rgb(var(--surface-secondary))] shadow-sm">
-                      <action.icon className={`w-5 h-5 ${colors.text}`} />
-                    </div>
-                    <span className={`text-sm font-medium ${colors.text}`}>
-                      {action.label}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </Card>
-        </motion.div>
-      </div>
-    </div>
+        
+        {/* Arrow */}
+        <ArrowRight className="w-4 h-4 text-[rgb(var(--text-tertiary))] opacity-0 group-hover:opacity-100 transition-opacity" />
+      </Link>
+    </motion.div>
   )
 }
 
+// ============================================================================
+// HOME PAGE COMPONENT
+// ============================================================================
+
+function HomePage() {
+  const user = useAuthStore((s) => s.user)
+  
+  const firstName = user?.name?.split(' ')[0]
+  const greeting = getGreeting(firstName)
+  
+  return (
+    <div className="max-w-5xl mx-auto space-y-10 pb-12">
+      {/* ================================================================== */}
+      {/* HERO GREETING SECTION */}
+      {/* ================================================================== */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="pt-4"
+      >
+        <h1 className="text-4xl sm:text-5xl font-bold text-[rgb(var(--text-primary))] tracking-tight">
+          {greeting}
+        </h1>
+      </motion.header>
+
+      {/* ================================================================== */}
+      {/* RECENTLY VISITED CAROUSEL */}
+      {/* ================================================================== */}
+      <section>
+        <RecentlyVisitedCarousel />
+      </section>
+
+      {/* ================================================================== */}
+      {/* UPCOMING EVENTS */}
+      {/* ================================================================== */}
+      <section>
+        <UpcomingEventsSection />
+      </section>
+
+      {/* ================================================================== */}
+      {/* QUICK ACTIONS */}
+      {/* ================================================================== */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+          <h2 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+            Quick actions
+          </h2>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {QUICK_ACTIONS.map((action, index) => (
+            <QuickActionCard key={action.id} action={action} index={index} />
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ================================================================== */}
+      {/* WELCOME TIP (For new users or empty state) */}
+      {/* ================================================================== */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="mt-12"
+      >
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-teal-500/5 via-transparent to-golden-400/5 dark:from-cyan-500/10 dark:to-golden-400/10 border border-[rgb(var(--border-primary))]">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-teal-500/15 dark:bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-6 h-6 text-teal-600 dark:text-cyan-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1">
+                Welcome to EdForge
+              </h3>
+              <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
+                Your all-in-one education management platform. Connect your video conferencing tools, 
+                manage students, track attendance, and streamline your school operations.
+              </p>
+              <Link
+                to="/communications"
+                className="inline-flex items-center gap-2 text-sm font-medium text-teal-600 dark:text-cyan-400 hover:underline"
+              >
+                <Plus className="w-4 h-4" />
+                Connect your meeting tools
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+    </div>
+  )
+}
