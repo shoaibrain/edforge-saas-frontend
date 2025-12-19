@@ -15,7 +15,7 @@ import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useSpring, animated } from '@react-spring/web'
 import { useState } from 'react'
-import { ArrowRight, GalleryVerticalEnd } from 'lucide-react'
+import { ArrowRight, ChartNoAxesColumnDecreasing, CloudLightning, GalleryVerticalEnd } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { RequirePermission } from '@/components/secure'
 import type { Action, Resource } from '@/lib/abac'
@@ -90,15 +90,15 @@ function statsToCarouselCards(stats: ModuleStat[]): CarouselCard[] {
 // ACTION CARD COMPONENT
 // ============================================================================
 
-function ActionCard({ 
-  card, 
-  delay = 0 
-}: { 
+function ActionCard({
+  card,
+  delay = 0
+}: {
   card: ModuleActionCard
   delay?: number
 }) {
   const [hovered, setHovered] = useState(false)
-  
+
   const springProps = useSpring({
     scale: hovered ? 1.02 : 1,
     y: hovered ? -6 : 0,
@@ -177,6 +177,7 @@ function QuickAccessWidget({ actionCards }: QuickAccessWidgetProps) {
       widgetId="quick-access"
       label="Quick access"
       animationDelay={0.35}
+      icon={CloudLightning}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {actionCards.map((card, index) => (
@@ -201,12 +202,13 @@ interface StatsCarouselWidgetProps {
 
 function StatsCarouselWidget({ stats }: StatsCarouselWidgetProps) {
   const carouselCards = statsToCarouselCards(stats)
-  
+
   return (
     <WidgetSection
       widgetId="quick-stats"
       label="Quick stats"
       animationDelay={0.1}
+      icon={ChartNoAxesColumnDecreasing}
     >
       <CarouselWidget cards={carouselCards} cardType="stat" />
     </WidgetSection>
@@ -247,7 +249,7 @@ function ModuleOverviewInner({
       >
         <WidgetVisibilityMenu />
       </motion.div>
-      
+
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -10 }}
@@ -264,10 +266,10 @@ function ModuleOverviewInner({
           >
             <GalleryVerticalEnd className="w-5 h-5 text-brand-600 dark:text-brand-400" />
           </motion.div>
-          
+
           {/* Title and description - Combined format */}
           <div>
-            
+
             <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">
               {title} Overview
             </h1>
@@ -322,7 +324,7 @@ export function ModuleOverviewPage({
 }: ModuleOverviewPageProps) {
   // Generate moduleId from title if not provided
   const pageId = moduleId || `${title.toLowerCase().replace(/\s+/g, '-')}-overview`
-  
+
   return (
     <DynamicPageProvider pageId={pageId} pageType="module-overview">
       <ModuleOverviewInner
