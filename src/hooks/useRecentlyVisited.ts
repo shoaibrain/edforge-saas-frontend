@@ -83,7 +83,7 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/academics/teachers': { title: 'Teachers', icon: 'UserCog', module: 'academics' },
   '/academics/classrooms': { title: 'Classrooms', icon: 'BookOpen', module: 'academics' },
   '/academics/attendance': { title: 'Attendance', icon: 'ClipboardList', module: 'academics' },
-  '/academics/grades': { title: 'Grades', icon: 'GraduationCap', module: 'academics' },
+  '/academics/gradebooks': { title: 'Gradebooks', icon: 'GraduationCap', module: 'academics' },
   '/finance': { title: 'Finance', icon: 'DollarSign', module: 'finance' },
   '/finance/tuition': { title: 'Tuition', icon: 'DollarSign', module: 'finance' },
   '/finance/fees': { title: 'Fees', icon: 'DollarSign', module: 'finance' },
@@ -91,7 +91,7 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/people': { title: 'People', icon: 'Users', module: 'people' },
   '/people/staff': { title: 'Staff', icon: 'UserCog', module: 'people' },
   '/people/parents': { title: 'Parents', icon: 'Users', module: 'people' },
-  '/communications': { title: 'Meetings', icon: 'Video', module: 'communications' },
+  '/messages': { title: 'Messages', icon: 'Mail', module: 'messages' },
   '/analytics': { title: 'Analytics', icon: 'BarChart3', module: 'analytics' },
   '/settings': { title: 'Settings', icon: 'Settings', module: 'settings' },
 }
@@ -101,19 +101,19 @@ function getPageMetadata(path: string): PageMetadata | null {
   if (PAGE_METADATA[path]) {
     return PAGE_METADATA[path]
   }
-  
+
   // Try to match dynamic routes by finding the base path
   const basePath = path.split('/').slice(0, 3).join('/')
   if (PAGE_METADATA[basePath]) {
     return PAGE_METADATA[basePath]
   }
-  
+
   // Try module level
   const modulePath = '/' + path.split('/')[1]
   if (PAGE_METADATA[modulePath]) {
     return PAGE_METADATA[modulePath]
   }
-  
+
   return null
 }
 
@@ -131,16 +131,16 @@ export const useRecentlyVisitedStore = create<RecentlyVisitedState>()(
         set((state) => {
           // Remove existing entry for this path if it exists
           const filteredPages = state.pages.filter((p) => p.path !== page.path)
-          
+
           // Add new entry at the beginning
           const newPage: VisitedPage = {
             ...page,
             visitedAt: new Date().toISOString(),
           }
-          
+
           // Keep only the most recent pages
           const updatedPages = [newPage, ...filteredPages].slice(0, MAX_RECENT_PAGES)
-          
+
           return { pages: updatedPages }
         }),
       clearPages: () => set({ pages: [] }),
@@ -158,15 +158,15 @@ export const useRecentlyVisitedStore = create<RecentlyVisitedState>()(
 export function useRecentlyVisited() {
   const location = useLocation()
   const { pages, addPage, clearPages } = useRecentlyVisitedStore()
-  
+
   // Track page visits
   const trackVisit = useCallback((path: string) => {
     // Don't track home page itself
     if (path === '/home' || path === '/') return
-    
+
     const metadata = getPageMetadata(path)
     if (!metadata) return
-    
+
     addPage({
       path,
       title: metadata.title,
@@ -174,12 +174,12 @@ export function useRecentlyVisited() {
       module: metadata.module,
     })
   }, [addPage])
-  
+
   // Auto-track on location change
   useEffect(() => {
     trackVisit(location.pathname)
   }, [location.pathname, trackVisit])
-  
+
   return {
     recentPages: pages,
     trackVisit,
@@ -222,8 +222,8 @@ export const MOCK_RECENT_PAGES: VisitedPage[] = [
     visitedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
   },
   {
-    path: '/academics/grades',
-    title: 'Grades',
+    path: '/academics/gradebooks',
+    title: 'Gradebooks',
     icon: 'GraduationCap',
     module: 'academics',
     visitedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago

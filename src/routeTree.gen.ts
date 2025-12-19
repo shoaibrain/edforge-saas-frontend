@@ -17,16 +17,29 @@ import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedStudentPortalRouteImport } from './routes/_protected/student-portal'
 import { Route as ProtectedPeopleRouteImport } from './routes/_protected/people'
 import { Route as ProtectedParentPortalRouteImport } from './routes/_protected/parent-portal'
+import { Route as ProtectedMessagesRouteImport } from './routes/_protected/messages'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedFinanceRouteImport } from './routes/_protected/finance'
-import { Route as ProtectedCommunicationsRouteImport } from './routes/_protected/communications'
 import { Route as ProtectedAnalyticsRouteImport } from './routes/_protected/analytics'
 import { Route as ProtectedAcademicsRouteImport } from './routes/_protected/academics'
 import { Route as ProtectedSettingsIndexRouteImport } from './routes/_protected/settings/index'
+import { Route as ProtectedMessagesIndexRouteImport } from './routes/_protected/messages/index'
 import { Route as ProtectedStudentPortalScheduleRouteImport } from './routes/_protected/student-portal/schedule'
 import { Route as ProtectedStudentPortalGradesRouteImport } from './routes/_protected/student-portal/grades'
 import { Route as ProtectedStudentPortalAttendanceRouteImport } from './routes/_protected/student-portal/attendance'
 import { Route as ProtectedStudentPortalAssignmentsRouteImport } from './routes/_protected/student-portal/assignments'
+import { Route as ProtectedSettingsSecurityRouteImport } from './routes/_protected/settings/security'
+import { Route as ProtectedSettingsSchoolsRouteImport } from './routes/_protected/settings/schools'
+import { Route as ProtectedSettingsPreferencesRouteImport } from './routes/_protected/settings/preferences'
+import { Route as ProtectedSettingsPeopleRouteImport } from './routes/_protected/settings/people'
+import { Route as ProtectedSettingsNotificationsRouteImport } from './routes/_protected/settings/notifications'
+import { Route as ProtectedSettingsIntegrationsRouteImport } from './routes/_protected/settings/integrations'
+import { Route as ProtectedSettingsGeneralRouteImport } from './routes/_protected/settings/general'
+import { Route as ProtectedSettingsDataRouteImport } from './routes/_protected/settings/data'
+import { Route as ProtectedSettingsDangerRouteImport } from './routes/_protected/settings/danger'
+import { Route as ProtectedSettingsConnectionsRouteImport } from './routes/_protected/settings/connections'
+import { Route as ProtectedSettingsBillingRouteImport } from './routes/_protected/settings/billing'
+import { Route as ProtectedSettingsAccountRouteImport } from './routes/_protected/settings/account'
 import { Route as ProtectedPeopleStaffRouteImport } from './routes/_protected/people/staff'
 import { Route as ProtectedPeopleReportingRouteImport } from './routes/_protected/people/reporting'
 import { Route as ProtectedPeopleParentsRouteImport } from './routes/_protected/people/parents'
@@ -37,21 +50,23 @@ import { Route as ProtectedPeopleAssignmentsRouteImport } from './routes/_protec
 import { Route as ProtectedParentPortalGradesRouteImport } from './routes/_protected/parent-portal/grades'
 import { Route as ProtectedParentPortalFeesRouteImport } from './routes/_protected/parent-portal/fees'
 import { Route as ProtectedParentPortalAttendanceRouteImport } from './routes/_protected/parent-portal/attendance'
+import { Route as ProtectedMessagesMeetingsRouteImport } from './routes/_protected/messages/meetings'
+import { Route as ProtectedMessagesIntegrationsRouteImport } from './routes/_protected/messages/integrations'
+import { Route as ProtectedMessagesInboxRouteImport } from './routes/_protected/messages/inbox'
+import { Route as ProtectedMessagesAnnouncementsRouteImport } from './routes/_protected/messages/announcements'
 import { Route as ProtectedFinanceTuitionandfeesRouteImport } from './routes/_protected/finance/tuitionandfees'
 import { Route as ProtectedFinanceReportsRouteImport } from './routes/_protected/finance/reports'
 import { Route as ProtectedFinancePayrollRouteImport } from './routes/_protected/finance/payroll'
 import { Route as ProtectedFinanceFinancialsRouteImport } from './routes/_protected/finance/financials'
 import { Route as ProtectedFinanceExpensesRouteImport } from './routes/_protected/finance/expenses'
-import { Route as ProtectedCommunicationsMessagesRouteImport } from './routes/_protected/communications/messages'
-import { Route as ProtectedCommunicationsAnnouncementsRouteImport } from './routes/_protected/communications/announcements'
 import { Route as ProtectedAnalyticsFinancialRouteImport } from './routes/_protected/analytics/financial'
 import { Route as ProtectedAnalyticsAcademicRouteImport } from './routes/_protected/analytics/academic'
 import { Route as ProtectedAcademicsTeachersRouteImport } from './routes/_protected/academics/teachers'
 import { Route as ProtectedAcademicsStudentsRouteImport } from './routes/_protected/academics/students'
 import { Route as ProtectedAcademicsSchoolcalendarRouteImport } from './routes/_protected/academics/schoolcalendar'
 import { Route as ProtectedAcademicsReportingRouteImport } from './routes/_protected/academics/reporting'
-import { Route as ProtectedAcademicsGradesRouteImport } from './routes/_protected/academics/grades'
 import { Route as ProtectedAcademicsGradelevelsRouteImport } from './routes/_protected/academics/gradelevels'
+import { Route as ProtectedAcademicsGradebooksRouteImport } from './routes/_protected/academics/gradebooks'
 import { Route as ProtectedAcademicsEnrollmentRouteImport } from './routes/_protected/academics/enrollment'
 import { Route as ProtectedAcademicsCurriculumRouteImport } from './routes/_protected/academics/curriculum'
 import { Route as ProtectedAcademicsClassroomsRouteImport } from './routes/_protected/academics/classrooms'
@@ -60,7 +75,7 @@ import { Route as ProtectedPeopleStaffStaffIdRouteImport } from './routes/_prote
 import { Route as ProtectedPeopleParentsParentIdRouteImport } from './routes/_protected/people/parents/$parentId'
 import { Route as ProtectedAcademicsTeachersTeacherIdRouteImport } from './routes/_protected/academics/teachers/$teacherId'
 import { Route as ProtectedAcademicsStudentsStudentIdRouteImport } from './routes/_protected/academics/students/$studentId'
-import { Route as ProtectedAcademicsGradesClassIdRouteImport } from './routes/_protected/academics/grades/$classId'
+import { Route as ProtectedAcademicsGradebooksClassIdRouteImport } from './routes/_protected/academics/gradebooks/$classId'
 import { Route as ProtectedAcademicsClassroomsClassroomIdRouteImport } from './routes/_protected/academics/classrooms/$classroomId'
 
 const MissingTenantRoute = MissingTenantRouteImport.update({
@@ -102,6 +117,11 @@ const ProtectedParentPortalRoute = ProtectedParentPortalRouteImport.update({
   path: '/parent-portal',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedMessagesRoute = ProtectedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedHomeRoute = ProtectedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -110,11 +130,6 @@ const ProtectedHomeRoute = ProtectedHomeRouteImport.update({
 const ProtectedFinanceRoute = ProtectedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
-  getParentRoute: () => ProtectedRoute,
-} as any)
-const ProtectedCommunicationsRoute = ProtectedCommunicationsRouteImport.update({
-  id: '/communications',
-  path: '/communications',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedAnalyticsRoute = ProtectedAnalyticsRouteImport.update({
@@ -131,6 +146,11 @@ const ProtectedSettingsIndexRoute = ProtectedSettingsIndexRouteImport.update({
   id: '/settings/',
   path: '/settings/',
   getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedMessagesIndexRoute = ProtectedMessagesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProtectedMessagesRoute,
 } as any)
 const ProtectedStudentPortalScheduleRoute =
   ProtectedStudentPortalScheduleRouteImport.update({
@@ -155,6 +175,75 @@ const ProtectedStudentPortalAssignmentsRoute =
     id: '/assignments',
     path: '/assignments',
     getParentRoute: () => ProtectedStudentPortalRoute,
+  } as any)
+const ProtectedSettingsSecurityRoute =
+  ProtectedSettingsSecurityRouteImport.update({
+    id: '/settings/security',
+    path: '/settings/security',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsSchoolsRoute =
+  ProtectedSettingsSchoolsRouteImport.update({
+    id: '/settings/schools',
+    path: '/settings/schools',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsPreferencesRoute =
+  ProtectedSettingsPreferencesRouteImport.update({
+    id: '/settings/preferences',
+    path: '/settings/preferences',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsPeopleRoute = ProtectedSettingsPeopleRouteImport.update({
+  id: '/settings/people',
+  path: '/settings/people',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedSettingsNotificationsRoute =
+  ProtectedSettingsNotificationsRouteImport.update({
+    id: '/settings/notifications',
+    path: '/settings/notifications',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsIntegrationsRoute =
+  ProtectedSettingsIntegrationsRouteImport.update({
+    id: '/settings/integrations',
+    path: '/settings/integrations',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsGeneralRoute =
+  ProtectedSettingsGeneralRouteImport.update({
+    id: '/settings/general',
+    path: '/settings/general',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsDataRoute = ProtectedSettingsDataRouteImport.update({
+  id: '/settings/data',
+  path: '/settings/data',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedSettingsDangerRoute = ProtectedSettingsDangerRouteImport.update({
+  id: '/settings/danger',
+  path: '/settings/danger',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedSettingsConnectionsRoute =
+  ProtectedSettingsConnectionsRouteImport.update({
+    id: '/settings/connections',
+    path: '/settings/connections',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsBillingRoute =
+  ProtectedSettingsBillingRouteImport.update({
+    id: '/settings/billing',
+    path: '/settings/billing',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsAccountRoute =
+  ProtectedSettingsAccountRouteImport.update({
+    id: '/settings/account',
+    path: '/settings/account',
+    getParentRoute: () => ProtectedRoute,
   } as any)
 const ProtectedPeopleStaffRoute = ProtectedPeopleStaffRouteImport.update({
   id: '/staff',
@@ -213,6 +302,29 @@ const ProtectedParentPortalAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => ProtectedParentPortalRoute,
   } as any)
+const ProtectedMessagesMeetingsRoute =
+  ProtectedMessagesMeetingsRouteImport.update({
+    id: '/meetings',
+    path: '/meetings',
+    getParentRoute: () => ProtectedMessagesRoute,
+  } as any)
+const ProtectedMessagesIntegrationsRoute =
+  ProtectedMessagesIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => ProtectedMessagesRoute,
+  } as any)
+const ProtectedMessagesInboxRoute = ProtectedMessagesInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => ProtectedMessagesRoute,
+} as any)
+const ProtectedMessagesAnnouncementsRoute =
+  ProtectedMessagesAnnouncementsRouteImport.update({
+    id: '/announcements',
+    path: '/announcements',
+    getParentRoute: () => ProtectedMessagesRoute,
+  } as any)
 const ProtectedFinanceTuitionandfeesRoute =
   ProtectedFinanceTuitionandfeesRouteImport.update({
     id: '/tuitionandfees',
@@ -240,18 +352,6 @@ const ProtectedFinanceExpensesRoute =
     id: '/expenses',
     path: '/expenses',
     getParentRoute: () => ProtectedFinanceRoute,
-  } as any)
-const ProtectedCommunicationsMessagesRoute =
-  ProtectedCommunicationsMessagesRouteImport.update({
-    id: '/messages',
-    path: '/messages',
-    getParentRoute: () => ProtectedCommunicationsRoute,
-  } as any)
-const ProtectedCommunicationsAnnouncementsRoute =
-  ProtectedCommunicationsAnnouncementsRouteImport.update({
-    id: '/announcements',
-    path: '/announcements',
-    getParentRoute: () => ProtectedCommunicationsRoute,
   } as any)
 const ProtectedAnalyticsFinancialRoute =
   ProtectedAnalyticsFinancialRouteImport.update({
@@ -289,16 +389,16 @@ const ProtectedAcademicsReportingRoute =
     path: '/reporting',
     getParentRoute: () => ProtectedAcademicsRoute,
   } as any)
-const ProtectedAcademicsGradesRoute =
-  ProtectedAcademicsGradesRouteImport.update({
-    id: '/grades',
-    path: '/grades',
-    getParentRoute: () => ProtectedAcademicsRoute,
-  } as any)
 const ProtectedAcademicsGradelevelsRoute =
   ProtectedAcademicsGradelevelsRouteImport.update({
     id: '/gradelevels',
     path: '/gradelevels',
+    getParentRoute: () => ProtectedAcademicsRoute,
+  } as any)
+const ProtectedAcademicsGradebooksRoute =
+  ProtectedAcademicsGradebooksRouteImport.update({
+    id: '/gradebooks',
+    path: '/gradebooks',
     getParentRoute: () => ProtectedAcademicsRoute,
   } as any)
 const ProtectedAcademicsEnrollmentRoute =
@@ -349,11 +449,11 @@ const ProtectedAcademicsStudentsStudentIdRoute =
     path: '/$studentId',
     getParentRoute: () => ProtectedAcademicsStudentsRoute,
   } as any)
-const ProtectedAcademicsGradesClassIdRoute =
-  ProtectedAcademicsGradesClassIdRouteImport.update({
+const ProtectedAcademicsGradebooksClassIdRoute =
+  ProtectedAcademicsGradebooksClassIdRouteImport.update({
     id: '/$classId',
     path: '/$classId',
-    getParentRoute: () => ProtectedAcademicsGradesRoute,
+    getParentRoute: () => ProtectedAcademicsGradebooksRoute,
   } as any)
 const ProtectedAcademicsClassroomsClassroomIdRoute =
   ProtectedAcademicsClassroomsClassroomIdRouteImport.update({
@@ -368,9 +468,9 @@ export interface FileRoutesByFullPath {
   '/missing-tenant': typeof MissingTenantRoute
   '/academics': typeof ProtectedAcademicsRouteWithChildren
   '/analytics': typeof ProtectedAnalyticsRouteWithChildren
-  '/communications': typeof ProtectedCommunicationsRouteWithChildren
   '/finance': typeof ProtectedFinanceRouteWithChildren
   '/home': typeof ProtectedHomeRoute
+  '/messages': typeof ProtectedMessagesRouteWithChildren
   '/parent-portal': typeof ProtectedParentPortalRouteWithChildren
   '/people': typeof ProtectedPeopleRouteWithChildren
   '/student-portal': typeof ProtectedStudentPortalRouteWithChildren
@@ -379,21 +479,23 @@ export interface FileRoutesByFullPath {
   '/academics/classrooms': typeof ProtectedAcademicsClassroomsRouteWithChildren
   '/academics/curriculum': typeof ProtectedAcademicsCurriculumRoute
   '/academics/enrollment': typeof ProtectedAcademicsEnrollmentRoute
+  '/academics/gradebooks': typeof ProtectedAcademicsGradebooksRouteWithChildren
   '/academics/gradelevels': typeof ProtectedAcademicsGradelevelsRoute
-  '/academics/grades': typeof ProtectedAcademicsGradesRouteWithChildren
   '/academics/reporting': typeof ProtectedAcademicsReportingRoute
   '/academics/schoolcalendar': typeof ProtectedAcademicsSchoolcalendarRoute
   '/academics/students': typeof ProtectedAcademicsStudentsRouteWithChildren
   '/academics/teachers': typeof ProtectedAcademicsTeachersRouteWithChildren
   '/analytics/academic': typeof ProtectedAnalyticsAcademicRoute
   '/analytics/financial': typeof ProtectedAnalyticsFinancialRoute
-  '/communications/announcements': typeof ProtectedCommunicationsAnnouncementsRoute
-  '/communications/messages': typeof ProtectedCommunicationsMessagesRoute
   '/finance/expenses': typeof ProtectedFinanceExpensesRoute
   '/finance/financials': typeof ProtectedFinanceFinancialsRoute
   '/finance/payroll': typeof ProtectedFinancePayrollRoute
   '/finance/reports': typeof ProtectedFinanceReportsRoute
   '/finance/tuitionandfees': typeof ProtectedFinanceTuitionandfeesRoute
+  '/messages/announcements': typeof ProtectedMessagesAnnouncementsRoute
+  '/messages/inbox': typeof ProtectedMessagesInboxRoute
+  '/messages/integrations': typeof ProtectedMessagesIntegrationsRoute
+  '/messages/meetings': typeof ProtectedMessagesMeetingsRoute
   '/parent-portal/attendance': typeof ProtectedParentPortalAttendanceRoute
   '/parent-portal/fees': typeof ProtectedParentPortalFeesRoute
   '/parent-portal/grades': typeof ProtectedParentPortalGradesRoute
@@ -404,13 +506,26 @@ export interface FileRoutesByFullPath {
   '/people/parents': typeof ProtectedPeopleParentsRouteWithChildren
   '/people/reporting': typeof ProtectedPeopleReportingRoute
   '/people/staff': typeof ProtectedPeopleStaffRouteWithChildren
+  '/settings/account': typeof ProtectedSettingsAccountRoute
+  '/settings/billing': typeof ProtectedSettingsBillingRoute
+  '/settings/connections': typeof ProtectedSettingsConnectionsRoute
+  '/settings/danger': typeof ProtectedSettingsDangerRoute
+  '/settings/data': typeof ProtectedSettingsDataRoute
+  '/settings/general': typeof ProtectedSettingsGeneralRoute
+  '/settings/integrations': typeof ProtectedSettingsIntegrationsRoute
+  '/settings/notifications': typeof ProtectedSettingsNotificationsRoute
+  '/settings/people': typeof ProtectedSettingsPeopleRoute
+  '/settings/preferences': typeof ProtectedSettingsPreferencesRoute
+  '/settings/schools': typeof ProtectedSettingsSchoolsRoute
+  '/settings/security': typeof ProtectedSettingsSecurityRoute
   '/student-portal/assignments': typeof ProtectedStudentPortalAssignmentsRoute
   '/student-portal/attendance': typeof ProtectedStudentPortalAttendanceRoute
   '/student-portal/grades': typeof ProtectedStudentPortalGradesRoute
   '/student-portal/schedule': typeof ProtectedStudentPortalScheduleRoute
+  '/messages/': typeof ProtectedMessagesIndexRoute
   '/settings': typeof ProtectedSettingsIndexRoute
   '/academics/classrooms/$classroomId': typeof ProtectedAcademicsClassroomsClassroomIdRoute
-  '/academics/grades/$classId': typeof ProtectedAcademicsGradesClassIdRoute
+  '/academics/gradebooks/$classId': typeof ProtectedAcademicsGradebooksClassIdRoute
   '/academics/students/$studentId': typeof ProtectedAcademicsStudentsStudentIdRoute
   '/academics/teachers/$teacherId': typeof ProtectedAcademicsTeachersTeacherIdRoute
   '/people/parents/$parentId': typeof ProtectedPeopleParentsParentIdRoute
@@ -422,7 +537,6 @@ export interface FileRoutesByTo {
   '/missing-tenant': typeof MissingTenantRoute
   '/academics': typeof ProtectedAcademicsRouteWithChildren
   '/analytics': typeof ProtectedAnalyticsRouteWithChildren
-  '/communications': typeof ProtectedCommunicationsRouteWithChildren
   '/finance': typeof ProtectedFinanceRouteWithChildren
   '/home': typeof ProtectedHomeRoute
   '/parent-portal': typeof ProtectedParentPortalRouteWithChildren
@@ -433,21 +547,23 @@ export interface FileRoutesByTo {
   '/academics/classrooms': typeof ProtectedAcademicsClassroomsRouteWithChildren
   '/academics/curriculum': typeof ProtectedAcademicsCurriculumRoute
   '/academics/enrollment': typeof ProtectedAcademicsEnrollmentRoute
+  '/academics/gradebooks': typeof ProtectedAcademicsGradebooksRouteWithChildren
   '/academics/gradelevels': typeof ProtectedAcademicsGradelevelsRoute
-  '/academics/grades': typeof ProtectedAcademicsGradesRouteWithChildren
   '/academics/reporting': typeof ProtectedAcademicsReportingRoute
   '/academics/schoolcalendar': typeof ProtectedAcademicsSchoolcalendarRoute
   '/academics/students': typeof ProtectedAcademicsStudentsRouteWithChildren
   '/academics/teachers': typeof ProtectedAcademicsTeachersRouteWithChildren
   '/analytics/academic': typeof ProtectedAnalyticsAcademicRoute
   '/analytics/financial': typeof ProtectedAnalyticsFinancialRoute
-  '/communications/announcements': typeof ProtectedCommunicationsAnnouncementsRoute
-  '/communications/messages': typeof ProtectedCommunicationsMessagesRoute
   '/finance/expenses': typeof ProtectedFinanceExpensesRoute
   '/finance/financials': typeof ProtectedFinanceFinancialsRoute
   '/finance/payroll': typeof ProtectedFinancePayrollRoute
   '/finance/reports': typeof ProtectedFinanceReportsRoute
   '/finance/tuitionandfees': typeof ProtectedFinanceTuitionandfeesRoute
+  '/messages/announcements': typeof ProtectedMessagesAnnouncementsRoute
+  '/messages/inbox': typeof ProtectedMessagesInboxRoute
+  '/messages/integrations': typeof ProtectedMessagesIntegrationsRoute
+  '/messages/meetings': typeof ProtectedMessagesMeetingsRoute
   '/parent-portal/attendance': typeof ProtectedParentPortalAttendanceRoute
   '/parent-portal/fees': typeof ProtectedParentPortalFeesRoute
   '/parent-portal/grades': typeof ProtectedParentPortalGradesRoute
@@ -458,13 +574,26 @@ export interface FileRoutesByTo {
   '/people/parents': typeof ProtectedPeopleParentsRouteWithChildren
   '/people/reporting': typeof ProtectedPeopleReportingRoute
   '/people/staff': typeof ProtectedPeopleStaffRouteWithChildren
+  '/settings/account': typeof ProtectedSettingsAccountRoute
+  '/settings/billing': typeof ProtectedSettingsBillingRoute
+  '/settings/connections': typeof ProtectedSettingsConnectionsRoute
+  '/settings/danger': typeof ProtectedSettingsDangerRoute
+  '/settings/data': typeof ProtectedSettingsDataRoute
+  '/settings/general': typeof ProtectedSettingsGeneralRoute
+  '/settings/integrations': typeof ProtectedSettingsIntegrationsRoute
+  '/settings/notifications': typeof ProtectedSettingsNotificationsRoute
+  '/settings/people': typeof ProtectedSettingsPeopleRoute
+  '/settings/preferences': typeof ProtectedSettingsPreferencesRoute
+  '/settings/schools': typeof ProtectedSettingsSchoolsRoute
+  '/settings/security': typeof ProtectedSettingsSecurityRoute
   '/student-portal/assignments': typeof ProtectedStudentPortalAssignmentsRoute
   '/student-portal/attendance': typeof ProtectedStudentPortalAttendanceRoute
   '/student-portal/grades': typeof ProtectedStudentPortalGradesRoute
   '/student-portal/schedule': typeof ProtectedStudentPortalScheduleRoute
+  '/messages': typeof ProtectedMessagesIndexRoute
   '/settings': typeof ProtectedSettingsIndexRoute
   '/academics/classrooms/$classroomId': typeof ProtectedAcademicsClassroomsClassroomIdRoute
-  '/academics/grades/$classId': typeof ProtectedAcademicsGradesClassIdRoute
+  '/academics/gradebooks/$classId': typeof ProtectedAcademicsGradebooksClassIdRoute
   '/academics/students/$studentId': typeof ProtectedAcademicsStudentsStudentIdRoute
   '/academics/teachers/$teacherId': typeof ProtectedAcademicsTeachersTeacherIdRoute
   '/people/parents/$parentId': typeof ProtectedPeopleParentsParentIdRoute
@@ -478,9 +607,9 @@ export interface FileRoutesById {
   '/missing-tenant': typeof MissingTenantRoute
   '/_protected/academics': typeof ProtectedAcademicsRouteWithChildren
   '/_protected/analytics': typeof ProtectedAnalyticsRouteWithChildren
-  '/_protected/communications': typeof ProtectedCommunicationsRouteWithChildren
   '/_protected/finance': typeof ProtectedFinanceRouteWithChildren
   '/_protected/home': typeof ProtectedHomeRoute
+  '/_protected/messages': typeof ProtectedMessagesRouteWithChildren
   '/_protected/parent-portal': typeof ProtectedParentPortalRouteWithChildren
   '/_protected/people': typeof ProtectedPeopleRouteWithChildren
   '/_protected/student-portal': typeof ProtectedStudentPortalRouteWithChildren
@@ -489,21 +618,23 @@ export interface FileRoutesById {
   '/_protected/academics/classrooms': typeof ProtectedAcademicsClassroomsRouteWithChildren
   '/_protected/academics/curriculum': typeof ProtectedAcademicsCurriculumRoute
   '/_protected/academics/enrollment': typeof ProtectedAcademicsEnrollmentRoute
+  '/_protected/academics/gradebooks': typeof ProtectedAcademicsGradebooksRouteWithChildren
   '/_protected/academics/gradelevels': typeof ProtectedAcademicsGradelevelsRoute
-  '/_protected/academics/grades': typeof ProtectedAcademicsGradesRouteWithChildren
   '/_protected/academics/reporting': typeof ProtectedAcademicsReportingRoute
   '/_protected/academics/schoolcalendar': typeof ProtectedAcademicsSchoolcalendarRoute
   '/_protected/academics/students': typeof ProtectedAcademicsStudentsRouteWithChildren
   '/_protected/academics/teachers': typeof ProtectedAcademicsTeachersRouteWithChildren
   '/_protected/analytics/academic': typeof ProtectedAnalyticsAcademicRoute
   '/_protected/analytics/financial': typeof ProtectedAnalyticsFinancialRoute
-  '/_protected/communications/announcements': typeof ProtectedCommunicationsAnnouncementsRoute
-  '/_protected/communications/messages': typeof ProtectedCommunicationsMessagesRoute
   '/_protected/finance/expenses': typeof ProtectedFinanceExpensesRoute
   '/_protected/finance/financials': typeof ProtectedFinanceFinancialsRoute
   '/_protected/finance/payroll': typeof ProtectedFinancePayrollRoute
   '/_protected/finance/reports': typeof ProtectedFinanceReportsRoute
   '/_protected/finance/tuitionandfees': typeof ProtectedFinanceTuitionandfeesRoute
+  '/_protected/messages/announcements': typeof ProtectedMessagesAnnouncementsRoute
+  '/_protected/messages/inbox': typeof ProtectedMessagesInboxRoute
+  '/_protected/messages/integrations': typeof ProtectedMessagesIntegrationsRoute
+  '/_protected/messages/meetings': typeof ProtectedMessagesMeetingsRoute
   '/_protected/parent-portal/attendance': typeof ProtectedParentPortalAttendanceRoute
   '/_protected/parent-portal/fees': typeof ProtectedParentPortalFeesRoute
   '/_protected/parent-portal/grades': typeof ProtectedParentPortalGradesRoute
@@ -514,13 +645,26 @@ export interface FileRoutesById {
   '/_protected/people/parents': typeof ProtectedPeopleParentsRouteWithChildren
   '/_protected/people/reporting': typeof ProtectedPeopleReportingRoute
   '/_protected/people/staff': typeof ProtectedPeopleStaffRouteWithChildren
+  '/_protected/settings/account': typeof ProtectedSettingsAccountRoute
+  '/_protected/settings/billing': typeof ProtectedSettingsBillingRoute
+  '/_protected/settings/connections': typeof ProtectedSettingsConnectionsRoute
+  '/_protected/settings/danger': typeof ProtectedSettingsDangerRoute
+  '/_protected/settings/data': typeof ProtectedSettingsDataRoute
+  '/_protected/settings/general': typeof ProtectedSettingsGeneralRoute
+  '/_protected/settings/integrations': typeof ProtectedSettingsIntegrationsRoute
+  '/_protected/settings/notifications': typeof ProtectedSettingsNotificationsRoute
+  '/_protected/settings/people': typeof ProtectedSettingsPeopleRoute
+  '/_protected/settings/preferences': typeof ProtectedSettingsPreferencesRoute
+  '/_protected/settings/schools': typeof ProtectedSettingsSchoolsRoute
+  '/_protected/settings/security': typeof ProtectedSettingsSecurityRoute
   '/_protected/student-portal/assignments': typeof ProtectedStudentPortalAssignmentsRoute
   '/_protected/student-portal/attendance': typeof ProtectedStudentPortalAttendanceRoute
   '/_protected/student-portal/grades': typeof ProtectedStudentPortalGradesRoute
   '/_protected/student-portal/schedule': typeof ProtectedStudentPortalScheduleRoute
+  '/_protected/messages/': typeof ProtectedMessagesIndexRoute
   '/_protected/settings/': typeof ProtectedSettingsIndexRoute
   '/_protected/academics/classrooms/$classroomId': typeof ProtectedAcademicsClassroomsClassroomIdRoute
-  '/_protected/academics/grades/$classId': typeof ProtectedAcademicsGradesClassIdRoute
+  '/_protected/academics/gradebooks/$classId': typeof ProtectedAcademicsGradebooksClassIdRoute
   '/_protected/academics/students/$studentId': typeof ProtectedAcademicsStudentsStudentIdRoute
   '/_protected/academics/teachers/$teacherId': typeof ProtectedAcademicsTeachersTeacherIdRoute
   '/_protected/people/parents/$parentId': typeof ProtectedPeopleParentsParentIdRoute
@@ -534,9 +678,9 @@ export interface FileRouteTypes {
     | '/missing-tenant'
     | '/academics'
     | '/analytics'
-    | '/communications'
     | '/finance'
     | '/home'
+    | '/messages'
     | '/parent-portal'
     | '/people'
     | '/student-portal'
@@ -545,21 +689,23 @@ export interface FileRouteTypes {
     | '/academics/classrooms'
     | '/academics/curriculum'
     | '/academics/enrollment'
+    | '/academics/gradebooks'
     | '/academics/gradelevels'
-    | '/academics/grades'
     | '/academics/reporting'
     | '/academics/schoolcalendar'
     | '/academics/students'
     | '/academics/teachers'
     | '/analytics/academic'
     | '/analytics/financial'
-    | '/communications/announcements'
-    | '/communications/messages'
     | '/finance/expenses'
     | '/finance/financials'
     | '/finance/payroll'
     | '/finance/reports'
     | '/finance/tuitionandfees'
+    | '/messages/announcements'
+    | '/messages/inbox'
+    | '/messages/integrations'
+    | '/messages/meetings'
     | '/parent-portal/attendance'
     | '/parent-portal/fees'
     | '/parent-portal/grades'
@@ -570,13 +716,26 @@ export interface FileRouteTypes {
     | '/people/parents'
     | '/people/reporting'
     | '/people/staff'
+    | '/settings/account'
+    | '/settings/billing'
+    | '/settings/connections'
+    | '/settings/danger'
+    | '/settings/data'
+    | '/settings/general'
+    | '/settings/integrations'
+    | '/settings/notifications'
+    | '/settings/people'
+    | '/settings/preferences'
+    | '/settings/schools'
+    | '/settings/security'
     | '/student-portal/assignments'
     | '/student-portal/attendance'
     | '/student-portal/grades'
     | '/student-portal/schedule'
+    | '/messages/'
     | '/settings'
     | '/academics/classrooms/$classroomId'
-    | '/academics/grades/$classId'
+    | '/academics/gradebooks/$classId'
     | '/academics/students/$studentId'
     | '/academics/teachers/$teacherId'
     | '/people/parents/$parentId'
@@ -588,7 +747,6 @@ export interface FileRouteTypes {
     | '/missing-tenant'
     | '/academics'
     | '/analytics'
-    | '/communications'
     | '/finance'
     | '/home'
     | '/parent-portal'
@@ -599,21 +757,23 @@ export interface FileRouteTypes {
     | '/academics/classrooms'
     | '/academics/curriculum'
     | '/academics/enrollment'
+    | '/academics/gradebooks'
     | '/academics/gradelevels'
-    | '/academics/grades'
     | '/academics/reporting'
     | '/academics/schoolcalendar'
     | '/academics/students'
     | '/academics/teachers'
     | '/analytics/academic'
     | '/analytics/financial'
-    | '/communications/announcements'
-    | '/communications/messages'
     | '/finance/expenses'
     | '/finance/financials'
     | '/finance/payroll'
     | '/finance/reports'
     | '/finance/tuitionandfees'
+    | '/messages/announcements'
+    | '/messages/inbox'
+    | '/messages/integrations'
+    | '/messages/meetings'
     | '/parent-portal/attendance'
     | '/parent-portal/fees'
     | '/parent-portal/grades'
@@ -624,13 +784,26 @@ export interface FileRouteTypes {
     | '/people/parents'
     | '/people/reporting'
     | '/people/staff'
+    | '/settings/account'
+    | '/settings/billing'
+    | '/settings/connections'
+    | '/settings/danger'
+    | '/settings/data'
+    | '/settings/general'
+    | '/settings/integrations'
+    | '/settings/notifications'
+    | '/settings/people'
+    | '/settings/preferences'
+    | '/settings/schools'
+    | '/settings/security'
     | '/student-portal/assignments'
     | '/student-portal/attendance'
     | '/student-portal/grades'
     | '/student-portal/schedule'
+    | '/messages'
     | '/settings'
     | '/academics/classrooms/$classroomId'
-    | '/academics/grades/$classId'
+    | '/academics/gradebooks/$classId'
     | '/academics/students/$studentId'
     | '/academics/teachers/$teacherId'
     | '/people/parents/$parentId'
@@ -643,9 +816,9 @@ export interface FileRouteTypes {
     | '/missing-tenant'
     | '/_protected/academics'
     | '/_protected/analytics'
-    | '/_protected/communications'
     | '/_protected/finance'
     | '/_protected/home'
+    | '/_protected/messages'
     | '/_protected/parent-portal'
     | '/_protected/people'
     | '/_protected/student-portal'
@@ -654,21 +827,23 @@ export interface FileRouteTypes {
     | '/_protected/academics/classrooms'
     | '/_protected/academics/curriculum'
     | '/_protected/academics/enrollment'
+    | '/_protected/academics/gradebooks'
     | '/_protected/academics/gradelevels'
-    | '/_protected/academics/grades'
     | '/_protected/academics/reporting'
     | '/_protected/academics/schoolcalendar'
     | '/_protected/academics/students'
     | '/_protected/academics/teachers'
     | '/_protected/analytics/academic'
     | '/_protected/analytics/financial'
-    | '/_protected/communications/announcements'
-    | '/_protected/communications/messages'
     | '/_protected/finance/expenses'
     | '/_protected/finance/financials'
     | '/_protected/finance/payroll'
     | '/_protected/finance/reports'
     | '/_protected/finance/tuitionandfees'
+    | '/_protected/messages/announcements'
+    | '/_protected/messages/inbox'
+    | '/_protected/messages/integrations'
+    | '/_protected/messages/meetings'
     | '/_protected/parent-portal/attendance'
     | '/_protected/parent-portal/fees'
     | '/_protected/parent-portal/grades'
@@ -679,13 +854,26 @@ export interface FileRouteTypes {
     | '/_protected/people/parents'
     | '/_protected/people/reporting'
     | '/_protected/people/staff'
+    | '/_protected/settings/account'
+    | '/_protected/settings/billing'
+    | '/_protected/settings/connections'
+    | '/_protected/settings/danger'
+    | '/_protected/settings/data'
+    | '/_protected/settings/general'
+    | '/_protected/settings/integrations'
+    | '/_protected/settings/notifications'
+    | '/_protected/settings/people'
+    | '/_protected/settings/preferences'
+    | '/_protected/settings/schools'
+    | '/_protected/settings/security'
     | '/_protected/student-portal/assignments'
     | '/_protected/student-portal/attendance'
     | '/_protected/student-portal/grades'
     | '/_protected/student-portal/schedule'
+    | '/_protected/messages/'
     | '/_protected/settings/'
     | '/_protected/academics/classrooms/$classroomId'
-    | '/_protected/academics/grades/$classId'
+    | '/_protected/academics/gradebooks/$classId'
     | '/_protected/academics/students/$studentId'
     | '/_protected/academics/teachers/$teacherId'
     | '/_protected/people/parents/$parentId'
@@ -757,6 +945,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedParentPortalRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/messages': {
+      id: '/_protected/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof ProtectedMessagesRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/home': {
       id: '/_protected/home'
       path: '/home'
@@ -769,13 +964,6 @@ declare module '@tanstack/react-router' {
       path: '/finance'
       fullPath: '/finance'
       preLoaderRoute: typeof ProtectedFinanceRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
-    '/_protected/communications': {
-      id: '/_protected/communications'
-      path: '/communications'
-      fullPath: '/communications'
-      preLoaderRoute: typeof ProtectedCommunicationsRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/analytics': {
@@ -798,6 +986,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof ProtectedSettingsIndexRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/messages/': {
+      id: '/_protected/messages/'
+      path: '/'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof ProtectedMessagesIndexRouteImport
+      parentRoute: typeof ProtectedMessagesRoute
     }
     '/_protected/student-portal/schedule': {
       id: '/_protected/student-portal/schedule'
@@ -826,6 +1021,90 @@ declare module '@tanstack/react-router' {
       fullPath: '/student-portal/assignments'
       preLoaderRoute: typeof ProtectedStudentPortalAssignmentsRouteImport
       parentRoute: typeof ProtectedStudentPortalRoute
+    }
+    '/_protected/settings/security': {
+      id: '/_protected/settings/security'
+      path: '/settings/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof ProtectedSettingsSecurityRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/schools': {
+      id: '/_protected/settings/schools'
+      path: '/settings/schools'
+      fullPath: '/settings/schools'
+      preLoaderRoute: typeof ProtectedSettingsSchoolsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/preferences': {
+      id: '/_protected/settings/preferences'
+      path: '/settings/preferences'
+      fullPath: '/settings/preferences'
+      preLoaderRoute: typeof ProtectedSettingsPreferencesRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/people': {
+      id: '/_protected/settings/people'
+      path: '/settings/people'
+      fullPath: '/settings/people'
+      preLoaderRoute: typeof ProtectedSettingsPeopleRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/notifications': {
+      id: '/_protected/settings/notifications'
+      path: '/settings/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof ProtectedSettingsNotificationsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/integrations': {
+      id: '/_protected/settings/integrations'
+      path: '/settings/integrations'
+      fullPath: '/settings/integrations'
+      preLoaderRoute: typeof ProtectedSettingsIntegrationsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/general': {
+      id: '/_protected/settings/general'
+      path: '/settings/general'
+      fullPath: '/settings/general'
+      preLoaderRoute: typeof ProtectedSettingsGeneralRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/data': {
+      id: '/_protected/settings/data'
+      path: '/settings/data'
+      fullPath: '/settings/data'
+      preLoaderRoute: typeof ProtectedSettingsDataRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/danger': {
+      id: '/_protected/settings/danger'
+      path: '/settings/danger'
+      fullPath: '/settings/danger'
+      preLoaderRoute: typeof ProtectedSettingsDangerRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/connections': {
+      id: '/_protected/settings/connections'
+      path: '/settings/connections'
+      fullPath: '/settings/connections'
+      preLoaderRoute: typeof ProtectedSettingsConnectionsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/billing': {
+      id: '/_protected/settings/billing'
+      path: '/settings/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof ProtectedSettingsBillingRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/account': {
+      id: '/_protected/settings/account'
+      path: '/settings/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof ProtectedSettingsAccountRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/people/staff': {
       id: '/_protected/people/staff'
@@ -897,6 +1176,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedParentPortalAttendanceRouteImport
       parentRoute: typeof ProtectedParentPortalRoute
     }
+    '/_protected/messages/meetings': {
+      id: '/_protected/messages/meetings'
+      path: '/meetings'
+      fullPath: '/messages/meetings'
+      preLoaderRoute: typeof ProtectedMessagesMeetingsRouteImport
+      parentRoute: typeof ProtectedMessagesRoute
+    }
+    '/_protected/messages/integrations': {
+      id: '/_protected/messages/integrations'
+      path: '/integrations'
+      fullPath: '/messages/integrations'
+      preLoaderRoute: typeof ProtectedMessagesIntegrationsRouteImport
+      parentRoute: typeof ProtectedMessagesRoute
+    }
+    '/_protected/messages/inbox': {
+      id: '/_protected/messages/inbox'
+      path: '/inbox'
+      fullPath: '/messages/inbox'
+      preLoaderRoute: typeof ProtectedMessagesInboxRouteImport
+      parentRoute: typeof ProtectedMessagesRoute
+    }
+    '/_protected/messages/announcements': {
+      id: '/_protected/messages/announcements'
+      path: '/announcements'
+      fullPath: '/messages/announcements'
+      preLoaderRoute: typeof ProtectedMessagesAnnouncementsRouteImport
+      parentRoute: typeof ProtectedMessagesRoute
+    }
     '/_protected/finance/tuitionandfees': {
       id: '/_protected/finance/tuitionandfees'
       path: '/tuitionandfees'
@@ -931,20 +1238,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/finance/expenses'
       preLoaderRoute: typeof ProtectedFinanceExpensesRouteImport
       parentRoute: typeof ProtectedFinanceRoute
-    }
-    '/_protected/communications/messages': {
-      id: '/_protected/communications/messages'
-      path: '/messages'
-      fullPath: '/communications/messages'
-      preLoaderRoute: typeof ProtectedCommunicationsMessagesRouteImport
-      parentRoute: typeof ProtectedCommunicationsRoute
-    }
-    '/_protected/communications/announcements': {
-      id: '/_protected/communications/announcements'
-      path: '/announcements'
-      fullPath: '/communications/announcements'
-      preLoaderRoute: typeof ProtectedCommunicationsAnnouncementsRouteImport
-      parentRoute: typeof ProtectedCommunicationsRoute
     }
     '/_protected/analytics/financial': {
       id: '/_protected/analytics/financial'
@@ -988,18 +1281,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAcademicsReportingRouteImport
       parentRoute: typeof ProtectedAcademicsRoute
     }
-    '/_protected/academics/grades': {
-      id: '/_protected/academics/grades'
-      path: '/grades'
-      fullPath: '/academics/grades'
-      preLoaderRoute: typeof ProtectedAcademicsGradesRouteImport
-      parentRoute: typeof ProtectedAcademicsRoute
-    }
     '/_protected/academics/gradelevels': {
       id: '/_protected/academics/gradelevels'
       path: '/gradelevels'
       fullPath: '/academics/gradelevels'
       preLoaderRoute: typeof ProtectedAcademicsGradelevelsRouteImport
+      parentRoute: typeof ProtectedAcademicsRoute
+    }
+    '/_protected/academics/gradebooks': {
+      id: '/_protected/academics/gradebooks'
+      path: '/gradebooks'
+      fullPath: '/academics/gradebooks'
+      preLoaderRoute: typeof ProtectedAcademicsGradebooksRouteImport
       parentRoute: typeof ProtectedAcademicsRoute
     }
     '/_protected/academics/enrollment': {
@@ -1058,12 +1351,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAcademicsStudentsStudentIdRouteImport
       parentRoute: typeof ProtectedAcademicsStudentsRoute
     }
-    '/_protected/academics/grades/$classId': {
-      id: '/_protected/academics/grades/$classId'
+    '/_protected/academics/gradebooks/$classId': {
+      id: '/_protected/academics/gradebooks/$classId'
       path: '/$classId'
-      fullPath: '/academics/grades/$classId'
-      preLoaderRoute: typeof ProtectedAcademicsGradesClassIdRouteImport
-      parentRoute: typeof ProtectedAcademicsGradesRoute
+      fullPath: '/academics/gradebooks/$classId'
+      preLoaderRoute: typeof ProtectedAcademicsGradebooksClassIdRouteImport
+      parentRoute: typeof ProtectedAcademicsGradebooksRoute
     }
     '/_protected/academics/classrooms/$classroomId': {
       id: '/_protected/academics/classrooms/$classroomId'
@@ -1090,18 +1383,19 @@ const ProtectedAcademicsClassroomsRouteWithChildren =
     ProtectedAcademicsClassroomsRouteChildren,
   )
 
-interface ProtectedAcademicsGradesRouteChildren {
-  ProtectedAcademicsGradesClassIdRoute: typeof ProtectedAcademicsGradesClassIdRoute
+interface ProtectedAcademicsGradebooksRouteChildren {
+  ProtectedAcademicsGradebooksClassIdRoute: typeof ProtectedAcademicsGradebooksClassIdRoute
 }
 
-const ProtectedAcademicsGradesRouteChildren: ProtectedAcademicsGradesRouteChildren =
+const ProtectedAcademicsGradebooksRouteChildren: ProtectedAcademicsGradebooksRouteChildren =
   {
-    ProtectedAcademicsGradesClassIdRoute: ProtectedAcademicsGradesClassIdRoute,
+    ProtectedAcademicsGradebooksClassIdRoute:
+      ProtectedAcademicsGradebooksClassIdRoute,
   }
 
-const ProtectedAcademicsGradesRouteWithChildren =
-  ProtectedAcademicsGradesRoute._addFileChildren(
-    ProtectedAcademicsGradesRouteChildren,
+const ProtectedAcademicsGradebooksRouteWithChildren =
+  ProtectedAcademicsGradebooksRoute._addFileChildren(
+    ProtectedAcademicsGradebooksRouteChildren,
   )
 
 interface ProtectedAcademicsStudentsRouteChildren {
@@ -1139,8 +1433,8 @@ interface ProtectedAcademicsRouteChildren {
   ProtectedAcademicsClassroomsRoute: typeof ProtectedAcademicsClassroomsRouteWithChildren
   ProtectedAcademicsCurriculumRoute: typeof ProtectedAcademicsCurriculumRoute
   ProtectedAcademicsEnrollmentRoute: typeof ProtectedAcademicsEnrollmentRoute
+  ProtectedAcademicsGradebooksRoute: typeof ProtectedAcademicsGradebooksRouteWithChildren
   ProtectedAcademicsGradelevelsRoute: typeof ProtectedAcademicsGradelevelsRoute
-  ProtectedAcademicsGradesRoute: typeof ProtectedAcademicsGradesRouteWithChildren
   ProtectedAcademicsReportingRoute: typeof ProtectedAcademicsReportingRoute
   ProtectedAcademicsSchoolcalendarRoute: typeof ProtectedAcademicsSchoolcalendarRoute
   ProtectedAcademicsStudentsRoute: typeof ProtectedAcademicsStudentsRouteWithChildren
@@ -1153,8 +1447,9 @@ const ProtectedAcademicsRouteChildren: ProtectedAcademicsRouteChildren = {
     ProtectedAcademicsClassroomsRouteWithChildren,
   ProtectedAcademicsCurriculumRoute: ProtectedAcademicsCurriculumRoute,
   ProtectedAcademicsEnrollmentRoute: ProtectedAcademicsEnrollmentRoute,
+  ProtectedAcademicsGradebooksRoute:
+    ProtectedAcademicsGradebooksRouteWithChildren,
   ProtectedAcademicsGradelevelsRoute: ProtectedAcademicsGradelevelsRoute,
-  ProtectedAcademicsGradesRoute: ProtectedAcademicsGradesRouteWithChildren,
   ProtectedAcademicsReportingRoute: ProtectedAcademicsReportingRoute,
   ProtectedAcademicsSchoolcalendarRoute: ProtectedAcademicsSchoolcalendarRoute,
   ProtectedAcademicsStudentsRoute: ProtectedAcademicsStudentsRouteWithChildren,
@@ -1177,23 +1472,6 @@ const ProtectedAnalyticsRouteChildren: ProtectedAnalyticsRouteChildren = {
 const ProtectedAnalyticsRouteWithChildren =
   ProtectedAnalyticsRoute._addFileChildren(ProtectedAnalyticsRouteChildren)
 
-interface ProtectedCommunicationsRouteChildren {
-  ProtectedCommunicationsAnnouncementsRoute: typeof ProtectedCommunicationsAnnouncementsRoute
-  ProtectedCommunicationsMessagesRoute: typeof ProtectedCommunicationsMessagesRoute
-}
-
-const ProtectedCommunicationsRouteChildren: ProtectedCommunicationsRouteChildren =
-  {
-    ProtectedCommunicationsAnnouncementsRoute:
-      ProtectedCommunicationsAnnouncementsRoute,
-    ProtectedCommunicationsMessagesRoute: ProtectedCommunicationsMessagesRoute,
-  }
-
-const ProtectedCommunicationsRouteWithChildren =
-  ProtectedCommunicationsRoute._addFileChildren(
-    ProtectedCommunicationsRouteChildren,
-  )
-
 interface ProtectedFinanceRouteChildren {
   ProtectedFinanceExpensesRoute: typeof ProtectedFinanceExpensesRoute
   ProtectedFinanceFinancialsRoute: typeof ProtectedFinanceFinancialsRoute
@@ -1212,6 +1490,25 @@ const ProtectedFinanceRouteChildren: ProtectedFinanceRouteChildren = {
 
 const ProtectedFinanceRouteWithChildren =
   ProtectedFinanceRoute._addFileChildren(ProtectedFinanceRouteChildren)
+
+interface ProtectedMessagesRouteChildren {
+  ProtectedMessagesAnnouncementsRoute: typeof ProtectedMessagesAnnouncementsRoute
+  ProtectedMessagesInboxRoute: typeof ProtectedMessagesInboxRoute
+  ProtectedMessagesIntegrationsRoute: typeof ProtectedMessagesIntegrationsRoute
+  ProtectedMessagesMeetingsRoute: typeof ProtectedMessagesMeetingsRoute
+  ProtectedMessagesIndexRoute: typeof ProtectedMessagesIndexRoute
+}
+
+const ProtectedMessagesRouteChildren: ProtectedMessagesRouteChildren = {
+  ProtectedMessagesAnnouncementsRoute: ProtectedMessagesAnnouncementsRoute,
+  ProtectedMessagesInboxRoute: ProtectedMessagesInboxRoute,
+  ProtectedMessagesIntegrationsRoute: ProtectedMessagesIntegrationsRoute,
+  ProtectedMessagesMeetingsRoute: ProtectedMessagesMeetingsRoute,
+  ProtectedMessagesIndexRoute: ProtectedMessagesIndexRoute,
+}
+
+const ProtectedMessagesRouteWithChildren =
+  ProtectedMessagesRoute._addFileChildren(ProtectedMessagesRouteChildren)
 
 interface ProtectedParentPortalRouteChildren {
   ProtectedParentPortalAttendanceRoute: typeof ProtectedParentPortalAttendanceRoute
@@ -1304,26 +1601,50 @@ const ProtectedStudentPortalRouteWithChildren =
 interface ProtectedRouteChildren {
   ProtectedAcademicsRoute: typeof ProtectedAcademicsRouteWithChildren
   ProtectedAnalyticsRoute: typeof ProtectedAnalyticsRouteWithChildren
-  ProtectedCommunicationsRoute: typeof ProtectedCommunicationsRouteWithChildren
   ProtectedFinanceRoute: typeof ProtectedFinanceRouteWithChildren
   ProtectedHomeRoute: typeof ProtectedHomeRoute
+  ProtectedMessagesRoute: typeof ProtectedMessagesRouteWithChildren
   ProtectedParentPortalRoute: typeof ProtectedParentPortalRouteWithChildren
   ProtectedPeopleRoute: typeof ProtectedPeopleRouteWithChildren
   ProtectedStudentPortalRoute: typeof ProtectedStudentPortalRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
+  ProtectedSettingsAccountRoute: typeof ProtectedSettingsAccountRoute
+  ProtectedSettingsBillingRoute: typeof ProtectedSettingsBillingRoute
+  ProtectedSettingsConnectionsRoute: typeof ProtectedSettingsConnectionsRoute
+  ProtectedSettingsDangerRoute: typeof ProtectedSettingsDangerRoute
+  ProtectedSettingsDataRoute: typeof ProtectedSettingsDataRoute
+  ProtectedSettingsGeneralRoute: typeof ProtectedSettingsGeneralRoute
+  ProtectedSettingsIntegrationsRoute: typeof ProtectedSettingsIntegrationsRoute
+  ProtectedSettingsNotificationsRoute: typeof ProtectedSettingsNotificationsRoute
+  ProtectedSettingsPeopleRoute: typeof ProtectedSettingsPeopleRoute
+  ProtectedSettingsPreferencesRoute: typeof ProtectedSettingsPreferencesRoute
+  ProtectedSettingsSchoolsRoute: typeof ProtectedSettingsSchoolsRoute
+  ProtectedSettingsSecurityRoute: typeof ProtectedSettingsSecurityRoute
   ProtectedSettingsIndexRoute: typeof ProtectedSettingsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAcademicsRoute: ProtectedAcademicsRouteWithChildren,
   ProtectedAnalyticsRoute: ProtectedAnalyticsRouteWithChildren,
-  ProtectedCommunicationsRoute: ProtectedCommunicationsRouteWithChildren,
   ProtectedFinanceRoute: ProtectedFinanceRouteWithChildren,
   ProtectedHomeRoute: ProtectedHomeRoute,
+  ProtectedMessagesRoute: ProtectedMessagesRouteWithChildren,
   ProtectedParentPortalRoute: ProtectedParentPortalRouteWithChildren,
   ProtectedPeopleRoute: ProtectedPeopleRouteWithChildren,
   ProtectedStudentPortalRoute: ProtectedStudentPortalRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
+  ProtectedSettingsAccountRoute: ProtectedSettingsAccountRoute,
+  ProtectedSettingsBillingRoute: ProtectedSettingsBillingRoute,
+  ProtectedSettingsConnectionsRoute: ProtectedSettingsConnectionsRoute,
+  ProtectedSettingsDangerRoute: ProtectedSettingsDangerRoute,
+  ProtectedSettingsDataRoute: ProtectedSettingsDataRoute,
+  ProtectedSettingsGeneralRoute: ProtectedSettingsGeneralRoute,
+  ProtectedSettingsIntegrationsRoute: ProtectedSettingsIntegrationsRoute,
+  ProtectedSettingsNotificationsRoute: ProtectedSettingsNotificationsRoute,
+  ProtectedSettingsPeopleRoute: ProtectedSettingsPeopleRoute,
+  ProtectedSettingsPreferencesRoute: ProtectedSettingsPreferencesRoute,
+  ProtectedSettingsSchoolsRoute: ProtectedSettingsSchoolsRoute,
+  ProtectedSettingsSecurityRoute: ProtectedSettingsSecurityRoute,
   ProtectedSettingsIndexRoute: ProtectedSettingsIndexRoute,
 }
 

@@ -58,8 +58,7 @@ import {
   Home,
   // Meeting Hub
   Video,
-  CalendarPlus,
-  CalendarCheck,
+
   // Student Portal
   BookOpen,
   Calendar,
@@ -85,19 +84,19 @@ export interface NavItem {
   icon: LucideIcon
   href?: string
   onClick?: () => void
-  
+
   // ABAC Security
   permission?: NavItemPermission
-  
+
   // Multi-tenant visibility - only show for these global roles
   tenantRoles?: GlobalRole[]
-  
+
   // School-specific visibility - requires an active school context
   requiresActiveSchool?: boolean
-  
+
   // Badge for notifications/counts
   badge?: number | string
-  
+
   // Variant for styling (e.g., danger for delete actions)
   variant?: 'default' | 'danger'
 }
@@ -116,16 +115,17 @@ export interface ModuleConfig {
   groups: NavItemGroup[]
 }
 
-export type SidebarModule = 
-  | 'home' 
-  | 'home-student' 
-  | 'home-parent' 
-  | 'settings' 
-  | 'academics' 
-  | 'finance' 
-  | 'people' 
-  | 'communications' 
-  | 'analytics' 
+export type SidebarModule =
+  | 'home'
+  | 'home-student'
+  | 'home-parent'
+  | 'settings'
+  | 'academics'
+  | 'finance'
+  | 'people'
+  | 'people'
+  | 'messages'
+  | 'analytics'
   | 'parent-portal'
   | 'student-portal'
 
@@ -164,21 +164,19 @@ const homeModule: ModuleConfig = {
           permission: { action: 'view', resource: 'staff' },
         },
         {
+          id: 'messages',
+          label: 'Messages',
+          icon: MessageCircleMore,
+          href: '/messages',
+          permission: { action: 'view', resource: 'communications' },
+        },
+        {
           id: 'analytics',
           label: 'Analytics',
           icon: BarChart3,
           href: '/analytics',
           permission: { action: 'view', resource: 'analytics' },
         },
-        {
-          id: 'communications',
-          label: 'Communication',
-          icon: MessageCircleMore,
-          href: '/communications',
-          permission: { action: 'view', resource: 'communications' },
-        },
-        // Note: Parent Portal is NOT listed here - parents get their own home module
-        // that renders the parent portal navigation directly
         {
           id: 'settings',
           label: 'Settings',
@@ -262,14 +260,14 @@ const studentHomeModule: ModuleConfig = {
           id: 'messages',
           label: 'Messages',
           icon: Mail,
-          href: '/communications/messages',
+          href: '/messages',
           permission: { action: 'view', resource: 'messages' },
         },
         {
           id: 'announcements',
           label: 'Announcements',
           icon: Megaphone,
-          href: '/communications/announcements',
+          href: '/messages/announcements',
           permission: { action: 'view', resource: 'announcements' },
         },
       ],
@@ -366,14 +364,14 @@ const parentHomeModule: ModuleConfig = {
           id: 'messages',
           label: 'Messages',
           icon: Mail,
-          href: '/communications/messages',
+          href: '/messages',
           permission: { action: 'view', resource: 'messages' },
         },
         {
           id: 'announcements',
           label: 'Announcements',
           icon: Megaphone,
-          href: '/communications/announcements',
+          href: '/messages/announcements',
           permission: { action: 'view', resource: 'announcements' },
         },
       ],
@@ -422,32 +420,32 @@ const settingsModule: ModuleConfig = {
           id: 'my-account',
           label: 'My Account',
           icon: User,
-          href: '/settings?tab=account',
+          href: '/settings/account',
           // No permission needed - all users can access their own profile
         },
         {
           id: 'preferences',
           label: 'Preferences',
           icon: SlidersHorizontal,
-          href: '/settings?tab=preferences',
+          href: '/settings/preferences',
         },
         {
           id: 'notifications',
           label: 'Notifications',
           icon: BellDot,
-          href: '/settings?tab=notifications',
+          href: '/settings/notifications',
         },
         {
           id: 'security',
           label: 'Security',
           icon: ShieldCheck,
-          href: '/settings?tab=security',
+          href: '/settings/security',
         },
         {
           id: 'connections',
           label: 'Connections',
           icon: Link2,
-          href: '/settings?tab=connections',
+          href: '/settings/connections',
         },
       ],
     },
@@ -459,28 +457,28 @@ const settingsModule: ModuleConfig = {
           id: 'general',
           label: 'General Settings',
           icon: Settings,
-          href: '/settings?tab=general',
+          href: '/settings/general',
           permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'system-access-policy',
           label: 'Access Policy',
           icon: BrickWallShield,
-          href: '/settings?tab=people',
+          href: '/settings/people',
           permission: { action: 'view', resource: 'staff' },
         },
         {
           id: 'schools',
           label: 'Schools',
           icon: School,
-          href: '/settings?tab=schools',
+          href: '/settings/schools',
           permission: { action: 'view', resource: 'settings:school' },
         },
         {
           id: 'billing',
           label: 'Billing',
           icon: CreditCard,
-          href: '/settings?tab=billing',
+          href: '/settings/billing',
           permission: { action: 'manage', resource: 'settings:tenant' },
           tenantRoles: ['TenantAdmin'],
         },
@@ -488,7 +486,7 @@ const settingsModule: ModuleConfig = {
           id: 'integrations',
           label: 'Integrations',
           icon: Zap,
-          href: '/settings?tab=integrations',
+          href: '/settings/integrations',
           permission: { action: 'manage', resource: 'settings:tenant' },
           tenantRoles: ['TenantAdmin'],
         },
@@ -496,7 +494,7 @@ const settingsModule: ModuleConfig = {
           id: 'data',
           label: 'Import/Export',
           icon: Database,
-          href: '/settings?tab=data',
+          href: '/settings/data',
           permission: { action: 'manage', resource: 'settings:tenant' },
           tenantRoles: ['TenantAdmin'],
         },
@@ -509,7 +507,7 @@ const settingsModule: ModuleConfig = {
           id: 'danger-zone',
           label: 'Danger Zone',
           icon: TriangleAlert,
-          href: '/settings?tab=danger',
+          href: '/settings/danger',
           variant: 'danger',
         },
       ],
@@ -599,9 +597,9 @@ const academicsModule: ModuleConfig = {
         },
         {
           id: 'gradebook',
-          label: 'Gradebook',
+          label: 'Gradebooks',
           icon: GraduationCap,
-          href: '/academics/grades',
+          href: '/academics/gradebooks',
           permission: { action: 'view', resource: 'grades' },
           requiresActiveSchool: true,
         },
@@ -632,7 +630,7 @@ const academicsModule: ModuleConfig = {
           permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
-                {
+        {
           id: 'reporting',
           label: 'Reporting',
           icon: ChartNoAxesCombined,
@@ -642,7 +640,7 @@ const academicsModule: ModuleConfig = {
         },
       ],
     },
-    
+
   ],
 }
 
@@ -801,7 +799,7 @@ const peopleModule: ModuleConfig = {
           permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
-                {
+        {
           id: 'reporting',
           label: 'Reporting',
           icon: ChartNoAxesCombined,
@@ -815,64 +813,6 @@ const peopleModule: ModuleConfig = {
 }
 
 // ============================================================================
-// COMMUNICATIONS MODULE - Meeting Hub (Video Conferencing Integrations)
-// ============================================================================
-
-const communicationsModule: ModuleConfig = {
-  id: 'communications',
-  title: 'Meeting Hub',
-  icon: Video,
-  backTo: { path: '/home', label: 'Back to Home' },
-  groups: [
-    {
-      id: 'overview',
-      items: [
-        {
-          id: 'meeting-hub-home',
-          label: 'Overview',
-          icon: GalleryVerticalEnd,
-          href: '/communications',
-          permission: { action: 'view', resource: 'communications' },
-        },
-      ],
-    },
-    {
-      id: 'integrations',
-      label: 'INTEGRATIONS',
-      items: [
-        {
-          id: 'integrations-manage',
-          label: 'Manage Integrations',
-          icon: Link2,
-          href: '/communications/integrations',
-          permission: { action: 'view', resource: 'communications' },
-        },
-      ],
-    },
-    {
-      id: 'meetings',
-      label: 'MEETINGS',
-      items: [
-        {
-          id: 'schedule-meeting',
-          label: 'Schedule Meeting',
-          icon: CalendarPlus,
-          href: '/communications/schedule',
-          permission: { action: 'create', resource: 'communications' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'my-meetings',
-          label: 'My Meetings',
-          icon: CalendarCheck,
-          href: '/communications/meetings',
-          permission: { action: 'view', resource: 'communications' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-  ],
-}
 
 // ============================================================================
 // ANALYTICS MODULE - Data insights and reports
@@ -1127,6 +1067,77 @@ const parentPortalModule: ModuleConfig = {
 // MODULE REGISTRY
 // ============================================================================
 
+
+// ============================================================================
+// MESSAGES MODULE - Communication hub
+// ============================================================================
+
+const messagesModule: ModuleConfig = {
+  id: 'messages',
+  title: 'Messages',
+  icon: MessageCircleMore,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'messages-home',
+          label: 'Overview',
+          icon: GalleryVerticalEnd,
+          href: '/messages',
+          permission: { action: 'view', resource: 'communications' },
+        },
+      ],
+    },
+    {
+      id: 'communication',
+      label: 'COMMUNICATION',
+      items: [
+        {
+          id: 'inbox',
+          label: 'Inbox',
+          icon: Mail,
+          href: '/messages/inbox',
+          badge: 12, // Mock badge count
+          permission: { action: 'view', resource: 'communications' },
+        },
+        {
+          id: 'announcements',
+          label: 'Announcements',
+          icon: Megaphone,
+          href: '/messages/announcements',
+          permission: { action: 'view', resource: 'announcements' },
+        },
+      ],
+    },
+    {
+      id: 'tools',
+      label: 'TOOLS',
+      items: [
+        {
+          id: 'meetings',
+          label: 'Meetings',
+          icon: Video,
+          href: '/messages/meetings',
+          permission: { action: 'view', resource: 'communications' },
+        },
+        {
+          id: 'integrations',
+          label: 'Integrations',
+          icon: Zap,
+          href: '/messages/integrations',
+          permission: { action: 'view', resource: 'settings' }, // Using settings permission for integrations
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
+// MODULE REGISTRY
+// ============================================================================
+
 export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   home: homeModule,
   'home-student': studentHomeModule,
@@ -1135,11 +1146,12 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   academics: academicsModule,
   finance: financeModule,
   people: peopleModule,
-  communications: communicationsModule,
+  messages: messagesModule,
   analytics: analyticsModule,
   'student-portal': studentPortalModule,
   'parent-portal': parentPortalModule,
 }
+
 
 /**
  * Get module config by ID
@@ -1178,7 +1190,7 @@ export function getHomeModuleForRole(roleCategory: RoleCategory | null): Sidebar
  */
 export function getHomeModuleForSchoolRole(schoolRole: SchoolRole | null): SidebarModule {
   if (!schoolRole) return 'home'
-  
+
   switch (schoolRole) {
     case 'Student':
       return 'home-student'
@@ -1199,7 +1211,7 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/academics')) return 'academics'
   if (pathname.startsWith('/finance')) return 'finance'
   if (pathname.startsWith('/people')) return 'people'
-  if (pathname.startsWith('/communications')) return 'communications'
+  if (pathname.startsWith('/messages')) return 'messages'
   if (pathname.startsWith('/analytics')) return 'analytics'
   if (pathname.startsWith('/student-portal')) return 'student-portal'
   if (pathname.startsWith('/parent-portal')) return 'parent-portal'

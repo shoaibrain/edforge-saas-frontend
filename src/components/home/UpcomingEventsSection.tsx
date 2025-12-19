@@ -325,7 +325,7 @@ export function UpcomingEventsSection({
         </div>
 
         <Link
-          to="/communications"
+          to="/messages"
           className="flex items-center gap-1 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:underline"
         >
           View all

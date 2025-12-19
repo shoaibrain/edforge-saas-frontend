@@ -27,7 +27,7 @@ import {
   ScheduledMeetingsList,
 } from '@/components/meetings'
 
-export const Route = createFileRoute('/_protected/communications')({
+export const Route = createFileRoute('/_protected/messages')({
   component: CommunicationsLayout,
 })
 
@@ -37,8 +37,8 @@ export const Route = createFileRoute('/_protected/communications')({
 
 function CommunicationsLayout() {
   const matches = useMatches()
-  const isExactRoute = matches[matches.length - 1]?.routeId === '/_protected/communications'
-  
+  const isExactRoute = matches[matches.length - 1]?.routeId === '/_protected/messages'
+
   if (isExactRoute) {
     return (
       <>
@@ -47,7 +47,7 @@ function CommunicationsLayout() {
       </>
     )
   }
-  
+
   return (
     <>
       <Outlet />
@@ -66,16 +66,16 @@ function MeetingHubPage() {
     openWizard,
     disconnectIntegration,
   } = useIntegrationsStore()
-  
+
   const videoPlatforms = getVideoPlatforms()
   const calendarPlatforms = getCalendarPlatforms()
-  
+
   const connectedCount = connectedIntegrations.filter(i => i.status === 'connected').length
   const totalPlatforms = videoPlatforms.length + calendarPlatforms.length
-  
+
   const getIntegration = (platformId: MeetingPlatformId) =>
     connectedIntegrations.find(i => i.platformId === platformId)
-  
+
   return (
     <div className="max-w-6xl mx-auto space-y-10 pb-12">
       {/* ================================================================== */}
@@ -99,7 +99,7 @@ function MeetingHubPage() {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <button
             onClick={() => openWizard()}
@@ -134,7 +134,7 @@ function MeetingHubPage() {
                 </p>
               </div>
             </div>
-            
+
             {/* Progress Indicator */}
             <div className="flex items-center gap-3">
               <div className="w-32 h-2 rounded-full bg-[rgb(var(--surface-tertiary))] overflow-hidden">
@@ -167,7 +167,7 @@ function MeetingHubPage() {
             Video Conferencing
           </h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {videoPlatforms.map((platform, index) => (
             <IntegrationCard
@@ -176,7 +176,7 @@ function MeetingHubPage() {
               integration={getIntegration(platform.id)}
               index={index}
               onConnect={() => openWizard(platform.id)}
-              onManage={() => {/* TODO: Open settings */}}
+              onManage={() => {/* TODO: Open settings */ }}
               onDisconnect={() => disconnectIntegration(platform.id)}
             />
           ))}
@@ -197,7 +197,7 @@ function MeetingHubPage() {
             Calendar Services
           </h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {calendarPlatforms.map((platform, index) => (
             <IntegrationCard
@@ -206,7 +206,7 @@ function MeetingHubPage() {
               integration={getIntegration(platform.id)}
               index={index}
               onConnect={() => openWizard(platform.id)}
-              onManage={() => {/* TODO: Open settings */}}
+              onManage={() => {/* TODO: Open settings */ }}
               onDisconnect={() => disconnectIntegration(platform.id)}
             />
           ))}
@@ -242,8 +242,8 @@ function MeetingHubPage() {
                 Google Workspace for Education
               </h3>
               <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
-                EdForge integrates seamlessly with Google Workspace for Education. 
-                Connect Google Meet for virtual classrooms, Google Calendar for scheduling, 
+                EdForge integrates seamlessly with Google Workspace for Education.
+                Connect Google Meet for virtual classrooms, Google Calendar for scheduling,
                 and access the full suite of Google's education tools.
               </p>
               <div className="flex flex-wrap gap-2">
