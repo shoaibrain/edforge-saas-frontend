@@ -147,14 +147,14 @@ function parseEventDate(date: Date | string): Date {
 
 function groupEventsByDay(events: UpcomingEvent[]): Map<string, UpcomingEvent[]> {
   const grouped = new Map<string, UpcomingEvent[]>()
-  
+
   events.forEach((event) => {
     const eventDate = parseEventDate(event.date)
     const dateKey = eventDate.toDateString()
     const existing = grouped.get(dateKey) || []
     grouped.set(dateKey, [...existing, event])
   })
-  
+
   return grouped
 }
 
@@ -180,7 +180,7 @@ interface EventCardProps {
 function EventCard({ event, index }: EventCardProps) {
   const config = EVENT_TYPES[event.type]
   const Icon = config.icon
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -195,7 +195,7 @@ function EventCard({ event, index }: EventCardProps) {
       `}>
         <Icon className={`w-4.5 h-4.5 ${config.iconColor}`} />
       </div>
-      
+
       {/* Event Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
@@ -206,7 +206,7 @@ function EventCard({ event, index }: EventCardProps) {
             {event.time}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2 mt-1 text-xs text-[rgb(var(--text-tertiary))]">
           {event.platform && (
             <span className="px-1.5 py-0.5 rounded bg-[rgb(var(--surface-tertiary))]">
@@ -242,7 +242,7 @@ function DayGroup({ dateKey, events, dayIndex }: DayGroupProps) {
   const date = new Date(dateKey)
   const relativeDate = formatRelativeDate(date)
   const isToday = relativeDate === 'Today'
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -254,8 +254,8 @@ function DayGroup({ dateKey, events, dayIndex }: DayGroupProps) {
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgb(var(--border-secondary))]">
         <div className={`
           px-2.5 py-1 rounded-lg text-xs font-semibold
-          ${isToday 
-            ? 'bg-teal-500/15 text-teal-700 dark:bg-cyan-500/20 dark:text-cyan-400' 
+          ${isToday
+            ? 'bg-teal-500/15 text-teal-700 dark:bg-cyan-500/20 dark:text-cyan-400'
             : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'
           }
         `}>
@@ -265,7 +265,7 @@ function DayGroup({ dateKey, events, dayIndex }: DayGroupProps) {
           {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
         </span>
       </div>
-      
+
       {/* Events List */}
       <div className="space-y-1">
         {events.map((event, index) => (
@@ -285,13 +285,13 @@ interface UpcomingEventsSectionProps {
   maxDays?: number
 }
 
-export function UpcomingEventsSection({ 
+export function UpcomingEventsSection({
   events = MOCK_UPCOMING_EVENTS,
-  maxDays = 3 
+  maxDays = 3
 }: UpcomingEventsSectionProps) {
   const groupedEvents = groupEventsByDay(events)
   const dayGroups = Array.from(groupedEvents.entries()).slice(0, maxDays)
-  
+
   if (dayGroups.length === 0) {
     return (
       <motion.div
@@ -308,7 +308,7 @@ export function UpcomingEventsSection({
       </motion.div>
     )
   }
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -323,7 +323,7 @@ export function UpcomingEventsSection({
             Upcoming this week
           </h2>
         </div>
-        
+
         <Link
           to="/communications"
           className="flex items-center gap-1 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:underline"
@@ -332,7 +332,7 @@ export function UpcomingEventsSection({
           <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
-      
+
       {/* Day Groups Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {dayGroups.map(([dateKey, dayEvents], dayIndex) => (

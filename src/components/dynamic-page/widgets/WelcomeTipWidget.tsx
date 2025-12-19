@@ -14,6 +14,7 @@ import {
   GraduationCap,
   BookOpen,
   Baby,
+  Lightbulb,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAuthStore, getUserRoleCategory } from '@/stores/auth.store'
@@ -98,7 +99,7 @@ interface WelcomeTipCardProps {
 
 function WelcomeTipCard({ tip }: WelcomeTipCardProps) {
   const WelcomeIcon = tip.icon
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -143,16 +144,17 @@ interface WelcomeTipWidgetProps {
 export function WelcomeTipWidget({ tip }: WelcomeTipWidgetProps) {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  
+
   // Use provided tip or get role-based default
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const welcomeTip = tip || WELCOME_TIPS[roleCategory ?? 'administrator']
-  
+
   return (
     <WidgetSection
       widgetId="welcome-tip"
       showHeader={false}
       animationDelay={0.5}
+      icon={Lightbulb}
     >
       <WelcomeTipCard tip={welcomeTip} />
     </WidgetSection>
@@ -230,11 +232,11 @@ interface ModuleTipWidgetProps {
 
 export function ModuleTipWidget({ moduleId }: ModuleTipWidgetProps) {
   const tip = MODULE_TIPS[moduleId]
-  
+
   if (!tip) {
     return null
   }
-  
+
   return <WelcomeTipWidget tip={tip} />
 }
 

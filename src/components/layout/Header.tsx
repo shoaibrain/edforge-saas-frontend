@@ -28,9 +28,8 @@ import { useQuickAddPersonModal, useInviteTeamModal, useAddClassroomModal, useAd
 import { Avatar } from '@/components/ui/Avatar'
 import { getSchoolAvatar } from '@/lib/avatar'
 import { CommandPalette, useCommandPalette } from '@/components/ui/CommandPalette'
-import { 
-  ADD_NEW_OPTIONS, 
-  ADD_NEW_CATEGORIES,
+import {
+  ADD_NEW_OPTIONS,
   getOptionsGroupedByCategory,
   getContextAwareOptions,
   type AddNewOption,
@@ -78,15 +77,15 @@ function SchoolSelector() {
   const filteredSchools = query === ''
     ? userSchools
     : userSchools.filter((schoolId) =>
-        MOCK_SCHOOLS[schoolId]?.name.toLowerCase().includes(query.toLowerCase())
-      )
+      MOCK_SCHOOLS[schoolId]?.name.toLowerCase().includes(query.toLowerCase())
+    )
 
   return (
     <Menu as="div" className="relative">
       <MenuButton className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group">
         <div className="w-8 h-8 rounded-lg overflow-hidden ring-2 ring-[rgb(var(--border-primary))] ring-offset-1 ring-offset-[rgb(var(--surface-secondary))]">
-          <img 
-            src={getSchoolAvatar(activeSchool?.name || 'school', { size: 32 })} 
+          <img
+            src={getSchoolAvatar(activeSchool?.name || 'school', { size: 32 })}
             alt={activeSchool?.name}
             className="w-full h-full object-cover"
           />
@@ -144,9 +143,8 @@ function SchoolSelector() {
                         setActiveSchoolId(schoolId)
                         setQuery('')
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150 ${
-                        active ? 'bg-[rgb(var(--interactive-hover))]' : ''
-                      } ${isSelected ? 'bg-teal-500/10 dark:bg-cyan-500/15' : ''}`}
+                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150 ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''
+                        } ${isSelected ? 'bg-teal-500/10 dark:bg-cyan-500/15' : ''}`}
                     >
                       <div className={`w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 ${isSelected ? 'ring-2 ring-teal-500' : 'ring-1 ring-[rgb(var(--border-primary))]'}`}>
                         <img
@@ -199,8 +197,8 @@ function PeopleSelector() {
   const filteredPeople = query === ''
     ? MOCK_PEOPLE
     : MOCK_PEOPLE.filter((person) =>
-        person.name.toLowerCase().includes(query.toLowerCase())
-      )
+      person.name.toLowerCase().includes(query.toLowerCase())
+    )
 
   const students = filteredPeople.filter(p => p.type === 'student')
   const staff = filteredPeople.filter(p => p.type === 'staff')
@@ -263,8 +261,7 @@ function PeopleSelector() {
                       key={person.id}
                       value={person}
                       className={({ active }) =>
-                        `flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150 ${
-                          active ? 'bg-[rgb(var(--interactive-hover))]' : ''
+                        `flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150 ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''
                         }`
                       }
                     >
@@ -297,8 +294,7 @@ function PeopleSelector() {
                       key={person.id}
                       value={person}
                       className={({ active }) =>
-                        `flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150 ${
-                          active ? 'bg-[rgb(var(--interactive-hover))]' : ''
+                        `flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150 ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''
                         }`
                       }
                     >
@@ -364,17 +360,17 @@ function GlobalSearchButton({ onClick }: { onClick: () => void }) {
 // ADD NEW DROPDOWN - ENHANCED WITH CONTEXT AWARENESS
 // ============================================================================
 
-function AddNewOptionItem({ 
-  option, 
+function AddNewOptionItem({
+  option,
   isHighlighted,
-  onSelect 
-}: { 
+  onSelect
+}: {
   option: AddNewOption
   isHighlighted?: boolean
-  onSelect: (option: AddNewOption) => void 
+  onSelect: (option: AddNewOption) => void
 }) {
   const [hovered, setHovered] = useState(false)
-  
+
   const springProps = useSpring({
     x: hovered ? 4 : 0,
     scale: hovered ? 1.02 : 1,
@@ -427,7 +423,7 @@ function AddNewDropdown() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  
+
   // Modal hooks
   const quickAddModal = useQuickAddPersonModal()
   const inviteModal = useInviteTeamModal()
@@ -486,11 +482,11 @@ function AddNewDropdown() {
         // TODO: Handle other modal types
         break
       case 'wizard':
-        navigate({ 
-          to: '/people/new', 
-          search: { 
-            type: option.actionData?.personType as 'student' | 'teacher' | 'staff' | 'guardian' 
-          } 
+        navigate({
+          to: '/people/new',
+          search: {
+            type: option.actionData?.personType as 'student' | 'teacher' | 'staff' | 'guardian'
+          }
         })
         break
     }
@@ -501,12 +497,14 @@ function AddNewDropdown() {
       {({ open }) => (
         <>
           <MenuButton className={cn(
-            'flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200',
-            'brand-gradient-warm hover:opacity-90',
-            'shadow-md shadow-golden-500/20 hover:shadow-lg hover:shadow-golden-500/30',
-            open && 'ring-2 ring-golden-400/50 ring-offset-2 ring-offset-[rgb(var(--surface-secondary))]'
+            'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-xl',
+            'bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]',
+            'border border-[rgb(var(--border-primary))]',
+            'hover:bg-[rgb(var(--surface-tertiary))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-secondary))]',
+            'shadow-sm hover:shadow-md',
+            open && 'ring-2 ring-[rgb(var(--interactive-focus))] ring-offset-1 bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))]'
           )}>
-            <Plus className={cn('w-4 h-4 transition-transform duration-200', open && 'rotate-45')} />
+            <Plus className={cn('w-4 h-4 transition-transform duration-200 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))]', open && 'rotate-45')} />
             <span className="hidden sm:inline">Add New</span>
           </MenuButton>
 
@@ -519,57 +517,104 @@ function AddNewDropdown() {
             leaveFrom="opacity-100 scale-100 translate-y-0"
             leaveTo="opacity-0 scale-95 translate-y-2"
           >
-            <MenuItems className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/15 dark:shadow-black/30 z-50 overflow-hidden">
-              {/* Highlighted Options (Context-Aware) */}
+            <MenuItems className="absolute right-0 mt-2 w-[550px] origin-top-right rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/15 dark:shadow-black/30 z-50 overflow-hidden outline-none">
+
+              {/* Highlighted/Suggested (Full Width) */}
               {highlighted.length > 0 && (
-                <div className="py-2">
-                  <div className="px-4 py-2 flex items-center gap-2">
+                <div className="bg-[rgb(var(--surface-tertiary))] border-b border-[rgb(var(--border-secondary))] p-2">
+                  <div className="px-3 py-2 flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-golden-500" />
                     <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                      Suggested
+                      Suggested for this page
                     </span>
                   </div>
-                  {highlighted.map((option) => (
-                    <AddNewOptionItem
-                      key={option.id}
-                      option={option}
-                      isHighlighted
-                      onSelect={handleSelect}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Categorized Options */}
-              {Array.from(groupedOptions.entries()).map(([category, options]) => {
-                if (options.length === 0) return null
-                
-                return (
-                  <div key={category} className="py-2 border-t border-[rgb(var(--border-secondary))] first:border-t-0">
-                    <div className="px-4 py-2">
-                      <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                        {ADD_NEW_CATEGORIES[category as keyof typeof ADD_NEW_CATEGORIES]?.label || category}
-                      </span>
-                    </div>
-                    {options.map((option) => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {highlighted.map((option) => (
                       <AddNewOptionItem
                         key={option.id}
                         option={option}
+                        isHighlighted
                         onSelect={handleSelect}
                       />
                     ))}
                   </div>
-                )
-              })}
+                </div>
+              )}
 
-              {/* Empty State */}
-              {filteredOptions.length === 0 && (
-                <div className="px-4 py-8 text-center">
+              {/* Main Grid Content */}
+              {filteredOptions.length > 0 ? (
+                <div className="grid grid-cols-2 divide-x divide-[rgb(var(--border-secondary))]">
+
+                  {/* Left Column: People */}
+                  <div className="p-2">
+                    <div className="px-4 py-2 mb-1">
+                      <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                        People
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {(groupedOptions.get('people') || []).map((option) => (
+                        <AddNewOptionItem
+                          key={option.id}
+                          option={option}
+                          onSelect={handleSelect}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Academic & Administrative */}
+                  <div className="p-2 bg-[rgb(var(--surface-primary))]/50">
+                    <div className="space-y-4">
+                      {/* Academic */}
+                      <div>
+                        <div className="px-4 py-2 mb-1">
+                          <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                            Academic
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          {(groupedOptions.get('academic') || []).map((option) => (
+                            <AddNewOptionItem
+                              key={option.id}
+                              option={option}
+                              onSelect={handleSelect}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Administrative */}
+                      {(groupedOptions.get('administrative') || []).length > 0 && (
+                        <div>
+                          <div className="px-4 py-2 mb-1 border-t border-[rgb(var(--border-secondary))] pt-4">
+                            <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                              Administrative
+                            </span>
+                          </div>
+                          <div className="space-y-1">
+                            {(groupedOptions.get('administrative') || []).map((option) => (
+                              <AddNewOptionItem
+                                key={option.id}
+                                option={option}
+                                onSelect={handleSelect}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                /* Empty State */
+                <div className="px-4 py-12 text-center">
                   <div className="w-12 h-12 rounded-xl bg-[rgb(var(--surface-tertiary))] flex items-center justify-center mx-auto mb-3">
                     <Plus className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
                   </div>
                   <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                    {activeSchoolId 
+                    {activeSchoolId
                       ? 'No actions available for your role'
                       : 'Select a school to add items'
                     }
@@ -649,11 +694,10 @@ function UserMenu() {
                       e.stopPropagation()
                       setTheme(value)
                     }}
-                    className={`p-2 rounded-md transition-all duration-200 ${
-                      theme === value
-                        ? 'bg-teal-500 dark:bg-cyan-500 text-white shadow-sm'
-                        : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]'
-                    }`}
+                    className={`p-2 rounded-md transition-all duration-200 ${theme === value
+                      ? 'bg-teal-500 dark:bg-cyan-500 text-white shadow-sm'
+                      : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]'
+                      }`}
                     title={label}
                   >
                     <Icon className="w-4 h-4" />
@@ -751,12 +795,12 @@ export function Header() {
         {/* Right Section */}
         <div className="flex items-center gap-3">
           <GlobalSearchButton onClick={commandPalette.toggle} />
-          
+
           {/* Documentation */}
           <button className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200">
             <FileText className="w-5 h-5" />
           </button>
-          
+
           <AddNewDropdown />
 
           {/* Notifications */}

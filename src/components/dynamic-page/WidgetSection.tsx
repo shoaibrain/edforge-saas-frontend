@@ -31,6 +31,8 @@ interface WidgetSectionProps {
   animationDelay?: number
   /** Whether to show the section header */
   showHeader?: boolean
+  /** Whether to allow overflow (disable overflow-hidden) - useful for dropdowns */
+  overflowVisible?: boolean
 }
 
 // ============================================================================
@@ -90,11 +92,12 @@ export function WidgetSection({
   className = '',
   animationDelay = 0,
   showHeader = true,
+  overflowVisible = false,
 }: WidgetSectionProps) {
   const { isWidgetVisible } = useDynamicPage()
-  
+
   const visible = isWidgetVisible(widgetId)
-  
+
   return (
     <AnimatePresence mode="sync">
       {visible && (
@@ -104,7 +107,7 @@ export function WidgetSection({
           initial="hidden"
           animate="visible"
           exit="hidden"
-          className={`overflow-hidden ${className}`}
+          className={`${overflowVisible ? '' : 'overflow-hidden'} ${className}`}
         >
           <motion.div
             variants={contentVariants}
@@ -123,7 +126,7 @@ export function WidgetSection({
                     {label}
                   </h2>
                 </div>
-                
+
                 {/* Header Actions */}
                 {headerActions && (
                   <div className="flex items-center gap-1">
@@ -132,7 +135,7 @@ export function WidgetSection({
                 )}
               </div>
             )}
-            
+
             {/* Widget Content */}
             {children}
           </motion.div>
@@ -210,4 +213,3 @@ export function HeaderActionButton({
     </button>
   )
 }
-
