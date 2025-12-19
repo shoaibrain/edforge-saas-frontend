@@ -27,7 +27,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 
-export const Route = createFileRoute('/_protected/academics/grades')({
+export const Route = createFileRoute('/_protected/academics/gradebooks')({
   beforeLoad: () => {
     const { user } = useAuthStore.getState()
     const { activeSchoolId } = useAppStore.getState()
@@ -99,14 +99,14 @@ const MOCK_STATS = {
 // STAT CARD COMPONENT
 // ============================================================================
 
-function StatCard({ 
-  label, 
-  value, 
-  icon: Icon, 
-  iconBg, 
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  iconBg,
   iconColor,
   suffix,
-}: { 
+}: {
   label: string
   value: string | number
   icon: typeof GraduationCap
@@ -115,7 +115,7 @@ function StatCard({
   suffix?: string
 }) {
   const [hovered, setHovered] = useState(false)
-  
+
   const springProps = useSpring({
     scale: hovered ? 1.02 : 1,
     y: hovered ? -2 : 0,
@@ -153,7 +153,7 @@ function StatCard({
 
 function ClassCard({ cls }: { cls: typeof MOCK_CLASSES[0] }) {
   const [hovered, setHovered] = useState(false)
-  
+
   const springProps = useSpring({
     scale: hovered ? 1.01 : 1,
     x: hovered ? 4 : 0,
@@ -161,7 +161,7 @@ function ClassCard({ cls }: { cls: typeof MOCK_CLASSES[0] }) {
   })
 
   return (
-    <Link to="/academics/grades/$classId" params={{ classId: cls.id }}>
+    <Link to="/academics/gradebooks/$classId" params={{ classId: cls.id }}>
       <animated.div
         style={{
           transform: springProps.scale.to(s => `scale(${s}) translateX(${springProps.x.get()}px)`),

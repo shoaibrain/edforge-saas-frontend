@@ -33,7 +33,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 
-export const Route = createFileRoute('/_protected/academics/grades/$classId')({
+export const Route = createFileRoute('/_protected/academics/gradebooks/$classId')({
   beforeLoad: () => {
     const { user } = useAuthStore.getState()
     const { activeSchoolId } = useAppStore.getState()
@@ -121,12 +121,12 @@ const MOCK_STUDENT_GRADES: StudentGradeRecord[] = [
 // GRADE CELL COMPONENT
 // ============================================================================
 
-function GradeCell({ 
-  score, 
-  maxScore, 
+function GradeCell({
+  score,
+  maxScore,
   onSave,
   canEdit,
-}: { 
+}: {
   score: number | null
   maxScore: number
   onSave: (score: number) => void
@@ -144,15 +144,15 @@ function GradeCell({
   }
 
   const percentage = score !== null ? (score / maxScore) * 100 : null
-  const colorClass = percentage === null 
+  const colorClass = percentage === null
     ? 'text-[rgb(var(--text-tertiary))]'
-    : percentage >= 90 
+    : percentage >= 90
       ? 'text-aqua-700 dark:text-aqua-400'
-      : percentage >= 80 
+      : percentage >= 80
         ? 'text-teal-600 dark:text-cyan-400'
-        : percentage >= 70 
+        : percentage >= 70
           ? 'text-golden-600 dark:text-golden-400'
-          : percentage >= 60 
+          : percentage >= 60
             ? 'text-caramel-600 dark:text-caramel-400'
             : 'text-rust-600 dark:text-rust-400'
 
@@ -227,7 +227,7 @@ function ClassGradebookPage() {
         animate={{ opacity: 1, x: 0 }}
       >
         <Link
-          to="/academics/grades"
+          to="/academics/gradebooks"
           className="inline-flex items-center gap-2 text-sm text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -319,16 +319,15 @@ function ClassGradebookPage() {
               </thead>
               <tbody>
                 {filteredStudents.map((student, idx) => (
-                  <tr 
-                    key={student.studentId} 
-                    className={`border-b border-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors ${
-                      idx % 2 === 0 ? 'bg-[rgb(var(--surface-secondary))]' : ''
-                    }`}
+                  <tr
+                    key={student.studentId}
+                    className={`border-b border-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors ${idx % 2 === 0 ? 'bg-[rgb(var(--surface-secondary))]' : ''
+                      }`}
                   >
                     <td className="py-3 px-4 sticky left-0 bg-inherit z-10">
                       <div className="flex items-center gap-3">
                         <Avatar name={student.name} size="sm" />
-                        <Link 
+                        <Link
                           to="/academics/students/$studentId"
                           params={{ studentId: student.studentId }}
                           className="font-medium text-[rgb(var(--text-primary))] hover:text-teal-600 dark:hover:text-cyan-400 transition-colors"
@@ -349,12 +348,11 @@ function ClassGradebookPage() {
                     ))}
                     <td className="py-3 px-4 text-center">
                       <div className="flex flex-col items-center">
-                        <span className={`text-lg font-bold ${
-                          student.percentage >= 90 ? 'text-aqua-700 dark:text-aqua-400' :
-                          student.percentage >= 80 ? 'text-teal-600 dark:text-cyan-400' :
-                          student.percentage >= 70 ? 'text-golden-600 dark:text-golden-400' :
-                          'text-rust-600 dark:text-rust-400'
-                        }`}>
+                        <span className={`text-lg font-bold ${student.percentage >= 90 ? 'text-aqua-700 dark:text-aqua-400' :
+                            student.percentage >= 80 ? 'text-teal-600 dark:text-cyan-400' :
+                              student.percentage >= 70 ? 'text-golden-600 dark:text-golden-400' :
+                                'text-rust-600 dark:text-rust-400'
+                          }`}>
                           {student.currentGrade}
                         </span>
                         <span className="text-xs text-[rgb(var(--text-tertiary))]">
@@ -378,7 +376,7 @@ function ClassGradebookPage() {
               </tbody>
             </table>
           </div>
-          
+
           {filteredStudents.length === 0 && (
             <div className="p-12 text-center">
               <p className="text-lg font-medium text-[rgb(var(--text-secondary))]">No students found</p>

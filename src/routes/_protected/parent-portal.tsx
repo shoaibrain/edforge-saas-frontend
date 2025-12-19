@@ -38,11 +38,11 @@ export const Route = createFileRoute('/_protected/parent-portal')({
 function ParentPortalLayout() {
   const matches = useMatches()
   const isExactRoute = matches[matches.length - 1]?.routeId === '/_protected/parent-portal'
-  
+
   if (isExactRoute) {
     return <ParentPortalPage />
   }
-  
+
   return <Outlet />
 }
 
@@ -95,7 +95,7 @@ const MOCK_ANNOUNCEMENTS = [
 
 function ChildCard({ child }: { child: typeof MOCK_CHILDREN[0] }) {
   const [hovered, setHovered] = useState(false)
-  
+
   const springProps = useSpring({
     scale: hovered ? 1.02 : 1,
     y: hovered ? -4 : 0,
@@ -125,7 +125,7 @@ function ChildCard({ child }: { child: typeof MOCK_CHILDREN[0] }) {
             </span>
           )}
         </div>
-        
+
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="text-center p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
             <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{child.gpa.toFixed(1)}</p>
@@ -140,7 +140,7 @@ function ChildCard({ child }: { child: typeof MOCK_CHILDREN[0] }) {
             <p className="text-xs text-[rgb(var(--text-tertiary))]">Upcoming</p>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-2">
           <Link to="/parent-portal/grades" search={{ studentId: child.id }}>
             <Button variant="outline" size="sm" className="w-full">
@@ -164,14 +164,14 @@ function ChildCard({ child }: { child: typeof MOCK_CHILDREN[0] }) {
 // QUICK ACTION CARD
 // ============================================================================
 
-function QuickActionCard({ 
-  icon: Icon, 
-  title, 
-  description, 
+function QuickActionCard({
+  icon: Icon,
+  title,
+  description,
   href,
   iconBg,
   iconColor,
-}: { 
+}: {
   icon: typeof Users
   title: string
   description: string
@@ -284,7 +284,7 @@ function ParentPortalPage() {
             icon={MessageSquare}
             title="Messages"
             description="Contact teachers & staff"
-            href="/communications/messages"
+            href="/messages"
             iconBg="bg-caramel-400/20"
             iconColor="text-caramel-600 dark:text-caramel-400"
           />
@@ -338,7 +338,7 @@ function ParentPortalPage() {
                 <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
                   School Announcements
                 </h2>
-                <Link to="/communications/announcements">
+                <Link to="/messages/announcements">
                   <Button variant="ghost" size="sm">View All</Button>
                 </Link>
               </div>
@@ -347,11 +347,10 @@ function ParentPortalPage() {
               {MOCK_ANNOUNCEMENTS.map((announcement) => (
                 <div key={announcement.id} className="p-4 flex items-start justify-between hover:bg-[rgb(var(--interactive-hover))] transition-colors cursor-pointer">
                   <div className="flex items-start gap-3">
-                    <div className={`mt-1 w-2 h-2 rounded-full ${
-                      announcement.priority === 'high' ? 'bg-rust-500' :
+                    <div className={`mt-1 w-2 h-2 rounded-full ${announcement.priority === 'high' ? 'bg-rust-500' :
                       announcement.priority === 'normal' ? 'bg-golden-500' :
-                      'bg-[rgb(var(--text-tertiary))]'
-                    }`} />
+                        'bg-[rgb(var(--text-tertiary))]'
+                      }`} />
                     <div>
                       <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{announcement.title}</p>
                       <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">

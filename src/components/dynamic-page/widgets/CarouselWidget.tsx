@@ -13,10 +13,10 @@ import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { 
-  useRecentlyVisited, 
-  getIconComponent, 
-  type VisitedPage 
+import {
+  useRecentlyVisited,
+  getIconComponent,
+  type VisitedPage
 } from '@/hooks/useRecentlyVisited'
 import { formatRelativeDate } from '@/lib/greeting'
 import { WidgetSection } from '../WidgetSection'
@@ -67,7 +67,7 @@ const moduleColors: Record<string, { bg: string; icon: string }> = {
     bg: 'bg-blue-500/15 dark:bg-blue-500/25',
     icon: 'text-blue-600 dark:text-blue-400',
   },
-  communications: {
+  messages: {
     bg: 'bg-violet-500/15 dark:bg-violet-500/25',
     icon: 'text-violet-600 dark:text-violet-400',
   },
@@ -110,7 +110,7 @@ interface PageCardProps {
 function PageCard({ card, index }: PageCardProps) {
   const Icon = typeof card.icon === 'string' ? getIconComponent(card.icon) : card.icon
   const colors = moduleColors[card.module || 'home'] || moduleColors.home
-  
+
   const content = (
     <motion.div
       className="flex-shrink-0"
@@ -131,7 +131,7 @@ function PageCard({ card, index }: PageCardProps) {
       >
         {/* Subtle inner glow */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-        
+
         {/* Icon */}
         <div className={`
           w-10 h-10 rounded-xl flex items-center justify-center
@@ -140,13 +140,13 @@ function PageCard({ card, index }: PageCardProps) {
         `}>
           <Icon className={`w-5 h-5 ${colors.icon}`} />
         </div>
-        
+
         {/* Title - positioned at bottom */}
         <div className="mt-auto relative z-10">
           <h3 className="font-semibold text-[rgb(var(--text-primary))] text-[15px] leading-tight mb-1">
             {card.title}
           </h3>
-          
+
           {/* Timestamp with clock icon - like Notion */}
           {card.subtitle && (
             <div className="flex items-center gap-1.5 text-xs text-[rgb(var(--text-tertiary))]">
@@ -158,7 +158,7 @@ function PageCard({ card, index }: PageCardProps) {
       </div>
     </motion.div>
   )
-  
+
   if (card.href) {
     return (
       <Link to={card.href} draggable={false} className="select-none">
@@ -166,7 +166,7 @@ function PageCard({ card, index }: PageCardProps) {
       </Link>
     )
   }
-  
+
   return content
 }
 
@@ -183,11 +183,11 @@ function StatCard({ card, index }: StatCardProps) {
   const Icon = typeof card.icon === 'string' ? getIconComponent(card.icon) : card.icon
   const colorKey = card.changeType || 'neutral'
   const colors = moduleColors[card.module || colorKey] || moduleColors[colorKey]
-  
-  const TrendIcon = card.changeType === 'positive' ? TrendingUp 
-    : card.changeType === 'negative' ? TrendingDown 
-    : Minus
-  
+
+  const TrendIcon = card.changeType === 'positive' ? TrendingUp
+    : card.changeType === 'negative' ? TrendingDown
+      : Minus
+
   const content = (
     <motion.div
       className="flex-shrink-0"
@@ -207,7 +207,7 @@ function StatCard({ card, index }: StatCardProps) {
       >
         {/* Subtle inner glow */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-        
+
         {/* Icon */}
         <div className={`
           w-9 h-9 rounded-xl flex items-center justify-center
@@ -216,7 +216,7 @@ function StatCard({ card, index }: StatCardProps) {
         `}>
           <Icon className={`w-4.5 h-4.5 ${colors.icon}`} />
         </div>
-        
+
         {/* Content */}
         <div className="mt-auto relative z-10">
           <p className="text-xs text-[rgb(var(--text-tertiary))] mb-0.5 truncate">
@@ -227,11 +227,10 @@ function StatCard({ card, index }: StatCardProps) {
               {card.value}
             </span>
             {card.change && (
-              <div className={`flex items-center gap-0.5 text-xs ${
-                card.changeType === 'positive' ? 'text-emerald-600' :
-                card.changeType === 'negative' ? 'text-rose-600' :
-                'text-[rgb(var(--text-tertiary))]'
-              }`}>
+              <div className={`flex items-center gap-0.5 text-xs ${card.changeType === 'positive' ? 'text-emerald-600' :
+                  card.changeType === 'negative' ? 'text-rose-600' :
+                    'text-[rgb(var(--text-tertiary))]'
+                }`}>
                 <TrendIcon className="w-3 h-3" />
                 <span>{card.change}</span>
               </div>
@@ -241,7 +240,7 @@ function StatCard({ card, index }: StatCardProps) {
       </div>
     </motion.div>
   )
-  
+
   if (card.href) {
     return (
       <Link to={card.href} draggable={false} className="select-none">
@@ -249,7 +248,7 @@ function StatCard({ card, index }: StatCardProps) {
       </Link>
     )
   }
-  
+
   return content
 }
 
@@ -315,75 +314,75 @@ function CarouselCore({ cards, cardType }: CarouselCoreProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
-  
+
   // Check scroll position and update button visibility
   const checkScrollPosition = useCallback(() => {
     if (!scrollRef.current) return
-    
+
     const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
     setCanScrollLeft(scrollLeft > 0)
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
   }, [])
-  
+
   // Check on mount
   useEffect(() => {
     checkScrollPosition()
   }, [checkScrollPosition, cards])
-  
+
   // Smooth scroll with easing
   const smoothScroll = useCallback((direction: 'left' | 'right') => {
     if (!scrollRef.current) return
-    
+
     const scrollAmount = direction === 'left' ? -SCROLL_AMOUNT : SCROLL_AMOUNT
     scrollRef.current.scrollBy({
       left: scrollAmount,
       behavior: 'smooth'
     })
   }, [])
-  
+
   // Handle wheel events for horizontal scrolling
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (!scrollRef.current) return
-    
+
     // Check if the scroll is primarily horizontal or if it's a trackpad gesture
     const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY)
     const hasTrackpadMomentum = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) > 0
-    
+
     if (isHorizontal || hasTrackpadMomentum) {
       const scrollDelta = e.deltaX !== 0 ? e.deltaX : e.deltaY
-      
+
       // Only prevent default if we can scroll in that direction
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
       const atStart = scrollLeft <= 0
       const atEnd = scrollLeft >= scrollWidth - clientWidth
-      
+
       if ((scrollDelta < 0 && !atStart) || (scrollDelta > 0 && !atEnd)) {
         e.preventDefault()
         scrollRef.current.scrollLeft += scrollDelta
       }
     }
   }, [])
-  
+
   const CardComponent = cardType === 'stat' ? StatCard : PageCard
-  
+
   return (
-    <div 
+    <div
       className="relative group/carousel px-4"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Navigation Buttons - positioned outside cards on edges */}
-      <NavButton 
-        direction="left" 
-        onClick={() => smoothScroll('left')} 
+      <NavButton
+        direction="left"
+        onClick={() => smoothScroll('left')}
         visible={isHovered && canScrollLeft}
       />
-      <NavButton 
-        direction="right" 
-        onClick={() => smoothScroll('right')} 
+      <NavButton
+        direction="right"
+        onClick={() => smoothScroll('right')}
         visible={isHovered && canScrollRight}
       />
-      
+
       {/* Scrollable Container */}
       <div
         ref={scrollRef}
@@ -403,9 +402,9 @@ function CarouselCore({ cards, cardType }: CarouselCoreProps) {
           <CardComponent key={card.id} card={card} index={index} />
         ))}
       </div>
-      
+
       {/* Glassy edge fade gradients - Notion style */}
-      <div 
+      <div
         className={`
           pointer-events-none absolute left-0 top-0 bottom-0 w-16
           bg-gradient-to-r from-[rgb(var(--surface-primary))] via-[rgb(var(--surface-primary))]/80 to-transparent
@@ -416,7 +415,7 @@ function CarouselCore({ cards, cardType }: CarouselCoreProps) {
           backdropFilter: canScrollLeft ? 'blur(2px)' : 'none',
         }}
       />
-      <div 
+      <div
         className={`
           pointer-events-none absolute right-0 top-0 bottom-0 w-16
           bg-gradient-to-l from-[rgb(var(--surface-primary))] via-[rgb(var(--surface-primary))]/80 to-transparent
@@ -443,7 +442,7 @@ export function CarouselWidget({
   if (cards.length === 0) {
     return null
   }
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -462,10 +461,10 @@ export function CarouselWidget({
 // Extended mock data for demo
 const EXTENDED_MOCK_PAGES: VisitedPage[] = [
   {
-    path: '/communications',
-    title: 'Meetings',
-    icon: 'Video',
-    module: 'communications',
+    path: '/messages',
+    title: 'Messages',
+    icon: 'Mail',
+    module: 'messages',
     visitedAt: new Date().toISOString(),
   },
   {
@@ -521,16 +520,16 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
 
 export function RecentlyVisitedWidget() {
   const { recentPages } = useRecentlyVisited()
-  
+
   // Use extended mock data if less than 3 real pages
-  const pages = recentPages.length >= 3 
-    ? recentPages 
+  const pages = recentPages.length >= 3
+    ? recentPages
     : (() => {
-        const existingPaths = new Set(recentPages.map(p => p.path))
-        const mockToAdd = EXTENDED_MOCK_PAGES.filter(p => !existingPaths.has(p.path))
-        return [...recentPages, ...mockToAdd].slice(0, 10)
-      })()
-  
+      const existingPaths = new Set(recentPages.map(p => p.path))
+      const mockToAdd = EXTENDED_MOCK_PAGES.filter(p => !existingPaths.has(p.path))
+      return [...recentPages, ...mockToAdd].slice(0, 10)
+    })()
+
   // Convert to CarouselCard format
   const cards: CarouselCard[] = pages.map((page) => ({
     id: page.path,
@@ -540,7 +539,7 @@ export function RecentlyVisitedWidget() {
     href: page.path,
     module: page.module,
   }))
-  
+
   return (
     <WidgetSection
       widgetId="recently-visited"

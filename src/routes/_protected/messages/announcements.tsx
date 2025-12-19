@@ -32,7 +32,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 
-export const Route = createFileRoute('/_protected/communications/announcements')({
+export const Route = createFileRoute('/_protected/messages/announcements')({
   beforeLoad: () => {
     const { user } = useAuthStore.getState()
     const { activeSchoolId } = useAppStore.getState()

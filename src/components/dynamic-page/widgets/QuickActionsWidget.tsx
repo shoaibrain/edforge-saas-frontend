@@ -22,7 +22,8 @@ import {
   BookOpen,
   Baby,
   Bell,
-  Clock,
+  // Clock,
+  CloudLightning,
 
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -84,7 +85,7 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
     label: 'Schedule',
     description: 'New meeting',
     icon: Video,
-    href: '/communications',
+    href: '/messages/schedule',
     color: {
       bg: 'bg-indigo-50 dark:bg-indigo-900/10',
       text: 'text-indigo-600 dark:text-indigo-400',
@@ -111,7 +112,7 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     label: 'My Classes',
     description: 'View your classes',
     icon: BookOpen,
-    href: '/academics/grades',
+    href: '/academics/gradebooks',
     color: {
       bg: 'bg-teal-50 dark:bg-teal-900/10',
       text: 'text-teal-600 dark:text-teal-400',
@@ -135,7 +136,7 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     label: 'Gradebook',
     description: 'Enter grades',
     icon: GraduationCap,
-    href: '/academics/grades',
+    href: '/academics/gradebooks',
     color: {
       bg: 'bg-indigo-50 dark:bg-indigo-900/10',
       text: 'text-indigo-600 dark:text-indigo-400',
@@ -147,7 +148,7 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     label: 'Messages',
     description: 'Parent communication',
     icon: MessageSquare,
-    href: '/communications/messages',
+    href: '/messages',
     color: {
       bg: 'bg-blue-50 dark:bg-blue-900/10',
       text: 'text-blue-600 dark:text-blue-400',
@@ -198,7 +199,7 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     label: 'News',
     description: 'School updates',
     icon: Bell,
-    href: '/communications/announcements',
+    href: '/messages/announcements',
     color: {
       bg: 'bg-blue-50 dark:bg-blue-900/10',
       text: 'text-blue-600 dark:text-blue-400',
@@ -249,7 +250,7 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     label: 'Messages',
     description: 'Contact teachers',
     icon: MessageSquare,
-    href: '/communications/messages',
+    href: '/messages',
     color: {
       bg: 'bg-blue-50 dark:bg-blue-900/10',
       text: 'text-blue-600 dark:text-blue-400',
@@ -375,7 +376,7 @@ export function QuickActionsWidget({
     <WidgetSection
       widgetId="quick-actions"
       label="Quick actions"
-      icon={Clock}
+      icon={CloudLightning}
     >
       <div className={`grid ${gridCols} gap-4`}>
         {quickActions.map((action, index) => (
