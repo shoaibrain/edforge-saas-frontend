@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { AppShell } from '@/components/layout/AppShell'
+import { RouteErrorBoundary } from '@/components/layout/ErrorBoundary'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: () => {
@@ -19,7 +20,9 @@ export const Route = createFileRoute('/_protected')({
 function ProtectedLayout() {
   return (
     <AppShell>
-      <Outlet />
+      <RouteErrorBoundary>
+        <Outlet />
+      </RouteErrorBoundary>
     </AppShell>
   )
 }

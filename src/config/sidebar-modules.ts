@@ -123,7 +123,6 @@ export type SidebarModule =
   | 'academics'
   | 'finance'
   | 'people'
-  | 'people'
   | 'messages'
   | 'analytics'
   | 'parent-portal'
@@ -150,8 +149,8 @@ const homeModule: ModuleConfig = {
           permission: { action: 'view', resource: 'students' },
         },
         {
-          id: 'human-resource',
-          label: 'Financials',
+          id: 'finance',
+          label: 'Finance',
           icon: HandCoins,
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
@@ -754,7 +753,7 @@ const peopleModule: ModuleConfig = {
       items: [
         {
           id: 'staff',
-          label: 'Colleague',
+          label: 'Directory',
           icon: UsersRound,
           href: '/people/staff',
           permission: { action: 'view', resource: 'staff' },
@@ -778,8 +777,8 @@ const peopleModule: ModuleConfig = {
           requiresActiveSchool: true,
         },
         {
-          id: 'assignments',
-          label: 'Assignments',
+          id: 'tasks',
+          label: 'Tasks',
           icon: ClipboardList,
           href: '/people/assignments',
           permission: { action: 'view', resource: 'staff:assignments' },
@@ -1122,13 +1121,7 @@ const messagesModule: ModuleConfig = {
           href: '/messages/meetings',
           permission: { action: 'view', resource: 'communications' },
         },
-        {
-          id: 'integrations',
-          label: 'Integrations',
-          icon: Zap,
-          href: '/messages/integrations',
-          permission: { action: 'view', resource: 'settings' }, // Using settings permission for integrations
-        },
+        // Note: Integrations moved to Settings module for proper one-time configuration
       ],
     },
   ],
