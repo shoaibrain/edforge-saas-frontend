@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import {
   Home,
-  ChevronDown,
+  ChevronsUpDown,
   ArrowLeft,
   Search,
   Check,
@@ -279,7 +279,7 @@ function NavGroup({
 
 // ============================================================================
 // UNIFIED HOME NAV BUTTON
-// Consolidates Home and Back to Home into a single smart component
+// Uses the same animation pattern as NavItemLink for consistency
 // ============================================================================
 
 function HomeNavButton({ 
@@ -290,7 +290,7 @@ function HomeNavButton({
   isSubModule: boolean 
 }) {
   const location = useLocation()
-  const [hovered, setHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   
   // Determine state based on context
   const isAtHome = location.pathname === '/home' || location.pathname === '/'
@@ -301,83 +301,81 @@ function HomeNavButton({
   const CurrentIcon = showBackMode ? ArrowLeft : Home
   const label = showBackMode ? 'Back to Home' : 'Home'
   
-  // Hover animation - arrow moves left when in back mode
+  // Same hover animation as NavItemLink
   const hoverSpring = useSpring({
-    x: showBackMode && hovered ? -4 : 0,
-    backgroundColor: hovered && !isActive ? 'rgba(100, 116, 139, 0.08)' : 'rgba(0, 0, 0, 0)',
-    config: { tension: 400, friction: 25 },
+    backgroundColor: isHovered && !isActive 
+      ? 'rgba(100, 116, 139, 0.06)' 
+      : 'rgba(0, 0, 0, 0)',
+    config: { tension: 300, friction: 30 },
   })
 
   const linkContent = (
     <Link
       to="/home"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="block relative"
     >
       <animated.div
-        style={{ backgroundColor: hoverSpring.backgroundColor }}
+        style={hoverSpring}
         className={cn(
           'relative flex items-center rounded-xl transition-colors duration-200',
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
         )}
       >
-        {/* Active indicator - only show when on Home module at Home page */}
+        {/* Active background pill - same as NavItemLink */}
         {isActive && (
           <motion.div
-            layoutId="homeActiveIndicator"
+            layoutId="activeNavBg"
             className="absolute inset-0 rounded-xl bg-[rgb(var(--interactive-active))]"
+            initial={false}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 35,
+            }}
           />
         )}
+        
+        {/* Active indicator line - same as NavItemLink */}
         {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500" />
+          <motion.div
+            layoutId="activeIndicator"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500"
+            initial={false}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 35,
+            }}
+          />
         )}
         
-        {/* Animated icon container */}
-        <animated.div
-          style={{ transform: hoverSpring.x.to(x => `translateX(${x}px)`) }}
-          className="relative z-10 flex-shrink-0"
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={showBackMode ? 'back' : 'home'}
-              initial={{ opacity: 0, scale: 0.8, rotate: showBackMode ? 90 : -90 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.8, rotate: showBackMode ? -90 : 90 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <CurrentIcon 
-                size={SIDEBAR_NAV_ICON_SIZE}
-                className={cn(
-                  'transition-colors duration-200',
-                  isActive && 'text-teal-700 dark:text-white',
-                  !isActive && showBackMode && 'text-[rgb(var(--text-secondary))]',
-                  !isActive && !showBackMode && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
-                )} 
-              />
-            </motion.div>
-          </AnimatePresence>
-        </animated.div>
-        
-        {/* Label */}
-        {!collapsed && (
-          <AnimatePresence mode="wait">
+        {/* Icon - using AnimatedNavIcon for consistency */}
+        <AnimatedNavIcon 
+          icon={CurrentIcon} 
+          isActive={isActive} 
+          isHovered={isHovered}
+        />
+
+        {/* Label - same animation as NavItemLink */}
+        <AnimatePresence mode="wait">
+          {!collapsed && (
             <motion.span
-              key={label}
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
               className={cn(
-                'text-sm font-medium relative z-10 whitespace-nowrap',
+                'text-sm font-medium whitespace-nowrap overflow-hidden relative z-10',
                 isActive && 'text-teal-700 dark:text-white',
                 !isActive && 'text-[rgb(var(--text-secondary))]'
               )}
             >
               {label}
             </motion.span>
-          </AnimatePresence>
-        )}
+          )}
+        </AnimatePresence>
       </animated.div>
     </Link>
   )
@@ -503,15 +501,15 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
   // Unified structure for both collapsed and expanded states
   // Avatar stays fixed, text animates with CSS transitions
   return (
-    <Menu as="div" className="relative flex-1">
+    <Menu as="div" className="relative w-full">
       {collapsed ? (
         // Collapsed: Tooltip wraps the button, dropdown floats to the right
         <Tooltip content={activeSchool?.name || 'Select School'} side="right" sideOffset={12}>
-          <MenuButton className="flex items-center justify-center w-full rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group p-2">
+          <MenuButton className="flex items-center justify-center w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group">
             {/* Avatar - fixed size, always visible */}
-            <div className="w-9 h-9 rounded-lg overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
               <img
-                src={getSchoolAvatar(activeSchool?.name || 'school', { size: 36 })}
+                src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
                 alt={activeSchool?.name}
                 className="w-full h-full object-cover"
               />
@@ -520,32 +518,32 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
         </Tooltip>
       ) : (
         // Expanded: Full button with text
-        <MenuButton className="flex items-center gap-3 w-full rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group p-2 pr-3">
+        <MenuButton className="flex items-center gap-3 w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group px-2">
           {/* Avatar - fixed size, always visible */}
-          <div className="w-9 h-9 rounded-lg overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
             <img
-              src={getSchoolAvatar(activeSchool?.name || 'school', { size: 36 })}
+              src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
               alt={activeSchool?.name}
               className="w-full h-full object-cover"
             />
           </div>
           
-          {/* Text content - animates with CSS */}
-          <div className="flex-1 min-w-0 text-left overflow-hidden">
-            <p className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">
+          {/* Text content */}
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate leading-tight">
               {activeSchool?.name || 'Select School'}
             </p>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] truncate">
+            <p className="text-[11px] text-[rgb(var(--text-tertiary))] truncate leading-tight">
               {activeSchoolId ? user.assignments[activeSchoolId] : 'Choose school'}
             </p>
           </div>
           
           {/* Chevron */}
-          <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] transition-colors flex-shrink-0" />
+          <ChevronsUpDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] transition-colors flex-shrink-0 mr-1" />
         </MenuButton>
       )}
 
-      {/* Dropdown - positioned differently based on collapsed state */}
+      {/* Dropdown - Apple-like glassmorphism with backdrop blur */}
       <Transition
         as={Fragment}
         enter="transition ease-out duration-200"
@@ -557,7 +555,13 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
       >
         <MenuItems 
           className={cn(
-            'w-80 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/15 dark:shadow-black/30 z-50 overflow-hidden',
+            'w-80 rounded-2xl z-50 overflow-hidden',
+            // Glassmorphism - frosted glass effect
+            'bg-[rgb(var(--surface-secondary))]/85 backdrop-blur-xl',
+            'border border-white/10 dark:border-white/5',
+            'shadow-xl shadow-black/10 dark:shadow-black/40',
+            // Ring for subtle depth
+            'ring-1 ring-inset ring-white/5',
             collapsed 
               ? 'absolute left-full top-0 ml-3 origin-left' 
               : 'absolute left-0 top-full mt-2 origin-top'
@@ -609,7 +613,7 @@ export function Sidebar() {
       aria-label="Main navigation"
     >
       {/* Header - School Selector */}
-      <div className="flex items-center h-16 px-3 border-b border-[rgb(var(--border-secondary))] overflow-hidden">
+      <div className="flex items-center h-16 px-2 border-b border-[rgb(var(--border-primary))]">
         <SidebarSchoolSelector collapsed={collapsed} />
       </div>
 
