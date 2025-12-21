@@ -17,3 +17,12 @@ export { useSecureNavItems, useSecureNavGroups, useCanSeeNavItem } from './useSe
 export { useSidebarModule, useIsInModule, useActiveNavItem } from './useSidebarModule'
 export type { UseSidebarModuleReturn } from './useSidebarModule'
 
+// Focus management hooks for accessibility
+export { 
+  useRouteFocus, 
+  useScreenReaderAnnounce, 
+  useRouteAnnouncement,
+  useFocusTrap,
+  useReturnFocus,
+} from './useFocusManagement'
+

@@ -17,6 +17,7 @@ import {
   Command,
   Hash,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface CommandItem {
   id: string
@@ -202,19 +203,32 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
   return (
     <Dialog as="div" className="relative z-50" open={open} onClose={onClose}>
-      {/* Backdrop */}
+      {/* Backdrop - Apple-like smoky blur */}
       <animated.div
         style={backdropSpring}
-        className="fixed inset-0 bg-ink-500/70 dark:bg-ink-900/85 backdrop-blur-md"
-        onClick={onClose}
+        className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm"
+        aria-hidden="true"
       />
 
-      {/* Modal Container */}
-      <div className="fixed inset-0 overflow-y-auto">
+      {/* Modal Container - click outside the Panel closes the dialog */}
+      <div 
+        className="fixed inset-0 overflow-y-auto"
+        onClick={onClose}
+      >
         <div className="flex min-h-full items-start justify-center p-4 pt-[10vh]">
-          <animated.div
+          <Dialog.Panel
+            as={animated.div}
             style={modalSpring}
-            className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/30 dark:shadow-black/50"
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            className={cn(
+              'w-full max-w-2xl transform overflow-hidden rounded-2xl',
+              // Glassmorphism - Apple-like frosted glass
+              'bg-[rgb(var(--surface-secondary))]/90 backdrop-blur-2xl',
+              'border border-white/10 dark:border-white/5',
+              'shadow-2xl shadow-black/20 dark:shadow-black/50',
+              // Subtle inner ring for depth
+              'ring-1 ring-inset ring-white/5'
+            )}
           >
             <Combobox
               onChange={(command: CommandItem | null) => {
@@ -300,7 +314,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 </div>
               </div>
             </Combobox>
-          </animated.div>
+          </Dialog.Panel>
         </div>
       </div>
     </Dialog>

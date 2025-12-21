@@ -5,30 +5,30 @@
  * Features ABAC permission filtering and smooth spring-based animations.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { useSpring, animated, config } from '@react-spring/web'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import {
   Home,
-  ChevronLeft,
-  Building2,
-  Command,
+  ChevronsUpDown,
   ArrowLeft,
+  Search,
+  Check,
+  Plus,
   type LucideIcon,
 } from 'lucide-react'
 import { useAppStore } from '@/stores/app.store'
 import { useSidebarStore } from '@/stores/sidebar.store'
-import { 
-  SIDEBAR_NAV_ICON_SIZE, 
-  SIDEBAR_HEADER_ICON_SIZE, 
-  SIDEBAR_TOGGLE_ICON_SIZE,
-  SIDEBAR_BADGE_ICON_SIZE 
-} from '@/config/ui-constants'
+import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
+import { SIDEBAR_NAV_ICON_SIZE } from '@/config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '@/hooks/useSidebarModule'
 import { useSecureNavGroups } from '@/hooks/useSecureNavItems'
 import type { NavItem, NavItemGroup } from '@/config/sidebar-modules'
 import { Tooltip } from '@/components/ui/Tooltip'
+import { SidebarEdgeTrigger } from './SidebarEdgeTrigger'
+import { getSchoolAvatar } from '@/lib/avatar'
 import { cn } from '@/lib/utils'
 
 // ============================================================================
@@ -279,7 +279,7 @@ function NavGroup({
 
 // ============================================================================
 // UNIFIED HOME NAV BUTTON
-// Consolidates Home and Back to Home into a single smart component
+// Uses the same animation pattern as NavItemLink for consistency
 // ============================================================================
 
 function HomeNavButton({ 
@@ -290,7 +290,7 @@ function HomeNavButton({
   isSubModule: boolean 
 }) {
   const location = useLocation()
-  const [hovered, setHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   
   // Determine state based on context
   const isAtHome = location.pathname === '/home' || location.pathname === '/'
@@ -301,83 +301,81 @@ function HomeNavButton({
   const CurrentIcon = showBackMode ? ArrowLeft : Home
   const label = showBackMode ? 'Back to Home' : 'Home'
   
-  // Hover animation - arrow moves left when in back mode
+  // Same hover animation as NavItemLink
   const hoverSpring = useSpring({
-    x: showBackMode && hovered ? -4 : 0,
-    backgroundColor: hovered && !isActive ? 'rgba(100, 116, 139, 0.08)' : 'rgba(0, 0, 0, 0)',
-    config: { tension: 400, friction: 25 },
+    backgroundColor: isHovered && !isActive 
+      ? 'rgba(100, 116, 139, 0.06)' 
+      : 'rgba(0, 0, 0, 0)',
+    config: { tension: 300, friction: 30 },
   })
 
   const linkContent = (
     <Link
       to="/home"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="block relative"
     >
       <animated.div
-        style={{ backgroundColor: hoverSpring.backgroundColor }}
+        style={hoverSpring}
         className={cn(
           'relative flex items-center rounded-xl transition-colors duration-200',
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
         )}
       >
-        {/* Active indicator - only show when on Home module at Home page */}
+        {/* Active background pill - same as NavItemLink */}
         {isActive && (
           <motion.div
-            layoutId="homeActiveIndicator"
+            layoutId="activeNavBg"
             className="absolute inset-0 rounded-xl bg-[rgb(var(--interactive-active))]"
+            initial={false}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 35,
+            }}
           />
         )}
+        
+        {/* Active indicator line - same as NavItemLink */}
         {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500" />
+          <motion.div
+            layoutId="activeIndicator"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500"
+            initial={false}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 35,
+            }}
+          />
         )}
         
-        {/* Animated icon container */}
-        <animated.div
-          style={{ transform: hoverSpring.x.to(x => `translateX(${x}px)`) }}
-          className="relative z-10 flex-shrink-0"
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={showBackMode ? 'back' : 'home'}
-              initial={{ opacity: 0, scale: 0.8, rotate: showBackMode ? 90 : -90 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.8, rotate: showBackMode ? -90 : 90 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <CurrentIcon 
-                size={SIDEBAR_NAV_ICON_SIZE}
-                className={cn(
-                  'transition-colors duration-200',
-                  isActive && 'text-teal-700 dark:text-white',
-                  !isActive && showBackMode && 'text-[rgb(var(--text-secondary))]',
-                  !isActive && !showBackMode && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
-                )} 
-              />
-            </motion.div>
-          </AnimatePresence>
-        </animated.div>
-        
-        {/* Label */}
-        {!collapsed && (
-          <AnimatePresence mode="wait">
+        {/* Icon - using AnimatedNavIcon for consistency */}
+        <AnimatedNavIcon 
+          icon={CurrentIcon} 
+          isActive={isActive} 
+          isHovered={isHovered}
+        />
+
+        {/* Label - same animation as NavItemLink */}
+        <AnimatePresence mode="wait">
+          {!collapsed && (
             <motion.span
-              key={label}
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
               className={cn(
-                'text-sm font-medium relative z-10 whitespace-nowrap',
+                'text-sm font-medium whitespace-nowrap overflow-hidden relative z-10',
                 isActive && 'text-teal-700 dark:text-white',
                 !isActive && 'text-[rgb(var(--text-secondary))]'
               )}
             >
               {label}
             </motion.span>
-          </AnimatePresence>
-        )}
+          )}
+        </AnimatePresence>
       </animated.div>
     </Link>
   )
@@ -394,90 +392,185 @@ function HomeNavButton({
 }
 
 // ============================================================================
-// COLLAPSE TOGGLE BUTTON
+// SIDEBAR SCHOOL SELECTOR
+// A context-aware school selector with unified structure for smooth animations
+// The avatar stays in a fixed position while text content animates away
 // ============================================================================
 
-function CollapseToggle({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
-  const [hovered, setHovered] = useState(false)
-  
-  const spring = useSpring({
-    scale: hovered ? 1.05 : 1,
-    config: config.wobbly,
-  })
+function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
+  const user = useAuthStore((s) => s.user)
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+  const setActiveSchoolId = useAppStore((s) => s.setActiveSchoolId)
+  const [query, setQuery] = useState('')
 
-  const rotateSpring = useSpring({
-    rotate: collapsed ? 180 : 0,
-    config: { tension: 300, friction: 25 },
-  })
+  if (!user) return null
 
-  const buttonContent = (
-    <animated.button
-      onClick={onToggle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        transform: spring.scale.to(s => `scale(${s})`),
-      }}
-      className={cn(
-        'flex items-center justify-center gap-2 rounded-xl',
-        'bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-active))]',
-        'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
-        'border border-[rgb(var(--border-primary))]',
-        'transition-colors duration-200',
-        collapsed ? 'w-9 h-9' : 'px-2 py-1.5'
+  const userSchools = Object.keys(user.assignments)
+  const activeSchool = activeSchoolId ? MOCK_SCHOOLS[activeSchoolId] : null
+
+  const filteredSchools = query === ''
+    ? userSchools
+    : userSchools.filter((schoolId) =>
+      MOCK_SCHOOLS[schoolId]?.name.toLowerCase().includes(query.toLowerCase())
+    )
+
+  // Dropdown content (shared between collapsed and expanded)
+  const dropdownContent = (
+    <>
+      {/* Search */}
+      <div className="p-3 border-b border-[rgb(var(--border-secondary))]">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+          <input
+            type="text"
+            placeholder="Find School..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
+          />
+        </div>
+      </div>
+
+      {/* Schools Label */}
+      <div className="px-4 py-2.5">
+        <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Your Schools</span>
+      </div>
+
+      {/* Schools List */}
+      <div className="max-h-64 overflow-y-auto scrollbar-thin px-2 pb-2">
+        {filteredSchools.map((schoolId) => {
+          const school = MOCK_SCHOOLS[schoolId]
+          const isSelected = schoolId === activeSchoolId
+          return (
+            <MenuItem key={schoolId}>
+              {({ active }) => (
+                <button
+                  onClick={() => {
+                    setActiveSchoolId(schoolId)
+                    setQuery('')
+                  }}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150',
+                    active && 'bg-[rgb(var(--interactive-hover))]',
+                    isSelected && 'bg-teal-500/10 dark:bg-cyan-500/15'
+                  )}
+                >
+                  <div className={cn(
+                    'w-10 h-10 rounded-lg overflow-hidden flex-shrink-0',
+                    isSelected ? 'ring-2 ring-teal-500' : 'ring-1 ring-[rgb(var(--border-primary))]'
+                  )}>
+                    <img
+                      src={getSchoolAvatar(school?.name || schoolId, { size: 40 })}
+                      alt={school?.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className={cn(
+                      'text-sm font-medium truncate',
+                      isSelected ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
+                    )}>
+                      {school?.name}
+                    </p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{user.assignments[schoolId]}</p>
+                  </div>
+                  {isSelected && (
+                    <div className="w-5 h-5 rounded-full bg-teal-500 dark:bg-cyan-500 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </button>
+              )}
+            </MenuItem>
+          )
+        })}
+      </div>
+
+      {/* Create School */}
+      {user.globalRole === 'TenantAdmin' && (
+        <div className="border-t border-[rgb(var(--border-secondary))] p-2">
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-teal-600 dark:text-cyan-400 hover:bg-teal-500/10 rounded-xl transition-colors font-medium">
+            <Plus className="w-4 h-4" />
+            Create New School
+          </button>
+        </div>
       )}
-    >
-      <animated.div
-        style={{
-          transform: rotateSpring.rotate.to(r => `rotate(${r}deg)`),
-        }}
-      >
-        <ChevronLeft size={SIDEBAR_TOGGLE_ICON_SIZE} />
-      </animated.div>
-      {!collapsed && (
-        <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded text-[rgb(var(--text-tertiary))]">
-          <Command size={SIDEBAR_BADGE_ICON_SIZE} />
-          <span>B</span>
-        </kbd>
-      )}
-    </animated.button>
+    </>
   )
 
-  if (collapsed) {
-    return (
-      <Tooltip content="Expand sidebar (⌘B)" side="right" sideOffset={12}>
-        {buttonContent}
-      </Tooltip>
-    )
-  }
-
-  return buttonContent
-}
-
-// ============================================================================
-// LOGO ICON
-// ============================================================================
-
-function LogoIcon() {
-  const [hovered, setHovered] = useState(false)
-  
-  const spring = useSpring({
-    scale: hovered ? 1.08 : 1,
-    rotate: hovered ? 5 : 0,
-    config: config.wobbly,
-  })
-
+  // Unified structure for both collapsed and expanded states
+  // Avatar stays fixed, text animates with CSS transitions
   return (
-    <animated.div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        transform: spring.scale.to(s => `scale(${s}) rotate(${spring.rotate.get()}deg)`),
-      }}
-      className="w-9 h-9 rounded-xl brand-gradient flex items-center justify-center shadow-lg shadow-teal-500/20 flex-shrink-0"
-    >
-      <Building2 size={SIDEBAR_HEADER_ICON_SIZE} className="text-white" />
-    </animated.div>
+    <Menu as="div" className="relative w-full">
+      {collapsed ? (
+        // Collapsed: Tooltip wraps the button, dropdown floats to the right
+        <Tooltip content={activeSchool?.name || 'Select School'} side="right" sideOffset={12}>
+          <MenuButton className="flex items-center justify-center w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group">
+            {/* Avatar - fixed size, always visible */}
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
+              <img
+                src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
+                alt={activeSchool?.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </MenuButton>
+        </Tooltip>
+      ) : (
+        // Expanded: Full button with text
+        <MenuButton className="flex items-center gap-3 w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group px-2">
+          {/* Avatar - fixed size, always visible */}
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
+            <img
+              src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
+              alt={activeSchool?.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          {/* Text content */}
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate leading-tight">
+              {activeSchool?.name || 'Select School'}
+            </p>
+            <p className="text-[11px] text-[rgb(var(--text-tertiary))] truncate leading-tight">
+              {activeSchoolId ? user.assignments[activeSchoolId] : 'Choose school'}
+            </p>
+          </div>
+          
+          {/* Chevron */}
+          <ChevronsUpDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] transition-colors flex-shrink-0 mr-1" />
+        </MenuButton>
+      )}
+
+      {/* Dropdown - Apple-like glassmorphism with backdrop blur */}
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 scale-95"
+        enterTo="opacity-100 scale-100"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 scale-100"
+        leaveTo="opacity-0 scale-95"
+      >
+        <MenuItems 
+          className={cn(
+            'w-80 rounded-2xl z-50 overflow-hidden',
+            // Glassmorphism - frosted glass effect
+            'bg-[rgb(var(--surface-secondary))]/85 backdrop-blur-xl',
+            'border border-white/10 dark:border-white/5',
+            'shadow-xl shadow-black/10 dark:shadow-black/40',
+            // Ring for subtle depth
+            'ring-1 ring-inset ring-white/5',
+            collapsed 
+              ? 'absolute left-full top-0 ml-3 origin-left' 
+              : 'absolute left-0 top-full mt-2 origin-top'
+          )}
+        >
+          {dropdownContent}
+        </MenuItems>
+      </Transition>
+    </Menu>
   )
 }
 
@@ -508,17 +601,7 @@ export function Sidebar() {
     config: { tension: 280, friction: 32 },
   })
 
-  // Keyboard shortcut for collapse/expand
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
-        e.preventDefault()
-        toggleSidebar()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [toggleSidebar])
+  // Note: Keyboard shortcut (Cmd+B) is handled in AppShell.tsx to avoid duplication
 
   // Calculate cumulative index for stagger animation
   let itemIndex = 0
@@ -527,45 +610,15 @@ export function Sidebar() {
     <animated.aside
       style={{ width: sidebarSpring.width }}
       className="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-[rgb(var(--surface-secondary))] border-r border-[rgb(var(--border-primary))]"
+      aria-label="Main navigation"
     >
-      {/* Header */}
-      <div className={cn(
-        'flex items-center h-16 px-4 border-b border-[rgb(var(--border-secondary))]',
-        collapsed ? 'justify-center' : 'justify-between'
-      )}>
-        <Link to="/home" className={cn('flex items-center', collapsed ? '' : 'gap-3')}>
-          <LogoIcon />
-          <AnimatePresence mode="wait">
-            {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.15 }}
-                className="overflow-hidden"
-              >
-                <span className="font-bold text-lg text-[rgb(var(--text-primary))]">Edforge</span>
-                <p className="text-[10px] text-[rgb(var(--text-tertiary))] font-medium tracking-wide">EMIS Platform</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </Link>
-
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
-              <CollapseToggle collapsed={collapsed} onToggle={toggleSidebar} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Header - School Selector */}
+      <div className="flex items-center h-16 px-2 border-b border-[rgb(var(--border-primary))]">
+        <SidebarSchoolSelector collapsed={collapsed} />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2" aria-label="Sidebar navigation">
         <AnimatePresence mode="wait">
           <motion.div
             key={moduleId}
@@ -599,12 +652,8 @@ export function Sidebar() {
         </AnimatePresence>
       </nav>
 
-      {/* Footer - Collapse toggle when collapsed */}
-      {collapsed && (
-        <div className="border-t border-[rgb(var(--border-secondary))] p-2.5 flex justify-center">
-          <CollapseToggle collapsed={collapsed} onToggle={toggleSidebar} />
-        </div>
-      )}
+      {/* Edge-based sidebar toggle - appears on hover at the right border */}
+      <SidebarEdgeTrigger collapsed={collapsed} onToggle={toggleSidebar} />
     </animated.aside>
   )
 }
