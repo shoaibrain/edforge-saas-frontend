@@ -1,0 +1,3 @@
+
+    export type RemoteKeys = 'academics/StudentsModule' | 'academics/TeachersModule' | 'academics/AttendanceModule' | 'academics/GradebookModule' | 'academics/EnrollmentModule' | 'academics/AcademicsModule';
+    type PackageType<T> = T extends 'academics/AcademicsModule' ? typeof import('academics/AcademicsModule') :T extends 'academics/EnrollmentModule' ? typeof import('academics/EnrollmentModule') :T extends 'academics/GradebookModule' ? typeof import('academics/GradebookModule') :T extends 'academics/AttendanceModule' ? typeof import('academics/AttendanceModule') :T extends 'academics/TeachersModule' ? typeof import('academics/TeachersModule') :T extends 'academics/StudentsModule' ? typeof import('academics/StudentsModule') :any;

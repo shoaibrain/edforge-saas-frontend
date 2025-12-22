@@ -1,0 +1,14 @@
+/**
+ * EdForge Theme
+ *
+ * The complete theme for EdForge EMIS applications.
+ * Import this file in your app's entry point.
+ */
+
+@import 'tailwindcss';
+
+/* Import all theme layers */
+@import './base.css';
+@import './components.css';
+@import './utilities.css';
+
