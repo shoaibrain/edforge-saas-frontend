@@ -65,6 +65,7 @@ import {
   FileText,
   // Additional icons
   Baby,
+  CheckCircle,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -127,6 +128,7 @@ export type SidebarModule =
   | 'analytics'
   | 'parent-portal'
   | 'student-portal'
+  | 'special-programs'
 
 // ============================================================================
 // HOME MODULE - Admin/Staff/Teacher dashboard navigation
@@ -157,7 +159,7 @@ const homeModule: ModuleConfig = {
         },
         {
           id: 'people',
-          label: 'My People',
+          label: 'People & HR',
           icon: UsersRound,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
@@ -537,47 +539,39 @@ const academicsModule: ModuleConfig = {
       ],
     },
     {
-      id: 'management',
-      label: 'MANAGEMENT',
+      id: 'students',
+      label: 'STUDENTS',
       items: [
         {
-          id: 'students',
-          label: 'Students',
+          id: 'students-directory',
+          label: 'Student Directory',
           icon: UsersRound,
           href: '/academics/students',
           permission: { action: 'view', resource: 'students' },
           requiresActiveSchool: true,
         },
-        // TODO: review and complete the implementation.
-        // For Enrollment
-        // Review and make sure all the routing, navigation and pages implementation is complete. 
         {
           id: 'enrollment',
           label: 'Enrollment',
           icon: Atom,
-          href: '/academics/enrollment',
+          href: '/academics/students/enrollment',
           permission: { action: 'view', resource: 'curriculum' },
           requiresActiveSchool: true,
         },
-        //TODO: Review this url and application path and make sure the 
-        // routing and navigation is correctly and completly implemented.
         {
-          id: 'teachers',
-          label: 'Teachers',
-          icon: ContactRound,
-          href: '/academics/teachers',
+          id: 'student-profiles',
+          label: 'Student Profiles',
+          icon: User,
+          href: '/academics/students/profiles',
           permission: { action: 'view', resource: 'students' },
           requiresActiveSchool: true,
         },
-        {
-          id: 'gradelevels',
-          label: 'Grade Levels',
-          icon: Layers,
-          href: '/academics/gradelevels',
-          permission: { action: 'view', resource: 'students' },
-          requiresActiveSchool: true,
-        },
-        // TODO: Implement routing and navigation
+      ],
+    },
+    {
+      id: 'classes',
+      label: 'CLASSES & SCHEDULING',
+      items: [
         {
           id: 'classrooms',
           label: 'Classrooms',
@@ -587,32 +581,79 @@ const academicsModule: ModuleConfig = {
           requiresActiveSchool: true,
         },
         {
-          id: 'curriculum',
-          label: 'Curriculum',
-          icon: ClipboardList,
-          href: '/academics/curriculum',
+          id: 'schedules',
+          label: 'Class Schedules',
+          icon: Calendar,
+          href: '/academics/schedules',
+          permission: { action: 'view', resource: 'classes' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'timetables',
+          label: 'Timetables',
+          icon: Calendar,
+          href: '/academics/timetables',
+          permission: { action: 'view', resource: 'classes' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'curriculum',
+      label: 'CURRICULUM',
+      items: [
+        {
+          id: 'grade-levels',
+          label: 'Grade Levels',
+          icon: Layers,
+          href: '/academics/grade-levels',
+          permission: { action: 'view', resource: 'students' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'courses',
+          label: 'Courses',
+          icon: BookOpen,
+          href: '/academics/courses',
           permission: { action: 'view', resource: 'curriculum' },
           requiresActiveSchool: true,
         },
         {
-          id: 'gradebook',
+          id: 'standards',
+          label: 'Standards',
+          icon: ClipboardList,
+          href: '/academics/standards',
+          permission: { action: 'view', resource: 'curriculum' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'assessment',
+      label: 'ASSESSMENT',
+      items: [
+        {
+          id: 'gradebooks',
           label: 'Gradebooks',
           icon: GraduationCap,
           href: '/academics/gradebooks',
           permission: { action: 'view', resource: 'grades' },
           requiresActiveSchool: true,
         },
-        // TODO: review and complete the implementation.
-        // this is the page for user to view, manage the academic calendars for each academic year
-        // that will apply to their school in edforge. here, user should be able to securely and effectively 
-        // manage and ogranize their school academic calendar - like academic year window, terms.
-        // Review and make sure all the routing, navigation and pages implementation is complete. 
         {
-          id: 'school-calendar',
-          label: 'School Calendar',
-          icon: Calendars,
-          href: '/academics/schoolcalendar',
-          permission: { action: 'view', resource: 'curriculum' },
+          id: 'assessments',
+          label: 'Assessments',
+          icon: FileText,
+          href: '/academics/assessments',
+          permission: { action: 'view', resource: 'assessments' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'exams',
+          label: 'Exams',
+          icon: FileText,
+          href: '/academics/exams',
+          permission: { action: 'view', resource: 'assessments' },
           requiresActiveSchool: true,
         },
       ],
@@ -623,18 +664,18 @@ const academicsModule: ModuleConfig = {
       items: [
         {
           id: 'attendance',
-          label: 'Attendance',
+          label: 'Student Attendance',
           icon: ClipboardPlus,
           href: '/academics/attendance',
           permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
         {
-          id: 'reporting',
-          label: 'Reporting',
-          icon: ChartNoAxesCombined,
-          href: '/academics/reporting',
-          permission: { action: 'view', resource: 'attendance' },
+          id: 'academic-calendar',
+          label: 'Academic Calendar',
+          icon: Calendars,
+          href: '/academics/calendar',
+          permission: { action: 'view', resource: 'curriculum' },
           requiresActiveSchool: true,
         },
       ],
@@ -649,7 +690,7 @@ const academicsModule: ModuleConfig = {
 
 const financeModule: ModuleConfig = {
   id: 'finance',
-  title: 'Finance',
+  title: 'Finance & Billing',
   icon: DollarSign,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
@@ -668,41 +709,90 @@ const financeModule: ModuleConfig = {
     },
 
     {
-      id: 'management',
-      label: 'MANAGEMENT',
+      id: 'accounting',
+      label: 'ACCOUNTING',
       items: [
-        // TODO: Refactor and compelte the implementation for /hr
         {
-          id: 'financials',
-          label: 'Financials',
+          id: 'general-ledger',
+          label: 'General Ledger',
           icon: Landmark,
-          href: '/finance/financials',
+          href: '/finance/accounting/general-ledger',
           permission: { action: 'view', resource: 'billing' },
           requiresActiveSchool: true,
         },
-        // TODO /hr from /finance
         {
-          id: 'payroll',
-          label: 'Payroll',
+          id: 'accounts-payable',
+          label: 'Accounts Payable',
           icon: BanknoteArrowDown,
-          href: '/finance/payroll',
-          permission: { action: 'view', resource: 'payroll' },
+          href: '/finance/accounting/accounts-payable',
+          permission: { action: 'view', resource: 'billing' },
           requiresActiveSchool: true,
         },
-        // TODO: Complete the implementation routing and pages navigation
         {
-          id: 'tuitionsandfees',
-          label: 'Tuition Fees',
+          id: 'accounts-receivable',
+          label: 'Accounts Receivable',
           icon: BanknoteArrowUp,
-          href: '/finance/tuitionandfees',
-          permission: { action: 'view', resource: 'payroll' },
+          href: '/finance/accounting/accounts-receivable',
+          permission: { action: 'view', resource: 'billing' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'billing',
+      label: 'BILLING',
+      items: [
+        {
+          id: 'tuition-fees',
+          label: 'Tuition & Fees',
+          icon: BanknoteArrowUp,
+          href: '/finance/billing/tuition-fees',
+          permission: { action: 'view', resource: 'billing' },
           requiresActiveSchool: true,
         },
         {
-          id: 'expenses',
-          label: 'Expenses',
+          id: 'fee-structures',
+          label: 'Fee Structures',
+          icon: Layers,
+          href: '/finance/billing/fee-structures',
+          permission: { action: 'view', resource: 'billing' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'collections',
+          label: 'Collections',
+          icon: CreditCard,
+          href: '/finance/billing/collections',
+          permission: { action: 'view', resource: 'billing' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'expenses',
+      label: 'EXPENSES',
+      items: [
+        {
+          id: 'expense-tracking',
+          label: 'Expense Tracking',
           icon: ClipboardList,
           href: '/finance/expenses',
+          permission: { action: 'view', resource: 'expenses' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'approvals',
+          label: 'Approvals',
+          icon: CheckCircle,
+          href: '/finance/expenses/approvals',
+          permission: { action: 'view', resource: 'expenses' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'budgets',
+          label: 'Budgets',
+          icon: BarChart3,
+          href: '/finance/expenses/budgets',
           permission: { action: 'view', resource: 'expenses' },
           requiresActiveSchool: true,
         },
@@ -713,10 +803,18 @@ const financeModule: ModuleConfig = {
       label: 'REPORTS',
       items: [
         {
-          id: 'finance-reports',
-          label: 'Reports',
+          id: 'financial-reports',
+          label: 'Financial Reports',
           icon: BarChart3,
           href: '/finance/reports',
+          permission: { action: 'view', resource: 'reports:finance' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'audit-trail',
+          label: 'Audit Trail',
+          icon: Database,
+          href: '/finance/reports/audit-trail',
           permission: { action: 'view', resource: 'reports:finance' },
           requiresActiveSchool: true,
         },
@@ -731,7 +829,7 @@ const financeModule: ModuleConfig = {
 
 const peopleModule: ModuleConfig = {
   id: 'people',
-  title: 'People',
+  title: 'People & HR',
   icon: Users,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
@@ -740,7 +838,7 @@ const peopleModule: ModuleConfig = {
       items: [
         {
           id: 'people-home',
-          label: 'My People',
+          label: 'Overview',
           icon: Users,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
@@ -748,12 +846,12 @@ const peopleModule: ModuleConfig = {
       ],
     },
     {
-      id: 'management',
-      label: 'MANAGEMENT',
+      id: 'staff',
+      label: 'STAFF',
       items: [
         {
-          id: 'staff',
-          label: 'Directory',
+          id: 'staff-directory',
+          label: 'Staff Directory',
           icon: UsersRound,
           href: '/people/staff',
           permission: { action: 'view', resource: 'staff' },
@@ -776,26 +874,86 @@ const peopleModule: ModuleConfig = {
           permission: { action: 'view', resource: 'staff' },
           requiresActiveSchool: true,
         },
+      ],
+    },
+    {
+      id: 'human-resources',
+      label: 'HUMAN RESOURCES',
+      items: [
         {
-          id: 'tasks',
-          label: 'Tasks',
+          id: 'payroll',
+          label: 'Payroll',
+          icon: BanknoteArrowDown,
+          href: '/people/hr/payroll',
+          permission: { action: 'view', resource: 'payroll' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'contracts',
+          label: 'Contracts',
+          icon: FileText,
+          href: '/people/hr/contracts',
+          permission: { action: 'view', resource: 'staff' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'professional-development',
+          label: 'Professional Development',
+          icon: GraduationCap,
+          href: '/people/hr/professional-development',
+          permission: { action: 'view', resource: 'staff' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'performance-reviews',
+          label: 'Performance Reviews',
+          icon: BarChart3,
+          href: '/people/hr/performance-reviews',
+          permission: { action: 'view', resource: 'staff' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'staff-attendance',
+          label: 'Staff Attendance',
+          icon: ClipboardPlus,
+          href: '/people/hr/attendance',
+          permission: { action: 'view', resource: 'attendance' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'tasks',
+      label: 'TASKS & DUTIES',
+      items: [
+        {
+          id: 'staff-tasks',
+          label: 'Staff Tasks',
           icon: ClipboardList,
-          href: '/people/assignments',
+          href: '/people/tasks',
+          permission: { action: 'view', resource: 'staff:assignments' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'duty-assignments',
+          label: 'Duty Assignments',
+          icon: ClipboardList,
+          href: '/people/tasks/assignments',
           permission: { action: 'view', resource: 'staff:assignments' },
           requiresActiveSchool: true,
         },
       ],
     },
     {
-      id: 'tracking',
-      label: 'TRACKING',
+      id: 'parents',
+      label: 'PARENTS & GUARDIANS',
       items: [
         {
-          id: 'attendance',
-          label: 'Attendance',
-          icon: ClipboardPlus,
-          href: '/people/attendance',
-          permission: { action: 'view', resource: 'attendance' },
+          id: 'parents-directory',
+          label: 'Parent Directory',
+          icon: UserStar,
+          href: '/people/parents',
+          permission: { action: 'view', resource: 'staff' },
           requiresActiveSchool: true,
         },
         {
@@ -1128,6 +1286,113 @@ const messagesModule: ModuleConfig = {
 }
 
 // ============================================================================
+// SPECIAL PROGRAMS MODULE - Special education and accommodations
+// ============================================================================
+
+const specialProgramsModule: ModuleConfig = {
+  id: 'special-programs',
+  title: 'Special Programs',
+  icon: ShieldCheck,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'special-programs-home',
+          label: 'Overview',
+          icon: GalleryVerticalEnd,
+          href: '/special-programs',
+          permission: { action: 'view', resource: 'special-programs' },
+        },
+      ],
+    },
+    {
+      id: 'special-education',
+      label: 'SPECIAL EDUCATION',
+      items: [
+        {
+          id: 'ieps',
+          label: 'IEPs',
+          icon: FileText,
+          href: '/special-programs/ieps',
+          permission: { action: 'view', resource: 'special-programs:ieps' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'iep-meetings',
+          label: 'IEP Meetings',
+          icon: Calendar,
+          href: '/special-programs/ieps/meetings',
+          permission: { action: 'view', resource: 'special-programs:ieps' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'iep-goals',
+          label: 'Goals & Objectives',
+          icon: TrendingUp,
+          href: '/special-programs/ieps/goals',
+          permission: { action: 'view', resource: 'special-programs:ieps' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'accommodations',
+      label: 'ACCOMMODATIONS',
+      items: [
+        {
+          id: '504-plans',
+          label: '504 Plans',
+          icon: ShieldCheck,
+          href: '/special-programs/504-plans',
+          permission: { action: 'view', resource: 'special-programs:504' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'accommodations',
+          label: 'Accommodations',
+          icon: Settings,
+          href: '/special-programs/accommodations',
+          permission: { action: 'view', resource: 'special-programs:504' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'accessibility',
+          label: 'Accessibility Services',
+          icon: Zap,
+          href: '/special-programs/accessibility',
+          permission: { action: 'view', resource: 'special-programs:504' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+    {
+      id: 'support',
+      label: 'SUPPORT SERVICES',
+      items: [
+        {
+          id: 'counseling',
+          label: 'Counseling',
+          icon: Users,
+          href: '/special-programs/counseling',
+          permission: { action: 'view', resource: 'special-programs' },
+          requiresActiveSchool: true,
+        },
+        {
+          id: 'interventions',
+          label: 'Interventions',
+          icon: TrendingUp,
+          href: '/special-programs/interventions',
+          permission: { action: 'view', resource: 'special-programs' },
+          requiresActiveSchool: true,
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
 // MODULE REGISTRY
 // ============================================================================
 
@@ -1143,6 +1408,7 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   analytics: analyticsModule,
   'student-portal': studentPortalModule,
   'parent-portal': parentPortalModule,
+  'special-programs': specialProgramsModule,
 }
 
 
@@ -1208,6 +1474,7 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/analytics')) return 'analytics'
   if (pathname.startsWith('/student-portal')) return 'student-portal'
   if (pathname.startsWith('/parent-portal')) return 'parent-portal'
+  if (pathname.startsWith('/special-programs')) return 'special-programs'
   return 'home'
 }
 

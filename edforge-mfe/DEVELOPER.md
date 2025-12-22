@@ -448,9 +448,66 @@ pnpm build:packages
 
 ---
 
+## Module Registry
+
+Current modules in the system:
+
+| Module | Port | Purpose |
+|--------|------|---------|
+| `@edforge/shell` | 3000 | Host application (orchestrates all modules) |
+| `@edforge/edfi` | 3001 | Ed-Fi Alliance integration |
+| `@edforge/academics` | 3002 | Academic management (Students, Classes, Curriculum, Assessment) |
+| `@edforge/finance` | 3003 | Financial management (Accounting, Billing, Expenses) |
+| `@edforge/special-programs` | 3005 | Special education (IEPs, 504 Plans, Accommodations) |
+
+### Module Structure
+
+**Academics Module:**
+- Students (Directory, Enrollment, Profiles)
+- Classes & Scheduling (Classrooms, Schedules, Timetables)
+- Curriculum (Grade Levels, Courses, Standards)
+- Assessment (Gradebooks, Assessments, Exams)
+- Tracking (Student Attendance, Academic Calendar)
+
+**Finance Module:**
+- Accounting (General Ledger, Accounts Payable, Accounts Receivable)
+- Billing (Tuition & Fees, Fee Structures, Collections)
+- Expenses (Expense Tracking, Approvals, Budgets)
+- Reports (Financial Reports, Audit Trail)
+
+**People & HR Module:**
+- Staff (Staff Directory, Profiles, Departments)
+- Human Resources (Payroll, Contracts, Professional Development, Performance Reviews, Staff Attendance)
+- Tasks & Duties (Staff Tasks, Duty Assignments)
+- Parents & Guardians (Parent Directory, Guardian Profiles)
+
+**Special Programs Module:**
+- Special Education (IEPs, IEP Meetings, Goals & Objectives)
+- Accommodations (504 Plans, Accommodations, Accessibility Services)
+- Support Services (Counseling, Interventions)
+
+## Navigation Architecture
+
+The navigation system uses a module-based sidebar that dynamically changes based on the current route. Each module has its own navigation configuration in `apps/shell/src/config/sidebar-modules.ts`.
+
+### Route Structure
+
+Routes follow a hierarchical structure:
+- `/academics/students/enrollment` - Nested under students
+- `/people/hr/payroll` - HR functions under People module
+- `/finance/accounting/general-ledger` - Accounting sub-modules
+- `/special-programs/ieps/meetings` - Special programs with nested routes
+
+### URL Naming Conventions
+
+- Use kebab-case for all URLs: `/academics/grade-levels` not `/academics/gradelevels`
+- Be RESTful: `/academics/students/:id` for detail views
+- Avoid redundancy: `/finance/accounting` not `/finance/financials`
+- Use nouns, not verbs: `/academics/enrollment` not `/academics/enroll`
+
 ## Next Steps
 
-- [ ] Add `@edforge/people` module (Students, Teachers, Staff)
+- [ ] Add `@edforge/people` module (currently handled in shell, may be extracted)
 - [ ] Add `@edforge/portal` module (Parent/Student self-service)
 - [ ] Implement OIDC authentication
 - [ ] Set up CI/CD with independent module deploys

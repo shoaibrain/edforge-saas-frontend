@@ -1,280 +1,48 @@
-[5:44:33 PM] Starting compilation in watch mode...
-@edforge/abac:dev: 
-@edforge/shell:dev:   ➜  press h + enter to show shortcuts
-@edforge/shell:dev: 
-@edforge/academics:dev: Rsbuild v1.6.15
-@edforge/academics:dev: 
-@edforge/shell:dev: start   build started...
-@edforge/shell:dev: [ Module Federation Dev Server ] Success Federated types extraction completed
-@edforge/finance:dev: Rsbuild v1.6.15
-@edforge/finance:dev: 
-@edforge/shell:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: /mf-manifest.json 
-@edforge/shell:dev: ready   built in 0.35 s
-@edforge/edfi:dev:   ➜  press h + enter to show shortcuts
-@edforge/edfi:dev: 
-@edforge/edfi:dev: start   build started...
-@edforge/types:dev: [5:44:34 PM] Found 0 errors. Watching for file changes.
-@edforge/types:dev: 
-@edforge/edfi:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3001/mf-manifest.json 
-@edforge/edfi:dev: ready   built in 0.53 s
-@edforge/academics:dev:   ➜  press h + enter to show shortcuts
-@edforge/academics:dev: 
-@edforge/academics:dev: start   build started...
-@edforge/finance:dev:   ➜  press h + enter to show shortcuts
-@edforge/finance:dev: 
-@edforge/finance:dev: start   build started...
-@edforge/academics:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3002/mf-manifest.json 
-@edforge/academics:dev: ready   built in 0.44 s
-@edforge/finance:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3003/mf-manifest.json 
-@edforge/finance:dev: ready   built in 0.47 s
-@edforge/academics:dev: start   building abac/dist/permissions.js
-@edforge/abac:dev: [5:44:36 PM] Found 0 errors. Watching for file changes.
-@edforge/abac:dev: 
-@edforge/academics:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3002/mf-manifest.json 
-@edforge/academics:dev: ready   built in 0.17 s
-@edforge/academics:dev: start   building abac/dist/engine.js and 2 more
-@edforge/academics:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3002/mf-manifest.json 
-@edforge/academics:dev: ready   built in 0.11 s
-@edforge/finance:dev: start   building ui/dist/utils.js
-@edforge/edfi:dev: start   building ui/dist/utils.js
-@edforge/academics:dev: start   building ui/dist/utils.js
-@edforge/finance:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3003/mf-manifest.json 
-@edforge/finance:dev: ready   built in 0.19 s
-@edforge/finance:dev: start   building dist/components/Button.js
-@edforge/academics:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3002/mf-manifest.json 
-@edforge/academics:dev: ready   built in 0.25 s
-@edforge/academics:dev: start   building dist/components/Avatar.js and 2 more
-@edforge/edfi:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3001/mf-manifest.json 
-@edforge/edfi:dev: ready   built in 0.27 s
-@edforge/edfi:dev: start   building dist/components/Avatar.js and 2 more
-@edforge/ui:dev: [5:44:36 PM] Found 0 errors. Watching for file changes.
-@edforge/ui:dev: 
-@edforge/finance:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3003/mf-manifest.json 
-@edforge/finance:dev: ready   built in 0.20 s
-@edforge/finance:dev: start   building dist/components/Avatar.js and 1 more
-@edforge/academics:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3002/mf-manifest.json 
-@edforge/academics:dev: ready   built in 0.20 s
-@edforge/academics:dev: start   building dist/components/Skeleton.js and 1 more
-@edforge/finance:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3003/mf-manifest.json 
-@edforge/edfi:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3001/mf-manifest.json 
-@edforge/finance:dev: ready   built in 0.25 s
-@edforge/finance:dev: start   building dist/components/Skeleton.js and 1 more
-@edforge/edfi:dev: ready   built in 0.37 s
-@edforge/edfi:dev: start   building dist/components/Skeleton.js and 1 more
-@edforge/academics:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3002/mf-manifest.json 
-@edforge/academics:dev: ready   built in 0.32 s
-@edforge/finance:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3003/mf-manifest.json 
-@edforge/finance:dev: ready   built in 0.35 s
-@edforge/edfi:dev: [ Module Federation Manifest Plugin ] Info Manifest Link: http://localhost:3001/mf-manifest.json 
-@edforge/edfi:dev: ready   built in 0.36 s
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/finance:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/edfi:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/finance:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/finance:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/finance:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/finance:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/edfi:dev: [ Module Federation Dev Server ] Error Unable to compile federated typesError: ADM-ZIP: File not found: "/Users/shoaibrain/edforge-saas-frontend/edforge-mfe/apps/edfi/dist/@mf-types/node_modules/@types/react/compiler-runtime.d.ts"
-@edforge/edfi:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/edfi:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/academics:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/finance:dev: [ Module Federation Dev Server ] Success Federated types created correctly
-@edforge/edfi:dev: [ Module Federation Dev Server ] Success Federated types created correctly
+Please review the application presentational modules, sidebar nav items for each modules, their perspective routings and pages - analyze all these information very carefully. 
+EdForge is next generation cloud based EMIS SaaS. Of course it should the solid enterprise EMIS - but it should be more than that. The system should allow the users for complaint, provable and traceable data driven decision to enhance the outcomes of classrooms, education programs and education institution.  right. 
+There is a lot of existing SIS, EMIS systems that does what EdForge is trying to do, but EdFOrge is not only that. Strength of edforge is its being born now.  It has plane slate to define a truly intuitive easy to use and understand scalable and efficient interfaces - clean design - elegant UI and very well though out and logical routings and navigations and pages for the users for the next generation robust ABAC multi tenant platform. 
+So please review all the modules and sidebar navigations and links and routes and think from the first principal like a staff porduct designer and architect - and weather it makes sense - the wedforge has presentation layer designed and implemented and what are the improvements needed for complete robust scalable production grade EMIS SaaS Platform? What is is missing, what is out of order, or confusing or does not make sense? Think very critically and technically and create a detailed technical and business rationale summary. 
 
+Critical Weaknesses:
 
-localhost port 3000 from browser:
-GET http://localhost:3000/ net::ERR_HTTP_RESPONSE_CODE_FAILURE 404 (Not Found)
+Inconsistent Hierarchy: Some modules like "People" and "Academics" have overlapping concerns in the navigation structure.
+Incomplete Implementations: Several configured routes (e.g., Enrollment, Classrooms, specific Finance reports) are marked as TODOs or appear to lack corresponding route definitions.
+Naming Conventions: Inconsistent naming (e.g., "Human Resource" vs "Financials" vs "Finance") creates confusion.
+Missing Critical Modules: The vision document mentions "Opportunity 9: Accessibility" and "Opportunity 6: Professional Development," but no dedicated modules or clear navigation paths exist for these features.
 
-Request header:
-GET / HTTP/1.1
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
-Accept-Encoding: gzip, deflate, br, zstd
-Accept-Language: en-US,en;q=0.9
-Connection: keep-alive
-Host: localhost:3000
-Sec-Fetch-Dest: document
-Sec-Fetch-Mode: navigate
-Sec-Fetch-Site: none
-Sec-Fetch-User: ?1
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
-sec-ch-ua: "Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Response Header:
-HTTP/1.1 404 Not Found
-Access-Control-Allow-Origin: *
-Date: Sun, 21 Dec 2025 23:46:09 GMT
-Connection: keep-alive
-Keep-Alive: timeout=5
-Transfer-Encoding: chunked
+Module-by-Module Critique
+Academics Module
+Current State:
 
-curl http://localhost:3000/mf-manifest.json
+Items: Students, Enrollment, Teachers, Grade Levels, Classrooms, Curriculum, Gradebooks, School Calendar, Attendance, Reporting.
+Critique:
+"Students" vs "Enrollment": These are listed as separate top-level items. Enrollment is typically a process/state of a Student. Having them separate suggests disjointed workflows.
+"Teachers" in Academics: Teachers are "People". Why are they managed in Academics? If this is for assigning teachers to classes, it should be under "Scheduling" or "Classrooms". If it's for managing teacher profiles, it belongs in "People/Staff".
+"Reporting": A generic "Reporting" link is less useful than context-specific reports (e.g., "Grade Reports", "Attendance Reports").
 
-{
-  "id": "shell",
-  "name": "shell",
-  "metaData": {
-    "name": "shell",
-    "type": "app",
-    "buildInfo": {
-      "buildVersion": "0.0.1",
-      "buildName": "@edforge/shell"
-    },
-    "remoteEntry": {
-      "name": "",
-      "path": "",
-      "type": "global"
-    },
-    "types": {
-      "path": "",
-      "name": "",
-      "zip": ".",
-      "api": "."
-    },
-    "globalName": "shell",
-    "pluginVersion": "0.8.12",
-    "prefetchInterface": false,
-    "publicPath": "/"
-  },
-  "shared": [],
-  "remotes": [
-    {
-      "federationContainerName": "edfi",
-      "moduleName": "UNKNOWN",
-      "alias": "edfi",
-      "entry": "http://localhost:3001/mf-manifest.json"
-    },
-    {
-      "federationContainerName": "academics",
-      "moduleName": "UNKNOWN",
-      "alias": "academics",
-      "entry": "http://localhost:3002/mf-manifest.json"
-    },
-    {
-      "federationContainerName": "finance",
-      "moduleName": "UNKNOWN",
-      "alias": "finance",
-      "entry": "http://localhost:3003/mf-manifest.json"
-    }
-  ],
-  "exposes": []
-}%
+Finance Module
+Current State:
 
-  "name": "shell",
-  "metaData": {
-    "name": "shell",
-    "type": "app",
-    "buildInfo": {
-      "buildVersion": "0.0.1",
-      "buildName": "@edforge/shell"
-    },
-    "remoteEntry": {
-      "name": "",
-      "path": "",
-      "type": "global"
-    },
-    "types": {
-      "path": "",
-      "name": "",
-      "zip": ".",
-      "api": "."
-    },
-    "globalName": "shell",
-    "pluginVersion": "0.8.12",
-    "prefetchInterface": false,
-    "publicPath": "/"
-  },
-  "shared": [],
-  "remotes": [
-    {
-      "federationContainerName": "edfi",
-      "moduleName": "UNKNOWN",
-      "alias": "edfi",
-      "entry": "http://localhost:3001/mf-manifest.json"
-    },
-    {
-      "federationContainerName": "academics",
-      "moduleName": "UNKNOWN",
-      "alias": "academics",
-      "entry": "http://localhost:3002/mf-manifest.json"
-    },
-    {
-      "federationContainerName": "finance",
-      "moduleName": "UNKNOWN",
-      "alias": "finance",
-      "entry": "http://localhost:3003/mf-manifest.json"
-    }
-  ],
-  "exposes": []
-}%
-❯ clear
-❯ curl http://localhost:3001/mf-manifest.json
+Items: Financials, Payroll, Tuition Fees, Expenses, Reports.
+Critique:
+Label Inconsistency: In the Home module, the link to /finance is labeled "Financials" but has an icon mismatch (HandCoins vs DollarSign). In the Finance module itself, it is titled "Finance".
+"Human Resource" ID: The ID human-resource is used for the Finance link in the Home module. This suggests confusion about whether this module is HR or Finance. Payroll is often shared, but they are distinct domains.
+Route vs Label: /finance/financials is redundant. /finance/general-ledger or /finance/accounting would be more precise.
+People Module
+Current State:
 
-{
-  "id": "edfi",
-  "name": "edfi",
-  "metaData": {
-    "name": "edfi",
-    "type": "app",
-    "buildInfo": {
-      "buildVersion": "0.0.1",
-      "buildName": "@edforge/edfi"
-    },
-    "remoteEntry": {
-      "name": "remoteEntry.js",
-      "path": "",
-      "type": "global"
-    },
-    "types": {
-      "path": "",
-      "name": "",
-      "zip": "@mf-types.zip",
-      "api": "@mf-types.d.ts"
-    },
-    "globalName": "edfi",
-    "pluginVersion": "0.8.12",
-    "prefetchInterface": false,
-    "publicPath": "http://localhost:3001/"
-  },
-  "shared": [],
-  "remotes": [],
-  "exposes": []
-}%
-❯ curl http://localhost:3002/mf-manifest.json
-
-{
-  "id": "academics",
-  "name": "academics",
-  "metaData": {
-    "name": "academics",
-    "type": "app",
-    "buildInfo": {
-      "buildVersion": "0.0.1",
-      "buildName": "@edforge/academics"
-    },
-    "remoteEntry": {
-      "name": "remoteEntry.js",
-      "path": "",
-      "type": "global"
-    },
-    "types": {
-      "path": "",
-      "name": "",
-      "zip": "@mf-types.zip",
-      "api": "@mf-types.d.ts"
-    },
-    "globalName": "academics",
-    "pluginVersion": "0.8.12",
-    "prefetchInterface": false,
-    "publicPath": "http://localhost:3002/"
-  },
-  "shared": [],
-  "remotes": [],
-  "exposes": []
-}
+Items: My People, Colleague, Department, Parents, Assignments, Attendance, Reporting.
+Critique:
+Ambiguous Purpose: "My People" (Overview) vs "Colleague" (Staff) vs "Parents". "Colleague" is a strange label for an admin view of Staff. It should be "Staff Directory".
+Assignments? "Assignments" under People usually implies "Task Assignments" (HR), but "Assignment" in an EMIS Context usually means "Homework" (Academics). This collision is dangerous.
+Redundant Attendance: "Attendance" is here and in Academics. Academic attendance is for students. Staff attendance is for payroll. If this link is for Staff Attendance, it should be explicit (Staff Attendance).
+Recommendations
+1. Refactor "People" and "Academics" Boundaries
+Move: "Teachers" from Academics -> People. All human profiles belong in People.
+Rename: "People" -> "Community" or "Directory" to imply a broader scope than just "HR".
+Clarify: "Assignments" in People -> "Tasks" or "Staff Duties" to avoid confusion with Student Assignments.
+2. Unify "Finance" and "HR" Terminology
+Decision: Is it a Finance module or an HR module? The ID human-resource suggests HR.
+Action: proper structure should likely be:
+Finance: Billing, Tuition, Ledger, Expenses.
+HR (a sub-section of People): Payroll, Contracts, Staff Attendance.

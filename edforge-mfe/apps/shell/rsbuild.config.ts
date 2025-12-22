@@ -40,6 +40,7 @@ export default defineConfig({
             edfi: 'edfi@http://localhost:3001/mf-manifest.json',
             academics: 'academics@http://localhost:3002/mf-manifest.json',
             finance: 'finance@http://localhost:3003/mf-manifest.json',
+            'specialPrograms': 'specialPrograms@http://localhost:3005/mf-manifest.json',
           },
           shared: {
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },

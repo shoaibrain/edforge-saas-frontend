@@ -40,4 +40,14 @@ export {
   SkeletonModuleOverview,
 } from './components/Skeleton'
 export { Tooltip } from './components/Tooltip'
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+} from './components/Table'
+export { Dropdown, type DropdownOption } from './components/Dropdown'
 

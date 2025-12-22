@@ -36,6 +36,9 @@ export type Resource =
   | 'enrollment'
   | 'assessments'
   | 'gradebook'
+  | 'scheduling'
+  | 'courses'
+  | 'standards'
   // People
   | 'guardians'
   | 'parents'
@@ -49,6 +52,12 @@ export type Resource =
   // Staff
   | 'staff'
   | 'staff:assignments'
+  // Human Resources
+  | 'hr'
+  | 'hr:payroll'
+  | 'hr:contracts'
+  | 'hr:professional-dev'
+  | 'hr:performance-reviews'
   // Communications
   | 'communications'
   | 'announcements'
@@ -84,6 +93,10 @@ export type Resource =
   | 'integrations'
   | 'integrations:google'
   | 'integrations:microsoft'
+  // Special Programs
+  | 'special-programs'
+  | 'special-programs:ieps'
+  | 'special-programs:504'
 
 // ============================================================================
 // ROLE → PERMISSION MAPPING
@@ -110,6 +123,9 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     enrollment: ['view', 'create', 'edit', 'delete', 'manage', 'approve'],
     assessments: ['view', 'create', 'edit', 'delete', 'manage'],
     gradebook: ['view', 'create', 'edit', 'manage', 'approve'],
+    scheduling: ['view', 'create', 'edit', 'delete', 'manage'],
+    courses: ['view', 'create', 'edit', 'delete', 'manage'],
+    standards: ['view', 'create', 'edit', 'delete', 'manage'],
     guardians: ['view', 'create', 'edit', 'delete', 'manage'],
     parents: ['view', 'create', 'edit', 'delete', 'manage'],
     departments: ['view', 'create', 'edit', 'delete', 'manage'],
@@ -120,6 +136,11 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     'reports:finance': ['view', 'export'],
     staff: ['view', 'create', 'edit', 'manage'],
     'staff:assignments': ['view', 'create', 'edit', 'delete'],
+    hr: ['view', 'manage'],
+    'hr:payroll': ['view', 'create', 'edit', 'approve'],
+    'hr:contracts': ['view', 'create', 'edit', 'delete', 'manage'],
+    'hr:professional-dev': ['view', 'create', 'edit', 'manage'],
+    'hr:performance-reviews': ['view', 'create', 'edit', 'approve'],
     communications: ['view', 'create', 'edit', 'delete', 'manage'],
     announcements: ['view', 'create', 'edit', 'delete', 'send', 'approve'],
     messages: ['view', 'create', 'send'],
@@ -148,6 +169,9 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     integrations: ['view', 'manage'],
     'integrations:google': ['view', 'manage'],
     'integrations:microsoft': ['view', 'manage'],
+    'special-programs': ['view', 'manage'],
+    'special-programs:ieps': ['view', 'create', 'edit', 'delete', 'manage'],
+    'special-programs:504': ['view', 'create', 'edit', 'delete', 'manage'],
   },
   Teacher: {
     dashboard: ['view'],
@@ -163,6 +187,9 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     enrollment: ['view'],
     assessments: ['view', 'create', 'edit'],
     gradebook: ['view', 'create', 'edit'],
+    scheduling: ['view'],
+    courses: ['view'],
+    standards: ['view'],
     guardians: ['view'],
     parents: ['view'],
     departments: ['view'],
@@ -180,6 +207,7 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     'student-portal:schedule': ['view'],
     'student-portal:assignments': ['view'],
     settings: ['view'],
+    'special-programs': ['view'],
   },
   Accountant: {
     dashboard: ['view'],
@@ -196,6 +224,8 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     tuition: ['view', 'create', 'edit', 'manage'],
     'reports:finance': ['view', 'create', 'export'],
     staff: ['view'],
+    hr: ['view'],
+    'hr:payroll': ['view', 'create', 'edit', 'manage'],
     communications: ['view'],
     announcements: ['view'],
     messages: ['view', 'create', 'send'],
@@ -204,6 +234,7 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     'analytics:financial': ['view', 'export'],
     'parent-portal:fees': ['view', 'manage'],
     settings: ['view'],
+    'special-programs': ['view'],
   },
   Staff: {
     dashboard: ['view'],
@@ -223,6 +254,7 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     announcements: ['view'],
     messages: ['view', 'create', 'send'],
     notifications: ['view'],
+    'special-programs': ['view'],
   },
   Student: {
     dashboard: ['view'],

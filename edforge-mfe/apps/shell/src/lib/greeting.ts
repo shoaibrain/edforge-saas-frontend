@@ -85,4 +85,3 @@ export function formatTime(date: Date): string {
     hour12: true,
   })
 }
-

@@ -32,38 +32,58 @@ const ROUTE_LABELS: Record<string, string> = {
   // Top-level modules
   home: 'Home',
   academics: 'Academics',
-  finance: 'Finance',
-  people: 'People',
+  finance: 'Finance & Billing',
+  people: 'People & HR',
   messages: 'Messages',
   analytics: 'Analytics',
   settings: 'Settings',
   'student-portal': 'Student Portal',
   'parent-portal': 'Family Portal',
+  'special-programs': 'Special Programs',
 
   // Academics sub-routes
   students: 'Students',
-  teachers: 'Teachers',
   enrollment: 'Enrollment',
-  gradelevels: 'Grade Levels',
+  'grade-levels': 'Grade Levels',
   classrooms: 'Classrooms',
+  schedules: 'Class Schedules',
+  timetables: 'Timetables',
   curriculum: 'Curriculum',
+  courses: 'Courses',
+  standards: 'Standards',
   gradebooks: 'Gradebooks',
-  schoolcalendar: 'School Calendar',
-  attendance: 'Attendance',
-  reporting: 'Reporting',
+  assessments: 'Assessments',
+  exams: 'Exams',
+  calendar: 'Academic Calendar',
+  attendance: 'Student Attendance',
 
   // Finance sub-routes
-  financials: 'Financials',
-  payroll: 'Payroll',
-  tuitionandfees: 'Tuition & Fees',
+  accounting: 'Accounting',
+  'general-ledger': 'General Ledger',
+  'accounts-payable': 'Accounts Payable',
+  'accounts-receivable': 'Accounts Receivable',
+  billing: 'Billing',
+  'tuition-fees': 'Tuition & Fees',
+  'fee-structures': 'Fee Structures',
+  collections: 'Collections',
   expenses: 'Expenses',
-  reports: 'Reports',
+  approvals: 'Approvals',
+  budgets: 'Budgets',
+  reports: 'Financial Reports',
+  'audit-trail': 'Audit Trail',
 
-  // People sub-routes
-  staff: 'Directory',
+  // People & HR sub-routes
+  staff: 'Staff Directory',
+  hr: 'Human Resources',
+  payroll: 'Payroll',
+  contracts: 'Contracts',
+  'professional-development': 'Professional Development',
+  'performance-reviews': 'Performance Reviews',
   department: 'Departments',
-  parents: 'Parents',
-  assignments: 'Tasks',  // Staff tasks/duties (not student assignments)
+  tasks: 'Staff Tasks',
+  assignments: 'Duty Assignments',
+  parents: 'Parent Directory',
+  '504-plans': '504 Plans',
 
   // Messages sub-routes
   inbox: 'Inbox',
@@ -93,6 +113,15 @@ const ROUTE_LABELS: Record<string, string> = {
 
   // Parent Portal
   fees: 'Fee Payments',
+
+  // Special Programs sub-routes
+  ieps: 'IEPs',
+  meetings: 'IEP Meetings',
+  goals: 'Goals & Objectives',
+  accommodations: 'Accommodations',
+  accessibility: 'Accessibility Services',
+  counseling: 'Counseling',
+  interventions: 'Interventions',
 
   // Common
   new: 'New',

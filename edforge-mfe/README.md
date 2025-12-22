@@ -12,7 +12,7 @@ pnpm typecheck        # Verify types
 pnpm dev              # Start all apps
 ```
 
-**URLs:** Shell `:3000` | Ed-Fi `:3001` | Academics `:3002` | Finance `:3003`
+**URLs:** Shell `:3000` | Ed-Fi `:3001` | Academics `:3002` | Finance `:3003` | Special Programs `:3005`
 
 📖 **Detailed developer documentation: [DEVELOPER.md](./DEVELOPER.md)**
 
@@ -117,11 +117,12 @@ pnpm docker:dev
 
 | App       | Port | URL                      |
 |-----------|------|--------------------------|
-| Shell     | 3000 | http://localhost:3000    |
-| Ed-Fi     | 3001 | http://localhost:3001    |
-| Academics | 3002 | http://localhost:3002    |
-| Finance   | 3003 | http://localhost:3003    |
-| Nginx     | 8080 | http://localhost:8080    |
+| Shell           | 3000 | http://localhost:3000    |
+| Ed-Fi           | 3001 | http://localhost:3001    |
+| Academics       | 3002 | http://localhost:3002    |
+| Finance         | 3003 | http://localhost:3003    |
+| Special Programs| 3005 | http://localhost:3005    |
+| Nginx           | 8080 | http://localhost:8080    |
 
 ## Module Federation
 

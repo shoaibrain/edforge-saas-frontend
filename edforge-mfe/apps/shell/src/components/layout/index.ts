@@ -4,4 +4,7 @@ export { Header } from './Header'
 export { Breadcrumbs } from './Breadcrumbs'
 export { SidebarEdgeTrigger } from './SidebarEdgeTrigger'
 export { SkipLink } from './SkipLink'
+export { BootstrapPage, type BootstrapPageProps, type FeatureHint } from './BootstrapPage'
+export { ErrorBoundary, RouteErrorBoundary } from './ErrorBoundary'
+export { NotFound } from './NotFound'
 

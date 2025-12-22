@@ -29,7 +29,6 @@ export default defineConfig({
           filename: 'remoteEntry.js',
           exposes: {
             './StudentsModule': './src/routes/students/index.tsx',
-            './TeachersModule': './src/routes/teachers/index.tsx',
             './AttendanceModule': './src/routes/attendance/index.tsx',
             './GradebookModule': './src/routes/gradebook/index.tsx',
             './EnrollmentModule': './src/routes/enrollment/index.tsx',
