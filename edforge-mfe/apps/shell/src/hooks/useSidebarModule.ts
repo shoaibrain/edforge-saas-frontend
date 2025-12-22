@@ -14,7 +14,7 @@
  */
 
 import { useMemo, useSyncExternalStore } from 'react'
-import { useRouterState } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import {
   type SidebarModule,
   type ModuleConfig,
@@ -25,25 +25,6 @@ import {
 } from '../config/sidebar-modules'
 import { useAuthStore } from '../stores/auth.store'
 import { useAppStore } from '../stores/app.store'
-
-// Custom hook to subscribe to browser location changes
-// This ensures the sidebar re-renders when the URL changes
-function usePathname(): string {
-  return useSyncExternalStore(
-    (callback) => {
-      // Subscribe to popstate events (back/forward navigation)
-      window.addEventListener('popstate', callback)
-      // Also listen for custom navigation events from TanStack Router
-      window.addEventListener('hashchange', callback)
-      return () => {
-        window.removeEventListener('popstate', callback)
-        window.removeEventListener('hashchange', callback)
-      }
-    },
-    () => window.location.pathname, // Get snapshot
-    () => window.location.pathname  // Get server snapshot
-  )
-}
 
 export interface UseSidebarModuleReturn {
   /** Current active module ID */
@@ -60,6 +41,25 @@ export interface UseSidebarModuleReturn {
 }
 
 /**
+ * Custom hook to get current pathname with guaranteed reactivity.
+ * Uses useSyncExternalStore to subscribe to router state changes.
+ */
+function usePathname(): string {
+  const router = useRouter()
+  
+  return useSyncExternalStore(
+    // Subscribe function
+    (callback) => {
+      return router.subscribe('onResolved', callback)
+    },
+    // Get snapshot
+    () => router.state.location.pathname,
+    // Get server snapshot
+    () => router.state.location.pathname
+  )
+}
+
+/**
  * Hook to detect and provide the current sidebar module based on route
  * and user role context.
  * 
@@ -70,12 +70,8 @@ export interface UseSidebarModuleReturn {
  * - Other roles → standard admin home module
  */
 export function useSidebarModule(): UseSidebarModuleReturn {
-  // Use both router state and browser pathname for reliable location tracking
-  const routerPathname = useRouterState({ select: (s) => s.location.pathname })
-  const browserPathname = usePathname()
-  // Prefer router pathname but fall back to browser pathname
-  const pathname = routerPathname || browserPathname
-  
+  // Use custom hook that guarantees reactivity on route changes
+  const pathname = usePathname()
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
 
@@ -105,7 +101,7 @@ export function useSidebarModule(): UseSidebarModuleReturn {
       isSubModule,
       backTo: config.backTo,
     }
-  }, [routerPathname, browserPathname, pathname, user, activeSchoolId])
+  }, [pathname, user, activeSchoolId])
 }
 
 /**
@@ -117,6 +113,19 @@ export function useIsInModule(targetModule: SidebarModule): boolean {
 }
 
 /**
+ * Custom hook to get current search params with guaranteed reactivity.
+ */
+function useSearchParams(): Record<string, unknown> {
+  const router = useRouter()
+  
+  return useSyncExternalStore(
+    (callback) => router.subscribe('onResolved', callback),
+    () => router.state.location.search as Record<string, unknown>,
+    () => router.state.location.search as Record<string, unknown>
+  )
+}
+
+/**
  * Hook to get the active nav item ID based on current path
  * 
  * Matching priority:
@@ -125,16 +134,14 @@ export function useIsInModule(targetModule: SidebarModule): boolean {
  * 3. Prefix match for nested routes (e.g., /academics for /academics/teachers/123)
  */
 export function useActiveNavItem(): string | null {
-  // Use useRouterState for more reliable location tracking
-  const routerState = useRouterState({ select: (s) => s.location })
+  const pathname = usePathname()
+  const search = useSearchParams()
   const { config } = useSidebarModule()
 
   return useMemo(() => {
-    const pathname = routerState.pathname
     // TanStack Router's search is an object, convert to URLSearchParams string
-    const searchObj = routerState.search as Record<string, unknown>
     const searchString = new URLSearchParams(
-      Object.entries(searchObj).map(([k, v]) => [k, String(v)])
+      Object.entries(search).map(([k, v]) => [k, String(v)])
     ).toString()
 
     // Collect all items from all groups for multi-pass matching
@@ -180,5 +187,5 @@ export function useActiveNavItem(): string | null {
     // Return null when no match found - this is expected when at /home
     // since "Home" is now handled by the unified HomeNavButton component
     return null
-  }, [routerState.pathname, routerState.search, config])
+  }, [pathname, search, config])
 }

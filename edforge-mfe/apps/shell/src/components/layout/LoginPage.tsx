@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from '@tanstack/react-router'
 import { User, Shield, GraduationCap, DollarSign, Book, UserCircle } from 'lucide-react'
 import { Button, Card, CardContent } from '@edforge/ui'
 import { useAuthStore } from '../../stores/auth.store'
@@ -57,11 +58,14 @@ const DEMO_USERS = [
 
 export function LoginPage() {
   const { loginAs } = useAuthStore()
-  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+  const navigate = useNavigate()
+  const [selectedUser, setSelectedUser] = useState<string | null>('tenant-admin')
 
   const handleLogin = () => {
     if (selectedUser) {
       loginAs(selectedUser as 'tenant-admin' | 'principal' | 'teacher' | 'accountant' | 'student' | 'parent')
+      // Navigate to home after successful login
+      navigate({ to: '/home' })
     }
   }
 

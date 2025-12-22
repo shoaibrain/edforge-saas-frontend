@@ -15,6 +15,7 @@ export default defineConfig({
   },
   dev: {
     hmr: true,
+    historyApiFallback: true, // Critical for SPA routing - must be in dev section
   },
   html: {
     title: 'EdForge EMIS',
@@ -43,13 +44,13 @@ export default defineConfig({
           shared: {
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
-            '@tanstack/react-query': { singleton: true, eager: true },
-            '@tanstack/react-router': { singleton: true, eager: true },
-            zustand: { singleton: true, eager: true },
-            '@edforge/ui': { singleton: true, eager: true },
-            '@edforge/abac': { singleton: true, eager: true },
-            '@edforge/types': { singleton: true, eager: true },
-            '@edforge/theme': { singleton: true, eager: true },
+            '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0', eager: true },
+            '@tanstack/react-router': { singleton: true, requiredVersion: '^1.82.0', eager: true },
+            zustand: { singleton: true, requiredVersion: '^5.0.0', eager: true },
+            '@edforge/ui': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/abac': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/types': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
           },
         }),
       ])

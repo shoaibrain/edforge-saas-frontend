@@ -1,10 +1,11 @@
 /**
- * Finance Module Overview Page
+ * Finance Module Layout
  * 
- * Provides the overview page for the Finance module at /finance.
- * Shows key stats and quick access cards to sub-routes.
+ * Provides nested routing support for the Finance module.
+ * Renders the overview page at /finance and child routes via Outlet.
  */
 
+import { Outlet, useLocation } from '@tanstack/react-router'
 import {
   DollarSign,
   Landmark,
@@ -20,10 +21,27 @@ import { ModuleOverviewPage } from '../components/layout/ModuleOverviewPage'
 import type { ModuleStat, ModuleActionCard } from '../components/layout/ModuleOverviewPage'
 
 // ============================================================================
-// FINANCE OVERVIEW PAGE
+// LAYOUT COMPONENT
 // ============================================================================
 
 export default function FinancePage() {
+  const location = useLocation()
+  // Check if we're at exactly /finance (not a child route like /finance/payroll)
+  const isExactRoute = location.pathname === '/finance'
+  
+  if (isExactRoute) {
+    return <FinanceOverviewPage />
+  }
+  
+  // Render child routes (financials, payroll, etc.)
+  return <Outlet />
+}
+
+// ============================================================================
+// OVERVIEW PAGE
+// ============================================================================
+
+function FinanceOverviewPage() {
   // Stats for the finance module
   const stats: ModuleStat[] = [
     {

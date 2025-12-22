@@ -10,6 +10,7 @@ export default defineConfig({
   },
   dev: {
     hmr: true,
+    historyApiFallback: true, // Critical for SPA routing
   },
   resolve: {
     alias: {
@@ -34,15 +35,15 @@ export default defineConfig({
             './FinanceModule': './src/bootstrap.tsx',
           },
           shared: {
-            react: { singleton: true, requiredVersion: '^19.0.0' },
-            'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
-            '@tanstack/react-query': { singleton: true },
-            '@tanstack/react-table': { singleton: true },
-            zustand: { singleton: true },
-            '@edforge/ui': { singleton: true },
-            '@edforge/abac': { singleton: true },
-            '@edforge/types': { singleton: true },
-            '@edforge/theme': { singleton: true },
+            react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
+            'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
+            '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0', eager: true },
+            '@tanstack/react-table': { singleton: true, eager: true },
+            zustand: { singleton: true, requiredVersion: '^5.0.0', eager: true },
+            '@edforge/ui': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/abac': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/types': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
           },
         }),
       ])

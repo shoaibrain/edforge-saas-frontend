@@ -1,10 +1,11 @@
 /**
- * Academics Module Overview Page
+ * Academics Module Layout
  * 
- * Provides the overview page for the Academics module at /academics.
- * Shows key stats and quick access cards to sub-routes.
+ * Provides nested routing support for the Academics module.
+ * Renders the overview page at /academics and child routes via Outlet.
  */
 
+import { Outlet, useLocation } from '@tanstack/react-router'
 import {
   GraduationCap,
   Users,
@@ -21,10 +22,27 @@ import { ModuleOverviewPage } from '../components/layout/ModuleOverviewPage'
 import type { ModuleStat, ModuleActionCard } from '../components/layout/ModuleOverviewPage'
 
 // ============================================================================
-// ACADEMICS OVERVIEW PAGE
+// LAYOUT COMPONENT
 // ============================================================================
 
 export default function AcademicsPage() {
+  const location = useLocation()
+  // Check if we're at exactly /academics (not a child route like /academics/students)
+  const isExactRoute = location.pathname === '/academics'
+  
+  if (isExactRoute) {
+    return <AcademicsOverviewPage />
+  }
+  
+  // Render child routes (students, teachers, etc.)
+  return <Outlet />
+}
+
+// ============================================================================
+// OVERVIEW PAGE
+// ============================================================================
+
+function AcademicsOverviewPage() {
   // Stats for the academics module
   const stats: ModuleStat[] = [
     {

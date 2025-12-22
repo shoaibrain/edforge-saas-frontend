@@ -5,8 +5,8 @@
  * Features ABAC permission filtering and smooth spring-based animations.
  */
 
-import { useState, useEffect, Fragment, useCallback } from 'react'
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { useState, useEffect, Fragment, useSyncExternalStore } from 'react'
+import { Link, useRouter } from '@tanstack/react-router'
 import { useSpring, animated, config } from '@react-spring/web'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
@@ -74,14 +74,14 @@ function AnimatedNavIcon({
           !isActive && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
         )} 
       />
-      {/* Glow effect - pointer-events-none to allow click through */}
+      {/* Glow effect */}
       <animated.div
         style={{
           opacity: glowSpring.opacity,
           transform: glowSpring.scale.to(s => `scale(${s})`),
         }}
         className={cn(
-          'absolute inset-0 rounded-full blur-md pointer-events-none',
+          'absolute inset-0 rounded-full blur-md',
           isDanger ? 'bg-rust-500/25' : 'bg-teal-500/25 dark:bg-cyan-500/25'
         )}
       />
@@ -106,7 +106,6 @@ function NavItemLink({
 }) {
   const [isHovered, setIsHovered] = useState(false)
   const isDanger = item.variant === 'danger'
-  const navigate = useNavigate()
 
   const hoverSpring = useSpring({
     backgroundColor: isHovered && !isActive 
@@ -115,21 +114,12 @@ function NavItemLink({
     config: { tension: 300, friction: 30 },
   })
 
-  // Handle click to navigate - use both router and window.location for reliability
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    const href = item.href || '/home'
-    // Use window.location for now to ensure navigation works
-    window.location.href = href
-  }, [item.href])
-
   const linkContent = (
-    <a
-      href={item.href || '#'}
-      onClick={handleClick}
+    <Link
+      to={item.href || '#'}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="block relative cursor-pointer"
+      className="block relative"
     >
       <animated.div
         style={hoverSpring}
@@ -138,12 +128,12 @@ function NavItemLink({
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
         )}
       >
-        {/* Active background pill - pointer-events-none to allow click through */}
+        {/* Active background pill */}
         {isActive && (
           <motion.div
             layoutId="activeNavBg"
             className={cn(
-              'absolute inset-0 rounded-xl pointer-events-none',
+              'absolute inset-0 rounded-xl',
               isDanger
                 ? 'bg-rust-500/10'
                 : 'bg-[rgb(var(--interactive-active))]'
@@ -157,12 +147,12 @@ function NavItemLink({
           />
         )}
 
-        {/* Active indicator line - pointer-events-none to allow click through */}
+        {/* Active indicator line */}
         {isActive && (
           <motion.div
             layoutId="activeIndicator"
             className={cn(
-              'absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full pointer-events-none',
+              'absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full',
               isDanger ? 'bg-rust-500' : 'bg-gradient-to-b from-teal-500 to-cyan-500'
             )}
             initial={false}
@@ -217,7 +207,7 @@ function NavItemLink({
           )}
         </AnimatePresence>
       </animated.div>
-    </a>
+    </Link>
   )
 
   if (collapsed) {
@@ -292,18 +282,30 @@ function NavGroup({
 // Uses the same animation pattern as NavItemLink for consistency
 // ============================================================================
 
-function HomeNavButton({ 
-  collapsed, 
+/**
+ * Custom hook for pathname with guaranteed reactivity in Sidebar context.
+ */
+function useSidebarPathname(): string {
+  const router = useRouter()
+  return useSyncExternalStore(
+    (callback) => router.subscribe('onResolved', callback),
+    () => router.state.location.pathname,
+    () => router.state.location.pathname
+  )
+}
+
+function HomeNavButton({
+  collapsed,
   isSubModule 
-}: { 
+}: {
   collapsed: boolean
   isSubModule: boolean 
 }) {
-  const location = useLocation()
+  const pathname = useSidebarPathname()
   const [isHovered, setIsHovered] = useState(false)
   
   // Determine state based on context
-  const isAtHome = location.pathname === '/home' || location.pathname === '/'
+  const isAtHome = pathname === '/home' || pathname === '/'
   const isActive = !isSubModule && isAtHome
   const showBackMode = isSubModule
   
@@ -319,19 +321,12 @@ function HomeNavButton({
     config: { tension: 300, friction: 30 },
   })
 
-  // Handle click to navigate
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    window.location.href = '/home'
-  }, [])
-
   const linkContent = (
-    <a
-      href="/home"
-      onClick={handleClick}
+    <Link
+      to="/home"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="block relative cursor-pointer"
+      className="block relative"
     >
       <animated.div
         style={hoverSpring}
@@ -340,11 +335,11 @@ function HomeNavButton({
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
         )}
       >
-        {/* Active background pill - same as NavItemLink, pointer-events-none */}
+        {/* Active background pill - same as NavItemLink */}
         {isActive && (
           <motion.div
             layoutId="activeNavBg"
-            className="absolute inset-0 rounded-xl bg-[rgb(var(--interactive-active))] pointer-events-none"
+            className="absolute inset-0 rounded-xl bg-[rgb(var(--interactive-active))]"
             initial={false}
             transition={{
               type: 'spring',
@@ -354,11 +349,11 @@ function HomeNavButton({
           />
         )}
         
-        {/* Active indicator line - same as NavItemLink, pointer-events-none */}
+        {/* Active indicator line - same as NavItemLink */}
         {isActive && (
           <motion.div
             layoutId="activeIndicator"
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500 pointer-events-none"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-teal-500 to-cyan-500"
             initial={false}
             transition={{
               type: 'spring',
@@ -394,7 +389,7 @@ function HomeNavButton({
           )}
         </AnimatePresence>
       </animated.div>
-    </a>
+    </Link>
   )
 
   if (collapsed) {
@@ -618,8 +613,6 @@ export function Sidebar() {
     config: { tension: 280, friction: 32 },
   })
 
-  // Note: Keyboard shortcut (Cmd+B) is handled in AppShell.tsx to avoid duplication
-
   // Calculate cumulative index for stagger animation
   let itemIndex = 0
 
@@ -636,28 +629,37 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2" aria-label="Sidebar navigation">
-        <div key={moduleId} className="space-y-1">
-          {/* Unified Home/Back button - Always visible, adapts to context */}
-          <div className="mb-3 pb-2 border-b border-[rgb(var(--border-secondary))]">
-            <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} />
-          </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={moduleId}
+            initial={{ opacity: 0, x: isSubModule ? 20 : -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isSubModule ? -20 : 20 }}
+            transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 30 }}
+            className="space-y-1"
+          >
+            {/* Unified Home/Back button - Always visible, adapts to context */}
+            <div className="mb-3 pb-2 border-b border-[rgb(var(--border-secondary))]">
+              <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} />
+            </div>
 
-          {/* Module navigation groups */}
-          {filteredGroups.map((group) => {
-            const groupStartIndex = itemIndex
-            itemIndex += group.items.length
-            
-            return (
-              <NavGroup
-                key={group.id}
-                group={group}
-                collapsed={collapsed}
-                activeItemId={activeItemId}
-                startIndex={groupStartIndex}
-              />
-            )
-          })}
-        </div>
+            {/* Module navigation groups */}
+            {filteredGroups.map((group) => {
+              const groupStartIndex = itemIndex
+              itemIndex += group.items.length
+              
+              return (
+                <NavGroup
+                  key={group.id}
+                  group={group}
+                  collapsed={collapsed}
+                  activeItemId={activeItemId}
+                  startIndex={groupStartIndex}
+                />
+              )
+            })}
+          </motion.div>
+        </AnimatePresence>
       </nav>
 
       {/* Edge-based sidebar toggle - appears on hover at the right border */}

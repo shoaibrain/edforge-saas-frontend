@@ -1,12 +1,13 @@
 /**
- * Settings Page - Clean Content-Only Design
+ * Settings Layout
  * 
- * Navigation is now handled by the dynamic sidebar.
- * This page only renders the overview content.
+ * Provides nested routing support for the Settings module.
+ * Renders the overview page at /settings and child routes via Outlet.
  * Features a Google Account-inspired overview.
  */
 
 import { useState } from 'react'
+import { Outlet, useLocation } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useSpring, animated, config } from '@react-spring/web'
 import {
@@ -22,7 +23,28 @@ import { useAuthStore } from '../stores/auth.store'
 import { getUserAvatar } from '../lib/avatar'
 import { QuickActionPill, type QuickActionProps } from '../components/settings/SettingsShared'
 
+// ============================================================================
+// LAYOUT COMPONENT
+// ============================================================================
+
 export default function SettingsPage() {
+  const location = useLocation()
+  // Check if we're at exactly /settings (not a child route like /settings/account)
+  const isExactRoute = location.pathname === '/settings'
+  
+  if (isExactRoute) {
+    return <SettingsOverviewPage />
+  }
+  
+  // Render child routes (account, security, etc.)
+  return <Outlet />
+}
+
+// ============================================================================
+// OVERVIEW PAGE
+// ============================================================================
+
+function SettingsOverviewPage() {
   const user = useAuthStore((s) => s.user)
   const avatarUrl = getUserAvatar(user?.name || 'User')
 
