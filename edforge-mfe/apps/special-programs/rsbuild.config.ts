@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     port: 3005,
     cors: true,
+    historyApiFallback: true,
   },
   dev: {
     hmr: true,
-    historyApiFallback: true,
   },
   resolve: {
     alias: {

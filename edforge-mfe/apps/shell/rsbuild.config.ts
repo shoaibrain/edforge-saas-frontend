@@ -12,10 +12,10 @@ export default defineConfig({
   server: {
     port: 3000,
     cors: true,
+    historyApiFallback: true, // Critical for SPA routing
   },
   dev: {
     hmr: true,
-    historyApiFallback: true, // Critical for SPA routing - must be in dev section
   },
   html: {
     title: 'EdForge EMIS',
@@ -37,10 +37,13 @@ export default defineConfig({
         new ModuleFederationPlugin({
           name: 'shell',
           remotes: {
-            edfi: 'edfi@http://localhost:3001/mf-manifest.json',
-            academics: 'academics@http://localhost:3002/mf-manifest.json',
-            finance: 'finance@http://localhost:3003/mf-manifest.json',
-            'specialPrograms': 'specialPrograms@http://localhost:3005/mf-manifest.json',
+            academics: 'academics@http://localhost:3002/remoteEntry.js',
+            finance: 'finance@http://localhost:3003/remoteEntry.js',
+            edfi: 'edfi@http://localhost:3004/remoteEntry.js',
+            'special-programs': 'special_programs@http://localhost:3005/remoteEntry.js',
+            people: 'people@http://localhost:3006/remoteEntry.js',
+            messages: 'messages@http://localhost:3007/remoteEntry.js',
+            analytics: 'analytics@http://localhost:3008/remoteEntry.js',
           },
           shared: {
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },

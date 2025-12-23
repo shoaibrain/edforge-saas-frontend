@@ -1,3 +1,0 @@
-
-    export type RemoteKeys = 'edfi/ConnectionWizard' | 'edfi/DescriptorMapper' | 'edfi/SyncDashboard' | 'edfi/ErrorAggregator' | 'edfi/EdFiModule';
-    type PackageType<T> = T extends 'edfi/EdFiModule' ? typeof import('edfi/EdFiModule') :T extends 'edfi/ErrorAggregator' ? typeof import('edfi/ErrorAggregator') :T extends 'edfi/SyncDashboard' ? typeof import('edfi/SyncDashboard') :T extends 'edfi/DescriptorMapper' ? typeof import('edfi/DescriptorMapper') :T extends 'edfi/ConnectionWizard' ? typeof import('edfi/ConnectionWizard') :any;

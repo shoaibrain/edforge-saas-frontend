@@ -6,7 +6,7 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Mail, Phone, MapPin, Home, Globe } from 'lucide-react'
+import { Mail, Phone, MapPin, Home } from 'lucide-react'
 import type { WizardStepProps } from '../WizardContext'
 import { cn } from '../../../lib/utils'
 
@@ -120,7 +120,7 @@ export function ContactAddressStep({
         <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] uppercase tracking-wider">
           Email Addresses
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatedInput
             label="Primary Email"
@@ -149,7 +149,7 @@ export function ContactAddressStep({
         <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] uppercase tracking-wider">
           Phone Numbers
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatedInput
             label="Primary Phone"
@@ -176,7 +176,7 @@ export function ContactAddressStep({
         <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] uppercase tracking-wider">
           Address
         </h3>
-        
+
         <AnimatedInput
           label="Street Address"
           placeholder="123 Main Street"
@@ -196,7 +196,7 @@ export function ContactAddressStep({
             onChange={handleAddressChange('city')}
             error={errors['address.city']}
           />
-          
+
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
               State

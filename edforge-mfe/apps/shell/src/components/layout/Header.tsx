@@ -22,7 +22,7 @@ import { useThemeStore, type Theme } from '../../stores/theme.store'
 import { useQuickAddPersonModal, useInviteTeamModal, useAddClassroomModal, useAddGradeLevelModal } from '../../stores/modal.store'
 import { Avatar } from '@edforge/ui'
 import { CommandPalette, useCommandPalette } from '../ui/CommandPalette'
-import { ModuleSwitcher, useModuleSwitcher } from '../ui/ModuleSwitcher'
+
 import { Breadcrumbs } from './Breadcrumbs'
 import {
   ADD_NEW_OPTIONS,
@@ -183,7 +183,7 @@ function AddNewDropdown() {
           search: {
             type: option.actionData?.personType as 'student' | 'teacher' | 'staff' | 'guardian'
           }
-        })
+        } as any)
         break
     }
   }
@@ -478,11 +478,11 @@ function UserMenu() {
 
 export function Header() {
   const commandPalette = useCommandPalette()
-  const moduleSwitcher = useModuleSwitcher()
+
 
   return (
     <>
-      <header 
+      <header
         className="sticky top-0 z-30 h-16 px-6 flex items-center justify-between border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
         aria-label="Global header"
       >
@@ -496,7 +496,7 @@ export function Header() {
           <GlobalSearchButton onClick={commandPalette.toggle} />
 
           {/* Documentation */}
-          <button 
+          <button
             className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
             aria-label="Documentation"
           >
@@ -506,7 +506,7 @@ export function Header() {
           <AddNewDropdown />
 
           {/* Notifications */}
-          <button 
+          <button
             className="relative p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
             aria-label="Notifications"
           >
@@ -521,9 +521,9 @@ export function Header() {
 
       {/* Command Palette Modal (⌘K) */}
       <CommandPalette open={commandPalette.open} onClose={commandPalette.close} />
-      
-      {/* Module Switcher Modal (⌘J) */}
-      <ModuleSwitcher open={moduleSwitcher.open} onClose={moduleSwitcher.close} />
+
+
+
     </>
   )
 }

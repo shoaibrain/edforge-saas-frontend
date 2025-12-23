@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     port: 3003,
     cors: true,
+    historyApiFallback: true, // Critical for SPA routing
   },
   dev: {
     hmr: true,
-    historyApiFallback: true, // Critical for SPA routing
   },
   resolve: {
     alias: {
@@ -38,6 +38,7 @@ export default defineConfig({
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
             '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0', eager: true },
+            '@tanstack/react-router': { singleton: true, requiredVersion: '^1.82.0', eager: true },
             '@tanstack/react-table': { singleton: true, eager: true },
             zustand: { singleton: true, requiredVersion: '^5.0.0', eager: true },
             '@edforge/ui': { singleton: true, requiredVersion: '0.0.1', eager: true },

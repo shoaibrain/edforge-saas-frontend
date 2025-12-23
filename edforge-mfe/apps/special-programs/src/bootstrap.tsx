@@ -1,15 +1,20 @@
 /**
- * Special Programs Module - Bootstrap
+ * Special Programs Module Bootstrap
+ *
+ * Entry point for the Special Programs federated module.
+ * Bootstraps the internal router.
  * 
- * Main entry point for the Special Programs micro-frontend module.
+ * Note: StrictMode is handled by the Shell.
+ * MFE modules should not wrap in StrictMode.
  */
+
+import { RouterProvider } from '@tanstack/react-router'
+import { router } from './router'
 
 export function SpecialProgramsModule() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Special Programs</h1>
-      <p className="text-gray-500 mt-2">Special Programs dashboard coming soon...</p>
-    </div>
+    <RouterProvider router={router} />
   )
 }
 
+export default SpecialProgramsModule

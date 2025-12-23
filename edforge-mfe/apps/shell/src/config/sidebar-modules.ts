@@ -22,7 +22,7 @@ import {
   MessageCircleMore,
   User,
   SlidersHorizontal,
-  ContactRound,
+
   BellDot,
   Component,
   Landmark,

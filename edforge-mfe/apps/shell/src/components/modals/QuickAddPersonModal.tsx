@@ -63,18 +63,18 @@ interface AnimatedInputProps extends React.InputHTMLAttributes<HTMLInputElement>
 const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
   ({ label, error, icon, className, ...props }, ref) => {
     const [focused, setFocused] = React.useState(false)
-    
+
     const springProps = useSpring({
       borderColor: error
         ? 'rgb(185, 62, 3)' // rust-500
         : focused
-        ? 'rgb(10, 147, 150)' // teal-500
-        : 'rgb(var(--border-primary))',
+          ? 'rgb(10, 147, 150)' // teal-500
+          : 'rgb(var(--border-primary))',
       boxShadow: error
         ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
         : focused
-        ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
-        : '0 0 0 0px transparent',
+          ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
+          : '0 0 0 0px transparent',
       scale: focused ? 1.01 : 1,
       config: { tension: 300, friction: 20 },
     })
@@ -276,7 +276,7 @@ export function QuickAddPersonModal() {
           lastName: formData.lastName,
           email: formData.email,
         },
-      })
+      } as any)
 
       close()
     },

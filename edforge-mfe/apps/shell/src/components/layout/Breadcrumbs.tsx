@@ -103,7 +103,7 @@ const ROUTE_LABELS: Record<string, string> = {
   connections: 'Connections',
   general: 'General',
   schools: 'Schools',
-  billing: 'Billing',
+
   data: 'Import/Export',
   danger: 'Danger Zone',
 
@@ -116,7 +116,7 @@ const ROUTE_LABELS: Record<string, string> = {
 
   // Special Programs sub-routes
   ieps: 'IEPs',
-  meetings: 'IEP Meetings',
+
   goals: 'Goals & Objectives',
   accommodations: 'Accommodations',
   accessibility: 'Accessibility Services',
@@ -148,7 +148,7 @@ function getSegmentLabel(segment: string): string {
   // Check if it's a dynamic segment (starts with $)
   if (segment.startsWith('$')) {
     const paramName = segment.slice(1)
-    return PARAM_LABELS[paramName] || 
+    return PARAM_LABELS[paramName] ||
       paramName.charAt(0).toUpperCase() + paramName.slice(1).replace(/Id$/, ' Details')
   }
 
@@ -174,7 +174,7 @@ function isDynamicSegment(segment: string): boolean {
   const shortIdPattern = /^[a-f0-9-]{8,}$/i
   // Pure numeric ID
   const numericPattern = /^\d+$/
-  
+
   return uuidPattern.test(segment) || shortIdPattern.test(segment) || numericPattern.test(segment)
 }
 
@@ -220,7 +220,7 @@ export function Breadcrumbs() {
 
     // Build breadcrumbs from path segments
     const segments = pathname.split('/').filter(Boolean)
-    
+
     // Extract any dynamic params from route matches for display
     const params: Record<string, string> = {}
     matches.forEach(match => {
@@ -233,10 +233,10 @@ export function Breadcrumbs() {
       const path = '/' + segments.slice(0, index + 1).join('/')
       const isCurrentPage = index === segments.length - 1
       const isDynamic = isDynamicSegment(segment)
-      
+
       // Find the corresponding route match for this path level
       const matchingRoute = matches.find(m => m.pathname === path)
-      
+
       // Determine the label
       let label: string
       if (isDynamic) {
@@ -277,8 +277,8 @@ export function Breadcrumbs() {
   }
 
   return (
-    <nav 
-      aria-label="Breadcrumb navigation" 
+    <nav
+      aria-label="Breadcrumb navigation"
       className="flex items-center gap-1.5 text-sm"
     >
       <ol className="flex items-center gap-1.5 list-none m-0 p-0">
@@ -294,8 +294,8 @@ export function Breadcrumbs() {
             >
               {/* Separator (except for first item) */}
               {index > 0 && (
-                <ChevronRight 
-                  className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0" 
+                <ChevronRight
+                  className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0"
                   aria-hidden="true"
                 />
               )}

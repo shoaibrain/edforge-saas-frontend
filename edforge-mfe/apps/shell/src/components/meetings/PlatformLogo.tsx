@@ -4,7 +4,7 @@
  * Renders logos for meeting platforms using simple colored icons.
  */
 
-import React from 'react'
+
 import { Video, Calendar } from 'lucide-react'
 import type { MeetingPlatformId } from '../../lib/meeting-integrations'
 
@@ -25,7 +25,7 @@ export function PlatformLogo({ platformId, size = 24, className = '' }: Platform
   const color = platformColors[platformId]
   const isCalendar = platformId === 'google-calendar'
   const Icon = isCalendar ? Calendar : Video
-  
+
   return (
     <Icon
       style={{ color, width: size, height: size }}

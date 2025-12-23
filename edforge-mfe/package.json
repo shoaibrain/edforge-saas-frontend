@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "turbo dev --concurrency 20",
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "clean": "turbo clean && rm -rf node_modules",
+    "clean": "rm -rf node_modules **/*/node_modules **/*/.turbo **/*/dist **/*/.cache .turbo dist .cache pnpm-lock.yaml",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "dev:shell": "turbo dev --filter=@edforge/shell",
     "dev:edfi": "turbo dev --filter=@edforge/edfi",
@@ -29,4 +29,3 @@
     "pnpm": ">=9.0.0"
   }
 }
-

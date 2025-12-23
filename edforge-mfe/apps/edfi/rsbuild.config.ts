@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     port: 3001,
     cors: true,
+    historyApiFallback: true, // Critical for SPA routing
   },
   dev: {
     hmr: true,
-    historyApiFallback: true, // Critical for SPA routing
   },
   resolve: {
     alias: {

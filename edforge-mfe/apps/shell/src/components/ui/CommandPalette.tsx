@@ -47,8 +47,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
   const modalSpring = useSpring({
     opacity: open ? 1 : 0,
-    transform: open 
-      ? 'scale(1) translateY(0px)' 
+    transform: open
+      ? 'scale(1) translateY(0px)'
       : 'scale(0.95) translateY(-20px)',
     config: config.gentle,
   })
@@ -80,7 +80,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       description: 'Manage students and classes',
       icon: GraduationCap,
       category: 'navigation',
-      action: () => { navigate({ to: '/academics' }); onClose() },
+      action: () => { navigate({ to: '/academics' as any }); onClose() },
       shortcut: 'G A',
     },
     {
@@ -89,7 +89,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       description: 'View financial reports and billing',
       icon: DollarSign,
       category: 'navigation',
-      action: () => { navigate({ to: '/finance' }); onClose() },
+      action: () => { navigate({ to: '/finance' as any }); onClose() },
       shortcut: 'G F',
     },
     {
@@ -98,7 +98,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       description: 'Manage all people in the organization',
       icon: Users,
       category: 'navigation',
-      action: () => { navigate({ to: '/people' }); onClose() },
+      // @ts-ignore
+      action: () => { navigate({ to: '/people' as any }); onClose() },
       shortcut: 'G P',
     },
     {
@@ -173,9 +174,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const filteredCommands = query === ''
     ? commands
     : commands.filter((command) =>
-        command.name.toLowerCase().includes(query.toLowerCase()) ||
-        command.description?.toLowerCase().includes(query.toLowerCase())
-      )
+      command.name.toLowerCase().includes(query.toLowerCase()) ||
+      command.description?.toLowerCase().includes(query.toLowerCase())
+    )
 
   const groupedCommands = filteredCommands.reduce((acc, command) => {
     if (!acc[command.category]) {
@@ -211,7 +212,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       />
 
       {/* Modal Container - click outside the Panel closes the dialog */}
-      <div 
+      <div
         className="fixed inset-0 overflow-y-auto"
         onClick={onClose}
       >
@@ -327,7 +328,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
 function CommandOption({ command }: { command: CommandItem }) {
   const [hovered, setHovered] = useState(false)
-  
+
   const spring = useSpring({
     x: hovered ? 4 : 0,
     scale: hovered ? 1.01 : 1,
@@ -343,21 +344,18 @@ function CommandOption({ command }: { command: CommandItem }) {
           }}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          className={`flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-colors ${
-            active ? 'bg-teal-500/10 dark:bg-cyan-500/15' : ''
-          }`}
+          className={`flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-colors ${active ? 'bg-teal-500/10 dark:bg-cyan-500/15' : ''
+            }`}
         >
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-            active 
-              ? 'bg-gradient-to-br from-teal-500 to-cyan-500 shadow-lg shadow-teal-500/30' 
-              : 'bg-[rgb(var(--surface-tertiary))]'
-          }`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${active
+            ? 'bg-gradient-to-br from-teal-500 to-cyan-500 shadow-lg shadow-teal-500/30'
+            : 'bg-[rgb(var(--surface-tertiary))]'
+            }`}>
             <command.icon className={`w-5 h-5 ${active ? 'text-white' : 'text-[rgb(var(--text-secondary))]'}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-medium truncate ${
-              active ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
-            }`}>
+            <p className={`text-sm font-medium truncate ${active ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
+              }`}>
               {command.name}
             </p>
             {command.description && (
@@ -371,11 +369,10 @@ function CommandOption({ command }: { command: CommandItem }) {
               {command.shortcut.split(' ').map((key, i) => (
                 <kbd
                   key={i}
-                  className={`px-2 py-1 text-[10px] font-bold border rounded-md transition-colors ${
-                    active 
-                      ? 'bg-teal-500/20 border-teal-500/30 text-teal-600 dark:text-cyan-300'
-                      : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))]'
-                  }`}
+                  className={`px-2 py-1 text-[10px] font-bold border rounded-md transition-colors ${active
+                    ? 'bg-teal-500/20 border-teal-500/30 text-teal-600 dark:text-cyan-300'
+                    : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))]'
+                    }`}
                 >
                   {key}
                 </kbd>

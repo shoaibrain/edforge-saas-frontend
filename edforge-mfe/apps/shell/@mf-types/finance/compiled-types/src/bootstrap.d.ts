@@ -2,7 +2,7 @@
  * Finance Module Bootstrap
  *
  * Entry point for the Finance federated module.
- * Contains Billing, Payroll, Tuition, and Expenses.
+ * Bootstraps the internal router.
  */
 export declare function FinanceModule(): import("react/jsx-runtime").JSX.Element;
 export default FinanceModule;
