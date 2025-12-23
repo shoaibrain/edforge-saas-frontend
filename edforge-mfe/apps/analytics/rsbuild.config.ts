@@ -12,6 +12,9 @@ export default defineConfig({
   dev: {
     hmr: true,
   },
+  html: {
+    template: './index.html',
+  },
   resolve: {
     alias: {
       '@': './src',
@@ -30,6 +33,8 @@ export default defineConfig({
           exposes: {
             './AnalyticsModule': './src/bootstrap.tsx',
           },
+          // Disable DTS generation to avoid errors during first build
+          dts: false,
           shared: {
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },

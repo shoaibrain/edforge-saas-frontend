@@ -1,0 +1,9 @@
+/**
+ * Analytics Module Styles
+ * 
+ * Imports the shared EdForge theme.
+ * All styling uses CSS variables defined in @edforge/theme.
+ */
+
+@import '@edforge/theme/base.css';
+
