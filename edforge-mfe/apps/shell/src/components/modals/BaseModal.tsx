@@ -2,7 +2,7 @@
  * BaseModal Component
  * 
  * Enterprise-grade modal foundation with:
- * - Spring-based animations
+ * - Framer Motion animations
  * - Focus trapping
  * - Keyboard navigation (Escape to close)
  * - Backdrop click handling
@@ -12,7 +12,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { useSpring, animated, config } from '@react-spring/web'
+import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
@@ -173,20 +173,6 @@ export function BaseModal({
     }
   }, [open])
 
-  // Backdrop spring animation
-  const backdropSpring = useSpring({
-    opacity: open ? 1 : 0,
-    config: { tension: 300, friction: 26 },
-  })
-
-  // Panel spring animation
-  const panelSpring = useSpring({
-    opacity: open ? 1 : 0,
-    scale: open ? 1 : 0.95,
-    y: open ? 0 : 20,
-    config: config.gentle,
-  })
-
   // Handle backdrop click
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent) => {
@@ -197,76 +183,76 @@ export function BaseModal({
     [closeOnBackdropClick, onClose]
   )
 
-  // Don't render if not open (after animation completes)
-  if (!open && panelSpring.opacity.get() === 0) {
-    return null
-  }
-
   const modalContent = (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <animated.div
-        style={{ opacity: backdropSpring.opacity }}
-        className={cn(
-          'fixed inset-0 bg-ink-900/60 dark:bg-ink-950/80 backdrop-blur-sm',
-          backdropClassName
-        )}
-        onClick={handleBackdropClick}
-        aria-hidden="true"
-      />
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className={cn(
+              'fixed inset-0 bg-ink-900/60 dark:bg-ink-950/80 backdrop-blur-sm',
+              backdropClassName
+            )}
+            onClick={handleBackdropClick}
+            aria-hidden="true"
+          />
 
-      {/* Modal Container */}
-      <div
-        className="fixed inset-0 flex items-center justify-center p-4"
-        onClick={handleBackdropClick}
-      >
-        {/* Modal Panel */}
-        <animated.div
-          ref={containerRef}
-          style={{
-            opacity: panelSpring.opacity,
-            transform: panelSpring.scale.to(
-              (s) => `scale(${s}) translateY(${panelSpring.y.get()}px)`
-            ),
-          }}
-          className={cn(
-            'relative w-full rounded-2xl',
-            'bg-[rgb(var(--surface-primary))]',
-            'border border-[rgb(var(--border-primary))]',
-            'shadow-2xl shadow-ink-900/20 dark:shadow-black/40',
-            sizeClasses[size],
-            className
-          )}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={title ? 'modal-title' : undefined}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Close Button */}
-          {showCloseButton && (
-            <button
-              type="button"
-              onClick={onClose}
+          {/* Modal Container */}
+          <div
+            className="fixed inset-0 flex items-center justify-center p-4"
+            onClick={handleBackdropClick}
+          >
+            {/* Modal Panel */}
+            <motion.div
+              ref={containerRef}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className={cn(
-                'absolute top-4 right-4 z-10',
-                'p-2 rounded-xl',
-                'text-[rgb(var(--text-tertiary))]',
-                'hover:text-[rgb(var(--text-primary))]',
-                'hover:bg-[rgb(var(--interactive-hover))]',
-                'focus:outline-none focus:ring-2 focus:ring-teal-500/50',
-                'transition-all duration-200'
+                'relative w-full rounded-2xl',
+                'bg-[rgb(var(--surface-primary))]',
+                'border border-[rgb(var(--border-primary))]',
+                'shadow-2xl shadow-ink-900/20 dark:shadow-black/40',
+                sizeClasses[size],
+                className
               )}
-              aria-label="Close modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={title ? 'modal-title' : undefined}
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+              {/* Close Button */}
+              {showCloseButton && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className={cn(
+                    'absolute top-4 right-4 z-10',
+                    'p-2 rounded-xl',
+                    'text-[rgb(var(--text-tertiary))]',
+                    'hover:text-[rgb(var(--text-primary))]',
+                    'hover:bg-[rgb(var(--interactive-hover))]',
+                    'focus:outline-none focus:ring-2 focus:ring-teal-500/50',
+                    'transition-all duration-200'
+                  )}
+                  aria-label="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
 
-          {/* Content */}
-          {children}
-        </animated.div>
-      </div>
-    </div>
+              {/* Content */}
+              {children}
+            </motion.div>
+          </div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 
   // Portal to body
@@ -376,4 +362,3 @@ export function ModalDivider({ className }: { className?: string }) {
     <div className={cn('border-t border-[rgb(var(--border-secondary))]', className)} />
   )
 }
-

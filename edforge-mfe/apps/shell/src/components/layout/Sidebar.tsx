@@ -2,12 +2,11 @@
  * Dynamic Sidebar Component
  * 
  * A context-aware sidebar that changes navigation items based on the current route/module.
- * Features ABAC permission filtering and smooth spring-based animations.
+ * Features ABAC permission filtering and smooth animations.
  */
 
 import { useState, useEffect, Fragment, useSyncExternalStore } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
-import { useSpring, animated, config } from '@react-spring/web'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import {
@@ -32,7 +31,7 @@ import { getSchoolAvatar } from '../../lib/avatar'
 import { cn } from '../../lib/utils'
 
 // ============================================================================
-// ANIMATED NAV ICON WITH REACT-SPRING
+// ANIMATED NAV ICON WITH FRAMER MOTION
 // ============================================================================
 
 function AnimatedNavIcon({ 
@@ -46,23 +45,13 @@ function AnimatedNavIcon({
   isHovered: boolean
   isDanger?: boolean
 }) {
-  const spring = useSpring({
-    scale: isHovered && !isActive ? 1.15 : 1,
-    rotate: isHovered && !isActive ? 6 : 0,
-    config: { tension: 400, friction: 17 },
-  })
-
-  const glowSpring = useSpring({
-    opacity: isHovered && !isActive ? 0.8 : 0,
-    scale: isHovered && !isActive ? 1.4 : 0.8,
-    config: config.gentle,
-  })
-
   return (
-    <animated.div
-      style={{
-        transform: spring.scale.to(s => `scale(${s}) rotate(${spring.rotate.get()}deg)`),
+    <motion.div
+      animate={{
+        scale: isHovered && !isActive ? 1.15 : 1,
+        rotate: isHovered && !isActive ? 6 : 0,
       }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className="relative flex items-center justify-center flex-shrink-0"
     >
       <Icon 
@@ -75,17 +64,18 @@ function AnimatedNavIcon({
         )} 
       />
       {/* Glow effect */}
-      <animated.div
-        style={{
-          opacity: glowSpring.opacity,
-          transform: glowSpring.scale.to(s => `scale(${s})`),
+      <motion.div
+        animate={{
+          opacity: isHovered && !isActive ? 0.8 : 0,
+          scale: isHovered && !isActive ? 1.4 : 0.8,
         }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
         className={cn(
           'absolute inset-0 rounded-full blur-md',
           isDanger ? 'bg-rust-500/25' : 'bg-teal-500/25 dark:bg-cyan-500/25'
         )}
       />
-    </animated.div>
+    </motion.div>
   )
 }
 
@@ -107,13 +97,6 @@ function NavItemLink({
   const [isHovered, setIsHovered] = useState(false)
   const isDanger = item.variant === 'danger'
 
-  const hoverSpring = useSpring({
-    backgroundColor: isHovered && !isActive 
-      ? 'rgba(100, 116, 139, 0.06)' 
-      : 'rgba(0, 0, 0, 0)',
-    config: { tension: 300, friction: 30 },
-  })
-
   const linkContent = (
     <Link
       to={item.href || '#'}
@@ -121,8 +104,13 @@ function NavItemLink({
       onMouseLeave={() => setIsHovered(false)}
       className="block relative"
     >
-      <animated.div
-        style={hoverSpring}
+      <motion.div
+        animate={{
+          backgroundColor: isHovered && !isActive 
+            ? 'rgba(100, 116, 139, 0.06)' 
+            : 'rgba(0, 0, 0, 0)',
+        }}
+        transition={{ duration: 0.15 }}
         className={cn(
           'relative flex items-center rounded-xl transition-colors duration-200',
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
@@ -206,7 +194,7 @@ function NavItemLink({
             </motion.span>
           )}
         </AnimatePresence>
-      </animated.div>
+      </motion.div>
     </Link>
   )
 
@@ -312,14 +300,6 @@ function HomeNavButton({
   // Dynamic icon and label
   const CurrentIcon = showBackMode ? ArrowLeft : Home
   const label = showBackMode ? 'Back to Home' : 'Home'
-  
-  // Same hover animation as NavItemLink
-  const hoverSpring = useSpring({
-    backgroundColor: isHovered && !isActive 
-      ? 'rgba(100, 116, 139, 0.06)' 
-      : 'rgba(0, 0, 0, 0)',
-    config: { tension: 300, friction: 30 },
-  })
 
   const linkContent = (
     <Link
@@ -328,8 +308,13 @@ function HomeNavButton({
       onMouseLeave={() => setIsHovered(false)}
       className="block relative"
     >
-      <animated.div
-        style={hoverSpring}
+      <motion.div
+        animate={{
+          backgroundColor: isHovered && !isActive 
+            ? 'rgba(100, 116, 139, 0.06)' 
+            : 'rgba(0, 0, 0, 0)',
+        }}
+        transition={{ duration: 0.15 }}
         className={cn(
           'relative flex items-center rounded-xl transition-colors duration-200',
           collapsed ? 'justify-center px-3 py-2.5' : 'gap-3 px-3 py-2.5'
@@ -388,7 +373,7 @@ function HomeNavButton({
             </motion.span>
           )}
         </AnimatePresence>
-      </animated.div>
+      </motion.div>
     </Link>
   )
 
@@ -607,18 +592,13 @@ export function Sidebar() {
     setModule(moduleId)
   }, [moduleId, setModule])
 
-  // React-spring for sidebar width
-  const sidebarSpring = useSpring({
-    width: collapsed ? 72 : 260,
-    config: { tension: 280, friction: 32 },
-  })
-
   // Calculate cumulative index for stagger animation
   let itemIndex = 0
 
   return (
-    <animated.aside
-      style={{ width: sidebarSpring.width }}
+    <motion.aside
+      animate={{ width: collapsed ? 72 : 260 }}
+      transition={{ type: 'spring', stiffness: 280, damping: 32 }}
       className="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-[rgb(var(--surface-secondary))] border-r border-[rgb(var(--border-primary))]"
       aria-label="Main navigation"
     >
@@ -664,6 +644,6 @@ export function Sidebar() {
 
       {/* Edge-based sidebar toggle - appears on hover at the right border */}
       <SidebarEdgeTrigger collapsed={collapsed} onToggle={toggleSidebar} />
-    </animated.aside>
+    </motion.aside>
   )
 }

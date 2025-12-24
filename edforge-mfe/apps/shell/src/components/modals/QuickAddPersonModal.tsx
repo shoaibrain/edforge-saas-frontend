@@ -5,18 +5,17 @@
  * to the full wizard for complete profile creation.
  * 
  * Features:
- * - Animated form fields with spring physics
+ * - Animated form fields with framer-motion
  * - Real-time validation with debounce
  * - Person type selection with visual cards
  * - Keyboard navigation support
  * - Accessibility compliant
  */
 
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSpring, animated, config } from '@react-spring/web'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   UserPlus,
@@ -62,22 +61,7 @@ interface AnimatedInputProps extends React.InputHTMLAttributes<HTMLInputElement>
 
 const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
   ({ label, error, icon, className, ...props }, ref) => {
-    const [focused, setFocused] = React.useState(false)
-
-    const springProps = useSpring({
-      borderColor: error
-        ? 'rgb(185, 62, 3)' // rust-500
-        : focused
-          ? 'rgb(10, 147, 150)' // teal-500
-          : 'rgb(var(--border-primary))',
-      boxShadow: error
-        ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
-        : focused
-          ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
-          : '0 0 0 0px transparent',
-      scale: focused ? 1.01 : 1,
-      config: { tension: 300, friction: 20 },
-    })
+    const [focused, setFocused] = useState(false)
 
     return (
       <div className="space-y-1.5">
@@ -85,12 +69,21 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
           {label}
           <span className="text-rust-500 ml-0.5">*</span>
         </label>
-        <animated.div
-          style={{
-            borderColor: springProps.borderColor,
-            boxShadow: springProps.boxShadow,
-            transform: springProps.scale.to((s) => `scale(${s})`),
+        <motion.div
+          animate={{
+            borderColor: error
+              ? 'rgb(185, 62, 3)' // rust-500
+              : focused
+                ? 'rgb(10, 147, 150)' // teal-500
+                : 'rgb(var(--border-primary))',
+            boxShadow: error
+              ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
+              : focused
+                ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
+                : '0 0 0 0px transparent',
+            scale: focused ? 1.01 : 1,
           }}
+          transition={{ duration: 0.2 }}
           className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
@@ -118,7 +111,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
               className
             )}
           />
-        </animated.div>
+        </motion.div>
         <AnimatePresence mode="wait">
           {error && (
             <motion.p
@@ -150,26 +143,20 @@ interface PersonTypeCardProps {
 }
 
 function PersonTypeCard({ option, selected, onSelect }: PersonTypeCardProps) {
-  const [hovered, setHovered] = React.useState(false)
+  const [hovered, setHovered] = useState(false)
   const Icon = IconMap[option.icon as keyof typeof IconMap]
 
-  const springProps = useSpring({
-    scale: selected ? 1.02 : hovered ? 1.01 : 1,
-    y: selected ? -2 : hovered ? -1 : 0,
-    config: config.gentle,
-  })
-
   return (
-    <animated.button
+    <motion.button
       type="button"
       onClick={onSelect}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{
-        transform: springProps.scale.to(
-          (s) => `scale(${s}) translateY(${springProps.y.get()}px)`
-        ),
+      animate={{
+        scale: selected ? 1.02 : hovered ? 1.01 : 1,
+        y: selected ? -2 : hovered ? -1 : 0,
       }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
         'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200',
         'focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2 focus:ring-offset-[rgb(var(--surface-primary))]',
@@ -217,7 +204,7 @@ function PersonTypeCard({ option, selected, onSelect }: PersonTypeCardProps) {
       >
         {option.label}
       </span>
-    </animated.button>
+    </motion.button>
   )
 }
 
@@ -402,4 +389,3 @@ export function QuickAddPersonModal() {
     </BaseModal>
   )
 }
-

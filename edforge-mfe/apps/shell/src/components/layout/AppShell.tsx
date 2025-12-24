@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import { useSpring, animated } from '@react-spring/web'
+import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
@@ -23,13 +23,6 @@ export function AppShell({ children }: AppShellProps) {
   // Accessibility: Focus management on route changes
   useRouteFocus()
   useRouteAnnouncement()
-
-  // React-spring for smooth margin animation
-  // Sidebar width: 72px collapsed, 260px expanded
-  const marginSpring = useSpring({
-    marginLeft: collapsed ? 72 : 260,
-    config: { tension: 280, friction: 32 },
-  })
 
   // Auto-select first school if none selected
   useEffect(() => {
@@ -61,9 +54,10 @@ export function AppShell({ children }: AppShellProps) {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Main content area - animated with sidebar using react-spring */}
-      <animated.div
-        style={{ marginLeft: marginSpring.marginLeft }}
+      {/* Main content area - animated with sidebar using framer-motion */}
+      <motion.div
+        animate={{ marginLeft: collapsed ? 72 : 260 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 32 }}
         className="flex flex-col min-h-screen"
       >
         {/* Global Header - includes SidebarTrigger + Breadcrumbs */}
@@ -78,7 +72,7 @@ export function AppShell({ children }: AppShellProps) {
         >
           {children}
         </main>
-      </animated.div>
+      </motion.div>
 
       {/* Global Modals */}
       <QuickAddPersonModal />

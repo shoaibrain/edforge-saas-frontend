@@ -55,6 +55,11 @@ export default defineConfig({
             '@edforge/abac': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/types': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            'react-hook-form': { singleton: true, eager: true },
+            zod: { singleton: true, eager: true },
+            '@hookform/resolvers': { singleton: true, eager: true },
+            'framer-motion': { singleton: true, eager: true },
+            '@react-spring/web': { singleton: true, eager: true },
           },
         }),
       ])

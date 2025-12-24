@@ -1,0 +1,40 @@
+{
+  "name": "@edforge/wizard",
+  "version": "0.0.1",
+  "description": "Multi-step wizard components for EdForge EMIS platform",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./hooks": {
+      "import": "./src/hooks/index.ts",
+      "types": "./src/hooks/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.15.0",
+    "lucide-react": "^0.511.0",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@edforge/ui": "workspace:*",
+    "@types/react": "^19.1.4",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

@@ -1,7 +1,7 @@
 import { useState, Fragment, useMemo, useCallback } from 'react'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
-import { useSpring, animated } from '@react-spring/web'
+import { motion } from 'framer-motion'
 import {
   Search,
   Bell,
@@ -67,21 +67,17 @@ function AddNewOptionItem({
 }) {
   const [hovered, setHovered] = useState(false)
 
-  const springProps = useSpring({
-    x: hovered ? 4 : 0,
-    scale: hovered ? 1.02 : 1,
-    config: { tension: 400, friction: 25 },
-  })
-
   const Icon = option.icon
 
   return (
     <MenuItem>
       {({ active }) => (
-        <animated.button
-          style={{
-            transform: springProps.x.to(x => `translateX(${x}px) scale(${springProps.scale.get()})`),
+        <motion.button
+          animate={{
+            x: hovered ? 4 : 0,
+            scale: hovered ? 1.02 : 1,
           }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           onClick={() => onSelect(option)}
@@ -108,7 +104,7 @@ function AddNewOptionItem({
               {option.shortcut}
             </kbd>
           )}
-        </animated.button>
+        </motion.button>
       )}
     </MenuItem>
   )

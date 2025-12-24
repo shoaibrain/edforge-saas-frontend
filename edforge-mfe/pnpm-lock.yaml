@@ -370,6 +370,9 @@ importers:
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
+      '@edforge/forms':
+        specifier: workspace:*
+        version: link:../../packages/forms
       '@edforge/theme':
         specifier: workspace:*
         version: link:../../packages/theme
@@ -379,6 +382,9 @@ importers:
       '@edforge/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@edforge/wizard':
+        specifier: workspace:*
+        version: link:../../packages/wizard
       '@tanstack/react-query':
         specifier: ^5.60.0
         version: 5.90.12(react@19.2.3)
@@ -443,6 +449,9 @@ importers:
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
+      '@edforge/forms':
+        specifier: workspace:*
+        version: link:../../packages/forms
       '@edforge/theme':
         specifier: workspace:*
         version: link:../../packages/theme
@@ -452,6 +461,9 @@ importers:
       '@edforge/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@edforge/wizard':
+        specifier: workspace:*
+        version: link:../../packages/wizard
       '@headlessui/react':
         specifier: ^2.2.9
         version: 2.2.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -594,6 +606,46 @@ importers:
         specifier: ^8.15.0
         version: 8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
 
+  packages/forms:
+    dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.9.0
+        version: 3.10.0(react-hook-form@7.69.0(react@19.2.3))
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      framer-motion:
+        specifier: ^11.15.0
+        version: 11.18.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      lucide-react:
+        specifier: ^0.511.0
+        version: 0.511.0(react@19.2.3)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.3(react@19.2.3)
+      react-hook-form:
+        specifier: ^7.54.2
+        version: 7.69.0(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+      zod:
+        specifier: ^3.24.4
+        version: 3.25.76
+    devDependencies:
+      '@edforge/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@types/react':
+        specifier: ^19.1.4
+        version: 19.2.7
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/shell-components:
     dependencies:
       '@edforge/ui':
@@ -678,6 +730,40 @@ importers:
         version: 19.2.3(react@19.2.3)
       typescript:
         specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/wizard:
+    dependencies:
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      framer-motion:
+        specifier: ^11.15.0
+        version: 11.18.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      lucide-react:
+        specifier: ^0.511.0
+        version: 0.511.0(react@19.2.3)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+      zod:
+        specifier: ^3.24.4
+        version: 3.25.76
+    devDependencies:
+      '@edforge/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@types/react':
+        specifier: ^19.1.4
+        version: 19.2.7
+      typescript:
+        specifier: ^5.9.3
         version: 5.9.3
 
 packages:
@@ -1812,6 +1898,11 @@ packages:
   long-timeout@0.1.1:
     resolution: {integrity: sha512-BFRuQUqc7x2NWxfJBCyUrN8iYUYznzL9JROmRz1gZ6KlOIgmoD+njPVbb+VNn2nGMKggMsK79iUNErillsrx7w==}
 
+  lucide-react@0.511.0:
+    resolution: {integrity: sha512-VK5a2ydJ7xm8GvBeKLS9mu1pVK6ucef9780JVUjw6bAjJL/QXnd4Y0p7SPeOUMC27YhzNCZvm5d/QX0Tp3rc0w==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   lucide-react@0.561.0:
     resolution: {integrity: sha512-Y59gMY38tl4/i0qewcqohPdEbieBy7SovpBL9IFebhc2mDd8x4PZSOsiFRkpPcOq6bj1r/mjH/Rk73gSlIJP2A==}
     peerDependencies:
@@ -2054,6 +2145,9 @@ packages:
 
   tabbable@6.3.0:
     resolution: {integrity: sha512-EIHvdY5bPLuWForiR/AN2Bxngzpuwn1is4asboytXtpTgsArc+WmSJKVLlhdh71u7jFcryDqB2A8lQvj78MkyQ==}
+
+  tailwind-merge@2.6.0:
+    resolution: {integrity: sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==}
 
   tailwind-merge@3.4.0:
     resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
@@ -3567,6 +3661,10 @@ snapshots:
 
   long-timeout@0.1.1: {}
 
+  lucide-react@0.511.0(react@19.2.3):
+    dependencies:
+      react: 19.2.3
+
   lucide-react@0.561.0(react@19.2.3):
     dependencies:
       react: 19.2.3
@@ -3753,6 +3851,8 @@ snapshots:
   supports-preserve-symlinks-flag@1.0.0: {}
 
   tabbable@6.3.0: {}
+
+  tailwind-merge@2.6.0: {}
 
   tailwind-merge@3.4.0: {}
 

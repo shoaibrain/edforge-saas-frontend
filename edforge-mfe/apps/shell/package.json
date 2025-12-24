@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@edforge/abac": "workspace:*",
+    "@edforge/forms": "workspace:*",
     "@edforge/theme": "workspace:*",
     "@edforge/types": "workspace:*",
     "@edforge/ui": "workspace:*",
+    "@edforge/wizard": "workspace:*",
     "@headlessui/react": "^2.2.9",
     "@react-spring/web": "^10.0.3",
     "@tanstack/react-query": "^5.60.0",
