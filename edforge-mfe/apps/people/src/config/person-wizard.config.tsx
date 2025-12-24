@@ -33,7 +33,7 @@ import {
 // GuardianLinkingStep is now imported from @/components/steps
 
 // Academic Info Step - For student academic placement
-function AcademicInfoStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function AcademicInfoStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
@@ -49,7 +49,7 @@ function AcademicInfoStep({ data, updateData }: { data: Record<string, unknown>;
 }
 
 // Employment Info Step - For staff employment details
-function EmploymentInfoStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function EmploymentInfoStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
@@ -65,7 +65,7 @@ function EmploymentInfoStep({ data, updateData }: { data: Record<string, unknown
 }
 
 // Credentials Step - For teacher qualifications
-function CredentialsStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function CredentialsStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
@@ -81,7 +81,7 @@ function CredentialsStep({ data, updateData }: { data: Record<string, unknown>; 
 }
 
 // Class Assignment Step - For assigning teachers to classes
-function ClassAssignmentStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function ClassAssignmentStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
@@ -97,7 +97,7 @@ function ClassAssignmentStep({ data, updateData }: { data: Record<string, unknow
 }
 
 // Department Assignment Step - For organizational structure
-function DepartmentAssignmentStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function DepartmentAssignmentStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
@@ -113,7 +113,7 @@ function DepartmentAssignmentStep({ data, updateData }: { data: Record<string, u
 }
 
 // Role Permissions Step - For ABAC role assignment
-function RolePermissionsStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function RolePermissionsStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
@@ -129,7 +129,7 @@ function RolePermissionsStep({ data, updateData }: { data: Record<string, unknow
 }
 
 // Student Linking Step - For guardians to link to students
-function StudentLinkingStep({ data, updateData }: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
+function StudentLinkingStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
