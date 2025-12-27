@@ -13,6 +13,11 @@ import {
 // We will create this layout component
 import { AcademicsLayout } from './layouts/AcademicsLayout'
 import { Overview } from './routes/overview'
+import { AttendanceModule } from './routes/attendance'
+import { StudentsModule } from './routes/students'
+import { TeachersModule } from './routes/teachers'
+import { GradebookModule } from './routes/gradebook'
+import { EnrollmentModule } from './routes/enrollment'
 
 // ============================================================================
 // ROOT ROUTE
@@ -41,35 +46,96 @@ const indexRoute = createRoute({
 const studentsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students',
-    component: () => <div className="p-8 text-center text-text-secondary">Students Module</div>,
+    component: StudentsModule,
+})
+
+const studentEnrollmentRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/students/enrollment',
+    component: EnrollmentModule,
+})
+
+const studentProfilesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/students/profiles',
+    component: () => <div className="p-8 text-center text-text-secondary">Student Profiles Module</div>,
 })
 
 // Teachers
 const teachersRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/teachers',
-    component: () => <div className="p-8 text-center text-text-secondary">Teachers Module</div>,
+    component: TeachersModule,
 })
 
-// Attendance
+// Classes & Scheduling
+const classroomsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/classrooms',
+    component: () => <div className="p-8 text-center text-text-secondary">Classrooms Module</div>,
+})
+
+const schedulesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/schedules',
+    component: () => <div className="p-8 text-center text-text-secondary">Class Schedules Module</div>,
+})
+
+const timetablesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/timetables',
+    component: () => <div className="p-8 text-center text-text-secondary">Timetables Module</div>,
+})
+
+// Curriculum
+const gradeLevelsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/grade-levels',
+    component: () => <div className="p-8 text-center text-text-secondary">Grade Levels Module</div>,
+})
+
+const coursesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/courses',
+    component: () => <div className="p-8 text-center text-text-secondary">Courses Module</div>,
+})
+
+const standardsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/standards',
+    component: () => <div className="p-8 text-center text-text-secondary">Standards Module</div>,
+})
+
+// Assessment
+const gradebooksRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/gradebooks',
+    component: GradebookModule,
+})
+
+const assessmentsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/assessments',
+    component: () => <div className="p-8 text-center text-text-secondary">Assessments Module</div>,
+})
+
+const examsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/exams',
+    component: () => <div className="p-8 text-center text-text-secondary">Exams Module</div>,
+})
+
+// Tracking
 const attendanceRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/attendance',
-    component: () => <div className="p-8 text-center text-text-secondary">Attendance Module</div>,
+    component: AttendanceModule,
 })
 
-// Gradebook
-const gradebookRoute = createRoute({
+const calendarRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/gradebook',
-    component: () => <div className="p-8 text-center text-text-secondary">Gradebook Module</div>,
-})
-
-// Enrollment
-const enrollmentRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/enrollment',
-    component: () => <div className="p-8 text-center text-text-secondary">Enrollment Module</div>,
+    path: '/calendar',
+    component: () => <div className="p-8 text-center text-text-secondary">Academic Calendar Module</div>,
 })
 
 // ============================================================================
@@ -79,10 +145,20 @@ const enrollmentRoute = createRoute({
 const routeTree = rootRoute.addChildren([
     indexRoute,
     studentsRoute,
+    studentEnrollmentRoute,
+    studentProfilesRoute,
     teachersRoute,
+    classroomsRoute,
+    schedulesRoute,
+    timetablesRoute,
+    gradeLevelsRoute,
+    coursesRoute,
+    standardsRoute,
+    gradebooksRoute,
+    assessmentsRoute,
+    examsRoute,
     attendanceRoute,
-    gradebookRoute,
-    enrollmentRoute,
+    calendarRoute,
 ])
 
 /**
