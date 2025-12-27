@@ -1,6 +1,4 @@
-export { Avatar, AvatarGroup, type AvatarProps } from './Avatar'
-export { Button, type ButtonProps } from './Button'
-export { Card, CardHeader, CardContent, CardFooter, type CardProps } from './Card'
+// Shared components imported from @edforge/ui
 
 export { Dropdown, type DropdownOption } from './Dropdown'
 export {

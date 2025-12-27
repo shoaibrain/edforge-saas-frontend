@@ -1,8 +1,8 @@
-export { Avatar, AvatarGroup, type AvatarProps } from './Avatar'
-export { Button, type ButtonProps } from './Button'
-export { Card, CardHeader, CardContent, CardFooter, type CardProps } from './Card'
+export { Avatar, AvatarGroup, type AvatarProps } from '@edforge/ui'
+export { Button, type ButtonProps } from '@edforge/ui'
+export { Card, CardHeader, CardContent, CardFooter, type CardProps } from '@edforge/ui'
 
-export { Dropdown, type DropdownOption } from './Dropdown'
+export { Dropdown, type DropdownOption } from '@edforge/ui'
 export {
   Skeleton,
   SkeletonText,
@@ -14,8 +14,8 @@ export {
   SkeletonStatsCard,
   SkeletonPageHeader,
   SkeletonModuleOverview,
-} from './Skeleton'
-export { Tooltip } from './Tooltip'
+} from '@edforge/ui'
+export { Tooltip } from '@edforge/ui'
 export {
   Table,
   TableHeader,
@@ -24,5 +24,5 @@ export {
   TableRow,
   TableHead,
   TableCell,
-} from './Table'
+} from '@edforge/ui'
 

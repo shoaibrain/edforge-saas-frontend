@@ -15,8 +15,8 @@ import {
   Sparkles,
 } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
-import { Avatar } from '@/components/ui/Avatar'
-import { cn } from '@/lib/utils'
+import { Avatar } from '@edforge/ui'
+import { cn } from '@edforge/ui'
 
 // ============================================================================
 // ANIMATED INPUT COMPONENT (Domain-specific styling)
@@ -45,13 +45,13 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
             borderColor: error
               ? 'rgb(185, 62, 3)'
               : focused
-              ? 'rgb(10, 147, 150)'
-              : 'rgb(var(--border-primary))',
+                ? 'rgb(10, 147, 150)'
+                : 'rgb(var(--border-primary))',
             boxShadow: error
               ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
               : focused
-              ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
-              : '0 0 0 0px transparent',
+                ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
+                : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
           className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
@@ -122,13 +122,13 @@ const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
             borderColor: error
               ? 'rgb(185, 62, 3)'
               : focused
-              ? 'rgb(10, 147, 150)'
-              : 'rgb(var(--border-primary))',
+                ? 'rgb(10, 147, 150)'
+                : 'rgb(var(--border-primary))',
             boxShadow: error
               ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
               : focused
-              ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
-              : '0 0 0 0px transparent',
+                ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
+                : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
           className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
@@ -224,7 +224,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
         Profile Photo
         <span className="ml-1 text-xs text-[rgb(var(--text-tertiary))]">(optional)</span>
       </label>
-      
+
       <motion.div
         animate={{
           scale: hovered ? 1.02 : 1,
@@ -255,7 +255,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
           onChange={handleInputChange}
           className="hidden"
         />
-        
+
         {value ? (
           <>
             <img
@@ -342,7 +342,7 @@ export function PersonalInfoStep({
           name="avatar"
           error={errors.avatar}
         />
-        
+
         <div className="flex-1 pt-2">
           <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-1">
             Add a profile photo
@@ -422,7 +422,7 @@ export function PersonalInfoStep({
             </motion.p>
           )}
         </div>
-        
+
         <AnimatedSelect
           label="Gender"
           icon={<User className="w-4 h-4" />}

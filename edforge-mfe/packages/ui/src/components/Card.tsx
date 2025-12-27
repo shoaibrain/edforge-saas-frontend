@@ -14,8 +14,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         className={cn(
           'rounded-2xl border transition-all duration-200',
           glass
-            ? 'backdrop-blur-xl shadow-lg bg-white/90 dark:bg-slate-900/90 border-white/50 dark:border-slate-700/50'
-            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md',
+            ? 'glass'
+            : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] shadow-sm hover:shadow-md',
           className
         )}
         {...props}
@@ -28,14 +28,14 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card'
 
-export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> { }
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'px-6 py-4 border-b border-slate-100 dark:border-slate-800',
+        'px-6 py-4 border-b border-[rgb(var(--border-secondary))]',
         className
       )}
       {...props}
@@ -45,7 +45,7 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
 
 CardHeader.displayName = 'CardHeader'
 
-export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardContentProps extends HTMLAttributes<HTMLDivElement> { }
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, ...props }, ref) => (
@@ -55,14 +55,14 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
 
 CardContent.displayName = 'CardContent'
 
-export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> { }
 
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'px-6 py-4 border-t border-slate-100 dark:border-slate-800',
+        'px-6 py-4 border-t border-[rgb(var(--border-secondary))]',
         className
       )}
       {...props}

@@ -27,8 +27,8 @@ import {
 import { can } from '@edforge/abac'
 import { useAppStore } from '@/stores/app.store'
 import { useAuthStore } from '@/stores/auth.store'
-import { Card } from '@/components/ui/Card'
-import { Avatar } from '@/components/ui/Avatar'
+import { Card } from '@edforge/ui'
+import { Avatar } from '@edforge/ui'
 
 
 

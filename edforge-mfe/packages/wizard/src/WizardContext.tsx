@@ -7,10 +7,15 @@
 
 import { createContext, useContext, useCallback, useMemo, useState } from 'react'
 import { ZodError } from 'zod'
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
 import type {
+  WizardStepStatus,
   WizardContextValue,
   WizardProviderProps,
-  WizardStepStatus,
 } from './types'
 
 // ============================================================================
@@ -19,21 +24,21 @@ import type {
 
 const WizardContext = createContext<WizardContextValue | null>(null)
 
-/**
- * Hook to access wizard context
- * @throws Error if used outside WizardProvider
- */
-export function useWizardContext(): WizardContextValue {
+export function useWizard(): WizardContextValue {
   const context = useContext(WizardContext)
   if (!context) {
-    throw new Error('useWizardContext must be used within a WizardProvider')
+    throw new Error('useWizard must be used within a WizardProvider')
   }
   return context
 }
 
+export const useWizardContext = useWizard
+
 // ============================================================================
 // PROVIDER
 // ============================================================================
+
+// WizardProviderProps imported from ./types
 
 export function WizardProvider({
   steps,
@@ -47,20 +52,12 @@ export function WizardProvider({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
 
-  // Calculate visible steps based on conditions
-  const visibleSteps = useMemo(() => {
-    return steps.filter((step) => {
-      if (!step.condition) return true
-      return step.condition(formData)
-    })
-  }, [steps, formData])
-
-  const currentStepData = visibleSteps[currentStep]
+  const currentStepData = steps[currentStep]
 
   // Validate current step data
   const validateStep = useCallback(async (stepIndex: number): Promise<boolean> => {
-    const step = visibleSteps[stepIndex]
-    if (!step?.schema) return true
+    const step = steps[stepIndex]
+    if (!step.schema) return true
 
     try {
       await step.schema.parseAsync(formData)
@@ -68,8 +65,9 @@ export function WizardProvider({
       return true
     } catch (error) {
       if (error instanceof ZodError) {
+        const zodError = error
         const newErrors: Record<string, string> = {}
-        error.issues.forEach((issue) => {
+        zodError.issues.forEach((issue) => {
           const path = issue.path.join('.')
           newErrors[path] = issue.message
         })
@@ -77,7 +75,7 @@ export function WizardProvider({
       }
       return false
     }
-  }, [visibleSteps, formData])
+  }, [steps, formData])
 
   // Go to next step
   const goToNext = useCallback(async (): Promise<boolean> => {
@@ -86,13 +84,13 @@ export function WizardProvider({
 
     setCompletedSteps((prev) => new Set([...prev, currentStep]))
 
-    if (currentStep < visibleSteps.length - 1) {
+    if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1)
       setErrors({})
     }
 
     return true
-  }, [currentStep, visibleSteps.length, validateStep])
+  }, [currentStep, steps.length, validateStep])
 
   // Go to previous step
   const goToBack = useCallback(() => {
@@ -104,11 +102,11 @@ export function WizardProvider({
 
   // Go to specific step
   const goToStep = useCallback((index: number) => {
-    if (index >= 0 && index < visibleSteps.length) {
+    if (index >= 0 && index < steps.length) {
       setCurrentStep(index)
       setErrors({})
     }
-  }, [visibleSteps.length])
+  }, [steps.length])
 
   // Update form data
   const updateData = useCallback((data: Record<string, unknown>) => {
@@ -118,7 +116,7 @@ export function WizardProvider({
   // Submit wizard
   const submit = useCallback(async () => {
     // Validate all steps
-    for (let i = 0; i < visibleSteps.length; i++) {
+    for (let i = 0; i < steps.length; i++) {
       const isValid = await validateStep(i)
       if (!isValid) {
         setCurrentStep(i)
@@ -132,7 +130,7 @@ export function WizardProvider({
     } finally {
       setIsSubmitting(false)
     }
-  }, [visibleSteps.length, validateStep, onSubmit, formData])
+  }, [steps.length, validateStep, onSubmit, formData])
 
   // Clear specific error
   const clearError = useCallback((field: string) => {
@@ -173,7 +171,7 @@ export function WizardProvider({
   const value = useMemo<WizardContextValue>(
     () => ({
       steps,
-      visibleSteps,
+      visibleSteps: steps,
       currentStep,
       currentStepData,
       formData,
@@ -193,7 +191,6 @@ export function WizardProvider({
     }),
     [
       steps,
-      visibleSteps,
       currentStep,
       currentStepData,
       formData,

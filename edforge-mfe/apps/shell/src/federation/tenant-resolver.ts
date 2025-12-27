@@ -19,11 +19,35 @@ interface TenantConfig {
   }
 }
 
+declare global {
+  interface Window {
+    __EDFORGE_CONFIG__?: {
+      tenantId?: string
+      remotes?: {
+        edfi?: string
+        academics?: string
+        finance?: string
+        people?: string
+        portal?: string
+        integrations?: string
+      }
+    }
+  }
+}
+
 /**
  * Get tenant configuration from environment or session
  */
 function getTenantConfig(): TenantConfig {
-  // In development, use local dev server URLs
+  // 1. Runtime Injection (Preferred for Production/Docker)
+  if (typeof window !== 'undefined' && window.__EDFORGE_CONFIG__?.remotes) {
+    return {
+      id: window.__EDFORGE_CONFIG__.tenantId || 'default',
+      remoteUrls: window.__EDFORGE_CONFIG__.remotes,
+    }
+  }
+
+  // 2. Local Development (Static Ports)
   if (import.meta.env.DEV) {
     return {
       id: 'dev',
@@ -38,10 +62,9 @@ function getTenantConfig(): TenantConfig {
     }
   }
 
-  // In production, resolve from tenant subdomain or session
+  // 3. Build-time Environment Variables (Legacy/CI)
   const tenantId = resolveTenantFromHostname()
 
-  // This would typically come from a tenant config API
   return {
     id: tenantId || 'default',
     remoteUrls: {

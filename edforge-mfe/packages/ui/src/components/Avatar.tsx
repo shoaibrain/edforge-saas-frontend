@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn, getUserAvatar } from '../utils'
 
 const avatarVariants = cva(
-  'inline-flex items-center justify-center overflow-hidden select-none ring-1 ring-slate-200 dark:ring-slate-700 transition-all duration-200',
+  'inline-flex items-center justify-center overflow-hidden select-none ring-1 ring-[rgb(var(--border-primary))] transition-all duration-200',
   {
     variants: {
       size: {
@@ -30,7 +30,7 @@ const avatarVariants = cva(
 
 export interface AvatarProps
   extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'>,
-    VariantProps<typeof avatarVariants> {
+  VariantProps<typeof avatarVariants> {
   /** Name used to generate fallback initials and DiceBear avatar */
   name?: string
   /** Custom image source (overrides DiceBear generation) */
@@ -63,7 +63,7 @@ export function Avatar({
     <div
       className={cn(
         avatarVariants({ size, shape }),
-        'bg-slate-100 dark:bg-slate-800',
+        'bg-[rgb(var(--surface-tertiary))]',
         className
       )}
     >
@@ -106,7 +106,7 @@ export function AvatarGroup({
         <div
           className={cn(
             avatarVariants({ size, shape: 'circle' }),
-            'bg-teal-100 dark:bg-cyan-900 text-teal-700 dark:text-cyan-400 font-semibold'
+            'bg-teal-500/15 dark:bg-cyan-500/20 text-teal-700 dark:text-cyan-400 font-semibold'
           )}
         >
           +{remainingCount}

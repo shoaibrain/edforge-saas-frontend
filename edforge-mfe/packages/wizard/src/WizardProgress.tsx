@@ -1,203 +1,210 @@
 /**
- * Wizard Progress Components
+ * Wizard Progress Indicator
  * 
- * Step indicators for desktop and mobile views.
+ * Horizontal stepper showing wizard progress.
  */
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Check } from 'lucide-react'
-import { useWizardContext } from './WizardContext'
-import { cn } from './utils'
+import { useSpring, animated, config } from '@react-spring/web'
+import { Check, AlertCircle } from 'lucide-react'
+import { useWizard } from './WizardContext'
 import type { WizardStepStatus } from './types'
+import { cn } from './utils'
 
-// ============================================================================
-// DESKTOP PROGRESS
-// ============================================================================
-
-export interface WizardProgressProps {
-  /** Additional class name */
-  className?: string
-  /** Variant style */
-  variant?: 'default' | 'compact' | 'numbered'
+interface StepIndicatorProps {
+  index: number
+  title: string
+  icon: React.ComponentType<{ className?: string }>
+  status: WizardStepStatus
+  isLast: boolean
+  onClick?: () => void
+  isClickable: boolean
 }
 
-export function WizardProgress({
-  className,
-  variant = 'default',
-}: WizardProgressProps) {
-  const { visibleSteps, getStepStatus, canGoToStep, goToStep, currentStep: _currentStep } = useWizardContext()
-  void _currentStep // Suppress unused var
+function StepIndicator({
+  index,
+  title,
+  icon: Icon,
+  status,
+  isLast,
+  onClick,
+  isClickable,
+}: StepIndicatorProps) {
+  const [hovered, setHovered] = React.useState(false)
+
+  const springProps = useSpring({
+    scale: hovered && isClickable ? 1.1 : 1,
+    y: hovered && isClickable ? -2 : 0,
+    config: config.wobbly,
+  })
+
+  const getStatusColors = () => {
+    switch (status) {
+      case 'completed':
+        return {
+          bg: 'bg-teal-500 dark:bg-cyan-500',
+          border: 'border-teal-500 dark:border-cyan-500',
+          text: 'text-white',
+          title: 'text-[rgb(var(--text-primary))]',
+        }
+      case 'current':
+        return {
+          bg: 'bg-gradient-to-br from-golden-500 to-caramel-500',
+          border: 'border-golden-500',
+          text: 'text-white',
+          title: 'text-[rgb(var(--text-primary))]',
+        }
+      case 'error':
+        return {
+          bg: 'bg-rust-500',
+          border: 'border-rust-500',
+          text: 'text-white',
+          title: 'text-rust-500',
+        }
+      default:
+        return {
+          bg: 'bg-[rgb(var(--surface-tertiary))]',
+          border: 'border-[rgb(var(--border-primary))]',
+          text: 'text-[rgb(var(--text-tertiary))]',
+          title: 'text-[rgb(var(--text-tertiary))]',
+        }
+    }
+  }
+
+  const colors = getStatusColors()
 
   return (
-    <nav
-      aria-label="Progress"
-      className={cn('max-w-4xl mx-auto px-6', className)}
-    >
-      <ol className="flex items-center justify-between" role="list">
-        {visibleSteps.map((step, index) => {
-          const status = getStepStatus(index)
-          const isClickable = canGoToStep(index)
+    <div className="flex items-center">
+      <animated.button
+        type="button"
+        onClick={isClickable ? onClick : undefined}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          transform: springProps.scale.to(
+            (s) => `scale(${s}) translateY(${springProps.y.get()}px)`
+          ),
+        }}
+        disabled={!isClickable}
+        className={cn(
+          'relative flex flex-col items-center group',
+          isClickable && 'cursor-pointer',
+          !isClickable && 'cursor-default'
+        )}
+        aria-current={status === 'current' ? 'step' : undefined}
+      >
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: index * 0.1 }}
+          className={cn(
+            'w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300',
+            colors.bg,
+            colors.border,
+            colors.text,
+            'shadow-md',
+            status === 'current' && 'ring-4 ring-golden-500/20 shadow-lg shadow-golden-500/30'
+          )}
+        >
+          {status === 'completed' ? (
+            <Check className="w-5 h-5" />
+          ) : status === 'error' ? (
+            <AlertCircle className="w-5 h-5" />
+          ) : status === 'current' ? (
+            <Icon className="w-5 h-5" />
+          ) : (
+            <span className="text-sm font-semibold">{index + 1}</span>
+          )}
+        </motion.div>
 
-          return (
-            <li
-              key={step.id}
-              className={cn(
-                'relative flex-1',
-                index !== visibleSteps.length - 1 && 'pr-8 sm:pr-20'
-              )}
-            >
-              {/* Connector Line */}
-              {index !== visibleSteps.length - 1 && (
-                <div
-                  className="absolute top-5 left-1/2 -right-1/2 h-0.5 bg-[rgb(var(--border-secondary))]"
-                  aria-hidden="true"
-                >
-                  {status === 'completed' && (
-                    <motion.div
-                      className="h-full bg-teal-500"
-                      initial={{ width: 0 }}
-                      animate={{ width: '100%' }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                    />
-                  )}
-                </div>
-              )}
+        <motion.span
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 + 0.1 }}
+          className={cn(
+            'mt-2 text-xs font-medium text-center max-w-[80px] truncate hidden sm:block',
+            colors.title
+          )}
+        >
+          {title}
+        </motion.span>
+      </animated.button>
 
-              {/* Step */}
-              <button
-                type="button"
-                onClick={() => isClickable && goToStep(index)}
-                disabled={!isClickable}
-                className={cn(
-                  'group relative flex flex-col items-center',
-                  isClickable && 'cursor-pointer',
-                  !isClickable && 'cursor-default'
-                )}
-                aria-current={status === 'current' ? 'step' : undefined}
-              >
-                {/* Step Icon */}
-                <StepIcon
-                  step={step}
-                  status={status}
-                  index={index}
-                  variant={variant}
-                />
+      {!isLast && (
+        <div className="flex-1 mx-2 sm:mx-4">
+          <div className="relative h-0.5 bg-[rgb(var(--border-primary))] rounded-full overflow-hidden">
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: status === 'completed' ? 1 : 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              style={{ originX: 0 }}
+              className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
-                {/* Step Label */}
-                <span
-                  className={cn(
-                    'mt-2 text-xs font-medium truncate max-w-[80px] sm:max-w-none text-center',
-                    status === 'current' && 'text-teal-600 dark:text-cyan-400',
-                    status === 'completed' && 'text-[rgb(var(--text-primary))]',
-                    status === 'pending' && 'text-[rgb(var(--text-tertiary))]',
-                    status === 'error' && 'text-rust-500'
-                  )}
-                >
-                  {step.title}
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ol>
+export interface WizardProgressProps {
+  className?: string
+}
+
+export function WizardProgress({ className }: WizardProgressProps) {
+  const { steps, getStepStatus, goToStep, canGoToStep } = useWizard()
+
+  return (
+    <nav aria-label="Wizard progress" className={cn("w-full max-w-3xl mx-auto px-4", className)}>
+      <div className="flex items-start justify-between">
+        {steps.map((step, index) => (
+          <StepIndicator
+            key={step.id}
+            index={index}
+            title={step.title}
+            icon={step.icon}
+            status={getStepStatus(index)}
+            isLast={index === steps.length - 1}
+            onClick={() => goToStep(index)}
+            isClickable={canGoToStep(index)}
+          />
+        ))}
+      </div>
     </nav>
   )
 }
 
-// ============================================================================
-// STEP ICON
-// ============================================================================
-
-interface StepIconProps {
-  step: { icon: React.ComponentType<{ className?: string }> }
-  status: WizardStepStatus
-  index: number
-  variant: 'default' | 'compact' | 'numbered'
-}
-
-function StepIcon({ step, status, index, variant }: StepIconProps) {
-  const Icon = step.icon
-
-  return (
-    <motion.span
-      className={cn(
-        'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors',
-        status === 'current' && 'border-teal-500 bg-teal-500/10 dark:bg-cyan-500/15',
-        status === 'completed' && 'border-teal-500 bg-teal-500',
-        status === 'pending' && 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]',
-        status === 'error' && 'border-rust-500 bg-rust-500/10'
-      )}
-      initial={{ scale: 0.8 }}
-      animate={{ scale: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-    >
-      {status === 'completed' ? (
-        <Check className="h-5 w-5 text-white" aria-hidden="true" />
-      ) : variant === 'numbered' ? (
-        <span
-          className={cn(
-            'text-sm font-semibold',
-            status === 'current' && 'text-teal-600 dark:text-cyan-400',
-            status === 'pending' && 'text-[rgb(var(--text-tertiary))]',
-            status === 'error' && 'text-rust-500'
-          )}
-        >
-          {index + 1}
-        </span>
-      ) : (
-        <Icon
-          className={cn(
-            'h-5 w-5',
-            status === 'current' && 'text-teal-600 dark:text-cyan-400',
-            status === 'pending' && 'text-[rgb(var(--text-tertiary))]',
-            status === 'error' && 'text-rust-500'
-          )}
-          aria-hidden="true"
-        />
-      )}
-    </motion.span>
-  )
-}
-
-// ============================================================================
-// COMPACT PROGRESS (Mobile)
-// ============================================================================
-
 export interface WizardProgressCompactProps {
-  /** Additional class name */
   className?: string
 }
 
 export function WizardProgressCompact({ className }: WizardProgressCompactProps) {
-  const { visibleSteps, currentStep, currentStepData } = useWizardContext()
-
-  const progress = ((currentStep + 1) / visibleSteps.length) * 100
+  const { steps, currentStep, getStepStatus } = useWizard()
 
   return (
-    <div className={cn('px-6', className)}>
-      {/* Progress Bar */}
-      <div className="h-1.5 w-full bg-[rgb(var(--surface-tertiary))] rounded-full overflow-hidden">
-        <motion.div
-          className="h-full bg-teal-500 rounded-full"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.3 }}
-        />
-      </div>
-
-      {/* Step Info */}
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-2">
-          <currentStepData.icon className="w-4 h-4 text-teal-500" />
-          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            {currentStepData.title}
-          </span>
-        </div>
-        <span className="text-xs text-[rgb(var(--text-tertiary))]">
-          Step {currentStep + 1} of {visibleSteps.length}
-        </span>
-      </div>
+    <div className={cn("flex items-center justify-center gap-2", className)}>
+      {steps.map((_, index) => {
+        const status = getStepStatus(index)
+        return (
+          <motion.div
+            key={index}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: index * 0.05 }}
+            className={cn(
+              'w-2 h-2 rounded-full transition-all duration-300',
+              status === 'current' && 'w-6 bg-gradient-to-r from-golden-500 to-caramel-500',
+              status === 'completed' && 'bg-teal-500 dark:bg-cyan-500',
+              status === 'pending' && 'bg-[rgb(var(--border-primary))]',
+              status === 'error' && 'bg-rust-500'
+            )}
+          />
+        )
+      })}
+      <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">
+        Step {currentStep + 1} of {steps.length}
+      </span>
     </div>
   )
 }

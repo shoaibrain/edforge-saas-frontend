@@ -28,7 +28,7 @@ import {
     RotateCcw,
     Check,
 } from 'lucide-react'
-import { Card } from '@/components/ui/Card'
+import { Card } from '@edforge/ui'
 
 // ============================================================================
 // TYPE DEFINITIONS

@@ -15,7 +15,7 @@ import { motion } from 'framer-motion'
 import { useSpring, animated } from '@react-spring/web'
 import { useState } from 'react'
 import { Building2, Sparkles, Clock, CheckCircle2 } from 'lucide-react'
-import { Card } from '@/components/ui/Card'
+import { Card } from '@edforge/ui'
 import { useAppStore } from '@/stores/app.store'
 import { useAuthStore } from '@/stores/auth.store'
 

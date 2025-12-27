@@ -21,8 +21,8 @@ import {
 import { can } from '@edforge/abac'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Card } from '@edforge/ui'
+import { Button } from '@edforge/ui'
 
 export default function MessagesOverviewPage() {
   const { user } = useAuthStore()
