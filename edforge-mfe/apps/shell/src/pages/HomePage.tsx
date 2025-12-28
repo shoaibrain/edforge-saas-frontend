@@ -29,6 +29,8 @@ import {
   UpcomingEventsWidget,
   QuickActionsWidget,
   WelcomeTipWidget,
+  ComplianceAlertsWidget,
+  DataHealthWidget,
 } from '../components/dynamic-page'
 
 // ============================================================================
@@ -57,6 +59,16 @@ export default function HomePage() {
       {/* UPCOMING EVENTS */}
       {/* ================================================================== */}
       <UpcomingEventsWidget />
+
+      {/* ================================================================== */}
+      {/* COMPLIANCE ALERTS - Special Programs (IEPs, 504s) */}
+      {/* ================================================================== */}
+      <ComplianceAlertsWidget />
+
+      {/* ================================================================== */}
+      {/* DATA HEALTH - Ed-Fi Sync Status (TenantAdmin only) */}
+      {/* ================================================================== */}
+      <DataHealthWidget />
 
       {/* ================================================================== */}
       {/* QUICK ACTIONS - Role-Specific */}

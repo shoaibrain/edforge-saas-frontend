@@ -10,7 +10,6 @@ import {
     createRootRoute,
     Outlet,
 } from '@tanstack/react-router'
-// We will create this layout component
 import { AcademicsLayout } from './layouts/AcademicsLayout'
 import { Overview } from './routes/overview'
 import { AttendanceModule } from './routes/attendance'
@@ -18,6 +17,19 @@ import { StudentsModule } from './routes/students'
 import { TeachersModule } from './routes/teachers'
 import { GradebookModule } from './routes/gradebook'
 import { EnrollmentModule } from './routes/enrollment'
+import { StudentProfilesModule } from './routes/students/profiles'
+import { ClassroomsModule } from './routes/classrooms'
+import { SchedulesModule } from './routes/schedules'
+import { TimetablesModule } from './routes/timetables'
+import { GradeLevelsModule } from './routes/grade-levels'
+import { CoursesModule } from './routes/courses'
+import { StandardsModule } from './routes/standards'
+import { AssessmentsModule } from './routes/assessments'
+import { ExamsModule } from './routes/exams'
+import { CalendarModule } from './routes/calendar'
+import { GradesModule } from './routes/grades'
+import { SchedulingModule } from './routes/scheduling'
+import { CurriculumModule } from './routes/curriculum'
 
 // ============================================================================
 // ROOT ROUTE
@@ -58,7 +70,7 @@ const studentEnrollmentRoute = createRoute({
 const studentProfilesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/profiles',
-    component: () => <div className="p-8 text-center text-text-secondary">Student Profiles Module</div>,
+    component: StudentProfilesModule,
 })
 
 // Teachers
@@ -72,38 +84,38 @@ const teachersRoute = createRoute({
 const classroomsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/classrooms',
-    component: () => <div className="p-8 text-center text-text-secondary">Classrooms Module</div>,
+    component: ClassroomsModule,
 })
 
 const schedulesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/schedules',
-    component: () => <div className="p-8 text-center text-text-secondary">Class Schedules Module</div>,
+    component: SchedulesModule,
 })
 
 const timetablesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/timetables',
-    component: () => <div className="p-8 text-center text-text-secondary">Timetables Module</div>,
+    component: TimetablesModule,
 })
 
 // Curriculum
 const gradeLevelsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/grade-levels',
-    component: () => <div className="p-8 text-center text-text-secondary">Grade Levels Module</div>,
+    component: GradeLevelsModule,
 })
 
 const coursesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/courses',
-    component: () => <div className="p-8 text-center text-text-secondary">Courses Module</div>,
+    component: CoursesModule,
 })
 
 const standardsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/standards',
-    component: () => <div className="p-8 text-center text-text-secondary">Standards Module</div>,
+    component: StandardsModule,
 })
 
 // Assessment
@@ -116,13 +128,13 @@ const gradebooksRoute = createRoute({
 const assessmentsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/assessments',
-    component: () => <div className="p-8 text-center text-text-secondary">Assessments Module</div>,
+    component: AssessmentsModule,
 })
 
 const examsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/exams',
-    component: () => <div className="p-8 text-center text-text-secondary">Exams Module</div>,
+    component: ExamsModule,
 })
 
 // Tracking
@@ -135,7 +147,33 @@ const attendanceRoute = createRoute({
 const calendarRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/calendar',
-    component: () => <div className="p-8 text-center text-text-secondary">Academic Calendar Module</div>,
+    component: CalendarModule,
+})
+
+// ============================================================================
+// CONSOLIDATED ROUTES (Workflow-Oriented)
+// These new routes map to the simplified sidebar navigation
+// ============================================================================
+
+// Grades & Assessments - Consolidated view of gradebooks, assessments, and exams
+const gradesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/grades',
+    component: GradesModule,
+})
+
+// Scheduling - Consolidated view of schedules, timetables, and classrooms
+const schedulingRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/scheduling',
+    component: SchedulingModule,
+})
+
+// Curriculum - Consolidated view of courses, grade levels, and standards
+const curriculumRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/curriculum',
+    component: CurriculumModule,
 })
 
 // ============================================================================
@@ -159,6 +197,10 @@ const routeTree = rootRoute.addChildren([
     examsRoute,
     attendanceRoute,
     calendarRoute,
+    // Consolidated routes
+    gradesRoute,
+    schedulingRoute,
+    curriculumRoute,
 ])
 
 /**

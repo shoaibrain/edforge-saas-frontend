@@ -24,6 +24,17 @@ import { useEffect } from 'react'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
+import {
+  AccountPage,
+  SecurityPage,
+  NotificationsPage,
+  PreferencesPage,
+  SchoolsSettingsPage,
+  IntegrationsSettingsPage,
+  BillingSettingsPage,
+  PeopleSettingsPage,
+  DangerZonePage,
+} from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React from 'react'
 
@@ -55,6 +66,11 @@ const MessagesModule = React.lazy(async () => {
 const AnalyticsModule = React.lazy(async () => {
   const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
   if (!module) throw new Error('Failed to load Analytics remote')
+  return module
+})
+const EdFiModule = React.lazy(async () => {
+  const module = await loadRemote<{ default: React.ComponentType }>('edfi/EdFiModule')
+  if (!module) throw new Error('Failed to load Ed-Fi remote')
   return module
 })
 
@@ -176,73 +192,73 @@ const settingsIndexRoute = createRoute({
 const settingsAccountRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/account',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Account Settings</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: AccountPage,
 })
 
 const settingsPreferencesRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/preferences',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Preferences</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: PreferencesPage,
 })
 
 const settingsSecurityRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/security',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Security Settings</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: SecurityPage,
 })
 
 const settingsNotificationsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/notifications',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Notification Settings</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: NotificationsPage,
 })
 
 const settingsConnectionsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/connections',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Connections</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: IntegrationsSettingsPage, // Connections merged into Integrations
 })
 
 const settingsGeneralRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/general',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">General Settings</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: PreferencesPage, // General maps to Preferences
 })
 
 const settingsAccessRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/access',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Access Policy</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: PeopleSettingsPage,
 })
 
 const settingsSchoolsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/schools',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Schools</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: SchoolsSettingsPage,
 })
 
 const settingsBillingRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/billing',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Billing</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: BillingSettingsPage,
 })
 
 const settingsIntegrationsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/integrations',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Integrations</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: IntegrationsSettingsPage,
 })
 
 const settingsImportExportRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/import-export',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Import / Export</h1><p className="text-gray-500 mt-2">Coming soon...</p></div>,
+  component: IntegrationsSettingsPage, // Import/Export as part of Integrations
 })
 
 const settingsDangerZoneRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/danger-zone',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold text-red-600">Danger Zone</h1><p className="text-gray-500 mt-2">Destructive actions...</p></div>,
+  component: DangerZonePage,
 })
 
 // ============================================================================
@@ -321,6 +337,20 @@ const analyticsRoute = createRoute({
 })
 
 // ============================================================================
+// ED-FI / STATE REPORTING ROUTES
+// ============================================================================
+
+const edfiRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/edfi/$',
+  component: () => (
+    <Suspense fallback={<LoadingScreen />}>
+      <EdFiModule />
+    </Suspense>
+  ),
+})
+
+// ============================================================================
 // PORTAL ROUTES
 // ============================================================================
 
@@ -379,6 +409,7 @@ const routeTree = rootRoute.addChildren([
     peopleRoute,
     messagesRoute,
     analyticsRoute,
+    edfiRoute,
     specialProgramsRoute,
     studentPortalRoute,
     parentPortalRoute,

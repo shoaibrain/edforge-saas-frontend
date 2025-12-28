@@ -15,6 +15,11 @@ import { PeopleLayout } from './layouts/PeopleLayout'
 import { Overview } from './routes/overview'
 import StaffPage from './routes/staff'
 import NewPersonPage from './routes/new'
+import { DepartmentsModule } from './routes/departments'
+import { RolesModule } from './routes/roles'
+import { SettingsModule } from './routes/settings'
+import { AnalyticsModule } from './routes/analytics'
+import { HRAdminModule } from './routes/hr'
 
 // ============================================================================
 // ROOT ROUTE
@@ -53,45 +58,32 @@ const newPersonRoute = createRoute({
 const departmentsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/departments',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Departments</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Department management coming soon...</p>
-        </div>
-    ),
+    component: DepartmentsModule,
 })
 
 const rolesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/roles',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Roles & Permissions</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Roles configuration coming soon...</p>
-        </div>
-    ),
+    component: RolesModule,
 })
 
 const settingsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/settings',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Profile Settings</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Profile settings coming soon...</p>
-        </div>
-    ),
+    component: SettingsModule,
 })
 
 const analyticsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/analytics',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">People Analytics</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Workforce analytics coming soon...</p>
-        </div>
-    ),
+    component: AnalyticsModule,
+})
+
+// HR Admin - Consolidated Payroll/Contracts/PD/Reviews
+const hrRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/hr',
+    component: HRAdminModule,
 })
 
 const routeTree = rootRoute.addChildren([
@@ -102,6 +94,7 @@ const routeTree = rootRoute.addChildren([
     rolesRoute,
     settingsRoute,
     analyticsRoute,
+    hrRoute,
 ])
 
 export const router = createRouter({

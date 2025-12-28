@@ -13,6 +13,8 @@ import {
 } from '@tanstack/react-router'
 import { AnalyticsLayout } from './layouts/AnalyticsLayout'
 import { Overview } from './routes/overview'
+import { ComparisonsModule } from './routes/comparisons'
+import { CustomReportsModule } from './routes/custom'
 
 // ============================================================================
 // ROOT ROUTE
@@ -78,15 +80,25 @@ const financeRoute = createRoute({
     ),
 })
 
+// Comparative Analysis
+const comparisonsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/comparisons',
+    component: ComparisonsModule,
+})
+
+// Custom Reports
+const customReportsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/custom',
+    component: CustomReportsModule,
+})
+
+// Legacy reports route (redirect to custom)
 const reportsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/reports',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Custom Reports</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Custom report builder coming soon...</p>
-        </div>
-    ),
+    component: CustomReportsModule,
 })
 
 const dashboardsRoute = createRoute({
@@ -106,6 +118,8 @@ const routeTree = rootRoute.addChildren([
     attendanceRoute,
     performanceRoute,
     financeRoute,
+    comparisonsRoute,
+    customReportsRoute,
     reportsRoute,
     dashboardsRoute,
 ])
@@ -120,4 +134,3 @@ declare module '@tanstack/react-router' {
         router: typeof router
     }
 }
-

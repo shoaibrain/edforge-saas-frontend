@@ -3,7 +3,7 @@
  * 
  * Provides nested routing support for the Settings module.
  * Renders the overview page at /settings and child routes via Outlet.
- * Features a Google Account-inspired overview.
+ * Features a Google Account-inspired overview with Account/Workspace sections.
  */
 
 import { useState } from 'react'
@@ -17,7 +17,7 @@ import {
   User,
   Bell,
   School,
-  Search,
+  Search
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth.store'
 import { getUserAvatar } from '../lib/avatar'
@@ -49,7 +49,7 @@ function SettingsOverviewPage() {
   const avatarUrl = getUserAvatar(user?.name || 'User')
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-4xl mx-auto px-6 py-8">
       <SettingsOverviewContent
         avatarUrl={avatarUrl}
         userName={user?.name}
@@ -85,7 +85,7 @@ function SettingsOverviewContent({
     config: config.wobbly,
   })
 
-  // Quick action items - Updated Hrefs to new nested routes
+  // Quick action items for the pill row
   const quickActions: QuickActionProps[] = [
     { label: 'My Account', icon: User, href: '/settings/account' },
     { label: 'Security', icon: Shield, href: '/settings/security' },
@@ -95,7 +95,7 @@ function SettingsOverviewContent({
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Profile Header - Google Account Style */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -170,7 +170,7 @@ function SettingsOverviewContent({
             transform: searchSpring.scale.to(s => `scale(${s})`),
             boxShadow: searchSpring.shadow.to(s => `0 ${s}px ${s * 2}px rgba(0, 0, 0, 0.08)`),
           }}
-          className="relative"
+          className="relative max-w-xl mx-auto"
         >
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           <input

@@ -25,7 +25,7 @@ export default defineConfig({
       }
       appendPlugins([
         new ModuleFederationPlugin({
-          name: 'specialPrograms',
+          name: 'special_programs',
           filename: 'remoteEntry.js',
           exposes: {
             './SpecialProgramsModule': './src/bootstrap.tsx',

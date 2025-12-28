@@ -34,3 +34,16 @@ export {
   type WelcomeTip,
 } from './WelcomeTipWidget'
 
+// Compliance Alerts Widget (Special Programs)
+export {
+  ComplianceAlertsWidget,
+  type ComplianceAlert,
+} from './ComplianceAlertsWidget'
+
+// Data Health Widget (Ed-Fi)
+export {
+  DataHealthWidget,
+  type DataHealthStatus,
+  type SyncJob,
+} from './DataHealthWidget'
+

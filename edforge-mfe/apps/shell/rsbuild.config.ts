@@ -39,7 +39,7 @@ export default defineConfig({
           remotes: {
             academics: 'academics@http://localhost:3002/remoteEntry.js',
             finance: 'finance@http://localhost:3003/remoteEntry.js',
-            edfi: 'edfi@http://localhost:3004/remoteEntry.js',
+            edfi: 'edfi@http://localhost:3001/remoteEntry.js',
             'special-programs': 'special_programs@http://localhost:3005/remoteEntry.js',
             people: 'people@http://localhost:3006/remoteEntry.js',
             messages: 'messages@http://localhost:3007/remoteEntry.js',

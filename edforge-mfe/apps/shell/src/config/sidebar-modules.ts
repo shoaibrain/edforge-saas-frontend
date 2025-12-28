@@ -20,12 +20,8 @@ import {
   Users,
   Settings,
   MessageCircleMore,
-  User,
-  SlidersHorizontal,
 
-  BellDot,
-  Component,
-  Landmark,
+
   Layers,
   ShieldCheck,
   Link2,
@@ -34,20 +30,15 @@ import {
   UsersRound,
   CreditCard,
   Zap,
+  Landmark,
   Database,
   TriangleAlert,
-  MapPinHouse,
   ClipboardList,
   BarChart3,
   type LucideIcon,
   BrickWallShield,
   Calendars,
-  Atom,
-  BanknoteArrowDown,
-  BanknoteArrowUp,
-  ChartNoAxesCombined,
   ClipboardPlus,
-  UserStar,
   // New imports for Analytics
   Megaphone,
   Mail,
@@ -65,7 +56,6 @@ import {
   FileText,
   // Additional icons
   Baby,
-  CheckCircle,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -129,6 +119,7 @@ export type SidebarModule =
   | 'parent-portal'
   | 'student-portal'
   | 'special-programs'
+  | 'edfi'
 
 // ============================================================================
 // HOME MODULE - Admin/Staff/Teacher dashboard navigation
@@ -151,11 +142,11 @@ const homeModule: ModuleConfig = {
           permission: { action: 'view', resource: 'students' },
         },
         {
-          id: 'finance',
-          label: 'Finance',
-          icon: HandCoins,
-          href: '/finance',
-          permission: { action: 'view', resource: 'billing' },
+          id: 'special-programs',
+          label: 'Special Programs',
+          icon: ShieldCheck,
+          href: '/special-programs',
+          permission: { action: 'view', resource: 'special-programs' },
         },
         {
           id: 'people',
@@ -163,6 +154,13 @@ const homeModule: ModuleConfig = {
           icon: UsersRound,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
+        },
+        {
+          id: 'finance',
+          label: 'Finance',
+          icon: HandCoins,
+          href: '/finance',
+          permission: { action: 'view', resource: 'billing' },
         },
         {
           id: 'messages',
@@ -179,8 +177,16 @@ const homeModule: ModuleConfig = {
           permission: { action: 'view', resource: 'analytics' },
         },
         {
+          id: 'edfi',
+          label: 'State Reporting',
+          icon: Database,
+          href: '/edfi',
+          permission: { action: 'view', resource: 'edfi' },
+          tenantRoles: ['TenantAdmin'],
+        },
+        {
           id: 'settings',
-          label: 'Settings',
+          label: 'System Admin',
           icon: Settings,
           href: '/settings',
           permission: { action: 'view', resource: 'settings' },
@@ -393,7 +399,9 @@ const parentHomeModule: ModuleConfig = {
 }
 
 // ============================================================================
-// SETTINGS MODULE - Account and workspace settings
+// SETTINGS MODULE - System Administration (Consolidated: 12 → 4 items)
+// Design: User preferences moved to avatar dropdown; system config remains here
+// Note: My Account, Preferences, Notifications, Security → Avatar dropdown menu
 // ============================================================================
 
 const settingsModule: ModuleConfig = {
@@ -403,13 +411,14 @@ const settingsModule: ModuleConfig = {
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
-      id: 'overview',
+      id: 'main',
       items: [
         {
           id: 'settings-home',
           label: 'Overview',
           icon: GalleryVerticalEnd,
           href: '/settings',
+          permission: { action: 'view', resource: 'settings' },
         },
       ],
     },
@@ -420,33 +429,37 @@ const settingsModule: ModuleConfig = {
         {
           id: 'my-account',
           label: 'My Account',
-          icon: User,
+          icon: Users,
           href: '/settings/account',
-          // No permission needed - all users can access their own profile
+          permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'preferences',
           label: 'Preferences',
-          icon: SlidersHorizontal,
+          icon: Layers,
           href: '/settings/preferences',
+          permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'notifications',
           label: 'Notifications',
-          icon: BellDot,
+          icon: MessageCircleMore,
           href: '/settings/notifications',
+          permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'security',
           label: 'Security',
           icon: ShieldCheck,
           href: '/settings/security',
+          permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'connections',
           label: 'Connections',
           icon: Link2,
           href: '/settings/connections',
+          permission: { action: 'view', resource: 'settings' },
         },
       ],
     },
@@ -455,18 +468,18 @@ const settingsModule: ModuleConfig = {
       label: 'WORKSPACE',
       items: [
         {
-          id: 'general',
+          id: 'general-settings',
           label: 'General Settings',
           icon: Settings,
           href: '/settings/general',
-          permission: { action: 'view', resource: 'settings' },
+          permission: { action: 'view', resource: 'settings:tenant' },
         },
         {
-          id: 'system-access-policy',
+          id: 'access-policy',
           label: 'Access Policy',
           icon: BrickWallShield,
-          href: '/settings/people',
-          permission: { action: 'view', resource: 'staff' },
+          href: '/settings/access',
+          permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'schools',
@@ -492,10 +505,10 @@ const settingsModule: ModuleConfig = {
           tenantRoles: ['TenantAdmin'],
         },
         {
-          id: 'data',
+          id: 'import-export',
           label: 'Import/Export',
           icon: Database,
-          href: '/settings/data',
+          href: '/settings/import-export',
           permission: { action: 'manage', resource: 'settings:tenant' },
           tenantRoles: ['TenantAdmin'],
         },
@@ -508,8 +521,10 @@ const settingsModule: ModuleConfig = {
           id: 'danger-zone',
           label: 'Danger Zone',
           icon: TriangleAlert,
-          href: '/settings/danger',
+          href: '/settings/danger-zone',
           variant: 'danger',
+          permission: { action: 'manage', resource: 'settings:tenant' },
+          tenantRoles: ['TenantAdmin'],
         },
       ],
     },
@@ -517,7 +532,8 @@ const settingsModule: ModuleConfig = {
 }
 
 // ============================================================================
-// ACADEMICS MODULE - Academic management
+// ACADEMICS MODULE - Academic management (Consolidated: 15 → 5 items)
+// Design: Workflow-oriented grouping with tabs/sub-views within pages
 // ============================================================================
 
 const academicsModule: ModuleConfig = {
@@ -527,7 +543,7 @@ const academicsModule: ModuleConfig = {
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
-      id: 'overview',
+      id: 'main',
       items: [
         {
           id: 'academics-home',
@@ -536,286 +552,102 @@ const academicsModule: ModuleConfig = {
           href: '/academics',
           permission: { action: 'view', resource: 'students' },
         },
-      ],
-    },
-    {
-      id: 'students',
-      label: 'STUDENTS',
-      items: [
         {
-          id: 'students-directory',
-          label: 'Student Directory',
+          // Students: Directory main view; Enrollment/Profiles/Families as tabs
+          id: 'students',
+          label: 'Students',
           icon: UsersRound,
           href: '/academics/students',
           permission: { action: 'view', resource: 'students' },
           requiresActiveSchool: true,
         },
         {
-          id: 'enrollment',
-          label: 'Enrollment',
-          icon: Atom,
-          href: '/academics/students/enrollment',
-          permission: { action: 'view', resource: 'curriculum' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'student-profiles',
-          label: 'Student Profiles',
-          icon: User,
-          href: '/academics/students/profiles',
-          permission: { action: 'view', resource: 'students' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'classes',
-      label: 'CLASSES & SCHEDULING',
-      items: [
-        {
-          id: 'classrooms',
-          label: 'Classrooms',
-          icon: MapPinHouse,
-          href: '/academics/classrooms',
-          permission: { action: 'view', resource: 'classes' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'schedules',
-          label: 'Class Schedules',
-          icon: Calendar,
-          href: '/academics/schedules',
-          permission: { action: 'view', resource: 'classes' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'timetables',
-          label: 'Timetables',
-          icon: Calendar,
-          href: '/academics/timetables',
-          permission: { action: 'view', resource: 'classes' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'curriculum',
-      label: 'CURRICULUM',
-      items: [
-        {
-          id: 'grade-levels',
-          label: 'Grade Levels',
-          icon: Layers,
-          href: '/academics/grade-levels',
-          permission: { action: 'view', resource: 'students' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'courses',
-          label: 'Courses',
-          icon: BookOpen,
-          href: '/academics/courses',
-          permission: { action: 'view', resource: 'curriculum' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'standards',
-          label: 'Standards',
-          icon: ClipboardList,
-          href: '/academics/standards',
-          permission: { action: 'view', resource: 'curriculum' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'assessment',
-      label: 'ASSESSMENT',
-      items: [
-        {
-          id: 'gradebooks',
-          label: 'Gradebooks',
-          icon: GraduationCap,
-          href: '/academics/gradebooks',
-          permission: { action: 'view', resource: 'grades' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'assessments',
-          label: 'Assessments',
-          icon: FileText,
-          href: '/academics/assessments',
-          permission: { action: 'view', resource: 'assessments' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'exams',
-          label: 'Exams',
-          icon: FileText,
-          href: '/academics/exams',
-          permission: { action: 'view', resource: 'assessments' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'tracking',
-      label: 'TRACKING',
-      items: [
-        {
+          // Attendance: Elevated to top-level (high-frequency daily task)
           id: 'attendance',
-          label: 'Student Attendance',
+          label: 'Attendance',
           icon: ClipboardPlus,
           href: '/academics/attendance',
           permission: { action: 'view', resource: 'attendance' },
           requiresActiveSchool: true,
         },
         {
-          id: 'academic-calendar',
-          label: 'Academic Calendar',
+          // Grades & Assessments: Gradebook main view; Assessments/Exams as tabs
+          id: 'grades',
+          label: 'Grades & Assessments',
+          icon: GraduationCap,
+          href: '/academics/grades',
+          permission: { action: 'view', resource: 'grades' },
+          requiresActiveSchool: true,
+        },
+        {
+          // Scheduling: Combined Classrooms + Schedules + Timetables
+          id: 'scheduling',
+          label: 'Scheduling',
           icon: Calendars,
-          href: '/academics/calendar',
+          href: '/academics/scheduling',
+          permission: { action: 'view', resource: 'classes' },
+          requiresActiveSchool: true,
+        },
+        {
+          // Curriculum: Courses main view; Grade Levels/Standards in "Configure"
+          id: 'curriculum',
+          label: 'Curriculum',
+          icon: BookOpen,
+          href: '/academics/curriculum',
           permission: { action: 'view', resource: 'curriculum' },
           requiresActiveSchool: true,
         },
       ],
     },
-
   ],
 }
 
 // ============================================================================
-// FINANCE MODULE - Financial management
+// FINANCE MODULE - Financial management (Consolidated: 12 → 3 items)
+// Design: Workflow-oriented with Reports accessible from page headers
 // ============================================================================
 
 const financeModule: ModuleConfig = {
   id: 'finance',
-  title: 'Finance & Billing',
-  icon: DollarSign,
+  title: 'Finance',
+  icon: HandCoins,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
-      id: 'overview',
+      id: 'main',
       items: [
         {
           id: 'finance-home',
           label: 'Overview',
           icon: GalleryVerticalEnd,
-          // TODO: Refactor for the path and page and routing /hr instead of /finance
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
-      ],
-    },
-
-    {
-      id: 'accounting',
-      label: 'ACCOUNTING',
-      items: [
         {
-          id: 'general-ledger',
-          label: 'General Ledger',
+          // Ledger: GL/AP/AR as tabs for specialists
+          id: 'ledger',
+          label: 'Ledger',
           icon: Landmark,
-          href: '/finance/accounting/general-ledger',
+          href: '/finance/ledger',
           permission: { action: 'view', resource: 'billing' },
           requiresActiveSchool: true,
         },
         {
-          id: 'accounts-payable',
-          label: 'Accounts Payable',
-          icon: BanknoteArrowDown,
-          href: '/finance/accounting/accounts-payable',
-          permission: { action: 'view', resource: 'billing' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'accounts-receivable',
-          label: 'Accounts Receivable',
-          icon: BanknoteArrowUp,
-          href: '/finance/accounting/accounts-receivable',
-          permission: { action: 'view', resource: 'billing' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'billing',
-      label: 'BILLING',
-      items: [
-        {
-          id: 'tuition-fees',
-          label: 'Tuition & Fees',
-          icon: BanknoteArrowUp,
-          href: '/finance/billing/tuition-fees',
-          permission: { action: 'view', resource: 'billing' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'fee-structures',
-          label: 'Fee Structures',
-          icon: Layers,
-          href: '/finance/billing/fee-structures',
-          permission: { action: 'view', resource: 'billing' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'collections',
-          label: 'Collections',
+          // Billing: Tuition main view; Fee Structures behind "Configure" gear
+          id: 'billing',
+          label: 'Billing',
           icon: CreditCard,
-          href: '/finance/billing/collections',
+          href: '/finance/billing',
           permission: { action: 'view', resource: 'billing' },
           requiresActiveSchool: true,
         },
-      ],
-    },
-    {
-      id: 'expenses',
-      label: 'EXPENSES',
-      items: [
         {
-          id: 'expense-tracking',
-          label: 'Expense Tracking',
+          // Expenses: Tracking main view; Approvals as filter, Budgets as tab
+          id: 'expenses',
+          label: 'Expenses',
           icon: ClipboardList,
           href: '/finance/expenses',
           permission: { action: 'view', resource: 'expenses' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'approvals',
-          label: 'Approvals',
-          icon: CheckCircle,
-          href: '/finance/expenses/approvals',
-          permission: { action: 'view', resource: 'expenses' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'budgets',
-          label: 'Budgets',
-          icon: BarChart3,
-          href: '/finance/expenses/budgets',
-          permission: { action: 'view', resource: 'expenses' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'reports',
-      label: 'REPORTS',
-      items: [
-        {
-          id: 'financial-reports',
-          label: 'Financial Reports',
-          icon: BarChart3,
-          href: '/finance/reports',
-          permission: { action: 'view', resource: 'reports:finance' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'audit-trail',
-          label: 'Audit Trail',
-          icon: Database,
-          href: '/finance/reports/audit-trail',
-          permission: { action: 'view', resource: 'reports:finance' },
           requiresActiveSchool: true,
         },
       ],
@@ -824,7 +656,8 @@ const financeModule: ModuleConfig = {
 }
 
 // ============================================================================
-// PEOPLE MODULE - Staff and user management
+// PEOPLE MODULE - Staff and user management (Consolidated: 10 → 2 items)
+// Design: Departments as filter, Tasks moved to Dashboard, HR as tabbed view
 // ============================================================================
 
 const peopleModule: ModuleConfig = {
@@ -834,22 +667,17 @@ const peopleModule: ModuleConfig = {
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
-      id: 'overview',
+      id: 'main',
       items: [
         {
           id: 'people-home',
           label: 'Overview',
-          icon: Users,
+          icon: GalleryVerticalEnd,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
         },
-      ],
-    },
-    {
-      id: 'staff',
-      label: 'STAFF',
-      items: [
         {
+          // Staff Directory: Departments as filter, Attendance as tab
           id: 'staff-directory',
           label: 'Staff Directory',
           icon: UsersRound,
@@ -858,118 +686,18 @@ const peopleModule: ModuleConfig = {
           requiresActiveSchool: true,
         },
         {
-          id: 'department',
-          label: 'Department',
-          icon: Component,
-          href: '/people/department',
-          permission: { action: 'view', resource: 'staff' },
-          requiresActiveSchool: true,
-        },
-        //TODO: Complete the implementation for routing and navigation
-        {
-          id: 'parents',
-          label: 'Parents',
-          icon: UserStar,
-          href: '/people/parents',
-          permission: { action: 'view', resource: 'staff' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'human-resources',
-      label: 'HUMAN RESOURCES',
-      items: [
-        {
-          id: 'payroll',
-          label: 'Payroll',
-          icon: BanknoteArrowDown,
-          href: '/people/hr/payroll',
-          permission: { action: 'view', resource: 'payroll' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'contracts',
-          label: 'Contracts',
-          icon: FileText,
-          href: '/people/hr/contracts',
-          permission: { action: 'view', resource: 'staff' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'professional-development',
-          label: 'Professional Development',
-          icon: GraduationCap,
-          href: '/people/hr/professional-development',
-          permission: { action: 'view', resource: 'staff' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'performance-reviews',
-          label: 'Performance Reviews',
-          icon: BarChart3,
-          href: '/people/hr/performance-reviews',
-          permission: { action: 'view', resource: 'staff' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'staff-attendance',
-          label: 'Staff Attendance',
-          icon: ClipboardPlus,
-          href: '/people/hr/attendance',
-          permission: { action: 'view', resource: 'attendance' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'tasks',
-      label: 'TASKS & DUTIES',
-      items: [
-        {
-          id: 'staff-tasks',
-          label: 'Staff Tasks',
-          icon: ClipboardList,
-          href: '/people/tasks',
-          permission: { action: 'view', resource: 'staff:assignments' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'duty-assignments',
-          label: 'Duty Assignments',
-          icon: ClipboardList,
-          href: '/people/tasks/assignments',
-          permission: { action: 'view', resource: 'staff:assignments' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-    {
-      id: 'parents',
-      label: 'PARENTS & GUARDIANS',
-      items: [
-        {
-          id: 'parents-directory',
-          label: 'Parent Directory',
-          icon: UserStar,
-          href: '/people/parents',
-          permission: { action: 'view', resource: 'staff' },
-          requiresActiveSchool: true,
-        },
-        {
-          id: 'reporting',
-          label: 'Reporting',
-          icon: ChartNoAxesCombined,
-          href: '/people/reporting',
-          permission: { action: 'view', resource: 'attendance' },
+          // HR Admin: Tabbed view for Compensation (Payroll/Contracts) & Development (PD/Reviews)
+          id: 'hr-admin',
+          label: 'HR Admin',
+          icon: BrickWallShield,
+          href: '/people/hr',
+          permission: { action: 'view', resource: 'hr' },
           requiresActiveSchool: true,
         },
       ],
     },
   ],
 }
-
-// ============================================================================
 
 // ============================================================================
 // ANALYTICS MODULE - Data insights and reports
@@ -1286,6 +1014,66 @@ const messagesModule: ModuleConfig = {
 }
 
 // ============================================================================
+// ED-FI MODULE - State Reporting and Data Exchange
+// ============================================================================
+
+const edfiModule: ModuleConfig = {
+  id: 'edfi',
+  title: 'State Reporting',
+  icon: Database,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'overview',
+      items: [
+        {
+          id: 'edfi-home',
+          label: 'Sync Dashboard',
+          icon: GalleryVerticalEnd,
+          href: '/edfi',
+          permission: { action: 'view', resource: 'edfi' },
+        },
+      ],
+    },
+    {
+      id: 'configuration',
+      label: 'CONFIGURATION',
+      items: [
+        {
+          id: 'edfi-connections',
+          label: 'Connections',
+          icon: Link2,
+          href: '/edfi/connections',
+          permission: { action: 'view', resource: 'edfi:connections' },
+          tenantRoles: ['TenantAdmin'],
+        },
+        {
+          id: 'edfi-mapping',
+          label: 'Descriptor Mapping',
+          icon: Layers,
+          href: '/edfi/mapping',
+          permission: { action: 'view', resource: 'edfi:mapping' },
+          tenantRoles: ['TenantAdmin'],
+        },
+      ],
+    },
+    {
+      id: 'monitoring',
+      label: 'MONITORING',
+      items: [
+        {
+          id: 'edfi-errors',
+          label: 'Error Aggregator',
+          icon: TriangleAlert,
+          href: '/edfi/errors',
+          permission: { action: 'view', resource: 'edfi:sync' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
 // SPECIAL PROGRAMS MODULE - Special education and accommodations
 // ============================================================================
 
@@ -1409,6 +1197,7 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   'student-portal': studentPortalModule,
   'parent-portal': parentPortalModule,
   'special-programs': specialProgramsModule,
+  edfi: edfiModule,
 }
 
 
@@ -1475,6 +1264,7 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/student-portal')) return 'student-portal'
   if (pathname.startsWith('/parent-portal')) return 'parent-portal'
   if (pathname.startsWith('/special-programs')) return 'special-programs'
+  if (pathname.startsWith('/edfi')) return 'edfi'
   return 'home'
 }
 

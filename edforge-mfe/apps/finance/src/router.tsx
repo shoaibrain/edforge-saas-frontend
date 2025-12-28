@@ -12,6 +12,7 @@ import {
 } from '@tanstack/react-router'
 import { FinanceLayout } from './layouts/FinanceLayout'
 import { Overview } from './routes/overview'
+import { LedgerModule } from './routes/ledger'
 
 // ============================================================================
 // ROOT ROUTE
@@ -64,6 +65,13 @@ const expensesRoute = createRoute({
     component: () => <div className="p-8 text-center text-text-secondary">Expenses Module</div>,
 })
 
+// Ledger - Consolidated GL/AP/AR view
+const ledgerRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/ledger',
+    component: LedgerModule,
+})
+
 // ============================================================================
 // ROUTE TREE
 // ============================================================================
@@ -74,6 +82,7 @@ const routeTree = rootRoute.addChildren([
     payrollRoute,
     tuitionRoute,
     expensesRoute,
+    ledgerRoute,
 ])
 
 /**
