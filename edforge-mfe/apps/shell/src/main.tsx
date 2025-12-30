@@ -8,9 +8,19 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { configureAmplify } from '@edforge/auth'
 import { router } from './router'
 import '@edforge/theme'
 import './index.css'
+
+// Initialize AWS Amplify for Cognito authentication
+// This must be called before any auth operations
+const amplifyConfigured = configureAmplify()
+if (amplifyConfigured) {
+  console.log('[EdForge] Amplify configured successfully')
+} else {
+  console.log('[EdForge] Running in dev mode without Cognito - use mock users')
+}
 
 // Query client for data fetching
 const queryClient = new QueryClient({

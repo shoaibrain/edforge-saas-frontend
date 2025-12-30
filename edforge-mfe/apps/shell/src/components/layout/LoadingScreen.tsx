@@ -6,7 +6,11 @@
 
 import { motion } from 'framer-motion'
 
-export function LoadingScreen() {
+interface LoadingScreenProps {
+  message?: string
+}
+
+export function LoadingScreen({ message = 'Loading module...' }: LoadingScreenProps) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <motion.div
@@ -46,7 +50,7 @@ export function LoadingScreen() {
         </div>
 
         {/* Loading Text */}
-        <p className="text-text-secondary text-sm">Loading module...</p>
+        <p className="text-text-secondary text-sm">{message}</p>
 
         {/* Progress Dots */}
         <div className="flex gap-1.5">

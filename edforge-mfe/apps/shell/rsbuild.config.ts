@@ -1,6 +1,9 @@
-import { defineConfig } from '@rsbuild/core'
+import { defineConfig, loadEnv } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
+
+// Load environment variables from .env files
+const { publicVars } = loadEnv({ prefixes: ['VITE_'] })
 
 export default defineConfig({
   plugins: [pluginReact()],
@@ -8,6 +11,7 @@ export default defineConfig({
     entry: {
       index: './src/main.tsx',
     },
+    define: publicVars,
   },
   server: {
     port: 3000,
@@ -46,20 +50,26 @@ export default defineConfig({
             analytics: 'analytics@http://localhost:3008/remoteEntry.js',
           },
           shared: {
+            // Core React
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
+            // Routing & State
             '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0', eager: true },
             '@tanstack/react-router': { singleton: true, requiredVersion: '^1.82.0', eager: true },
             zustand: { singleton: true, requiredVersion: '^5.0.0', eager: true },
+            // EdForge packages
             '@edforge/ui': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/abac': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/auth': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/types': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
-            'react-hook-form': { singleton: true, eager: true },
-            zod: { singleton: true, eager: true },
-            '@hookform/resolvers': { singleton: true, eager: true },
-            'framer-motion': { singleton: true, eager: true },
-            '@react-spring/web': { singleton: true, eager: true },
+            // Forms - explicit versions to prevent MF warnings
+            'react-hook-form': { singleton: true, requiredVersion: '^7.50.0', eager: true },
+            '@hookform/resolvers': { singleton: true, requiredVersion: '^3.9.0', eager: true },
+            zod: { singleton: true, requiredVersion: '^3.23.0', eager: true },
+            // Animation - aligned version across all apps
+            'framer-motion': { singleton: true, requiredVersion: '^11.15.0', eager: true },
+            '@react-spring/web': { singleton: true, requiredVersion: '^10.0.3', eager: true },
           },
         }),
       ])

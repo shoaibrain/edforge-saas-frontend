@@ -5,13 +5,14 @@
  * Uses proper layout routes with Outlet for nested routing.
  */
 
-import { Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import {
   createRootRoute,
   createRoute,
   createRouter,
   Outlet,
   redirect,
+  useNavigate,
 } from '@tanstack/react-router'
 import { ShellProvider } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
@@ -20,7 +21,7 @@ import { LoadingScreen } from './components/layout/LoadingScreen'
 import { LoginPage } from './components/layout/LoginPage'
 import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
-import { useEffect } from 'react'
+import { isAuthenticated } from '@edforge/auth'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
@@ -135,33 +136,163 @@ const loginRoute = createRoute({
 })
 
 // ============================================================================
+// OAUTH CALLBACK HANDLER
+// Detects OAuth params and waits for Amplify to process them
+// ============================================================================
+
+function hasOAuthParams(): boolean {
+  if (typeof window === 'undefined') return false
+  const params = new URLSearchParams(window.location.search)
+  return params.has('code') || params.has('error')
+}
+
+function OAuthCallbackHandler() {
+  const navigate = useNavigate()
+  const [error, setError] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(true)
+  
+  useEffect(() => {
+    const processCallback = async () => {
+      // Check for OAuth error from Cognito
+      const params = new URLSearchParams(window.location.search)
+      const oauthError = params.get('error')
+      if (oauthError) {
+        console.error('[OAuth] Error from Cognito:', oauthError)
+        setError(`Authentication error: ${oauthError}`)
+        setIsProcessing(false)
+        setTimeout(() => navigate({ to: '/login', replace: true }), 2000)
+        return
+      }
+
+      try {
+        console.log('[OAuth] Processing callback, waiting for Amplify...')
+        
+        // Wait for Amplify to process the OAuth callback
+        // This may take a moment as it exchanges the code for tokens
+        const maxAttempts = 20
+        let attempt = 0
+        
+        while (attempt < maxAttempts) {
+          const authenticated = await isAuthenticated()
+          if (authenticated) {
+            console.log('[OAuth] Authentication successful, initializing store...')
+            // Initialize auth store with user data
+            await useAuthStore.getState().initializeAuth()
+            
+            // Clear the URL params and navigate to home
+            window.history.replaceState({}, '', '/home')
+            navigate({ to: '/home', replace: true })
+            return
+          }
+          // Wait and retry - Amplify needs time to exchange the code
+          await new Promise(resolve => setTimeout(resolve, 300))
+          attempt++
+        }
+        
+        // Auth failed after retries
+        console.error('[OAuth] Authentication timed out after', maxAttempts, 'attempts')
+        setError('Authentication timed out. Please try again.')
+        setIsProcessing(false)
+        setTimeout(() => navigate({ to: '/login', replace: true }), 2000)
+      } catch (err) {
+        console.error('[OAuth] Error:', err)
+        setError(err instanceof Error ? err.message : 'Authentication failed')
+        setIsProcessing(false)
+        setTimeout(() => navigate({ to: '/login', replace: true }), 2000)
+      }
+    }
+    
+    processCallback()
+  }, [navigate])
+
+  return <LoadingScreen message={error || (isProcessing ? "Completing sign in..." : "Redirecting...")} />
+}
+
+// ============================================================================
+// INDEX ROUTE - Handles OAuth callback OR redirects based on auth state
+// ============================================================================
+
+function IndexPage() {
+  const navigate = useNavigate()
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const isLoading = useAuthStore((s) => s.isLoading)
+  const user = useAuthStore((s) => s.user)
+  
+  // If we have OAuth params in the URL, process the callback
+  if (hasOAuthParams()) {
+    return <OAuthCallbackHandler />
+  }
+  
+  useEffect(() => {
+    // Don't redirect while auth is still initializing
+    if (isLoading) {
+      console.log('[IndexPage] Auth is loading, waiting...')
+      return
+    }
+    
+    console.log('[IndexPage] Auth loaded. isAuthenticated:', isAuthenticated, 'user:', user?.email)
+    
+    if (isAuthenticated && user) {
+      console.log('[IndexPage] Redirecting to /home')
+      navigate({ to: '/home', replace: true })
+    } else {
+      console.log('[IndexPage] Redirecting to /login')
+      navigate({ to: '/login', replace: true })
+    }
+  }, [isAuthenticated, isLoading, user, navigate])
+  
+  return <LoadingScreen message="Loading..." />
+}
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: IndexPage,
+})
+
+// Keep the /auth/callback route as a fallback
+const authCallbackRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth/callback',
+  component: OAuthCallbackHandler,
+})
+
+// ============================================================================
 // PROTECTED ROUTE - Wraps all authenticated routes
 // ============================================================================
 
 const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: '_protected',
-  beforeLoad: () => {
-    const { token, user } = useAuthStore.getState()
-    if (!token || !user) {
+  beforeLoad: async () => {
+    const { isLoading } = useAuthStore.getState()
+    
+    // If auth is still loading, wait for it to complete
+    if (isLoading) {
+      await new Promise<void>((resolve) => {
+        const unsubscribe = useAuthStore.subscribe((currentState: { isLoading: boolean }) => {
+          if (!currentState.isLoading) {
+            unsubscribe()
+            resolve()
+          }
+        })
+        // Timeout after 10 seconds to prevent infinite wait
+        setTimeout(() => {
+          unsubscribe()
+          resolve()
+        }, 10000)
+      })
+    }
+    
+    // Re-check after loading completes
+    const state = useAuthStore.getState()
+    if (!state.isAuthenticated || !state.user) {
       throw redirect({ to: '/login' })
     }
   },
   component: ProtectedLayout,
 })
 
-// ============================================================================
-// INDEX ROUTE - Redirects to home
-// ============================================================================
-
-const indexRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/home' })
-  },
-  component: () => null,
-})
 
 // ============================================================================
 // HOME ROUTE
@@ -385,9 +516,10 @@ const specialProgramsRoute = createRoute({
 // ============================================================================
 
 const routeTree = rootRoute.addChildren([
+  indexRoute,
   loginRoute,
+  authCallbackRoute,
   protectedRoute.addChildren([
-    indexRoute,
     homeRoute,
     settingsRoute.addChildren([
       settingsIndexRoute,
