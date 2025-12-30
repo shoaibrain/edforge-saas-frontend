@@ -117,20 +117,18 @@ export function LoginPage() {
                   onClick={() => setSelectedUser(user.id)}
                   className={`
                     p-4 rounded-xl text-left transition-all duration-200
-                    ${
-                      selectedUser === user.id
-                        ? 'bg-teal-500/20 border-2 border-teal-500 dark:border-cyan-400'
-                        : 'bg-surface-tertiary border-2 border-transparent hover:border-border-primary'
+                    ${selectedUser === user.id
+                      ? 'bg-teal-500/20 border-2 border-teal-500 dark:border-cyan-400'
+                      : 'bg-surface-tertiary border-2 border-transparent hover:border-border-primary'
                     }
                   `}
                 >
                   <user.icon
                     className={`
                       w-6 h-6 mb-2
-                      ${
-                        selectedUser === user.id
-                          ? 'text-teal-600 dark:text-cyan-400'
-                          : 'text-text-tertiary'
+                      ${selectedUser === user.id
+                        ? 'text-teal-600 dark:text-cyan-400'
+                        : 'text-text-tertiary'
                       }
                     `}
                   />
