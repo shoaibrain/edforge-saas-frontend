@@ -25,6 +25,7 @@ import { isAuthenticated } from '@edforge/auth'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
+import AuthDebugPage from './pages/AuthDebugPage'
 import {
   AccountPage,
   SecurityPage,
@@ -226,17 +227,12 @@ function IndexPage() {
   useEffect(() => {
     // Don't redirect while auth is still initializing
     if (isLoading) {
-      console.log('[IndexPage] Auth is loading, waiting...')
       return
     }
     
-    console.log('[IndexPage] Auth loaded. isAuthenticated:', isAuthenticated, 'user:', user?.email)
-    
     if (isAuthenticated && user) {
-      console.log('[IndexPage] Redirecting to /home')
       navigate({ to: '/home', replace: true })
     } else {
-      console.log('[IndexPage] Redirecting to /login')
       navigate({ to: '/login', replace: true })
     }
   }, [isAuthenticated, isLoading, user, navigate])
@@ -265,10 +261,10 @@ const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: '_protected',
   beforeLoad: async () => {
-    const { isLoading } = useAuthStore.getState()
+    const initialState = useAuthStore.getState()
     
     // If auth is still loading, wait for it to complete
-    if (isLoading) {
+    if (initialState.isLoading) {
       await new Promise<void>((resolve) => {
         const unsubscribe = useAuthStore.subscribe((currentState: { isLoading: boolean }) => {
           if (!currentState.isLoading) {
@@ -286,6 +282,7 @@ const protectedRoute = createRoute({
     
     // Re-check after loading completes
     const state = useAuthStore.getState()
+    
     if (!state.isAuthenticated || !state.user) {
       throw redirect({ to: '/login' })
     }
@@ -482,6 +479,16 @@ const edfiRoute = createRoute({
 })
 
 // ============================================================================
+// AUTH DEBUG ROUTE
+// ============================================================================
+
+const authDebugRoute2 = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/auth-debug',
+  component: AuthDebugPage,
+})
+
+// ============================================================================
 // PORTAL ROUTES
 // ============================================================================
 
@@ -545,6 +552,7 @@ const routeTree = rootRoute.addChildren([
     specialProgramsRoute,
     studentPortalRoute,
     parentPortalRoute,
+    authDebugRoute2,
   ]),
 ])
 

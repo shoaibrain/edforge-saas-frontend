@@ -34,11 +34,18 @@ api.interceptors.request.use(
       
       if (token) {
         config.headers.set('Authorization', `Bearer ${token}`)
+        console.log('[API] Token injected:', {
+          url: config.url,
+          tokenLength: token.length,
+          tokenPreview: token.substring(0, 50) + '...',
+        })
+      } else {
+        console.warn('[API] No token available for request:', config.url)
       }
     } catch (error) {
       // Not authenticated - let request proceed without token
       // Backend will return 401 if auth is required
-      console.debug('[API] No auth token available')
+      console.warn('[API] Failed to get auth token:', error)
     }
 
     return config
@@ -62,17 +69,50 @@ api.interceptors.response.use(
 
     // Handle authentication errors
     if (status === 401 && !isRedirecting) {
-      isRedirecting = true
+      // Import auth store and signOut dynamically to avoid circular dependency
+      const { useAuthStore } = await import('../stores/auth.store')
+      const { signOut } = await import('aws-amplify/auth')
 
+      // Set a persistent flag to prevent initializeAuth from re-authenticating
+      // This flag is only cleared when user explicitly clicks login button
+      sessionStorage.setItem('edforge-session-invalidated', 'true')
+      
+      // Clear auth state synchronously
+      useAuthStore.setState({ 
+        user: null, 
+        isAuthenticated: false, 
+        isLoading: false,
+        tenantName: null,
+        tenantTier: null,
+        error: 'Session expired. Please log in again.',
+      })
+      
+      // Clear persisted auth data
+      localStorage.removeItem('edforge-auth')
+      
+      // Sign out from Cognito (local only - no global redirect)
+      // This clears Amplify's local session so user can login again
+      try {
+        await signOut()
+      } catch (signOutError) {
+        console.warn('[API] Failed to sign out from Cognito:', signOutError)
+      }
+
+      // Skip redirect if already on login page
+      if (window.location.pathname === '/login') {
+        return Promise.reject(error)
+      }
+
+      isRedirecting = true
       console.warn('[API] Authentication error - redirecting to login')
       
-      // Redirect to login
+      // Redirect to login immediately (no async operations)
       window.location.href = '/login'
 
       // Reset flag after a delay
       setTimeout(() => {
         isRedirecting = false
-      }, 1000)
+      }, 2000)
     }
 
     // Handle authorization errors

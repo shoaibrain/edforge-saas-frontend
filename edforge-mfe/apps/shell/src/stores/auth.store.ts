@@ -23,7 +23,7 @@ import {
 // TYPES
 // ============================================================================
 
-interface AuthStore {
+export interface AuthStore {
   user: UserIdentity | null
   isAuthenticated: boolean
   isLoading: boolean
@@ -151,9 +151,18 @@ export const useAuthStore = create<AuthStore>()(
       initializeAuth: async () => {
         const currentState = get()
         
+        // Check if session was invalidated by a 401 error
+        // This flag persists until user explicitly clicks login button
+        const sessionInvalidated = sessionStorage.getItem('edforge-session-invalidated')
+        
+        if (sessionInvalidated === 'true') {
+          // Do NOT clear the flag here - it's cleared when user clicks login
+          set({ isLoading: false })
+          return
+        }
+        
         // Prevent multiple concurrent initializations
         if (currentState.isLoading) {
-          console.log('[Auth] Initialization already in progress, skipping')
           return
         }
 

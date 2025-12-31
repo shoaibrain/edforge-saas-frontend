@@ -14,7 +14,7 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'r
 import { useQuery } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
 import type { UserIdentity, Tenant, School, SchoolYear } from '@edforge/types'
-import { useAuthStore } from '../stores/auth.store'
+import { useAuthStore, type AuthStore } from '../stores/auth.store'
 import { useAppStore } from '../stores/app.store'
 import { tenantService } from '../services/tenant.service'
 
@@ -125,16 +125,16 @@ interface ShellProviderProps {
 }
 
 export function ShellProvider({ children }: ShellProviderProps) {
-  // Auth store
-  const user = useAuthStore((s) => s.user)
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  const isAuthLoading = useAuthStore((s) => s.isLoading)
-  const initializeAuth = useAuthStore((s) => s.initializeAuth)
-  const loginAsMock = useAuthStore((s) => s.loginAsMock)
-  const logout = useAuthStore((s) => s.logout)
-  const setUser = useAuthStore((s) => s.setUser)
-  const tenantName = useAuthStore((s) => s.tenantName)
-  const tenantTier = useAuthStore((s) => s.tenantTier)
+  // Auth store - with proper type annotations
+  const user = useAuthStore((s: AuthStore) => s.user)
+  const isAuthenticated = useAuthStore((s: AuthStore) => s.isAuthenticated)
+  const isAuthLoading = useAuthStore((s: AuthStore) => s.isLoading)
+  const initializeAuth = useAuthStore((s: AuthStore) => s.initializeAuth)
+  const loginAsMock = useAuthStore((s: AuthStore) => s.loginAsMock)
+  const logout = useAuthStore((s: AuthStore) => s.logout)
+  const setUser = useAuthStore((s: AuthStore) => s.setUser)
+  const tenantName = useAuthStore((s: AuthStore) => s.tenantName)
+  const tenantTier = useAuthStore((s: AuthStore) => s.tenantTier)
 
   // App store
   const {
@@ -160,7 +160,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
   // ============================================================================
 
   // Fetch user profile with school assignments
-  const { data: userProfile, isLoading: isUserProfileLoading } = useQuery({
+  const { data: userProfile, isLoading: isUserProfileLoading, error: userProfileError } = useQuery({
     queryKey: ['userProfile'],
     queryFn: () => tenantService.getCurrentUser(),
     enabled: isAuthenticated && !!user,

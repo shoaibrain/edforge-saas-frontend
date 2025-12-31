@@ -90,7 +90,19 @@ export function LoginPage() {
     setIsLoading(true)
     setError(null)
     
+    // Clear the session invalidation flag so auth can proceed after login
+    sessionStorage.removeItem('edforge-session-invalidated')
+    
     try {
+      // First, ensure we're signed out from any existing Cognito session
+      // This prevents "There is already a signed in user" error
+      const { signOut } = await import('aws-amplify/auth')
+      try {
+        await signOut()
+      } catch {
+        // Ignore signout errors - user might not be signed in
+      }
+      
       await cognitoLogin()
       // User will be redirected to Cognito Hosted UI
       // After successful auth, they'll be redirected back to the app
