@@ -24,11 +24,9 @@ import {
   Send,
   Clock,
 } from 'lucide-react'
-import { can } from '@edforge/abac'
 import { useAppStore } from '@/stores/app.store'
-import { useAuthStore } from '@/stores/auth.store'
-import { Card } from '@edforge/ui'
-import { Avatar } from '@edforge/ui'
+import { Card, Avatar } from '@edforge/ui'
+// NOTE: Auth is handled by Shell's protected routes - remotes inherit auth from Shell
 
 
 
@@ -212,12 +210,10 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
 // ============================================================================
 
 export default function AnnouncementsPage() {
-  const { user } = useAuthStore()
   const { activeSchoolId } = useAppStore()
 
-  if (!can(user, { action: 'view', resource: 'staff', schoolId: activeSchoolId ?? undefined })) {
-    return <div className="p-8">Access Denied</div>
-  }
+  // NOTE: Auth/ABAC checks removed - Shell's protected routes handle authentication
+  console.log('[Messages:Announcements] Rendering announcements page, activeSchoolId:', activeSchoolId)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'scheduled' | 'draft'>('all')
 

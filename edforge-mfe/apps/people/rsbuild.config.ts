@@ -31,6 +31,9 @@ export default defineConfig({
             './PeopleModule': './src/bootstrap.tsx',
           },
           shared: {
+            // Auth - CRITICAL: Share Shell's Amplify instance to prevent split-brain auth state
+            '@edforge/auth': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            'aws-amplify': { singleton: true, eager: true },
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
             '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0', eager: true },

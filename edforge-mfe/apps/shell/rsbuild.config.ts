@@ -50,6 +50,8 @@ export default defineConfig({
             analytics: 'analytics@http://localhost:3008/remoteEntry.js',
           },
           shared: {
+            // Auth - CRITICAL: aws-amplify must be singleton to share token state across all modules
+            'aws-amplify': { singleton: true, eager: true },
             // Core React
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },

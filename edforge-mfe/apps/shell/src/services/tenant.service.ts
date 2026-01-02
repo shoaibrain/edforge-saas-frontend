@@ -148,18 +148,18 @@ export const tenantService = {
   // User
   getCurrentUser,
   getUserAssignments,
-  
+
   // Tenant
   getTenant,
   updateTenant,
-  
+
   // Schools
   getSchools,
   getSchool,
   createSchool,
   updateSchool,
   deleteSchool,
-  
+
   // School Years
   getSchoolYears,
   getCurrentSchoolYear,

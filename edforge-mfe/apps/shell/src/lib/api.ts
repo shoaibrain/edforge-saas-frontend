@@ -28,24 +28,50 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    // Generate correlation ID for distributed tracing
+    const correlationId = crypto.randomUUID()
+    config.headers.set('X-Correlation-Id', correlationId)
+
     try {
-      // Get the ID token from Cognito session
+      // Get the ID token from Cognito session (uses shared singleton Amplify instance)
       const token = await getIdToken()
-      
+
       if (token) {
         config.headers.set('Authorization', `Bearer ${token}`)
-        console.log('[API] Token injected:', {
+
+        // Extract tenant ID from the JWT token payload for multi-tenant context
+        // The token payload contains custom:tenantId from Cognito
+        try {
+          const payloadBase64 = token.split('.')[1]
+          const payload = JSON.parse(atob(payloadBase64))
+          const tenantId = payload['custom:tenantId']
+          if (tenantId) {
+            config.headers.set('X-Tenant-Id', tenantId)
+          }
+        } catch (parseError) {
+          console.warn('[API] Could not parse tenant from token:', parseError)
+        }
+
+        console.log('[API] Request configured:', {
           url: config.url,
-          tokenLength: token.length,
-          tokenPreview: token.substring(0, 50) + '...',
+          correlationId,
+          hasToken: true,
+          hasTenant: config.headers.has('X-Tenant-Id'),
         })
       } else {
-        console.warn('[API] No token available for request:', config.url)
+        console.warn('[API] No token available for request:', {
+          url: config.url,
+          correlationId,
+        })
       }
     } catch (error) {
       // Not authenticated - let request proceed without token
       // Backend will return 401 if auth is required
-      console.warn('[API] Failed to get auth token:', error)
+      console.warn('[API] Failed to get auth token:', {
+        url: config.url,
+        correlationId,
+        error: error instanceof Error ? error.message : error,
+      })
     }
 
     return config
@@ -76,20 +102,20 @@ api.interceptors.response.use(
       // Set a persistent flag to prevent initializeAuth from re-authenticating
       // This flag is only cleared when user explicitly clicks login button
       sessionStorage.setItem('edforge-session-invalidated', 'true')
-      
+
       // Clear auth state synchronously
-      useAuthStore.setState({ 
-        user: null, 
-        isAuthenticated: false, 
+      useAuthStore.setState({
+        user: null,
+        isAuthenticated: false,
         isLoading: false,
         tenantName: null,
         tenantTier: null,
         error: 'Session expired. Please log in again.',
       })
-      
+
       // Clear persisted auth data
       localStorage.removeItem('edforge-auth')
-      
+
       // Sign out from Cognito (local only - no global redirect)
       // This clears Amplify's local session so user can login again
       try {
@@ -105,7 +131,7 @@ api.interceptors.response.use(
 
       isRedirecting = true
       console.warn('[API] Authentication error - redirecting to login')
-      
+
       // Redirect to login immediately (no async operations)
       window.location.href = '/login'
 

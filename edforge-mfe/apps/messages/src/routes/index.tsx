@@ -18,38 +18,17 @@ import {
   Clock,
   CheckCircle2
 } from 'lucide-react'
-import { can } from '@edforge/abac'
-import { useAuthStore } from '@/stores/auth.store'
+// NOTE: Auth is handled by Shell's protected routes - remotes inherit auth from Shell
 import { useAppStore } from '@/stores/app.store'
 import { Card } from '@edforge/ui'
 import { Button } from '@edforge/ui'
 
 export default function MessagesOverviewPage() {
-  const { user } = useAuthStore()
   const { activeSchoolId } = useAppStore()
 
-  console.log('[Messages] Debug:', {
-    user,
-    activeSchoolId,
-    assignments: user?.assignments,
-    roleInSchool: activeSchoolId && user?.assignments ? user.assignments[activeSchoolId] : 'none',
-    canViewMessages: can(user, { action: 'view', resource: 'messages', schoolId: activeSchoolId ?? undefined })
-  })
-
-  // Explicitly check role existence
-  if (activeSchoolId && user?.assignments?.[activeSchoolId]) {
-    console.log('[Messages] User has role in school:', user.assignments[activeSchoolId]);
-  } else {
-    console.log('[Messages] User has NO role in active school or school is missing');
-  }
-
-  if (!can(user, { action: 'view', resource: 'messages', schoolId: activeSchoolId ?? undefined })) {
-    // Ideally redirect or show forbidden. For now, we can return null or a forbidden component if we had one.
-    // But since we don't have navigate from router passed in easily or a useNavigate hook setup guaranteed to work across MFEs smoothly without setup,
-    // we'll rely on Shell or just show a message.
-    // actually we have Redirect from router.
-    return <div className="p-8">Access Denied</div>
-  }
+  // NOTE: Auth/ABAC checks removed - Shell's protected routes handle authentication
+  // Remote modules should NOT perform independent redirect logic
+  console.log('[Messages:Overview] Rendering messages overview, activeSchoolId:', activeSchoolId)
   return (
     <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
       {/* Header */}

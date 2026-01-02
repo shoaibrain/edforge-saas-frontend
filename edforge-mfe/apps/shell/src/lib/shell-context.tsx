@@ -143,7 +143,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
     sidebarCollapsed,
     toggleSidebar,
   } = useAppStore()
-  
+
   // Theme (using 'system' as default for now)
   const theme: 'light' | 'dark' | 'system' = 'system'
   const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
@@ -214,12 +214,12 @@ export function ShellProvider({ children }: ShellProviderProps) {
   // Filter schools user has access to based on assignments
   const availableSchools = useMemo(() => {
     if (!user) return []
-    
+
     // TenantAdmin has access to all schools
     if (user.globalRole === 'TenantAdmin') {
       return effectiveSchools
     }
-    
+
     // StandardUser only sees assigned schools
     const assignedSchoolIds = Object.keys(user.assignments)
     return effectiveSchools.filter((s) => assignedSchoolIds.includes(s.id))

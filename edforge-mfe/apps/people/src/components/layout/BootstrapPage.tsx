@@ -17,7 +17,7 @@ import { useState } from 'react'
 import { Building2, Sparkles, Clock, CheckCircle2 } from 'lucide-react'
 import { Card } from '@edforge/ui'
 import { useAppStore } from '@/stores/app.store'
-import { useAuthStore } from '@/stores/auth.store'
+// NOTE: Auth is handled by Shell's protected routes - remotes inherit auth context from Shell
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -80,7 +80,7 @@ function FeatureStatusBadge({ status }: { status: FeatureHint['status'] }) {
 
 function SchoolRequiredState() {
   const [hovered, setHovered] = useState(false)
-  
+
   const springProps = useSpring({
     scale: hovered ? 1.02 : 1,
     y: hovered ? -2 : 0,
@@ -98,7 +98,7 @@ function SchoolRequiredState() {
       <Card className="p-8 relative overflow-hidden">
         {/* Subtle gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-golden-400/5 via-transparent to-caramel-400/5 dark:from-golden-400/10 dark:to-caramel-400/10" />
-        
+
         <div className="relative flex flex-col items-center text-center gap-4">
           <div className="p-4 rounded-2xl bg-golden-400/20 dark:bg-golden-400/25">
             <Building2 className="w-8 h-8 text-golden-600 dark:text-golden-400" />
@@ -108,7 +108,7 @@ function SchoolRequiredState() {
               Select a School
             </h3>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-md">
-              Choose a school from the header to access this feature. 
+              Choose a school from the header to access this feature.
               This ensures data is properly scoped to your institution.
             </p>
           </div>
@@ -131,7 +131,6 @@ export function BootstrapPage({
   children,
 }: BootstrapPageProps) {
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  const user = useAuthStore((s) => s.user)
 
   const showSchoolRequiredState = requiresActiveSchool && !activeSchoolId
 
@@ -175,7 +174,7 @@ export function BootstrapPage({
           <Card className="relative overflow-hidden">
             {/* Subtle gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-teal-500/3 via-transparent to-cyan-500/3 dark:from-teal-500/8 dark:to-cyan-500/8" />
-            
+
             <div className="relative p-8">
               <div className="flex items-start gap-5">
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-500/15 to-cyan-500/10 dark:from-teal-500/20 dark:to-cyan-500/15 border border-teal-500/20 dark:border-cyan-500/25 flex-shrink-0">
@@ -188,18 +187,12 @@ export function BootstrapPage({
                         Feature Coming Soon
                       </h2>
                       <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-lg">
-                        This module is scaffolded and ready for development. 
-                        Navigation and routing are complete—feature implementation 
+                        This module is scaffolded and ready for development.
+                        Navigation and routing are complete—feature implementation
                         will be added incrementally.
                       </p>
                     </div>
-                    {user?.globalRole && (
-                      <div className="flex-shrink-0">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-secondary))] text-xs font-medium text-[rgb(var(--text-secondary))]">
-                          Signed in as {user.globalRole}
-                        </span>
-                      </div>
-                    )}
+                    {/* Role display removed - auth context should come from Shell if needed */}
                   </div>
 
                   {/* Feature hints */}

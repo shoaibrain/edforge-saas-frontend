@@ -28,7 +28,7 @@ export interface AuthStore {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
-  
+
   // Tenant info from Cognito claims
   tenantName: string | null
   tenantTier: string | null
@@ -38,7 +38,7 @@ export interface AuthStore {
   setUser: (user: UserIdentity, assignments?: SchoolAssignment[]) => void
   logout: () => Promise<void>
   setError: (error: string | null) => void
-  
+
   // Dev mode - will be removed in production
   loginAsMock: (mockUserId: string) => void
 
@@ -150,17 +150,17 @@ export const useAuthStore = create<AuthStore>()(
        */
       initializeAuth: async () => {
         const currentState = get()
-        
+
         // Check if session was invalidated by a 401 error
         // This flag persists until user explicitly clicks login button
         const sessionInvalidated = sessionStorage.getItem('edforge-session-invalidated')
-        
+
         if (sessionInvalidated === 'true') {
           // Do NOT clear the flag here - it's cleared when user clicks login
           set({ isLoading: false })
           return
         }
-        
+
         // Prevent multiple concurrent initializations
         if (currentState.isLoading) {
           return
@@ -171,11 +171,11 @@ export const useAuthStore = create<AuthStore>()(
 
           // Check if user is authenticated with Cognito
           const authenticated = await checkIsAuthenticated()
-          
+
           if (!authenticated) {
-            set({ 
-              user: null, 
-              isAuthenticated: false, 
+            set({
+              user: null,
+              isAuthenticated: false,
               isLoading: false,
               tenantName: null,
               tenantTier: null,
@@ -185,11 +185,11 @@ export const useAuthStore = create<AuthStore>()(
 
           // Get the ID token payload with user claims
           const payload = await getIdTokenPayload()
-          
+
           if (!payload) {
-            set({ 
-              user: null, 
-              isAuthenticated: false, 
+            set({
+              user: null,
+              isAuthenticated: false,
               isLoading: false,
               error: 'Failed to get user information',
             })
@@ -204,21 +204,21 @@ export const useAuthStore = create<AuthStore>()(
           // Shell context will fetch assignments from API
           const user = mapCognitoToUserIdentity(payload as CognitoIdTokenPayload, [])
 
-          set({ 
-            user, 
-            isAuthenticated: true, 
+          set({
+            user,
+            isAuthenticated: true,
             isLoading: false,
             tenantName,
             tenantTier,
             error: null,
           })
-          
+
           console.log('[Auth] Initialization successful for user:', user.email)
         } catch (error) {
           console.error('[Auth] Initialization failed:', error)
-          set({ 
-            user: null, 
-            isAuthenticated: false, 
+          set({
+            user: null,
+            isAuthenticated: false,
             isLoading: false,
             error: error instanceof Error ? error.message : 'Authentication failed',
           })
@@ -237,7 +237,7 @@ export const useAuthStore = create<AuthStore>()(
             return acc
           }, {} as Record<string, SchoolRole>)
 
-          set({ 
+          set({
             user: { ...user, assignments: updatedAssignments },
             isAuthenticated: true,
           })
@@ -256,9 +256,9 @@ export const useAuthStore = create<AuthStore>()(
         } catch (error) {
           console.error('Logout error:', error)
         } finally {
-          set({ 
-            user: null, 
-            isAuthenticated: false, 
+          set({
+            user: null,
+            isAuthenticated: false,
             isLoading: false,
             tenantName: null,
             tenantTier: null,
@@ -283,9 +283,9 @@ export const useAuthStore = create<AuthStore>()(
           return
         }
 
-        set({ 
-          user, 
-          isAuthenticated: true, 
+        set({
+          user,
+          isAuthenticated: true,
           isLoading: false,
           tenantName: 'Demo District',
           tenantTier: 'PROFESSIONAL',
@@ -313,8 +313,8 @@ export const useAuthStore = create<AuthStore>()(
           const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
           if (match) {
             const cookieVal = decodeURIComponent(match[2])
-            try { 
-              return JSON.parse(cookieVal) 
+            try {
+              return JSON.parse(cookieVal)
             } catch {
               return cookieVal
             }
@@ -330,8 +330,8 @@ export const useAuthStore = create<AuthStore>()(
           document.cookie = `${name}=; path=/; max-age=0`
         },
       },
-      partialize: (state) => ({ 
-        user: state.user, 
+      partialize: (state) => ({
+        user: state.user,
         isAuthenticated: state.isAuthenticated,
         tenantName: state.tenantName,
         tenantTier: state.tenantTier,
@@ -348,7 +348,7 @@ export const useAuthStore = create<AuthStore>()(
 if (typeof window !== 'undefined') {
   subscribeToAuthChanges((event) => {
     const store = useAuthStore.getState()
-    
+
     switch (event) {
       case 'signedIn':
         // Re-initialize auth to fetch user data
@@ -356,8 +356,8 @@ if (typeof window !== 'undefined') {
         break
       case 'signedOut':
         // Clear the store
-        useAuthStore.setState({ 
-          user: null, 
+        useAuthStore.setState({
+          user: null,
           isAuthenticated: false,
           tenantName: null,
           tenantTier: null,
