@@ -34,12 +34,12 @@ import { cn } from '../../lib/utils'
 // ANIMATED NAV ICON WITH FRAMER MOTION
 // ============================================================================
 
-function AnimatedNavIcon({ 
-  icon: Icon, 
-  isActive, 
+function AnimatedNavIcon({
+  icon: Icon,
+  isActive,
   isHovered,
   isDanger,
-}: { 
+}: {
   icon: LucideIcon
   isActive: boolean
   isHovered: boolean
@@ -54,14 +54,14 @@ function AnimatedNavIcon({
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className="relative flex items-center justify-center flex-shrink-0"
     >
-      <Icon 
+      <Icon
         size={SIDEBAR_NAV_ICON_SIZE}
         className={cn(
           'transition-colors duration-200 relative z-10',
           isActive && !isDanger && 'text-teal-700 dark:text-white',
           isActive && isDanger && 'text-rust-500',
           !isActive && 'text-[rgb(var(--icon-inactive))] hover:text-[rgb(var(--icon-inactive-hover))]'
-        )} 
+        )}
       />
       {/* Glow effect */}
       <motion.div
@@ -83,12 +83,12 @@ function AnimatedNavIcon({
 // NAV ITEM LINK
 // ============================================================================
 
-function NavItemLink({ 
-  item, 
-  collapsed, 
+function NavItemLink({
+  item,
+  collapsed,
   isActive,
   index,
-}: { 
+}: {
   item: NavItem
   collapsed: boolean
   isActive: boolean
@@ -106,8 +106,8 @@ function NavItemLink({
     >
       <motion.div
         animate={{
-          backgroundColor: isHovered && !isActive 
-            ? 'rgba(100, 116, 139, 0.06)' 
+          backgroundColor: isHovered && !isActive
+            ? 'rgba(100, 116, 139, 0.06)'
             : 'rgba(0, 0, 0, 0)',
         }}
         transition={{ duration: 0.15 }}
@@ -151,11 +151,11 @@ function NavItemLink({
             }}
           />
         )}
-        
+
         {/* Icon */}
-        <AnimatedNavIcon 
-          icon={item.icon} 
-          isActive={isActive} 
+        <AnimatedNavIcon
+          icon={item.icon}
+          isActive={isActive}
           isHovered={isHovered}
           isDanger={isDanger}
         />
@@ -184,7 +184,7 @@ function NavItemLink({
         {/* Badge */}
         <AnimatePresence>
           {item.badge && !collapsed && (
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
@@ -250,7 +250,7 @@ function NavGroup({
           {group.label}
         </motion.p>
       )}
-      
+
       {/* Group items */}
       {group.items.map((item, idx) => (
         <NavItemLink
@@ -284,19 +284,19 @@ function useSidebarPathname(): string {
 
 function HomeNavButton({
   collapsed,
-  isSubModule 
+  isSubModule
 }: {
   collapsed: boolean
-  isSubModule: boolean 
+  isSubModule: boolean
 }) {
   const pathname = useSidebarPathname()
   const [isHovered, setIsHovered] = useState(false)
-  
+
   // Determine state based on context
   const isAtHome = pathname === '/home' || pathname === '/'
   const isActive = !isSubModule && isAtHome
   const showBackMode = isSubModule
-  
+
   // Dynamic icon and label
   const CurrentIcon = showBackMode ? ArrowLeft : Home
   const label = showBackMode ? 'Back to Home' : 'Home'
@@ -310,8 +310,8 @@ function HomeNavButton({
     >
       <motion.div
         animate={{
-          backgroundColor: isHovered && !isActive 
-            ? 'rgba(100, 116, 139, 0.06)' 
+          backgroundColor: isHovered && !isActive
+            ? 'rgba(100, 116, 139, 0.06)'
             : 'rgba(0, 0, 0, 0)',
         }}
         transition={{ duration: 0.15 }}
@@ -333,7 +333,7 @@ function HomeNavButton({
             }}
           />
         )}
-        
+
         {/* Active indicator line - same as NavItemLink */}
         {isActive && (
           <motion.div
@@ -347,11 +347,11 @@ function HomeNavButton({
             }}
           />
         )}
-        
+
         {/* Icon - using AnimatedNavIcon for consistency */}
-        <AnimatedNavIcon 
-          icon={CurrentIcon} 
-          isActive={isActive} 
+        <AnimatedNavIcon
+          icon={CurrentIcon}
+          isActive={isActive}
           isHovered={isHovered}
         />
 
@@ -524,7 +524,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
               className="w-full h-full object-cover"
             />
           </div>
-          
+
           {/* Text content */}
           <div className="flex-1 min-w-0 text-left">
             <p className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate leading-tight">
@@ -534,7 +534,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
               {activeSchoolId ? user.assignments[activeSchoolId] : 'Choose school'}
             </p>
           </div>
-          
+
           {/* Chevron */}
           <ChevronsUpDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] transition-colors flex-shrink-0 mr-1" />
         </MenuButton>
@@ -550,7 +550,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
         leaveFrom="opacity-100 scale-100"
         leaveTo="opacity-0 scale-95"
       >
-        <MenuItems 
+        <MenuItems
           className={cn(
             'w-80 rounded-2xl z-50 overflow-hidden',
             // Glassmorphism - frosted glass effect
@@ -559,8 +559,8 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
             'shadow-xl shadow-black/10 dark:shadow-black/40',
             // Ring for subtle depth
             'ring-1 ring-inset ring-white/5',
-            collapsed 
-              ? 'absolute left-full top-0 ml-3 origin-left' 
+            collapsed
+              ? 'absolute left-full top-0 ml-3 origin-left'
               : 'absolute left-0 top-full mt-2 origin-top'
           )}
         >
@@ -579,11 +579,11 @@ export function Sidebar() {
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
   const setModule = useSidebarStore((s) => s.setModule)
-  
+
   // Get current module based on route
   const { moduleId, config, isSubModule } = useSidebarModule()
   const activeItemId = useActiveNavItem()
-  
+
   // Filter groups based on permissions
   const filteredGroups = useSecureNavGroups(config.groups)
 
@@ -627,7 +627,7 @@ export function Sidebar() {
             {filteredGroups.map((group) => {
               const groupStartIndex = itemIndex
               itemIndex += group.items.length
-              
+
               return (
                 <NavGroup
                   key={group.id}
