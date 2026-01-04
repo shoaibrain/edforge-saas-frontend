@@ -1,0 +1,227 @@
+/**
+ * EdForge Theme - Base Layer
+ *
+ * Core CSS custom properties and base typography.
+ * This file should be imported by all EdForge applications.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Custom theme configuration with Coolors palette */
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  /* Edforge Brand Colors - Coolors Palette
+     https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226 
+  */
+  
+  /* Ink Black - Primary dark */
+  --color-ink-50: #9ee4ff;
+  --color-ink-100: #3dc8ff;
+  --color-ink-200: #009ddb;
+  --color-ink-300: #00587a;
+  --color-ink-400: #002a3d;
+  --color-ink-500: #001219;
+  --color-ink-600: #000f14;
+  --color-ink-700: #000b0f;
+  --color-ink-800: #00070a;
+  --color-ink-900: #000405;
+  
+  /* Dark Teal - Primary brand */
+  --color-teal-50: #b0f2ff;
+  --color-teal-100: #62e5ff;
+  --color-teal-200: #13d8ff;
+  --color-teal-300: #00a3c4;
+  --color-teal-400: #007a93;
+  --color-teal-500: #005f73;
+  --color-teal-600: #004e5e;
+  --color-teal-700: #003b46;
+  --color-teal-800: #00272f;
+  --color-teal-900: #001417;
+  
+  /* Dark Cyan - Secondary brand */
+  --color-cyan-50: #bdfafb;
+  --color-cyan-100: #7bf4f7;
+  --color-cyan-200: #39eff2;
+  --color-cyan-300: #0ed3d7;
+  --color-cyan-400: #0ab3b6;
+  --color-cyan-500: #0a9396;
+  --color-cyan-600: #087577;
+  --color-cyan-700: #065859;
+  --color-cyan-800: #043b3b;
+  --color-cyan-900: #021d1e;
+  
+  /* Pearl Aqua - Light accent */
+  --color-aqua-50: #e9f6f2;
+  --color-aqua-100: #d4ede5;
+  --color-aqua-200: #bee4d7;
+  --color-aqua-300: #a9dbca;
+  --color-aqua-400: #94d2bd;
+  --color-aqua-500: #7ac4ab;
+  --color-aqua-600: #61bd9e;
+  --color-aqua-700: #3f977a;
+  --color-aqua-800: #2a6551;
+  --color-aqua-900: #153229;
+  
+  /* Vanilla Custard - Warm neutral */
+  --color-vanilla-50: #fbf7ed;
+  --color-vanilla-100: #f6efdb;
+  --color-vanilla-200: #f2e7c9;
+  --color-vanilla-300: #ede0b7;
+  --color-vanilla-400: #e9d8a6;
+  --color-vanilla-500: #d9bc66;
+  --color-vanilla-600: #bf9b30;
+  --color-vanilla-700: #7f6720;
+  --color-vanilla-800: #403410;
+  --color-vanilla-900: #201a08;
+  
+  /* Golden Orange - Primary CTA */
+  --color-golden-50: #ffecc9;
+  --color-golden-100: #ffd993;
+  --color-golden-200: #ffc65d;
+  --color-golden-300: #ffb327;
+  --color-golden-400: #ee9b00;
+  --color-golden-500: #c07d00;
+  --color-golden-600: #905d00;
+  --color-golden-700: #603e00;
+  --color-golden-800: #301f00;
+  --color-golden-900: #180f00;
+  
+  /* Burnt Caramel - Warning */
+  --color-caramel-50: #fee0c2;
+  --color-caramel-100: #fec286;
+  --color-caramel-200: #fda349;
+  --color-caramel-300: #fd850d;
+  --color-caramel-400: #ca6702;
+  --color-caramel-500: #a25202;
+  --color-caramel-600: #793d01;
+  --color-caramel-700: #512901;
+  --color-caramel-800: #281400;
+  --color-caramel-900: #140a00;
+  
+  /* Oxidized Iron - Error/Danger */
+  --color-rust-50: #f9cac6;
+  --color-rust-100: #f3958d;
+  --color-rust-200: #ed6053;
+  --color-rust-300: #e72b1a;
+  --color-rust-400: #ae2012;
+  --color-rust-500: #8c190f;
+  --color-rust-600: #69130b;
+  --color-rust-700: #460d07;
+  --color-rust-800: #230604;
+  --color-rust-900: #110302;
+}
+
+/* CSS Custom Properties for theming */
+:root {
+  /* Font */
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Surface colors - Light mode uses warm neutrals */
+  --surface-primary: 251 249 245; /* warm off-white */
+  --surface-secondary: 255 255 255;
+  --surface-tertiary: 246 243 235; /* vanilla-100 tint */
+  --surface-elevated: 255 255 255;
+
+  /* Text colors */
+  --text-primary: 0 18 25; /* ink-500 */
+  --text-secondary: 0 95 115; /* teal-500 */
+  --text-tertiary: 107 114 128; /* neutral gray */
+  --text-inverted: 251 249 245;
+
+  /* Border colors */
+  --border-primary: 233 216 166; /* vanilla-400 */
+  --border-secondary: 246 239 219; /* vanilla-100 */
+  --border-tertiary: 213 196 146;
+
+  /* Interactive states */
+  --interactive-hover: 246 243 235;
+  --interactive-active: 233 216 166;
+  --interactive-focus: 10 147 150;
+
+  /* Brand accent */
+  --brand-primary: 0 95 115; /* teal-500 */
+  --brand-secondary: 10 147 150; /* cyan-500 */
+  --brand-accent: 238 155 0; /* golden-400 */
+
+  /* Icon colors - subtle brand tint for warmth */
+  --icon-inactive: 71 85 105; /* slate-600 with slight warmth */
+  --icon-inactive-hover: 51 65 85; /* slate-700 - darker on hover */
+}
+
+.dark {
+  /* Surface colors - Dark mode uses ink palette */
+  --surface-primary: 0 18 25;
+  --surface-secondary: 0 39 47;
+  --surface-tertiary: 0 59 70;
+  --surface-elevated: 0 78 94;
+
+  /* Text colors - Dark mode */
+  --text-primary: 251 247 237;
+  --text-secondary: 169 219 202;
+  --text-tertiary: 148 210 189;
+  --text-inverted: 0 18 25;
+
+  /* Border colors - Dark mode */
+  --border-primary: 0 78 94;
+  --border-secondary: 0 59 70;
+
+  /* Interactive states - Dark mode */
+  --interactive-hover: 0 59 70;
+  --interactive-active: 0 78 94;
+
+  /* Brand accent */
+  --brand-primary: 10 147 150;
+  --brand-secondary: 148 210 189;
+  --brand-accent: 238 155 0;
+
+  /* Icon colors */
+  --icon-inactive: 125 164 152;
+  --icon-inactive-hover: 148 210 189;
+}
+
+/* Base layer styles */
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: rgb(var(--surface-primary));
+  color: rgb(var(--text-primary));
+  min-height: 100vh;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Typography defaults */
+h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: rgb(var(--text-primary));
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: rgb(var(--text-primary));
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  color: rgb(var(--text-primary));
+}
+
+p {
+  color: rgb(var(--text-secondary));
+  line-height: 1.625;
+}
+

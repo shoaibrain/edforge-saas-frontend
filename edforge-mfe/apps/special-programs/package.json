@@ -1,0 +1,27 @@
+{
+  "name": "@edforge/special-programs",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@edforge/ui": "workspace:*",
+    "@edforge/types": "workspace:*",
+    "@edforge/abac": "workspace:*",
+    "@tanstack/react-router": "^1.82.0",
+    "@module-federation/enhanced": "^0.8.0",
+    "@rsbuild/core": "^1.0.0",
+    "@rsbuild/plugin-react": "^1.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}
