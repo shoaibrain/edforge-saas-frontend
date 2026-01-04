@@ -160,7 +160,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
   // ============================================================================
 
   // Fetch user profile with school assignments
-  const { data: userProfile, isLoading: isUserProfileLoading, error: userProfileError } = useQuery({
+  const { data: userProfile, isLoading: isUserProfileLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: () => tenantService.getCurrentUser(),
     enabled: isAuthenticated && !!user,
@@ -215,14 +215,17 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const availableSchools = useMemo(() => {
     if (!user) return []
 
+    // Ensure effectiveSchools is always an array
+    const schoolsList = Array.isArray(effectiveSchools) ? effectiveSchools : []
+
     // TenantAdmin has access to all schools
     if (user.globalRole === 'TenantAdmin') {
-      return effectiveSchools
+      return schoolsList
     }
 
     // StandardUser only sees assigned schools
     const assignedSchoolIds = Object.keys(user.assignments)
-    return effectiveSchools.filter((s) => assignedSchoolIds.includes(s.id))
+    return schoolsList.filter((s) => assignedSchoolIds.includes(s.id))
   }, [user, effectiveSchools])
 
   const activeSchool = useMemo(() => {

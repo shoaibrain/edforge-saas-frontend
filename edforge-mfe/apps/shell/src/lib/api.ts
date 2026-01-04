@@ -175,11 +175,27 @@ export interface ApiError {
 }
 
 /**
+ * Helper to unwrap API response
+ * Checks if the response has a 'data' property and returns it, otherwise returns the whole response.
+ */
+function unwrapResponse<T>(response: any): T {
+  if (response && typeof response === 'object' && 'data' in response) {
+    // Check if it's really a wrapper (e.g. has data and maybe message/meta)
+    // or if the actual data just happens to have a 'data' property.
+    // In this specific case, based on the error "availableSchools.find is not a function",
+    // we know we are getting an object when we expect an array.
+    // So if 'data' is an array and we expect an array, it's likely a wrapper.
+    return response.data as T
+  }
+  return response as T
+}
+
+/**
  * GET request with typed response
  */
 export async function apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
   const response = await api.get<T>(url, { params })
-  return response.data
+  return unwrapResponse<T>(response.data)
 }
 
 /**
@@ -187,7 +203,7 @@ export async function apiGet<T>(url: string, params?: Record<string, unknown>): 
  */
 export async function apiPost<T, B = unknown>(url: string, body?: B): Promise<T> {
   const response = await api.post<T>(url, body)
-  return response.data
+  return unwrapResponse<T>(response.data)
 }
 
 /**
@@ -195,7 +211,7 @@ export async function apiPost<T, B = unknown>(url: string, body?: B): Promise<T>
  */
 export async function apiPut<T, B = unknown>(url: string, body?: B): Promise<T> {
   const response = await api.put<T>(url, body)
-  return response.data
+  return unwrapResponse<T>(response.data)
 }
 
 /**
@@ -203,7 +219,7 @@ export async function apiPut<T, B = unknown>(url: string, body?: B): Promise<T> 
  */
 export async function apiPatch<T, B = unknown>(url: string, body?: B): Promise<T> {
   const response = await api.patch<T>(url, body)
-  return response.data
+  return unwrapResponse<T>(response.data)
 }
 
 /**
@@ -211,6 +227,6 @@ export async function apiPatch<T, B = unknown>(url: string, body?: B): Promise<T
  */
 export async function apiDelete<T>(url: string): Promise<T> {
   const response = await api.delete<T>(url)
-  return response.data
+  return unwrapResponse<T>(response.data)
 }
 
