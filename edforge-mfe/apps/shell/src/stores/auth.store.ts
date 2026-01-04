@@ -1,25 +1,58 @@
+/**
+ * Auth Store
+ * 
+ * Zustand store for authentication state management.
+ * Integrates with AWS Cognito via @edforge/auth package.
+ */
+
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { UserIdentity, SchoolRole, RoleCategory } from '@edforge/types'
 import { getRoleCategory } from '@edforge/types'
+import {
+  getIdTokenPayload,
+  isAuthenticated as checkIsAuthenticated,
+  logout as amplifyLogout,
+  subscribeToAuthChanges,
+  mapCognitoToUserIdentity,
+  type CognitoIdTokenPayload,
+  type SchoolAssignment,
+} from '@edforge/auth'
 
 // ============================================================================
-// MOCK DATA - Replace with real Cognito integration later
+// TYPES
+// ============================================================================
+
+export interface AuthStore {
+  user: UserIdentity | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  error: string | null
+
+  // Tenant info from Cognito claims
+  tenantName: string | null
+  tenantTier: string | null
+
+  // Actions
+  initializeAuth: () => Promise<void>
+  setUser: (user: UserIdentity, assignments?: SchoolAssignment[]) => void
+  logout: () => Promise<void>
+  setError: (error: string | null) => void
+
+  // Dev mode - will be removed in production
+  loginAsMock: (mockUserId: string) => void
+
+  // Helpers
+  getUserSchools: () => string[]
+  getUserRoleInSchool: (schoolId: string) => SchoolRole | null
+}
+
+// ============================================================================
+// MOCK DATA - For development/demo purposes only
+// Will be removed once backend is fully integrated
 // ============================================================================
 
 const MOCK_USERS: Record<string, UserIdentity> = {
-  'system-admin': {
-    id: 'user-000',
-    email: 'system@edforge.com',
-    name: 'System Admin',
-    globalRole: 'TenantAdmin', // Super admin
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Principal',
-      'school-002': 'Principal',
-      'school-003': 'Principal',
-    },
-  },
   'tenant-admin': {
     id: 'user-001',
     email: 'admin@edforge.com',
@@ -82,16 +115,14 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     globalRole: 'StandardUser',
     tenantId: 'tenant-001',
     assignments: {
-      // Parent has children at Lincoln High (Emma) and Washington Elementary (Lucas)
       'school-001': 'Parent',
       'school-002': 'Parent',
     },
-    // Links to student records - will be used to fetch children's data
     childrenIds: ['STU-0001', 'STU-0002'],
   },
 }
 
-// Mock school metadata for display purposes
+// Mock school metadata - will be replaced by API data
 export const MOCK_SCHOOLS: Record<string, { name: string; code: string }> = {
   'school-001': { name: 'Lincoln High School', code: 'LHS' },
   'school-002': { name: 'Washington Elementary', code: 'WES' },
@@ -102,48 +133,164 @@ export const MOCK_SCHOOLS: Record<string, { name: string; code: string }> = {
 // STORE DEFINITION
 // ============================================================================
 
-interface AuthStore {
-  user: UserIdentity | null
-  token: string | null
-
-  // Computed - stored as state property for reactivity
-  isAuthenticated: boolean
-
-  // Actions
-  loginAs: (mockUserId: keyof typeof MOCK_USERS) => void
-  logout: () => void
-
-  // Helpers
-  getUserSchools: () => string[]
-  getUserRoleInSchool: (schoolId: string) => SchoolRole | null
-}
-
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
       user: null,
-      token: null,
-      isAuthenticated: false, // Stored as state property for reactivity
+      isAuthenticated: false,
+      isLoading: false, // Start as false, will be set to true when initializeAuth is called
+      error: null,
+      tenantName: null,
+      tenantTier: null,
 
-      loginAs: (mockUserId) => {
-        const user = MOCK_USERS[mockUserId]
-        // @ts-ignore
-        if (!user && mockUserId !== 'system-admin') { // Check fallback
-          // Allow flexible check
-        }
-        if (!user) {
-          console.error(`Mock user "${mockUserId}" not found`)
+      /**
+       * Initialize authentication state on app load
+       * Checks if user is already authenticated with Cognito
+       * Includes debouncing to prevent concurrent initializations
+       */
+      initializeAuth: async () => {
+        const currentState = get()
+
+        // Check if session was invalidated by a 401 error
+        // This flag persists until user explicitly clicks login button
+        const sessionInvalidated = sessionStorage.getItem('edforge-session-invalidated')
+
+        if (sessionInvalidated === 'true') {
+          // Do NOT clear the flag here - it's cleared when user clicks login
+          set({ isLoading: false })
           return
         }
 
-        // Generate a fake JWT-like token for testing interceptors
-        const fakeToken = `mock-jwt-${user.id}-${Date.now()}`
+        // Prevent multiple concurrent initializations
+        if (currentState.isLoading) {
+          return
+        }
 
-        set({ user, token: fakeToken, isAuthenticated: true })
+        try {
+          set({ isLoading: true, error: null })
+
+          // Check if user is authenticated with Cognito
+          const authenticated = await checkIsAuthenticated()
+
+          if (!authenticated) {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              tenantName: null,
+              tenantTier: null,
+            })
+            return
+          }
+
+          // Get the ID token payload with user claims
+          const payload = await getIdTokenPayload()
+
+          if (!payload) {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              error: 'Failed to get user information',
+            })
+            return
+          }
+
+          // Extract tenant info from Cognito claims
+          const tenantName = payload['custom:tenantName']
+          const tenantTier = payload['custom:tenantTier']
+
+          // For now, create user with empty assignments
+          // Shell context will fetch assignments from API
+          const user = mapCognitoToUserIdentity(payload as CognitoIdTokenPayload, [])
+
+          set({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            tenantName,
+            tenantTier,
+            error: null,
+          })
+
+          console.log('[Auth] Initialization successful for user:', user.email)
+        } catch (error) {
+          console.error('[Auth] Initialization failed:', error)
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: error instanceof Error ? error.message : 'Authentication failed',
+          })
+        }
       },
 
-      logout: () => {
-        set({ user: null, token: null, isAuthenticated: false })
+      /**
+       * Set the authenticated user with school assignments
+       * Called after fetching assignments from the API
+       */
+      setUser: (user, assignments) => {
+        if (assignments && assignments.length > 0) {
+          // Update user with fetched assignments
+          const updatedAssignments = assignments.reduce((acc, { schoolId, role }) => {
+            acc[schoolId] = role
+            return acc
+          }, {} as Record<string, SchoolRole>)
+
+          set({
+            user: { ...user, assignments: updatedAssignments },
+            isAuthenticated: true,
+          })
+        } else {
+          set({ user, isAuthenticated: true })
+        }
+      },
+
+      /**
+       * Logout the current user
+       * Clears local state and signs out from Cognito
+       */
+      logout: async () => {
+        try {
+          await amplifyLogout()
+        } catch (error) {
+          console.error('Logout error:', error)
+        } finally {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            tenantName: null,
+            tenantTier: null,
+            error: null,
+          })
+        }
+      },
+
+      setError: (error) => {
+        set({ error })
+      },
+
+      /**
+       * DEV MODE: Login as a mock user
+       * This will be removed in production
+       */
+      loginAsMock: (mockUserId) => {
+        const user = MOCK_USERS[mockUserId]
+        if (!user) {
+          console.error(`Mock user "${mockUserId}" not found`)
+          set({ error: `Mock user "${mockUserId}" not found` })
+          return
+        }
+
+        set({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+          tenantName: 'Demo District',
+          tenantTier: 'PROFESSIONAL',
+          error: null,
+        })
       },
 
       getUserSchools: () => {
@@ -162,27 +309,70 @@ export const useAuthStore = create<AuthStore>()(
       name: 'edforge-auth',
       storage: {
         getItem: (name) => {
-          const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+          if (typeof document === 'undefined') return null
+          const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
           if (match) {
-            const cookieVal = decodeURIComponent(match[2]);
-            try { return JSON.parse(cookieVal); } catch (e) { return cookieVal; }
+            const cookieVal = decodeURIComponent(match[2])
+            try {
+              return JSON.parse(cookieVal)
+            } catch {
+              return cookieVal
+            }
           }
           return null
         },
         setItem: (name, value) => {
-          document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; path=/; max-age=86400; SameSite=Lax`;
+          if (typeof document === 'undefined') return
+          document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; path=/; max-age=86400; SameSite=Lax`
         },
         removeItem: (name) => {
-          document.cookie = `${name}=; path=/; max-age=0`;
-        }
+          if (typeof document === 'undefined') return
+          document.cookie = `${name}=; path=/; max-age=0`
+        },
       },
-      partialize: (state) => ({ user: state.user, token: state.token, isAuthenticated: state.isAuthenticated }) as AuthStore,
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+        tenantName: state.tenantName,
+        tenantTier: state.tenantTier,
+      }) as unknown as AuthStore,
     }
   )
 )
 
 // ============================================================================
-// MOCK USER OPTIONS FOR LOGIN PAGE
+// AUTH EVENT LISTENER
+// ============================================================================
+
+// Subscribe to Amplify auth events and update store accordingly
+if (typeof window !== 'undefined') {
+  subscribeToAuthChanges((event) => {
+    const store = useAuthStore.getState()
+
+    switch (event) {
+      case 'signedIn':
+        // Re-initialize auth to fetch user data
+        store.initializeAuth()
+        break
+      case 'signedOut':
+        // Clear the store
+        useAuthStore.setState({
+          user: null,
+          isAuthenticated: false,
+          tenantName: null,
+          tenantTier: null,
+        })
+        break
+      case 'tokenRefresh_failure':
+        // Token refresh failed, logout the user
+        store.logout()
+        break
+    }
+  })
+}
+
+// ============================================================================
+// HELPER EXPORTS
 // ============================================================================
 
 /**
@@ -195,8 +385,7 @@ function getPrimaryRole(user: UserIdentity): SchoolRole {
 }
 
 /**
- * Export mock users for the login page with enhanced metadata.
- * Includes role category for visual differentiation in the UI.
+ * Export mock users for the login page (dev mode only)
  */
 export const mockUserOptions = Object.entries(MOCK_USERS).map(([key, user]) => {
   const primaryRole = getPrimaryRole(user)

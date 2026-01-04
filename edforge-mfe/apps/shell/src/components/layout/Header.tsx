@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { motion } from 'framer-motion'
 import {
-  Search,
   Bell,
   Plus,
   User,
@@ -21,7 +20,6 @@ import { useAppStore } from '../../stores/app.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
 import { useQuickAddPersonModal, useInviteTeamModal, useAddClassroomModal, useAddGradeLevelModal } from '../../stores/modal.store'
 import { Avatar } from '@edforge/ui'
-import { CommandPalette, useCommandPalette } from '../ui/CommandPalette'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import {
@@ -33,24 +31,7 @@ import {
 import { can, type Action, type Resource } from '@edforge/abac'
 import { cn } from '../../lib/utils'
 
-// ============================================================================
-// GLOBAL SEARCH BUTTON
-// ============================================================================
 
-function GlobalSearchButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-2.5 px-4 py-2 text-sm text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] border border-[rgb(var(--border-primary))] rounded-xl transition-all duration-200 hover:border-teal-500/50"
-    >
-      <Search className="w-4 h-4" />
-      <span className="hidden md:inline">Search...</span>
-      <kbd className="hidden md:inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-semibold bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-md text-[rgb(var(--text-tertiary))]">
-        ⌘K
-      </kbd>
-    </button>
-  )
-}
 
 // ============================================================================
 // ADD NEW DROPDOWN - ENHANCED WITH CONTEXT AWARENESS
@@ -473,7 +454,7 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
-  const commandPalette = useCommandPalette()
+
 
 
   return (
@@ -489,7 +470,7 @@ export function Header() {
 
         {/* Right Section - All header actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <GlobalSearchButton onClick={commandPalette.toggle} />
+
 
           {/* Documentation */}
           <button
@@ -514,9 +495,6 @@ export function Header() {
           <UserMenu />
         </div>
       </header>
-
-      {/* Command Palette Modal (⌘K) */}
-      <CommandPalette open={commandPalette.open} onClose={commandPalette.close} />
 
 
 

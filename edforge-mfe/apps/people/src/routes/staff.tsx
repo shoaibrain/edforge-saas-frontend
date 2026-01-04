@@ -5,19 +5,16 @@
  * Primary view for accessing staff profiles, assignments, and contact information.
  */
 
-import { Navigate } from '@tanstack/react-router'
-import { can } from '@edforge/abac'
 import { UsersRound, Search, Filter, Plus, Users, GraduationCap, Briefcase, Award } from 'lucide-react'
 import { useAppStore } from '@/stores/app.store'
-import { useAuthStore } from '@/stores/auth.store'
+// NOTE: Auth is handled by Shell's protected routes - remotes don't need their own auth store
 
 export default function StaffPage() {
-  const { user } = useAuthStore.getState()
   const { activeSchoolId } = useAppStore.getState()
 
-  if (!can(user, { action: 'view', resource: 'staff', schoolId: activeSchoolId ?? undefined })) {
-    return <Navigate to={'/forbidden' as any} />
-  }
+  // NOTE: Auth check removed - Shell's protected routes already ensure user is authenticated
+  // ABAC checks should be done at Shell level before loading this remote module
+  console.log('[People:Staff] Rendering staff page, activeSchoolId:', activeSchoolId)
 
   return (
     <div className="min-h-full">

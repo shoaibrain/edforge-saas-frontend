@@ -6,13 +6,17 @@
  * - Tenant context
  * - Active school selection
  * - ABAC permissions
+ * 
+ * Integrates with AWS Cognito and backend APIs for real data.
  */
 
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
 import type { UserIdentity, Tenant, School, SchoolYear } from '@edforge/types'
-import { useAuthStore } from '../stores/auth.store'
+import { useAuthStore, type AuthStore } from '../stores/auth.store'
 import { useAppStore } from '../stores/app.store'
+import { tenantService } from '../services/tenant.service'
 
 // ============================================================================
 // SHELL CONTEXT TYPES
@@ -22,12 +26,15 @@ export interface ShellContextValue {
   // Authentication
   user: UserIdentity | null
   isAuthenticated: boolean
+  isLoading: boolean
   login: (userId: string) => void
-  logout: () => void
+  logout: () => Promise<void>
 
   // Tenant
   tenant: Tenant | null
   tenantId: string | null
+  tenantName: string | null
+  tenantTier: string | null
 
   // School Context
   activeSchoolId: string | null
@@ -53,14 +60,14 @@ export interface ShellContextValue {
 const ShellContext = createContext<ShellContextValue | null>(null)
 
 // ============================================================================
-// MOCK DATA (Replace with API calls in production)
+// MOCK DATA (Fallback for development when API is unavailable)
 // ============================================================================
 
 const MOCK_TENANT: Tenant = {
   id: 'demo-district',
   name: 'Demo School District',
   subdomain: 'demo',
-  schools: ['school-1', 'school-2', 'school-3'],
+  schools: ['school-001', 'school-002', 'school-003'],
   activeSchoolYear: '2024-2025',
   features: {
     edfiEnabled: true,
@@ -118,11 +125,16 @@ interface ShellProviderProps {
 }
 
 export function ShellProvider({ children }: ShellProviderProps) {
-  // Auth store - isAuthenticated is now a proper state property for reactivity
-  const user = useAuthStore((s) => s.user)
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  const loginAs = useAuthStore((s) => s.loginAs)
-  const logout = useAuthStore((s) => s.logout)
+  // Auth store - with proper type annotations
+  const user = useAuthStore((s: AuthStore) => s.user)
+  const isAuthenticated = useAuthStore((s: AuthStore) => s.isAuthenticated)
+  const isAuthLoading = useAuthStore((s: AuthStore) => s.isLoading)
+  const initializeAuth = useAuthStore((s: AuthStore) => s.initializeAuth)
+  const loginAsMock = useAuthStore((s: AuthStore) => s.loginAsMock)
+  const logout = useAuthStore((s: AuthStore) => s.logout)
+  const setUser = useAuthStore((s: AuthStore) => s.setUser)
+  const tenantName = useAuthStore((s: AuthStore) => s.tenantName)
+  const tenantTier = useAuthStore((s: AuthStore) => s.tenantTier)
 
   // App store
   const {
@@ -131,24 +143,94 @@ export function ShellProvider({ children }: ShellProviderProps) {
     sidebarCollapsed,
     toggleSidebar,
   } = useAppStore()
-  
+
   // Theme (using 'system' as default for now)
   const theme: 'light' | 'dark' | 'system' = 'system'
   const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    // Will be handled by theme store
     console.log('Setting theme:', newTheme)
   }
 
-  // Compute active school from user assignments
+  // Initialize auth on mount
+  useEffect(() => {
+    initializeAuth()
+  }, [initializeAuth])
+
+  // ============================================================================
+  // API QUERIES - Fetch real data when authenticated
+  // ============================================================================
+
+  // Fetch user profile with school assignments
+  const { data: userProfile, isLoading: isUserProfileLoading } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: () => tenantService.getCurrentUser(),
+    enabled: isAuthenticated && !!user,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // Update user with fetched assignments
+  useEffect(() => {
+    if (userProfile && user) {
+      setUser(user, userProfile.assignments)
+    }
+  }, [userProfile, user, setUser])
+
+  // Fetch tenant data
+  const { data: tenant, isLoading: isTenantLoading } = useQuery({
+    queryKey: ['tenant', user?.tenantId],
+    queryFn: () => tenantService.getTenant(user!.tenantId),
+    enabled: isAuthenticated && !!user?.tenantId,
+    retry: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  })
+
+  // Fetch schools for the tenant
+  const { data: schools, isLoading: isSchoolsLoading } = useQuery({
+    queryKey: ['schools', user?.tenantId],
+    queryFn: () => tenantService.getSchools(user!.tenantId),
+    enabled: isAuthenticated && !!user?.tenantId,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // Fetch current school year
+  const { data: schoolYear } = useQuery({
+    queryKey: ['currentSchoolYear', user?.tenantId],
+    queryFn: () => tenantService.getCurrentSchoolYear(user!.tenantId),
+    enabled: isAuthenticated && !!user?.tenantId,
+    retry: false,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  })
+
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+
+  // Use API data or fallback to mock data for development
+  const effectiveTenant = tenant ?? (isAuthenticated ? MOCK_TENANT : null)
+  const effectiveSchools = schools ?? (isAuthenticated ? MOCK_SCHOOLS : [])
+  const effectiveSchoolYear = schoolYear ?? (isAuthenticated ? MOCK_SCHOOL_YEAR : null)
+
+  // Filter schools user has access to based on assignments
   const availableSchools = useMemo(() => {
     if (!user) return []
+
+    // Ensure effectiveSchools is always an array
+    const schoolsList = Array.isArray(effectiveSchools) ? effectiveSchools : []
+
+    // TenantAdmin has access to all schools
+    if (user.globalRole === 'TenantAdmin') {
+      return schoolsList
+    }
+
+    // StandardUser only sees assigned schools
     const assignedSchoolIds = Object.keys(user.assignments)
-    return MOCK_SCHOOLS.filter((s) => assignedSchoolIds.includes(s.id))
-  }, [user])
+    return schoolsList.filter((s) => assignedSchoolIds.includes(s.id))
+  }, [user, effectiveSchools])
 
   const activeSchool = useMemo(() => {
     if (!activeSchoolId) return null
-    return availableSchools.find((s) => s.id === activeSchoolId) || null
+    return availableSchools.find((s) => s.id === activeSchoolId) ?? null
   }, [activeSchoolId, availableSchools])
 
   // Auto-select first school if none selected
@@ -158,28 +240,41 @@ export function ShellProvider({ children }: ShellProviderProps) {
     }
   }, [user, activeSchoolId, availableSchools, setActiveSchoolId])
 
-  // Simple navigate function (will be replaced with proper router in production)
+  // ============================================================================
+  // NAVIGATION
+  // ============================================================================
+
   const navigate = (path: string) => {
-    // For now, just log the navigation - in production this would use the router
     console.log(`Navigating to: ${path}`)
-    // Trigger a custom event that modules can listen to
     window.dispatchEvent(new CustomEvent('shell:navigate', { detail: { path } }))
   }
 
-  // Shell context value
+  // ============================================================================
+  // LOADING STATE
+  // ============================================================================
+
+  const isLoading = isAuthLoading || (isAuthenticated && (isUserProfileLoading || isTenantLoading || isSchoolsLoading))
+
+  // ============================================================================
+  // CONTEXT VALUES
+  // ============================================================================
+
   const shellValue: ShellContextValue = useMemo(
     () => ({
       user,
       isAuthenticated,
-      login: (userId: string) => loginAs(userId as 'tenant-admin' | 'principal' | 'teacher' | 'accountant' | 'student' | 'parent'),
+      isLoading,
+      login: (userId: string) => loginAsMock(userId),
       logout,
-      tenant: MOCK_TENANT,
-      tenantId: MOCK_TENANT.id,
+      tenant: effectiveTenant,
+      tenantId: user?.tenantId ?? effectiveTenant?.id ?? null,
+      tenantName,
+      tenantTier,
       activeSchoolId,
       activeSchool,
       setActiveSchool: setActiveSchoolId,
       availableSchools,
-      activeSchoolYear: MOCK_SCHOOL_YEAR,
+      activeSchoolYear: effectiveSchoolYear,
       theme,
       setTheme,
       sidebarCollapsed,
@@ -189,14 +284,18 @@ export function ShellProvider({ children }: ShellProviderProps) {
     [
       user,
       isAuthenticated,
-      loginAs,
+      isLoading,
+      loginAsMock,
       logout,
+      effectiveTenant,
+      tenantName,
+      tenantTier,
       activeSchoolId,
       activeSchool,
       setActiveSchoolId,
       availableSchools,
+      effectiveSchoolYear,
       theme,
-      setTheme,
       sidebarCollapsed,
       toggleSidebar,
     ]
@@ -233,8 +332,8 @@ export function useShell(): ShellContextValue {
 }
 
 export function useTenant() {
-  const { tenant, tenantId } = useShell()
-  return { tenant, tenantId }
+  const { tenant, tenantId, tenantName, tenantTier } = useShell()
+  return { tenant, tenantId, tenantName, tenantTier }
 }
 
 export function useActiveSchool() {
@@ -246,4 +345,3 @@ export function useSchoolYear() {
   const { activeSchoolYear } = useShell()
   return activeSchoolYear
 }
-

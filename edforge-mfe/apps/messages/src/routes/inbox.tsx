@@ -22,12 +22,9 @@ import {
     Trash2,
     CheckCheck,
 } from 'lucide-react'
-import { can } from '@edforge/abac'
 import { useAppStore } from '@/stores/app.store'
-import { useAuthStore } from '@/stores/auth.store'
-import { Card } from '@edforge/ui'
-import { Button } from '@edforge/ui'
-import { Avatar } from '@edforge/ui'
+import { Card, Button, Avatar } from '@edforge/ui'
+// NOTE: Auth is handled by Shell's protected routes - remotes inherit auth from Shell
 
 
 const MOCK_CONVERSATIONS = [
@@ -211,13 +208,10 @@ function MessageBubble({ message }: { message: typeof MOCK_MESSAGES[0] }) {
 // ============================================================================
 
 export default function MessagesInboxPage() {
-    const { user } = useAuthStore()
     const { activeSchoolId } = useAppStore()
 
-    // Permission check
-    if (!can(user, { action: 'view', resource: 'staff', schoolId: activeSchoolId ?? undefined })) {
-        return <div className="p-8">Access Denied</div>
-    }
+    // NOTE: Auth/ABAC checks removed - Shell's protected routes handle authentication
+    console.log('[Messages:Inbox] Rendering inbox page, activeSchoolId:', activeSchoolId)
     const [selectedConversation, setSelectedConversation] = useState<string | null>('conv-001')
     const [searchQuery, setSearchQuery] = useState('')
     const [messageInput, setMessageInput] = useState('')

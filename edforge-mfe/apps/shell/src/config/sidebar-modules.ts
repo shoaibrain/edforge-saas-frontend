@@ -56,6 +56,8 @@ import {
   FileText,
   // Additional icons
   Baby,
+  // Auth Debug
+  Bug,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -524,6 +526,19 @@ const settingsModule: ModuleConfig = {
           href: '/settings/danger-zone',
           variant: 'danger',
           permission: { action: 'manage', resource: 'settings:tenant' },
+          tenantRoles: ['TenantAdmin'],
+        },
+      ],
+    },
+    {
+      id: 'developer',
+      label: 'DEVELOPER',
+      items: [
+        {
+          id: 'auth-debug',
+          label: 'Auth Debug',
+          icon: Bug,
+          href: '/auth-debug',
           tenantRoles: ['TenantAdmin'],
         },
       ],
