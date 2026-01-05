@@ -1,3 +1,0 @@
-
-    export type RemoteKeys = 'finance/BillingModule' | 'finance/PayrollModule' | 'finance/TuitionModule' | 'finance/ExpensesModule' | 'finance/FinanceModule';
-    type PackageType<T> = T extends 'finance/FinanceModule' ? typeof import('finance/FinanceModule') :T extends 'finance/ExpensesModule' ? typeof import('finance/ExpensesModule') :T extends 'finance/TuitionModule' ? typeof import('finance/TuitionModule') :T extends 'finance/PayrollModule' ? typeof import('finance/PayrollModule') :T extends 'finance/BillingModule' ? typeof import('finance/BillingModule') :any;
