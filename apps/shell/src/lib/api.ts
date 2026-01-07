@@ -44,34 +44,18 @@ api.interceptors.request.use(
         try {
           const payloadBase64 = token.split('.')[1]
           const payload = JSON.parse(atob(payloadBase64))
-          const tenantId = payload['custom:tenantId']
+          const tenantId = payload['custom:tenantId'] as string
           if (tenantId) {
             config.headers.set('X-Tenant-Id', tenantId)
           }
         } catch (parseError) {
           console.warn('[API] Could not parse tenant from token:', parseError)
         }
-
-        console.log('[API] Request configured:', {
-          url: config.url,
-          correlationId,
-          hasToken: true,
-          hasTenant: config.headers.has('X-Tenant-Id'),
-        })
-      } else {
-        console.warn('[API] No token available for request:', {
-          url: config.url,
-          correlationId,
-        })
       }
     } catch (error) {
       // Not authenticated - let request proceed without token
       // Backend will return 401 if auth is required
-      console.warn('[API] Failed to get auth token:', {
-        url: config.url,
-        correlationId,
-        error: error instanceof Error ? error.message : error,
-      })
+      console.warn('[API] Failed to get auth token:', error)
     }
 
     return config
