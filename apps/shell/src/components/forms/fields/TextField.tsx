@@ -7,7 +7,7 @@
 
 import { forwardRef, useState, type ReactNode } from 'react'
 import { useFormContext, type RegisterOptions } from 'react-hook-form'
-import { useSpring, animated, config } from '@react-spring/web'
+import { motion, AnimatePresence } from 'framer-motion'
 import { AlertCircle, Check, type LucideIcon } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 
@@ -68,60 +68,37 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     const hasError = !!errorMessage
     const isValid = showSuccessState && isDirty && isTouched && !hasError
 
-    // Animation springs
-    const focusSpring = useSpring({
-      borderColor: hasError 
-        ? 'rgb(239, 68, 68)' 
-        : isFocused 
-          ? 'rgb(20, 184, 166)' 
-          : 'rgb(var(--border-primary))',
-      boxShadow: isFocused && !hasError
-        ? '0 0 0 3px rgba(20, 184, 166, 0.15)'
-        : hasError
-          ? '0 0 0 3px rgba(239, 68, 68, 0.1)'
-          : '0 0 0 0px transparent',
-      config: config.gentle,
-    })
-
-    const labelSpring = useSpring({
-      color: hasError 
-        ? 'rgb(239, 68, 68)' 
-        : isFocused 
-          ? 'rgb(20, 184, 166)' 
-          : 'rgb(var(--text-secondary))',
-      config: config.gentle,
-    })
-
-    const errorSpring = useSpring({
-      opacity: hasError ? 1 : 0,
-      y: hasError ? 0 : -4,
-      config: config.gentle,
-    })
-
     const { ref: registerRef, ...registerProps } = register(name, rules)
 
     return (
       <div className={cn('space-y-1.5', className)}>
         {/* Label */}
         {label && (
-          <animated.label
+          <label
             htmlFor={name}
-            style={labelSpring}
-            className="block text-sm font-medium"
+            className={cn(
+              'block text-sm font-medium transition-colors duration-200',
+              hasError 
+                ? 'text-rust-500' 
+                : isFocused 
+                  ? 'text-teal-500' 
+                  : 'text-[rgb(var(--text-secondary))]'
+            )}
           >
             {label}
             {required && <span className="text-rust-500 ml-0.5">*</span>}
-          </animated.label>
+          </label>
         )}
 
         {/* Input Container */}
-        <animated.div
-          style={{
-            borderColor: focusSpring.borderColor,
-            boxShadow: focusSpring.boxShadow,
-          }}
+        <div
           className={cn(
-            'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-colors',
+            'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-all duration-200',
+            hasError 
+              ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
+              : isFocused 
+                ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+                : 'border-[rgb(var(--border-primary))]',
             disabled && 'opacity-60 cursor-not-allowed',
             inputClassName
           )}
@@ -178,27 +155,30 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
               <AlertCircle className="w-4 h-4 text-rust-500" />
             )}
           </div>
-        </animated.div>
+        </div>
 
         {/* Helper Text or Error */}
         <div className="min-h-[1.25rem]">
-          {hasError ? (
-            <animated.p
-              id={`${name}-error`}
-              style={{
-                opacity: errorSpring.opacity,
-                transform: errorSpring.y.to((y) => `translateY(${y}px)`),
-              }}
-              className="text-xs text-rust-500 flex items-center gap-1"
-              role="alert"
-            >
-              {errorMessage}
-            </animated.p>
-          ) : helperText ? (
-            <p id={`${name}-helper`} className="text-xs text-[rgb(var(--text-tertiary))]">
-              {helperText}
-            </p>
-          ) : null}
+          <AnimatePresence mode="wait">
+            {hasError ? (
+              <motion.p
+                key="error"
+                id={`${name}-error`}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="text-xs text-rust-500 flex items-center gap-1"
+                role="alert"
+              >
+                {errorMessage}
+              </motion.p>
+            ) : helperText ? (
+              <p id={`${name}-helper`} className="text-xs text-[rgb(var(--text-tertiary))]">
+                {helperText}
+              </p>
+            ) : null}
+          </AnimatePresence>
         </div>
       </div>
     )

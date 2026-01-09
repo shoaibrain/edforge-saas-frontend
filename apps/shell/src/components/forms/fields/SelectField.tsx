@@ -7,7 +7,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useFormContext, type RegisterOptions } from 'react-hook-form'
-import { useSpring, animated, config } from '@react-spring/web'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Check, AlertCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 
@@ -72,41 +72,6 @@ export function SelectField({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Animation springs
-  const focusSpring = useSpring({
-    borderColor: hasError 
-      ? 'rgb(239, 68, 68)' 
-      : isOpen || isFocused 
-        ? 'rgb(20, 184, 166)' 
-        : 'rgb(var(--border-primary))',
-    boxShadow: (isOpen || isFocused) && !hasError
-      ? '0 0 0 3px rgba(20, 184, 166, 0.15)'
-      : hasError
-        ? '0 0 0 3px rgba(239, 68, 68, 0.1)'
-        : '0 0 0 0px transparent',
-    config: config.gentle,
-  })
-
-  const dropdownSpring = useSpring({
-    opacity: isOpen ? 1 : 0,
-    transform: isOpen ? 'translateY(0px) scale(1)' : 'translateY(-8px) scale(0.98)',
-    config: { tension: 300, friction: 25 },
-  })
-
-  const chevronSpring = useSpring({
-    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-    config: config.gentle,
-  })
-
-  const labelSpring = useSpring({
-    color: hasError 
-      ? 'rgb(239, 68, 68)' 
-      : isOpen 
-        ? 'rgb(20, 184, 166)' 
-        : 'rgb(var(--text-secondary))',
-    config: config.gentle,
-  })
-
   const handleSelect = (optionValue: string) => {
     setValue(name, optionValue, { shouldValidate: true, shouldDirty: true })
     setIsOpen(false)
@@ -116,35 +81,42 @@ export function SelectField({
   register(name, rules)
 
   return (
-    <div className={cn('space-y-1.5', className)} ref={containerRef}>
+    <div className={cn('space-y-1.5 relative', className)} ref={containerRef}>
       {/* Label */}
       {label && (
-        <animated.label
+        <label
           htmlFor={name}
-          style={labelSpring}
-          className="block text-sm font-medium"
+          className={cn(
+            'block text-sm font-medium transition-colors duration-200',
+            hasError 
+              ? 'text-rust-500' 
+              : isOpen 
+                ? 'text-teal-500' 
+                : 'text-[rgb(var(--text-secondary))]'
+          )}
         >
           {label}
           {required && <span className="text-rust-500 ml-0.5">*</span>}
-        </animated.label>
+        </label>
       )}
 
       {/* Select Trigger */}
-      <animated.button
+      <button
         type="button"
         id={name}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         disabled={disabled}
-        style={{
-          borderColor: focusSpring.borderColor,
-          boxShadow: focusSpring.boxShadow,
-        }}
         className={cn(
           'relative w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border',
-          'bg-[rgb(var(--surface-secondary))] text-left',
+          'bg-[rgb(var(--surface-secondary))] text-left transition-all duration-200',
           'focus:outline-none',
+          hasError 
+            ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
+            : (isOpen || isFocused) 
+              ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+              : 'border-[rgb(var(--border-primary))]',
           disabled && 'opacity-60 cursor-not-allowed'
         )}
         aria-haspopup="listbox"
@@ -164,52 +136,60 @@ export function SelectField({
 
         {hasError && <AlertCircle className="w-4 h-4 text-rust-500" />}
         
-        <animated.div style={chevronSpring}>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
           <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-        </animated.div>
-      </animated.button>
+        </motion.div>
+      </button>
 
       {/* Dropdown */}
-      {isOpen && (
-        <animated.div
-          style={dropdownSpring}
-          className={cn(
-            'absolute z-50 w-full mt-1 py-1 rounded-xl border',
-            'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]',
-            'shadow-xl shadow-black/10 dark:shadow-black/30',
-            'max-h-60 overflow-auto scrollbar-thin'
-          )}
-          role="listbox"
-        >
-          {options.map((option) => {
-            const isSelected = option.value === value
-            const OptionIcon = option.icon
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className={cn(
+              'absolute z-50 w-full mt-1 py-1 rounded-xl border',
+              'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]',
+              'shadow-xl shadow-black/10 dark:shadow-black/30',
+              'max-h-60 overflow-auto scrollbar-thin'
+            )}
+            role="listbox"
+          >
+            {options.map((option) => {
+              const isSelected = option.value === value
+              const OptionIcon = option.icon
 
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleSelect(option.value)}
-                disabled={option.disabled}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left',
-                  'transition-colors duration-150',
-                  isSelected 
-                    ? 'bg-teal-500/10 text-teal-700 dark:text-cyan-300' 
-                    : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]',
-                  option.disabled && 'opacity-50 cursor-not-allowed'
-                )}
-                role="option"
-                aria-selected={isSelected}
-              >
-                {OptionIcon && <OptionIcon className="w-4 h-4" />}
-                <span className="flex-1">{option.label}</span>
-                {isSelected && <Check className="w-4 h-4 text-teal-500" />}
-              </button>
-            )
-          })}
-        </animated.div>
-      )}
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleSelect(option.value)}
+                  disabled={option.disabled}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left',
+                    'transition-colors duration-150',
+                    isSelected 
+                      ? 'bg-teal-500/10 text-teal-700 dark:text-cyan-300' 
+                      : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]',
+                    option.disabled && 'opacity-50 cursor-not-allowed'
+                  )}
+                  role="option"
+                  aria-selected={isSelected}
+                >
+                  {OptionIcon && <OptionIcon className="w-4 h-4" />}
+                  <span className="flex-1">{option.label}</span>
+                  {isSelected && <Check className="w-4 h-4 text-teal-500" />}
+                </button>
+              )
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Helper Text or Error */}
       <div className="min-h-[1.25rem]">

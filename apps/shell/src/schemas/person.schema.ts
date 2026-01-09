@@ -258,6 +258,122 @@ export const profileUpdateSchema = z.object({
 })
 
 // ============================================================================
+// USER PROFILE SCHEMA (Settings - My Account)
+// ============================================================================
+
+export const userAddressSchema = z.object({
+  street: z.string().max(100).optional().or(z.literal('')),
+  street2: z.string().max(100).optional().or(z.literal('')),
+  city: z.string().max(50).optional().or(z.literal('')),
+  state: z.string().max(50).optional().or(z.literal('')),
+  postalCode: z.string().max(20).optional().or(z.literal('')),
+  country: z.string().max(50).optional().or(z.literal('')),
+})
+
+export const userProfileSchema = z.object({
+  firstName: nameSchema,
+  lastName: nameSchema,
+  middleName: z.string().max(50).optional().or(z.literal('')),
+  displayName: z.string().max(100).optional().or(z.literal('')),
+  email: emailSchema,
+  phone: z.string().max(30).optional().or(z.literal('')), // Include country code (e.g., "+1 555-123-4567")
+  address: userAddressSchema.optional(),
+})
+
+// ============================================================================
+// USER PREFERENCES SCHEMA (Settings - Preferences)
+// ============================================================================
+
+export const userPreferencesSchema = z.object({
+  theme: z.enum(['light', 'dark', 'system']),
+  language: z.string().min(2).max(10),
+  timezone: z.string().min(1).max(50),
+  dateFormat: z.enum(['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD']),
+  timeFormat: z.enum(['12h', '24h']),
+  weekStartsOn: z.enum(['sunday', 'monday']),
+  defaultSchoolId: z.string().optional(),
+})
+
+// ============================================================================
+// NOTIFICATION SETTINGS SCHEMA (Settings - Notifications)
+// ============================================================================
+
+export const notificationChannelsSchema = z.object({
+  email: z.object({
+    enabled: z.boolean(),
+    digest: z.enum(['immediate', 'daily', 'weekly', 'never']),
+  }),
+  push: z.object({
+    enabled: z.boolean(),
+  }),
+  sms: z.object({
+    enabled: z.boolean(),
+    phone: z.string().optional(),
+  }),
+})
+
+export const notificationCategoriesSchema = z.object({
+  announcements: z.boolean(),
+  attendance: z.boolean(),
+  grades: z.boolean(),
+  messages: z.boolean(),
+  calendar: z.boolean(),
+  billing: z.boolean(),
+  security: z.boolean(),
+})
+
+export const notificationSettingsSchema = z.object({
+  channels: notificationChannelsSchema,
+  categories: notificationCategoriesSchema,
+})
+
+// ============================================================================
+// PASSWORD CHANGE SCHEMA (Settings - Security)
+// ============================================================================
+
+/**
+ * Password validation rules (must match backend):
+ * - At least 8 characters
+ * - At least one uppercase letter (A-Z)
+ * - At least one lowercase letter (a-z) 
+ * - At least one digit (0-9)
+ * - At least one special character from: !@#$%^&*(),.?":{}|<>
+ * 
+ * NOTE: Underscore (_) is NOT considered a special character by the backend
+ */
+export const PASSWORD_SPECIAL_CHARS = '!@#$%^&*(),.?":{}|<>'
+
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password must be less than 128 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[!@#$%^&*(),.?":{}|<>]/, `Password must contain a special character (${PASSWORD_SPECIAL_CHARS})`),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+}).refine((data) => data.currentPassword !== data.newPassword, {
+  message: 'New password must be different from current password',
+  path: ['newPassword'],
+})
+
+// ============================================================================
+// MFA VERIFICATION SCHEMA
+// ============================================================================
+
+export const mfaVerificationSchema = z.object({
+  code: z
+    .string()
+    .length(6, 'Verification code must be 6 digits')
+    .regex(/^\d{6}$/, 'Verification code must contain only numbers'),
+})
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 
@@ -272,4 +388,12 @@ export type GuardianFormValues = z.infer<typeof guardianSchema>
 export type PersonFormValues = z.infer<typeof personSchema>
 export type InviteFormValues = z.infer<typeof inviteSchema>
 export type ProfileUpdateFormValues = z.infer<typeof profileUpdateSchema>
+export type UserAddressFormValues = z.infer<typeof userAddressSchema>
+export type UserProfileFormValues = z.infer<typeof userProfileSchema>
+export type UserPreferencesFormValues = z.infer<typeof userPreferencesSchema>
+export type NotificationChannelsFormValues = z.infer<typeof notificationChannelsSchema>
+export type NotificationCategoriesFormValues = z.infer<typeof notificationCategoriesSchema>
+export type NotificationSettingsFormValues = z.infer<typeof notificationSettingsSchema>
+export type PasswordChangeFormValues = z.infer<typeof passwordChangeSchema>
+export type MfaVerificationFormValues = z.infer<typeof mfaVerificationSchema>
 

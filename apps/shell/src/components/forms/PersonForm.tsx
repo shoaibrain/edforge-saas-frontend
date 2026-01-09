@@ -9,7 +9,6 @@ import { useEffect } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSpring, animated, config } from '@react-spring/web'
 import { 
   User, 
   GraduationCap, 
@@ -145,14 +144,6 @@ export function PersonForm({
     }
   }, [selectedType, lockedType, mode, reset])
 
-  // Animation for type indicator
-  const typeIndicatorSpring = useSpring({
-    opacity: 1,
-    y: 0,
-    from: { opacity: 0, y: -10 },
-    config: config.gentle,
-  })
-
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -173,15 +164,17 @@ export function PersonForm({
             />
 
             {/* Type Indicator */}
-            <animated.div
-              style={typeIndicatorSpring}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
               className="mt-4 flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface-tertiary))]"
             >
               <typeConfig.icon className={`w-5 h-5 ${typeConfig.color}`} />
               <span className="text-sm text-[rgb(var(--text-secondary))]">
                 Adding a new <strong className="text-[rgb(var(--text-primary))]">{typeConfig.label}</strong>
               </span>
-            </animated.div>
+            </motion.div>
           </motion.div>
         )}
 

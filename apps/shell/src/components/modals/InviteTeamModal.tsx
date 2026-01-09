@@ -11,7 +11,6 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSpring, animated } from '@react-spring/web'
 import {
   Mail,
   UserPlus,
@@ -69,18 +68,7 @@ interface InviteEntryRowProps {
 }
 
 function InviteEntryRow({ entry, onUpdate, onRemove, canRemove }: InviteEntryRowProps) {
-  const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
-
-  const springProps = useSpring({
-    borderColor: entry.error
-      ? 'rgb(185, 62, 3)'
-      : focused
-      ? 'rgb(10, 147, 150)'
-      : 'rgb(var(--border-primary))',
-    scale: hovered ? 1.01 : 1,
-    config: { tension: 300, friction: 20 },
-  })
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const email = e.target.value
@@ -89,18 +77,21 @@ function InviteEntryRow({ entry, onUpdate, onRemove, canRemove }: InviteEntryRow
   }
 
   return (
-    <animated.div
-      style={{ transform: springProps.scale.to((s) => `scale(${s})`) }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className="flex items-start gap-3"
     >
       {/* Email Input */}
-      <animated.div
-        style={{
-          borderColor: springProps.borderColor,
-        }}
-        className="flex-1 relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden"
+      <div
+        className={cn(
+          'flex-1 relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors duration-200',
+          entry.error
+            ? 'border-rust-500'
+            : focused
+              ? 'border-teal-500'
+              : 'border-[rgb(var(--border-primary))]'
+        )}
       >
         <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         <input
@@ -119,7 +110,7 @@ function InviteEntryRow({ entry, onUpdate, onRemove, canRemove }: InviteEntryRow
         {entry.isValid && entry.email && (
           <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-500" />
         )}
-      </animated.div>
+      </div>
 
       {/* Role Selector */}
       <div className="relative w-36">
@@ -155,7 +146,7 @@ function InviteEntryRow({ entry, onUpdate, onRemove, canRemove }: InviteEntryRow
           <Trash2 className="w-4 h-4" />
         </motion.button>
       )}
-    </animated.div>
+    </motion.div>
   )
 }
 

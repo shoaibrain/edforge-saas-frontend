@@ -2,12 +2,11 @@
  * QuickActionsWidget
  * 
  * Role-aware quick actions grid widget.
- * Redesigned with react-spring for fluid, Apple-like interactions.
+ * Redesigned with framer-motion for fluid, Apple-like interactions.
  */
 
-import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { useSpring, animated } from '@react-spring/web'
+import { motion } from 'framer-motion'
 import {
   Users,
   Calendar,
@@ -279,26 +278,13 @@ interface QuickActionCardProps {
 }
 
 function QuickActionCard({ action }: QuickActionCardProps) {
-  const [hovered, setHovered] = useState(false)
   const Icon = action.icon
 
-  // Spring animation for fluid hover effect
-  const springProps = useSpring({
-    scale: hovered ? 1.02 : 1,
-    shadow: hovered ? '0 10px 30px -10px rgba(0,0,0,0.1)' : '0 4px 6px -1px rgba(0,0,0,0.0)',
-    translateY: hovered ? -2 : 0,
-    config: { tension: 400, friction: 15 }, // Bouncy Apple-like feel
-  })
-
   return (
-    <animated.div
-      style={{
-        transform: springProps.scale.to(s => `scale(${s}) translateY(${springProps.translateY.get()}px)`),
-        boxShadow: springProps.shadow,
-      }}
+    <motion.div
+      whileHover={{ scale: 1.02, y: -2 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
       className="h-full"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <Link
         to={action.href}
@@ -308,10 +294,12 @@ function QuickActionCard({ action }: QuickActionCardProps) {
           bg-[rgb(var(--surface-primary))]
           border border-[rgb(var(--border-primary))]
           hover:border-[rgb(var(--border-secondary))]
+          hover:shadow-lg
+          group
         `}
       >
         {/* Subtle Background Gradient Overlay */}
-        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent to-[rgb(var(--surface-secondary))]`} />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent to-[rgb(var(--surface-secondary))]" />
 
         <div className="p-5 flex flex-col h-full relative z-10">
           {/* Header: Icon & Arrow */}
@@ -323,13 +311,7 @@ function QuickActionCard({ action }: QuickActionCardProps) {
               <Icon className="w-6 h-6" />
             </div>
 
-            <div className={`
-              w-8 h-8 rounded-full flex items-center justify-center
-              text-[rgb(var(--text-tertiary))] 
-              bg-[rgb(var(--surface-tertiary))]
-              opacity-0 ${hovered ? 'opacity-100' : ''}
-              transition-all duration-300
-            `}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))] opacity-0 group-hover:opacity-100 transition-all duration-300">
               <ArrowRight className="w-4 h-4" />
             </div>
           </div>
@@ -345,7 +327,7 @@ function QuickActionCard({ action }: QuickActionCardProps) {
           </div>
         </div>
       </Link>
-    </animated.div>
+    </motion.div>
   )
 }
 

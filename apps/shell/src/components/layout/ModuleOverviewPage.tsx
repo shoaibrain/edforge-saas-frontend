@@ -13,8 +13,6 @@ import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { useSpring, animated } from '@react-spring/web'
-import { useState } from 'react'
 import { ArrowRight, ChartNoAxesColumnDecreasing, CloudLightning, GalleryVerticalEnd } from 'lucide-react'
 import { Card } from '@edforge/ui'
 import { RequirePermission } from '../secure'
@@ -97,58 +95,36 @@ function ActionCard({
   card: ModuleActionCard
   delay?: number
 }) {
-  const [hovered, setHovered] = useState(false)
-
-  const springProps = useSpring({
-    scale: hovered ? 1.02 : 1,
-    y: hovered ? -6 : 0,
-    config: { tension: 300, friction: 20 },
-  })
-
-  const arrowSpring = useSpring({
-    x: hovered ? 4 : 0,
-    opacity: hovered ? 1 : 0.6,
-    config: { tension: 400, friction: 25 },
-  })
-
   const content = (
-    <animated.div
-      style={{
-        transform: springProps.scale.to(s => `scale(${s}) translateY(${springProps.y.get()}px)`),
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02, y: -6 }}
+      transition={{ delay, type: 'spring', stiffness: 300, damping: 20 }}
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay }}
-      >
-        <Link to={card.href}>
-          <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-teal-500/30 dark:hover:border-cyan-500/30">
-            <div className="flex items-start justify-between mb-4">
-              <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
-                <card.icon className={`w-6 h-6 ${card.iconColor}`} />
-              </div>
-              <animated.div
-                style={{
-                  transform: arrowSpring.x.to(x => `translateX(${x}px)`),
-                  opacity: arrowSpring.opacity,
-                }}
-              >
-                <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
-              </animated.div>
+      <Link to={card.href}>
+        <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-teal-500/30 dark:hover:border-cyan-500/30">
+          <div className="flex items-start justify-between mb-4">
+            <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
+              <card.icon className={`w-6 h-6 ${card.iconColor}`} />
             </div>
-            <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-teal-600 dark:group-hover:text-cyan-400 transition-colors">
-              {card.title}
-            </h3>
-            <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              {card.description}
-            </p>
-          </Card>
-        </Link>
-      </motion.div>
-    </animated.div>
+            <motion.div
+              initial={{ x: 0, opacity: 0.6 }}
+              whileHover={{ x: 4, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            >
+              <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
+            </motion.div>
+          </div>
+          <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-teal-600 dark:group-hover:text-cyan-400 transition-colors">
+            {card.title}
+          </h3>
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">
+            {card.description}
+          </p>
+        </Card>
+      </Link>
+    </motion.div>
   )
 
   // Wrap with permission check if specified

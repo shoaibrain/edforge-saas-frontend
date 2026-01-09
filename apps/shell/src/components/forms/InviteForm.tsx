@@ -10,7 +10,6 @@ import type { z } from 'zod'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSpring, animated, config } from '@react-spring/web'
 import {
   Users,
   Briefcase,
@@ -126,34 +125,26 @@ export function InviteForm({
     }
   }
 
-  // Animation springs
-  const backdropSpring = useSpring({
-    opacity: isOpen ? 1 : 0,
-    config: config.gentle,
-  })
-
-  const modalSpring = useSpring({
-    opacity: isOpen ? 1 : 0,
-    transform: isOpen 
-      ? 'scale(1) translateY(0px)' 
-      : 'scale(0.95) translateY(-20px)',
-    config: { tension: 280, friction: 25 },
-  })
-
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <animated.div
-        style={backdropSpring}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
         onClick={onClose}
         className="absolute inset-0 bg-ink-500/70 dark:bg-ink-900/85 backdrop-blur-md"
       />
 
       {/* Modal */}
-      <animated.div
-        style={modalSpring}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: -20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: -20 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 25 }}
         className="relative w-full max-w-lg rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-black/20"
       >
         {/* Header */}
@@ -325,7 +316,7 @@ export function InviteForm({
             </motion.div>
           )}
         </AnimatePresence>
-      </animated.div>
+      </motion.div>
     </div>
   )
 }

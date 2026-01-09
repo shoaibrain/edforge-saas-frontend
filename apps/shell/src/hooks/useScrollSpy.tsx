@@ -160,7 +160,7 @@ export function useScrollSpy(
  * the currently visible section.
  */
 
-import { useSpring, animated, config } from '@react-spring/web'
+import { motion } from 'framer-motion'
 import { cn } from '../lib/utils'
 
 export interface ScrollSpyNavProps {
@@ -179,12 +179,6 @@ export function ScrollSpyNav({
   variant = 'sidebar',
 }: ScrollSpyNavProps) {
   const activeIndex = sections.findIndex((s) => s.id === activeSection)
-
-  // Spring for the active indicator
-  const indicatorSpring = useSpring({
-    y: activeIndex * 44, // Approximate height of each item
-    config: config.gentle,
-  })
 
   if (variant === 'pills') {
     return (
@@ -247,10 +241,9 @@ export function ScrollSpyNav({
   return (
     <nav className={cn('relative space-y-1', className)}>
       {/* Active Indicator */}
-      <animated.div
-        style={{
-          transform: indicatorSpring.y.to((y) => `translateY(${y}px)`),
-        }}
+      <motion.div
+        animate={{ y: activeIndex * 44 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className="absolute left-0 w-0.5 h-10 bg-gradient-to-b from-teal-500 to-cyan-500 rounded-full"
       />
 

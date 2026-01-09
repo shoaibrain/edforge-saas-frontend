@@ -5,20 +5,121 @@
  * Integrated with backend Users API via TanStack Query.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { motion } from 'framer-motion'
-import { Mail, Camera, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  Mail, 
+  Camera, 
+  User, 
+  MapPin,
+  Phone,
+  Upload,
+  Trash2,
+  Copy,
+  Check
+} from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@edforge/ui'
-import { TextField, PhoneField } from '@/components/forms/fields'
-import { AddressSection } from '@/components/forms/sections'
+import { TextField, SelectField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
-import { profileUpdateSchema, type ProfileUpdateFormValues } from '@/schemas/person.schema'
+import { 
+  userProfileSchema, 
+  type UserProfileFormValues 
+} from '@/schemas/person.schema'
 import { getUserAvatar } from '@/lib/avatar'
-import { SaveButton } from '@/components/settings/SettingsShared'
-import { usersService, type UpdateUserDto, type UserResponseDto } from '@/services/users.service'
+import { 
+  SettingsPageHeader,
+  SettingsSection,
+  SettingsFormCard,
+  SettingsAlert,
+  SettingsSkeleton,
+  SettingsDivider,
+  SaveButton,
+  staggerChildren,
+  fadeInUp,
+} from '@/components/settings/SettingsShared'
+import { 
+  usersService, 
+  type UpdateUserDto, 
+  type UserResponseDto,
+  type UserAddress,
+} from '@/services/users.service'
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const COUNTRY_OPTIONS = [
+  { value: '', label: 'Select country' },
+  { value: 'US', label: 'United States' },
+  { value: 'CA', label: 'Canada' },
+  { value: 'GB', label: 'United Kingdom' },
+  { value: 'AU', label: 'Australia' },
+  { value: 'DE', label: 'Germany' },
+  { value: 'FR', label: 'France' },
+  { value: 'IN', label: 'India' },
+  { value: 'JP', label: 'Japan' },
+  { value: 'MX', label: 'Mexico' },
+  { value: 'BR', label: 'Brazil' },
+  { value: 'NP', label: 'Nepal' },
+]
+
+const US_STATE_OPTIONS = [
+  { value: '', label: 'Select state' },
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' },
+]
+
 
 // ============================================================================
 // LOADING SKELETON
@@ -27,40 +128,7 @@ import { usersService, type UpdateUserDto, type UserResponseDto } from '@/servic
 function AccountPageSkeleton() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
-      <div className="space-y-8 animate-pulse">
-        {/* Header Skeleton */}
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="h-8 w-32 bg-[rgb(var(--surface-tertiary))] rounded" />
-            <div className="h-4 w-48 bg-[rgb(var(--surface-tertiary))] rounded mt-2" />
-          </div>
-          <div className="h-10 w-24 bg-[rgb(var(--surface-tertiary))] rounded" />
-        </div>
-
-        {/* Profile Photo Skeleton */}
-        <div className="flex items-start gap-6">
-          <div className="w-20 h-20 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
-          <div className="flex-1 space-y-2">
-            <div className="h-6 w-32 bg-[rgb(var(--surface-tertiary))] rounded" />
-            <div className="h-4 w-24 bg-[rgb(var(--surface-tertiary))] rounded" />
-            <div className="flex gap-2 mt-3">
-              <div className="h-8 w-28 bg-[rgb(var(--surface-tertiary))] rounded" />
-              <div className="h-8 w-20 bg-[rgb(var(--surface-tertiary))] rounded" />
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-[rgb(var(--border-primary))]" />
-
-        {/* Form Fields Skeleton */}
-        <div className="space-y-5">
-          <div className="h-4 w-36 bg-[rgb(var(--surface-tertiary))] rounded" />
-          <div className="grid grid-cols-2 gap-5">
-            <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded" />
-            <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded" />
-          </div>
-        </div>
-      </div>
+      <SettingsSkeleton rows={5} showHeader />
     </div>
   )
 }
@@ -72,9 +140,13 @@ function AccountPageSkeleton() {
 function AccountPageError({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
-      <div className="flex flex-col items-center justify-center py-12">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center justify-center py-12"
+      >
         <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-          <AlertCircle className="w-8 h-8 text-red-500" />
+          <User className="w-8 h-8 text-red-500" />
         </div>
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
           Failed to Load Profile
@@ -85,8 +157,188 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
         <Button variant="outline" onClick={onRetry}>
           Try Again
         </Button>
+      </motion.div>
+    </div>
+  )
+}
+
+// ============================================================================
+// AVATAR UPLOAD COMPONENT
+// ============================================================================
+
+interface AvatarUploadProps {
+  avatarUrl: string
+  displayName: string
+  onUpload: (file: File) => Promise<void>
+  onRemove: () => Promise<void>
+  isUploading: boolean
+}
+
+function AvatarUpload({ avatarUrl, displayName, onUpload, onRemove, isUploading }: AvatarUploadProps) {
+  const [isHovered, setIsHovered] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileSelect = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      return
+    }
+    // Max 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      return
+    }
+    await onUpload(file)
+  }, [onUpload])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFileSelect(file)
+  }, [handleFileSelect])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  return (
+    <div className="flex items-start gap-6">
+      <motion.div
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={() => fileInputRef.current?.click()}
+        className="relative group cursor-pointer"
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: 'spring', stiffness: 400 }}
+      >
+        <img
+          src={avatarUrl}
+          alt={displayName}
+          className={`
+            w-24 h-24 rounded-xl object-cover 
+            ring-2 ring-[rgb(var(--border-primary))] 
+            group-hover:ring-teal-500/50 transition-all
+            ${isDragging ? 'ring-teal-500 ring-4' : ''}
+          `}
+        />
+        
+        <AnimatePresence>
+          {(isHovered || isDragging || isUploading) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/60"
+            >
+              {isUploading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full"
+                />
+              ) : (
+                <Camera className="w-6 h-6 text-white" />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) handleFileSelect(file)
+          }}
+          className="hidden"
+        />
+      </motion.div>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate">{displayName}</p>
+        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+          JPG, PNG or GIF. Max 5MB.
+        </p>
+        <div className="flex items-center gap-2 mt-3">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            <Upload className="w-3.5 h-3.5 mr-1.5" />
+            Upload
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            type="button" 
+            className="text-[rgb(var(--text-tertiary))] hover:text-red-500"
+            onClick={onRemove}
+            disabled={isUploading}
+          >
+            <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+            Remove
+          </Button>
+        </div>
       </div>
     </div>
+  )
+}
+
+
+// ============================================================================
+// COPY USER ID BUTTON
+// ============================================================================
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="p-1 rounded hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+      title="Copy to clipboard"
+    >
+      <AnimatePresence mode="wait">
+        {copied ? (
+          <motion.div
+            key="check"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+          >
+            <Check className="w-3.5 h-3.5 text-emerald-500" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="copy"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+          >
+            <Copy className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </button>
   )
 }
 
@@ -95,12 +347,12 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
 // ============================================================================
 
 export default function AccountPage() {
-  const user = useAuthStore((s: { user: ReturnType<typeof useAuthStore.getState>['user'] }) => s.user)
+  const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
   
-  const [photoHovered, setPhotoHovered] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
 
   // Fetch user profile from API
   const {
@@ -113,24 +365,15 @@ export default function AccountPage() {
     queryKey: ['user', user?.id],
     queryFn: () => usersService.getUser(user!.id),
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   })
 
   // Update user mutation
   const updateMutation = useMutation({
     mutationFn: (data: UpdateUserDto) => usersService.updateUser(user!.id, data),
-    onSuccess: (updatedUser) => {
-      // Invalidate and refetch user data
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', user?.id] })
-      
-      // Update auth store if name changed
-      if (user && (updatedUser.firstName !== user.name?.split(' ')[0] || 
-                   updatedUser.lastName !== user.name?.split(' ').slice(1).join(' '))) {
-        // The auth store will be updated when the user re-authenticates or via a dedicated update
-        console.log('[Account] Profile updated:', updatedUser)
-      }
-      
       setSaveSuccess(true)
       setSaveError(null)
       setTimeout(() => setSaveSuccess(false), 3000)
@@ -141,13 +384,24 @@ export default function AccountPage() {
     },
   })
 
-  const methods = useForm<ProfileUpdateFormValues>({
-    resolver: zodResolver(profileUpdateSchema),
+  // Form setup
+  const methods = useForm<UserProfileFormValues>({
+    resolver: zodResolver(userProfileSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
+      middleName: '',
+      displayName: '',
       email: '',
       phone: '',
+      address: {
+        street: '',
+        street2: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: '',
+      },
     },
   })
 
@@ -159,40 +413,100 @@ export default function AccountPage() {
       reset({
         firstName: userProfile.firstName || '',
         lastName: userProfile.lastName || '',
+        middleName: userProfile.middleName || '',
+        displayName: userProfile.displayName || '',
         email: userProfile.email || '',
         phone: userProfile.phone || '',
+        address: {
+          street: userProfile.address?.street || '',
+          street2: userProfile.address?.street2 || '',
+          city: userProfile.address?.city || '',
+          state: userProfile.address?.state || '',
+          postalCode: userProfile.address?.postalCode || '',
+          country: userProfile.address?.country || '',
+        },
       })
     } else if (user && !userProfile) {
-      // Fallback to auth store data while loading
+      const nameParts = user.name?.split(' ') || []
       reset({
-        firstName: user.name?.split(' ')[0] || '',
-        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        middleName: '',
+        displayName: '',
         email: user.email || '',
         phone: '',
+        address: {
+          street: '',
+          street2: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: '',
+        },
       })
     }
   }, [userProfile, user, reset])
 
-  const onSubmit = async (data: ProfileUpdateFormValues) => {
+  const onSubmit = async (data: UserProfileFormValues) => {
     setSaveError(null)
+    
+    const address: Partial<UserAddress> = {}
+    if (data.address?.street) address.street = data.address.street
+    if (data.address?.street2) address.street2 = data.address.street2
+    if (data.address?.city) address.city = data.address.city
+    if (data.address?.state) address.state = data.address.state
+    if (data.address?.postalCode) address.postalCode = data.address.postalCode
+    if (data.address?.country) address.country = data.address.country
     
     const updateData: UpdateUserDto = {
       firstName: data.firstName,
       lastName: data.lastName,
+      middleName: data.middleName || undefined,
+      displayName: data.displayName || undefined,
       phone: data.phone || undefined,
+      address: Object.keys(address).length > 0 ? address : undefined,
     }
     
     updateMutation.mutate(updateData)
   }
 
-  // Get avatar URL from profile or fallback
+  // Avatar handlers
+  const handleAvatarUpload = async (file: File) => {
+    if (!user?.id) return
+    setAvatarUploading(true)
+    try {
+      await usersService.uploadAvatar(user.id, file)
+      queryClient.invalidateQueries({ queryKey: ['user', user.id] })
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to upload photo')
+    } finally {
+      setAvatarUploading(false)
+    }
+  }
+
+  const handleAvatarRemove = async () => {
+    if (!user?.id) return
+    setAvatarUploading(true)
+    try {
+      await usersService.removeAvatar(user.id)
+      queryClient.invalidateQueries({ queryKey: ['user', user.id] })
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to remove photo')
+    } finally {
+      setAvatarUploading(false)
+    }
+  }
+
+  // Computed values
   const avatarUrl = userProfile?.avatarUrl || getUserAvatar(
     userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : user?.name || 'User'
   )
   
-  const displayName = userProfile 
-    ? `${userProfile.firstName} ${userProfile.lastName}`.trim() || userProfile.email
-    : user?.name || 'User'
+  const displayName = userProfile?.displayName || 
+    (userProfile ? `${userProfile.firstName} ${userProfile.lastName}`.trim() : '') || 
+    userProfile?.email || 
+    user?.name || 
+    'User'
   
   const displayRole = userProfile?.globalRole || user?.globalRole || 'User'
 
@@ -216,173 +530,205 @@ export default function AccountPage() {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            initial="hidden"
+            animate="visible"
+            variants={staggerChildren}
             className="space-y-8"
           >
             {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">My Account</h1>
-                <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                  Manage your personal information
-                </p>
-              </div>
-              <SaveButton 
-                isDirty={isDirty} 
-                isSaving={updateMutation.isPending} 
-                saveSuccess={saveSuccess} 
-              />
-            </div>
+            <SettingsPageHeader
+              title="My Account"
+              description="Manage your personal information"
+              action={
+                <SaveButton 
+                  isDirty={isDirty} 
+                  isSaving={updateMutation.isPending} 
+                  saveSuccess={saveSuccess} 
+                />
+              }
+            />
 
-            {/* Success/Error Messages */}
-            {saveSuccess && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span className="text-sm">Profile updated successfully</span>
-              </motion.div>
-            )}
+            {/* Alerts */}
+            <AnimatePresence>
+              {saveSuccess && (
+                <SettingsAlert
+                  type="success"
+                  message="Profile updated successfully"
+                  onDismiss={() => setSaveSuccess(false)}
+                  autoDismiss
+                />
+              )}
+              {saveError && (
+                <SettingsAlert
+                  type="error"
+                  message={saveError}
+                  onDismiss={() => setSaveError(null)}
+                />
+              )}
+            </AnimatePresence>
 
-            {saveError && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500"
-              >
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">{saveError}</span>
-              </motion.div>
-            )}
-
-            {/* Profile Photo + Name */}
-            <div className="space-y-6">
-              <div className="flex items-start gap-6">
-                <motion.div
-                  onMouseEnter={() => setPhotoHovered(true)}
-                  onMouseLeave={() => setPhotoHovered(false)}
-                  className="relative group cursor-pointer"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: 'spring', stiffness: 400 }}
-                >
-                  <img
-                    src={avatarUrl}
-                    alt={displayName}
-                    className="w-20 h-20 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))] group-hover:ring-teal-500/50 transition-all"
+            {/* Profile Photo Section */}
+            <motion.div variants={fadeInUp}>
+              <SettingsFormCard>
+                <div className="flex items-start gap-6">
+                  <AvatarUpload
+                    avatarUrl={avatarUrl}
+                    displayName={displayName}
+                    onUpload={handleAvatarUpload}
+                    onRemove={handleAvatarRemove}
+                    isUploading={avatarUploading}
                   />
-                  <motion.div
-                    initial={false}
-                    animate={{ opacity: photoHovered ? 1 : 0 }}
-                    className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50"
-                  >
-                    <Camera className="w-5 h-5 text-white" />
-                  </motion.div>
-                </motion.div>
-
-                <div className="flex-1 space-y-1">
-                  <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">{displayName}</p>
-                  <p className="text-sm text-teal-600 dark:text-cyan-400">{displayRole}</p>
-                  {userProfile?.status && (
-                    <span className={`
-                      inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                      ${userProfile.status === 'active' 
-                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
-                        : userProfile.status === 'pending'
-                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                          : 'bg-gray-500/10 text-gray-600 dark:text-gray-400'
-                      }
-                    `}>
-                      {userProfile.status.charAt(0).toUpperCase() + userProfile.status.slice(1)}
+                  
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="text-sm font-medium text-teal-600 dark:text-cyan-400">
+                      {displayRole}
                     </span>
-                  )}
-                  <div className="flex items-center gap-2 mt-3">
-                    <Button variant="outline" size="sm" type="button">Upload Photo</Button>
-                    <Button variant="ghost" size="sm" type="button" className="text-[rgb(var(--text-tertiary))]">Remove</Button>
+                    {userProfile?.status && (
+                      <span className={`
+                        inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                        ${userProfile.status === 'active' 
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                          : userProfile.status === 'pending'
+                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                            : 'bg-gray-500/10 text-gray-600 dark:text-gray-400'
+                        }
+                      `}>
+                        {userProfile.status.charAt(0).toUpperCase() + userProfile.status.slice(1)}
+                      </span>
+                    )}
                   </div>
                 </div>
+              </SettingsFormCard>
+            </motion.div>
+
+            <SettingsDivider />
+
+            {/* Personal Information Section */}
+            <SettingsSection
+              title="Personal Information"
+              icon={User}
+              description="Your name and identity"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextField name="firstName" label="First Name" placeholder="Enter first name" required />
+                <TextField name="lastName" label="Last Name" placeholder="Enter last name" required />
               </div>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-[rgb(var(--border-primary))]" />
-
-            {/* Personal Information */}
-            <div className="space-y-5">
-              <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Personal Information</h2>
-              <div className="grid grid-cols-2 gap-5">
-                <TextField name="firstName" label="First Name" placeholder="Enter first name" />
-                <TextField name="lastName" label="Last Name" placeholder="Enter last name" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextField name="middleName" label="Middle Name" placeholder="Enter middle name (optional)" />
+                <TextField 
+                  name="displayName" 
+                  label="Display Name" 
+                  placeholder="How you want to be called"
+                  helperText="This is how your name appears to others"
+                />
               </div>
-            </div>
+            </SettingsSection>
 
-            {/* Divider */}
-            <div className="border-t border-[rgb(var(--border-primary))]" />
-
-            {/* Contact Information */}
-            <div className="space-y-5">
-              <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Contact Information</h2>
-              <div className="grid grid-cols-2 gap-5">
+            {/* Contact Information Section */}
+            <SettingsSection
+              title="Contact Information"
+              icon={Mail}
+              description="Email and phone details"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField 
                   name="email" 
                   label="Email" 
                   type="email" 
                   placeholder="email@example.com" 
                   icon={Mail}
-                  disabled // Email cannot be changed directly
+                  disabled
+                  helperText="Contact support to change your email"
                 />
-                <PhoneField name="phone" label="Phone" placeholder="(555) 123-4567" />
+                <TextField 
+                  name="phone" 
+                  label="Phone Number" 
+                  type="tel" 
+                  placeholder="+1 555-123-4567" 
+                  icon={Phone}
+                  helperText="Include country code"
+                />
               </div>
-            </div>
+            </SettingsSection>
 
-            {/* Divider */}
-            <div className="border-t border-[rgb(var(--border-primary))]" />
-
-            {/* Address */}
-            <div className="space-y-5">
-              <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Address</h2>
-              <AddressSection namePrefix="address" showHeader={false} />
-            </div>
+            {/* Address Section */}
+            <SettingsSection
+              title="Address"
+              icon={MapPin}
+              description="Your mailing address"
+            >
+              <div className="space-y-4">
+                <TextField 
+                  name="address.street" 
+                  label="Street Address" 
+                  placeholder="123 Main Street"
+                  icon={MapPin}
+                />
+                <TextField 
+                  name="address.street2" 
+                  label="Apartment, Suite, etc." 
+                  placeholder="Apt 4B (optional)"
+                />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <TextField name="address.city" label="City" placeholder="San Francisco" />
+                  <SelectField 
+                    name="address.state" 
+                    label="State / Province"
+                    options={US_STATE_OPTIONS}
+                  />
+                  <TextField name="address.postalCode" label="Postal Code" placeholder="94102" />
+                </div>
+                <SelectField 
+                  name="address.country" 
+                  label="Country"
+                  options={COUNTRY_OPTIONS}
+                  className="max-w-xs"
+                />
+              </div>
+            </SettingsSection>
 
             {/* Account Metadata */}
             {userProfile && (
               <>
-                <div className="border-t border-[rgb(var(--border-primary))]" />
-                <div className="space-y-3">
+                <SettingsDivider />
+                <motion.div variants={fadeInUp} className="space-y-3">
                   <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Account Details</h2>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-[rgb(var(--text-tertiary))]">User ID:</span>
-                      <p className="font-mono text-[rgb(var(--text-secondary))] truncate" title={userProfile.userId}>
-                        {userProfile.userId}
-                      </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+                    <div className="space-y-1">
+                      <span className="text-[rgb(var(--text-tertiary))]">User ID</span>
+                      <div className="flex items-center gap-2">
+                        <p className="font-mono text-xs text-[rgb(var(--text-secondary))] truncate" title={userProfile.userId}>
+                          {userProfile.userId}
+                        </p>
+                        <CopyButton text={userProfile.userId} />
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[rgb(var(--text-tertiary))]">Created:</span>
+                    <div className="space-y-1">
+                      <span className="text-[rgb(var(--text-tertiary))]">Created</span>
                       <p className="text-[rgb(var(--text-secondary))]">
-                        {new Date(userProfile.createdAt).toLocaleDateString()}
+                        {new Date(userProfile.createdAt).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
                       </p>
                     </div>
                     {userProfile.lastLoginAt && (
-                      <div>
-                        <span className="text-[rgb(var(--text-tertiary))]">Last Login:</span>
+                      <div className="space-y-1">
+                        <span className="text-[rgb(var(--text-tertiary))]">Last Login</span>
                         <p className="text-[rgb(var(--text-secondary))]">
                           {new Date(userProfile.lastLoginAt).toLocaleString()}
                         </p>
                       </div>
                     )}
-                    <div>
-                      <span className="text-[rgb(var(--text-tertiary))]">MFA Enabled:</span>
-                      <p className="text-[rgb(var(--text-secondary))]">
-                        {userProfile.mfaEnabled ? 'Yes' : 'No'}
+                    <div className="space-y-1">
+                      <span className="text-[rgb(var(--text-tertiary))]">MFA Status</span>
+                      <p className={`font-medium ${userProfile.mfaEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-[rgb(var(--text-secondary))]'}`}>
+                        {userProfile.mfaEnabled ? 'Enabled' : 'Not enabled'}
                       </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </>
             )}
           </motion.div>

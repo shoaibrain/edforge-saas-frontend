@@ -6,7 +6,6 @@
  */
 
 import { useFormContext, type RegisterOptions } from 'react-hook-form'
-import { useSpring, animated, config } from '@react-spring/web'
 import { cn } from '../../../lib/utils'
 
 export interface ToggleFieldProps {
@@ -32,24 +31,10 @@ export function ToggleField({
   const isChecked = watch(name)
 
   const sizeClasses = {
-    sm: { track: 'w-8 h-4', thumb: 'w-3 h-3', translate: 16 },
-    md: { track: 'w-11 h-6', thumb: 'w-5 h-5', translate: 20 },
-    lg: { track: 'w-14 h-7', thumb: 'w-6 h-6', translate: 28 },
+    sm: { track: 'w-8 h-4', thumb: 'w-3 h-3', translate: 'translate-x-4' },
+    md: { track: 'w-11 h-6', thumb: 'w-5 h-5', translate: 'translate-x-5' },
+    lg: { track: 'w-14 h-7', thumb: 'w-6 h-6', translate: 'translate-x-7' },
   }[size]
-
-  // Animation springs
-  const trackSpring = useSpring({
-    backgroundColor: isChecked 
-      ? 'rgb(20, 184, 166)' 
-      : 'rgb(var(--surface-tertiary))',
-    config: config.gentle,
-  })
-
-  const thumbSpring = useSpring({
-    x: isChecked ? sizeClasses.translate : 0,
-    scale: isChecked ? 1 : 0.95,
-    config: { tension: 400, friction: 30 },
-  })
 
   return (
     <div className={cn('flex items-start gap-3', className)}>
@@ -64,25 +49,23 @@ export function ToggleField({
         />
         
         {/* Track */}
-        <animated.div
-          style={trackSpring}
+        <div
           className={cn(
             sizeClasses.track,
-            'rounded-full transition-colors',
+            'rounded-full transition-colors duration-200',
             'peer-focus:ring-4 peer-focus:ring-teal-500/20',
+            isChecked ? 'bg-teal-500' : 'bg-[rgb(var(--surface-tertiary))]',
             disabled && 'opacity-60 cursor-not-allowed'
           )}
         />
         
         {/* Thumb */}
-        <animated.div
-          style={{
-            transform: thumbSpring.x.to((x) => `translateX(${x}px) scale(${thumbSpring.scale.get()})`),
-          }}
+        <div
           className={cn(
             sizeClasses.thumb,
             'absolute left-0.5 top-0.5 bg-white rounded-full shadow-sm',
-            'pointer-events-none'
+            'pointer-events-none transition-transform duration-200',
+            isChecked && sizeClasses.translate
           )}
         />
       </label>

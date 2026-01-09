@@ -6,10 +6,8 @@
  * Features a Google Account-inspired overview with Account/Workspace sections.
  */
 
-import { useState } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { useSpring, animated, config } from '@react-spring/web'
 import {
   Camera,
   Shield,
@@ -71,20 +69,6 @@ function SettingsOverviewContent({
   userEmail?: string
   userRole?: string
 }) {
-  const [searchFocused, setSearchFocused] = useState(false)
-  const [photoHovered, setPhotoHovered] = useState(false)
-
-  const searchSpring = useSpring({
-    scale: searchFocused ? 1.01 : 1,
-    shadow: searchFocused ? 12 : 0,
-    config: config.gentle,
-  })
-
-  const photoSpring = useSpring({
-    scale: photoHovered ? 1.05 : 1,
-    config: config.wobbly,
-  })
-
   // Quick action items for the pill row
   const quickActions: QuickActionProps[] = [
     { label: 'My Account', icon: User, href: '/settings/account' },
@@ -104,10 +88,9 @@ function SettingsOverviewContent({
         className="flex flex-col items-center text-center pt-4 pb-6"
       >
         {/* Avatar with camera overlay */}
-        <animated.div
-          style={{ transform: photoSpring.scale.to(s => `scale(${s})`) }}
-          onMouseEnter={() => setPhotoHovered(true)}
-          onMouseLeave={() => setPhotoHovered(false)}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="relative group cursor-pointer mb-4"
         >
           <img
@@ -116,8 +99,8 @@ function SettingsOverviewContent({
             className="w-24 h-24 rounded-full object-cover ring-4 ring-[rgb(var(--surface-tertiary))] group-hover:ring-teal-500/30 transition-all"
           />
           <motion.div
-            initial={false}
-            animate={{ opacity: photoHovered ? 1 : 0 }}
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
             className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50"
           >
             <Camera className="w-6 h-6 text-white" />
@@ -126,7 +109,7 @@ function SettingsOverviewContent({
           <div className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[rgb(var(--surface-secondary))] border-2 border-[rgb(var(--surface-primary))] shadow-lg">
             <Camera className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
           </div>
-        </animated.div>
+        </motion.div>
 
         {/* Name and Email */}
         <motion.h1
@@ -165,22 +148,17 @@ function SettingsOverviewContent({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.4 }}
       >
-        <animated.div
-          style={{
-            transform: searchSpring.scale.to(s => `scale(${s})`),
-            boxShadow: searchSpring.shadow.to(s => `0 ${s}px ${s * 2}px rgba(0, 0, 0, 0.08)`),
-          }}
+        <motion.div
+          whileFocus={{ scale: 1.01 }}
           className="relative max-w-xl mx-auto"
         >
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
             placeholder="Search settings..."
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
-            className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all"
+            className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all focus:shadow-lg"
           />
-        </animated.div>
+        </motion.div>
       </motion.div>
 
       {/* Quick Actions - Pill Buttons */}

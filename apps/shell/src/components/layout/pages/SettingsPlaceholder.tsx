@@ -10,7 +10,6 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useSpring, animated } from '@react-spring/web'
 import {
   Search,
   User,
@@ -209,12 +208,6 @@ export default function SettingsPlaceholder() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
 
-  // Animated search bar
-  const searchSpring = useSpring({
-    width: searchFocused ? '100%' : '50%',
-    config: { tension: 300, friction: 30 },
-  })
-
   const filteredCategories = searchQuery
     ? SETTINGS_CATEGORIES.filter(
         (cat) =>
@@ -263,7 +256,11 @@ export default function SettingsPlaceholder() {
         transition={{ delay: 0.3 }}
         className="flex justify-center"
       >
-        <animated.div style={searchSpring} className="relative max-w-xl">
+        <motion.div
+          animate={{ width: searchFocused ? '100%' : '50%' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className="relative max-w-xl"
+        >
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
@@ -274,7 +271,7 @@ export default function SettingsPlaceholder() {
             onBlur={() => setSearchFocused(false)}
             className="w-full pl-12 pr-4 py-3 rounded-full bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] transition-all"
           />
-        </animated.div>
+        </motion.div>
       </motion.div>
 
       {/* Quick Actions */}

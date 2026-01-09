@@ -12,8 +12,6 @@
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useSpring, animated } from '@react-spring/web'
-import { useState } from 'react'
 import { Building2, Sparkles, Clock, CheckCircle2 } from 'lucide-react'
 import { Card } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
@@ -79,21 +77,10 @@ function FeatureStatusBadge({ status }: { status: FeatureHint['status'] }) {
 // ============================================================================
 
 function SchoolRequiredState() {
-  const [hovered, setHovered] = useState(false)
-  
-  const springProps = useSpring({
-    scale: hovered ? 1.02 : 1,
-    y: hovered ? -2 : 0,
-    config: { tension: 300, friction: 20 },
-  })
-
   return (
-    <animated.div
-      style={{
-        transform: springProps.scale.to(s => `scale(${s}) translateY(${springProps.y.get()}px)`),
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <motion.div
+      whileHover={{ scale: 1.02, y: -2 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     >
       <Card className="p-8 relative overflow-hidden">
         {/* Subtle gradient background */}
@@ -114,7 +101,7 @@ function SchoolRequiredState() {
           </div>
         </div>
       </Card>
-    </animated.div>
+    </motion.div>
   )
 }
 

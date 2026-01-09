@@ -7,7 +7,6 @@
 
 import { useState } from 'react'
 import { useFormContext, type RegisterOptions } from 'react-hook-form'
-import { useSpring, animated, config } from '@react-spring/web'
 import { Calendar, AlertCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 
@@ -49,54 +48,37 @@ export function DateField({
   const errorMessage = error?.message as string | undefined
   const hasError = !!errorMessage
 
-  // Animation springs
-  const focusSpring = useSpring({
-    borderColor: hasError 
-      ? 'rgb(239, 68, 68)' 
-      : isFocused 
-        ? 'rgb(20, 184, 166)' 
-        : 'rgb(var(--border-primary))',
-    boxShadow: isFocused && !hasError
-      ? '0 0 0 3px rgba(20, 184, 166, 0.15)'
-      : hasError
-        ? '0 0 0 3px rgba(239, 68, 68, 0.1)'
-        : '0 0 0 0px transparent',
-    config: config.gentle,
-  })
-
-  const labelSpring = useSpring({
-    color: hasError 
-      ? 'rgb(239, 68, 68)' 
-      : isFocused 
-        ? 'rgb(20, 184, 166)' 
-        : 'rgb(var(--text-secondary))',
-    config: config.gentle,
-  })
-
   const { onBlur, ...registerProps } = register(name, rules)
 
   return (
     <div className={cn('space-y-1.5', className)}>
       {/* Label */}
       {label && (
-        <animated.label
+        <label
           htmlFor={name}
-          style={labelSpring}
-          className="block text-sm font-medium"
+          className={cn(
+            'block text-sm font-medium transition-colors duration-200',
+            hasError 
+              ? 'text-rust-500' 
+              : isFocused 
+                ? 'text-teal-500' 
+                : 'text-[rgb(var(--text-secondary))]'
+          )}
         >
           {label}
           {required && <span className="text-rust-500 ml-0.5">*</span>}
-        </animated.label>
+        </label>
       )}
 
       {/* Input Container */}
-      <animated.div
-        style={{
-          borderColor: focusSpring.borderColor,
-          boxShadow: focusSpring.boxShadow,
-        }}
+      <div
         className={cn(
-          'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-colors',
+          'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-all duration-200',
+          hasError 
+            ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
+            : isFocused 
+              ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+              : 'border-[rgb(var(--border-primary))]',
           disabled && 'opacity-60 cursor-not-allowed'
         )}
       >
@@ -138,7 +120,7 @@ export function DateField({
             <AlertCircle className="w-4 h-4 text-rust-500" />
           </div>
         )}
-      </animated.div>
+      </div>
 
       {/* Helper Text or Error */}
       <div className="min-h-[1.25rem]">

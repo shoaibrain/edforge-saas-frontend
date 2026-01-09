@@ -1,525 +1,246 @@
 # EdForge MFE Technical Status Report
 
-> Implementation status as of January 2026
+> Implementation Status: January 2026
 
 ---
 
-## Executive Summary
+## 1. Implementation Summary
 
-EdForge is a **multi-tenant Education Management Information System (EMIS)** built as a **Micro-Frontend (MFE)** application using **Module Federation**. The presentation layer has undergone significant reorganization to transition from a "database-first" navigation pattern to a "workflow-oriented" design, reducing cognitive friction while maintaining enterprise-grade functionality.
-
----
-
-## 1. Architecture Overview
-
-### 1.1 Technology Stack
-
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Build System | Rsbuild + Rspack | Latest |
-| Module Federation | @module-federation/enhanced | Latest |
-| Routing | TanStack Router | ^1.82.0 |
-| State Management | Zustand | ^5.0.0 |
-| UI Framework | React | ^19.0.0 |
-| Styling | Tailwind CSS + CSS Variables | ^3.4.0 |
-| Animation | Framer Motion + React Spring | Latest |
-| Forms | React Hook Form + Zod | Latest |
-| Auth (Planned) | AWS Cognito | - |
-| Database | Amazon DynamoDB | On-Demand |
-
-### 1.2 Application Structure
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              SHELL APPLICATION                               │
-│    (Authentication, Routing, Layout, Theme, ABAC, Multi-tenant Context)     │
-│                              Port: 3000                                      │
-├────────────┬────────────┬────────────┬────────────┬────────────┬────────────┤
-│ Academics  │  Finance   │   People   │  Messages  │ Analytics  │  Special   │
-│   Remote   │   Remote   │   Remote   │   Remote   │   Remote   │  Programs  │
-│   :3002    │   :3003    │   :3006    │   :3007    │   :3008    │   :3005    │
-├────────────┴────────────┴────────────┴────────────┴────────────┴────────────┤
-│                            Ed-Fi Remote (:3001)                              │
-│                    (State Education Data Exchange)                           │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Shell Application | ✅ Complete | Auth, routing, layout, settings |
+| Module Federation | ✅ Complete | 7 remote modules configured |
+| Authentication | ✅ Complete | AWS Cognito OAuth2/PKCE |
+| Settings Module | ✅ Complete | 4 pages with TanStack Query |
+| Multi-tenant Context | ✅ Complete | Tenant/school switching |
+| Backend Integration | ⚠️ Partial | Waiting for identity-service APIs |
 
 ---
 
-## 2. Module Implementation Status
-
-### 2.1 Shell Application (Port 3000)
-
-**Status: ✅ Fully Implemented**
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| TanStack Router | ✅ Complete | Type-safe routing with splat routes for remotes |
-| ABAC Engine | ✅ Complete | 50+ resources, 8 actions, 6 school roles |
-| Multi-Tenant Context | ✅ Complete | Tenant/School switching, subdomain support |
-| Theme System | ✅ Complete | Dark/Light/System with CSS variables |
-| Dynamic Sidebar | ✅ Complete | Role-based, module-aware navigation |
-| Settings Module | ✅ Complete | ACCOUNT + WORKSPACE grouped sections |
-| Login/Auth Flow | ✅ Complete | Mock auth, Cognito-ready interface |
-
-### 2.2 Remote MFEs
-
-| Remote | Port | Status | Routes Implemented |
-|--------|------|--------|-------------------|
-| **Academics** | 3002 | ✅ Complete | 18 routes (6 consolidated + 12 legacy) |
-| **Finance** | 3003 | ✅ Complete | 5 routes |
-| **Ed-Fi** | 3001 | ✅ Complete | 4 routes |
-| **Special Programs** | 3005 | ✅ Complete | 9 routes |
-| **People** | 3006 | ✅ Complete | 8 routes |
-| **Messages** | 3007 | ✅ Complete | 5 routes |
-| **Analytics** | 3008 | ✅ Complete | 9 routes |
-
-### 2.3 Shared Packages
-
-| Package | Purpose | Status |
-|---------|---------|--------|
-| `@edforge/types` | TypeScript types (Person, Auth, Tenant) | ✅ Complete |
-| `@edforge/abac` | Permission engine + React hooks | ✅ Complete |
-| `@edforge/ui` | Shared UI components (Button, Card, Table, etc.) | ✅ Complete |
-| `@edforge/theme` | Tailwind config + CSS variables | ✅ Complete |
-| `@edforge/forms` | Form fields + validation schemas | ✅ Complete |
-| `@edforge/wizard` | Multi-step wizard components | ✅ Complete |
-| `@edforge/config` | ESLint + Tailwind shared config | ✅ Complete |
-| `@edforge/shell-components` | ModuleOverviewPage shared component | ✅ Complete |
-
----
-
-## 3. Navigation Consolidation Summary
-
-### 3.1 Before vs After Comparison
-
-The navigation was refactored from a "database-first" pattern (where each DB table had its own nav item) to a "workflow-oriented" pattern (where related tasks are grouped under consolidated views).
-
-| Module | Before | After | Reduction |
-|--------|--------|-------|-----------|
-| **Academics** | 15 items | 6 items | -60% |
-| **Finance** | 12 items | 4 items | -67% |
-| **People** | 10 items | 3 items | -70% |
-| **Settings** | 12 mixed items | 12 grouped items | Organized |
-
-### 3.2 Academics Module (15 → 6 items)
-
-**Before:**
-- Students, Enrollment, Student Profiles
-- Classrooms, Class Schedules, Timetables
-- Grade Levels, Courses, Standards
-- Gradebooks, Assessments, Exams
-- Student Attendance, Academic Calendar
-
-**After:**
-- **Overview** - Dashboard with key metrics
-- **Students** - Directory + Enrollment/Profiles as tabs
-- **Attendance** - Daily tracking (elevated for high frequency)
-- **Grades & Assessments** - Gradebook + Assessments/Exams as tabs
-- **Scheduling** - Classrooms + Schedules + Timetables combined
-- **Curriculum** - Courses + Grade Levels + Standards in "Configure" tab
-
-### 3.3 Finance Module (12 → 4 items)
-
-**Before:**
-- General Ledger, Accounts Payable, Accounts Receivable
-- Tuition & Fees, Fee Structures, Collections
-- Expense Tracking, Expense Approvals, Budgets
-
-**After:**
-- **Overview** - Financial dashboard
-- **Ledger** - GL/AP/AR as tabs (specialist view)
-- **Billing** - Tuition + Fee Structures behind gear icon
-- **Expenses** - Tracking + Approvals as filter + Budgets as tab
-
-### 3.4 People Module (10 → 3 items)
-
-**Before:**
-- Staff Directory, Departments
-- Payroll, Contracts, Professional Development, Performance Reviews
-- Staff Tasks, Duty Assignments
-- Parent Directory (misplaced)
-
-**After:**
-- **Overview** - Staff metrics dashboard
-- **Staff Directory** - Departments as filter
-- **HR Admin** - Tabbed: Compensation (Payroll/Contracts) + Development (PD/Reviews)
-
-*Note: Parents moved to Academics/Families context or dedicated portal*
-
-### 3.5 Settings Module (Grouped Structure)
-
-**ACCOUNT Section:**
-- My Account (personal info)
-- Preferences (theme, language, timezone)
-- Notifications (email, push, SMS)
-- Security (password, 2FA, sessions)
-- Connections (linked accounts)
-
-**WORKSPACE Section:**
-- General Settings (tenant config)
-- Access Policy (ABAC management)
-- Schools (school management)
-- Billing (subscription, payment)
-- Integrations (third-party services)
-- Import/Export (data management)
-
-**Danger Zone:**
-- Destructive tenant actions
-
----
-
-## 4. Route Structure
-
-### 4.1 Shell Routes (`apps/shell/src/router.tsx`)
+## 2. Shell Routes Structure
 
 ```
-/login                          → LoginPage
-/home                           → HomePage (role-based dashboard)
+/                           → Auth redirect
+/login                      → LoginPage (Cognito redirect)
+/auth/callback              → OAuth callback handler
 
-/settings                       → SettingsPage
-/settings/account               → AccountPage
-/settings/preferences           → PreferencesPage
-/settings/security              → SecurityPage
-/settings/notifications         → NotificationsPage
-/settings/connections           → IntegrationsSettingsPage
-/settings/general               → PreferencesPage
-/settings/access                → PeopleSettingsPage
-/settings/schools               → SchoolsSettingsPage
-/settings/billing               → BillingSettingsPage
-/settings/integrations          → IntegrationsSettingsPage
-/settings/import-export         → IntegrationsSettingsPage
-/settings/danger-zone           → DangerZonePage
+/home                       → HomePage (protected)
 
-/academics/$                    → AcademicsModule (remote)
-/finance/$                      → FinanceModule (remote)
-/people/$                       → PeopleModule (remote)
-/messages/$                     → MessagesModule (remote)
-/analytics/$                    → AnalyticsModule (remote)
-/edfi/$                         → EdFiModule (remote)
-/special-programs/$             → SpecialProgramsModule (remote)
+/settings                   → SettingsPage
+  /account                  → AccountPage
+  /preferences              → PreferencesPage
+  /notifications            → NotificationsPage
+  /security                 → SecurityPage
+  /connections              → IntegrationsSettingsPage
+  /general                  → PreferencesPage (alias)
+  /access                   → PeopleSettingsPage
+  /schools                  → SchoolsSettingsPage
+  /billing                  → BillingSettingsPage
+  /integrations             → IntegrationsSettingsPage
+  /import-export            → IntegrationsSettingsPage
+  /danger-zone              → DangerZonePage
 
-/student-portal                 → StudentPortal (placeholder)
-/parent-portal                  → ParentPortal (placeholder)
-```
+/academics/$                → AcademicsModule (remote)
+/finance/$                  → FinanceModule (remote)
+/people/$                   → PeopleModule (remote)
+/messages/$                 → MessagesModule (remote)
+/analytics/$                → AnalyticsModule (remote)
+/edfi/$                     → EdFiModule (remote)
+/special-programs/$         → SpecialProgramsModule (remote)
 
-### 4.2 Academics Remote Routes (`apps/academics/src/router.tsx`)
-
-```
-basepath: /academics
-
-/                               → Overview
-/students                       → StudentsModule
-/students/enrollment            → EnrollmentModule
-/students/profiles              → StudentProfilesModule
-/attendance                     → AttendanceModule
-/grades                         → GradesModule (consolidated)
-/scheduling                     → SchedulingModule (consolidated)
-/curriculum                     → CurriculumModule (consolidated)
-
-# Legacy routes (redirect notices)
-/gradebooks, /assessments, /exams → redirect to /grades
-/classrooms, /schedules, /timetables → redirect to /scheduling
-/courses, /grade-levels, /standards → redirect to /curriculum
-/teachers                       → TeachersModule
-/calendar                       → CalendarModule
-```
-
-### 4.3 Finance Remote Routes (`apps/finance/src/router.tsx`)
-
-```
-basepath: /finance
-
-/                               → Overview
-/ledger                         → LedgerModule
-/billing                        → BillingModule
-/expenses                       → ExpensesModule
-/payroll                        → PayrollModule
-/tuition                        → TuitionModule
-```
-
-### 4.4 Ed-Fi Remote Routes (`apps/edfi/src/router.tsx`)
-
-```
-basepath: /edfi
-
-/                               → SyncDashboard
-/connections                    → ConnectionWizard
-/mapping                        → DescriptorMapper
-/errors                         → ErrorAggregator
-```
-
-### 4.5 Special Programs Remote Routes (`apps/special-programs/src/router.tsx`)
-
-```
-basepath: /special-programs
-
-/                               → Overview
-/ieps                           → IEPsModule
-/ieps/meetings                  → IEPMeetingsModule
-/ieps/goals                     → IEPGoalsModule
-/504-plans                      → 504PlansModule
-/accommodations                 → AccommodationsModule
-/accessibility                  → AccessibilityModule
-/counseling                     → CounselingModule
-/interventions                  → InterventionsModule
-```
-
-### 4.6 Analytics Remote Routes (`apps/analytics/src/router.tsx`)
-
-```
-basepath: /analytics
-
-/                               → Overview
-/enrollment                     → EnrollmentAnalytics
-/attendance                     → AttendanceAnalytics
-/performance                    → PerformanceAnalytics
-/finance                        → FinancialAnalytics
-/comparisons                    → ComparativeAnalysis
-/custom                         → CustomReports
-/reports                        → CustomReports (legacy redirect)
-/dashboards                     → DashboardsModule
+/student-portal             → Placeholder
+/parent-portal              → Placeholder
 ```
 
 ---
 
-## 5. Role-Based Navigation
+## 3. Authentication Implementation
 
-### 5.1 Home Module Variants
+### Source Files
+- `packages/auth/src/service.ts` - Amplify v6 auth operations
+- `packages/auth/src/config.ts` - Cognito configuration
+- `apps/shell/src/stores/auth.store.ts` - Zustand auth state
+- `apps/shell/src/lib/api.ts` - Axios JWT interceptor
 
-The sidebar dynamically changes based on the user's role category:
+### Auth Flow
+1. `signInWithRedirect()` → Cognito Hosted UI
+2. OAuth callback → Amplify exchanges code for tokens
+3. `getIdTokenPayload()` → Extract custom claims
+4. `mapCognitoToUserIdentity()` → Create UserIdentity
+5. Shell context fetches `/users/me` for assignments
 
-| Role Category | Home Module | Navigation Focus |
-|--------------|-------------|------------------|
-| Administrator | `home` | Full module access (Academics, Finance, HR, etc.) |
-| Educator | `home` | Same as admin (Teachers have limited permissions) |
-| Student | `home-student` | My Grades, Attendance, Schedule, Assignments |
-| Parent | `home-parent` | Children overview, Grades, Fees, Communications |
-
-### 5.2 Student Portal Navigation
-
-```
-MY ACADEMICS
-├── My Grades
-├── My Attendance
-├── My Schedule
-└── Assignments
-
-RESOURCES
-├── Curriculum
-└── School Calendar
-
-COMMUNICATION
-├── Messages
-└── Announcements
+### Required Environment Variables
+```bash
+VITE_COGNITO_USER_POOL_ID=
+VITE_COGNITO_CLIENT_ID=
+VITE_COGNITO_DOMAIN=
+VITE_COGNITO_REGION=us-east-1
+VITE_REDIRECT_SIGN_IN=http://localhost:3000
+VITE_REDIRECT_SIGN_OUT=http://localhost:3000
+VITE_API_URL=
 ```
 
-### 5.3 Parent Portal Navigation
-
-```
-MY CHILDREN
-├── Overview
-├── Grades
-├── Attendance
-└── Schedule
-
-PAYMENTS
-└── Fee Payments
-
-SCHOOL
-└── School Calendar
-
-COMMUNICATION
-├── Messages
-└── Announcements
-```
+### Dev Mode
+Without Cognito config, mock users are available via `loginAsMock()`:
+- tenant-admin, principal, teacher, accountant, student, parent
 
 ---
 
-## 6. ABAC Implementation
+## 4. API Service Layer
 
-### 6.1 Role Hierarchy
+### tenant.service.ts — Active Endpoints
 
-```
-GlobalRole (Tenant-level)
-├── TenantAdmin     → Full access across all schools
-└── StandardUser    → School-specific access via assignments
+| Method | Endpoint | Used In |
+|--------|----------|---------|
+| `getCurrentUser()` | `GET /users/me` | ShellContext |
+| `getUserAssignments()` | `GET /users/{id}/assignments` | ShellContext |
+| `getTenant()` | `GET /tenants/{id}` | ShellContext |
+| `updateTenant()` | `PUT /tenants/{id}` | — |
+| `getSchools()` | `GET /schools?tenantId=` | ShellContext |
+| `getSchool()` | `GET /schools/{id}` | — |
+| `createSchool()` | `POST /schools` | — |
+| `updateSchool()` | `PUT /schools/{id}` | — |
+| `deleteSchool()` | `DELETE /schools/{id}` | — |
+| `getSchoolYears()` | `GET /school-years?tenantId=` | ShellContext |
 
-SchoolRole (Per-school)
-├── Principal       → Full school access + approvals
-├── Teacher         → Class-level access + grading
-├── Accountant      → Finance access
-├── Staff           → Limited operational access
-├── Student         → Student portal only
-└── Parent          → Parent portal only (read-only)
-```
+### users.service.ts — Active Endpoints
 
-### 6.2 Permission Check Flow
+| Method | Endpoint | Used In |
+|--------|----------|---------|
+| `getUser()` | `GET /users/{id}` | AccountPage |
+| `updateUser()` | `PATCH /users/{id}` | AccountPage |
+| `getPreferences()` | `GET /users/{id}/preferences` | PreferencesPage, NotificationsPage |
+| `updatePreferences()` | `PATCH /users/{id}/preferences` | PreferencesPage, NotificationsPage |
+| `getAvatarUploadUrl()` | `POST /users/{id}/avatar/upload-url` | AccountPage |
+| `uploadAvatar()` | S3 + PATCH | AccountPage |
+| `removeAvatar()` | `DELETE /users/{id}/avatar` | AccountPage |
+| `getSecurityOverview()` | `GET /users/{id}/security` | SecurityPage |
+| `changePassword()` | `POST /users/{id}/security/change-password` | SecurityPage |
+| `initiateMfaSetup()` | `POST /users/{id}/security/mfa/setup` | SecurityPage |
+| `verifyAndEnableMfa()` | `POST /users/{id}/security/mfa/verify` | SecurityPage |
+| `disableMfa()` | `POST /users/{id}/security/mfa/disable` | SecurityPage |
+| `getActiveSessions()` | `GET /users/{id}/security/sessions` | SecurityPage |
+| `revokeSession()` | `DELETE /users/{id}/security/sessions/{sessionId}` | SecurityPage |
+| `revokeAllSessions()` | `POST /users/{id}/security/sessions/revoke-all` | SecurityPage |
+| `getLoginHistory()` | `GET /users/{id}/security/login-history` | SecurityPage |
+
+---
+
+## 5. Settings Module Implementation
+
+### Account Page (`account.tsx`)
+- **Query:** `usersService.getUser(userId)`
+- **Mutation:** `usersService.updateUser(userId, data)`
+- **Avatar:** `uploadAvatar()`, `removeAvatar()`
+- **Form:** React Hook Form + Zod validation
+- **Fields:** firstName, lastName, middleName, displayName, phone, address
+
+### Preferences Page (`preferences.tsx`)
+- **Query:** `usersService.getPreferences(userId)`
+- **Mutation:** `usersService.updatePreferences(userId, data)`
+- **Fields:** theme, language, timezone, dateFormat, timeFormat, weekStartsOn, defaultSchoolId
+
+### Notifications Page (`notifications.tsx`)
+- **Query:** `usersService.getPreferences(userId)`
+- **Mutation:** `usersService.updatePreferences(userId, { notifications })`
+- **Fields:** channels (email/push/sms), categories (announcements/attendance/grades/etc.)
+
+### Security Page (`security.tsx`)
+- **Queries:** `getSecurityOverview`, `getActiveSessions`, `getLoginHistory`
+- **Mutations:** `changePassword`, MFA setup/verify/disable, session management
+- **Status:** UI complete, backend endpoints not yet implemented
+
+---
+
+## 6. Shell Context (shell-context.tsx)
+
+Provides app-wide state via React Context + TanStack Query:
 
 ```typescript
-// Frontend permission check
-const canEditStudents = usePermission('edit', 'students')
-
-// ABAC engine evaluation
-can(user, {
-  action: 'edit',
-  resource: 'students',
-  schoolId: activeSchoolId,
-})
+interface ShellContextValue {
+  user: UserIdentity              // From auth store
+  tenant: Tenant | null           // From /tenants/{tenantId}
+  availableSchools: School[]      // From /schools?tenantId=
+  activeSchool: School | null     // User-selected
+  activeSchoolYear: SchoolYear | null
+  setActiveSchool: (school) => void
+}
 ```
 
-### 6.3 Resource Categories
-
-**Academics (15 resources):**
-`students`, `teachers`, `grades`, `gradelevels`, `curriculum`, `classes`, `classrooms`, `calendar`, `attendance`, `enrollment`, `assessments`, `gradebook`, `scheduling`, `courses`, `standards`
-
-**Finance (5 resources):**
-`billing`, `payroll`, `expenses`, `tuition`, `reports:finance`
-
-**HR (5 resources):**
-`staff`, `hr`, `hr:payroll`, `hr:contracts`, `hr:professional-dev`, `hr:performance-reviews`
-
-**Communications (4 resources):**
-`communications`, `announcements`, `messages`, `notifications`
-
-**Analytics (4 resources):**
-`analytics`, `analytics:academic`, `analytics:financial`, `analytics:attendance`
-
-**Special Programs (3 resources):**
-`special-programs`, `special-programs:ieps`, `special-programs:504`
-
-**Portals (9 resources):**
-`student-portal`, `student-portal:grades`, `student-portal:attendance`, `student-portal:schedule`, `student-portal:assignments`, `parent-portal`, `parent-portal:grades`, `parent-portal:attendance`, `parent-portal:fees`, `parent-portal:schedule`
-
-**Settings (3 resources):**
-`settings`, `settings:school`, `settings:tenant`
-
-**Integrations (5 resources):**
-`edfi`, `edfi:connections`, `edfi:mapping`, `edfi:sync`, `integrations`, `integrations:google`, `integrations:microsoft`
+**Query Keys:**
+- `['user-profile']` → `/users/me`
+- `['tenant', tenantId]` → `/tenants/{tenantId}`
+- `['schools', tenantId]` → `/schools?tenantId=`
+- `['current-school-year', tenantId]` → `/school-years?tenantId=`
 
 ---
 
 ## 7. Module Federation Configuration
 
-### 7.1 Shell Remote Configuration
+### Remote Modules
 
-```typescript
-// apps/shell/rsbuild.config.ts
-remotes: {
-  academics: 'academics@http://localhost:3002/remoteEntry.js',
-  finance: 'finance@http://localhost:3003/remoteEntry.js',
-  edfi: 'edfi@http://localhost:3001/remoteEntry.js',
-  'special-programs': 'special_programs@http://localhost:3005/remoteEntry.js',
-  people: 'people@http://localhost:3006/remoteEntry.js',
-  messages: 'messages@http://localhost:3007/remoteEntry.js',
-  analytics: 'analytics@http://localhost:3008/remoteEntry.js',
-}
-```
+| Module | Port | Federation Name | Entry Point |
+|--------|------|-----------------|-------------|
+| Shell | 3000 | shell | Host only |
+| Academics | 3002 | academics | AcademicsModule |
+| Finance | 3003 | finance | FinanceModule |
+| Ed-Fi | 3001 | edfi | EdFiModule |
+| Special Programs | 3005 | special_programs | SpecialProgramsModule |
+| People | 3006 | people | PeopleModule |
+| Messages | 3007 | messages | MessagesModule |
+| Analytics | 3008 | analytics | AnalyticsModule |
 
-### 7.2 Shared Dependencies
-
-```typescript
-shared: {
-  react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
-  'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
-  '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0' },
-  '@tanstack/react-router': { singleton: true, requiredVersion: '^1.82.0' },
-  zustand: { singleton: true, requiredVersion: '^5.0.0' },
-  '@edforge/ui': { singleton: true },
-  '@edforge/abac': { singleton: true },
-  '@edforge/types': { singleton: true },
-  '@edforge/theme': { singleton: true },
-  'framer-motion': { singleton: true },
-  '@react-spring/web': { singleton: true },
-}
-```
+### Shared Dependencies (Singletons)
+- react, react-dom (^19.0.0)
+- @tanstack/react-query, @tanstack/react-router
+- zustand, framer-motion
+- @edforge/ui, @edforge/abac, @edforge/types, @edforge/theme
 
 ---
 
-## 8. Outstanding Items
+## 8. Outstanding Backend Requirements
 
-### 8.1 Placeholder Pages (Require Backend Integration)
+### P0 (MVP Blockers)
+- [ ] `GET /users/me` - User profile with assignments
+- [ ] `GET /tenants/{tenantId}` - Tenant details
+- [ ] `GET /schools?tenantId=` - List schools
 
-- Student Portal sub-routes (grades, attendance, schedule, assignments)
-- Parent Portal sub-routes (children data, fees)
-- Some Special Programs routes have placeholder content
+### P1 (Settings MVP)
+- [ ] `GET /users/{userId}` - User profile
+- [ ] `PATCH /users/{userId}` - Update profile
+- [ ] `GET /users/{userId}/preferences` - Preferences
+- [ ] `PATCH /users/{userId}/preferences` - Update preferences
 
-### 8.2 Backend Dependencies
+### P2 (Settings Complete)
+- [ ] Avatar upload (S3 presigned URLs)
+- [ ] School CRUD endpoints
 
-- AWS Cognito integration for production auth
-- API services for all CRUD operations
-- Real-time sync for Ed-Fi integration
-- File upload/download for Import/Export
-
-### 8.3 Future Enhancements
-
-- Offline support with service workers
-- Push notifications integration
-- Advanced analytics with custom chart builder
-- Bulk operations for data management
+### P3 (Post-MVP)
+- [ ] All security endpoints (password, MFA, sessions)
+- [ ] Login history / audit logging
 
 ---
 
-## 9. Development Environment
-
-### 9.1 Port Assignments
-
-| Application | Port | Federation Name |
-|-------------|------|-----------------|
-| Shell | 3000 | shell |
-| Ed-Fi | 3001 | edfi |
-| Academics | 3002 | academics |
-| Finance | 3003 | finance |
-| Special Programs | 3005 | special_programs |
-| People | 3006 | people |
-| Messages | 3007 | messages |
-| Analytics | 3008 | analytics |
-
-### 9.2 Running the Development Environment
+## 9. Development Commands
 
 ```bash
-# From edforge-mfe root
+# Install dependencies
 pnpm install
-pnpm dev          # Starts all apps concurrently
 
-# Or start individual apps
+# Start all apps
+pnpm dev
+
+# Start shell only
 pnpm --filter @edforge/shell dev
-pnpm --filter @edforge/academics dev
-```
 
-### 9.3 Type Checking
-
-```bash
+# Type check
 pnpm turbo run typecheck
+
+# Build
+pnpm turbo run build
 ```
 
 ---
 
-*Report Generated: December 2024*
-*EdForge MFE Version: 2.0.0*
-
-
-## 10. Technical Review & Verification (January 2026)
-
-### 10.1 Application Architecture Review
-A comprehensive code review confirms the architecture adheres strictly to the **Micro-Frontend** and **Module Federation** patterns described. The monorepo structure is robust, utilizing `pnpm` workspaces and `turbo` for build orchestration.
-
-- **Shell Application**: Correctly handles routing, authentication state (Zustand), and remote loading.
-- **Micro-Frontends**: All 7 defined remotes (`academics`, `finance`, `people`, `messages`, `analytics`, `special-programs`, `edfi`) are present and configured in `rsbuild.config.ts`.
-- **Shared Packages**: The `packages/` directory contains all 9 shared libraries (`abac`, `auth`, `ui`, etc.), ensuring DRY principles are followed.
-
-### 10.2 Implementation Completeness Verification
-
-| Component | Status | Verification Findings |
-|-----------|--------|----------------------|
-| **Routing** | ✅ Verified | `apps/shell/src/router.tsx` accurately maps all modules. `apps/academics/src/router.tsx` implements the "Workflow-Oriented" design with consolidated routes (`/grades`, `/scheduling`, `/curriculum`). |
-| **Authentication** | ⚠️ Hybrid | `auth.store.ts` implements a hybrid model. It is fully "Cognito-ready" via `@edforge/auth` but currently relies on `MOCK_USERS` and a `loginAsMock` action for development. Production readiness requires full backend Cognito integration. |
-| **Portals** | 🚧 Pending | `student-portal` and `parent-portal` routes exist in the Shell but render placeholder "Coming soon" components, matching the "Outstanding Items" list. |
-| **Dependencies** | ✅ Up-to-date | `react@^19.0.0` and `@module-federation/enhanced` are currently used, positioning the app on the latest stable tech stack. |
-
-### 10.3 Architecture Compliance
-The implementation provides a high degree of fidelity to the `ARCHITECTURE_KNOWLEDGE_KIT.md`:
-- **Domain Boundaries**: The remote module boundaries align perfectly with the defined Domain Contexts (Academics, Finance, etc.).
-- **Tech Stack**: The actual usage of `Rsbuild`, `TanStack Router`, and `Zustand` matches the architectural specification exactly.
-
-*Report Verified: January 4, 2026*
+*Report Generated: January 2026*
+*Version: 2.1.0*
