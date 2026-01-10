@@ -5,6 +5,9 @@ import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
 // Load environment variables from .env files
 const { publicVars } = loadEnv({ prefixes: ['VITE_'] })
 
+// Get API URL from environment (used for proxy target)
+const API_URL = process.env.VITE_API_URL || 'https://f3xlvrqt24.execute-api.us-east-1.amazonaws.com/prod'
+
 export default defineConfig({
   plugins: [pluginReact()],
   source: {
@@ -17,6 +20,38 @@ export default defineConfig({
     port: 3000,
     cors: true,
     historyApiFallback: true, // Critical for SPA routing
+    // Development-only proxy to bypass CORS
+    // Only active in dev mode (rsbuild automatically checks NODE_ENV)
+    proxy: process.env.NODE_ENV === 'development' ? {
+      '/api': {
+        target: API_URL,
+        changeOrigin: true,
+        secure: true,
+        // Remove /api prefix - target URL already includes /prod
+        // /api/users/123 -> /users/123 (then target adds /prod)
+        pathRewrite: { '^/api': '' },
+        // http-proxy-middleware automatically forwards all headers
+        // We don't modify them to avoid corruption during body streaming
+        onProxyReq: (_proxyReq, req, _res) => {
+          // Log for debugging only - don't modify headers
+          if (process.env.NODE_ENV === 'development') {
+            const authHeader = req.headers.authorization
+            const tenantId = req.headers['x-tenant-id']
+            console.log(`[Proxy] ${req.method} ${req.url} -> ${API_URL}${req.url?.replace('/api', '')}`)
+            console.log(`[Proxy] Headers - Authorization: ${authHeader ? `${authHeader.substring(0, 30)}...` : 'missing'}, X-Tenant-Id: ${tenantId || 'missing'}`)
+          }
+        },
+        onProxyRes: (proxyRes, req, _res) => {
+          // Log response for debugging
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[Proxy] Response: ${proxyRes.statusCode} for ${req.method} ${req.url}`)
+          }
+        },
+        onError: (err, _req, _res) => {
+          console.error('[Proxy Error]', err.message)
+        },
+      },
+    } : undefined,
   },
   dev: {
     hmr: true,

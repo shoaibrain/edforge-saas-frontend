@@ -272,8 +272,9 @@ interface MfaSetupModalProps {
   onSuccess: () => void
 }
 
+// Post-MVP: MFA Setup Modal - disabled for MVP
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps) {
+function _MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps) {
   const user = useAuthStore((s) => s.user)
   const [step, setStep] = useState<'setup' | 'verify' | 'backup'>('setup')
   const [setupData, setSetupData] = useState<any>(null) // MfaSetupResponse - disabled for MVP
@@ -505,8 +506,9 @@ interface SessionCardProps {
   isRevoking: boolean
 }
 
+// Post-MVP: Session Card - disabled for MVP
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
+function _SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
   const Icon = getDeviceIcon(session.deviceType)
   
   return (
@@ -575,8 +577,9 @@ interface LoginHistoryItemProps {
   entry: any // LoginHistoryEntry - disabled for MVP
 }
 
+// Post-MVP: Login History Item - disabled for MVP
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function LoginHistoryItem({ entry }: LoginHistoryItemProps) {
+function _LoginHistoryItem({ entry }: LoginHistoryItemProps) {
   const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string }> = {
     success: { icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     failed: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },

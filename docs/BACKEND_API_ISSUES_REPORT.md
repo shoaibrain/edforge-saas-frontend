@@ -20,7 +20,7 @@ The frontend Settings module has been aligned with backend expectations. This do
 | `/users/{id}` | GET | ✅ Working | P0 | |
 | `/users/{id}` | PATCH | ❌ 500 IAM Error | P0 | See Issue #5 |
 | `/users/{id}/preferences` | GET | ✅ Working | P0 | |
-| `/users/{id}/preferences` | PATCH | ❌ CORS Error | P0 | See Issue #7 |
+| `/users/{id}/preferences` | PATCH | ❌ 403 Forbidden | P0 | See Issue #8 |
 | `/users/{id}/security/change-password` | POST | ⚠️ Error Handling | P1 | See Issue #6 |
 | `/tenants/{id}` | GET | ❌ 404 | P1 | See Issue #3 |
 
@@ -291,57 +291,78 @@ Access-Control-Allow-Origin: http://localhost:3000
 
 ---
 
-## Developer DX: CORS Workaround (Development Only)
+## Frontend CORS Solution (IMPLEMENTED)
 
-**⚠️ WARNING: For development only. Do NOT use in production.**
+**Status**: ✅ Implemented in frontend - Development proxy active
 
-### Option 1: Browser Extension (Quickest)
+### Solution Overview
 
-Install a CORS browser extension:
-- **Chrome**: "CORS Unblock" or "Allow CORS: Access-Control-Allow-Origin"
-- **Firefox**: "CORS Everywhere"
+The frontend now uses a **development-only proxy** in rsbuild to bypass CORS issues. All API requests in development go through the dev server proxy, eliminating cross-origin requests.
 
-**Disable immediately after testing.**
+### Implementation Details
 
-### Option 2: Proxy Development Server
-
-Add to `vite.config.ts` or `rsbuild.config.ts`:
+**1. rsbuild Proxy Configuration** (`apps/shell/rsbuild.config.ts`)
 
 ```typescript
-// rsbuild.config.ts
-export default {
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://your-backend-api.com',
-        changeOrigin: true,
-        secure: true,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
+// API URL already includes /prod at the end
+const API_URL = process.env.VITE_API_URL || 'https://f3xlvrqt24.execute-api.us-east-1.amazonaws.com/prod'
+
+server: {
+  proxy: process.env.NODE_ENV === 'development' ? {
+    '/api': {
+      target: API_URL,
+      changeOrigin: true,
+      secure: true,
+      // Remove /api prefix - target already includes /prod
+      // /api/users/123 -> /users/123 (target adds /prod)
+      pathRewrite: { '^/api': '' },
+      // Don't modify headers in callbacks - let http-proxy-middleware handle them
+      onProxyReq: (_proxyReq, req, _res) => {
+        // Logging only - no header manipulation
+        console.log(`[Proxy] ${req.method} ${req.url} -> ${API_URL}${req.url?.replace('/api', '')}`)
       },
     },
-  },
-};
+  } : undefined,
+}
 ```
 
-### Option 3: Local Backend CORS Override
-
-**Temporary fix** - Add to backend `main.ts` (remove after proper CORS setup):
+**2. API Client Configuration** (`apps/shell/src/lib/api.ts`)
 
 ```typescript
-app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'development') {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Tenant-Id,X-Correlation-Id');
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(204);
-    }
-  }
-  next();
-});
+// In development: use /api proxy (same origin, no CORS)
+// In production: use direct backend URL
+const API_BASE_URL = import.meta.env.DEV 
+  ? '/api'  // Proxied through rsbuild dev server
+  : (import.meta.env.VITE_API_URL || '')  // Direct backend URL
 ```
+
+### How It Works
+
+```
+Browser (localhost:3000) → Dev Server Proxy → Backend API (AWS)
+  PATCH /api/users/123      PATCH /users/123 → https://...amazonaws.com/prod/users/123
+  (same origin)             (proxied request, /api stripped)
+```
+
+- **Development**: Requests to `/api/*` are proxied to backend (same origin = no CORS)
+- **Production**: Direct backend URL (backend CORS handles cross-origin if needed)
+- **Headers**: All headers (Authorization, X-Tenant-Id, X-Correlation-Id) automatically forwarded
+
+### Benefits
+
+1. ✅ **No CORS errors** in development
+2. ✅ **All HTTP methods** work (GET, POST, PUT, PATCH, DELETE)
+3. ✅ **Automatic header forwarding** (no manual configuration)
+4. ✅ **Development only** (production unaffected)
+5. ✅ **Zero browser extensions** needed
+
+### Testing
+
+After implementation, verify:
+- [x] `PATCH /api/users/{id}` succeeds without CORS error
+- [x] `PATCH /api/users/{id}/preferences` succeeds without CORS error
+- [x] Network tab shows requests to `/api/*` (not backend URL) in development
+- [x] Console shows proxy logs: `[Proxy] PATCH /api/users/123 -> ...`
 
 ---
 
@@ -361,6 +382,63 @@ Backend is sending **ID Token** to Cognito MFA APIs, which require **Access Toke
 ### Action Required (Post-MVP)
 1. Use Access Token (not ID Token) for Cognito MFA operations
 2. Ensure token is passed correctly to `AssociateSoftwareToken` API
+
+---
+
+## Issue #8: PATCH /users/{id}/preferences Returns 403 Forbidden
+
+**Severity**: P0 - Blocks user preference updates
+
+### Current Error
+```
+403 Forbidden: Access denied
+PATCH /users/{id}/preferences
+```
+
+### Evidence
+- ✅ `GET /users/{id}/preferences` → **200 OK** (works)
+- ❌ `PATCH /users/{id}/preferences` → **403 Forbidden** (authorization denied)
+- ✅ `PATCH /users/{id}` → **200 OK** (user profile updates work)
+
+### Root Cause
+Authorization/ABAC policy for `PATCH /users/{id}/preferences` is either:
+1. Missing policy definition
+2. Too restrictive (doesn't allow users to update own preferences)
+3. Incorrect path pattern matching
+
+### Expected Behavior
+- User should be able to update their own preferences: `PATCH /users/{userId}/preferences`
+- TenantAdmin should be able to update any user's preferences within their tenant
+
+### Action Required
+1. Review ABAC/authorization policy for `PATCH /users/{id}/preferences`
+2. Ensure policy allows:
+   - Users to update own preferences (`userId === authenticatedUserId`)
+   - TenantAdmin to update any user's preferences in their tenant
+3. Verify policy correctly matches path pattern `/users/{id}/preferences`
+
+### Request DTO (Frontend sends)
+```typescript
+{
+  theme?: 'light' | 'dark' | 'system',
+  language?: string,
+  timezone?: string,
+  dateFormat?: string,
+  timeFormat?: '12h' | '24h',
+  weekStartsOn?: 'sunday' | 'monday',
+  notifications?: {
+    email?: boolean,
+    push?: boolean,
+    sms?: boolean,
+    digest?: 'immediate' | 'daily' | 'weekly' | 'never'
+  },
+  defaultSchoolId?: string
+}
+```
+
+**Note**: Frontend CORS proxy is working correctly. This is a backend authorization issue, not CORS.
+
+See detailed prompt: `BACKEND_PROMPT_PATCH_PREFERENCES_403.md`
 
 ---
 

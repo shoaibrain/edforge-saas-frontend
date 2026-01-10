@@ -12,7 +12,11 @@ import { getIdToken } from '@edforge/auth'
 // API CLIENT SETUP
 // ============================================================================
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || ''
+// In development, use /api proxy path (same origin, no CORS)
+// In production, use direct backend URL (CORS handled by backend)
+const API_BASE_URL = import.meta.env.DEV 
+  ? '/api'  // Proxied through rsbuild dev server
+  : (import.meta.env.VITE_API_URL || '')  // Direct backend URL
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
