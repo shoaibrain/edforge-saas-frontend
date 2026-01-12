@@ -456,13 +456,6 @@ const settingsModule: ModuleConfig = {
           href: '/settings/security',
           permission: { action: 'view', resource: 'settings' },
         },
-        {
-          id: 'connections',
-          label: 'Connections',
-          icon: Link2,
-          href: '/settings/connections',
-          permission: { action: 'view', resource: 'settings' },
-        },
       ],
     },
     {
@@ -470,25 +463,25 @@ const settingsModule: ModuleConfig = {
       label: 'WORKSPACE',
       items: [
         {
-          id: 'general-settings',
-          label: 'General Settings',
+          id: 'workspace-settings',
+          label: 'Workspace Settings',
           icon: Settings,
-          href: '/settings/general',
+          href: '/settings/workspace',
           permission: { action: 'view', resource: 'settings:tenant' },
         },
         {
-          id: 'access-policy',
-          label: 'Access Policy',
-          icon: BrickWallShield,
-          href: '/settings/access',
-          permission: { action: 'view', resource: 'settings' },
-        },
-        {
-          id: 'schools',
-          label: 'Schools',
+          id: 'school-settings',
+          label: 'School Settings',
           icon: School,
           href: '/settings/schools',
           permission: { action: 'view', resource: 'settings:school' },
+        },
+        {
+          id: 'rbac-security',
+          label: 'RBAC Security',
+          icon: BrickWallShield,
+          href: '/settings/security-policies',
+          permission: { action: 'view', resource: 'settings' },
         },
         {
           id: 'billing',

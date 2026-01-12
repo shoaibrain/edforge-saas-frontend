@@ -31,7 +31,10 @@ import {
   SecurityPage,
   NotificationsPage,
   PreferencesPage,
+  WorkspaceSettingsPage,
   SchoolsSettingsPage,
+  SchoolDetailPage,
+  RBACSecurityPage,
   IntegrationsSettingsPage,
   BillingSettingsPage,
   PeopleSettingsPage,
@@ -343,28 +346,43 @@ const settingsNotificationsRoute = createRoute({
   component: NotificationsPage,
 })
 
-const settingsConnectionsRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/connections',
-  component: IntegrationsSettingsPage, // Connections merged into Integrations
-})
-
 const settingsGeneralRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/general',
-  component: PreferencesPage, // General maps to Preferences
+  component: PreferencesPage, // General maps to Preferences (legacy)
+})
+
+const settingsWorkspaceRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/workspace',
+  component: WorkspaceSettingsPage,
 })
 
 const settingsAccessRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/access',
-  component: PeopleSettingsPage,
+  component: PeopleSettingsPage, // Legacy route
+})
+
+const settingsSecurityPoliciesRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/security-policies',
+  component: RBACSecurityPage,
 })
 
 const settingsSchoolsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/schools',
   component: SchoolsSettingsPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    create: search.create as string | undefined,
+  }),
+})
+
+const settingsSchoolDetailRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/schools/$schoolId',
+  component: SchoolDetailPage,
 })
 
 const settingsBillingRoute = createRoute({
@@ -536,10 +554,12 @@ const routeTree = rootRoute.addChildren([
       settingsPreferencesRoute,
       settingsSecurityRoute,
       settingsNotificationsRoute,
-      settingsConnectionsRoute,
       settingsGeneralRoute,
+      settingsWorkspaceRoute,
       settingsAccessRoute,
+      settingsSecurityPoliciesRoute,
       settingsSchoolsRoute,
+      settingsSchoolDetailRoute,
       settingsBillingRoute,
       settingsIntegrationsRoute,
       settingsImportExportRoute,

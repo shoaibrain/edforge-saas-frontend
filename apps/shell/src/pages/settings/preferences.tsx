@@ -1,21 +1,27 @@
 /**
- * Preferences Settings Page
+ * User Preferences Page
  * 
- * Customize display settings like theme, language, timezone, and date format.
- * Integrated with backend User Preferences API via TanStack Query.
+ * Personal display preferences for the logged-in user.
+ * Organization-wide settings have been moved to Workspace Settings.
+ * 
+ * User-specific settings:
+ * - Theme (light/dark/system)
+ * - Default School (for multi-school users)
  */
 
 import { useState, useEffect, useMemo } from 'react'
+import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Palette, 
-  Globe, 
-  Clock, 
   Sun,
   Moon,
   Monitor,
   School,
-  Check
+  Check,
+  ArrowRight,
+  Building2,
+  Info,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
@@ -43,52 +49,6 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun; descriptio
   { value: 'light', label: 'Light', icon: Sun, description: 'Always use light mode' },
   { value: 'dark', label: 'Dark', icon: Moon, description: 'Always use dark mode' },
   { value: 'system', label: 'System', icon: Monitor, description: 'Match your system settings' },
-]
-
-const LANGUAGE_OPTIONS = [
-  { value: 'en-US', label: 'English (US)' },
-  { value: 'en-GB', label: 'English (UK)' },
-  { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
-  { value: 'pt-BR', label: 'Português (Brasil)' },
-  { value: 'zh-CN', label: '简体中文' },
-  { value: 'ja', label: '日本語' },
-  { value: 'np', label: 'Nepali (Nepal)' },
-  {value:  'hin', label: 'Hindi (India)'},
-]
-
-const TIMEZONE_OPTIONS = [
-  { value: 'America/New_York', label: 'Eastern Time (ET)', offset: 'UTC-5' },
-  { value: 'America/Chicago', label: 'Central Time (CT)', offset: 'UTC-6' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)', offset: 'UTC-7' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)', offset: 'UTC-8' },
-  { value: 'America/Anchorage', label: 'Alaska Time (AKT)', offset: 'UTC-9' },
-  { value: 'Pacific/Honolulu', label: 'Hawaii Time (HST)', offset: 'UTC-10' },
-  { value: 'UTC', label: 'Coordinated Universal Time (UTC)', offset: 'UTC+0' },
-  { value: 'Europe/London', label: 'London (GMT/BST)', offset: 'UTC+0/+1' },
-  { value: 'Europe/Paris', label: 'Paris (CET/CEST)', offset: 'UTC+1/+2' },
-  { value: 'Europe/Berlin', label: 'Berlin (CET/CEST)', offset: 'UTC+1/+2' },
-  { value: 'Asia/Tokyo', label: 'Tokyo (JST)', offset: 'UTC+9' },
-  { value: 'Asia/Shanghai', label: 'Beijing (CST)', offset: 'UTC+8' },
-  { value: 'Asia/Kolkata', label: 'India (IST)', offset: 'UTC+5:30' },
-  { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)', offset: 'UTC+10/+11' },
-]
-
-const DATE_FORMAT_OPTIONS = [
-  { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY', example: '01/15/2026' },
-  { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY', example: '15/01/2026' },
-  { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD', example: '2026-01-15' },
-]
-
-const TIME_FORMAT_OPTIONS = [
-  { value: '12h', label: '12-hour', example: '2:30 PM' },
-  { value: '24h', label: '24-hour', example: '14:30' },
-]
-
-const WEEK_START_OPTIONS = [
-  { value: 'sunday', label: 'Sunday' },
-  { value: 'monday', label: 'Monday' },
 ]
 
 // ============================================================================
@@ -162,84 +122,6 @@ function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
 }
 
 // ============================================================================
-// STYLED SELECT
-// ============================================================================
-
-interface StyledSelectProps {
-  value: string
-  onChange: (value: string) => void
-  options: { value: string; label: string; [key: string]: string }[]
-  showExtra?: keyof { value: string; label: string; [key: string]: string }
-}
-
-function StyledSelect({ value, onChange, options, showExtra }: StyledSelectProps) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 min-w-[200px]"
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}{showExtra && opt[showExtra] ? ` (${opt[showExtra]})` : ''}
-        </option>
-      ))}
-    </select>
-  )
-}
-
-// ============================================================================
-// DATE FORMAT PREVIEW
-// ============================================================================
-
-interface DateFormatPreviewProps {
-  format: string
-  timezone: string
-}
-
-function DateFormatPreview({ format, timezone }: DateFormatPreviewProps) {
-  const now = new Date()
-  
-  const formattedDate = useMemo(() => {
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    const year = now.getFullYear()
-    
-    switch (format) {
-      case 'MM/DD/YYYY':
-        return `${month}/${day}/${year}`
-      case 'DD/MM/YYYY':
-        return `${day}/${month}/${year}`
-      case 'YYYY-MM-DD':
-        return `${year}-${month}-${day}`
-      default:
-        return `${month}/${day}/${year}`
-    }
-  }, [format, now])
-
-  const formattedTime = useMemo(() => {
-    try {
-      return now.toLocaleTimeString('en-US', { 
-        timeZone: timezone,
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    } catch {
-      return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    }
-  }, [timezone, now])
-
-  return (
-    <div className="px-4 py-3 rounded-lg bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
-      <p className="text-xs text-[rgb(var(--text-tertiary))] mb-1">Preview</p>
-      <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-        {formattedDate} • {formattedTime}
-      </p>
-    </div>
-  )
-}
-
-// ============================================================================
 // SCHOOL SELECTOR
 // ============================================================================
 
@@ -282,6 +164,36 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
 }
 
 // ============================================================================
+// WORKSPACE SETTINGS LINK
+// ============================================================================
+
+function WorkspaceSettingsLink() {
+  return (
+    <motion.div variants={fadeInUp}>
+      <Link
+        to="/settings/workspace"
+        className="flex items-center justify-between p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500/30 hover:shadow-md transition-all group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-teal-500/10">
+            <Building2 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          </div>
+          <div>
+            <p className="font-medium text-[rgb(var(--text-primary))] group-hover:text-teal-700 dark:group-hover:text-teal-400">
+              Workspace Settings
+            </p>
+            <p className="text-sm text-[rgb(var(--text-tertiary))]">
+              Manage organization-wide settings like timezone, language, and date formats
+            </p>
+          </div>
+        </div>
+        <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
+      </Link>
+    </motion.div>
+  )
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -298,20 +210,12 @@ export default function PreferencesPage() {
   
   // Local form state (used for immediate UI updates)
   const [theme, setTheme] = useState<Theme>(localTheme)
-  const [language, setLanguage] = useState('en-US')
-  const [timezone, setTimezone] = useState('America/New_York')
-  const [dateFormat, setDateFormat] = useState('MM/DD/YYYY')
-  const [timeFormat, setTimeFormat] = useState<'12h' | '24h'>('12h')
-  const [weekStartsOn, setWeekStartsOn] = useState<'sunday' | 'monday'>('sunday')
   const [defaultSchoolId, setDefaultSchoolId] = useState<string | undefined>()
 
   // Fetch preferences from API
   const {
     data: preferences,
     isLoading,
-    isError,
-    error,
-    refetch,
   } = useQuery<UserPreferences>({
     queryKey: ['preferences', user?.id],
     queryFn: () => usersService.getPreferences(user!.id),
@@ -339,11 +243,6 @@ export default function PreferencesPage() {
   useEffect(() => {
     if (preferences) {
       setTheme(preferences.theme)
-      setLanguage(preferences.language)
-      setTimezone(preferences.timezone)
-      setDateFormat(preferences.dateFormat)
-      setTimeFormat(preferences.timeFormat || '12h')
-      setWeekStartsOn(preferences.weekStartsOn || 'sunday')
       setDefaultSchoolId(preferences.defaultSchoolId)
       
       // Sync theme with local store
@@ -360,7 +259,7 @@ export default function PreferencesPage() {
     updateMutation.mutate({ theme: newTheme })
   }
 
-  // Save preference changes (debounced for select changes)
+  // Save preference changes
   const handlePreferenceChange = <K extends keyof UpdatePreferencesDto>(
     key: K,
     value: UpdatePreferencesDto[K]
@@ -381,33 +280,12 @@ export default function PreferencesPage() {
   if (isLoading) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
-        <SettingsSkeleton rows={5} showHeader />
+        <SettingsSkeleton rows={3} showHeader />
       </div>
     )
   }
 
-  // Error state
-  if (isError && !preferences) {
-    return (
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
-        >
-          <p className="text-[rgb(var(--text-tertiary))]">
-            {error instanceof Error ? error.message : 'Failed to load preferences'}
-          </p>
-          <button
-            onClick={() => refetch()}
-            className="mt-4 text-teal-600 dark:text-cyan-400 hover:underline"
-          >
-            Try again
-          </button>
-        </motion.div>
-      </div>
-    )
-  }
+  // Error state - show UI anyway with local theme
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
@@ -419,8 +297,9 @@ export default function PreferencesPage() {
       >
         {/* Header */}
         <SettingsPageHeader
-          title="Preferences"
-          description="Customize your display and regional settings"
+          title="My Preferences"
+          description="Personal display settings for your account"
+          icon={Palette}
         />
 
         {/* Alerts */}
@@ -447,90 +326,9 @@ export default function PreferencesPage() {
         <SettingsSection
           title="Appearance"
           icon={Palette}
-          description="Choose your preferred theme"
+          description="Choose your preferred color theme"
         >
           <ThemeSelector value={theme} onChange={handleThemeChange} />
-        </SettingsSection>
-
-        {/* Language Section */}
-        <SettingsSection
-          title="Language"
-          icon={Globe}
-          description="Select your preferred language"
-        >
-          <SettingsCard title="Display Language" description="Language used throughout the app">
-            <StyledSelect
-              value={language}
-              onChange={(value) => {
-                setLanguage(value)
-                handlePreferenceChange('language', value)
-              }}
-              options={LANGUAGE_OPTIONS}
-            />
-          </SettingsCard>
-        </SettingsSection>
-
-        {/* Date & Time Section */}
-        <SettingsSection
-          title="Date & Time"
-          icon={Clock}
-          description="Configure how dates and times are displayed"
-        >
-          <div className="space-y-4">
-            <SettingsCard title="Timezone" description="Your local timezone for all timestamps">
-              <StyledSelect
-                value={timezone}
-                onChange={(value) => {
-                  setTimezone(value)
-                  handlePreferenceChange('timezone', value)
-                }}
-                options={TIMEZONE_OPTIONS}
-                showExtra="offset"
-              />
-            </SettingsCard>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SettingsCard title="Date Format" description="How dates are shown">
-                <StyledSelect
-                  value={dateFormat}
-                  onChange={(value) => {
-                    setDateFormat(value)
-                    handlePreferenceChange('dateFormat', value as 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD')
-                  }}
-                  options={DATE_FORMAT_OPTIONS}
-                  showExtra="example"
-                />
-              </SettingsCard>
-
-              <SettingsCard title="Time Format" description="12 or 24 hour clock">
-                <StyledSelect
-                  value={timeFormat}
-                  onChange={(value) => {
-                    setTimeFormat(value as '12h' | '24h')
-                    handlePreferenceChange('timeFormat', value as '12h' | '24h')
-                  }}
-                  options={TIME_FORMAT_OPTIONS}
-                  showExtra="example"
-                />
-              </SettingsCard>
-            </div>
-
-            <SettingsCard title="Week Starts On" description="First day of the week in calendars">
-              <StyledSelect
-                value={weekStartsOn}
-                onChange={(value) => {
-                  setWeekStartsOn(value as 'sunday' | 'monday')
-                  handlePreferenceChange('weekStartsOn', value as 'sunday' | 'monday')
-                }}
-                options={WEEK_START_OPTIONS}
-              />
-            </SettingsCard>
-
-            {/* Live Preview */}
-            <motion.div variants={fadeInUp}>
-              <DateFormatPreview format={dateFormat} timezone={timezone} />
-            </motion.div>
-          </div>
         </SettingsSection>
 
         {/* Default School (for multi-school users) */}
@@ -552,6 +350,20 @@ export default function PreferencesPage() {
             </SettingsCard>
           </SettingsSection>
         )}
+
+        {/* Link to Workspace Settings */}
+        <motion.div variants={fadeInUp}>
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] mb-4">
+            <Info className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">
+                <strong>Looking for regional settings?</strong> Organization-wide settings like
+                timezone, language, date format, and week start day are now managed in Workspace Settings.
+              </p>
+            </div>
+          </div>
+          <WorkspaceSettingsLink />
+        </motion.div>
       </motion.div>
     </div>
   )

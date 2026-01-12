@@ -54,6 +54,7 @@ const fadeInUp = {
 export interface SettingsPageHeaderProps {
   title: string
   description?: string
+  icon?: LucideIcon
   action?: ReactNode
   className?: string
 }
@@ -61,6 +62,7 @@ export interface SettingsPageHeaderProps {
 export function SettingsPageHeader({ 
   title, 
   description, 
+  icon: Icon,
   action,
   className 
 }: SettingsPageHeaderProps) {
@@ -71,11 +73,18 @@ export function SettingsPageHeader({
       transition={springTransition}
       className={cn('flex items-center justify-between', className)}
     >
-      <div>
-        <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">{title}</h1>
-        {description && (
-          <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">{description}</p>
+      <div className="flex items-center gap-3">
+        {Icon && (
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-teal-500/10 to-cyan-500/10 border border-teal-500/20">
+            <Icon className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+          </div>
         )}
+        <div>
+          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">{title}</h1>
+          {description && (
+            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">{description}</p>
+          )}
+        </div>
       </div>
       {action}
     </motion.div>

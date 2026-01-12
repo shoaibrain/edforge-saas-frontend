@@ -6,9 +6,10 @@
  */
 
 import { useState, useEffect, Fragment, useSyncExternalStore } from 'react'
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link, useRouter, useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
+import { useQuery } from '@tanstack/react-query'
 import {
   Home,
   ChevronsUpDown,
@@ -16,11 +17,16 @@ import {
   Search,
   Check,
   Plus,
+  School,
+  AlertCircle,
   type LucideIcon,
 } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useSidebarStore } from '../../stores/sidebar.store'
-import { useAuthStore, MOCK_SCHOOLS } from '../../stores/auth.store'
+import { useAuthStore } from '../../stores/auth.store'
+import { tenantService } from '../../services/tenant.service'
+import { getRoleCategory } from '@edforge/types'
+import type { School as SchoolType } from '@edforge/types'
 import { SIDEBAR_NAV_ICON_SIZE } from '../../config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '../../hooks/useSidebarModule'
 import { useSecureNavGroups } from '../../hooks/useSecureNavItems'
@@ -390,120 +396,333 @@ function HomeNavButton({
 
 // ============================================================================
 // SIDEBAR SCHOOL SELECTOR
-// A context-aware school selector with unified structure for smooth animations
-// The avatar stays in a fixed position while text content animates away
+// A context-aware school selector with role-based behavior:
+// - TenantAdmin: Can see all schools, switch between them, create new
+// - Principal/Staff/Teacher: See assigned schools only, can switch
+// - Student/Parent: Fixed to their enrolled school, no switching
 // ============================================================================
 
 function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
+  const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const setActiveSchoolId = useAppStore((s) => s.setActiveSchoolId)
   const [query, setQuery] = useState('')
 
+  // Fetch real schools from API
+  const { data: allSchools = [], isLoading } = useQuery({
+    queryKey: ['schools', user?.tenantId],
+    queryFn: () => tenantService.getSchools(user?.tenantId || ''),
+    enabled: !!user?.tenantId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  // Ensure allSchools is always an array
+  const schoolsArray: SchoolType[] = Array.isArray(allSchools) ? allSchools : []
+
   if (!user) return null
 
-  const userSchools = Object.keys(user.assignments)
-  const activeSchool = activeSchoolId ? MOCK_SCHOOLS[activeSchoolId] : null
+  // Determine user's role category for behavior
+  const userAssignedSchoolIds = Object.keys(user.assignments || {})
+  const firstAssignedSchoolId = userAssignedSchoolIds[0]
+  const firstAssignedRole = firstAssignedSchoolId ? user.assignments[firstAssignedSchoolId] : null
+  const roleCategory = firstAssignedRole ? getRoleCategory(firstAssignedRole) : null
 
+  // Student/Parent cannot switch schools
+  const isStudentOrParent = roleCategory === 'student' || roleCategory === 'parent'
+  const isTenantAdmin = user.globalRole === 'TenantAdmin'
+
+  // Filter schools based on user role
+  // TenantAdmin sees all, others see only assigned schools
+  const visibleSchools = isTenantAdmin
+    ? schoolsArray
+    : schoolsArray.filter(s => userAssignedSchoolIds.includes(s.id))
+
+  // Get active school data
+  const activeSchool = schoolsArray.find(s => s.id === activeSchoolId)
+
+  // Auto-select first school if none selected
+  useEffect(() => {
+    if (!activeSchoolId && visibleSchools.length > 0) {
+      // Try to restore from localStorage first
+      const savedSchoolId = localStorage.getItem(`edforge-active-school-${user.id}`)
+      if (savedSchoolId && visibleSchools.some(s => s.id === savedSchoolId)) {
+        setActiveSchoolId(savedSchoolId)
+      } else {
+        // Default to first visible school
+        setActiveSchoolId(visibleSchools[0].id)
+      }
+    }
+  }, [activeSchoolId, visibleSchools, user.id, setActiveSchoolId])
+
+  // Persist school selection
+  useEffect(() => {
+    if (activeSchoolId && user.id) {
+      localStorage.setItem(`edforge-active-school-${user.id}`, activeSchoolId)
+    }
+  }, [activeSchoolId, user.id])
+
+  // Filter by search query
   const filteredSchools = query === ''
-    ? userSchools
-    : userSchools.filter((schoolId) =>
-      MOCK_SCHOOLS[schoolId]?.name.toLowerCase().includes(query.toLowerCase())
-    )
+    ? visibleSchools
+    : visibleSchools.filter(school =>
+        school.name.toLowerCase().includes(query.toLowerCase()) ||
+        school.code.toLowerCase().includes(query.toLowerCase())
+      )
 
-  // Dropdown content (shared between collapsed and expanded)
-  const dropdownContent = (
-    <>
-      {/* Search */}
-      <div className="p-3 border-b border-[rgb(var(--border-secondary))]">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          <input
-            type="text"
-            placeholder="Find School..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
-          />
+  // Handle create school navigation
+  const handleCreateSchool = () => {
+    navigate({ to: '/settings/schools', search: { create: 'true' } })
+  }
+
+  // ============================================================================
+  // EMPTY STATE - No Schools
+  // ============================================================================
+  if (!isLoading && schoolsArray.length === 0) {
+    // TenantAdmin: Show create CTA
+    if (isTenantAdmin) {
+      if (collapsed) {
+        return (
+          <Tooltip content="Create your first school" side="right" sideOffset={12}>
+            <button
+              onClick={handleCreateSchool}
+              className="flex items-center justify-center w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20 border border-dashed border-teal-500/40 flex items-center justify-center">
+                <Plus className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+              </div>
+            </button>
+          </Tooltip>
+        )
+      }
+      return (
+        <button
+          onClick={handleCreateSchool}
+          className="flex items-center gap-3 w-full h-14 rounded-xl border border-dashed border-teal-500/40 hover:border-teal-500/60 hover:bg-teal-500/5 transition-all duration-200 group px-3"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex items-center justify-center flex-shrink-0">
+            <School className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          </div>
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-sm font-medium text-teal-700 dark:text-teal-400">
+              Create first school
+            </p>
+            <p className="text-[11px] text-[rgb(var(--text-tertiary))]">
+              Get started with EdForge
+            </p>
+          </div>
+          <Plus className="w-4 h-4 text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
+        </button>
+      )
+    }
+
+    // Non-admin: Show not assigned message
+    if (collapsed) {
+      return (
+        <Tooltip content="No school assigned" side="right" sideOffset={12}>
+          <div className="flex items-center justify-center w-full h-12">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+          </div>
+        </Tooltip>
+      )
+    }
+    return (
+      <div className="flex items-center gap-3 w-full h-14 rounded-xl bg-amber-500/5 border border-amber-500/20 px-3">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+            No school assigned
+          </p>
+          <p className="text-[11px] text-[rgb(var(--text-tertiary))]">
+            Contact your administrator
+          </p>
         </div>
       </div>
+    )
+  }
+
+  // ============================================================================
+  // STUDENT/PARENT - Fixed display, no dropdown
+  // ============================================================================
+  if (isStudentOrParent && activeSchool) {
+    if (collapsed) {
+      return (
+        <Tooltip content={activeSchool.name} side="right" sideOffset={12}>
+          <div className="flex items-center justify-center w-full h-12">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))]">
+              <img
+                src={getSchoolAvatar(activeSchool.name, { size: 40 })}
+                alt={activeSchool.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </Tooltip>
+      )
+    }
+    return (
+      <div className="flex items-center gap-3 w-full h-12 rounded-xl px-2">
+        <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] flex-shrink-0">
+          <img
+            src={getSchoolAvatar(activeSchool.name, { size: 40 })}
+            alt={activeSchool.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate leading-tight">
+            {activeSchool.name}
+          </p>
+          <p className="text-[11px] text-[rgb(var(--text-tertiary))] truncate leading-tight">
+            {user.assignments[activeSchool.id] || 'Student'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // ============================================================================
+  // LOADING STATE
+  // ============================================================================
+  if (isLoading) {
+    if (collapsed) {
+      return (
+        <div className="flex items-center justify-center w-full h-12">
+          <div className="w-10 h-10 rounded-xl bg-[rgb(var(--surface-tertiary))] animate-pulse" />
+        </div>
+      )
+    }
+    return (
+      <div className="flex items-center gap-3 w-full h-12 px-2">
+        <div className="w-10 h-10 rounded-xl bg-[rgb(var(--surface-tertiary))] animate-pulse flex-shrink-0" />
+        <div className="flex-1 space-y-1.5">
+          <div className="h-4 w-24 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
+          <div className="h-3 w-16 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
+        </div>
+      </div>
+    )
+  }
+
+  // ============================================================================
+  // DROPDOWN CONTENT - Admin/Staff with multiple schools
+  // ============================================================================
+  const dropdownContent = (
+    <>
+      {/* Search - only show if more than 3 schools */}
+      {visibleSchools.length > 3 && (
+        <div className="p-3 border-b border-[rgb(var(--border-secondary))]">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+            <input
+              type="text"
+              placeholder="Find School..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Schools Label */}
       <div className="px-4 py-2.5">
-        <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Your Schools</span>
+        <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+          {isTenantAdmin ? 'All Schools' : 'Your Schools'}
+        </span>
       </div>
 
       {/* Schools List */}
       <div className="max-h-64 overflow-y-auto scrollbar-thin px-2 pb-2">
-        {filteredSchools.map((schoolId) => {
-          const school = MOCK_SCHOOLS[schoolId]
-          const isSelected = schoolId === activeSchoolId
-          return (
-            <MenuItem key={schoolId}>
-              {({ active }) => (
-                <button
-                  onClick={() => {
-                    setActiveSchoolId(schoolId)
-                    setQuery('')
-                  }}
-                  className={cn(
-                    'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150',
-                    active && 'bg-[rgb(var(--interactive-hover))]',
-                    isSelected && 'bg-teal-500/10 dark:bg-cyan-500/15'
-                  )}
-                >
-                  <div className={cn(
-                    'w-10 h-10 rounded-lg overflow-hidden flex-shrink-0',
-                    isSelected ? 'ring-2 ring-teal-500' : 'ring-1 ring-[rgb(var(--border-primary))]'
-                  )}>
-                    <img
-                      src={getSchoolAvatar(school?.name || schoolId, { size: 40 })}
-                      alt={school?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className={cn(
-                      'text-sm font-medium truncate',
-                      isSelected ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
+        {filteredSchools.length === 0 ? (
+          <div className="px-3 py-6 text-center">
+            <p className="text-sm text-[rgb(var(--text-tertiary))]">No schools found</p>
+          </div>
+        ) : (
+          filteredSchools.map((school) => {
+            const isSelected = school.id === activeSchoolId
+            const userRole = user.assignments[school.id]
+            return (
+              <MenuItem key={school.id}>
+                {({ active }) => (
+                  <button
+                    onClick={() => {
+                      setActiveSchoolId(school.id)
+                      setQuery('')
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150',
+                      active && 'bg-[rgb(var(--interactive-hover))]',
+                      isSelected && 'bg-teal-500/10 dark:bg-cyan-500/15'
+                    )}
+                  >
+                    <div className={cn(
+                      'w-10 h-10 rounded-lg overflow-hidden flex-shrink-0',
+                      isSelected ? 'ring-2 ring-teal-500' : 'ring-1 ring-[rgb(var(--border-primary))]'
                     )}>
-                      {school?.name}
-                    </p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{user.assignments[schoolId]}</p>
-                  </div>
-                  {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-teal-500 dark:bg-cyan-500 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-white" />
+                      <img
+                        src={getSchoolAvatar(school.name, { size: 40 })}
+                        alt={school.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  )}
-                </button>
-              )}
-            </MenuItem>
-          )
-        })}
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className={cn(
+                        'text-sm font-medium truncate',
+                        isSelected ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
+                      )}>
+                        {school.name}
+                      </p>
+                      <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                        {userRole || school.code}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <div className="w-5 h-5 rounded-full bg-teal-500 dark:bg-cyan-500 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                )}
+              </MenuItem>
+            )
+          })
+        )}
       </div>
 
-      {/* Create School */}
-      {user.globalRole === 'TenantAdmin' && (
+      {/* Create School - Only for TenantAdmin */}
+      {isTenantAdmin && (
         <div className="border-t border-[rgb(var(--border-secondary))] p-2">
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-teal-600 dark:text-cyan-400 hover:bg-teal-500/10 rounded-xl transition-colors font-medium">
-            <Plus className="w-4 h-4" />
-            Create New School
-          </button>
+          <MenuItem>
+            {({ active }) => (
+              <button
+                onClick={handleCreateSchool}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-teal-600 dark:text-cyan-400 rounded-xl transition-colors font-medium',
+                  active && 'bg-teal-500/10'
+                )}
+              >
+                <Plus className="w-4 h-4" />
+                Create New School
+              </button>
+            )}
+          </MenuItem>
         </div>
       )}
     </>
   )
 
-  // Unified structure for both collapsed and expanded states
-  // Avatar stays fixed, text animates with CSS transitions
+  // ============================================================================
+  // MAIN SELECTOR - With dropdown for admin/staff
+  // ============================================================================
   return (
     <Menu as="div" className="relative w-full">
       {collapsed ? (
-        // Collapsed: Tooltip wraps the button, dropdown floats to the right
         <Tooltip content={activeSchool?.name || 'Select School'} side="right" sideOffset={12}>
           <MenuButton className="flex items-center justify-center w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group">
-            {/* Avatar - fixed size, always visible */}
             <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
               <img
                 src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
@@ -514,9 +733,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
           </MenuButton>
         </Tooltip>
       ) : (
-        // Expanded: Full button with text
         <MenuButton className="flex items-center gap-3 w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group px-2">
-          {/* Avatar - fixed size, always visible */}
           <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
             <img
               src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
@@ -524,23 +741,18 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
               className="w-full h-full object-cover"
             />
           </div>
-
-          {/* Text content */}
           <div className="flex-1 min-w-0 text-left">
             <p className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate leading-tight">
               {activeSchool?.name || 'Select School'}
             </p>
             <p className="text-[11px] text-[rgb(var(--text-tertiary))] truncate leading-tight">
-              {activeSchoolId ? user.assignments[activeSchoolId] : 'Choose school'}
+              {activeSchool ? (user.assignments[activeSchool.id] || activeSchool.code) : 'Choose school'}
             </p>
           </div>
-
-          {/* Chevron */}
           <ChevronsUpDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] transition-colors flex-shrink-0 mr-1" />
         </MenuButton>
       )}
 
-      {/* Dropdown - Apple-like glassmorphism with backdrop blur */}
       <Transition
         as={Fragment}
         enter="transition ease-out duration-200"
@@ -553,11 +765,9 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
         <MenuItems
           className={cn(
             'w-80 rounded-2xl z-50 overflow-hidden',
-            // Glassmorphism - frosted glass effect
             'bg-[rgb(var(--surface-secondary))]/85 backdrop-blur-xl',
             'border border-white/10 dark:border-white/5',
             'shadow-xl shadow-black/10 dark:shadow-black/40',
-            // Ring for subtle depth
             'ring-1 ring-inset ring-white/5',
             collapsed
               ? 'absolute left-full top-0 ml-3 origin-left'

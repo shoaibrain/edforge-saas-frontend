@@ -4,11 +4,22 @@
  * Barrel exports for all settings sub-pages.
  */
 
+// Account
 export { default as AccountPage } from './account'
 export { default as SecurityPage } from './security'
 export { default as NotificationsPage } from './notifications'
 export { default as PreferencesPage } from './preferences'
+
+// Workspace
+export { default as WorkspaceSettingsPage } from './workspace'
 export { default as SchoolsSettingsPage } from './schools'
+export { default as SchoolDetailPage } from './school-detail'
+export { default as SchoolConfigurationPage } from './school-configuration'
+export { default as SchoolDepartmentsPage } from './school-departments'
+export { default as SchoolAcademicYearsPage } from './school-academic-years'
+export { default as RBACSecurityPage } from './rbac-security'
+
+// Other
 export { default as IntegrationsSettingsPage } from './integrations'
 export { default as BillingSettingsPage } from './billing'
 export { default as PeopleSettingsPage } from './people'

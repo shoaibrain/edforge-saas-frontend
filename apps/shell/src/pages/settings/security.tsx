@@ -273,6 +273,7 @@ interface MfaSetupModalProps {
 }
 
 // Post-MVP: MFA Setup Modal - disabled for MVP
+// @ts-expect-error - Disabled for MVP, will be enabled later
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps) {
   const user = useAuthStore((s) => s.user)
@@ -507,6 +508,7 @@ interface SessionCardProps {
 }
 
 // Post-MVP: Session Card - disabled for MVP
+// @ts-expect-error - Disabled for MVP, will be enabled later
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
   const Icon = getDeviceIcon(session.deviceType)
@@ -578,6 +580,7 @@ interface LoginHistoryItemProps {
 }
 
 // Post-MVP: Login History Item - disabled for MVP
+// @ts-expect-error - Disabled for MVP, will be enabled later
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _LoginHistoryItem({ entry }: LoginHistoryItemProps) {
   const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string }> = {
