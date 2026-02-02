@@ -25,20 +25,6 @@ export const personTypeSchema = z.enum(['student', 'teacher', 'staff', 'guardian
 export type PersonType = z.infer<typeof personTypeSchema>
 
 // ============================================================================
-// QUICK ADD PERSON SCHEMA (Modal)
-// ============================================================================
-
-export const quickAddPersonSchema = z.object({
-  firstName: nameSchema,
-  lastName: nameSchema,
-  email: emailSchema,
-  personType: personTypeSchema.exclude(['admin']),
-})
-
-export type QuickAddPersonInput = z.input<typeof quickAddPersonSchema>
-export type QuickAddPersonOutput = z.output<typeof quickAddPersonSchema>
-
-// ============================================================================
 // PERSONAL INFO STEP SCHEMA
 // ============================================================================
 

@@ -1,76 +1,29 @@
 /**
  * School Detail Page
  * 
- * Displays school details with tabbed navigation for:
- * - Configuration
- * - Departments
- * - Academic Years
+ * Redesigned with a modern, enterprise-grade UI.
+ * Features:
+ * - Clean, minimal header with key metadata
+ * - "Apple-style" animated tab navigation (right-aligned)
+ * - Fluid transitions and responsive layout
  */
 
 import { useState } from 'react'
-import { Navigate, Link } from '@tanstack/react-router'
+import { useParams } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import {
   Settings,
   Users,
   Calendar,
-  ChevronLeft,
-  MapPin,
-  Phone,
-  Mail,
-  Globe,
   Building2,
 } from 'lucide-react'
-import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
-import { useAppStore } from '@/stores/app.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
-import type { School as SchoolType, SchoolAddress } from '@edforge/types'
+import type { School as SchoolType } from '@edforge/types'
 
-// Local type for SchoolConfiguration
-interface SchoolConfiguration {
-  schoolId: string
-  identity: {
-    displayName: string
-    shortCode: string
-    schoolType: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-    logoUrl?: string
-    website?: string
-  }
-  location: {
-    address: SchoolAddress
-    timezone?: string
-    phone?: string
-    email?: string
-    fax?: string
-  }
-  operations: {
-    operatingHours: { dayOfWeek: number; isOpen: boolean; openTime?: string; closeTime?: string }[]
-    gradeLevels: string[]
-    capacity?: number
-  }
-  academic: {
-    gradingScale: 'letter' | 'percentage' | 'points' | 'custom'
-    reportCardFormat: 'standard' | 'narrative' | 'standards-based'
-    termStructure: 'semester' | 'trimester' | 'quarter' | 'custom'
-  }
-  attendance: {
-    policy: 'daily' | 'period' | 'both'
-    tardyThresholdMinutes: number
-    excusedAbsenceTypes: string[]
-    unexcusedAbsenceTypes: string[]
-  }
-  inheritsFromWorkspace: boolean
-  createdAt: string
-  updatedAt: string
-}
-import {
-  staggerChildren,
-  fadeInUp,
-} from '@/components/settings/SettingsShared'
-
-// Sub-page components (will be created separately)
+// Sub-page components
 import SchoolConfigurationPage from './school-configuration'
 import SchoolDepartmentsPage from './school-departments'
 import SchoolAcademicYearsPage from './school-academic-years'
@@ -88,140 +41,31 @@ const TABS: { id: SchoolTab; label: string; icon: typeof Settings }[] = [
 ]
 
 // ============================================================================
-// SCHOOL HEADER
-// ============================================================================
-
-interface SchoolHeaderProps {
-  school: SchoolType
-  configuration?: SchoolConfiguration
-}
-
-function SchoolHeader({ school, configuration }: SchoolHeaderProps) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      className="bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-6 text-white"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-bold">
-            {school.name.charAt(0)}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">{school.name}</h1>
-            <p className="text-white/80 mt-1">
-              {school.code} • {school.type ? school.type.charAt(0).toUpperCase() + school.type.slice(1) : 'School'}
-            </p>
-          </div>
-        </div>
-        <div className={`px-3 py-1 rounded-full text-sm font-medium ${school.isActive ? 'bg-white/20 text-white' : 'bg-rust-500/80 text-white'}`}>
-          {school.isActive ? 'Active' : 'Inactive'}
-        </div>
-      </div>
-
-      {/* Quick Info */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        {school.address && (
-          <div className="flex items-center gap-2 text-sm text-white/80">
-            <MapPin className="w-4 h-4" />
-            <span>{school.address.city}, {school.address.state}</span>
-          </div>
-        )}
-        {school.phone && (
-          <div className="flex items-center gap-2 text-sm text-white/80">
-            <Phone className="w-4 h-4" />
-            <span>{school.phone}</span>
-          </div>
-        )}
-        {school.email && (
-          <div className="flex items-center gap-2 text-sm text-white/80">
-            <Mail className="w-4 h-4" />
-            <span>{school.email}</span>
-          </div>
-        )}
-        {configuration?.identity.website && (
-          <div className="flex items-center gap-2 text-sm text-white/80">
-            <Globe className="w-4 h-4" />
-            <span>{configuration.identity.website}</span>
-          </div>
-        )}
-      </div>
-    </motion.div>
-  )
-}
-
-// ============================================================================
-// TAB NAVIGATION
-// ============================================================================
-
-interface TabNavigationProps {
-  activeTab: SchoolTab
-  onTabChange: (tab: SchoolTab) => void
-}
-
-function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-secondary))] rounded-xl"
-    >
-      {TABS.map((tab) => {
-        const Icon = tab.icon
-        const isActive = activeTab === tab.id
-        return (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={`
-              flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
-              ${isActive 
-                ? 'bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] shadow-sm' 
-                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
-              }
-            `}
-          >
-            <Icon className="w-4 h-4" />
-            {tab.label}
-          </button>
-        )
-      })}
-    </motion.div>
-  )
-}
-
-// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
 export default function SchoolDetailPage() {
   const user = useAuthStore((s) => s.user)
-  const { activeSchoolId } = useAppStore.getState()
-  
-  // Get schoolId from URL params
-  // Note: In TanStack Router, we'd use useParams or route context
-  // For now, we'll use the activeSchoolId or a mock
-  const schoolId = activeSchoolId || 'school-001'
-  
+  // Source of Truth: URL Params
+  const params = useParams({ strict: false }) as { schoolId?: string }
+  const schoolId = params.schoolId || 'school-001'
+
   const [activeTab, setActiveTab] = useState<SchoolTab>('configuration')
 
-  if (!user) {
-    return <Navigate to="/login" />
-  }
+  // Permission Check
+  if (!user) return null // Or redirect to login
 
+  // (Optional) Permissions logic - keeping it simple for UI focus
   const hasPermission = can(user, {
     action: 'view',
     resource: 'settings:school',
     schoolId: schoolId,
   })
 
-  if (!hasPermission) {
-    return <AccessDenied message="You don't have permission to view this school's settings." />
-  }
-
-  // Fetch school data
+  // Fetch School Data
   const {
     data: school,
-    isLoading: schoolLoading,
+    isLoading,
   } = useQuery({
     queryKey: ['school', schoolId],
     queryFn: () => tenantService.getSchool(schoolId),
@@ -229,97 +73,130 @@ export default function SchoolDetailPage() {
     staleTime: 5 * 60 * 1000,
   })
 
-  // Fetch school configuration
-  const {
-    data: configuration,
-    isLoading: configLoading,
-  } = useQuery({
-    queryKey: ['schoolConfiguration', schoolId],
-    queryFn: () => tenantService.getSchoolConfiguration(schoolId),
-    enabled: !!schoolId,
-    staleTime: 5 * 60 * 1000,
-  })
-
-  // Use mock data if API fails
-  const displaySchool: SchoolType = school || {
-    id: schoolId,
-    tenantId: user.tenantId,
-    name: MOCK_SCHOOLS[schoolId]?.name || 'Unknown School',
-    code: MOCK_SCHOOLS[schoolId]?.code || 'UNK',
-    type: 'high',
-    isActive: true,
-    address: {
-      street1: '123 Education Way',
-      city: 'Springfield',
-      state: 'IL',
-      postalCode: '62701',
-      country: 'USA',
-    },
-    phone: '(555) 123-4567',
-    email: 'info@school.edu',
-  }
-
-  const isLoading = schoolLoading || configLoading
+  const displaySchool: SchoolType | undefined = school
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-40 bg-[rgb(var(--surface-secondary))] rounded-2xl" />
-          <div className="h-12 bg-[rgb(var(--surface-secondary))] rounded-xl" />
-          <div className="h-64 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
+        <div className="animate-pulse space-y-8">
+          <div className="h-12 w-1/3 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+          <div className="h-64 bg-[rgb(var(--surface-secondary))] rounded-2xl" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!hasPermission) {
+    return <AccessDenied message="You don't have permission to view this school's settings." />
+  }
+
+  if (!displaySchool) {
+    return (
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
+        <div className="text-center text-[rgb(var(--text-tertiary))]">
+          School not found or could not be loaded.
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerChildren}
-        className="space-y-6"
-      >
-        {/* Back Link */}
-        <motion.div variants={fadeInUp}>
-          <Link
-            to="/settings/schools"
-            search={{ create: undefined }}
-            className="inline-flex items-center gap-2 text-sm text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back to Schools
-          </Link>
-        </motion.div>
+    <div className="min-h-full">
+      {/* 
+        Main Container 
+        Using max-width to keep content readable on ultra-wide screens, 
+        but extensive enough for enterprise data tables.
+      */}
+      <div className="max-w-[1600px] mx-auto px-6 py-4 space-y-8">
 
-        {/* School Header */}
-        <SchoolHeader school={displaySchool} configuration={configuration} />
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[rgb(var(--border-primary))] pb-0.5">
+          {/* Left: Title & Metadata */}
+          <div className="pb-4">
+            <h1 className="text-3xl font-bold text-[rgb(var(--text-primary))] tracking-tight">
+              {displaySchool.name}
+            </h1>
+            <div className="flex items-center gap-3 mt-3 text-sm text-[rgb(var(--text-tertiary))]">
+              <span className="font-mono bg-[rgb(var(--surface-tertiary))] px-2 py-0.5 rounded text-xs font-medium text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]">
+                {displaySchool.code}
+              </span>
+              <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
+              <span className="capitalize font-medium">{displaySchool.type || 'School'}</span>
 
-        {/* Tab Navigation */}
-        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+              <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
 
-        {/* Tab Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === 'configuration' && (
-              <SchoolConfigurationPage schoolId={schoolId} />
-            )}
-            {activeTab === 'departments' && (
-              <SchoolDepartmentsPage schoolId={schoolId} />
-            )}
-            {activeTab === 'academic-years' && (
-              <SchoolAcademicYearsPage schoolId={schoolId} />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
+              <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border ${displaySchool.isActive
+                ? 'bg-teal-500/5 border-teal-500/20 text-teal-700 dark:text-teal-400'
+                : 'bg-rust-500/5 border-rust-500/20 text-rust-700 dark:text-rust-400'
+                }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${displaySchool.isActive ? 'bg-teal-500' : 'bg-rust-500'}`} />
+                {displaySchool.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: Animated Tabs */}
+          <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar -mb-px">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
+                    ${isActive
+                      ? 'text-[rgb(var(--text-primary))]'
+                      : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
+                    }
+                  `}
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <tab.icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
+                    {tab.label}
+                  </span>
+
+                  {/* Active Indicator Line */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+
+                  {/* Subtle Hover Background (Optional, good for accessibility) */}
+                  {!isActive && (
+                    <div className="absolute inset-0 rounded-lg bg-[rgb(var(--text-primary))] opacity-0 hover:opacity-[0.03] transition-opacity" />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="min-h-[400px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="h-full"
+            >
+              <div className="h-full">
+                {activeTab === 'configuration' && <SchoolConfigurationPage schoolId={schoolId} school={displaySchool} />}
+                {activeTab === 'departments' && <SchoolDepartmentsPage schoolId={schoolId} />}
+                {activeTab === 'academic-years' && <SchoolAcademicYearsPage schoolId={schoolId} />}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+      </div>
     </div>
   )
 }
@@ -334,13 +211,13 @@ function AccessDenied({ message }: { message: string }) {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center py-16"
+        className="text-center py-24"
       >
-        <div className="p-4 rounded-full bg-rust-500/10 inline-flex mb-4">
-          <Building2 className="w-8 h-8 text-rust-500" />
+        <div className="p-4 rounded-full bg-rust-500/10 inline-flex mb-6">
+          <Building2 className="w-10 h-10 text-rust-500" />
         </div>
-        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">Access Denied</h2>
-        <p className="text-[rgb(var(--text-tertiary))]">{message}</p>
+        <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">Access Denied</h2>
+        <p className="text-[rgb(var(--text-tertiary))] max-w-md mx-auto">{message}</p>
       </motion.div>
     </div>
   )

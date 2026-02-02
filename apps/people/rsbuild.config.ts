@@ -21,7 +21,7 @@ export default defineConfig({
     rspack: (config, { appendPlugins }) => {
       config.output = {
         ...config.output,
-        publicPath: 'auto',
+        publicPath: 'http://localhost:3006/',
       }
       appendPlugins([
         new ModuleFederationPlugin({

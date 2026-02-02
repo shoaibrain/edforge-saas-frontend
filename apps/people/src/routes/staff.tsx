@@ -9,12 +9,29 @@ import { UsersRound, Search, Filter, Plus, Users, GraduationCap, Briefcase, Awar
 import { useAppStore } from '@/stores/app.store'
 // NOTE: Auth is handled by Shell's protected routes - remotes don't need their own auth store
 
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { peopleService } from '../services/people.service'
+
+// Native date formatting
+const formatDate = (date: string) => new Date(date).toLocaleDateString()
+
 export default function StaffPage() {
   const { activeSchoolId } = useAppStore.getState()
 
-  // NOTE: Auth check removed - Shell's protected routes already ensure user is authenticated
-  // ABAC checks should be done at Shell level before loading this remote module
   console.log('[People:Staff] Rendering staff page, activeSchoolId:', activeSchoolId)
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['users', activeSchoolId],
+    queryFn: () => peopleService.listUsers(50),
+    enabled: true, // Fetch for all users generally, or filter by school if API supports it (currently listUsers is generic)
+  })
+
+  // Basic stats handling (mock for now, or derived from data if pagination allows)
+  const totalStaff = data?.items.length || 0
+
+  // NOTE: This simple implementation fetches specific page of users. 
+  // Real stats should come from a separate API endpoint.
 
   return (
     <div className="min-h-full">
@@ -41,33 +58,33 @@ export default function StaffPage() {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Quick Stats */}
+        {/* Quick Stats (Mocked or Derived) */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard
             icon={Users}
             label="Total Staff"
-            value="156"
+            value={isLoading ? '-' : totalStaff.toString()}
             accent="text-blue-600 dark:text-blue-400"
             bg="bg-blue-500/10"
           />
-          <StatCard
+          <StatCard // Placeholder stats
             icon={GraduationCap}
             label="Teachers"
-            value="87"
+            value="-"
             accent="text-emerald-600 dark:text-emerald-400"
             bg="bg-emerald-500/10"
           />
           <StatCard
             icon={Briefcase}
             label="Support Staff"
-            value="45"
+            value="-"
             accent="text-purple-600 dark:text-purple-400"
             bg="bg-purple-500/10"
           />
           <StatCard
             icon={Award}
             label="Administrators"
-            value="24"
+            value="-"
             accent="text-amber-600 dark:text-amber-400"
             bg="bg-amber-500/10"
           />
@@ -89,36 +106,49 @@ export default function StaffPage() {
           </button>
         </div>
 
-        {/* Product Description */}
+        {/* Staff List */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-blue-500/10">
-              <UsersRound className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-text-primary mb-2">
-                Employee Management
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                View all staff members with their contact information, department assignments,
-                and employment status. Filter by department, role, or employment type. Click
-                any staff member to view their full profile including certifications and
-                school assignments.
-              </p>
-            </div>
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-5 h-5 text-text-secondary" />
+            <h3 className="text-lg font-semibold text-text-primary">Staff Roster ({data?.items.length || 0})</h3>
           </div>
-        </div>
 
-        {/* Placeholder Table */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
-          <Users className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">
-            Staff Roster
-          </h4>
-          <p className="text-text-secondary max-w-md mx-auto">
-            Browse all staff members organized by department or role.
-            Click a row to view the full employee profile.
-          </p>
+          {isLoading ? (
+            <div className="text-center py-8 text-text-secondary">Loading staff...</div>
+          ) : error ? (
+            <div className="text-center py-8 text-red-500">Failed to load staff logic.</div>
+          ) : data?.items.length === 0 ? (
+            <div className="text-center py-8 text-text-secondary">No staff members found.</div>
+          ) : (
+            <div className="space-y-3">
+              {data?.items.map((user) => (
+                <Link
+                  to="/staff/$userId"
+                  params={{ userId: user.userId }}
+                  key={user.userId}
+                  className="flex items-center justify-between p-4 rounded-lg border border-border-tertiary bg-surface-primary hover:border-accent-primary/30 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 font-semibold group-hover:scale-105 transition-transform">
+                      {user.firstName?.[0]}{user.lastName?.[0]}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-text-primary group-hover:text-accent-primary transition-colors">{user.firstName} {user.lastName}</h4>
+                      <div className="text-sm text-text-secondary">{user.email}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-surface-tertiary text-text-secondary border border-border-tertiary">
+                      {user.globalRole}
+                    </span>
+                    <div className="text-xs text-text-tertiary">
+                      Joined {formatDate(user.createdAt)}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

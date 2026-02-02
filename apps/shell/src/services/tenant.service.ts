@@ -6,177 +6,27 @@
  */
 
 import { apiGet, apiPost, apiPut, apiDelete, apiPatch } from '../lib/api'
-import type { 
-  Tenant, 
-  School, 
+import type {
+  Tenant,
+  School,
   SchoolYear,
-  SchoolAddress,
-  Term,
+  WorkspaceSettings,
+  SchoolConfiguration,
+  Department,
+  AcademicYear,
 } from '@edforge/types'
 import type { SchoolAssignment } from '@edforge/auth'
+import type {
+  CreateSchoolDto,
+  UpdateSchoolDto,
+  CreateDepartmentDto,
+  UpdateDepartmentDto,
+  CreateAcademicYearDto,
+  UpdateAcademicYearDto,
+  UpdateAcademicYearStatusDto
+} from '@edforge/shared-types'
 
-// ============================================================================
-// LOCAL TYPES (Defined here until @edforge/types is rebuilt)
-// ============================================================================
-
-export interface WorkspaceSettings {
-  tenantId: string
-  regional: {
-    defaultTimezone: string
-    defaultLocale: string
-    defaultDateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
-    defaultTimeFormat: '12h' | '24h'
-    defaultWeekStartsOn: 'sunday' | 'monday'
-  }
-  calendar: {
-    defaultAcademicYearStart: string
-    defaultAcademicYearEnd: string
-    defaultTermStructure: 'semester' | 'trimester' | 'quarter'
-  }
-  branding: {
-    organizationName: string
-    logoUrl?: string
-    primaryColor?: string
-    accentColor?: string
-  }
-  policies: {
-    defaultGradingScale: 'letter' | 'percentage' | 'points' | 'custom'
-    defaultAttendancePolicy: 'daily' | 'period' | 'both'
-  }
-  isLocked: boolean
-  lockReason?: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface OperatingHours {
-  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  isOpen: boolean
-  openTime?: string
-  closeTime?: string
-}
-
-export interface SchoolConfiguration {
-  schoolId: string
-  identity: {
-    displayName: string
-    shortCode: string
-    schoolType: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-    logoUrl?: string
-    website?: string
-  }
-  location: {
-    address: SchoolAddress
-    timezone?: string
-    phone?: string
-    email?: string
-    fax?: string
-  }
-  operations: {
-    operatingHours: OperatingHours[]
-    gradeLevels: string[]
-    capacity?: number
-  }
-  academic: {
-    gradingScale: 'letter' | 'percentage' | 'points' | 'custom'
-    customGradingScale?: {
-      grades: { letter: string; minPercentage: number; maxPercentage: number; gpaPoints: number }[]
-    }
-    reportCardFormat: 'standard' | 'narrative' | 'standards-based'
-    termStructure: 'semester' | 'trimester' | 'quarter' | 'custom'
-  }
-  attendance: {
-    policy: 'daily' | 'period' | 'both'
-    tardyThresholdMinutes: number
-    excusedAbsenceTypes: string[]
-    unexcusedAbsenceTypes: string[]
-  }
-  inheritsFromWorkspace: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export type DepartmentScope = 'tenant' | 'school'
-
-export interface Department {
-  id: string
-  tenantId: string
-  scope: DepartmentScope
-  schoolId?: string
-  name: string
-  code: string
-  description?: string
-  headId?: string
-  headName?: string
-  parentDepartmentId?: string
-  isActive: boolean
-  budget?: {
-    fiscalYear: string
-    allocatedAmount: number
-    spentAmount: number
-    currency: string
-  }
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateDepartmentDto {
-  name: string
-  code: string
-  scope: DepartmentScope
-  schoolId?: string
-  description?: string
-  headId?: string
-  parentDepartmentId?: string
-}
-
-export interface UpdateDepartmentDto {
-  name?: string
-  code?: string
-  description?: string
-  headId?: string
-  parentDepartmentId?: string
-  isActive?: boolean
-}
-
-export type AcademicYearStatus = 'planning' | 'active' | 'completed'
-
-export interface AcademicYear {
-  id: string
-  tenantId: string
-  schoolId: string
-  schoolName?: string
-  name: string
-  startDate: string
-  endDate: string
-  status: AcademicYearStatus
-  terms: Term[]
-  isLocked: boolean
-  activatedAt?: string
-  completedAt?: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateAcademicYearDto {
-  schoolId: string
-  name: string
-  startDate: string
-  endDate: string
-  terms?: Omit<Term, 'id'>[]
-}
-
-export interface UpdateAcademicYearDto {
-  name?: string
-  startDate?: string
-  endDate?: string
-  terms?: Term[]
-}
-
-export interface UpdateAcademicYearStatusDto {
-  status: AcademicYearStatus
-  confirmTransition?: boolean
-}
+// Local types removed - imported from @edforge/types and @edforge/shared-types
 
 // ============================================================================
 // TYPES
@@ -194,25 +44,8 @@ export interface UserProfile {
   updatedAt: string
 }
 
-export interface CreateSchoolRequest {
-  name: string
-  code: string
-  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-  address?: {
-    street1: string
-    street2?: string
-    city: string
-    state: string
-    postalCode: string
-    country: string
-  }
-  phone?: string
-  email?: string
-}
+// REMOVED LOCAL CreateSchoolRequest/UpdateSchoolRequest in favor of shared types
 
-export interface UpdateSchoolRequest extends Partial<CreateSchoolRequest> {
-  isActive?: boolean
-}
 
 // ============================================================================
 // USER API
@@ -255,32 +88,62 @@ export async function updateTenant(tenantId: string, data: Partial<Tenant>): Pro
 // SCHOOL API
 // ============================================================================
 
+// Helper to map API school format to Frontend School interface
+function mapApiSchool(apiSchool: any, tenantId?: string): School {
+  return {
+    id: apiSchool.schoolId || apiSchool.id,
+    tenantId: apiSchool.tenantId || tenantId || '',
+    name: apiSchool.name,
+    code: apiSchool.schoolCode || apiSchool.code,
+    type: apiSchool.schoolType || apiSchool.type,
+    isActive: apiSchool.status === 'active' || apiSchool.status === 'setup',
+    address: apiSchool.address ? {
+      street1: apiSchool.address.street1,
+      street2: apiSchool.address.street2,
+      city: apiSchool.address.city,
+      state: apiSchool.address.state,
+      postalCode: apiSchool.address.zipCode || apiSchool.address.postalCode,
+      country: apiSchool.address.country
+    } : undefined,
+    phone: apiSchool.phone,
+    email: apiSchool.email
+  }
+}
+
+interface SchoolResponse {
+  items: any[]
+  hasMore: boolean
+}
+
 /**
  * Get all schools for a tenant
  */
 export async function getSchools(tenantId: string): Promise<School[]> {
-  return apiGet<School[]>(`/schools`, { tenantId })
+  const response = await apiGet<SchoolResponse>(`/schools`, { tenantId })
+  return (response.items || []).map(item => mapApiSchool(item, tenantId))
 }
 
 /**
  * Get a single school by ID
  */
 export async function getSchool(schoolId: string): Promise<School> {
-  return apiGet<School>(`/schools/${schoolId}`)
+  const data = await apiGet<any>(`/schools/${schoolId}`)
+  return mapApiSchool(data)
 }
 
 /**
  * Create a new school
  */
-export async function createSchool(data: CreateSchoolRequest): Promise<School> {
-  return apiPost<School, CreateSchoolRequest>('/schools', data)
+export async function createSchool(data: CreateSchoolDto): Promise<School> {
+  return apiPost<School, CreateSchoolDto>('/schools', data)
 }
 
 /**
  * Update a school
+ * PATCH /schools/{schoolId} - per FRONTEND_INTEGRATION_GUIDE.md
  */
-export async function updateSchool(schoolId: string, data: UpdateSchoolRequest): Promise<School> {
-  return apiPut<School, UpdateSchoolRequest>(`/schools/${schoolId}`, data)
+export async function updateSchool(schoolId: string, data: UpdateSchoolDto): Promise<School> {
+  return apiPatch<School, UpdateSchoolDto>(`/schools/${schoolId}`, data)
 }
 
 /**
@@ -364,15 +227,64 @@ export async function updateSchoolConfiguration(
 }
 
 // ============================================================================
+// Helper to map API department format to Frontend Department interface
+function mapApiDepartment(apiDept: any, tenantId?: string): Department {
+  return {
+    id: apiDept.departmentId || apiDept.id,
+    tenantId: apiDept.tenantId || tenantId || 'unknown',
+    scope: apiDept.scope || 'school',
+    schoolId: apiDept.schoolId,
+    name: apiDept.name,
+    code: apiDept.code,
+    description: apiDept.description,
+    headId: apiDept.headId,
+    headName: apiDept.headName,
+    parentDepartmentId: apiDept.parentDepartmentId,
+    isActive: apiDept.isActive !== undefined ? apiDept.isActive : true,
+    budget: apiDept.budget,
+    createdAt: apiDept.createdAt || new Date().toISOString(),
+    updatedAt: apiDept.updatedAt || new Date().toISOString(),
+  }
+}
+
+// Helper to map API academic year format to Frontend AcademicYear interface
+function mapApiAcademicYear(apiYear: any, schoolId?: string, tenantId?: string): AcademicYear {
+  return {
+    // API returns 'yearId', fallback to 'academicYearId' or 'id' for compatibility
+    id: apiYear.yearId || apiYear.academicYearId || apiYear.id,
+    tenantId: apiYear.tenantId || tenantId || '',
+    schoolId: apiYear.schoolId || schoolId || '',
+    schoolName: apiYear.schoolName,
+    name: apiYear.name,
+    startDate: apiYear.startDate,
+    endDate: apiYear.endDate,
+    status: apiYear.status,
+    // Map isCurrent to isLocked for backward compatibility
+    isLocked: apiYear.isLocked ?? (apiYear.status === 'active' || apiYear.status === 'completed'),
+    terms: apiYear.terms || [],
+    activatedAt: apiYear.activatedAt,
+    completedAt: apiYear.completedAt,
+    createdAt: apiYear.createdAt || new Date().toISOString(),
+    updatedAt: apiYear.updatedAt || new Date().toISOString(),
+  }
+}
+
+// ============================================================================
 // DEPARTMENT API
 // ============================================================================
+
+interface DepartmentResponse {
+  items: any[]
+  hasMore: boolean
+}
 
 /**
  * Get all departments for a school (includes both tenant-scoped and school-scoped)
  * GET /schools/{schoolId}/departments
  */
 export async function getDepartments(schoolId: string): Promise<Department[]> {
-  return apiGet<Department[]>(`/schools/${schoolId}/departments`)
+  const response = await apiGet<DepartmentResponse>(`/schools/${schoolId}/departments`)
+  return (response.items || []).map(item => mapApiDepartment(item))
 }
 
 /**
@@ -380,7 +292,8 @@ export async function getDepartments(schoolId: string): Promise<Department[]> {
  * GET /schools/{schoolId}/departments/{departmentId}
  */
 export async function getDepartment(schoolId: string, departmentId: string): Promise<Department> {
-  return apiGet<Department>(`/schools/${schoolId}/departments/${departmentId}`)
+  const data = await apiGet<any>(`/schools/${schoolId}/departments/${departmentId}`)
+  return mapApiDepartment(data)
 }
 
 /**
@@ -391,10 +304,11 @@ export async function createDepartment(
   schoolId: string,
   data: CreateDepartmentDto
 ): Promise<Department> {
-  return apiPost<Department, CreateDepartmentDto>(
+  const result = await apiPost<any, CreateDepartmentDto>(
     `/schools/${schoolId}/departments`,
     data
   )
+  return mapApiDepartment(result)
 }
 
 /**
@@ -406,10 +320,11 @@ export async function updateDepartment(
   departmentId: string,
   data: UpdateDepartmentDto
 ): Promise<Department> {
-  return apiPatch<Department, UpdateDepartmentDto>(
+  const result = await apiPut<any, UpdateDepartmentDto>(
     `/schools/${schoolId}/departments/${departmentId}`,
     data
   )
+  return mapApiDepartment(result)
 }
 
 /**
@@ -424,12 +339,18 @@ export async function deleteDepartment(schoolId: string, departmentId: string): 
 // ACADEMIC YEAR API
 // ============================================================================
 
+interface AcademicYearResponse {
+  items: any[]
+  hasMore: boolean
+}
+
 /**
  * Get all academic years for a school
  * GET /schools/{schoolId}/academic-years
  */
 export async function getAcademicYears(schoolId: string): Promise<AcademicYear[]> {
-  return apiGet<AcademicYear[]>(`/schools/${schoolId}/academic-years`)
+  const response = await apiGet<AcademicYearResponse>(`/schools/${schoolId}/academic-years`)
+  return (response.items || []).map(item => mapApiAcademicYear(item, schoolId))
 }
 
 /**
@@ -440,7 +361,8 @@ export async function getAcademicYear(
   schoolId: string,
   academicYearId: string
 ): Promise<AcademicYear> {
-  return apiGet<AcademicYear>(`/schools/${schoolId}/academic-years/${academicYearId}`)
+  const data = await apiGet<any>(`/schools/${schoolId}/academic-years/${academicYearId}`)
+  return mapApiAcademicYear(data, schoolId)
 }
 
 /**
@@ -449,7 +371,8 @@ export async function getAcademicYear(
  */
 export async function getCurrentAcademicYear(schoolId: string): Promise<AcademicYear | null> {
   try {
-    return await apiGet<AcademicYear>(`/schools/${schoolId}/academic-years/current`)
+    const data = await apiGet<any>(`/schools/${schoolId}/academic-years/current`)
+    return mapApiAcademicYear(data, schoolId)
   } catch {
     // No active academic year
     return null
@@ -464,10 +387,11 @@ export async function createAcademicYear(
   schoolId: string,
   data: CreateAcademicYearDto
 ): Promise<AcademicYear> {
-  return apiPost<AcademicYear, CreateAcademicYearDto>(
+  const result = await apiPost<any, CreateAcademicYearDto>(
     `/schools/${schoolId}/academic-years`,
-    { ...data, schoolId }
+    data
   )
+  return mapApiAcademicYear(result, schoolId)
 }
 
 /**
@@ -479,25 +403,28 @@ export async function updateAcademicYear(
   academicYearId: string,
   data: UpdateAcademicYearDto
 ): Promise<AcademicYear> {
-  return apiPatch<AcademicYear, UpdateAcademicYearDto>(
+  const result = await apiPatch<any, UpdateAcademicYearDto>(
     `/schools/${schoolId}/academic-years/${academicYearId}`,
     data
   )
+  return mapApiAcademicYear(result, schoolId)
 }
 
 /**
  * Update academic year status (planning → active → completed)
- * PATCH /schools/{schoolId}/academic-years/{academicYearId}/status
+ * PUT /schools/{schoolId}/academic-years/{yearId}/status
+ * Note: Backend API spec uses PUT method for status updates
  */
 export async function updateAcademicYearStatus(
   schoolId: string,
   academicYearId: string,
   data: UpdateAcademicYearStatusDto
 ): Promise<AcademicYear> {
-  return apiPatch<AcademicYear, UpdateAcademicYearStatusDto>(
+  const result = await apiPut<any, UpdateAcademicYearStatusDto>(
     `/schools/${schoolId}/academic-years/${academicYearId}/status`,
     data
   )
+  return mapApiAcademicYear(result, schoolId)
 }
 
 /**
@@ -509,6 +436,108 @@ export async function deleteAcademicYear(
   academicYearId: string
 ): Promise<void> {
   return apiDelete<void>(`/schools/${schoolId}/academic-years/${academicYearId}`)
+}
+
+// ============================================================================
+// GRADING PERIOD API
+// ============================================================================
+
+interface GradingPeriod {
+  id: string
+  yearId: string
+  schoolId: string
+  name: string
+  shortName?: string
+  termType: 'semester' | 'quarter' | 'trimester' | 'year'
+  sequence: number
+  startDate: string
+  endDate: string
+  gradesDueDate?: string
+  reportCardDate?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+interface CreateGradingPeriodDto {
+  name: string
+  shortName?: string
+  termType: 'semester' | 'quarter' | 'trimester' | 'year'
+  sequence: number
+  startDate: string
+  endDate: string
+  gradesDueDate?: string
+  reportCardDate?: string
+}
+
+interface GradingPeriodResponse {
+  items: any[]
+  hasMore: boolean
+}
+
+// Helper to map API grading period format to Frontend interface
+function mapApiGradingPeriod(apiPeriod: any): GradingPeriod {
+  return {
+    id: apiPeriod.termId || apiPeriod.id,
+    yearId: apiPeriod.yearId,
+    schoolId: apiPeriod.schoolId,
+    name: apiPeriod.name,
+    shortName: apiPeriod.shortName,
+    termType: apiPeriod.termType,
+    sequence: apiPeriod.sequence,
+    startDate: apiPeriod.startDate,
+    endDate: apiPeriod.endDate,
+    gradesDueDate: apiPeriod.gradesDueDate,
+    reportCardDate: apiPeriod.reportCardDate,
+    isActive: apiPeriod.isActive ?? true,
+    createdAt: apiPeriod.createdAt || new Date().toISOString(),
+    updatedAt: apiPeriod.updatedAt || new Date().toISOString(),
+  }
+}
+
+/**
+ * Get all grading periods for an academic year
+ * GET /schools/{schoolId}/academic-years/{yearId}/grading-periods
+ */
+export async function getGradingPeriods(
+  schoolId: string,
+  yearId: string
+): Promise<GradingPeriod[]> {
+  const response = await apiGet<GradingPeriodResponse>(
+    `/schools/${schoolId}/academic-years/${yearId}/grading-periods`
+  )
+  return (response.items || []).map(item => mapApiGradingPeriod(item))
+}
+
+/**
+ * Create a new grading period
+ * POST /schools/{schoolId}/academic-years/{yearId}/grading-periods
+ */
+export async function createGradingPeriod(
+  schoolId: string,
+  yearId: string,
+  data: CreateGradingPeriodDto
+): Promise<GradingPeriod> {
+  const result = await apiPost<any, CreateGradingPeriodDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/grading-periods`,
+    data
+  )
+  return mapApiGradingPeriod(result)
+}
+
+/**
+ * Create multiple grading periods at once
+ * Calls POST /schools/{schoolId}/academic-years/{yearId}/grading-periods for each period
+ */
+export async function createGradingPeriods(
+  schoolId: string,
+  yearId: string,
+  periods: CreateGradingPeriodDto[]
+): Promise<GradingPeriod[]> {
+  const results = await Promise.all(
+    periods.map(period => createGradingPeriod(schoolId, yearId, period))
+  )
+  return results
 }
 
 // ============================================================================
@@ -555,8 +584,16 @@ export const tenantService = {
   updateAcademicYearStatus,
   deleteAcademicYear,
 
+  // Grading Periods
+  getGradingPeriods,
+  createGradingPeriod,
+  createGradingPeriods,
+
   // School Years (Legacy)
   getSchoolYears,
   getCurrentSchoolYear,
 }
+
+// Export types for use in components
+export type { GradingPeriod, CreateGradingPeriodDto }
 

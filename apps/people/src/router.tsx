@@ -14,6 +14,7 @@ import {
 import { PeopleLayout } from './layouts/PeopleLayout'
 import { Overview } from './routes/overview'
 import StaffPage from './routes/staff'
+import StaffDetailPage from './routes/staff/detail'
 import NewPersonPage from './routes/new'
 import { DepartmentsModule } from './routes/departments'
 import { RolesModule } from './routes/roles'
@@ -45,6 +46,13 @@ const staffRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/staff',
     component: StaffPage,
+})
+
+// Staff Detail
+const staffDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/staff/$userId',
+    component: StaffDetailPage,
 })
 
 // New Person
@@ -89,6 +97,7 @@ const hrRoute = createRoute({
 const routeTree = rootRoute.addChildren([
     indexRoute,
     staffRoute,
+    staffDetailRoute,
     newPersonRoute,
     departmentsRoute,
     rolesRoute,

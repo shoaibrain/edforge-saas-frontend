@@ -6,33 +6,14 @@
  */
 
 import { create } from 'zustand'
-import type { PersonType } from '../lib/mock-data'
 
 // ============================================================================
 // MODAL TYPES
 // ============================================================================
 
 export type ModalType =
-  | 'quick-add-person'
-  | 'invite-team'
-  | 'add-classroom'
-  | 'add-grade-level'
   | 'confirm-delete'
   | 'person-details'
-
-export interface QuickAddPersonData {
-  firstName?: string
-  lastName?: string
-  email?: string
-  personType?: PersonType
-  prefillFromSearch?: boolean
-}
-
-export interface InviteTeamData {
-  emails?: string[]
-  defaultRole?: 'teacher' | 'staff' | 'admin'
-  schoolId?: string
-}
 
 export interface ConfirmDeleteData {
   title: string
@@ -47,10 +28,6 @@ export interface PersonDetailsData {
 }
 
 export type ModalData = 
-  | { type: 'quick-add-person'; data?: QuickAddPersonData }
-  | { type: 'invite-team'; data?: InviteTeamData }
-  | { type: 'add-classroom'; data?: undefined }
-  | { type: 'add-grade-level'; data?: undefined }
   | { type: 'confirm-delete'; data: ConfirmDeleteData }
   | { type: 'person-details'; data: PersonDetailsData }
 
@@ -128,64 +105,6 @@ export const useModalStore = create<ModalState>()((set, get) => ({
 // CONVENIENCE HOOKS
 // ============================================================================
 
-/** Hook for Quick Add Person modal */
-export function useQuickAddPersonModal() {
-  const openModal = useModalStore((s) => s.openModal)
-  const closeModal = useModalStore((s) => s.closeModal)
-  const isOpen = useModalStore((s) => s.isOpen('quick-add-person'))
-  const data = useModalStore((s) => s.getData('quick-add-person'))
-
-  return {
-    isOpen,
-    data,
-    open: (initialData?: QuickAddPersonData) =>
-      openModal({ type: 'quick-add-person', data: initialData }),
-    close: () => closeModal('quick-add-person'),
-  }
-}
-
-/** Hook for Invite Team modal */
-export function useInviteTeamModal() {
-  const openModal = useModalStore((s) => s.openModal)
-  const closeModal = useModalStore((s) => s.closeModal)
-  const isOpen = useModalStore((s) => s.isOpen('invite-team'))
-  const data = useModalStore((s) => s.getData('invite-team'))
-
-  return {
-    isOpen,
-    data,
-    open: (initialData?: InviteTeamData) =>
-      openModal({ type: 'invite-team', data: initialData }),
-    close: () => closeModal('invite-team'),
-  }
-}
-
-/** Hook for Add Classroom modal */
-export function useAddClassroomModal() {
-  const openModal = useModalStore((s) => s.openModal)
-  const closeModal = useModalStore((s) => s.closeModal)
-  const isOpen = useModalStore((s) => s.isOpen('add-classroom'))
-
-  return {
-    isOpen,
-    open: () => openModal({ type: 'add-classroom' }),
-    close: () => closeModal('add-classroom'),
-  }
-}
-
-/** Hook for Add Grade Level modal */
-export function useAddGradeLevelModal() {
-  const openModal = useModalStore((s) => s.openModal)
-  const closeModal = useModalStore((s) => s.closeModal)
-  const isOpen = useModalStore((s) => s.isOpen('add-grade-level'))
-
-  return {
-    isOpen,
-    open: () => openModal({ type: 'add-grade-level' }),
-    close: () => closeModal('add-grade-level'),
-  }
-}
-
 /** Hook for Confirm Delete modal */
 export function useConfirmDeleteModal() {
   const openModal = useModalStore((s) => s.openModal)
@@ -201,4 +120,3 @@ export function useConfirmDeleteModal() {
     close: () => closeModal('confirm-delete'),
   }
 }
-

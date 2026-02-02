@@ -198,19 +198,20 @@ export interface SchoolConfiguration {
   }
   /** Academic settings */
   academic: {
-    gradingScale: 'letter' | 'percentage' | 'points' | 'custom'
+    gradingScale?: 'letter' | 'percentage' | 'points' | 'custom'
     customGradingScale?: {
       grades: { letter: string; minPercentage: number; maxPercentage: number; gpaPoints: number }[]
     }
-    reportCardFormat: 'standard' | 'narrative' | 'standards-based'
-    termStructure: 'semester' | 'trimester' | 'quarter' | 'custom'
+    reportCardFormat?: 'standard' | 'narrative' | 'standards-based'
+    termStructure?: 'semester' | 'trimester' | 'quarter' | 'custom'
   }
   /** Attendance settings */
   attendance: {
-    policy: 'daily' | 'period' | 'both'
-    tardyThresholdMinutes: number
-    excusedAbsenceTypes: string[]
-    unexcusedAbsenceTypes: string[]
+    attendanceRequired?: boolean
+    policy?: 'daily' | 'period' | 'both'
+    tardyThresholdMinutes?: number
+    excusedAbsenceTypes?: string[]
+    unexcusedAbsenceTypes?: string[]
   }
   /** Whether this configuration inherits from workspace or is customized */
   inheritsFromWorkspace: boolean

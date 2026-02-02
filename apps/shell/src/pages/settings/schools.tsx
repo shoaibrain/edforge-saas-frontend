@@ -9,7 +9,7 @@
  * - Workspace settings inheritance preview
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Navigate, useNavigate, useSearch, Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -34,17 +34,19 @@ import {
   Check,
   Phone,
   Mail,
-  Clock,
   Info,
-  Save,
   Building2,
+  Save,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
-import { tenantService, type CreateSchoolRequest, type WorkspaceSettings, type OperatingHours } from '@/services/tenant.service'
-import type { School as SchoolType } from '@edforge/types'
+import { tenantService } from '@/services/tenant.service'
+import type { School as SchoolType, WorkspaceSettings } from '@edforge/types'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { createSchoolSchema, type CreateSchoolDto } from '@edforge/shared-types'
 import {
   SettingsAlert,
   staggerChildren,
@@ -55,26 +57,6 @@ import {
 // TYPES
 // ============================================================================
 
-interface SchoolFormData {
-  // Basic Info
-  name: string
-  code: string
-  type: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-  // Location
-  street1: string
-  street2: string
-  city: string
-  state: string
-  postalCode: string
-  country: string
-  // Contact
-  phone: string
-  email: string
-  website: string
-  // Operating Hours
-  operatingHours: OperatingHours[]
-}
-
 interface SectionStatus {
   completed: boolean
   skipped: boolean
@@ -84,40 +66,12 @@ interface SectionState {
   basic: SectionStatus
   location: SectionStatus
   contact: SectionStatus
-  hours: SectionStatus
-}
-
-const DEFAULT_OPERATING_HOURS: OperatingHours[] = [
-  { dayOfWeek: 0, isOpen: false }, // Sunday
-  { dayOfWeek: 1, isOpen: true, openTime: '08:00', closeTime: '16:00' },
-  { dayOfWeek: 2, isOpen: true, openTime: '08:00', closeTime: '16:00' },
-  { dayOfWeek: 3, isOpen: true, openTime: '08:00', closeTime: '16:00' },
-  { dayOfWeek: 4, isOpen: true, openTime: '08:00', closeTime: '16:00' },
-  { dayOfWeek: 5, isOpen: true, openTime: '08:00', closeTime: '16:00' },
-  { dayOfWeek: 6, isOpen: false }, // Saturday
-]
-
-const initialFormData: SchoolFormData = {
-  name: '',
-  code: '',
-  type: 'high',
-  street1: '',
-  street2: '',
-  city: '',
-  state: '',
-  postalCode: '',
-  country: 'USA',
-  phone: '',
-  email: '',
-  website: '',
-  operatingHours: DEFAULT_OPERATING_HOURS,
 }
 
 const initialSectionState: SectionState = {
   basic: { completed: false, skipped: false },
   location: { completed: false, skipped: false },
   contact: { completed: false, skipped: false },
-  hours: { completed: false, skipped: false },
 }
 
 // ============================================================================
@@ -211,7 +165,7 @@ function EmptyState({ onCreateSchool, isTenantAdmin }: EmptyStateProps) {
             Create your first school
           </h2>
           <p className="text-[rgb(var(--text-secondary))] leading-relaxed">
-            Schools are the foundation of EdForge. Set up academic calendars, 
+            Schools are the foundation of EdForge. Set up academic calendars,
             manage departments, and organize your educational programs.
           </p>
         </motion.div>
@@ -247,7 +201,7 @@ function EmptyState({ onCreateSchool, isTenantAdmin }: EmptyStateProps) {
             <Zap className="w-3.5 h-3.5" />
             <span>What you can do with schools</span>
           </div>
-          
+
           <div className="grid grid-cols-4 gap-4">
             {[
               { icon: GraduationCap, label: 'Academic Programs', desc: 'Courses & Curriculum' },
@@ -394,11 +348,10 @@ function CollapsibleSection({
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-[rgb(var(--surface-tertiary))]/50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            status.completed 
-              ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400' 
-              : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'
-          }`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${status.completed
+            ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400'
+            : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'
+            }`}>
             <Icon className="w-5 h-5" />
           </div>
           <div className="text-left">
@@ -482,13 +435,12 @@ interface ProgressTrackerProps {
 }
 
 function ProgressTracker({ sections }: ProgressTrackerProps) {
-  const weights = { basic: 40, location: 25, contact: 15, hours: 20 }
-  
+  const weights = { basic: 50, location: 30, contact: 20 }
+
   let progress = 0
   if (sections.basic.completed) progress += weights.basic
   if (sections.location.completed || sections.location.skipped) progress += weights.location
   if (sections.contact.completed || sections.contact.skipped) progress += weights.contact
-  if (sections.hours.completed || sections.hours.skipped) progress += weights.hours
 
   return (
     <div className="mb-6">
@@ -551,7 +503,7 @@ function InheritedSettingsPreview({ settings, isLoading }: InheritedSettingsPrev
           <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
             This school will inherit these defaults. You can override them in school configuration after creation.
           </p>
-          
+
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-[rgb(var(--text-tertiary))]">Timezone:</span>
@@ -604,114 +556,111 @@ interface SchoolCreatePageProps {
 function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
   const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
-
-  const [formData, setFormData] = useState<SchoolFormData>(initialFormData)
   const [sections, setSections] = useState<SectionState>(initialSectionState)
   const [openSection, setOpenSection] = useState<string>('basic')
   const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof SchoolFormData, string>>>({})
 
-  // Fetch workspace settings for inheritance preview
   const { data: workspaceSettings, isLoading: loadingSettings } = useQuery({
-    queryKey: ['workspaceSettings', user?.tenantId],
-    queryFn: () => tenantService.getWorkspaceSettings(user?.tenantId || ''),
+    queryKey: ['workspace-settings', user?.tenantId],
+    queryFn: () => tenantService.getWorkspaceSettings(user?.tenantId!),
     enabled: !!user?.tenantId,
-    staleTime: 5 * 60 * 1000,
   })
 
-  // Create mutation
+  // Handle URL query params
+  const search = useSearch({ strict: false }) as { create?: string }
+  useEffect(() => {
+    if (search.create === 'true' || search.create === '"true"') {
+      // Logic to show create view - actually the parent component might use this, 
+      // but here we are IN the create page component.
+      // If this component is rendered conditionally by parent, we don't need this.
+      // But looking at file structure, this seems to be the page component.
+      // Wait, the previous code didn't use search params in this component.
+      // Let's assume the router handles showing this component.
+    }
+  }, [search])
+
+  // Initialize form with Zod schema
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    trigger,
+    formState: { errors, isValid },
+  } = useForm<CreateSchoolDto>({
+    resolver: zodResolver(createSchoolSchema),
+    defaultValues: {
+      name: '',
+      schoolCode: '',
+      schoolType: 'high',
+      gradeRange: { start: '9', end: '12' },
+      address: {
+        country: 'USA'
+      },
+      timezone: 'America/Chicago',
+      locale: 'en-US',
+      academicCalendarType: 'semester'
+    },
+    mode: 'onBlur'
+  })
+
+  // Watch values for auto-generation and validation progress
+  const schoolName = watch('name')
+  const schoolCode = watch('schoolCode')
+  // ... other watches as needed for progress tracking
+
   const createMutation = useMutation({
-    mutationFn: (data: CreateSchoolRequest) => tenantService.createSchool(data),
+    mutationFn: (data: CreateSchoolDto) => tenantService.createSchool(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['schools', user?.tenantId] })
       onSuccess()
     },
-    onError: (err: Error) => {
-      setError(err.message || 'Failed to create school. Please try again.')
+    onError: (err: any) => {
+      console.error(err)
+      setError(err.message || 'Failed to create school')
     },
   })
 
-  // Auto-generate code from name
+  // Auto-generate code
   useEffect(() => {
-    if (formData.name && !formData.code) {
-      const code = formData.name
+    if (schoolName && !schoolCode) {
+      const code = schoolName
         .split(' ')
         .map(word => word.charAt(0))
         .join('')
         .toUpperCase()
         .slice(0, 5)
-      setFormData(prev => ({ ...prev, code }))
+      setValue('schoolCode', code)
     }
-  }, [formData.name])
+  }, [schoolName, schoolCode, setValue])
 
-  const updateField = useCallback((field: keyof SchoolFormData, value: unknown) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    if (fieldErrors[field]) {
-      setFieldErrors(prev => ({ ...prev, [field]: undefined }))
-    }
-    if (error) setError(null)
-  }, [fieldErrors, error])
 
-  // Validation functions
-  const validateBasicInfo = (): boolean => {
-    const errors: Partial<Record<keyof SchoolFormData, string>> = {}
-    if (!formData.name.trim()) errors.name = 'School name is required'
-    if (!formData.code.trim()) errors.code = 'School code is required'
-    if (formData.code.length > 10) errors.code = 'Code must be 10 characters or less'
-    setFieldErrors(prev => ({ ...prev, ...errors }))
-    return Object.keys(errors).length === 0
-  }
 
-  const validateLocation = (): boolean => {
-    const errors: Partial<Record<keyof SchoolFormData, string>> = {}
-    if (!formData.street1.trim()) errors.street1 = 'Address is required'
-    if (!formData.city.trim()) errors.city = 'City is required'
-    if (!formData.state.trim()) errors.state = 'State is required'
-    if (!formData.postalCode.trim()) errors.postalCode = 'Postal code is required'
-    setFieldErrors(prev => ({ ...prev, ...errors }))
-    return Object.keys(errors).length === 0
-  }
-
-  const validateContact = (): boolean => {
-    const errors: Partial<Record<keyof SchoolFormData, string>> = {}
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address'
-    }
-    if (formData.phone && !/^[\d\s\-+()]+$/.test(formData.phone)) {
-      errors.phone = 'Please enter a valid phone number'
-    }
-    setFieldErrors(prev => ({ ...prev, ...errors }))
-    return Object.keys(errors).length === 0
-  }
-
-  // Section save handlers
-  const handleSaveBasic = () => {
-    if (validateBasicInfo()) {
+  // Section handlers
+  const handleSaveBasic = async () => {
+    const valid = await trigger(['name', 'schoolCode', 'schoolType'])
+    if (valid) {
       setSections(prev => ({ ...prev, basic: { completed: true, skipped: false } }))
       setOpenSection('location')
     }
   }
 
-  const handleSaveLocation = () => {
-    if (validateLocation()) {
+  const handleSaveLocation = async () => {
+    const valid = await trigger(['address.street1', 'address.city', 'address.state', 'address.zipCode'])
+    if (valid) {
       setSections(prev => ({ ...prev, location: { completed: true, skipped: false } }))
       setOpenSection('contact')
     }
   }
 
-  const handleSaveContact = () => {
-    if (validateContact()) {
+  const handleSaveContact = async () => {
+    const valid = await trigger(['phone', 'email', 'website'])
+    if (valid) {
       setSections(prev => ({ ...prev, contact: { completed: true, skipped: false } }))
-      setOpenSection('hours')
+      setOpenSection('')
     }
   }
 
-  const handleSaveHours = () => {
-    setSections(prev => ({ ...prev, hours: { completed: true, skipped: false } }))
-    setOpenSection('')
-  }
-
-  // Skip handlers
   const handleSkipLocation = () => {
     setSections(prev => ({ ...prev, location: { completed: false, skipped: true } }))
     setOpenSection('contact')
@@ -719,51 +668,21 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
 
   const handleSkipContact = () => {
     setSections(prev => ({ ...prev, contact: { completed: false, skipped: true } }))
-    setOpenSection('hours')
-  }
-
-  const handleSkipHours = () => {
-    setSections(prev => ({ ...prev, hours: { completed: false, skipped: true } }))
     setOpenSection('')
   }
 
-  // Create school
   const handleCreateSchool = () => {
-    if (!sections.basic.completed) {
-      setError('Please complete the Basic Information section')
-      setOpenSection('basic')
-      return
-    }
-
-    const request: CreateSchoolRequest = {
-      name: formData.name.trim(),
-      code: formData.code.trim().toUpperCase(),
-      type: formData.type,
-    }
-
-    // Include location if provided
-    if (sections.location.completed) {
-      request.address = {
-        street1: formData.street1.trim(),
-        street2: formData.street2.trim() || undefined,
-        city: formData.city.trim(),
-        state: formData.state.trim().toUpperCase(),
-        postalCode: formData.postalCode.trim(),
-        country: formData.country,
-      }
-    }
-
-    // Include contact if provided
-    if (sections.contact.completed) {
-      if (formData.phone.trim()) request.phone = formData.phone.trim()
-      if (formData.email.trim()) request.email = formData.email.trim()
-    }
-
-    createMutation.mutate(request)
+    handleSubmit((data) => {
+      createMutation.mutate(data)
+    })()
   }
 
+  // ... Render form using RHF registers
+  // ... Remove Operating Hours section
+
+
   // Day names for operating hours
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
@@ -833,12 +752,11 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                 </label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => updateField('name', e.target.value)}
+                  {...register('name')}
                   placeholder="e.g., Lincoln High School"
-                  className={`w-full px-3.5 py-2.5 rounded-xl border ${fieldErrors.name ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.name ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
                 />
-                {fieldErrors.name && <p className="mt-1 text-xs text-rust-500">{fieldErrors.name}</p>}
+                {errors.name && <p className="mt-1 text-xs text-rust-500">{errors.name.message}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -848,21 +766,19 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                   </label>
                   <input
                     type="text"
-                    value={formData.code}
-                    onChange={(e) => updateField('code', e.target.value.toUpperCase())}
+                    {...register('schoolCode')}
                     placeholder="e.g., LHS"
                     maxLength={10}
-                    className={`w-full px-3.5 py-2.5 rounded-xl border ${fieldErrors.code ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all font-mono`}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.schoolCode ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all font-mono`}
                   />
-                  {fieldErrors.code && <p className="mt-1 text-xs text-rust-500">{fieldErrors.code}</p>}
+                  {errors.schoolCode && <p className="mt-1 text-xs text-rust-500">{errors.schoolCode.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
                     School Type <span className="text-rust-500">*</span>
                   </label>
                   <select
-                    value={formData.type}
-                    onChange={(e) => updateField('type', e.target.value)}
+                    {...register('schoolType')}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
                   >
                     <option value="elementary">Elementary School</option>
@@ -871,6 +787,7 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                     <option value="k12">K-12</option>
                     <option value="other">Other</option>
                   </select>
+                  {errors.schoolType && <p className="mt-1 text-xs text-rust-500">{errors.schoolType.message}</p>}
                 </div>
               </div>
             </div>
@@ -894,12 +811,11 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                 </label>
                 <input
                   type="text"
-                  value={formData.street1}
-                  onChange={(e) => updateField('street1', e.target.value)}
+                  {...register('address.street1')}
                   placeholder="123 Main Street"
-                  className={`w-full px-3.5 py-2.5 rounded-xl border ${fieldErrors.street1 ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.address?.street1 ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
                 />
-                {fieldErrors.street1 && <p className="mt-1 text-xs text-rust-500">{fieldErrors.street1}</p>}
+                {errors.address?.street1 && <p className="mt-1 text-xs text-rust-500">{errors.address.street1.message}</p>}
               </div>
 
               <div>
@@ -908,8 +824,7 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                 </label>
                 <input
                   type="text"
-                  value={formData.street2}
-                  onChange={(e) => updateField('street2', e.target.value)}
+                  {...register('address.street2')}
                   placeholder="Suite 100, Building A"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
                 />
@@ -922,12 +837,11 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                   </label>
                   <input
                     type="text"
-                    value={formData.city}
-                    onChange={(e) => updateField('city', e.target.value)}
+                    {...register('address.city')}
                     placeholder="Springfield"
-                    className={`w-full px-3.5 py-2.5 rounded-xl border ${fieldErrors.city ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.address?.city ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
                   />
-                  {fieldErrors.city && <p className="mt-1 text-xs text-rust-500">{fieldErrors.city}</p>}
+                  {errors.address?.city && <p className="mt-1 text-xs text-rust-500">{errors.address.city.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
@@ -935,37 +849,34 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                   </label>
                   <input
                     type="text"
-                    value={formData.state}
-                    onChange={(e) => updateField('state', e.target.value.toUpperCase())}
+                    {...register('address.state')}
                     placeholder="IL"
                     maxLength={2}
-                    className={`w-full px-3.5 py-2.5 rounded-xl border ${fieldErrors.state ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all font-mono`}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.address?.state ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all font-mono`}
                   />
-                  {fieldErrors.state && <p className="mt-1 text-xs text-rust-500">{fieldErrors.state}</p>}
+                  {errors.address?.state && <p className="mt-1 text-xs text-rust-500">{errors.address.state.message}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                    Postal Code <span className="text-rust-500">*</span>
+                    Zip/Postal Code <span className="text-rust-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={formData.postalCode}
-                    onChange={(e) => updateField('postalCode', e.target.value)}
+                    {...register('address.zipCode')}
                     placeholder="62701"
-                    className={`w-full px-3.5 py-2.5 rounded-xl border ${fieldErrors.postalCode ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.address?.zipCode ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
                   />
-                  {fieldErrors.postalCode && <p className="mt-1 text-xs text-rust-500">{fieldErrors.postalCode}</p>}
+                  {errors.address?.zipCode && <p className="mt-1 text-xs text-rust-500">{errors.address.zipCode.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
                     Country <span className="text-rust-500">*</span>
                   </label>
                   <select
-                    value={formData.country}
-                    onChange={(e) => updateField('country', e.target.value)}
+                    {...register('address.country')}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
                   >
                     <option value="USA">United States</option>
@@ -999,13 +910,12 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                   <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                   <input
                     type="tel"
-                    value={formData.phone}
-                    onChange={(e) => updateField('phone', e.target.value)}
+                    {...register('phone')}
                     placeholder="(555) 123-4567"
-                    className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl border ${fieldErrors.phone ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                    className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl border ${errors.phone ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
                   />
                 </div>
-                {fieldErrors.phone && <p className="mt-1 text-xs text-rust-500">{fieldErrors.phone}</p>}
+                {errors.phone && <p className="mt-1 text-xs text-rust-500">{errors.phone.message}</p>}
               </div>
 
               <div>
@@ -1016,13 +926,12 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                   <input
                     type="email"
-                    value={formData.email}
-                    onChange={(e) => updateField('email', e.target.value)}
+                    {...register('email')}
                     placeholder="office@school.edu"
-                    className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl border ${fieldErrors.email ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                    className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl border ${errors.email ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
                   />
                 </div>
-                {fieldErrors.email && <p className="mt-1 text-xs text-rust-500">{fieldErrors.email}</p>}
+                {errors.email && <p className="mt-1 text-xs text-rust-500">{errors.email.message}</p>}
               </div>
 
               <div>
@@ -1033,103 +942,21 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                   <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                   <input
                     type="url"
-                    value={formData.website}
-                    onChange={(e) => updateField('website', e.target.value)}
+                    {...register('website')}
                     placeholder="https://school.edu"
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500 bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all"
                   />
                 </div>
+                {errors.website && <p className="mt-1 text-xs text-rust-500">{errors.website.message}</p>}
               </div>
             </div>
           </CollapsibleSection>
 
-          {/* Operating Hours */}
-          <CollapsibleSection
-            title="Operating Hours"
-            description="School operating hours (Mon-Fri)"
-            icon={Clock}
-            isOpen={openSection === 'hours'}
-            onToggle={() => setOpenSection(openSection === 'hours' ? '' : 'hours')}
-            status={sections.hours}
-            onSave={handleSaveHours}
-            onSkip={handleSkipHours}
-          >
-            <div className="space-y-3">
-              <p className="text-sm text-[rgb(var(--text-tertiary))] mb-4">
-                Set the default operating hours for this school. These can be customized later in school configuration.
-              </p>
-              
-              {formData.operatingHours.map((day, index) => (
-                <div 
-                  key={day.dayOfWeek} 
-                  className={`flex items-center gap-4 p-3 rounded-xl ${
-                    day.isOpen 
-                      ? 'bg-[rgb(var(--surface-tertiary))]' 
-                      : 'bg-slate-500/5'
-                  }`}
-                >
-                  <div className="w-24">
-                    <span className={`text-sm font-medium ${
-                      day.isOpen 
-                        ? 'text-[rgb(var(--text-primary))]' 
-                        : 'text-[rgb(var(--text-tertiary))]'
-                    }`}>
-                      {dayNames[day.dayOfWeek]}
-                    </span>
-                  </div>
-                  
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={day.isOpen}
-                      onChange={(e) => {
-                        const newHours = [...formData.operatingHours]
-                        newHours[index] = {
-                          ...newHours[index],
-                          isOpen: e.target.checked,
-                          openTime: e.target.checked ? '08:00' : undefined,
-                          closeTime: e.target.checked ? '16:00' : undefined,
-                        }
-                        updateField('operatingHours', newHours)
-                      }}
-                      className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/40"
-                    />
-                    <span className="text-sm text-[rgb(var(--text-secondary))]">Open</span>
-                  </label>
 
-                  {day.isOpen && (
-                    <div className="flex items-center gap-2 ml-auto">
-                      <input
-                        type="time"
-                        value={day.openTime || '08:00'}
-                        onChange={(e) => {
-                          const newHours = [...formData.operatingHours]
-                          newHours[index] = { ...newHours[index], openTime: e.target.value }
-                          updateField('operatingHours', newHours)
-                        }}
-                        className="px-2 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
-                      />
-                      <span className="text-[rgb(var(--text-tertiary))]">to</span>
-                      <input
-                        type="time"
-                        value={day.closeTime || '16:00'}
-                        onChange={(e) => {
-                          const newHours = [...formData.operatingHours]
-                          newHours[index] = { ...newHours[index], closeTime: e.target.value }
-                          updateField('operatingHours', newHours)
-                        }}
-                        className="px-2 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CollapsibleSection>
 
           {/* Inherited Settings Preview */}
-          <InheritedSettingsPreview 
-            settings={workspaceSettings} 
+          <InheritedSettingsPreview
+            settings={workspaceSettings}
             isLoading={loadingSettings}
           />
         </div>
@@ -1152,7 +979,7 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
 
               <button
                 onClick={handleCreateSchool}
-                disabled={!sections.basic.completed || createMutation.isPending}
+                disabled={!isValid || createMutation.isPending}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-medium shadow-lg shadow-teal-500/20 hover:from-teal-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {createMutation.isPending ? (
@@ -1201,6 +1028,10 @@ function SchoolCard({ school, onDelete }: SchoolCardProps) {
   }
 
   const handleNavigate = () => {
+    if (!school.id) {
+      console.error('School ID is undefined', school)
+      return
+    }
     navigate({ to: '/settings/schools/$schoolId', params: { schoolId: school.id } })
   }
 
@@ -1350,7 +1181,12 @@ export default function SchoolsSettingsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (schoolId: string) => tenantService.deleteSchool(schoolId),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      // Optimistically update the list to remove the deleted school
+      queryClient.setQueryData(['schools', user.tenantId], (oldData: SchoolType[] | undefined) => {
+        if (!oldData) return oldData
+        return oldData.filter((school) => school.id !== variables)
+      })
       queryClient.invalidateQueries({ queryKey: ['schools', user.tenantId] })
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
@@ -1429,8 +1265,8 @@ export default function SchoolsSettingsPage() {
           </AnimatePresence>
         </div>
 
-        <EmptyState 
-          onCreateSchool={handleCreateSchool} 
+        <EmptyState
+          onCreateSchool={handleCreateSchool}
           isTenantAdmin={isTenantAdmin}
         />
       </>

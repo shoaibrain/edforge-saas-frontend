@@ -15,6 +15,3 @@ export {
   type ModalFooterProps,
 } from './BaseModal'
 
-export { QuickAddPersonModal } from './QuickAddPersonModal'
-export { InviteTeamModal } from './InviteTeamModal'
-

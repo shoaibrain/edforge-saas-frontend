@@ -1,13 +1,8 @@
-/**
- * RBAC Security Page
- * 
- * Role-Based Access Control management for tenant administrators.
- * Provides overview of roles, permissions, and user assignments.
- */
-
+// ... imports
 import { useState } from 'react'
-import { Navigate } from '@tanstack/react-router'
+import { Navigate, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import {
   Shield,
   Users,
@@ -22,11 +17,13 @@ import {
   UserPlus,
   Settings,
 } from 'lucide-react'
-import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { ROLE_PERMISSIONS } from '@edforge/abac'
 import type { SchoolRole } from '@edforge/types'
+import { usersService } from '@/services/users.service'
+import AssignUserModal from '@/components/modals/AssignUserModal'
 import {
   SettingsPageHeader,
   SettingsSection,
@@ -102,14 +99,6 @@ const SYSTEM_ROLES: RoleInfo[] = [
   },
 ]
 
-// Mock user assignments for display
-const MOCK_USER_ASSIGNMENTS = [
-  { userId: 'user-001', userName: 'Sarah Chen', userEmail: 'admin@edforge.com', schoolId: 'school-001', roleName: 'Principal' },
-  { userId: 'user-002', userName: 'James Wilson', userEmail: 'principal@lincoln.edu', schoolId: 'school-001', roleName: 'Principal' },
-  { userId: 'user-003', userName: 'Emily Rodriguez', userEmail: 'teacher@lincoln.edu', schoolId: 'school-001', roleName: 'Teacher' },
-  { userId: 'user-004', userName: 'Michael Park', userEmail: 'finance@edforge.com', schoolId: 'school-001', roleName: 'Accountant' },
-]
-
 // ============================================================================
 // ROLE CARD COMPONENT
 // ============================================================================
@@ -156,41 +145,6 @@ function RoleCard({ role, onViewDetails }: RoleCardProps) {
         <ChevronRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] group-hover:translate-x-0.5 transition-all" />
       </div>
     </motion.button>
-  )
-}
-
-// ============================================================================
-// USER ASSIGNMENT ROW
-// ============================================================================
-
-interface UserAssignmentRowProps {
-  assignment: typeof MOCK_USER_ASSIGNMENTS[0]
-}
-
-function UserAssignmentRow({ assignment }: UserAssignmentRowProps) {
-  const school = MOCK_SCHOOLS[assignment.schoolId]
-
-  return (
-    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-medium">
-          {assignment.userName.charAt(0)}
-        </div>
-        <div>
-          <p className="font-medium text-[rgb(var(--text-primary))]">{assignment.userName}</p>
-          <p className="text-sm text-[rgb(var(--text-tertiary))]">{assignment.userEmail}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <div className="text-right">
-          <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">{assignment.roleName}</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))]">{school?.name}</p>
-        </div>
-        <button className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors">
-          <Edit className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
   )
 }
 
@@ -251,6 +205,15 @@ export default function RBACSecurityPage() {
   const { activeSchoolId } = useAppStore.getState()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTab, setSelectedTab] = useState<'roles' | 'users' | 'audit'>('roles')
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
+
+  // Fetch Users
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['users', 'list', searchQuery], // Include searchQuery if we implement server-side search
+    queryFn: () => usersService.listUsers(50),
+    staleTime: 5 * 60 * 1000,
+  })
+
 
   if (!user) {
     return <Navigate to="/login" />
@@ -266,8 +229,18 @@ export default function RBACSecurityPage() {
     return <AccessDenied message="You don't have permission to manage access policies." />
   }
 
+  const filteredUsers = usersData?.items.filter(u =>
+    `${u.firstName} ${u.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.email.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || []
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
+      <AssignUserModal
+        isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+      />
+
       <motion.div
         initial="hidden"
         animate="visible"
@@ -296,8 +269,8 @@ export default function RBACSecurityPage() {
                 onClick={() => setSelectedTab(tab.id as typeof selectedTab)}
                 className={`
                   flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
-                  ${isActive 
-                    ? 'bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] shadow-sm' 
+                  ${isActive
+                    ? 'bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] shadow-sm'
                     : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
                   }
                 `}
@@ -380,7 +353,10 @@ export default function RBACSecurityPage() {
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
                 />
               </div>
-              <button className="px-4 py-2.5 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors inline-flex items-center gap-2">
+              <button
+                onClick={() => setIsAssignModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors inline-flex items-center gap-2"
+              >
                 <UserPlus className="w-4 h-4" />
                 Assign User
               </button>
@@ -388,12 +364,45 @@ export default function RBACSecurityPage() {
 
             {/* User List */}
             <div className="space-y-1">
-              {MOCK_USER_ASSIGNMENTS.filter((a) =>
-                a.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                a.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((assignment) => (
-                <UserAssignmentRow key={`${assignment.userId}-${assignment.schoolId}`} assignment={assignment} />
-              ))}
+              {isLoadingUsers ? (
+                <div className="py-8 text-center text-[rgb(var(--text-secondary))]">Loading users...</div>
+              ) : filteredUsers.length === 0 ? (
+                <div className="py-8 text-center text-[rgb(var(--text-secondary))]">No users found.</div>
+              ) : (
+                filteredUsers.map((user) => (
+                  <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-medium">
+                        {user.firstName?.charAt(0) || user.email.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-[rgb(var(--text-primary))]">{user.firstName} {user.lastName}</p>
+                        <p className="text-sm text-[rgb(var(--text-tertiary))]">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">{user.globalRole === 'TenantAdmin' ? 'Tenant Admin' : 'Standard User'}</p>
+                        {/* NOTE: We don't have assignment details in listUsers yet. 
+                              Displaying placeholder or fetching details would be next step. 
+                              For now, we show the global role and 'Details' button. 
+                           */}
+                        <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                          {/* Placeholder for school name or count of assignments */}
+                          Click Details to view assignments
+                        </p>
+                      </div>
+                      <Link
+                        to="/people/$"
+                        params={{ _splat: `staff/${user.userId}` }}
+                        className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </SettingsSection>
         )}

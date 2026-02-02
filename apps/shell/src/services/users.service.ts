@@ -63,6 +63,38 @@ export interface UpdateUserDto {
   status?: 'active' | 'inactive' | 'suspended'
 }
 
+/**
+ * Assign role request DTO
+ */
+export interface AssignRoleDto {
+  schoolId: string
+  role: string
+  departmentId?: string
+  expiresAt?: string
+  permissionOverrides?: any[]
+}
+
+/**
+ * Create user request DTO
+ */
+export interface CreateUserDto {
+  email: string
+  firstName: string
+  lastName: string
+  middleName?: string
+  phone?: string
+  globalRole?: GlobalRole
+}
+
+/**
+ * User list response DTO
+ */
+export interface UserListResponseDto {
+  items: UserResponseDto[]
+  lastEvaluatedKey?: string
+  hasMore: boolean
+}
+
 // ============================================================================
 // NOTIFICATION TYPES
 // ============================================================================
@@ -165,9 +197,9 @@ export interface UserPreferences {
 function normalizePreferences(raw: RawUserPreferencesResponse): UserPreferences {
   // Check if notifications is in flat format (backend) vs nested format (frontend)
   const rawNotifications = raw.notifications as any
-  
+
   let notifications: NotificationSettings
-  
+
   if (rawNotifications?.channels) {
     // Already in nested format
     notifications = rawNotifications as NotificationSettings
@@ -237,13 +269,13 @@ export interface UpdatePreferencesDto {
  */
 function flattenPreferencesForBackend(data: UpdatePreferencesDto): any {
   if (!data.notifications) return data
-  
+
   const { channels } = data.notifications as Partial<NotificationSettings>
   if (!channels) return data
-  
+
   // Convert nested structure to flat structure
   const flatNotifications: Record<string, unknown> = {}
-  
+
   if (channels.email !== undefined) {
     flatNotifications.email = channels.email.enabled
     if (channels.email.digest) {
@@ -256,7 +288,7 @@ function flattenPreferencesForBackend(data: UpdatePreferencesDto): any {
   if (channels.sms !== undefined) {
     flatNotifications.sms = channels.sms.enabled
   }
-  
+
   return {
     ...data,
     notifications: flatNotifications
@@ -360,6 +392,36 @@ export async function getUser(userId: string): Promise<UserResponseDto> {
 }
 
 /**
+ * List users
+ * GET /users
+ */
+export async function listUsers(
+  limit: number = 20,
+  cursor?: string
+): Promise<UserListResponseDto> {
+  const params: Record<string, any> = { limit }
+  if (cursor) params.cursor = cursor
+
+  return apiGet<UserListResponseDto>('/users', params)
+}
+
+/**
+ * Create user
+ * POST /users
+ */
+export async function createUser(data: CreateUserDto): Promise<UserResponseDto> {
+  return apiPost<UserResponseDto, CreateUserDto>('/users', data)
+}
+
+/**
+ * Assign role to user
+ * POST /users/:id/roles
+ */
+export async function assignRole(userId: string, data: AssignRoleDto): Promise<void> {
+  return apiPost(`/users/${userId}/roles`, data)
+}
+
+/**
  * Update user profile
  * PATCH /users/:id
  */
@@ -391,7 +453,7 @@ export async function updatePreferences(
 ): Promise<UserPreferences> {
   // Flatten nested notifications to backend's expected flat format
   const flattenedData = flattenPreferencesForBackend(data)
-  
+
   const raw = await apiPatch<RawUserPreferencesResponse, typeof flattenedData>(
     `/users/${userId}/preferences`,
     flattenedData
@@ -429,7 +491,7 @@ export async function uploadAvatar(
 ): Promise<UserResponseDto> {
   // Get presigned URL
   const { uploadUrl, avatarUrl } = await getAvatarUploadUrl(userId, file.type)
-  
+
   // Upload to S3
   await fetch(uploadUrl, {
     method: 'PUT',
@@ -438,7 +500,7 @@ export async function uploadAvatar(
       'Content-Type': file.type,
     },
   })
-  
+
   // Update user profile with new avatar URL
   return updateUser(userId, { avatarUrl })
 }
@@ -554,17 +616,20 @@ export async function getLoginHistory(
 export const usersService = {
   // User profile
   getUser,
+  listUsers,
+  createUser,
+  assignRole,
   updateUser,
-  
+
   // Preferences
   getPreferences,
   updatePreferences,
-  
+
   // Avatar
   getAvatarUploadUrl,
   uploadAvatar,
   removeAvatar,
-  
+
   // Security
   getSecurityOverview,
   changePassword,

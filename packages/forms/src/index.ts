@@ -64,7 +64,6 @@ export {
   optionalUrlSchema,
   // Person
   personTypeSchema,
-  quickAddPersonSchema,
   personalInfoSchema,
   contactAddressSchema,
   personSchema,
@@ -80,8 +79,6 @@ export {
   type ContactInfoOutput,
   type Gender,
   type PersonType,
-  type QuickAddPersonInput,
-  type QuickAddPersonOutput,
   type PersonalInfoInput,
   type PersonalInfoOutput,
   type ContactAddressInput,

@@ -33,7 +33,6 @@ export {
 // Person schemas
 export {
   personTypeSchema,
-  quickAddPersonSchema,
   personalInfoSchema,
   contactAddressSchema,
   personSchema,
@@ -43,8 +42,6 @@ export {
   guardianSchema,
   PERSON_TYPE_OPTIONS,
   type PersonType,
-  type QuickAddPersonInput,
-  type QuickAddPersonOutput,
   type PersonalInfoInput,
   type PersonalInfoOutput,
   type ContactAddressInput,

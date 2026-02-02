@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
-import { QuickAddPersonModal, InviteTeamModal } from '../modals'
 import { useAppStore } from '../../stores/app.store'
 import { useAuthStore } from '../../stores/auth.store'
 import { useRouteFocus, useRouteAnnouncement } from '../../hooks/useFocusManagement'
@@ -73,10 +72,6 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </motion.div>
-
-      {/* Global Modals */}
-      <QuickAddPersonModal />
-      <InviteTeamModal />
     </div>
   )
 }

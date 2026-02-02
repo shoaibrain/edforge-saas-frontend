@@ -10,7 +10,7 @@
  * Integrates with AWS Cognito and backend APIs for real data.
  */
 
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
 import type { UserIdentity, Tenant, School, SchoolYear } from '@edforge/types'
@@ -168,12 +168,25 @@ export function ShellProvider({ children }: ShellProviderProps) {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // Update user with fetched assignments
+  // Track if we've already synced assignments for this userProfile
+  // This prevents infinite loops when setUser updates the user object
+  const lastSyncedAssignmentsRef = useRef<string | null>(null)
+
+  // Update user with fetched assignments - only when assignments actually change
   useEffect(() => {
-    if (userProfile && user) {
+    if (!userProfile || !user) return
+
+    // Create a stable key from the assignments to detect actual changes
+    const assignmentsKey = userProfile.assignments
+      ? JSON.stringify(userProfile.assignments.map(a => `${a.schoolId}:${a.role}`).sort())
+      : null
+
+    // Only update if assignments have actually changed
+    if (assignmentsKey && assignmentsKey !== lastSyncedAssignmentsRef.current) {
+      lastSyncedAssignmentsRef.current = assignmentsKey
       setUser(user, userProfile.assignments)
     }
-  }, [userProfile, user, setUser])
+  }, [userProfile, setUser]) // Intentionally exclude 'user' to prevent infinite loop
 
   // Fetch tenant data
   const { data: tenant, isLoading: isTenantLoading } = useQuery({

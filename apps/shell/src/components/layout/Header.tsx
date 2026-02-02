@@ -1,10 +1,8 @@
-import { useState, Fragment, useMemo, useCallback } from 'react'
-import { useNavigate, useLocation } from '@tanstack/react-router'
+import { Fragment } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
-import { motion } from 'framer-motion'
 import {
   Bell,
-  Plus,
   User,
   Settings,
   FileText,
@@ -13,294 +11,12 @@ import {
   Monitor,
   LogOut,
   HelpCircle,
-  Sparkles,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
-import { useAppStore } from '../../stores/app.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
-import { useQuickAddPersonModal, useInviteTeamModal, useAddClassroomModal, useAddGradeLevelModal } from '../../stores/modal.store'
 import { Avatar } from '@edforge/ui'
 
 import { Breadcrumbs } from './Breadcrumbs'
-import {
-  ADD_NEW_OPTIONS,
-  getOptionsGroupedByCategory,
-  getContextAwareOptions,
-  type AddNewOption,
-} from '../../config/add-new-options'
-import { can, type Action, type Resource } from '@edforge/abac'
-import { cn } from '../../lib/utils'
-
-
-
-// ============================================================================
-// ADD NEW DROPDOWN - ENHANCED WITH CONTEXT AWARENESS
-// ============================================================================
-
-function AddNewOptionItem({
-  option,
-  isHighlighted,
-  onSelect
-}: {
-  option: AddNewOption
-  isHighlighted?: boolean
-  onSelect: (option: AddNewOption) => void
-}) {
-  const [hovered, setHovered] = useState(false)
-
-  const Icon = option.icon
-
-  return (
-    <MenuItem>
-      {({ active }) => (
-        <motion.button
-          animate={{
-            x: hovered ? 4 : 0,
-            scale: hovered ? 1.02 : 1,
-          }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-          onClick={() => onSelect(option)}
-          className={cn(
-            'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
-            active && 'bg-[rgb(var(--interactive-hover))]',
-            isHighlighted && 'bg-teal-500/5 dark:bg-cyan-500/5'
-          )}
-        >
-          <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0', option.iconBg)}>
-            <Icon className={cn('w-4.5 h-4.5', option.iconColor)} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{option.label}</p>
-              {isHighlighted && (
-                <Sparkles className="w-3 h-3 text-golden-500" />
-              )}
-            </div>
-            <p className="text-xs text-[rgb(var(--text-tertiary))]">{option.description}</p>
-          </div>
-          {option.shortcut && (
-            <kbd className="hidden lg:flex items-center px-2 py-1 text-[10px] font-semibold bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-md text-[rgb(var(--text-tertiary))]">
-              {option.shortcut}
-            </kbd>
-          )}
-        </motion.button>
-      )}
-    </MenuItem>
-  )
-}
-
-function AddNewDropdown() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const user = useAuthStore((s) => s.user)
-  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-
-  // Modal hooks
-  const quickAddModal = useQuickAddPersonModal()
-  const inviteModal = useInviteTeamModal()
-  const classroomModal = useAddClassroomModal()
-  const gradeLevelModal = useAddGradeLevelModal()
-
-  // Check permission helper
-  const hasPermission = useCallback((action: Action, resource: Resource) => {
-    return can(user, { action, resource, schoolId: activeSchoolId || undefined })
-  }, [user, activeSchoolId])
-
-  // Filter options based on permissions and active school
-  const filteredOptions = useMemo(() => {
-    return ADD_NEW_OPTIONS.filter((option) => {
-      // Check permission
-      if (option.permission) {
-        if (!hasPermission(option.permission.action, option.permission.resource)) {
-          return false
-        }
-      }
-      // Check if requires active school
-      if (option.requiresActiveSchool && !activeSchoolId) {
-        return false
-      }
-      return true
-    })
-  }, [hasPermission, activeSchoolId])
-
-  // Get context-aware options
-  const { highlighted, other } = useMemo(() => {
-    return getContextAwareOptions(filteredOptions, location.pathname)
-  }, [filteredOptions, location.pathname])
-
-  // Group remaining options by category
-  const groupedOptions = useMemo(() => {
-    return getOptionsGroupedByCategory(other)
-  }, [other])
-
-  // Handle option selection
-  const handleSelect = (option: AddNewOption) => {
-    switch (option.actionType) {
-      case 'quick-add-person':
-        quickAddModal.open({
-          personType: option.actionData?.personType as any,
-        })
-        break
-      case 'invite':
-        inviteModal.open()
-        break
-      case 'modal':
-        if (option.id === 'new-classroom') {
-          classroomModal.open()
-        } else if (option.id === 'new-grade-level') {
-          gradeLevelModal.open()
-        }
-        // TODO: Handle other modal types
-        break
-      case 'wizard':
-        navigate({
-          to: '/people/new',
-          search: {
-            type: option.actionData?.personType as 'student' | 'teacher' | 'staff' | 'guardian'
-          }
-        } as any)
-        break
-    }
-  }
-
-  return (
-    <Menu as="div" className="relative">
-      {({ open }) => (
-        <>
-          <MenuButton className={cn(
-            'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-xl',
-            'bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]',
-            'border border-[rgb(var(--border-primary))]',
-            'hover:bg-[rgb(var(--surface-tertiary))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-secondary))]',
-            'shadow-sm hover:shadow-md',
-            open && 'ring-2 ring-[rgb(var(--interactive-focus))] ring-offset-1 bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))]'
-          )}>
-            <Plus className={cn('w-4 h-4 transition-transform duration-200 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))]', open && 'rotate-45')} />
-            <span className="hidden sm:inline">Add New</span>
-          </MenuButton>
-
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-200"
-            enterFrom="opacity-0 scale-95 translate-y-2"
-            enterTo="opacity-100 scale-100 translate-y-0"
-            leave="transition ease-in duration-150"
-            leaveFrom="opacity-100 scale-100 translate-y-0"
-            leaveTo="opacity-0 scale-95 translate-y-2"
-          >
-            <MenuItems className="absolute right-0 mt-2 w-[550px] origin-top-right rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-ink-500/15 dark:shadow-black/30 z-50 overflow-hidden outline-none">
-
-              {/* Highlighted/Suggested (Full Width) */}
-              {highlighted.length > 0 && (
-                <div className="bg-[rgb(var(--surface-tertiary))] border-b border-[rgb(var(--border-secondary))] p-2">
-                  <div className="px-3 py-2 flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-golden-500" />
-                    <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                      Suggested for this page
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {highlighted.map((option) => (
-                      <AddNewOptionItem
-                        key={option.id}
-                        option={option}
-                        isHighlighted
-                        onSelect={handleSelect}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Main Grid Content */}
-              {filteredOptions.length > 0 ? (
-                <div className="grid grid-cols-2 divide-x divide-[rgb(var(--border-secondary))]">
-
-                  {/* Left Column: People */}
-                  <div className="p-2">
-                    <div className="px-4 py-2 mb-1">
-                      <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                        People
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      {(groupedOptions.get('people') || []).map((option) => (
-                        <AddNewOptionItem
-                          key={option.id}
-                          option={option}
-                          onSelect={handleSelect}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Right Column: Academic & Administrative */}
-                  <div className="p-2 bg-[rgb(var(--surface-primary))]/50">
-                    <div className="space-y-4">
-                      {/* Academic */}
-                      <div>
-                        <div className="px-4 py-2 mb-1">
-                          <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                            Academic
-                          </span>
-                        </div>
-                        <div className="space-y-1">
-                          {(groupedOptions.get('academic') || []).map((option) => (
-                            <AddNewOptionItem
-                              key={option.id}
-                              option={option}
-                              onSelect={handleSelect}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Administrative */}
-                      {(groupedOptions.get('administrative') || []).length > 0 && (
-                        <div>
-                          <div className="px-4 py-2 mb-1 border-t border-[rgb(var(--border-secondary))] pt-4">
-                            <span className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                              Administrative
-                            </span>
-                          </div>
-                          <div className="space-y-1">
-                            {(groupedOptions.get('administrative') || []).map((option) => (
-                              <AddNewOptionItem
-                                key={option.id}
-                                option={option}
-                                onSelect={handleSelect}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                </div>
-              ) : (
-                /* Empty State */
-                <div className="px-4 py-12 text-center">
-                  <div className="w-12 h-12 rounded-xl bg-[rgb(var(--surface-tertiary))] flex items-center justify-center mx-auto mb-3">
-                    <Plus className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
-                  </div>
-                  <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                    {activeSchoolId
-                      ? 'No actions available for your role'
-                      : 'Select a school to add items'
-                    }
-                  </p>
-                </div>
-              )}
-            </MenuItems>
-          </Transition>
-        </>
-      )}
-    </Menu>
-  )
-}
 
 // ============================================================================
 // USER MENU WITH THEME PICKER
@@ -454,9 +170,6 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
-
-
-
   return (
     <>
       <header
@@ -470,8 +183,6 @@ export function Header() {
 
         {/* Right Section - All header actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
-
-
           {/* Documentation */}
           <button
             className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
@@ -479,8 +190,6 @@ export function Header() {
           >
             <FileText className="w-5 h-5" />
           </button>
-
-          <AddNewDropdown />
 
           {/* Notifications */}
           <button
@@ -495,9 +204,6 @@ export function Header() {
           <UserMenu />
         </div>
       </header>
-
-
-
     </>
   )
 }

@@ -8,7 +8,7 @@
  * - Notion-style page cards with icon, title, and timestamp
  */
 
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react'
@@ -324,10 +324,10 @@ function CarouselCore({ cards, cardType }: CarouselCoreProps) {
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
   }, [])
 
-  // Check on mount
+  // Check on mount and when card count changes
   useEffect(() => {
     checkScrollPosition()
-  }, [checkScrollPosition, cards])
+  }, [checkScrollPosition, cards.length])
 
   // Smooth scroll with easing
   const smoothScroll = useCallback((direction: 'left' | 'right') => {
@@ -522,23 +522,26 @@ export function RecentlyVisitedWidget() {
   const { recentPages } = useRecentlyVisited()
 
   // Use extended mock data if less than 3 real pages
-  const pages = recentPages.length >= 3
+  const pages: VisitedPage[] = recentPages.length >= 3
     ? recentPages
     : (() => {
-      const existingPaths = new Set(recentPages.map(p => p.path))
-      const mockToAdd = EXTENDED_MOCK_PAGES.filter(p => !existingPaths.has(p.path))
+      const existingPaths = new Set(recentPages.map((p: VisitedPage) => p.path))
+      const mockToAdd = EXTENDED_MOCK_PAGES.filter((p: VisitedPage) => !existingPaths.has(p.path))
       return [...recentPages, ...mockToAdd].slice(0, 10)
     })()
 
-  // Convert to CarouselCard format
-  const cards: CarouselCard[] = pages.map((page) => ({
-    id: page.path,
-    title: page.title,
-    subtitle: formatRelativeDate(new Date(page.visitedAt)),
-    icon: page.icon,
-    href: page.path,
-    module: page.module,
-  }))
+  // Convert to CarouselCard format - memoized to prevent infinite re-renders
+  const cards: CarouselCard[] = useMemo(() => 
+    pages.map((page: VisitedPage) => ({
+      id: page.path,
+      title: page.title,
+      subtitle: formatRelativeDate(new Date(page.visitedAt)),
+      icon: page.icon,
+      href: page.path,
+      module: page.module,
+    })),
+    [pages]
+  )
 
   return (
     <WidgetSection

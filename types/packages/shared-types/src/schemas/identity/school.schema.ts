@@ -32,7 +32,7 @@ export const schoolStatusSchema = z.enum([
 ]);
 export type SchoolStatus = z.infer<typeof schoolStatusSchema>;
 
-export const academicCalendarTypeSchema = z.enum(['semester', 'quarter', 'trimester']);
+export const academicCalendarTypeSchema = z.enum(['semester', 'quarter', 'trimester', 'year']);
 export type AcademicCalendarType = z.infer<typeof academicCalendarTypeSchema>;
 
 // ============================================

@@ -5,7 +5,7 @@
  * Academic years are critical temporal boundaries for all school data.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -18,10 +18,16 @@ import {
   Lock,
   CalendarDays,
   Milestone,
+  Edit,
+  Trash2,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
-import { tenantService } from '@/services/tenant.service'
+import { tenantService, type CreateGradingPeriodDto } from '@/services/tenant.service'
 import type { Term } from '@edforge/types'
+import type {
+  CreateAcademicYearDto,
+  UpdateAcademicYearDto,
+} from '@edforge/shared-types'
 import {
   SettingsSection,
   SettingsAlert,
@@ -31,7 +37,7 @@ import {
 import { Button } from '@edforge/ui'
 
 // ============================================================================
-// LOCAL TYPES (until @edforge/types is rebuilt)
+// LOCAL TYPES
 // ============================================================================
 
 type AcademicYearStatus = 'planning' | 'active' | 'completed'
@@ -53,12 +59,10 @@ interface AcademicYear {
   updatedAt: string
 }
 
-interface CreateAcademicYearDto {
+// Extended type for internal use that includes schoolId (for routing) and generated terms
+interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
   schoolId: string
-  name: string
-  startDate: string
-  endDate: string
-  terms?: Omit<Term, 'id'>[]
+  generatedTerms?: CreateGradingPeriodDto[]
 }
 
 // ============================================================================
@@ -101,7 +105,7 @@ interface TimelineVisualizationProps {
 }
 
 function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
-  const sortedYears = [...academicYears].sort((a, b) => 
+  const sortedYears = [...academicYears].sort((a, b) =>
     new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   )
 
@@ -136,8 +140,8 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
               {/* Year card */}
               <div className={`
                 flex-1 p-4 rounded-xl border transition-all
-                ${isActive 
-                  ? 'bg-teal-500/5 border-teal-500/30 shadow-sm' 
+                ${isActive
+                  ? 'bg-teal-500/5 border-teal-500/30 shadow-sm'
                   : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
                 }
               `}>
@@ -180,7 +184,7 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
 interface CreateAcademicYearModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: CreateAcademicYearDto) => void
+  onSubmit: (data: CreateAcademicYearWithTerms) => void
   isLoading: boolean
   schoolId: string
 }
@@ -191,7 +195,8 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
   const [endDate, setEndDate] = useState('')
   const [termStructure, setTermStructure] = useState<'semester' | 'trimester' | 'quarter'>('semester')
 
-  const generateTerms = (): Omit<Term, 'id'>[] => {
+  // Generate grading period DTOs that match backend schema
+  const generateGradingPeriods = (): CreateGradingPeriodDto[] => {
     if (!startDate || !endDate) return []
 
     const start = new Date(startDate)
@@ -199,31 +204,33 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
     const totalDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
 
     const termConfigs = {
-      semester: { count: 2, names: ['Fall Semester', 'Spring Semester'] },
-      trimester: { count: 3, names: ['Fall Trimester', 'Winter Trimester', 'Spring Trimester'] },
-      quarter: { count: 4, names: ['Q1', 'Q2', 'Q3', 'Q4'] },
+      semester: { count: 2, names: ['Fall Semester', 'Spring Semester'], shortNames: ['Fall', 'Spring'] },
+      trimester: { count: 3, names: ['Fall Trimester', 'Winter Trimester', 'Spring Trimester'], shortNames: ['T1', 'T2', 'T3'] },
+      quarter: { count: 4, names: ['Q1', 'Q2', 'Q3', 'Q4'], shortNames: ['Q1', 'Q2', 'Q3', 'Q4'] },
     }
 
     const config = termConfigs[termStructure]
     const daysPerTerm = Math.floor(totalDays / config.count)
 
-    return config.names.map((name, index) => {
+    return config.names.map((periodName, index) => {
       const termStart = new Date(start)
       termStart.setDate(termStart.getDate() + (index * daysPerTerm))
-      
+
       const termEnd = new Date(termStart)
       termEnd.setDate(termEnd.getDate() + daysPerTerm - 1)
-      
+
       // Last term ends on the year end date
       if (index === config.count - 1) {
         termEnd.setTime(end.getTime())
       }
 
       return {
-        name,
+        name: periodName,
+        shortName: config.shortNames[index],
+        termType: termStructure,
+        sequence: index + 1,
         startDate: termStart.toISOString().split('T')[0],
         endDate: termEnd.toISOString().split('T')[0],
-        type: termStructure,
       }
     })
   }
@@ -235,7 +242,8 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
       name,
       startDate,
       endDate,
-      terms: generateTerms(),
+      calendarType: termStructure,
+      generatedTerms: generateGradingPeriods(),
     })
   }
 
@@ -251,7 +259,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
         className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6"
       >
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Create Academic Year</h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
@@ -310,8 +318,8 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
                   onClick={() => setTermStructure(option.value as typeof termStructure)}
                   className={`
                     p-3 rounded-xl border-2 text-center transition-all
-                    ${termStructure === option.value 
-                      ? 'border-teal-500 bg-teal-500/5' 
+                    ${termStructure === option.value
+                      ? 'border-teal-500 bg-teal-500/5'
                       : 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
                     }
                   `}
@@ -329,7 +337,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
           <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
             <AlertCircle className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              The academic year will be created in "Planning" status. 
+              The academic year will be created in "Planning" status.
               You can activate it when ready. Once active, dates cannot be changed.
             </p>
           </div>
@@ -349,6 +357,157 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
             >
               {isLoading ? 'Creating...' : 'Create Academic Year'}
             </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  )
+}
+
+// ============================================================================
+// EDIT ACADEMIC YEAR MODAL
+// ============================================================================
+
+interface EditAcademicYearModalProps {
+  isOpen: boolean
+  year: AcademicYear | null
+  onClose: () => void
+  onSubmit: (data: UpdateAcademicYearDto) => void
+  isLoading: boolean
+}
+
+function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading }: EditAcademicYearModalProps) {
+  const [name, setName] = useState(year?.name || '')
+  const [startDate, setStartDate] = useState(year?.startDate || '')
+  const [endDate, setEndDate] = useState(year?.endDate || '')
+
+  // Reset form when year changes
+  useEffect(() => {
+    if (year) {
+      setName(year.name)
+      setStartDate(year.startDate)
+      setEndDate(year.endDate)
+    }
+  }, [year])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit({
+      name,
+      startDate,
+      endDate,
+    })
+  }
+
+  if (!isOpen || !year) return null
+
+  // Only allow editing years in planning status
+  const canEdit = year.status === 'planning'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">
+              {canEdit ? 'Edit Academic Year' : 'View Academic Year'}
+            </h2>
+            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
+              {canEdit ? 'Update the academic year details' : 'This year is locked and cannot be edited'}
+            </p>
+          </div>
+          <StatusBadge status={year.status} />
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+              Year Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={!canEdit}
+              placeholder="e.g., 2025-2026"
+              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+                disabled={!canEdit}
+                className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+                End Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+                disabled={!canEdit}
+                className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+          </div>
+
+          {/* Info for locked years */}
+          {!canEdit && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+              <Lock className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                This academic year is {year.status} and cannot be modified.
+                Dates are locked to maintain data integrity.
+              </p>
+            </div>
+          )}
+
+          {/* Info for planning years */}
+          {canEdit && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+              <AlertCircle className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                Once this year is activated, dates will be locked and cannot be changed.
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+            >
+              {canEdit ? 'Cancel' : 'Close'}
+            </button>
+            {canEdit && (
+              <button
+                type="submit"
+                disabled={isLoading || !name || !startDate || !endDate}
+                className="px-4 py-2 rounded-xl bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            )}
           </div>
         </form>
       </motion.div>
@@ -440,8 +599,9 @@ interface SchoolAcademicYearsPageProps {
 export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYearsPageProps) {
   const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
-  
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [yearToEdit, setYearToEdit] = useState<AcademicYear | null>(null)
   const [yearToActivate, setYearToActivate] = useState<AcademicYear | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -456,10 +616,25 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
     staleTime: 5 * 60 * 1000,
   })
 
-  // Create mutation
+  // Create mutation with grading period creation
   const createMutation = useMutation({
-    mutationFn: (data: CreateAcademicYearDto) =>
-      tenantService.createAcademicYear(schoolId, data),
+    mutationFn: async (data: CreateAcademicYearWithTerms) => {
+      // First create the academic year
+      const { generatedTerms, ...yearData } = data
+      const createdYear = await tenantService.createAcademicYear(schoolId, yearData)
+      
+      // Then create grading periods if provided
+      if (generatedTerms && generatedTerms.length > 0 && createdYear.id) {
+        try {
+          await tenantService.createGradingPeriods(schoolId, createdYear.id, generatedTerms)
+        } catch (err) {
+          // Log but don't fail - year was created successfully
+          console.warn('Failed to create grading periods:', err)
+        }
+      }
+      
+      return createdYear
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
       setIsCreateModalOpen(false)
@@ -471,12 +646,26 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
     },
   })
 
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ yearId, data }: { yearId: string; data: UpdateAcademicYearDto }) =>
+      tenantService.updateAcademicYear(schoolId, yearId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      setYearToEdit(null)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    },
+    onError: (err: Error) => {
+      setSaveError(err.message || 'Failed to update academic year')
+    },
+  })
+
   // Activate mutation
   const activateMutation = useMutation({
     mutationFn: (academicYearId: string) =>
       tenantService.updateAcademicYearStatus(schoolId, academicYearId, {
         status: 'active',
-        confirmTransition: true,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
@@ -486,6 +675,20 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
     },
     onError: (err: Error) => {
       setSaveError(err.message || 'Failed to activate academic year')
+    },
+  })
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (academicYearId: string) =>
+      tenantService.deleteAcademicYear(schoolId, academicYearId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    },
+    onError: (err: Error) => {
+      setSaveError(err.message || 'Failed to delete academic year')
     },
   })
 
@@ -629,14 +832,15 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
         <SettingsSection
           title="Upcoming Academic Years"
           icon={Clock}
-          description="Years in planning that can be activated"
+          description="Years in planning that can be edited and activated"
         >
           <div className="space-y-3">
             {planningYears.map((year) => (
               <motion.div
                 key={year.id}
                 variants={fadeInUp}
-                className="p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-golden-500/30 transition-all"
+                className="p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-golden-500/30 transition-all cursor-pointer"
+                onClick={() => setYearToEdit(year)}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -648,14 +852,34 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                       {new Date(year.startDate).toLocaleDateString()} - {new Date(year.endDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setYearToActivate(year)}
-                  >
-                    <Play className="w-4 h-4 mr-1" />
-                    Activate
-                  </Button>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => setYearToEdit(year)}
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      title="Edit academic year"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(`Are you sure you want to delete "${year.name}"? This cannot be undone.`)) {
+                          deleteMutation.mutate(year.id)
+                        }
+                      }}
+                      className="p-2 rounded-lg hover:bg-rust-500/10 text-[rgb(var(--text-tertiary))] hover:text-rust-500 transition-colors"
+                      title="Delete academic year"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setYearToActivate(year)}
+                    >
+                      <Play className="w-4 h-4 mr-1" />
+                      Activate
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -698,6 +922,15 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
             onSubmit={(data) => createMutation.mutate(data)}
             isLoading={createMutation.isPending}
             schoolId={schoolId}
+          />
+        )}
+        {yearToEdit && (
+          <EditAcademicYearModal
+            isOpen={!!yearToEdit}
+            year={yearToEdit}
+            onClose={() => setYearToEdit(null)}
+            onSubmit={(data) => updateMutation.mutate({ yearId: yearToEdit.id, data })}
+            isLoading={updateMutation.isPending}
           />
         )}
         {yearToActivate && (
