@@ -17,6 +17,7 @@ import {
 import { ShellProvider } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingScreen } from './components/layout/LoadingScreen'
+import { NotFound } from './components/layout/NotFound'
 // Pages
 import { LoginPage } from './components/layout/LoginPage'
 import { useThemeStore } from './stores/theme.store'
@@ -127,6 +128,7 @@ function ProtectedLayout() {
 
 const rootRoute = createRootRoute({
   component: RootLayout,
+  notFoundComponent: NotFound,
 })
 
 // ============================================================================
@@ -585,6 +587,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
+  defaultNotFoundComponent: NotFound,
 })
 
 // Type registration for type safety

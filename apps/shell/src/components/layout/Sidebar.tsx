@@ -819,10 +819,10 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2" aria-label="Sidebar navigation">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={moduleId}
-            initial={{ opacity: 0, x: isSubModule ? 20 : -20 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: isSubModule ? -20 : 20 }}
             transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 30 }}
