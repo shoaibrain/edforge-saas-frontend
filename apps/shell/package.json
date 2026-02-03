@@ -1,0 +1,45 @@
+{
+  "name": "@edforge/shell",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@edforge/abac": "workspace:*",
+    "@edforge/auth": "workspace:*",
+    "@edforge/forms": "workspace:*",
+    "@edforge/theme": "workspace:*",
+    "@edforge/types": "workspace:*",
+    "@edforge/shared-types": "workspace:*",
+    "@edforge/ui": "workspace:*",
+    "@edforge/wizard": "workspace:*",
+    "@headlessui/react": "^2.2.9",
+    "axios": "^1.7.0",
+    "@react-spring/web": "^10.0.3",
+    "@tanstack/react-query": "^5.60.0",
+    "@tanstack/react-router": "^1.82.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.15.0",
+    "lucide-react": "^0.561.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.4.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@edforge/config": "workspace:*",
+    "@module-federation/enhanced": "^0.8.0",
+    "@module-federation/rsbuild-plugin": "^0.8.0",
+    "@rsbuild/core": "^1.1.0",
+    "@rsbuild/plugin-react": "^1.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}

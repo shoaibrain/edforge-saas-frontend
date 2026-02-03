@@ -1,0 +1,703 @@
+/**
+ * School Configuration Page
+ * 
+ * Modern, clean configuration interface for school settings.
+ * 
+ * Sections:
+ * - Identity (name, type, website)
+ * - Location & Contact
+ * - Schedule & Operations (school days, hours, period duration)
+ * - Academic Settings (grading scale, term structure)
+ * - Features (module toggles)
+ * - Notifications
+ * - Attendance
+ */
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  Building2,
+  MapPin,
+  Clock,
+  GraduationCap,
+  ClipboardCheck,
+  Bell,
+  Layers,
+  Save,
+  RotateCcw,
+  AlertTriangle,
+} from 'lucide-react'
+import { useAuthStore } from '@/stores/auth.store'
+import { tenantService } from '@/services/tenant.service'
+import type { School } from '@edforge/types'
+import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@edforge/shared-types'
+import { Button } from '@edforge/ui'
+import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
+import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
+import { GradingScaleEditor, type GradeLevelConfig } from '@/components/settings/GradingScaleEditor'
+import { FeatureToggles, type SchoolFeatures, DEFAULT_FEATURES } from '@/components/settings/FeatureToggles'
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const SCHOOL_TYPE_OPTIONS = [
+  { value: 'elementary', label: 'Elementary School' },
+  { value: 'middle', label: 'Middle School' },
+  { value: 'high', label: 'High School' },
+  { value: 'k12', label: 'K-12 School' },
+  { value: 'charter', label: 'Charter School' },
+  { value: 'private', label: 'Private School' },
+  { value: 'vocational', label: 'Vocational School' },
+  { value: 'special_education', label: 'Special Education' },
+]
+
+const TERM_STRUCTURE_OPTIONS = [
+  { value: 'semester', label: 'Semester (2 terms)' },
+  { value: 'trimester', label: 'Trimester (3 terms)' },
+  { value: 'quarter', label: 'Quarter (4 terms)' },
+  { value: 'year', label: 'Full Year (1 term)' },
+]
+
+// ============================================================================
+// SECTION COMPONENT
+// ============================================================================
+
+interface SectionProps {
+  title: string
+  description: string
+  icon: React.ElementType
+  children: React.ReactNode
+}
+
+function Section({ title, description, icon: Icon, children }: SectionProps) {
+  return (
+    <section className="space-y-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-base font-semibold text-[rgb(var(--text-primary))]">{title}</h2>
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">{description}</p>
+        </div>
+      </div>
+      <div className="pl-12">
+        {children}
+      </div>
+    </section>
+  )
+}
+
+// ============================================================================
+// FIELD ROW COMPONENT
+// ============================================================================
+
+interface FieldRowProps {
+  label: string
+  description?: string
+  children: React.ReactNode
+  inline?: boolean
+}
+
+function FieldRow({ label, description, children, inline }: FieldRowProps) {
+  return (
+    <div className={`py-4 border-b border-[rgb(var(--border-tertiary))] last:border-b-0 ${inline ? 'flex items-center justify-between gap-4' : ''}`}>
+      <div className={inline ? 'flex-1' : 'mb-2'}>
+        <label className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</label>
+        {description && (
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{description}</p>
+        )}
+      </div>
+      <div className={inline ? '' : 'mt-2'}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// TOGGLE SWITCH
+// ============================================================================
+
+interface ToggleSwitchProps {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+}
+
+function ToggleSwitch({ checked, onChange, disabled }: ToggleSwitchProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => !disabled && onChange(!checked)}
+      disabled={disabled}
+      className={`
+        relative w-11 h-6 rounded-full transition-colors
+        ${checked ? 'bg-teal-500' : 'bg-[rgb(var(--surface-tertiary))]'}
+        ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+        focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:ring-offset-2
+      `}
+      role="switch"
+      aria-checked={checked}
+    >
+      <motion.span
+        className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow"
+        animate={{ x: checked ? 20 : 0 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      />
+    </button>
+  )
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+interface SchoolConfigurationPageProps {
+  schoolId: string
+  school?: School
+}
+
+export default function SchoolConfigurationPage({ schoolId, school }: SchoolConfigurationPageProps) {
+  useAuthStore((s) => s.user)
+  const queryClient = useQueryClient()
+
+  // Fetch configuration from API
+  const { data: apiConfig, isLoading } = useQuery({
+    queryKey: ['schoolConfiguration', schoolId],
+    queryFn: () => tenantService.getSchoolConfiguration(schoolId),
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  // Form state
+  const [formState, setFormState] = useState<{
+    // Identity
+    displayName: string
+    schoolType: string
+    website: string
+    // Location
+    address: {
+      street1: string
+      street2?: string
+      city: string
+      state: string
+      postalCode: string
+      country: string
+    }
+    phone: string
+    email: string
+    // Schedule
+    schoolDays: number[]
+    startTime: string
+    endTime: string
+    periodDuration: number
+    // Academic
+    gradingScaleType: 'letter' | 'percentage' | 'points' | 'custom'
+    gradingScale: GradeLevelConfig[]
+    passingGrade: number
+    termStructure: string
+    // Features
+    features: SchoolFeatures
+    // Notifications
+    notificationsEnabled: boolean
+    emailNotifications: boolean
+    smsNotifications: boolean
+    // Attendance
+    attendanceRequired: boolean
+  } | null>(null)
+
+  const [originalState, setOriginalState] = useState<typeof formState>(null)
+  const [isDirty, setIsDirty] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  // Initialize form state from API data
+  useEffect(() => {
+    if (apiConfig && school) {
+      const initialState = {
+        // Identity (from school entity)
+        displayName: school.name || '',
+        schoolType: school.type || 'high',
+        website: (apiConfig as any).identity?.website || '',
+        // Location (from school entity)
+        address: {
+          street1: school.address?.street1 || '',
+          street2: school.address?.street2 || '',
+          city: school.address?.city || '',
+          state: school.address?.state || '',
+          postalCode: school.address?.postalCode || '',
+          country: school.address?.country || 'USA',
+        },
+        phone: school.phone || '',
+        email: school.email || '',
+        // Schedule (from configuration)
+        schoolDays: (apiConfig as any).schoolDays || [1, 2, 3, 4, 5],
+        startTime: (apiConfig as any).startTime || '08:00',
+        endTime: (apiConfig as any).endTime || '15:30',
+        periodDuration: (apiConfig as any).periodDuration || 50,
+        // Academic
+        gradingScaleType: (apiConfig as any).gradingScale?.type || 'letter',
+        gradingScale: (apiConfig as any).gradingScale?.scale || [
+          { letter: 'A', minScore: 90, maxScore: 100, gpa: 4.0 },
+          { letter: 'B', minScore: 80, maxScore: 89, gpa: 3.0 },
+          { letter: 'C', minScore: 70, maxScore: 79, gpa: 2.0 },
+          { letter: 'D', minScore: 60, maxScore: 69, gpa: 1.0 },
+          { letter: 'F', minScore: 0, maxScore: 59, gpa: 0.0 },
+        ],
+        passingGrade: (apiConfig as any).gradingScale?.passingGrade || 60,
+        termStructure: (apiConfig as any).academicCalendarType || 'semester',
+        // Features
+        features: (apiConfig as any).features || DEFAULT_FEATURES,
+        // Notifications
+        notificationsEnabled: (apiConfig as any).notificationsEnabled ?? true,
+        emailNotifications: (apiConfig as any).emailNotifications ?? true,
+        smsNotifications: (apiConfig as any).smsNotifications ?? false,
+        // Attendance
+        attendanceRequired: (apiConfig as any).attendanceRequired ?? true,
+      }
+      setFormState(initialState)
+      setOriginalState(initialState)
+    }
+  }, [apiConfig, school])
+
+  // Track dirty state
+  useEffect(() => {
+    if (formState && originalState) {
+      setIsDirty(JSON.stringify(formState) !== JSON.stringify(originalState))
+    }
+  }, [formState, originalState])
+
+  // Update mutations
+  const updateSchoolMutation = useMutation({
+    mutationFn: (data: UpdateSchoolDto) => tenantService.updateSchool(schoolId, data),
+    onSuccess: (updatedSchool) => {
+      queryClient.setQueryData(['school', schoolId], updatedSchool)
+      queryClient.invalidateQueries({ queryKey: ['schools'] })
+    },
+  })
+
+  const updateConfigMutation = useMutation({
+    mutationFn: (data: UpdateSchoolConfigDto) => tenantService.updateSchoolConfiguration(schoolId, data as any),
+    onSuccess: (updatedConfig) => {
+      queryClient.setQueryData(['schoolConfiguration', schoolId], updatedConfig)
+    },
+  })
+
+  const handleSave = async () => {
+    if (!formState || !originalState) return
+
+    setSaveError(null)
+
+    try {
+      // Check what changed and update appropriately
+      const identityChanged = 
+        formState.displayName !== originalState.displayName ||
+        formState.schoolType !== originalState.schoolType ||
+        formState.website !== originalState.website ||
+        formState.phone !== originalState.phone ||
+        formState.email !== originalState.email ||
+        JSON.stringify(formState.address) !== JSON.stringify(originalState.address)
+
+      const configChanged = 
+        JSON.stringify(formState.schoolDays) !== JSON.stringify(originalState.schoolDays) ||
+        formState.startTime !== originalState.startTime ||
+        formState.endTime !== originalState.endTime ||
+        formState.periodDuration !== originalState.periodDuration ||
+        JSON.stringify(formState.gradingScale) !== JSON.stringify(originalState.gradingScale) ||
+        formState.passingGrade !== originalState.passingGrade ||
+        formState.termStructure !== originalState.termStructure ||
+        JSON.stringify(formState.features) !== JSON.stringify(originalState.features) ||
+        formState.notificationsEnabled !== originalState.notificationsEnabled ||
+        formState.emailNotifications !== originalState.emailNotifications ||
+        formState.smsNotifications !== originalState.smsNotifications ||
+        formState.attendanceRequired !== originalState.attendanceRequired
+
+      // Update school entity if changed
+      if (identityChanged) {
+        await updateSchoolMutation.mutateAsync({
+          name: formState.displayName,
+          schoolType: formState.schoolType as UpdateSchoolDto['schoolType'],
+          website: formState.website || undefined,
+          phone: formState.phone || undefined,
+          email: formState.email || undefined,
+          address: {
+            street1: formState.address.street1,
+            street2: formState.address.street2,
+            city: formState.address.city,
+            state: formState.address.state,
+            zipCode: formState.address.postalCode,
+            country: formState.address.country,
+          },
+        })
+      }
+
+      // Update configuration if changed
+      if (configChanged) {
+        await updateConfigMutation.mutateAsync({
+          schoolDays: formState.schoolDays,
+          startTime: formState.startTime,
+          endTime: formState.endTime,
+          periodDuration: formState.periodDuration,
+          academicCalendarType: formState.termStructure as 'semester' | 'quarter' | 'trimester' | 'year',
+          gradingScale: {
+            type: formState.gradingScaleType,
+            passingGrade: formState.passingGrade,
+            scale: formState.gradingScale,
+          },
+          features: formState.features,
+          notificationsEnabled: formState.notificationsEnabled,
+          emailNotifications: formState.emailNotifications,
+          smsNotifications: formState.smsNotifications,
+          attendanceRequired: formState.attendanceRequired,
+        })
+      }
+
+      setOriginalState(formState)
+      setIsDirty(false)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    } catch (err: any) {
+      setSaveError(err.message || 'Failed to save changes')
+    }
+  }
+
+  const handleReset = () => {
+    if (originalState) {
+      setFormState(originalState)
+      setIsDirty(false)
+    }
+  }
+
+  const updateField = <K extends keyof NonNullable<typeof formState>>(
+    key: K,
+    value: NonNullable<typeof formState>[K]
+  ) => {
+    setFormState((prev) => prev ? { ...prev, [key]: value } : null)
+  }
+
+  if (isLoading || !formState) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-[rgb(var(--surface-tertiary))] rounded-lg" />
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-[rgb(var(--surface-tertiary))] rounded" />
+                <div className="h-3 w-48 bg-[rgb(var(--surface-tertiary))] rounded" />
+              </div>
+            </div>
+            <div className="pl-12 space-y-4">
+              <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
+              <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-3xl space-y-8 pb-24">
+      {/* Success/Error Alerts */}
+      <AnimatePresence>
+        {saveSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-3 p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-400"
+          >
+            <Save className="w-5 h-5" />
+            <span className="text-sm font-medium">Configuration saved successfully</span>
+          </motion.div>
+        )}
+        {saveError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-3 p-4 rounded-xl bg-rust-500/10 border border-rust-500/20 text-rust-700 dark:text-rust-400"
+          >
+            <AlertTriangle className="w-5 h-5" />
+            <span className="text-sm font-medium">{saveError}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Identity Section */}
+      <Section
+        title="School Identity"
+        description="Basic school information"
+        icon={Building2}
+      >
+        <FieldRow label="Display Name" description="Full name of the school">
+          <input
+            type="text"
+            value={formState.displayName}
+            onChange={(e) => updateField('displayName', e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          />
+        </FieldRow>
+
+        <FieldRow label="School Type" description="Level of education" inline>
+          <select
+            value={formState.schoolType}
+            onChange={(e) => updateField('schoolType', e.target.value)}
+            className="min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          >
+            {SCHOOL_TYPE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </FieldRow>
+
+        <FieldRow label="Website" description="School's public website">
+          <input
+            type="url"
+            value={formState.website}
+            onChange={(e) => updateField('website', e.target.value)}
+            placeholder="https://www.school.edu"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          />
+        </FieldRow>
+      </Section>
+
+      {/* Location & Contact Section */}
+      <Section
+        title="Location & Contact"
+        description="Physical address and contact information"
+        icon={MapPin}
+      >
+        <FieldRow label="Street Address">
+          <input
+            type="text"
+            value={formState.address.street1}
+            onChange={(e) => updateField('address', { ...formState.address, street1: e.target.value })}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          />
+        </FieldRow>
+
+        <FieldRow label="City, State, ZIP">
+          <div className="grid grid-cols-3 gap-3">
+            <input
+              type="text"
+              value={formState.address.city}
+              onChange={(e) => updateField('address', { ...formState.address, city: e.target.value })}
+              placeholder="City"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <input
+              type="text"
+              value={formState.address.state}
+              onChange={(e) => updateField('address', { ...formState.address, state: e.target.value })}
+              placeholder="State"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <input
+              type="text"
+              value={formState.address.postalCode}
+              onChange={(e) => updateField('address', { ...formState.address, postalCode: e.target.value })}
+              placeholder="ZIP"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+          </div>
+        </FieldRow>
+
+        <FieldRow label="Phone & Email">
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="tel"
+              value={formState.phone}
+              onChange={(e) => updateField('phone', e.target.value)}
+              placeholder="Phone number"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <input
+              type="email"
+              value={formState.email}
+              onChange={(e) => updateField('email', e.target.value)}
+              placeholder="Email address"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+          </div>
+        </FieldRow>
+      </Section>
+
+      {/* Schedule & Operations Section */}
+      <Section
+        title="Schedule & Operations"
+        description="School days and operating hours"
+        icon={Clock}
+      >
+        <FieldRow label="School Days" description="Days when school is in session">
+          <SchoolDaysSelector
+            selected={formState.schoolDays}
+            onChange={(days) => updateField('schoolDays', days)}
+          />
+        </FieldRow>
+
+        <FieldRow label="School Hours" description="Daily start and end times">
+          <TimeRangePicker
+            startTime={formState.startTime}
+            endTime={formState.endTime}
+            onChange={(start, end) => {
+              updateField('startTime', start)
+              updateField('endTime', end)
+            }}
+          />
+        </FieldRow>
+
+        <FieldRow label="Period Duration" description="Length of each class period" inline>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={formState.periodDuration}
+              onChange={(e) => updateField('periodDuration', Number(e.target.value))}
+              min={15}
+              max={120}
+              className="w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
+          </div>
+        </FieldRow>
+      </Section>
+
+      {/* Academic Settings Section */}
+      <Section
+        title="Academic Settings"
+        description="Grading and term structure"
+        icon={GraduationCap}
+      >
+        <FieldRow label="Term Structure" description="How the academic year is divided" inline>
+          <select
+            value={formState.termStructure}
+            onChange={(e) => updateField('termStructure', e.target.value)}
+            className="min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          >
+            {TERM_STRUCTURE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </FieldRow>
+
+        <FieldRow label="Grading Scale" description="Configure how grades are calculated">
+          <GradingScaleEditor
+            scaleType={formState.gradingScaleType}
+            scale={formState.gradingScale}
+            passingGrade={formState.passingGrade}
+            onChange={(scale, passingGrade) => {
+              updateField('gradingScale', scale)
+              updateField('passingGrade', passingGrade)
+            }}
+            onScaleTypeChange={(type) => updateField('gradingScaleType', type)}
+          />
+        </FieldRow>
+      </Section>
+
+      {/* Features Section */}
+      <Section
+        title="Enabled Features"
+        description="Control which modules are active for this school"
+        icon={Layers}
+      >
+        <div className="py-2">
+          <FeatureToggles
+            features={formState.features}
+            onChange={(features) => updateField('features', features)}
+          />
+        </div>
+      </Section>
+
+      {/* Notifications Section */}
+      <Section
+        title="Notifications"
+        description="Configure how notifications are delivered"
+        icon={Bell}
+      >
+        <FieldRow label="Enable Notifications" description="Master toggle for all notifications" inline>
+          <ToggleSwitch
+            checked={formState.notificationsEnabled}
+            onChange={(checked) => updateField('notificationsEnabled', checked)}
+          />
+        </FieldRow>
+
+        {formState.notificationsEnabled && (
+          <>
+            <FieldRow label="Email Notifications" description="Send notifications via email" inline>
+              <ToggleSwitch
+                checked={formState.emailNotifications}
+                onChange={(checked) => updateField('emailNotifications', checked)}
+              />
+            </FieldRow>
+
+            <FieldRow label="SMS Notifications" description="Send notifications via text message" inline>
+              <ToggleSwitch
+                checked={formState.smsNotifications}
+                onChange={(checked) => updateField('smsNotifications', checked)}
+              />
+            </FieldRow>
+          </>
+        )}
+      </Section>
+
+      {/* Attendance Section */}
+      <Section
+        title="Attendance Settings"
+        description="Attendance tracking configuration"
+        icon={ClipboardCheck}
+      >
+        <FieldRow label="Attendance Required" description="Is attendance tracking mandatory for this school?" inline>
+          <ToggleSwitch
+            checked={formState.attendanceRequired}
+            onChange={(checked) => updateField('attendanceRequired', checked)}
+          />
+        </FieldRow>
+      </Section>
+
+      {/* Workspace Inheritance Notice */}
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+        <AlertTriangle className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm text-cyan-700 dark:text-cyan-400">
+            <strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings.
+            Changes here will override the workspace defaults for this school only.
+          </p>
+        </div>
+      </div>
+
+      {/* Floating Save Bar */}
+      <AnimatePresence>
+        {isDirty && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-2xl border border-[rgb(var(--border-primary))]"
+          >
+            <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+              You have unsaved changes
+            </span>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={handleReset}>
+                <RotateCcw className="w-4 h-4 mr-1.5" />
+                Reset
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                isLoading={updateSchoolMutation.isPending || updateConfigMutation.isPending}
+              >
+                <Save className="w-4 h-4 mr-1.5" />
+                Save Changes
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}

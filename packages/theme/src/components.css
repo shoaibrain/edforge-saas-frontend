@@ -1,0 +1,113 @@
+/**
+ * EdForge Theme - Component Layer
+ *
+ * Reusable component styles and patterns.
+ */
+
+/* Glassmorphism utility */
+.glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  background-color: rgb(var(--surface-secondary) / 0.9);
+  border: 1px solid rgb(var(--border-primary) / 0.5);
+}
+
+/* Themed surface */
+.surface {
+  background-color: rgb(var(--surface-secondary));
+  border-color: rgb(var(--border-primary));
+}
+
+.surface-elevated {
+  background-color: rgb(var(--surface-elevated));
+  border-color: rgb(var(--border-primary));
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Brand gradient for primary elements */
+.brand-gradient {
+  background: linear-gradient(135deg, #005f73 0%, #0a9396 100%);
+}
+
+.brand-gradient-warm {
+  background: linear-gradient(135deg, #ee9b00 0%, #ca6702 100%);
+}
+
+/* Card styles */
+.card {
+  border-radius: 1rem;
+  border: 1px solid rgb(var(--border-primary));
+  background-color: rgb(var(--surface-secondary));
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Input styles */
+.input {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(var(--border-primary));
+  background-color: rgb(var(--surface-primary));
+  color: rgb(var(--text-primary));
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input::placeholder {
+  color: rgb(var(--text-tertiary));
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0a9396;
+  box-shadow: 0 0 0 3px rgb(10 147 150 / 0.2);
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.badge-primary {
+  background-color: rgb(0 95 115 / 0.15);
+  color: #005f73;
+}
+
+.dark .badge-primary {
+  background-color: rgb(10 147 150 / 0.2);
+  color: #0ed3d7;
+}
+
+.badge-success {
+  background-color: rgb(148 210 189 / 0.2);
+  color: #3f977a;
+}
+
+.badge-warning {
+  background-color: rgb(238 155 0 / 0.2);
+  color: #c07d00;
+}
+
+.badge-danger {
+  background-color: rgb(174 32 18 / 0.15);
+  color: #ae2012;
+}
+
