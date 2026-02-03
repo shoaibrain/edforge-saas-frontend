@@ -11,6 +11,11 @@ export default defineConfig({
   },
   dev: {
     hmr: true,
+    client: {
+      host: 'localhost',
+      port: '<port>',
+      protocol: 'ws',
+    },
   },
   resolve: {
     alias: {
@@ -21,7 +26,7 @@ export default defineConfig({
     rspack: (config, { appendPlugins }) => {
       config.output = {
         ...config.output,
-        publicPath: 'http://localhost:3006/',
+        publicPath: 'auto',
       }
       appendPlugins([
         new ModuleFederationPlugin({

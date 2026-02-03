@@ -11,6 +11,11 @@ export default defineConfig({
   },
   dev: {
     hmr: true,
+    client: {
+      host: 'localhost',
+      port: '<port>',
+      protocol: 'ws',
+    },
   },
   html: {
     template: './index.html',

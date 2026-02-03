@@ -14,7 +14,8 @@ pnpm dev              # Start all apps
 
 **URLs:** Shell `:3000` | Ed-Fi `:3001` | Academics `:3002` | Finance `:3003` | Special Programs `:3005`
 
-📖 **Detailed developer documentation: [DEVELOPER.md](./DEVELOPER.md)**
+📖 **Detailed developer documentation: [DEVELOPER.md](./DEVELOPER.md)**  
+🏗️ **Architecture deep dive: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)**
 
 ---
 

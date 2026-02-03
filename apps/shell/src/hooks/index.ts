@@ -26,3 +26,10 @@ export {
   useReturnFocus,
 } from './useFocusManagement'
 
+// Pagination hooks
+export { usePaginatedQuery } from './usePaginatedQuery'
+export type { 
+  PaginatedResponse, 
+  UsePaginatedQueryOptions, 
+  UsePaginatedQueryResult 
+} from './usePaginatedQuery'

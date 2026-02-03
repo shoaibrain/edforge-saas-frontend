@@ -1,5 +1,5 @@
 /**
- * Sync Health Dashboard
+ * Sync Dashboard
  *
  * Visual status center showing data transmission with real-time progress bars.
  * Uses SSE/WebSocket for live updates during synchronization.
@@ -159,8 +159,8 @@ export function SyncDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Sync Health Dashboard</h1>
-          <p className="text-text-secondary">Monitor Ed-Fi data synchronization status</p>
+          <h1 className="text-2xl font-bold text-text-primary">Sync Dashboard</h1>
+          <p className="text-text-secondary">Monitor state reporting data synchronization</p>
         </div>
         <div className="flex items-center gap-3">
           {isGlobalSyncing ? (

@@ -19,7 +19,6 @@ import {
   CalendarDays,
   Milestone,
   Edit,
-  Trash2,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService, type CreateGradingPeriodDto } from '@/services/tenant.service'
@@ -678,19 +677,24 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
     },
   })
 
-  // Delete mutation
-  const deleteMutation = useMutation({
+  // Complete year mutation (Active → Completed)
+  const completeMutation = useMutation({
     mutationFn: (academicYearId: string) =>
-      tenantService.deleteAcademicYear(schoolId, academicYearId),
+      tenantService.updateAcademicYearStatus(schoolId, academicYearId, {
+        status: 'completed',
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     },
     onError: (err: Error) => {
-      setSaveError(err.message || 'Failed to delete academic year')
+      setSaveError(err.message || 'Failed to complete academic year')
     },
   })
+
+  // Note: Academic years cannot be deleted by design
+  // This preserves historical data integrity
 
   // Mock data if API fails
   const displayYears: AcademicYear[] = academicYears || [
@@ -804,6 +808,9 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                 <div className="flex items-center gap-2">
                   <h4 className="text-lg font-bold text-[rgb(var(--text-primary))]">{activeYear.name}</h4>
                   <StatusBadge status={activeYear.status} />
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-500/20 text-teal-700 dark:text-teal-400">
+                    Current
+                  </span>
                 </div>
                 <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
                   {new Date(activeYear.startDate).toLocaleDateString()} - {new Date(activeYear.endDate).toLocaleDateString()}
@@ -821,7 +828,22 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                   </div>
                 )}
               </div>
-              <Lock className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm(`Mark "${activeYear.name}" as completed? This will end the current academic year.`)) {
+                      completeMutation.mutate(activeYear.id)
+                    }
+                  }}
+                  disabled={completeMutation.isPending}
+                >
+                  <CheckCircle className="w-4 h-4 mr-1" />
+                  Complete Year
+                </Button>
+                <Lock className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
+              </div>
             </div>
           </div>
         </SettingsSection>
@@ -860,17 +882,6 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Are you sure you want to delete "${year.name}"? This cannot be undone.`)) {
-                          deleteMutation.mutate(year.id)
-                        }
-                      }}
-                      className="p-2 rounded-lg hover:bg-rust-500/10 text-[rgb(var(--text-tertiary))] hover:text-rust-500 transition-colors"
-                      title="Delete academic year"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -895,6 +906,20 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
       >
         <TimelineVisualization academicYears={displayYears} />
       </SettingsSection>
+
+      {/* Info Note */}
+      {displayYears.length > 0 && (
+        <motion.div variants={fadeInUp}>
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+            <AlertCircle className="w-5 h-5 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-[rgb(var(--text-tertiary))]">
+              <strong className="text-[rgb(var(--text-secondary))]">Note:</strong> Academic years cannot be deleted once created. 
+              This preserves historical data integrity for grades, attendance records, and transcripts. 
+              You can mark completed years as archived to hide them from active views.
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Empty State */}
       {displayYears.length === 0 && (

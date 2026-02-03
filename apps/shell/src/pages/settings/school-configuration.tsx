@@ -1,17 +1,19 @@
 /**
  * School Configuration Page
  * 
- * School-specific configuration that can override workspace defaults.
+ * Modern, clean configuration interface for school settings.
  * 
  * Sections:
- * - Identity (name, code, type, logo)
+ * - Identity (name, type, website)
  * - Location & Contact
- * - Operations (hours, grade levels)
- * - Academic (grading, report cards)
+ * - Schedule & Operations (school days, hours, period duration)
+ * - Academic Settings (grading scale, term structure)
+ * - Features (module toggles)
+ * - Notifications
  * - Attendance
  */
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -20,21 +22,21 @@ import {
   Clock,
   GraduationCap,
   ClipboardCheck,
+  Bell,
+  Layers,
+  Save,
+  RotateCcw,
   AlertTriangle,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
-import type { SchoolConfiguration, School } from '@edforge/types'
+import type { School } from '@edforge/types'
 import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@edforge/shared-types'
-import {
-  SettingsSection,
-  SettingsCard,
-  SettingsAlert,
-  staggerChildren,
-  fadeInUp,
-} from '@/components/settings/SettingsShared'
-
-// Local types removed - imported from @edforge/types
+import { Button } from '@edforge/ui'
+import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
+import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
+import { GradingScaleEditor, type GradeLevelConfig } from '@/components/settings/GradingScaleEditor'
+import { FeatureToggles, type SchoolFeatures, DEFAULT_FEATURES } from '@/components/settings/FeatureToggles'
 
 // ============================================================================
 // CONSTANTS
@@ -51,134 +53,101 @@ const SCHOOL_TYPE_OPTIONS = [
   { value: 'special_education', label: 'Special Education' },
 ]
 
-const GRADING_SCALE_OPTIONS = [
-  { value: 'letter', label: 'Letter Grades (A-F)' },
-  { value: 'percentage', label: 'Percentage (0-100%)' },
-  { value: 'points', label: 'Points-based' },
-  { value: 'custom', label: 'Custom Scale' },
-]
-
 const TERM_STRUCTURE_OPTIONS = [
   { value: 'semester', label: 'Semester (2 terms)' },
   { value: 'trimester', label: 'Trimester (3 terms)' },
   { value: 'quarter', label: 'Quarter (4 terms)' },
-  { value: 'custom', label: 'Custom' },
-]
-
-const GRADE_LEVEL_OPTIONS = [
-  'Pre-K', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+  { value: 'year', label: 'Full Year (1 term)' },
 ]
 
 // ============================================================================
-// CHANGE DETECTION HELPERS
+// SECTION COMPONENT
 // ============================================================================
 
-/**
- * Determines if school identity/entity fields have changed.
- * These fields are updated via PATCH /schools/{id} endpoint.
- */
-function hasIdentityChanges(
-  current: SchoolConfiguration | null,
-  original: SchoolConfiguration | null
-): boolean {
-  if (!current || !original) return false
-  return (
-    current.identity.displayName !== original.identity.displayName ||
-    current.identity.schoolType !== original.identity.schoolType ||
-    current.identity.website !== original.identity.website ||
-    current.location.phone !== original.location.phone ||
-    current.location.email !== original.location.email ||
-    JSON.stringify(current.location.address) !== JSON.stringify(original.location.address)
-  )
+interface SectionProps {
+  title: string
+  description: string
+  icon: React.ElementType
+  children: React.ReactNode
 }
 
-/**
- * Determines if configuration/settings fields have changed.
- * These fields are updated via PATCH /schools/{id}/configuration endpoint.
- */
-function hasConfigChanges(
-  current: SchoolConfiguration | null,
-  original: SchoolConfiguration | null
-): boolean {
-  if (!current || !original) return false
+function Section({ title, description, icon: Icon, children }: SectionProps) {
   return (
-    JSON.stringify(current.academic) !== JSON.stringify(original.academic) ||
-    JSON.stringify(current.attendance) !== JSON.stringify(original.attendance) ||
-    JSON.stringify(current.operations) !== JSON.stringify(original.operations)
+    <section className="space-y-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-base font-semibold text-[rgb(var(--text-primary))]">{title}</h2>
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">{description}</p>
+        </div>
+      </div>
+      <div className="pl-12">
+        {children}
+      </div>
+    </section>
   )
 }
 
 // ============================================================================
-// STYLED SELECT
+// FIELD ROW COMPONENT
 // ============================================================================
 
-interface StyledSelectProps {
-  value: string
-  onChange: (value: string) => void
-  options: { value: string; label: string }[]
-  disabled?: boolean
+interface FieldRowProps {
+  label: string
+  description?: string
+  children: React.ReactNode
+  inline?: boolean
 }
 
-function StyledSelect({ value, onChange, options, disabled }: StyledSelectProps) {
+function FieldRow({ label, description, children, inline }: FieldRowProps) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 min-w-[200px] disabled:opacity-50"
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
-      ))}
-    </select>
-  )
-}
-
-// ============================================================================
-// GRADE LEVEL SELECTOR
-// ============================================================================
-
-interface GradeLevelSelectorProps {
-  selected: string[]
-  onChange: (levels: string[]) => void
-  disabled?: boolean
-}
-
-function GradeLevelSelector({ selected, onChange, disabled }: GradeLevelSelectorProps) {
-  const toggleLevel = (level: string) => {
-    if (selected.includes(level)) {
-      onChange(selected.filter((l) => l !== level))
-    } else {
-      onChange([...selected, level].sort((a, b) => {
-        const order = GRADE_LEVEL_OPTIONS
-        return order.indexOf(a) - order.indexOf(b)
-      }))
-    }
-  }
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {GRADE_LEVEL_OPTIONS.map((level) => {
-        const isSelected = selected.includes(level)
-        return (
-          <button
-            key={level}
-            onClick={() => toggleLevel(level)}
-            disabled={disabled}
-            className={`
-              px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-              ${isSelected
-                ? 'bg-teal-500 text-white'
-                : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
-              }
-              ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
-          >
-            {level}
-          </button>
-        )
-      })}
+    <div className={`py-4 border-b border-[rgb(var(--border-tertiary))] last:border-b-0 ${inline ? 'flex items-center justify-between gap-4' : ''}`}>
+      <div className={inline ? 'flex-1' : 'mb-2'}>
+        <label className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</label>
+        {description && (
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{description}</p>
+        )}
+      </div>
+      <div className={inline ? '' : 'mt-2'}>
+        {children}
+      </div>
     </div>
+  )
+}
+
+// ============================================================================
+// TOGGLE SWITCH
+// ============================================================================
+
+interface ToggleSwitchProps {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+}
+
+function ToggleSwitch({ checked, onChange, disabled }: ToggleSwitchProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => !disabled && onChange(!checked)}
+      disabled={disabled}
+      className={`
+        relative w-11 h-6 rounded-full transition-colors
+        ${checked ? 'bg-teal-500' : 'bg-[rgb(var(--surface-tertiary))]'}
+        ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+        focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:ring-offset-2
+      `}
+      role="switch"
+      aria-checked={checked}
+    >
+      <motion.span
+        className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow"
+        animate={{ x: checked ? 20 : 0 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      />
+    </button>
   )
 }
 
@@ -195,251 +164,510 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
   useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
 
-  // Fetch configuration
-  const { data: config, isLoading } = useQuery({
+  // Fetch configuration from API
+  const { data: apiConfig, isLoading } = useQuery({
     queryKey: ['schoolConfiguration', schoolId],
     queryFn: () => tenantService.getSchoolConfiguration(schoolId),
     enabled: !!schoolId,
     staleTime: 5 * 60 * 1000,
   })
 
-  // Local form state
-  const [formState, setFormState] = useState<SchoolConfiguration | null>(null)
-
-  // Original state for change detection (to determine which API endpoints to call)
-  const [originalState, setOriginalState] = useState<SchoolConfiguration | null>(null)
-
-  // Track dirty state
-  const [isDirty, setIsDirty] = useState(false)
-
-  // Initialize form state when config loads
-  const defaultConfig: SchoolConfiguration = useMemo(() => ({
-    schoolId,
-    identity: {
-      displayName: school?.name || '',
-      shortCode: school?.code || '',
-      schoolType: school?.type || 'other',
-      website: '',
-    },
-    location: {
-      address: {
-        street1: school?.address?.street1 || '',
-        city: school?.address?.city || '',
-        state: school?.address?.state || '',
-        postalCode: school?.address?.postalCode || '',
-        country: school?.address?.country || '',
-      },
-      phone: school?.phone || '',
-      email: school?.email || '',
-    },
-    operations: {
-      operatingHours: [],
-      gradeLevels: [],
-    },
-    academic: {
-      gradingScale: 'letter',
-      termStructure: 'semester',
-    },
-    attendance: {
-      attendanceRequired: true,
-    },
-    inheritsFromWorkspace: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  }), [school, schoolId])
-
-  useEffect(() => {
-    if (config) {
-      // Merge config with default structure to ensure all fields exist
-      const mergedState: SchoolConfiguration = {
-        ...defaultConfig,
-        ...config,
-        identity: { ...defaultConfig.identity, ...config.identity },
-        location: {
-          ...defaultConfig.location,
-          ...config.location,
-          address: { ...defaultConfig.location.address, ...config.location?.address }
-        },
-        operations: { ...defaultConfig.operations, ...config.operations },
-        academic: { ...defaultConfig.academic, ...config.academic },
-        attendance: { ...defaultConfig.attendance, ...config.attendance },
-      }
-      setFormState(mergedState)
-      // Save original state for change detection
-      setOriginalState(mergedState)
-    } else if (!isLoading) {
-      setFormState(defaultConfig)
-      setOriginalState(defaultConfig)
+  // Form state
+  const [formState, setFormState] = useState<{
+    // Identity
+    displayName: string
+    schoolType: string
+    website: string
+    // Location
+    address: {
+      street1: string
+      street2?: string
+      city: string
+      state: string
+      postalCode: string
+      country: string
     }
-  }, [config, defaultConfig, isLoading])
+    phone: string
+    email: string
+    // Schedule
+    schoolDays: number[]
+    startTime: string
+    endTime: string
+    periodDuration: number
+    // Academic
+    gradingScaleType: 'letter' | 'percentage' | 'points' | 'custom'
+    gradingScale: GradeLevelConfig[]
+    passingGrade: number
+    termStructure: string
+    // Features
+    features: SchoolFeatures
+    // Notifications
+    notificationsEnabled: boolean
+    emailNotifications: boolean
+    smsNotifications: boolean
+    // Attendance
+    attendanceRequired: boolean
+  } | null>(null)
 
-
+  const [originalState, setOriginalState] = useState<typeof formState>(null)
+  const [isDirty, setIsDirty] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
 
-  // Mutation for updating school ENTITY (identity fields)
-  // Uses PATCH /schools/{id} endpoint per FRONTEND_INTEGRATION_GUIDE.md
+  // Initialize form state from API data
+  useEffect(() => {
+    if (apiConfig && school) {
+      const initialState = {
+        // Identity (from school entity)
+        displayName: school.name || '',
+        schoolType: school.type || 'high',
+        website: (apiConfig as any).identity?.website || '',
+        // Location (from school entity)
+        address: {
+          street1: school.address?.street1 || '',
+          street2: school.address?.street2 || '',
+          city: school.address?.city || '',
+          state: school.address?.state || '',
+          postalCode: school.address?.postalCode || '',
+          country: school.address?.country || 'USA',
+        },
+        phone: school.phone || '',
+        email: school.email || '',
+        // Schedule (from configuration)
+        schoolDays: (apiConfig as any).schoolDays || [1, 2, 3, 4, 5],
+        startTime: (apiConfig as any).startTime || '08:00',
+        endTime: (apiConfig as any).endTime || '15:30',
+        periodDuration: (apiConfig as any).periodDuration || 50,
+        // Academic
+        gradingScaleType: (apiConfig as any).gradingScale?.type || 'letter',
+        gradingScale: (apiConfig as any).gradingScale?.scale || [
+          { letter: 'A', minScore: 90, maxScore: 100, gpa: 4.0 },
+          { letter: 'B', minScore: 80, maxScore: 89, gpa: 3.0 },
+          { letter: 'C', minScore: 70, maxScore: 79, gpa: 2.0 },
+          { letter: 'D', minScore: 60, maxScore: 69, gpa: 1.0 },
+          { letter: 'F', minScore: 0, maxScore: 59, gpa: 0.0 },
+        ],
+        passingGrade: (apiConfig as any).gradingScale?.passingGrade || 60,
+        termStructure: (apiConfig as any).academicCalendarType || 'semester',
+        // Features
+        features: (apiConfig as any).features || DEFAULT_FEATURES,
+        // Notifications
+        notificationsEnabled: (apiConfig as any).notificationsEnabled ?? true,
+        emailNotifications: (apiConfig as any).emailNotifications ?? true,
+        smsNotifications: (apiConfig as any).smsNotifications ?? false,
+        // Attendance
+        attendanceRequired: (apiConfig as any).attendanceRequired ?? true,
+      }
+      setFormState(initialState)
+      setOriginalState(initialState)
+    }
+  }, [apiConfig, school])
+
+  // Track dirty state
+  useEffect(() => {
+    if (formState && originalState) {
+      setIsDirty(JSON.stringify(formState) !== JSON.stringify(originalState))
+    }
+  }, [formState, originalState])
+
+  // Update mutations
   const updateSchoolMutation = useMutation({
     mutationFn: (data: UpdateSchoolDto) => tenantService.updateSchool(schoolId, data),
     onSuccess: (updatedSchool) => {
-      // Update both school and schools list caches
       queryClient.setQueryData(['school', schoolId], updatedSchool)
       queryClient.invalidateQueries({ queryKey: ['schools'] })
     },
   })
 
-  // Mutation for updating school CONFIGURATION (settings fields)
-  // Uses PATCH /schools/{id}/configuration endpoint
-  // Backend expects FLAT structure per FRONTEND_INTEGRATION_GUIDE.md
   const updateConfigMutation = useMutation({
-    mutationFn: (data: UpdateSchoolConfigDto) => {
-      return tenantService.updateSchoolConfiguration(schoolId, data as any)
-    },
+    mutationFn: (data: UpdateSchoolConfigDto) => tenantService.updateSchoolConfiguration(schoolId, data as any),
     onSuccess: (updatedConfig) => {
       queryClient.setQueryData(['schoolConfiguration', schoolId], updatedConfig)
     },
   })
 
-  /**
-   * Handles saving changes by calling the appropriate API endpoints:
-   * - School entity updates (name, type, address, etc.) → PATCH /schools/{id}
-   * - Configuration updates (grading, attendance, etc.) → PATCH /schools/{id}/configuration
-   * 
-   * Per FRONTEND_INTEGRATION_GUIDE.md, school code (schoolCode) cannot be changed after creation.
-   */
   const handleSave = async () => {
-    if (!formState) return
+    if (!formState || !originalState) return
 
-    // Determine which fields changed
-    const identityChanged = hasIdentityChanges(formState, originalState)
-    const configChanged = hasConfigChanges(formState, originalState)
-
-    // If nothing changed, do nothing
-    if (!identityChanged && !configChanged) {
-      setIsDirty(false)
-      return
-    }
-
-    setIsSaving(true)
     setSaveError(null)
 
     try {
-      // 1. Update school entity (identity fields) if changed
+      // Check what changed and update appropriately
+      const identityChanged = 
+        formState.displayName !== originalState.displayName ||
+        formState.schoolType !== originalState.schoolType ||
+        formState.website !== originalState.website ||
+        formState.phone !== originalState.phone ||
+        formState.email !== originalState.email ||
+        JSON.stringify(formState.address) !== JSON.stringify(originalState.address)
+
+      const configChanged = 
+        JSON.stringify(formState.schoolDays) !== JSON.stringify(originalState.schoolDays) ||
+        formState.startTime !== originalState.startTime ||
+        formState.endTime !== originalState.endTime ||
+        formState.periodDuration !== originalState.periodDuration ||
+        JSON.stringify(formState.gradingScale) !== JSON.stringify(originalState.gradingScale) ||
+        formState.passingGrade !== originalState.passingGrade ||
+        formState.termStructure !== originalState.termStructure ||
+        JSON.stringify(formState.features) !== JSON.stringify(originalState.features) ||
+        formState.notificationsEnabled !== originalState.notificationsEnabled ||
+        formState.emailNotifications !== originalState.emailNotifications ||
+        formState.smsNotifications !== originalState.smsNotifications ||
+        formState.attendanceRequired !== originalState.attendanceRequired
+
+      // Update school entity if changed
       if (identityChanged) {
-        const schoolUpdateData: UpdateSchoolDto = {
-          name: formState.identity.displayName,
-          schoolType: formState.identity.schoolType as UpdateSchoolDto['schoolType'],
-          website: formState.identity.website || undefined,
-          phone: formState.location.phone || undefined,
-          email: formState.location.email || undefined,
+        await updateSchoolMutation.mutateAsync({
+          name: formState.displayName,
+          schoolType: formState.schoolType as UpdateSchoolDto['schoolType'],
+          website: formState.website || undefined,
+          phone: formState.phone || undefined,
+          email: formState.email || undefined,
           address: {
-            street1: formState.location.address.street1,
-            street2: formState.location.address.street2,
-            city: formState.location.address.city,
-            state: formState.location.address.state,
-            // IMPORTANT: Map frontend postalCode → backend zipCode
-            zipCode: formState.location.address.postalCode,
-            country: formState.location.address.country,
+            street1: formState.address.street1,
+            street2: formState.address.street2,
+            city: formState.address.city,
+            state: formState.address.state,
+            zipCode: formState.address.postalCode,
+            country: formState.address.country,
           },
-        }
-        await updateSchoolMutation.mutateAsync(schoolUpdateData)
+        })
       }
 
-      // 2. Update configuration (settings fields) if changed
-      // Backend expects FLAT structure per FRONTEND_INTEGRATION_GUIDE.md
+      // Update configuration if changed
       if (configChanged) {
-        const configUpdateData: UpdateSchoolConfigDto = {
-          // Map nested academic settings to flat backend structure
-          academicCalendarType: formState.academic.termStructure as 'semester' | 'quarter' | 'trimester',
+        await updateConfigMutation.mutateAsync({
+          schoolDays: formState.schoolDays,
+          startTime: formState.startTime,
+          endTime: formState.endTime,
+          periodDuration: formState.periodDuration,
+          academicCalendarType: formState.termStructure as 'semester' | 'quarter' | 'trimester' | 'year',
           gradingScale: {
-            type: formState.academic.gradingScale as 'letter' | 'percentage' | 'points' | 'custom',
-            passingGrade: 60, // Default, should be configurable in future
-            scale: [
-              { letter: 'A', minScore: 90, maxScore: 100, gpa: 4.0 },
-              { letter: 'B', minScore: 80, maxScore: 89, gpa: 3.0 },
-              { letter: 'C', minScore: 70, maxScore: 79, gpa: 2.0 },
-              { letter: 'D', minScore: 60, maxScore: 69, gpa: 1.0 },
-              { letter: 'F', minScore: 0, maxScore: 59, gpa: 0.0 },
-            ],
+            type: formState.gradingScaleType,
+            passingGrade: formState.passingGrade,
+            scale: formState.gradingScale,
           },
-          // Map nested attendance settings to flat backend structure
-          attendanceRequired: formState.attendance.attendanceRequired,
-        }
-        await updateConfigMutation.mutateAsync(configUpdateData)
+          features: formState.features,
+          notificationsEnabled: formState.notificationsEnabled,
+          emailNotifications: formState.emailNotifications,
+          smsNotifications: formState.smsNotifications,
+          attendanceRequired: formState.attendanceRequired,
+        })
       }
 
-      // Update original state to match current state after successful save
       setOriginalState(formState)
-      setSaveSuccess(true)
       setIsDirty(false)
+      setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (err: any) {
       setSaveError(err.message || 'Failed to save changes')
-      setSaveSuccess(false)
-    } finally {
-      setIsSaving(false)
     }
   }
 
-  // Handle changes
-  const handleChange = <K extends keyof SchoolConfiguration>(
-    section: K,
-    key: string,
-    value: unknown
-  ) => {
-    if (!formState) return
-
-    setFormState((prev) => {
-      if (!prev) return prev
-      const sectionData = prev[section]
-      if (typeof sectionData === 'object' && sectionData !== null) {
-        return {
-          ...prev,
-          [section]: {
-            ...sectionData,
-            [key]: value
-          }
-        }
-      }
-      return prev
-    })
-    setIsDirty(true)
+  const handleReset = () => {
+    if (originalState) {
+      setFormState(originalState)
+      setIsDirty(false)
+    }
   }
 
-  // Use formState for rendering, fall back to defaultConfig if null (loading)
-  const displayConfig = formState || defaultConfig
+  const updateField = <K extends keyof NonNullable<typeof formState>>(
+    key: K,
+    value: NonNullable<typeof formState>[K]
+  ) => {
+    setFormState((prev) => prev ? { ...prev, [key]: value } : null)
+  }
 
-  if (isLoading && !formState) {
-    return <div className="p-8 text-center text-gray-400">Loading configuration...</div>
+  if (isLoading || !formState) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-[rgb(var(--surface-tertiary))] rounded-lg" />
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-[rgb(var(--surface-tertiary))] rounded" />
+                <div className="h-3 w-48 bg-[rgb(var(--surface-tertiary))] rounded" />
+              </div>
+            </div>
+            <div className="pl-12 space-y-4">
+              <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
+              <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
   }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={staggerChildren}
-      className="space-y-6 pb-20"
-    >
-      {/* Alerts */}
+    <div className="max-w-3xl space-y-8 pb-24">
+      {/* Success/Error Alerts */}
       <AnimatePresence>
         {saveSuccess && (
-          <SettingsAlert
-            type="success"
-            message="Configuration saved successfully"
-            onDismiss={() => setSaveSuccess(false)}
-            autoDismiss
-            autoDismissDelay={2000}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-3 p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-400"
+          >
+            <Save className="w-5 h-5" />
+            <span className="text-sm font-medium">Configuration saved successfully</span>
+          </motion.div>
         )}
         {saveError && (
-          <SettingsAlert
-            type="error"
-            message={saveError}
-            onDismiss={() => setSaveError(null)}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-3 p-4 rounded-xl bg-rust-500/10 border border-rust-500/20 text-rust-700 dark:text-rust-400"
+          >
+            <AlertTriangle className="w-5 h-5" />
+            <span className="text-sm font-medium">{saveError}</span>
+          </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Identity Section */}
+      <Section
+        title="School Identity"
+        description="Basic school information"
+        icon={Building2}
+      >
+        <FieldRow label="Display Name" description="Full name of the school">
+          <input
+            type="text"
+            value={formState.displayName}
+            onChange={(e) => updateField('displayName', e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          />
+        </FieldRow>
+
+        <FieldRow label="School Type" description="Level of education" inline>
+          <select
+            value={formState.schoolType}
+            onChange={(e) => updateField('schoolType', e.target.value)}
+            className="min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          >
+            {SCHOOL_TYPE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </FieldRow>
+
+        <FieldRow label="Website" description="School's public website">
+          <input
+            type="url"
+            value={formState.website}
+            onChange={(e) => updateField('website', e.target.value)}
+            placeholder="https://www.school.edu"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          />
+        </FieldRow>
+      </Section>
+
+      {/* Location & Contact Section */}
+      <Section
+        title="Location & Contact"
+        description="Physical address and contact information"
+        icon={MapPin}
+      >
+        <FieldRow label="Street Address">
+          <input
+            type="text"
+            value={formState.address.street1}
+            onChange={(e) => updateField('address', { ...formState.address, street1: e.target.value })}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          />
+        </FieldRow>
+
+        <FieldRow label="City, State, ZIP">
+          <div className="grid grid-cols-3 gap-3">
+            <input
+              type="text"
+              value={formState.address.city}
+              onChange={(e) => updateField('address', { ...formState.address, city: e.target.value })}
+              placeholder="City"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <input
+              type="text"
+              value={formState.address.state}
+              onChange={(e) => updateField('address', { ...formState.address, state: e.target.value })}
+              placeholder="State"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <input
+              type="text"
+              value={formState.address.postalCode}
+              onChange={(e) => updateField('address', { ...formState.address, postalCode: e.target.value })}
+              placeholder="ZIP"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+          </div>
+        </FieldRow>
+
+        <FieldRow label="Phone & Email">
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="tel"
+              value={formState.phone}
+              onChange={(e) => updateField('phone', e.target.value)}
+              placeholder="Phone number"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <input
+              type="email"
+              value={formState.email}
+              onChange={(e) => updateField('email', e.target.value)}
+              placeholder="Email address"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+          </div>
+        </FieldRow>
+      </Section>
+
+      {/* Schedule & Operations Section */}
+      <Section
+        title="Schedule & Operations"
+        description="School days and operating hours"
+        icon={Clock}
+      >
+        <FieldRow label="School Days" description="Days when school is in session">
+          <SchoolDaysSelector
+            selected={formState.schoolDays}
+            onChange={(days) => updateField('schoolDays', days)}
+          />
+        </FieldRow>
+
+        <FieldRow label="School Hours" description="Daily start and end times">
+          <TimeRangePicker
+            startTime={formState.startTime}
+            endTime={formState.endTime}
+            onChange={(start, end) => {
+              updateField('startTime', start)
+              updateField('endTime', end)
+            }}
+          />
+        </FieldRow>
+
+        <FieldRow label="Period Duration" description="Length of each class period" inline>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={formState.periodDuration}
+              onChange={(e) => updateField('periodDuration', Number(e.target.value))}
+              min={15}
+              max={120}
+              className="w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            />
+            <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
+          </div>
+        </FieldRow>
+      </Section>
+
+      {/* Academic Settings Section */}
+      <Section
+        title="Academic Settings"
+        description="Grading and term structure"
+        icon={GraduationCap}
+      >
+        <FieldRow label="Term Structure" description="How the academic year is divided" inline>
+          <select
+            value={formState.termStructure}
+            onChange={(e) => updateField('termStructure', e.target.value)}
+            className="min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+          >
+            {TERM_STRUCTURE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </FieldRow>
+
+        <FieldRow label="Grading Scale" description="Configure how grades are calculated">
+          <GradingScaleEditor
+            scaleType={formState.gradingScaleType}
+            scale={formState.gradingScale}
+            passingGrade={formState.passingGrade}
+            onChange={(scale, passingGrade) => {
+              updateField('gradingScale', scale)
+              updateField('passingGrade', passingGrade)
+            }}
+            onScaleTypeChange={(type) => updateField('gradingScaleType', type)}
+          />
+        </FieldRow>
+      </Section>
+
+      {/* Features Section */}
+      <Section
+        title="Enabled Features"
+        description="Control which modules are active for this school"
+        icon={Layers}
+      >
+        <div className="py-2">
+          <FeatureToggles
+            features={formState.features}
+            onChange={(features) => updateField('features', features)}
+          />
+        </div>
+      </Section>
+
+      {/* Notifications Section */}
+      <Section
+        title="Notifications"
+        description="Configure how notifications are delivered"
+        icon={Bell}
+      >
+        <FieldRow label="Enable Notifications" description="Master toggle for all notifications" inline>
+          <ToggleSwitch
+            checked={formState.notificationsEnabled}
+            onChange={(checked) => updateField('notificationsEnabled', checked)}
+          />
+        </FieldRow>
+
+        {formState.notificationsEnabled && (
+          <>
+            <FieldRow label="Email Notifications" description="Send notifications via email" inline>
+              <ToggleSwitch
+                checked={formState.emailNotifications}
+                onChange={(checked) => updateField('emailNotifications', checked)}
+              />
+            </FieldRow>
+
+            <FieldRow label="SMS Notifications" description="Send notifications via text message" inline>
+              <ToggleSwitch
+                checked={formState.smsNotifications}
+                onChange={(checked) => updateField('smsNotifications', checked)}
+              />
+            </FieldRow>
+          </>
+        )}
+      </Section>
+
+      {/* Attendance Section */}
+      <Section
+        title="Attendance Settings"
+        description="Attendance tracking configuration"
+        icon={ClipboardCheck}
+      >
+        <FieldRow label="Attendance Required" description="Is attendance tracking mandatory for this school?" inline>
+          <ToggleSwitch
+            checked={formState.attendanceRequired}
+            onChange={(checked) => updateField('attendanceRequired', checked)}
+          />
+        </FieldRow>
+      </Section>
+
+      {/* Workspace Inheritance Notice */}
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+        <AlertTriangle className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm text-cyan-700 dark:text-cyan-400">
+            <strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings.
+            Changes here will override the workspace defaults for this school only.
+          </p>
+        </div>
+      </div>
 
       {/* Floating Save Bar */}
       <AnimatePresence>
@@ -448,236 +676,28 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-2xl border border-[rgb(var(--border-primary))]"
           >
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
               You have unsaved changes
-            </div>
+            </span>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  // Reset to original (server) state
-                  if (originalState) {
-                    setFormState(originalState)
-                  }
-                  setIsDirty(false)
-                }}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
-              >
+              <Button variant="ghost" size="sm" onClick={handleReset}>
+                <RotateCcw className="w-4 h-4 mr-1.5" />
                 Reset
-              </button>
-              <button
+              </Button>
+              <Button
+                size="sm"
                 onClick={handleSave}
-                disabled={isSaving}
-                className="px-4 py-2 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                isLoading={updateSchoolMutation.isPending || updateConfigMutation.isPending}
               >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
+                <Save className="w-4 h-4 mr-1.5" />
+                Save Changes
+              </Button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Identity */}
-      <SettingsSection
-        title="School Identity"
-        icon={Building2}
-        description="Basic school information"
-      >
-        <div className="space-y-4">
-          <SettingsCard title="Display Name" description="Full name of the school">
-            <input
-              type="text"
-              value={displayConfig.identity.displayName}
-              onChange={(e) => handleChange('identity', 'displayName', e.target.value)}
-              className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-            />
-          </SettingsCard>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SettingsCard title="School Code" description="Short identifier (cannot be changed)">
-              <input
-                type="text"
-                value={displayConfig.identity.shortCode}
-                disabled
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-secondary))] cursor-not-allowed w-full"
-              />
-            </SettingsCard>
-
-            <SettingsCard title="School Type" description="Level of education">
-              <StyledSelect
-                value={displayConfig.identity.schoolType}
-                onChange={(v) => handleChange('identity', 'schoolType', v)}
-                options={SCHOOL_TYPE_OPTIONS}
-              />
-            </SettingsCard>
-          </div>
-
-          <SettingsCard title="Website" description="School's public website">
-            <input
-              type="url"
-              value={displayConfig.identity.website || ''}
-              onChange={(e) => handleChange('identity', 'website', e.target.value)}
-              placeholder="https://www.school.edu"
-              className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-            />
-          </SettingsCard>
-        </div>
-      </SettingsSection>
-
-      {/* Location & Contact */}
-      <SettingsSection
-        title="Location & Contact"
-        icon={MapPin}
-        description="Physical address and contact information"
-      >
-        <div className="space-y-4">
-          <SettingsCard title="Street Address" description="Primary address line">
-            <input
-              type="text"
-              value={displayConfig.location.address.street1}
-              onChange={(e) => handleChange('location', 'address', { ...displayConfig.location.address, street1: e.target.value })}
-              className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-            />
-          </SettingsCard>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SettingsCard title="City" description="">
-              <input
-                type="text"
-                value={displayConfig.location.address.city}
-                onChange={(e) => handleChange('location', 'address', { ...displayConfig.location.address, city: e.target.value })}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-              />
-            </SettingsCard>
-            <SettingsCard title="State" description="">
-              <input
-                type="text"
-                value={displayConfig.location.address.state}
-                onChange={(e) => handleChange('location', 'address', { ...displayConfig.location.address, state: e.target.value })}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-              />
-            </SettingsCard>
-            <SettingsCard title="ZIP Code" description="">
-              <input
-                type="text"
-                value={displayConfig.location.address.postalCode}
-                onChange={(e) => handleChange('location', 'address', { ...displayConfig.location.address, postalCode: e.target.value })}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-              />
-            </SettingsCard>
-            <SettingsCard title="Country" description="">
-              <input
-                type="text"
-                value={displayConfig.location.address.country}
-                onChange={(e) => handleChange('location', 'address', { ...displayConfig.location.address, country: e.target.value })}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-              />
-            </SettingsCard>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SettingsCard title="Phone" description="Main contact number">
-              <input
-                type="tel"
-                value={displayConfig.location.phone || ''}
-                onChange={(e) => handleChange('location', 'phone', e.target.value)}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-              />
-            </SettingsCard>
-            <SettingsCard title="Email" description="Contact email">
-              <input
-                type="email"
-                value={displayConfig.location.email || ''}
-                onChange={(e) => handleChange('location', 'email', e.target.value)}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 w-full"
-              />
-            </SettingsCard>
-          </div>
-        </div>
-      </SettingsSection>
-
-      {/* Operations */}
-      <SettingsSection
-        title="Operations"
-        icon={Clock}
-        description="Operating hours and capacity"
-      >
-        <div className="space-y-4">
-          <SettingsCard title="Grade Levels" description="Grades served by this school">
-            <GradeLevelSelector
-              selected={displayConfig.operations.gradeLevels}
-              onChange={(levels) => handleChange('operations', 'gradeLevels', levels)}
-            />
-          </SettingsCard>
-        </div>
-      </SettingsSection>
-
-      {/* Academic */}
-      <SettingsSection
-        title="Academic Settings"
-        icon={GraduationCap}
-        description="Grading and term structure"
-      >
-        <div className="space-y-4">
-          <SettingsCard title="Grading Scale" description="How grades are calculated">
-            <StyledSelect
-              value={displayConfig.academic.gradingScale || 'letter'}
-              onChange={(v) => handleChange('academic', 'gradingScale', v)}
-              options={GRADING_SCALE_OPTIONS}
-            />
-          </SettingsCard>
-
-          <SettingsCard title="Term Structure" description="How the year is divided">
-            <StyledSelect
-              value={displayConfig.academic.termStructure || 'semester'}
-              onChange={(v) => handleChange('academic', 'termStructure', v)}
-              options={TERM_STRUCTURE_OPTIONS}
-            />
-          </SettingsCard>
-        </div>
-      </SettingsSection>
-
-      {/* Attendance */}
-      <SettingsSection
-        title="Attendance Settings"
-        icon={ClipboardCheck}
-        description="Attendance tracking configuration"
-      >
-        <div className="space-y-4">
-          <SettingsCard title="Attendance Required" description="Is attendance mandatory?">
-            <button
-              onClick={() => handleChange('attendance', 'attendanceRequired', !displayConfig.attendance.attendanceRequired)}
-              className={`
-                    w-12 h-6 rounded-full transition-colors relative cursor-pointer
-                    ${displayConfig.attendance.attendanceRequired ? 'bg-teal-500' : 'bg-gray-200'}
-                    `}
-            >
-              <span
-                className={`
-                        absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform
-                        ${displayConfig.attendance.attendanceRequired ? 'translate-x-6' : 'translate-x-0'}
-                    `}
-              />
-            </button>
-          </SettingsCard>
-        </div>
-      </SettingsSection>
-
-      {/* Inheritance Notice */}
-      {displayConfig.inheritsFromWorkspace && (
-        <motion.div variants={fadeInUp}>
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-            <AlertTriangle className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-cyan-700 dark:text-cyan-400">
-                <strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings.
-                Changes here will override the workspace defaults for this school only.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </motion.div>
+    </div>
   )
 }

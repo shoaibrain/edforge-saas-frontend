@@ -40,6 +40,7 @@ const ROUTE_LABELS: Record<string, string> = {
   'student-portal': 'Student Portal',
   'parent-portal': 'Family Portal',
   'special-programs': 'Special Programs',
+  edfi: 'State Reporting',
 
   // Academics sub-routes
   students: 'Students',

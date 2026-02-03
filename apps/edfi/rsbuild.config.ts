@@ -11,6 +11,11 @@ export default defineConfig({
   },
   dev: {
     hmr: true,
+    client: {
+      host: 'localhost',
+      port: '<port>',
+      protocol: 'ws',
+    },
   },
   resolve: {
     alias: {
@@ -21,6 +26,8 @@ export default defineConfig({
     rspack: (config, { appendPlugins }) => {
       config.output = {
         ...config.output,
+        // Remotes use 'auto' to resolve chunk URLs from their own origin (e.g. localhost:3001).
+        // The Shell host uses '/' instead — see apps/shell/rsbuild.config.ts for rationale.
         publicPath: 'auto',
       }
       appendPlugins([
@@ -41,6 +48,7 @@ export default defineConfig({
             react: { singleton: true, requiredVersion: '^19.0.0', eager: true },
             'react-dom': { singleton: true, requiredVersion: '^19.0.0', eager: true },
             '@tanstack/react-query': { singleton: true, requiredVersion: '^5.60.0', eager: true },
+            '@tanstack/react-router': { singleton: true, requiredVersion: '^1.82.0', eager: true },
             zustand: { singleton: true, requiredVersion: '^5.0.0', eager: true },
             '@edforge/ui': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/abac': { singleton: true, requiredVersion: '0.0.1', eager: true },

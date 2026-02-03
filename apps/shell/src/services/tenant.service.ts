@@ -113,6 +113,13 @@ function mapApiSchool(apiSchool: any, tenantId?: string): School {
 interface SchoolResponse {
   items: any[]
   hasMore: boolean
+  lastEvaluatedKey?: string
+}
+
+export interface SchoolListResponse {
+  items: School[]
+  hasMore: boolean
+  lastEvaluatedKey?: string
 }
 
 /**
@@ -121,6 +128,33 @@ interface SchoolResponse {
 export async function getSchools(tenantId: string): Promise<School[]> {
   const response = await apiGet<SchoolResponse>(`/schools`, { tenantId })
   return (response.items || []).map(item => mapApiSchool(item, tenantId))
+}
+
+/**
+ * Get paginated schools for a tenant
+ */
+export async function getSchoolsPaginated(
+  tenantId: string, 
+  params: { limit?: number; cursor?: string } = {}
+): Promise<SchoolListResponse> {
+  const queryParams: Record<string, string> = { tenantId }
+  if (params.limit) queryParams.limit = String(params.limit)
+  if (params.cursor) queryParams.cursor = params.cursor
+  
+  const response = await apiGet<SchoolResponse>(`/schools`, queryParams)
+  
+  // Handle case where response might not have expected shape
+  if (!response || typeof response !== 'object') {
+    return { items: [], hasMore: false, lastEvaluatedKey: undefined }
+  }
+  
+  return {
+    items: Array.isArray(response.items) 
+      ? response.items.map(item => mapApiSchool(item, tenantId)) 
+      : [],
+    hasMore: response.hasMore ?? false,
+    lastEvaluatedKey: response.lastEvaluatedKey,
+  }
 }
 
 /**
@@ -541,6 +575,78 @@ export async function createGradingPeriods(
 }
 
 // ============================================================================
+// HOLIDAYS API
+// ============================================================================
+
+export interface Holiday {
+  holidayId: string
+  yearId: string
+  schoolId: string
+  name: string
+  date: string
+  endDate?: string
+  holidayType: 'federal' | 'state' | 'local' | 'school' | 'religious' | 'other'
+  affectsStudents: boolean
+  affectsStaff: boolean
+  createdAt: string
+}
+
+export interface CreateHolidayDto {
+  name: string
+  date: string
+  endDate?: string
+  holidayType: 'federal' | 'state' | 'local' | 'school' | 'religious' | 'other'
+  affectsStudents?: boolean
+  affectsStaff?: boolean
+}
+
+interface HolidayListResponse {
+  items: Holiday[]
+  hasMore: boolean
+}
+
+/**
+ * Get all holidays for an academic year
+ * GET /schools/{schoolId}/academic-years/{yearId}/holidays
+ */
+export async function getHolidays(
+  schoolId: string,
+  yearId: string
+): Promise<Holiday[]> {
+  const response = await apiGet<HolidayListResponse>(
+    `/schools/${schoolId}/academic-years/${yearId}/holidays`
+  )
+  return response.items || []
+}
+
+/**
+ * Create a new holiday
+ * POST /schools/{schoolId}/academic-years/{yearId}/holidays
+ */
+export async function createHoliday(
+  schoolId: string,
+  yearId: string,
+  data: CreateHolidayDto
+): Promise<Holiday> {
+  return apiPost<Holiday, CreateHolidayDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/holidays`,
+    data
+  )
+}
+
+/**
+ * Delete a holiday
+ * DELETE /schools/{schoolId}/academic-years/{yearId}/holidays/{holidayId}
+ */
+export async function deleteHoliday(
+  schoolId: string,
+  yearId: string,
+  holidayId: string
+): Promise<void> {
+  await apiDelete(`/schools/${schoolId}/academic-years/${yearId}/holidays/${holidayId}`)
+}
+
+// ============================================================================
 // CONVENIENCE EXPORTS
 // ============================================================================
 
@@ -559,6 +665,7 @@ export const tenantService = {
 
   // Schools
   getSchools,
+  getSchoolsPaginated,
   getSchool,
   createSchool,
   updateSchool,
@@ -588,6 +695,11 @@ export const tenantService = {
   getGradingPeriods,
   createGradingPeriod,
   createGradingPeriods,
+
+  // Holidays
+  getHolidays,
+  createHoliday,
+  deleteHoliday,
 
   // School Years (Legacy)
   getSchoolYears,

@@ -9,13 +9,12 @@
  * - Workspace settings inheritance preview
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Navigate, useNavigate, useSearch, Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   School,
-  ChevronRight,
   ChevronLeft,
   ChevronDown,
   ShieldX,
@@ -24,7 +23,6 @@ import {
   MapPin,
   Users,
   Calendar,
-  MoreHorizontal,
   Trash2,
   GraduationCap,
   ArrowRight,
@@ -52,6 +50,7 @@ import {
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
+import { DataTable, type Column } from '@/components/ui/DataTable'
 
 // ============================================================================
 // TYPES
@@ -245,34 +244,6 @@ function EmptyState({ onCreateSchool, isTenantAdmin }: EmptyStateProps) {
           )}
         </div>
       </motion.div>
-    </div>
-  )
-}
-
-// ============================================================================
-// LOADING STATE
-// ============================================================================
-
-function LoadingState() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="h-7 w-40 bg-[rgb(var(--surface-tertiary))] rounded-lg animate-pulse" />
-          <div className="h-4 w-56 bg-[rgb(var(--surface-tertiary))] rounded mt-2 animate-pulse" />
-        </div>
-      </div>
-      <div className="h-11 w-full bg-[rgb(var(--surface-tertiary))] rounded-xl animate-pulse" />
-      <div className="grid grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-20 bg-[rgb(var(--surface-tertiary))] rounded-xl animate-pulse" />
-        ))}
-      </div>
-      <div className="space-y-3">
-        {[...Array(2)].map((_, i) => (
-          <div key={i} className="h-24 bg-[rgb(var(--surface-tertiary))] rounded-xl animate-pulse" />
-        ))}
-      </div>
     </div>
   )
 }
@@ -617,7 +588,12 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
     },
     onError: (err: any) => {
       console.error(err)
-      setError(err.message || 'Failed to create school')
+      // Handle 409 conflict (duplicate school code)
+      if (err.status === 409 || err.message?.toLowerCase().includes('duplicate') || err.message?.toLowerCase().includes('already exists')) {
+        setError('A school with this code already exists. Please choose a different school code.')
+      } else {
+        setError(err.message || 'Failed to create school. Please try again.')
+      }
     },
   })
 
@@ -736,7 +712,7 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
           {/* Basic Information (Required) */}
           <CollapsibleSection
             title="Basic Information"
-            description="School name, code, and type"
+            description="School name, code, type, and grade levels"
             icon={Building2}
             isOpen={openSection === 'basic'}
             onToggle={() => setOpenSection(openSection === 'basic' ? '' : 'basic')}
@@ -746,17 +722,31 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
             showSkip={false}
           >
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                  School Name <span className="text-rust-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  {...register('name')}
-                  placeholder="e.g., Lincoln High School"
-                  className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.name ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
-                />
-                {errors.name && <p className="mt-1 text-xs text-rust-500">{errors.name.message}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
+                    School Name <span className="text-rust-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register('name')}
+                    placeholder="e.g., Lincoln High School"
+                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.name ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                  />
+                  {errors.name && <p className="mt-1 text-xs text-rust-500">{errors.name.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
+                    Short Name <span className="text-[rgb(var(--text-tertiary))] font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register('shortName')}
+                    placeholder="e.g., Lincoln HS"
+                    maxLength={50}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -769,9 +759,10 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                     {...register('schoolCode')}
                     placeholder="e.g., LHS"
                     maxLength={10}
-                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.schoolCode ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all font-mono`}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.schoolCode ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all font-mono uppercase`}
                   />
                   {errors.schoolCode && <p className="mt-1 text-xs text-rust-500">{errors.schoolCode.message}</p>}
+                  <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">2-10 characters. Cannot be changed after creation.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
@@ -784,10 +775,95 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                     <option value="elementary">Elementary School</option>
                     <option value="middle">Middle School</option>
                     <option value="high">High School</option>
-                    <option value="k12">K-12</option>
-                    <option value="other">Other</option>
+                    <option value="k12">K-12 School</option>
+                    <option value="charter">Charter School</option>
+                    <option value="private">Private School</option>
+                    <option value="vocational">Vocational School</option>
+                    <option value="special_education">Special Education</option>
                   </select>
                   {errors.schoolType && <p className="mt-1 text-xs text-rust-500">{errors.schoolType.message}</p>}
+                </div>
+              </div>
+
+              {/* Grade Range */}
+              <div>
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
+                  Grade Range <span className="text-rust-500">*</span>
+                </label>
+                <div className="flex items-center gap-3">
+                  <select
+                    {...register('gradeRange.start')}
+                    className="flex-1 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                  >
+                    <option value="PK">Pre-K</option>
+                    <option value="K">Kindergarten</option>
+                    <option value="1">1st Grade</option>
+                    <option value="2">2nd Grade</option>
+                    <option value="3">3rd Grade</option>
+                    <option value="4">4th Grade</option>
+                    <option value="5">5th Grade</option>
+                    <option value="6">6th Grade</option>
+                    <option value="7">7th Grade</option>
+                    <option value="8">8th Grade</option>
+                    <option value="9">9th Grade</option>
+                    <option value="10">10th Grade</option>
+                    <option value="11">11th Grade</option>
+                    <option value="12">12th Grade</option>
+                  </select>
+                  <span className="text-[rgb(var(--text-tertiary))]">to</span>
+                  <select
+                    {...register('gradeRange.end')}
+                    className="flex-1 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                  >
+                    <option value="PK">Pre-K</option>
+                    <option value="K">Kindergarten</option>
+                    <option value="1">1st Grade</option>
+                    <option value="2">2nd Grade</option>
+                    <option value="3">3rd Grade</option>
+                    <option value="4">4th Grade</option>
+                    <option value="5">5th Grade</option>
+                    <option value="6">6th Grade</option>
+                    <option value="7">7th Grade</option>
+                    <option value="8">8th Grade</option>
+                    <option value="9">9th Grade</option>
+                    <option value="10">10th Grade</option>
+                    <option value="11">11th Grade</option>
+                    <option value="12">12th Grade</option>
+                  </select>
+                </div>
+                {(errors.gradeRange?.start || errors.gradeRange?.end) && (
+                  <p className="mt-1 text-xs text-rust-500">Please select valid grade range</p>
+                )}
+              </div>
+
+              {/* Principal Information */}
+              <div className="pt-4 border-t border-[rgb(var(--border-secondary))]">
+                <p className="text-xs text-[rgb(var(--text-tertiary))] mb-3 uppercase tracking-wider font-medium">Principal Information (Optional)</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
+                      Principal Name
+                    </label>
+                    <input
+                      type="text"
+                      {...register('principalName')}
+                      placeholder="e.g., Dr. Jane Smith"
+                      maxLength={100}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
+                      Principal Email
+                    </label>
+                    <input
+                      type="email"
+                      {...register('principalEmail')}
+                      placeholder="principal@school.edu"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border ${errors.principalEmail ? 'border-rust-500 focus:ring-rust-500/40' : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/40 focus:border-teal-500'} bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-all`}
+                    />
+                    {errors.principalEmail && <p className="mt-1 text-xs text-rust-500">{errors.principalEmail.message}</p>}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1007,119 +1083,59 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
 }
 
 // ============================================================================
-// SCHOOL CARD
+// SCHOOL TYPE LABELS
 // ============================================================================
 
-interface SchoolCardProps {
-  school: SchoolType
-  onDelete?: () => void
+const SCHOOL_TYPE_LABELS: Record<string, string> = {
+  elementary: 'Elementary',
+  middle: 'Middle School',
+  high: 'High School',
+  k12: 'K-12',
+  charter: 'Charter',
+  private: 'Private',
+  vocational: 'Vocational',
+  special_education: 'Special Ed',
+  other: 'Other',
 }
 
-function SchoolCard({ school, onDelete }: SchoolCardProps) {
-  const [showMenu, setShowMenu] = useState(false)
-  const navigate = useNavigate()
+// ============================================================================
+// STATUS BADGE COMPONENT
+// ============================================================================
 
-  const typeLabels: Record<string, string> = {
-    elementary: 'Elementary',
-    middle: 'Middle School',
-    high: 'High School',
-    k12: 'K-12',
-    other: 'Other',
-  }
-
-  const handleNavigate = () => {
-    if (!school.id) {
-      console.error('School ID is undefined', school)
-      return
-    }
-    navigate({ to: '/settings/schools/$schoolId', params: { schoolId: school.id } })
-  }
-
+function StatusBadge({ isActive }: { isActive: boolean }) {
   return (
-    <motion.div variants={fadeInUp}>
-      <div onClick={handleNavigate} className="block cursor-pointer">
-        <div className="relative p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500/40 hover:shadow-lg hover:shadow-teal-500/5 transition-all duration-200 group">
-          <div className="flex items-center gap-4">
-            {/* School Avatar */}
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-lg font-semibold flex-shrink-0 shadow-md shadow-teal-500/20">
-              {school.name.charAt(0)}
-            </div>
+    <span className={`
+      inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium
+      ${isActive 
+        ? 'bg-teal-500/10 text-teal-700 dark:text-teal-400' 
+        : 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
+      }
+    `}>
+      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-teal-500' : 'bg-slate-400'}`} />
+      {isActive ? 'Active' : 'Inactive'}
+    </span>
+  )
+}
 
-            {/* School Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium text-[rgb(var(--text-primary))] group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors truncate">
-                  {school.name}
-                </h3>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${school.isActive ? 'bg-teal-500/10 text-teal-700 dark:text-teal-400' : 'bg-slate-500/10 text-slate-600'}`}>
-                  {school.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 mt-1 text-xs text-[rgb(var(--text-tertiary))]">
-                <span className="font-mono">{school.code}</span>
-                {school.type && (
-                  <>
-                    <span>•</span>
-                    <span>{typeLabels[school.type] || school.type}</span>
-                  </>
-                )}
-                {school.address?.city && school.address?.state && (
-                  <>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {school.address.city}, {school.address.state}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
+// ============================================================================
+// SCHOOL NAME CELL
+// ============================================================================
 
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              {onDelete && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    setShowMenu(!showMenu)
-                  }}
-                  className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-all"
-                >
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              )}
-              <ChevronRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
-            </div>
-
-            {/* Dropdown menu */}
-            <AnimatePresence>
-              {showMenu && onDelete && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute right-4 top-14 w-36 bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl border border-[rgb(var(--border-primary))] overflow-hidden z-10"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      onDelete()
-                      setShowMenu(false)
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-rust-500 hover:bg-rust-500/10"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+function SchoolNameCell({ school }: { school: SchoolType }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+        {school.name.charAt(0)}
+      </div>
+      <div className="min-w-0">
+        <div className="font-medium text-[rgb(var(--text-primary))] truncate">
+          {school.name}
+        </div>
+        <div className="text-xs text-[rgb(var(--text-tertiary))] font-mono">
+          {school.code}
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -1168,10 +1184,11 @@ export default function SchoolsSettingsPage() {
     return <AccessDenied message="You don't have permission to manage schools." />
   }
 
+  // Fetch schools using regular query
   const {
-    data: schools,
+    data: schools = [],
     isLoading,
-    isError,
+    error,
   } = useQuery({
     queryKey: ['schools', user.tenantId],
     queryFn: () => tenantService.getSchools(user.tenantId),
@@ -1181,12 +1198,7 @@ export default function SchoolsSettingsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (schoolId: string) => tenantService.deleteSchool(schoolId),
-    onSuccess: (_data, variables) => {
-      // Optimistically update the list to remove the deleted school
-      queryClient.setQueryData(['schools', user.tenantId], (oldData: SchoolType[] | undefined) => {
-        if (!oldData) return oldData
-        return oldData.filter((school) => school.id !== variables)
-      })
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['schools', user.tenantId] })
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
@@ -1209,17 +1221,67 @@ export default function SchoolsSettingsPage() {
   const handleCreateSuccess = () => {
     navigate({ to: '/settings/schools', search: { create: undefined }, replace: true })
     setIsCreateMode(false)
+    queryClient.invalidateQueries({ queryKey: ['schools', user.tenantId] })
     setSaveSuccess(true)
     setTimeout(() => setSaveSuccess(false), 3000)
   }
 
+  const handleRowClick = (school: SchoolType) => {
+    if (school.id) {
+      navigate({ to: '/settings/schools/$schoolId', params: { schoolId: school.id } })
+    }
+  }
+
   const isTenantAdmin = user.globalRole === 'TenantAdmin'
-  const displaySchools: SchoolType[] = Array.isArray(schools) ? schools : []
-  const filteredSchools = displaySchools.filter((school) =>
-    school.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    school.code.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-  const hasSchools = displaySchools.length > 0
+
+  // Filter schools by search query
+  const filteredSchools = useMemo(() => {
+    if (!searchQuery.trim()) return schools
+    const query = searchQuery.toLowerCase()
+    return schools.filter((school) =>
+      school.name.toLowerCase().includes(query) ||
+      school.code.toLowerCase().includes(query)
+    )
+  }, [schools, searchQuery])
+
+  // Define table columns
+  const columns: Column<SchoolType>[] = useMemo(() => [
+    {
+      key: 'name',
+      header: 'School Name',
+      sortable: true,
+      render: (school) => <SchoolNameCell school={school} />,
+    },
+    {
+      key: 'type',
+      header: 'Type',
+      sortable: true,
+      render: (school) => (
+        <span className="text-[rgb(var(--text-secondary))]">
+          {SCHOOL_TYPE_LABELS[school.type || ''] || school.type || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (school) => <StatusBadge isActive={school.isActive} />,
+    },
+    {
+      key: 'location',
+      header: 'Location',
+      render: (school) => (
+        school.address?.city && school.address?.state ? (
+          <span className="flex items-center gap-1.5 text-[rgb(var(--text-secondary))]">
+            <MapPin className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+            {school.address.city}, {school.address.state}
+          </span>
+        ) : (
+          <span className="text-[rgb(var(--text-tertiary))]">—</span>
+        )
+      ),
+    },
+  ], [])
 
   // Show create page if in create mode
   if (isCreateMode) {
@@ -1231,20 +1293,12 @@ export default function SchoolsSettingsPage() {
     )
   }
 
-  if (isLoading) {
-    return (
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <LoadingState />
-      </div>
-    )
-  }
-
   // Empty state - full width experience
-  if (!hasSchools && !isError) {
+  if (!isLoading && schools.length === 0 && !error) {
     return (
       <>
         {/* Alerts */}
-        <div className="max-w-3xl mx-auto px-6 pt-6">
+        <div className="max-w-5xl mx-auto px-6 pt-6">
           <AnimatePresence>
             {saveSuccess && (
               <SettingsAlert
@@ -1273,9 +1327,9 @@ export default function SchoolsSettingsPage() {
     )
   }
 
-  // Schools list view
+  // Schools list view with DataTable
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-5xl mx-auto px-6 py-8">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -1287,13 +1341,13 @@ export default function SchoolsSettingsPage() {
           <div>
             <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))]">Schools</h1>
             <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">
-              {displaySchools.length} school{displaySchools.length !== 1 ? 's' : ''} in your organization
+              Manage schools in your organization
             </p>
           </div>
           {isTenantAdmin && (
             <Button onClick={handleCreateSchool} size="sm">
               <Plus className="w-4 h-4 mr-1.5" />
-              Add School
+              Create School
             </Button>
           )}
         </motion.div>
@@ -1320,7 +1374,7 @@ export default function SchoolsSettingsPage() {
 
         {/* Search */}
         <motion.div variants={fadeInUp}>
-          <div className="relative">
+          <div className="relative max-w-md">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             <input
               type="text"
@@ -1332,29 +1386,40 @@ export default function SchoolsSettingsPage() {
           </div>
         </motion.div>
 
-        {/* Schools List */}
-        <div className="space-y-2">
-          {filteredSchools.length > 0 ? (
-            filteredSchools.map((school) => (
-              <SchoolCard
-                key={school.id}
-                school={school}
-                onDelete={isTenantAdmin ? () => deleteMutation.mutate(school.id) : undefined}
-              />
-            ))
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <Search className="w-8 h-8 text-[rgb(var(--text-tertiary))] mx-auto mb-3" />
-              <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                No schools match "{searchQuery}"
-              </p>
-            </motion.div>
-          )}
-        </div>
+        {/* Schools DataTable */}
+        <motion.div variants={fadeInUp}>
+          <DataTable
+            columns={columns}
+            data={filteredSchools}
+            keyExtractor={(school) => school.id}
+            isLoading={isLoading}
+            onRowClick={handleRowClick}
+            rowActions={isTenantAdmin ? (school) => (
+              <button
+                onClick={() => {
+                  if (confirm(`Are you sure you want to delete "${school.name}"?`)) {
+                    deleteMutation.mutate(school.id)
+                  }
+                }}
+                className="p-2 rounded-lg hover:bg-rust-500/10 text-[rgb(var(--text-tertiary))] hover:text-rust-500 transition-colors"
+                title="Delete school"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            ) : undefined}
+            emptyState={{
+              icon: <Search className="w-10 h-10" />,
+              title: searchQuery ? `No schools match "${searchQuery}"` : 'No schools found',
+              description: searchQuery 
+                ? 'Try adjusting your search terms' 
+                : 'Create your first school to get started',
+              action: !searchQuery && isTenantAdmin ? {
+                label: 'Create School',
+                onClick: handleCreateSchool,
+              } : undefined,
+            }}
+          />
+        </motion.div>
       </motion.div>
     </div>
   )

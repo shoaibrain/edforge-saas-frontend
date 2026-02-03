@@ -70,7 +70,10 @@ export default defineConfig({
     rspack: (config, { appendPlugins }) => {
       config.output = {
         ...config.output,
-        publicPath: 'auto',
+        // Shell must use '/' (not 'auto') to prevent historyApiFallback from serving
+        // index.html when nested routes (e.g. /settings/account) request JS assets.
+        // Remotes use 'auto' instead — their assets resolve from their own origin.
+        publicPath: '/',
       }
       appendPlugins([
         new ModuleFederationPlugin({
