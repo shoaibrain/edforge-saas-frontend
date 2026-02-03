@@ -9,11 +9,23 @@
  */
 
 import { RouterProvider } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
 import { router } from './router'
 
 export function PeopleModule() {
   return (
-    <RouterProvider router={router} />
+    <>
+      <RouterProvider router={router} />
+      <Toaster 
+        position="bottom-right" 
+        richColors 
+        closeButton 
+        toastOptions={{ 
+          duration: 4000,
+          className: 'font-sans',
+        }}
+      />
+    </>
   )
 }
 
