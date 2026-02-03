@@ -51,7 +51,7 @@ export default defineConfig({
             '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
             'react-hook-form': { singleton: true, eager: true },
             zod: { singleton: true, eager: true },
-            '@hookform/resolvers': { singleton: true, eager: true },
+            '@hookform/resolvers': { singleton: true, requiredVersion: '^3.9.0', eager: true },
             'framer-motion': { singleton: true, eager: true },
             '@react-spring/web': { singleton: true, eager: true },
           },

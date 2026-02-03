@@ -93,6 +93,7 @@ export const router = createRouter({
     routeTree,
     defaultPreload: 'intent',
     basepath: '/messages',
+    defaultNotFoundComponent: () => null, // Shell handles 404 UI
 });
 
 // Register the router instance for type safety

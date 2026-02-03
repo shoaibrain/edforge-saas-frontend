@@ -91,6 +91,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
     routeTree,
     basepath: '/finance', // IMPORTANT: Matches Shell mount point
+    defaultNotFoundComponent: () => null, // Shell handles 404 UI
 })
 
 declare module '@tanstack/react-router' {

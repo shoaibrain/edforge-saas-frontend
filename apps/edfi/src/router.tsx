@@ -79,6 +79,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
   routeTree,
   basepath: '/edfi',
+  defaultNotFoundComponent: () => null, // Shell handles 404 UI
 })
 
 declare module '@tanstack/react-router' {
