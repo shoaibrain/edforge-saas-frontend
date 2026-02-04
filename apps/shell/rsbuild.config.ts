@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url'
+import path from 'path'
 import { defineConfig, loadEnv } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
@@ -8,6 +10,15 @@ const { publicVars } = loadEnv({ prefixes: ['VITE_'] })
 // Get API URL from environment (used for proxy target)
 const API_URL = process.env.VITE_API_URL || 'https://f3xlvrqt24.execute-api.us-east-1.amazonaws.com/prod'
 
+// Production builds use same-origin relative paths for remotes (consolidated deployment).
+// Development uses localhost ports for each remote's dev server.
+const isProd = process.env.NODE_ENV === 'production'
+function remoteUrl(dirName: string, mfName: string, devPort: number): string {
+  return isProd
+    ? `${mfName}@/remotes/${dirName}/remoteEntry.js`
+    : `${mfName}@http://localhost:${devPort}/remoteEntry.js`
+}
+
 export default defineConfig({
   plugins: [pluginReact()],
   source: {
@@ -15,6 +26,8 @@ export default defineConfig({
       index: './src/main.tsx',
     },
     define: publicVars,
+    // Transpile shared-types source directly (dist/ not available on Vercel)
+    include: [/types\/packages\/shared-types\/src/],
   },
   server: {
     port: 3000,
@@ -68,6 +81,17 @@ export default defineConfig({
   },
   tools: {
     rspack: (config, { appendPlugins }) => {
+      // Ensure Rspack can resolve workspace packages from the monorepo root node_modules
+      // (fixes pnpm symlink resolution on Vercel for packages in types/packages/*)
+      const monorepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+      config.resolve = {
+        ...config.resolve,
+        modules: ['node_modules', path.resolve(monorepoRoot, 'node_modules')],
+        alias: {
+          ...(config.resolve?.alias || {}),
+          '@edforge/shared-types': path.resolve(monorepoRoot, 'types/packages/shared-types/src'),
+        },
+      }
       config.output = {
         ...config.output,
         // Shell must use '/' (not 'auto') to prevent historyApiFallback from serving
@@ -79,13 +103,13 @@ export default defineConfig({
         new ModuleFederationPlugin({
           name: 'shell',
           remotes: {
-            academics: 'academics@http://localhost:3002/remoteEntry.js',
-            finance: 'finance@http://localhost:3003/remoteEntry.js',
-            edfi: 'edfi@http://localhost:3001/remoteEntry.js',
-            'special-programs': 'special_programs@http://localhost:3005/remoteEntry.js',
-            people: 'people@http://localhost:3006/remoteEntry.js',
-            messages: 'messages@http://localhost:3007/remoteEntry.js',
-            analytics: 'analytics@http://localhost:3008/remoteEntry.js',
+            academics:          remoteUrl('academics', 'academics', 3002),
+            finance:            remoteUrl('finance', 'finance', 3003),
+            edfi:               remoteUrl('edfi', 'edfi', 3001),
+            'special-programs': remoteUrl('special-programs', 'special_programs', 3005),
+            people:             remoteUrl('people', 'people', 3006),
+            messages:           remoteUrl('messages', 'messages', 3007),
+            analytics:          remoteUrl('analytics', 'analytics', 3008),
           },
           shared: {
             // Auth - CRITICAL: aws-amplify must be singleton to share token state across all modules

@@ -6,6 +6,7 @@ node_modules/
 # Build outputs
 dist/
 build/
+output/
 *.tsbuildinfo
 
 # Turbo cache
@@ -116,3 +117,4 @@ debugging.txt
 package-lock.json
 yarn.lock
 
+.vercel

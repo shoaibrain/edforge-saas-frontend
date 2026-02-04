@@ -1,9 +1,15 @@
+import { fileURLToPath } from 'url'
+import path from 'path'
 import { defineConfig } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
 
 export default defineConfig({
   plugins: [pluginReact()],
+  source: {
+    // Transpile shared-types source directly (dist/ not available on Vercel)
+    include: [/types\/packages\/shared-types\/src/],
+  },
   server: {
     port: 3006,
     cors: true,
@@ -24,6 +30,17 @@ export default defineConfig({
   },
   tools: {
     rspack: (config, { appendPlugins }) => {
+      // Ensure Rspack can resolve workspace packages from the monorepo root node_modules
+      // (fixes pnpm symlink resolution on Vercel for packages in types/packages/*)
+      const monorepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+      config.resolve = {
+        ...config.resolve,
+        modules: ['node_modules', path.resolve(monorepoRoot, 'node_modules')],
+        alias: {
+          ...(config.resolve?.alias || {}),
+          '@edforge/shared-types': path.resolve(monorepoRoot, 'types/packages/shared-types/src'),
+        },
+      }
       config.output = {
         ...config.output,
         publicPath: 'auto',
