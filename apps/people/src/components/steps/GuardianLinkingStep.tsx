@@ -166,7 +166,7 @@ function GuardianCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="font-medium text-[rgb(var(--text-primary))]">
-              {guardian.firstName} {guardian.lastName}
+              {guardian.firstName ?? ''} {guardian.lastName ?? ''}
             </p>
             {isPrimary && (
               <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-teal-500/15 text-teal-700 dark:text-cyan-300">
@@ -366,8 +366,8 @@ export function GuardianLinkingStep({
   // Filter guardians based on search
   const filteredGuardians = MOCK_GUARDIANS.filter(
     (g) =>
-      g.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (g.firstName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (g.lastName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       g.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
 

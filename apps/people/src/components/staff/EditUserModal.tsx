@@ -108,7 +108,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
       open={open}
       onClose={handleClose}
       title="Edit Staff Member"
-      description={`Update information for ${user.firstName} ${user.lastName}`}
+      description={`Update information for ${user.firstName ?? ''} ${user.lastName ?? ''}`}
       size="md"
     >
       <form onSubmit={onSubmit} className="space-y-4">

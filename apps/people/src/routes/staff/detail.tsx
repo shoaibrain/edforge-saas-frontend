@@ -37,6 +37,7 @@ import {
 } from 'lucide-react'
 import { peopleService } from '../../services/people.service'
 import type { SecurityOverview, UserSession, SchoolAssignment, UserResponseDto } from '../../services/people.service'
+import { getStaffAvatar } from '../../lib/avatar'
 
 // ============================================================================
 // ANIMATION VARIANTS
@@ -216,38 +217,38 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
             variants={staggerChildren}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-5"
         >
             {/* Profile Information */}
-            <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-6">
-                {/* Contact Information Card */}
-                <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-primary))] p-6">
-                    <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4 flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+            <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-5">
+                {/* Contact Information */}
+                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <Mail className="w-3.5 h-3.5" />
                         Contact Information
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Email</span>
-                            <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{user.email}</p>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Email</span>
+                            <p className="text-sm text-[rgb(var(--text-primary))]">{user.email}</p>
                         </div>
                         {user.phone && (
                             <div className="space-y-1">
-                                <span className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Phone</span>
-                                <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{user.phone}</p>
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Phone</span>
+                                <p className="text-sm text-[rgb(var(--text-primary))]">{user.phone}</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Address Card */}
+                {/* Address */}
                 {user.address && (
-                    <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-primary))] p-6">
-                        <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4 flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                    <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                        <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <MapPin className="w-3.5 h-3.5" />
                             Address
                         </h3>
-                        <div className="text-sm text-[rgb(var(--text-secondary))] space-y-1">
+                        <div className="text-sm text-[rgb(var(--text-secondary))] space-y-0.5">
                             {user.address.street && <p>{user.address.street}</p>}
                             {user.address.street2 && <p>{user.address.street2}</p>}
                             <p>
@@ -260,16 +261,16 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                     </div>
                 )}
 
-                {/* Account Details Card */}
-                <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-primary))] p-6">
-                    <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4 flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                {/* Account Details */}
+                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <Activity className="w-3.5 h-3.5" />
                         Account Details
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">User ID</span>
-                            <div className="flex items-center gap-2">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">User ID</span>
+                            <div className="flex items-center gap-1.5">
                                 <p className="text-xs font-mono text-[rgb(var(--text-secondary))] truncate max-w-[200px]" title={user.userId}>
                                     {user.userId}
                                 </p>
@@ -277,11 +278,11 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Global Role</span>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Global Role</span>
                             <p className="text-sm text-teal-600 dark:text-teal-400 font-medium">{user.globalRole}</p>
                         </div>
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Created</span>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Created</span>
                             <p className="text-sm text-[rgb(var(--text-secondary))]">
                                 {new Date(user.createdAt).toLocaleDateString(undefined, {
                                     year: 'numeric',
@@ -291,7 +292,7 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                             </p>
                         </div>
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Last Updated</span>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Last Updated</span>
                             <p className="text-sm text-[rgb(var(--text-secondary))]">
                                 {new Date(user.updatedAt).toLocaleDateString(undefined, {
                                     year: 'numeric',
@@ -304,36 +305,36 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                 </div>
             </motion.div>
 
-            {/* Sidebar - Security Summary */}
-            <motion.div variants={fadeInUp} className="space-y-6">
-                {/* Quick Security Overview */}
-                <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-primary))] p-6">
-                    <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4 flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+            {/* Sidebar */}
+            <motion.div variants={fadeInUp} className="space-y-5">
+                {/* Security Summary */}
+                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <Shield className="w-3.5 h-3.5" />
                         Security Summary
                     </h3>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between py-2 border-b border-[rgb(var(--border-secondary))]">
+                    <div className="space-y-0">
+                        <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
                             <span className="text-sm text-[rgb(var(--text-secondary))]">MFA Status</span>
                             {security?.mfaEnabled ? (
                                 <span className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
-                                    <CheckCircle2 className="w-4 h-4" />
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
                                     Enabled
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
-                                    <AlertTriangle className="w-4 h-4" />
+                                    <AlertTriangle className="w-3.5 h-3.5" />
                                     Not Enabled
                                 </span>
                             )}
                         </div>
-                        <div className="flex items-center justify-between py-2 border-b border-[rgb(var(--border-secondary))]">
+                        <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
                             <span className="text-sm text-[rgb(var(--text-secondary))]">Active Sessions</span>
                             <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                                {security?.activeSessions ?? '-'}
+                                {security?.activeSessions ?? 0}
                             </span>
                         </div>
-                        <div className="flex items-center justify-between py-2">
+                        <div className="flex items-center justify-between py-2.5">
                             <span className="text-sm text-[rgb(var(--text-secondary))]">Last Login</span>
                             <span className="text-sm text-[rgb(var(--text-primary))]">
                                 {security?.lastLoginAt
@@ -345,9 +346,9 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                 </div>
 
                 {/* Account Status */}
-                <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-primary))] p-6">
-                    <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <Clock className="w-3.5 h-3.5" />
                         Account Status
                     </h3>
                     <div className="space-y-3">
@@ -356,8 +357,8 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                             <StatusBadge status={user.status} />
                         </div>
                         {security?.accountLocked && (
-                            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                                <XCircle className="w-4 h-4 text-red-500" />
+                            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20">
+                                <XCircle className="w-3.5 h-3.5 text-red-500" />
                                 <span className="text-sm text-red-600 dark:text-red-400">Account Locked</span>
                             </div>
                         )}
@@ -691,45 +692,41 @@ export default function StaffDetailPage() {
         )
     }
 
-    const displayName = user.displayName || `${user.firstName} ${user.lastName}`.trim()
+    const displayName = user.displayName || [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Unknown User'
+
+    const avatarUrl = user.avatarUrl || getStaffAvatar(user.email || displayName)
 
     return (
         <div className="min-h-full">
-            <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
+            <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-0">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[rgb(var(--border-primary))] pb-0.5">
-                    {/* Left: Profile Info */}
-                    <div className="flex items-start gap-5 pb-4">
+                <div className="space-y-0">
+                    {/* Profile Info */}
+                    <div className="flex items-start gap-5 pb-6">
                         <Link
                             to="/staff"
-                            className="p-2 -ml-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                            className="p-2 -ml-2 mt-1 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
-                        
+
                         {/* Avatar */}
-                        <div className="relative">
-                            {user.avatarUrl ? (
-                                <img
-                                    src={user.avatarUrl}
-                                    alt={displayName}
-                                    className="w-16 h-16 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))]"
-                                />
-                            ) : (
-                                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-2xl font-bold text-white ring-2 ring-[rgb(var(--border-primary))]">
-                                    {user.firstName?.[0]}{user.lastName?.[0]}
-                                </div>
-                            )}
+                        <div className="relative flex-shrink-0">
+                            <img
+                                src={avatarUrl}
+                                alt={displayName}
+                                className="w-16 h-16 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+                            />
                             <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[rgb(var(--surface-primary))] ${user.status === 'active' ? 'bg-emerald-500' : user.status === 'pending' ? 'bg-amber-500' : 'bg-gray-400'}`} />
                         </div>
 
                         {/* Name & Meta */}
-                        <div>
+                        <div className="min-w-0">
                             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] tracking-tight">
                                 {displayName}
                             </h1>
-                            <div className="flex items-center gap-3 mt-2 text-sm">
-                                <span className="text-[rgb(var(--text-tertiary))]">{user.email}</span>
+                            <div className="flex flex-wrap items-center gap-3 mt-1.5 text-sm">
+                                <span className="text-[rgb(var(--text-tertiary))] truncate">{user.email}</span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
                                 <span className="font-medium text-teal-600 dark:text-teal-400">
                                     {user.globalRole}
@@ -740,8 +737,8 @@ export default function StaffDetailPage() {
                         </div>
                     </div>
 
-                    {/* Right: Animated Tabs */}
-                    <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar -mb-px">
+                    {/* Tabs — left-aligned */}
+                    <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
                         {TABS.map((tab) => {
                             const isActive = activeTab === tab.id
                             const Icon = tab.icon
@@ -778,7 +775,7 @@ export default function StaffDetailPage() {
                 </div>
 
                 {/* Content Area */}
-                <div className="min-h-[500px]">
+                <div className="min-h-[500px] pt-6">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}

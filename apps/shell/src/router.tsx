@@ -14,6 +14,7 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
 import { ShellProvider } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingScreen } from './components/layout/LoadingScreen'
@@ -103,6 +104,7 @@ function RootLayout() {
   return (
     <ShellProvider>
       <ThemeSync />
+      <Toaster position="bottom-right" richColors closeButton />
       <Suspense fallback={<LoadingScreen />}>
         <Outlet />
       </Suspense>

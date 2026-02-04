@@ -195,7 +195,7 @@ export default function StaffPage() {
           </div>
           <div>
             <div className="font-medium text-text-primary">
-              {user.firstName} {user.lastName}
+              {user.firstName ?? ''} {user.lastName ?? ''}
             </div>
             <div className="text-sm text-text-secondary">{user.email}</div>
           </div>

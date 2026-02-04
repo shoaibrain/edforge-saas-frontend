@@ -8,16 +8,17 @@
 import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Save, 
-  Check, 
+import {
+  Save,
+  Check,
   ChevronDown,
   AlertCircle,
   CheckCircle2,
   XCircle,
   Info,
   X,
-  type LucideIcon 
+  RotateCcw,
+  type LucideIcon
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { cn } from '@/lib/utils'
@@ -667,6 +668,85 @@ export function SettingsEmptyState({
       )}
       {action && <div className="mt-4">{action}</div>}
     </motion.div>
+  )
+}
+
+// ============================================================================
+// UNSAVED CHANGES BAR
+// ============================================================================
+
+export interface UnsavedChangesBarProps {
+  isDirty: boolean
+  onReset: () => void
+  onSave: () => void
+  isSaving?: boolean
+  message?: string
+}
+
+export function UnsavedChangesBar({
+  isDirty,
+  onReset,
+  onSave,
+  isSaving = false,
+  message = 'You have unsaved changes',
+}: UnsavedChangesBarProps) {
+  return (
+    <AnimatePresence>
+      {isDirty && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-2xl border border-[rgb(var(--border-primary))]"
+        >
+          <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+            {message}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={onReset} disabled={isSaving}>
+              <RotateCcw className="w-4 h-4 mr-1.5" />
+              Reset
+            </Button>
+            <Button size="sm" onClick={onSave} isLoading={isSaving}>
+              <Save className="w-4 h-4 mr-1.5" />
+              Save Changes
+            </Button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+// ============================================================================
+// SETTINGS FIELD ROW
+// ============================================================================
+
+export interface SettingsFieldRowProps {
+  label: string
+  description?: string
+  children: ReactNode
+  inline?: boolean
+  className?: string
+}
+
+export function SettingsFieldRow({ label, description, children, inline, className }: SettingsFieldRowProps) {
+  return (
+    <div className={cn(
+      'py-4 border-b border-[rgb(var(--border-tertiary))] last:border-b-0',
+      inline && 'flex items-center justify-between gap-4',
+      className
+    )}>
+      <div className={inline ? 'flex-1' : 'mb-2'}>
+        <label className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</label>
+        {description && (
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{description}</p>
+        )}
+      </div>
+      <div className={inline ? '' : 'mt-2'}>
+        {children}
+      </div>
+    </div>
   )
 }
 

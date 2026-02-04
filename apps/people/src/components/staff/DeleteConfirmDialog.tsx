@@ -64,7 +64,7 @@ export function DeleteConfirmDialog({
             </h4>
             <p className="mt-1 text-sm text-red-700 dark:text-red-300">
               You are about to permanently delete the user account for{' '}
-              <strong>{user.firstName} {user.lastName}</strong>.
+              <strong>{user.firstName ?? ''} {user.lastName ?? ''}</strong>.
               This will remove all their data and access.
             </p>
           </div>
@@ -74,11 +74,11 @@ export function DeleteConfirmDialog({
         <div className="p-4 rounded-lg bg-surface-secondary border border-border-secondary">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 font-medium">
-              {user.firstName[0]}{user.lastName[0]}
+              {user.firstName?.[0] ?? '?'}{user.lastName?.[0] ?? '?'}
             </div>
             <div>
               <p className="font-medium text-text-primary">
-                {user.firstName} {user.lastName}
+                {user.firstName ?? ''} {user.lastName ?? ''}
               </p>
               <p className="text-sm text-text-secondary">{user.email}</p>
             </div>

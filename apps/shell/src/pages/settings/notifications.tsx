@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 import { 
   Bell,
   Mail,
@@ -26,7 +27,6 @@ import {
   SettingsPageHeader,
   SettingsSection,
   SettingsToggleRow,
-  SettingsAlert,
   SettingsSkeleton,
   staggerChildren,
 } from '@/components/settings/SettingsShared'
@@ -163,8 +163,6 @@ export default function NotificationsPage() {
   const queryClient = useQueryClient()
   
   // Local state for UI
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
   const [pendingChanges, setPendingChanges] = useState<Map<string, boolean>>(new Map())
   
   // Local notification state
@@ -204,14 +202,11 @@ export default function NotificationsPage() {
     mutationFn: (data: UpdatePreferencesDto) => usersService.updatePreferences(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['preferences', user?.id] })
-      setSaveSuccess(true)
-      setSaveError(null)
+      toast.success('Notification settings saved')
       setPendingChanges(new Map())
-      setTimeout(() => setSaveSuccess(false), 2000)
     },
     onError: (err: Error) => {
-      setSaveError(err.message || 'Failed to save notification settings')
-      setSaveSuccess(false)
+      toast.error(err.message || 'Failed to save notification settings')
       setPendingChanges(new Map())
     },
   })
@@ -336,26 +331,6 @@ export default function NotificationsPage() {
           title="Notifications"
           description="Manage how and when you receive updates"
         />
-
-        {/* Alerts */}
-        <AnimatePresence>
-          {saveSuccess && (
-            <SettingsAlert
-              type="success"
-              message="Notification settings saved"
-              onDismiss={() => setSaveSuccess(false)}
-              autoDismiss
-              autoDismissDelay={2000}
-            />
-          )}
-          {saveError && (
-            <SettingsAlert
-              type="error"
-              message={saveError}
-              onDismiss={() => setSaveError(null)}
-            />
-          )}
-        </AnimatePresence>
 
         {/* Delivery Channels */}
         <SettingsSection
