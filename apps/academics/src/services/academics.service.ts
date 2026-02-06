@@ -23,6 +23,15 @@ export type {
   StudentStatus,
   CreateEnrollmentDto,
   EnrollmentResponseDto,
+  CourseResponseDto,
+  CourseListResponseDto,
+  CourseFilterDto,
+  CreateCourseDto,
+  UpdateCourseDto,
+  CourseSubjectArea,
+  CourseType,
+  CreditType,
+  CourseDuration,
 } from '@edforge/shared-types'
 
 // Import for internal use
@@ -35,6 +44,11 @@ import type {
   UpdateStudentDto,
   CreateEnrollmentDto,
   EnrollmentResponseDto,
+  CourseResponseDto,
+  CourseListResponseDto,
+  CourseFilterDto,
+  CreateCourseDto,
+  UpdateCourseDto,
 } from '@edforge/shared-types'
 
 // ============================================================================
@@ -284,6 +298,78 @@ export async function createEnrollment(
 }
 
 // ============================================================================
+// COURSE CRUD OPERATIONS
+// ============================================================================
+
+/**
+ * List courses with optional filters and pagination
+ * GET /academics/courses
+ */
+export async function getCourses(
+  params: CourseFilterDto & PaginationQuery
+): Promise<CourseListResponseDto> {
+  const queryParams: Record<string, unknown> = {}
+
+  if (params.schoolId) queryParams.schoolId = params.schoolId
+  if (params.subjectArea) queryParams.subjectArea = params.subjectArea
+  if (params.courseType) queryParams.courseType = params.courseType
+  if (params.creditType) queryParams.creditType = params.creditType
+  if (params.gradeLevel) queryParams.gradeLevel = params.gradeLevel
+  if (params.departmentId) queryParams.departmentId = params.departmentId
+  if (params.academicYearId) queryParams.academicYearId = params.academicYearId
+  if (params.isActive !== undefined) queryParams.isActive = params.isActive
+  if (params.searchTerm) queryParams.search = params.searchTerm
+  if (params.limit) queryParams.limit = params.limit
+  if (params.cursor) queryParams.cursor = params.cursor
+
+  return apiGet<CourseListResponseDto>('/academics/courses', queryParams)
+}
+
+/**
+ * Get course by ID
+ * GET /academics/courses/:id?schoolId=
+ */
+export async function getCourse(
+  courseId: string,
+  schoolId: string
+): Promise<CourseResponseDto> {
+  return apiGet<CourseResponseDto>(`/academics/courses/${courseId}`, { schoolId })
+}
+
+/**
+ * Create a new course
+ * POST /academics/courses
+ */
+export async function createCourse(
+  data: CreateCourseDto
+): Promise<CourseResponseDto> {
+  return apiPost<CourseResponseDto>('/academics/courses', data)
+}
+
+/**
+ * Update course
+ * PATCH /academics/courses/:id?schoolId=
+ */
+export async function updateCourse(
+  courseId: string,
+  schoolId: string,
+  data: UpdateCourseDto
+): Promise<CourseResponseDto> {
+  return apiPatch<CourseResponseDto>(`/academics/courses/${courseId}?schoolId=${schoolId}`, data)
+}
+
+/**
+ * Delete (deactivate) course
+ * DELETE /academics/courses/:id?schoolId=
+ */
+export async function deleteCourse(
+  courseId: string,
+  schoolId: string
+): Promise<void> {
+  return apiDelete(`/academics/courses/${courseId}?schoolId=${schoolId}`)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -297,4 +383,10 @@ export const academicsService = {
   deleteStudent,
   // Enrollment
   createEnrollment,
+  // Course CRUD
+  getCourses,
+  getCourse,
+  createCourse,
+  updateCourse,
+  deleteCourse,
 }

@@ -15,4 +15,14 @@ export {
   getTotalFromPages,
   studentKeys,
 } from './useStudents'
+export {
+  useCourses,
+  useCourse,
+  useCreateCourse,
+  useUpdateCourse,
+  useDeleteCourse,
+  flattenCoursePages,
+  getCourseTotalFromPages,
+  courseKeys,
+} from './useCourses'
 export { useWizardForm } from './useWizardForm'

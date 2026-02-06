@@ -5,7 +5,6 @@ import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
 import { useAppStore } from '../../stores/app.store'
-import { useAuthStore } from '../../stores/auth.store'
 import { useRouteFocus, useRouteAnnouncement } from '../../hooks/useFocusManagement'
 
 interface AppShellProps {
@@ -15,23 +14,15 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
-  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  const setActiveSchoolId = useAppStore((s) => s.setActiveSchoolId)
-  const user = useAuthStore((s) => s.user)
 
   // Accessibility: Focus management on route changes
   useRouteFocus()
   useRouteAnnouncement()
 
-  // Auto-select first school if none selected
-  useEffect(() => {
-    if (!activeSchoolId && user) {
-      const schools = Object.keys(user.assignments)
-      if (schools.length > 0) {
-        setActiveSchoolId(schools[0])
-      }
-    }
-  }, [activeSchoolId, user, setActiveSchoolId])
+  // NOTE: School auto-selection is handled by the SidebarSchoolSelector
+  // which fetches real schools from the API. Do NOT auto-select from
+  // user.assignments keys here — those are role-mapping keys that may
+  // not match actual school UUIDs from the Identity service.
 
   // Keyboard shortcut: Cmd+B / Ctrl+B to toggle sidebar
   useEffect(() => {
