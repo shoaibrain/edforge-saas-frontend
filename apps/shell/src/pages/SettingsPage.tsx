@@ -50,7 +50,7 @@ function SettingsOverviewPage() {
     <div className="max-w-4xl mx-auto px-6 py-8">
       <SettingsOverviewContent
         avatarUrl={avatarUrl}
-        userName={user?.name}
+        userName={user?.displayName || user?.name}
         userEmail={user?.email}
         userRole={user?.globalRole}
       />

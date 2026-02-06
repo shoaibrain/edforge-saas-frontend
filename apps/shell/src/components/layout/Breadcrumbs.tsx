@@ -16,7 +16,7 @@
 
 import { useMemo } from 'react'
 import { Link, useMatches } from '@tanstack/react-router'
-import { ChevronRight, Home } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../../lib/utils'
 
@@ -328,9 +328,6 @@ export function Breadcrumbs() {
                   )}
                   title={crumb.label}
                 >
-                  {index === 0 && (
-                    <Home className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
-                  )}
                   <span className="truncate">{crumb.label}</span>
                 </Link>
               )}

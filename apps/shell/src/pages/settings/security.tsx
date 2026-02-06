@@ -1,6 +1,6 @@
 /**
  * Security Settings Page
- * 
+ *
  * Manage account security settings including password, MFA, and sessions.
  * Integrated with backend Security API and Cognito.
  */
@@ -9,71 +9,32 @@ import { useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Key, 
-  Smartphone, 
-  Shield, 
-  Monitor,
-  Tablet,
-  Globe,
-  LogOut,
-  CheckCircle2,
+import {
   AlertTriangle,
-  XCircle,
-  Clock,
-  MapPin,
-  Eye,
-  EyeOff,
-  QrCode,
-  Copy,
   Check,
+  Key,
+  Monitor,
+  RotateCcw,
+  Shield,
+  type LucideIcon,
 } from 'lucide-react'
 import { useQuery, useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
 import { TextField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
-import { 
-  passwordChangeSchema, 
-  mfaVerificationSchema,
+import {
+  passwordChangeSchema,
   type PasswordChangeFormValues,
-  type MfaVerificationFormValues,
 } from '@/schemas/person.schema'
 import {
   SettingsPageHeader,
-  SettingsSection,
   SettingsRow,
-  SettingsAlert,
   SettingsSkeleton,
-  // SettingsEmptyState, // Post-MVP: used for sessions
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { 
-  usersService, 
-  type SecurityOverview,
-  // Post-MVP types
-  // type UserSession,
-  // type LoginHistoryEntry,
-  // type MfaSetupResponse,
-} from '@/services/users.service'
-
-// ============================================================================
-// DEVICE ICON HELPER (Post-MVP)
-// ============================================================================
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getDeviceIcon(deviceType: 'desktop' | 'mobile' | 'tablet' | 'unknown') {
-  switch (deviceType) {
-    case 'desktop':
-      return Monitor
-    case 'mobile':
-      return Smartphone
-    case 'tablet':
-      return Tablet
-    default:
-      return Globe
-  }
-}
+import { usersService, type SecurityOverview } from '@/services/users.service'
 
 // ============================================================================
 // PASSWORD STRENGTH INDICATOR
@@ -88,7 +49,7 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
     if (/[a-z]/.test(pwd)) score++
     if (/[0-9]/.test(pwd)) score++
     if (/[^A-Za-z0-9]/.test(pwd)) score++
-    
+
     if (score <= 2) return { score: 1, label: 'Weak', color: 'bg-red-500' }
     if (score <= 4) return { score: 2, label: 'Fair', color: 'bg-amber-500' }
     if (score <= 5) return { score: 3, label: 'Good', color: 'bg-emerald-500' }
@@ -111,7 +72,11 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
           />
         ))}
       </div>
-      <p className={`text-xs ${strength.score <= 1 ? 'text-red-500' : strength.score <= 2 ? 'text-amber-500' : 'text-emerald-500'}`}>
+      <p
+        className={`text-xs ${
+          strength.score <= 1 ? 'text-red-500' : strength.score <= 2 ? 'text-amber-500' : 'text-emerald-500'
+        }`}
+      >
         {strength.label}
       </p>
     </div>
@@ -145,11 +110,16 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
     },
   })
 
-  const { handleSubmit, watch, reset, formState: { isSubmitting } } = methods
+  const {
+    handleSubmit,
+    watch,
+    reset,
+    formState: { isSubmitting },
+  } = methods
   const newPassword = watch('newPassword')
 
   const changeMutation = useMutation({
-    mutationFn: (data: PasswordChangeFormValues) => 
+    mutationFn: (data: PasswordChangeFormValues) =>
       usersService.changePassword(user!.id, {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
@@ -159,10 +129,17 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
       onSuccess()
       onClose()
     },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : 'Failed to change password')
+    },
   })
 
   const onSubmit = async (data: PasswordChangeFormValues) => {
-    await changeMutation.mutateAsync(data)
+    try {
+      await changeMutation.mutateAsync(data)
+    } catch {
+      // Error handled via toast
+    }
   }
 
   if (!isOpen) return null
@@ -202,7 +179,11 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
                   onClick={() => setShowPasswords((p) => ({ ...p, current: !p.current }))}
                   className="absolute right-3 top-8 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
                 >
-                  {showPasswords.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPasswords.current ? (
+                    <span className="text-xs font-semibold">Hide</span>
+                  ) : (
+                    <span className="text-xs font-semibold">Show</span>
+                  )}
                 </button>
               </div>
 
@@ -218,7 +199,11 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
                   onClick={() => setShowPasswords((p) => ({ ...p, new: !p.new }))}
                   className="absolute right-3 top-8 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
                 >
-                  {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPasswords.new ? (
+                    <span className="text-xs font-semibold">Hide</span>
+                  ) : (
+                    <span className="text-xs font-semibold">Show</span>
+                  )}
                 </button>
                 <PasswordStrengthIndicator password={newPassword || ''} />
               </div>
@@ -235,16 +220,13 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
                   onClick={() => setShowPasswords((p) => ({ ...p, confirm: !p.confirm }))}
                   className="absolute right-3 top-8 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
                 >
-                  {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPasswords.confirm ? (
+                    <span className="text-xs font-semibold">Hide</span>
+                  ) : (
+                    <span className="text-xs font-semibold">Show</span>
+                  )}
                 </button>
               </div>
-
-              {changeMutation.isError && (
-                <SettingsAlert
-                  type="error"
-                  message={changeMutation.error instanceof Error ? changeMutation.error.message : 'Failed to change password'}
-                />
-              )}
 
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
@@ -263,349 +245,231 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
 }
 
 // ============================================================================
-// MFA SETUP MODAL (Post-MVP - Disabled until backend supports Access Token)
+// SECURITY OVERVIEW CARD
 // ============================================================================
 
-interface MfaSetupModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
+type StatusTone = 'good' | 'warn' | 'neutral'
+
+const STATUS_DOT: Record<StatusTone, string> = {
+  good: 'bg-emerald-500',
+  warn: 'bg-amber-500',
+  neutral: 'bg-[rgb(var(--text-tertiary))]',
 }
 
-// Post-MVP: MFA Setup Modal - disabled for MVP
-// @ts-expect-error - Disabled for MVP, will be enabled later
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps) {
-  const user = useAuthStore((s) => s.user)
-  const [step, setStep] = useState<'setup' | 'verify' | 'backup'>('setup')
-  const [setupData, setSetupData] = useState<any>(null) // MfaSetupResponse - disabled for MVP
-  const [copiedCode, setCopiedCode] = useState(false)
+function StatusItem({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: string
+  tone: StatusTone
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[tone]}`} />
+      <div className="flex items-center gap-2 text-sm">
+        <span className="font-medium text-[rgb(var(--text-primary))]">{label}</span>
+        <span className="text-[rgb(var(--text-secondary))]">{value}</span>
+      </div>
+    </div>
+  )
+}
 
-  const methods = useForm<MfaVerificationFormValues>({
-    resolver: zodResolver(mfaVerificationSchema),
-    defaultValues: { code: '' },
-  })
+function getPasswordLastChangedText(passwordLastChanged?: string | null): string {
+  if (!passwordLastChanged) return 'Never changed'
+  const daysSince = Math.floor((Date.now() - new Date(passwordLastChanged).getTime()) / (1000 * 60 * 60 * 24))
+  if (daysSince === 0) return 'Changed today'
+  if (daysSince === 1) return 'Changed yesterday'
+  return `Changed ${daysSince} days ago`
+}
 
-  const { handleSubmit, reset, formState: { isSubmitting } } = methods
-
-  // Initiate MFA setup
-  const setupMutation = useMutation({
-    mutationFn: () => usersService.initiateMfaSetup(user!.id),
-    onSuccess: (data) => {
-      setSetupData(data)
-      setStep('verify')
-    },
-  })
-
-  // Verify MFA code
-  const verifyMutation = useMutation({
-    mutationFn: (data: MfaVerificationFormValues) => 
-      usersService.verifyAndEnableMfa(user!.id, data),
-    onSuccess: (data: { success: boolean; backupCodes?: string[] }) => {
-      if (data.backupCodes && data.backupCodes.length > 0) {
-        setSetupData((prev: any) => prev ? { ...prev, backupCodes: data.backupCodes! } : prev)
-        setStep('backup')
-      } else {
-        onSuccess()
-        onClose()
-      }
-    },
-  })
-
-  const handleStartSetup = () => {
-    setupMutation.mutate()
+function SecurityOverviewCard({
+  overview,
+  onRetry,
+}: {
+  overview?: SecurityOverview
+  onRetry: () => void
+}) {
+  if (!overview) {
+    return (
+      <motion.div
+        variants={fadeInUp}
+        className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Security Overview</h2>
+            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
+              Unable to load security overview.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={onRetry}>
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Retry
+          </Button>
+        </div>
+      </motion.div>
+    )
   }
 
-  const onVerify = async (data: MfaVerificationFormValues) => {
-    await verifyMutation.mutateAsync(data)
-  }
-
-  const handleCopySecret = async () => {
-    if (setupData?.secretKey) {
-      await navigator.clipboard.writeText(setupData.secretKey)
-      setCopiedCode(true)
-      setTimeout(() => setCopiedCode(false), 2000)
-    }
-  }
-
-  const handleClose = () => {
-    setStep('setup')
-    setSetupData(null)
-    reset()
-    onClose()
-  }
-
-  const handleComplete = () => {
-    onSuccess()
-    handleClose()
-  }
-
-  if (!isOpen) return null
+  const daysSincePasswordChange = overview.passwordLastChanged
+    ? Math.floor((Date.now() - new Date(overview.passwordLastChanged).getTime()) / (1000 * 60 * 60 * 24))
+    : null
+  const passwordTone = daysSincePasswordChange !== null && daysSincePasswordChange < 90 ? 'good' : 'warn'
+  const passwordText = getPasswordLastChangedText(overview.passwordLastChanged)
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-        onClick={handleClose}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md mx-4 p-6 rounded-2xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-xl"
-        >
-          {step === 'setup' && (
-            <>
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-teal-500/10 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-teal-600 dark:text-cyan-400" />
-                </div>
-                <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Enable Two-Factor Authentication</h2>
-                <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                  Add an extra layer of security to your account
-                </p>
-              </div>
+    <motion.div
+      variants={fadeInUp}
+      className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] space-y-4"
+    >
+      <div>
+        <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Security Overview</h2>
+        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+          Quick summary of your account security.
+        </p>
+      </div>
 
-              <div className="space-y-3 mb-6 text-sm text-[rgb(var(--text-secondary))]">
-                <p>1. Install an authenticator app (Google Authenticator, Authy, etc.)</p>
-                <p>2. Scan the QR code with your authenticator app</p>
-                <p>3. Enter the verification code to enable 2FA</p>
-              </div>
+      <div className="space-y-2">
+        <StatusItem label="Password" value={passwordText} tone={passwordTone} />
+        <StatusItem label="Two-Factor" value={overview.mfaEnabled ? 'Enabled' : 'Not enabled'} tone={overview.mfaEnabled ? 'good' : 'warn'} />
+        <StatusItem
+          label="Sessions"
+          value={`${overview.activeSessions} active session${overview.activeSessions === 1 ? '' : 's'}`}
+          tone="neutral"
+        />
+      </div>
 
-              <div className="flex gap-3">
-                <Button type="button" variant="ghost" onClick={handleClose} className="flex-1">
-                  Cancel
-                </Button>
-                <Button 
-                  type="button" 
-                  onClick={handleStartSetup} 
-                  disabled={setupMutation.isPending}
-                  className="flex-1"
-                >
-                  {setupMutation.isPending ? 'Setting up...' : 'Get Started'}
-                </Button>
-              </div>
-            </>
-          )}
-
-          {step === 'verify' && setupData && (
-            <>
-              <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-1">Scan QR Code</h2>
-              <p className="text-sm text-[rgb(var(--text-tertiary))] mb-4">
-                Scan this code with your authenticator app
-              </p>
-
-              <div className="flex justify-center mb-4">
-                <div className="p-4 bg-white rounded-xl">
-                  {setupData.qrCodeUrl ? (
-                    <img src={setupData.qrCodeUrl} alt="QR Code" className="w-48 h-48" />
-                  ) : (
-                    <div className="w-48 h-48 flex items-center justify-center bg-gray-100 rounded">
-                      <QrCode className="w-16 h-16 text-gray-400" />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="mb-4 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-                <p className="text-xs text-[rgb(var(--text-tertiary))] mb-1">Or enter this code manually:</p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 text-sm font-mono text-[rgb(var(--text-primary))] break-all">
-                    {setupData.secretKey}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={handleCopySecret}
-                    className="p-1.5 rounded hover:bg-[rgb(var(--surface-secondary))] transition-colors"
-                  >
-                    {copiedCode ? (
-                      <Check className="w-4 h-4 text-emerald-500" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onVerify)} className="space-y-4">
-                  <TextField
-                    name="code"
-                    label="Verification Code"
-                    placeholder="Enter 6-digit code"
-                    maxLength={6}
-                  />
-
-                  {verifyMutation.isError && (
-                    <SettingsAlert
-                      type="error"
-                      message={verifyMutation.error instanceof Error ? verifyMutation.error.message : 'Invalid code'}
-                    />
-                  )}
-
-                  <div className="flex gap-3">
-                    <Button type="button" variant="ghost" onClick={handleClose} className="flex-1">
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting} className="flex-1">
-                      {isSubmitting ? 'Verifying...' : 'Verify & Enable'}
-                    </Button>
-                  </div>
-                </form>
-              </FormProvider>
-            </>
-          )}
-
-          {step === 'backup' && setupData && (
-            <>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-                </div>
-                <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">2FA Enabled!</h2>
-                <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                  Save these backup codes in a safe place
-                </p>
-              </div>
-
-              <div className="mb-4 p-4 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-                <div className="grid grid-cols-2 gap-2">
-                  {setupData.backupCodes.map((code: string, i: number) => (
-                    <code key={i} className="text-sm font-mono text-[rgb(var(--text-primary))] p-2 bg-[rgb(var(--surface-secondary))] rounded">
-                      {code}
-                    </code>
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-xs text-[rgb(var(--text-tertiary))] mb-4">
-                Each code can only be used once. Keep them safe!
-              </p>
-
-              <Button type="button" onClick={handleComplete} className="w-full">
-                Done
-              </Button>
-            </>
-          )}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+      {overview.recommendations?.length > 0 && (
+        <div className="pt-2 border-t border-[rgb(var(--border-secondary))]">
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="text-xs font-semibold">Recommendations</span>
+          </div>
+          <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
+            {overview.recommendations.map((rec, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-amber-500">•</span>
+                <span>{rec}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </motion.div>
   )
 }
 
 // ============================================================================
-// SESSION CARD (Post-MVP)
+// COMING SOON PANEL
 // ============================================================================
 
-interface SessionCardProps {
-  session: any // UserSession - disabled for MVP
-  onRevoke: (sessionId: string) => void
-  isRevoking: boolean
+interface ComingSoonPanelProps {
+  icon: LucideIcon
+  title: string
+  description: string
+  features: string[]
+  actionLabel?: string
 }
 
-// Post-MVP: Session Card - disabled for MVP
-// @ts-expect-error - Disabled for MVP, will be enabled later
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
-  const Icon = getDeviceIcon(session.deviceType)
-  
+function ComingSoonPanel({
+  icon: Icon,
+  title,
+  description,
+  features,
+  actionLabel,
+}: ComingSoonPanelProps) {
   return (
     <motion.div
       variants={fadeInUp}
-      className={`
-        p-4 rounded-xl border transition-colors
-        ${session.isCurrent 
-          ? 'bg-teal-500/5 border-teal-500/20' 
-          : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]'
-        }
-      `}
+      className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
     >
-      <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-teal-500/10' : 'bg-[rgb(var(--surface-tertiary))]'}`}>
-          <Icon className={`w-4 h-4 ${session.isCurrent ? 'text-teal-600 dark:text-cyan-400' : 'text-[rgb(var(--text-tertiary))]'}`} />
+      <div className="flex flex-col items-center text-center space-y-4">
+        <div className="w-14 h-14 rounded-full bg-teal-500/10 flex items-center justify-center">
+          <Icon className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
         </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="font-medium text-[rgb(var(--text-primary))] truncate">
-              {session.browser} on {session.os}
-            </p>
-            {session.isCurrent && (
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-teal-500/10 text-teal-600 dark:text-cyan-400">
-                Current
-              </span>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-3 mt-1 text-xs text-[rgb(var(--text-tertiary))]">
-            {session.location && (
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                {session.location}
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {new Date(session.lastActivityAt).toLocaleString()}
-            </span>
-          </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
+          <p className="text-sm text-[rgb(var(--text-secondary))] max-w-xl">
+            {description}
+          </p>
         </div>
 
-        {!session.isCurrent && (
+        <div className="w-full max-w-xl space-y-2">
+          {features.map((feature, index) => (
+            <div key={index} className="flex items-start gap-2 text-sm text-[rgb(var(--text-secondary))]">
+              <Check className="w-4 h-4 text-teal-600 dark:text-cyan-400 mt-0.5" />
+              <span>{feature}</span>
+            </div>
+          ))}
+        </div>
+
+        {actionLabel && (
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onRevoke(session.sessionId)}
-            disabled={isRevoking}
-            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+            type="button"
+            variant="outline"
+            disabled
+            className="mt-2 cursor-not-allowed opacity-60"
           >
-            <LogOut className="w-4 h-4" />
+            {actionLabel}
           </Button>
         )}
+
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">
+          Coming in a future update
+        </p>
       </div>
     </motion.div>
   )
 }
 
 // ============================================================================
-// LOGIN HISTORY ITEM (Post-MVP)
+// SECURITY TABS
 // ============================================================================
 
-interface LoginHistoryItemProps {
-  entry: any // LoginHistoryEntry - disabled for MVP
-}
+type SecurityTab = 'password' | 'mfa' | 'sessions'
 
-// Post-MVP: Login History Item - disabled for MVP
-// @ts-expect-error - Disabled for MVP, will be enabled later
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _LoginHistoryItem({ entry }: LoginHistoryItemProps) {
-  const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string }> = {
-    success: { icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    failed: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
-    blocked: { icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-  }
+const SECURITY_TABS: Array<{ id: SecurityTab; label: string }> = [
+  { id: 'password', label: 'Password' },
+  { id: 'mfa', label: 'Two-Factor Auth' },
+  { id: 'sessions', label: 'Sessions & Activity' },
+]
 
-  const config = statusConfig[entry.status as string]
-  const Icon = config.icon
-
+function SecurityTabs({
+  activeTab,
+  onChange,
+}: {
+  activeTab: SecurityTab
+  onChange: (tab: SecurityTab) => void
+}) {
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-[rgb(var(--border-primary))] last:border-0">
-      <div className={`p-1.5 rounded-lg ${config.bg}`}>
-        <Icon className={`w-3.5 h-3.5 ${config.color}`} />
+    <div className="border-b border-[rgb(var(--border-primary))] overflow-x-auto">
+      <div className="flex gap-6 min-w-max">
+        {SECURITY_TABS.map((tab) => {
+          const isActive = tab.id === activeTab
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => onChange(tab.id)}
+              className={`relative py-3 px-1 text-sm font-medium transition-colors ${
+                isActive
+                  ? 'text-teal-600 dark:text-cyan-400'
+                  : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
+              }`}
+            >
+              {tab.label}
+              {isActive && (
+                <motion.div
+                  layoutId="security-tab-underline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500"
+                />
+              )}
+            </button>
+          )
+        })}
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-[rgb(var(--text-primary))] truncate">{entry.deviceInfo}</p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          {entry.ipAddress} • {new Date(entry.timestamp).toLocaleString()}
-        </p>
-      </div>
-      {entry.failureReason && (
-        <span className="text-xs text-red-500">{entry.failureReason}</span>
-      )}
     </div>
   )
 }
@@ -616,19 +480,13 @@ function _LoginHistoryItem({ entry }: LoginHistoryItemProps) {
 
 export default function SecurityPage() {
   const user = useAuthStore((s) => s.user)
-  
-  // Modal states
   const [showPasswordModal, setShowPasswordModal] = useState(false)
-  // MFA modal disabled for MVP - const [showMfaModal, setShowMfaModal] = useState(false)
-  
-  // Alert states
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<SecurityTab>('password')
 
-  // Fetch security overview
   const {
     data: securityOverview,
     isLoading: isLoadingOverview,
+    isError: isOverviewError,
     refetch: refetchOverview,
   } = useQuery<SecurityOverview>({
     queryKey: ['security', user?.id],
@@ -637,49 +495,11 @@ export default function SecurityPage() {
     staleTime: 60 * 1000,
   })
 
-  // Post-MVP: Sessions and MFA queries/mutations disabled for MVP
-  // These will be re-enabled when backend support is ready
-  /*
-  const {
-    data: sessions,
-    isLoading: isLoadingSessions,
-    refetch: refetchSessions,
-  } = useQuery<UserSession[]>({
-    queryKey: ['sessions', user?.id],
-    queryFn: () => usersService.getActiveSessions(user!.id),
-    enabled: !!user?.id,
-    staleTime: 30 * 1000,
-  })
-
-  const {
-    data: loginHistory,
-    isLoading: isLoadingHistory,
-  } = useQuery<LoginHistoryEntry[]>({
-    queryKey: ['loginHistory', user?.id],
-    queryFn: () => usersService.getLoginHistory(user!.id, 5),
-    enabled: !!user?.id,
-    staleTime: 60 * 1000,
-  })
-
-  const revokeSessionMutation = useMutation({...})
-  const revokeAllMutation = useMutation({...})
-  const disableMfaMutation = useMutation({...})
-  */
-
   const handlePasswordSuccess = () => {
-    setSuccessMessage('Password changed successfully')
+    toast.success('Password changed successfully')
     refetchOverview()
-    setTimeout(() => setSuccessMessage(null), 3000)
   }
 
-  // Post-MVP: MFA success handler disabled
-  // const handleMfaSuccess = () => {
-  //   setSuccessMessage('Two-factor authentication enabled')
-  //   refetchOverview()
-  //   setTimeout(() => setSuccessMessage(null), 3000)
-  // }
-
-  // Loading state
   if (isLoadingOverview) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
@@ -688,142 +508,98 @@ export default function SecurityPage() {
     )
   }
 
-  // Get password last changed text
-  const getPasswordLastChanged = () => {
-    if (!securityOverview?.passwordLastChanged) return 'Never changed'
-    const days = Math.floor((Date.now() - new Date(securityOverview.passwordLastChanged).getTime()) / (1000 * 60 * 60 * 24))
-    if (days === 0) return 'Changed today'
-    if (days === 1) return 'Changed yesterday'
-    return `Changed ${days} days ago`
-  }
+  const showOverviewError = !securityOverview || isOverviewError
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerChildren}
-        className="space-y-8"
-      >
-        {/* Header */}
+      <motion.div initial="hidden" animate="visible" variants={staggerChildren} className="space-y-8">
         <SettingsPageHeader
           title="Security"
           description="Manage your account security and authentication"
         />
 
-        {/* Alerts */}
-        <AnimatePresence>
-          {successMessage && (
-            <SettingsAlert
-              type="success"
-              message={successMessage}
-              onDismiss={() => setSuccessMessage(null)}
-              autoDismiss
-            />
-          )}
-          {errorMessage && (
-            <SettingsAlert
-              type="error"
-              message={errorMessage}
-              onDismiss={() => setErrorMessage(null)}
-            />
-          )}
-        </AnimatePresence>
+        <SecurityOverviewCard
+          overview={showOverviewError ? undefined : securityOverview}
+          onRetry={refetchOverview}
+        />
 
-        {/* Security Score / Recommendations */}
-        {securityOverview && securityOverview.recommendations.length > 0 && (
-          <motion.div 
-            variants={fadeInUp}
-            className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20"
-          >
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
-              <div>
-                <p className="font-medium text-[rgb(var(--text-primary))]">Security Recommendations</p>
-                <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
-                  {securityOverview.recommendations.map((rec, i) => (
-                    <li key={i}>• {rec}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        <div className="space-y-6">
+          <SecurityTabs activeTab={activeTab} onChange={setActiveTab} />
 
-        {/* Password Section */}
-        <SettingsSection
-          title="Password"
-          icon={Key}
-          description="Manage your account password"
-        >
-          <SettingsRow
-            icon={Key}
-            title="Password"
-            description={getPasswordLastChanged()}
-            action={
-              <Button variant="outline" size="sm" onClick={() => setShowPasswordModal(true)}>
-                Change
-              </Button>
-            }
-          />
-        </SettingsSection>
+          <AnimatePresence mode="wait">
+            {activeTab === 'password' && (
+              <motion.div
+                key="password"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4"
+              >
+                <SettingsRow
+                  icon={Key}
+                  title="Password"
+                  description={getPasswordLastChangedText(securityOverview?.passwordLastChanged)}
+                  action={
+                    <Button variant="outline" size="sm" onClick={() => setShowPasswordModal(true)}>
+                      Change
+                    </Button>
+                  }
+                />
+              </motion.div>
+            )}
 
-        {/* Two-Factor Authentication - Post-MVP */}
-        <SettingsSection
-          title="Two-Factor Authentication"
-          icon={Smartphone}
-          description="Add an extra layer of security"
-        >
-          <div className="p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Shield className="w-5 h-5 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Coming Soon</p>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Two-factor authentication will be available in a future update
-                </p>
-              </div>
-            </div>
-          </div>
-        </SettingsSection>
+            {activeTab === 'mfa' && (
+              <motion.div
+                key="mfa"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ComingSoonPanel
+                  icon={Shield}
+                  title="Two-Factor Authentication"
+                  description="Add an extra layer of security to your account. When enabled, you'll need your password plus a verification code from your authenticator app each time you sign in."
+                  features={[
+                    'Supports Google Authenticator, Authy, and more',
+                    'Backup codes for account recovery',
+                    'Required for sensitive operations',
+                  ]}
+                  actionLabel="Set Up Two-Factor Auth"
+                />
+              </motion.div>
+            )}
 
-        {/* Active Sessions - Post-MVP */}
-        <SettingsSection
-          title="Active Sessions"
-          icon={Monitor}
-          description="Devices where you're currently logged in"
-        >
-          <div className="p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Monitor className="w-5 h-5 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Coming Soon</p>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Session management will be available in a future update
-                </p>
-              </div>
-            </div>
-          </div>
-        </SettingsSection>
+            {activeTab === 'sessions' && (
+              <motion.div
+                key="sessions"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ComingSoonPanel
+                  icon={Monitor}
+                  title="Session Management"
+                  description="View and manage all devices where you're currently signed in. Revoke access to any session you don't recognize."
+                  features={[
+                    'See all active sessions and devices',
+                    'Revoke individual or all sessions',
+                    'View recent login history',
+                  ]}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
-      {/* Modals */}
       <PasswordChangeModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
         onSuccess={handlePasswordSuccess}
       />
-      
-      {/* Post-MVP: MFA Modal disabled */}
-      {/* <MfaSetupModal
-        isOpen={showMfaModal}
-        onClose={() => setShowMfaModal(false)}
-        onSuccess={handleMfaSuccess}
-      /> */}
     </div>
   )
 }

@@ -14,6 +14,7 @@ import { AcademicsLayout } from './layouts/AcademicsLayout'
 import { Overview } from './routes/overview'
 import { AttendanceModule } from './routes/attendance'
 import { StudentsModule } from './routes/students'
+import { StudentProfilePage } from './routes/students/$studentId'
 import { TeachersModule } from './routes/teachers'
 import { GradebookModule } from './routes/gradebook'
 import { EnrollmentModule } from './routes/enrollment'
@@ -59,6 +60,12 @@ const studentsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students',
     component: StudentsModule,
+})
+
+const studentProfileRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/students/$studentId',
+    component: StudentProfilePage,
 })
 
 const studentEnrollmentRoute = createRoute({
@@ -183,6 +190,7 @@ const curriculumRoute = createRoute({
 const routeTree = rootRoute.addChildren([
     indexRoute,
     studentsRoute,
+    studentProfileRoute,
     studentEnrollmentRoute,
     studentProfilesRoute,
     teachersRoute,

@@ -25,7 +25,15 @@ export interface CognitoIdTokenPayload {
   phone_number_verified?: boolean
   /** User's profile picture URL */
   picture?: string
-  
+  /** User's preferred username */
+  preferred_username?: string
+  /** User's nickname */
+  nickname?: string
+  /** User's given (first) name */
+  given_name?: string
+  /** User's family (last) name */
+  family_name?: string
+
   // Custom Cognito attributes (prefixed with custom:)
   /** Tenant ID the user belongs to */
   'custom:tenantId': string

@@ -40,7 +40,7 @@ import {
 export default function HomePage() {
   const user = useAuthStore((s) => s.user)
   
-  const firstName = user?.name?.split(' ')[0]
+  const firstName = user?.displayName || user?.name?.split(' ')[0]
   const greeting = getGreeting(firstName)
   
   return (
