@@ -17,14 +17,19 @@ import {
   getStudents,
   getStudent,
   getStudentProfile,
+  createStudent,
   updateStudent,
   deleteStudent,
+  createEnrollment,
   parseApiError,
   type StudentFilterDto,
   type StudentResponseDto,
   type StudentListResponseDto,
   type StudentProfileResponseDto,
+  type CreateStudentDto,
   type UpdateStudentDto,
+  type CreateEnrollmentDto,
+  type EnrollmentResponseDto,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -178,6 +183,56 @@ export function useUpdateStudent() {
       })
 
       toast.success('Student updated successfully')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// CREATE STUDENT
+// ============================================================================
+
+/**
+ * Hook to create a new student
+ * Invalidates the students list on success
+ */
+export function useCreateStudent() {
+  const queryClient = useQueryClient()
+
+  return useMutation<StudentResponseDto, Error, CreateStudentDto>({
+    mutationFn: (data) => createStudent(data),
+    onSuccess: () => {
+      // Invalidate student lists so they refetch with the new student
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// CREATE ENROLLMENT
+// ============================================================================
+
+/**
+ * Hook to create an enrollment for a student
+ */
+export function useCreateEnrollment() {
+  const queryClient = useQueryClient()
+
+  return useMutation<EnrollmentResponseDto, Error, CreateEnrollmentDto>({
+    mutationFn: (data) => createEnrollment(data),
+    onSuccess: (_, variables) => {
+      // Invalidate the student's profile so enrollment shows up
+      queryClient.invalidateQueries({
+        queryKey: studentKeys.profile(variables.studentId),
+      })
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
     },
     onError: (error) => {
       const parsed = parseApiError(error)

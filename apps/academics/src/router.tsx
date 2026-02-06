@@ -62,16 +62,16 @@ const studentsRoute = createRoute({
     component: StudentsModule,
 })
 
-const studentProfileRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/students/$studentId',
-    component: StudentProfilePage,
-})
-
 const studentEnrollmentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/enrollment',
     component: EnrollmentModule,
+})
+
+const studentProfileRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/students/$studentId',
+    component: StudentProfilePage,
 })
 
 const studentProfilesRoute = createRoute({
@@ -190,8 +190,8 @@ const curriculumRoute = createRoute({
 const routeTree = rootRoute.addChildren([
     indexRoute,
     studentsRoute,
-    studentProfileRoute,
     studentEnrollmentRoute,
+    studentProfileRoute,
     studentProfilesRoute,
     teachersRoute,
     classroomsRoute,

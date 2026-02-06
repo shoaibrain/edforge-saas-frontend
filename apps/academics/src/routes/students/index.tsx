@@ -11,6 +11,7 @@
  */
 
 import { useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import {
   Users,
   Plus,
@@ -120,6 +121,8 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 // ============================================================================
 
 export function StudentsModule() {
+  const navigate = useNavigate()
+
   // Get active school from shared store
   const activeSchoolId = useActiveSchoolId()
 
@@ -182,15 +185,14 @@ export function StudentsModule() {
     }
   }, [students, totalCount])
 
-  // Handle add student (placeholder - will be implemented in Sprint 2)
+  // Navigate to the full-page registration wizard
   const handleAddStudent = () => {
-    // TODO: Open add student modal/form
-    console.log('Add student clicked')
+    navigate({ to: '/students/enrollment' })
   }
 
-  // Handle edit student (placeholder - will be implemented in Sprint 2)
+  // Handle edit student (placeholder - will be wired to inline editing)
   const handleEditStudent = () => {
-    // TODO: Open edit student modal/form
+    // TODO: Open edit student drawer/modal
     console.log('Edit student clicked')
   }
 

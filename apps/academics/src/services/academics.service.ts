@@ -6,7 +6,7 @@
  */
 
 import axios from 'axios'
-import { apiGet, apiPatch, apiDelete } from '../lib/api'
+import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
 
 // ============================================================================
 // TYPES - Import from @edforge/shared-types
@@ -21,6 +21,8 @@ export type {
   CreateStudentDto,
   UpdateStudentDto,
   StudentStatus,
+  CreateEnrollmentDto,
+  EnrollmentResponseDto,
 } from '@edforge/shared-types'
 
 // Import for internal use
@@ -29,7 +31,10 @@ import type {
   StudentListResponseDto,
   StudentProfileResponseDto,
   StudentFilterDto,
+  CreateStudentDto,
   UpdateStudentDto,
+  CreateEnrollmentDto,
+  EnrollmentResponseDto,
 } from '@edforge/shared-types'
 
 // ============================================================================
@@ -247,11 +252,35 @@ export async function updateStudent(
 }
 
 /**
+ * Create a new student
+ * POST /academics/students
+ */
+export async function createStudent(
+  data: CreateStudentDto
+): Promise<StudentResponseDto> {
+  return apiPost<StudentResponseDto>('/academics/students', data)
+}
+
+/**
  * Delete student
  * DELETE /academics/students/:id
  */
 export async function deleteStudent(studentId: string): Promise<void> {
   return apiDelete(`/academics/students/${studentId}`)
+}
+
+// ============================================================================
+// ENROLLMENT OPERATIONS
+// ============================================================================
+
+/**
+ * Create a new enrollment
+ * POST /academics/enrollments
+ */
+export async function createEnrollment(
+  data: CreateEnrollmentDto
+): Promise<EnrollmentResponseDto> {
+  return apiPost<EnrollmentResponseDto>('/academics/enrollments', data)
 }
 
 // ============================================================================
@@ -263,6 +292,9 @@ export const academicsService = {
   getStudents,
   getStudent,
   getStudentProfile,
+  createStudent,
   updateStudent,
   deleteStudent,
+  // Enrollment
+  createEnrollment,
 }
