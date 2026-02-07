@@ -21,6 +21,7 @@ import {
   GraduationCap,
   Users,
   BookOpen,
+  Award,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { toast } from 'sonner'
@@ -35,18 +36,20 @@ import {
   FamilyTab,
   ScheduleTab,
 } from '../../components/students/profile'
+import { StudentGradesView } from '../../components/grades/StudentGradesView'
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-type TabId = 'overview' | 'enrollment' | 'family' | 'schedule'
+type TabId = 'overview' | 'enrollment' | 'family' | 'schedule' | 'grades'
 
 const TABS: { id: TabId; label: string; icon: typeof User }[] = [
   { id: 'overview', label: 'Overview', icon: User },
   { id: 'enrollment', label: 'Enrollment', icon: GraduationCap },
   { id: 'family', label: 'Family', icon: Users },
   { id: 'schedule', label: 'Schedule', icon: BookOpen },
+  { id: 'grades', label: 'Grades', icon: Award },
 ]
 
 // ============================================================================
@@ -258,6 +261,9 @@ export function StudentProfilePage() {
               )}
               {activeTab === 'schedule' && (
                 <ScheduleTab student={student} />
+              )}
+              {activeTab === 'grades' && (
+                <StudentGradesView studentId={studentId} />
               )}
             </motion.div>
           </AnimatePresence>

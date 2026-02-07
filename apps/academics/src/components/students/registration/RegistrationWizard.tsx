@@ -114,7 +114,7 @@ const WIZARD_STEPS: WizardStep[] = [
 // ============================================================================
 
 function RegistrationStepper() {
-  const { steps, currentStep, getStepStatus, goToStep, canGoToStep } = useWizard()
+  const { steps, currentStep: _currentStep, getStepStatus, goToStep, canGoToStep } = useWizard()
 
   return (
     <nav

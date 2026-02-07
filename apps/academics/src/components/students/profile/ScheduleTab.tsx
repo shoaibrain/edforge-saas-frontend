@@ -12,8 +12,11 @@ import {
   TrendingDown,
   TrendingUp,
   GraduationCap,
+  ExternalLink,
 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import type { StudentProfileResponseDto } from '@edforge/shared-types'
+import { useStudentAttendanceSummary } from '../../../hooks/useAttendance'
 
 // ============================================================================
 // TYPES
@@ -228,7 +231,25 @@ export function ScheduleTab({ student }: ScheduleTabProps) {
   const classrooms = student.classrooms || []
   const attendanceSummary = student.attendanceSummary
 
-  const hasNoData = classrooms.length === 0 && !attendanceSummary
+  // Try to fetch live attendance summary from API
+  const { data: liveAttendance } = useStudentAttendanceSummary({
+    studentId: student.studentId,
+    enabled: !!student.studentId,
+  })
+
+  // Prefer live data, fall back to profile data
+  const effectiveSummary = liveAttendance
+    ? {
+        attendanceRate: liveAttendance.attendanceRate,
+        totalDays: liveAttendance.totalDays,
+        present: liveAttendance.present,
+        absent: liveAttendance.absent,
+        late: liveAttendance.late,
+        excused: liveAttendance.excused,
+      }
+    : attendanceSummary
+
+  const hasNoData = classrooms.length === 0 && !effectiveSummary
 
   if (hasNoData) {
     return (
@@ -244,7 +265,27 @@ export function ScheduleTab({ student }: ScheduleTabProps) {
 
   return (
     <div>
-      {attendanceSummary && <AttendanceSection summary={attendanceSummary} />}
+      {effectiveSummary && <AttendanceSection summary={effectiveSummary} />}
+
+      {/* Quick Links */}
+      <div className="flex items-center gap-3 mb-6">
+        <Link
+          to="/attendance"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+        >
+          <Calendar className="w-3.5 h-3.5" />
+          Attendance History
+          <ExternalLink className="w-3 h-3" />
+        </Link>
+        <Link
+          to="/grades"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors"
+        >
+          <GraduationCap className="w-3.5 h-3.5" />
+          View Grades
+          <ExternalLink className="w-3 h-3" />
+        </Link>
+      </div>
 
       {classrooms.length > 0 ? (
         <ScheduleTable classrooms={classrooms} student={student} />

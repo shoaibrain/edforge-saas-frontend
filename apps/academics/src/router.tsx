@@ -30,6 +30,7 @@ import { ExamsModule } from './routes/exams'
 import { CalendarModule } from './routes/calendar'
 import { GradesModule } from './routes/grades'
 import { SchedulingModule } from './routes/scheduling'
+import { SectionDetailPage } from './routes/scheduling/$sectionId'
 import { CurriculumModule } from './routes/curriculum'
 
 // ============================================================================
@@ -176,6 +177,13 @@ const schedulingRoute = createRoute({
     component: SchedulingModule,
 })
 
+// Section detail - individual section view
+const sectionDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/scheduling/$sectionId',
+    component: SectionDetailPage,
+})
+
 // Curriculum - Consolidated view of courses, grade levels, and standards
 const curriculumRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -208,6 +216,7 @@ const routeTree = rootRoute.addChildren([
     // Consolidated routes
     gradesRoute,
     schedulingRoute,
+    sectionDetailRoute,
     curriculumRoute,
 ])
 

@@ -32,6 +32,14 @@ export type {
   CourseType,
   CreditType,
   CourseDuration,
+  SectionResponseDto,
+  SectionListResponseDto,
+  SectionFilterDto,
+  CreateSectionDto,
+  UpdateSectionDto,
+  SectionRosterResponseDto,
+  StudentSectionResponseDto,
+  EnrollStudentInSectionDto,
 } from '@edforge/shared-types'
 
 // Import for internal use
@@ -49,6 +57,12 @@ import type {
   CourseFilterDto,
   CreateCourseDto,
   UpdateCourseDto,
+  SectionResponseDto,
+  SectionListResponseDto,
+  SectionFilterDto,
+  CreateSectionDto,
+  UpdateSectionDto,
+  SectionRosterResponseDto,
 } from '@edforge/shared-types'
 
 // ============================================================================
@@ -370,6 +384,604 @@ export async function deleteCourse(
 }
 
 // ============================================================================
+// SECTION CRUD OPERATIONS
+// ============================================================================
+
+/**
+ * List sections with optional filters and pagination
+ * GET /academics/sections
+ */
+export async function getSections(
+  params: SectionFilterDto & PaginationQuery
+): Promise<SectionListResponseDto> {
+  const queryParams: Record<string, unknown> = {}
+
+  if (params.schoolId) queryParams.schoolId = params.schoolId
+  if (params.courseId) queryParams.courseId = params.courseId
+  if (params.academicYearId) queryParams.academicYearId = params.academicYearId
+  if (params.termId) queryParams.termId = params.termId
+  if (params.teacherId) queryParams.teacherId = params.teacherId
+  if (params.isActive !== undefined) queryParams.isActive = params.isActive
+  if (params.searchTerm) queryParams.search = params.searchTerm
+  if (params.limit) queryParams.limit = params.limit
+  if (params.cursor) queryParams.cursor = params.cursor
+
+  return apiGet<SectionListResponseDto>('/academics/sections', queryParams)
+}
+
+/**
+ * Get section by ID
+ * GET /academics/sections/:id?schoolId=
+ */
+export async function getSection(
+  sectionId: string,
+  schoolId: string
+): Promise<SectionResponseDto> {
+  return apiGet<SectionResponseDto>(`/academics/sections/${sectionId}`, { schoolId })
+}
+
+/**
+ * Create a new section
+ * POST /academics/sections
+ */
+export async function createSection(
+  data: CreateSectionDto
+): Promise<SectionResponseDto> {
+  return apiPost<SectionResponseDto>('/academics/sections', data)
+}
+
+/**
+ * Update section
+ * PATCH /academics/sections/:id?schoolId=
+ */
+export async function updateSection(
+  sectionId: string,
+  schoolId: string,
+  data: UpdateSectionDto
+): Promise<SectionResponseDto> {
+  return apiPatch<SectionResponseDto>(
+    `/academics/sections/${sectionId}?schoolId=${schoolId}`,
+    data
+  )
+}
+
+/**
+ * Delete (deactivate) section
+ * DELETE /academics/sections/:id?schoolId=
+ */
+export async function deleteSection(
+  sectionId: string,
+  schoolId: string
+): Promise<void> {
+  return apiDelete(`/academics/sections/${sectionId}?schoolId=${schoolId}`)
+}
+
+// ============================================================================
+// SECTION ROSTER OPERATIONS
+// ============================================================================
+
+/**
+ * Get section roster (enrolled students)
+ * GET /academics/sections/:id/students?schoolId=
+ */
+export async function getSectionRoster(
+  sectionId: string,
+  schoolId: string
+): Promise<SectionRosterResponseDto> {
+  return apiGet<SectionRosterResponseDto>(
+    `/academics/sections/${sectionId}/students`,
+    { schoolId }
+  )
+}
+
+/**
+ * Enroll a student in a section
+ * POST /academics/sections/:id/students?schoolId=
+ */
+export async function enrollStudentInSection(
+  sectionId: string,
+  schoolId: string,
+  studentId: string
+): Promise<void> {
+  return apiPost(`/academics/sections/${sectionId}/students?schoolId=${schoolId}`, {
+    studentId,
+  })
+}
+
+/**
+ * Remove a student from a section
+ * DELETE /academics/sections/:id/students/:studentId?schoolId=
+ */
+export async function removeStudentFromSection(
+  sectionId: string,
+  schoolId: string,
+  studentId: string
+): Promise<void> {
+  return apiDelete(
+    `/academics/sections/${sectionId}/students/${studentId}?schoolId=${schoolId}`
+  )
+}
+
+// ============================================================================
+// ATTENDANCE OPERATIONS
+// ============================================================================
+
+/**
+ * Attendance types used by the service layer.
+ * These match the backend API contract from FRONTEND_API_STATUS_RESPONSE.md.
+ */
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused' | 'half_day' | 'early_departure' | 'remote'
+
+export interface CreateAttendanceParams {
+  studentId: string
+  schoolId: string
+  date: string
+  status: AttendanceStatus
+  notes?: string
+  sectionId?: string
+  academicYearId?: string
+}
+
+export interface BulkAttendanceRecord {
+  studentId: string
+  status: AttendanceStatus
+  notes?: string
+}
+
+export interface BulkAttendanceParams {
+  date: string
+  schoolId: string
+  sectionId?: string
+  records: BulkAttendanceRecord[]
+}
+
+export interface AttendanceRecord {
+  studentId: string
+  studentName?: string
+  studentNumber?: string
+  date: string
+  status: AttendanceStatus
+  notes?: string
+  sectionId?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface BulkAttendanceResponse {
+  recorded: number
+  errors: Array<{ studentId: string; error: string }>
+}
+
+export interface DailyAttendanceSummary {
+  date: string
+  schoolId: string
+  totalStudents: number
+  present: number
+  absent: number
+  late: number
+  excused: number
+  halfDay: number
+  attendanceRate: number
+  byGradeLevel?: Record<string, {
+    total: number
+    present: number
+    absent: number
+    rate: number
+  }>
+}
+
+export interface StudentAttendanceSummary {
+  studentId: string
+  studentName: string
+  totalDays: number
+  present: number
+  absent: number
+  late: number
+  excused: number
+  halfDay: number
+  attendanceRate: number
+  dateRange: { start: string; end: string }
+}
+
+/**
+ * Record a single attendance entry
+ * POST /academics/attendance
+ */
+export async function recordAttendance(
+  data: CreateAttendanceParams
+): Promise<AttendanceRecord> {
+  return apiPost<AttendanceRecord>('/academics/attendance', data)
+}
+
+/**
+ * Record bulk attendance for a classroom
+ * POST /academics/attendance/bulk
+ */
+export async function recordBulkAttendance(
+  data: BulkAttendanceParams
+): Promise<BulkAttendanceResponse> {
+  return apiPost<BulkAttendanceResponse>('/academics/attendance/bulk', data)
+}
+
+/**
+ * Get daily attendance summary for a school
+ * GET /academics/attendance/summary?schoolId=&date=
+ */
+export async function getAttendanceSummary(
+  schoolId: string,
+  date: string
+): Promise<DailyAttendanceSummary> {
+  return apiGet<DailyAttendanceSummary>('/academics/attendance/summary', {
+    schoolId,
+    date,
+  })
+}
+
+/**
+ * Get student attendance history
+ * GET /academics/attendance/student/:id?startDate=&endDate=
+ */
+export async function getStudentAttendance(
+  studentId: string,
+  params?: { startDate?: string; endDate?: string }
+): Promise<AttendanceRecord[]> {
+  const queryParams: Record<string, unknown> = {}
+  if (params?.startDate) queryParams.startDate = params.startDate
+  if (params?.endDate) queryParams.endDate = params.endDate
+  return apiGet<AttendanceRecord[]>(`/academics/attendance/student/${studentId}`, queryParams)
+}
+
+/**
+ * Get student attendance summary (rate + counts)
+ * GET /academics/attendance/student/:id/summary
+ */
+export async function getStudentAttendanceSummary(
+  studentId: string
+): Promise<StudentAttendanceSummary> {
+  return apiGet<StudentAttendanceSummary>(`/academics/attendance/student/${studentId}/summary`)
+}
+
+/**
+ * Update/correct an attendance record
+ * PATCH /academics/attendance/:date/:studentId
+ */
+export async function updateAttendance(
+  date: string,
+  studentId: string,
+  data: { status: AttendanceStatus; notes?: string }
+): Promise<AttendanceRecord> {
+  return apiPatch<AttendanceRecord>(`/academics/attendance/${date}/${studentId}`, data)
+}
+
+// ============================================================================
+// ENROLLMENT MANAGEMENT OPERATIONS
+// ============================================================================
+
+export interface EnrollmentFilterParams {
+  gradeLevel?: string
+  status?: string
+  limit?: number
+  cursor?: string
+}
+
+export interface EnrollmentListResponse {
+  items: EnrollmentResponseDto[]
+  hasMore: boolean
+  lastEvaluatedKey?: string
+  total?: number
+}
+
+export interface EnrollmentSummaryResponse {
+  totalEnrolled: number
+  byGradeLevel: Record<string, number>
+  byStatus: Record<string, number>
+}
+
+export interface WithdrawStudentParams {
+  withdrawalDate: string
+  reason: string
+  notes?: string
+  destinationSchool?: string
+}
+
+export interface TransferStudentParams {
+  transferDate: string
+  destinationSchoolId: string
+  reason?: string
+  notes?: string
+}
+
+/**
+ * List enrollments for a school year
+ * GET /academics/schools/:schoolId/years/:yearId/enrollments
+ */
+export async function getEnrollments(
+  schoolId: string,
+  yearId: string,
+  params?: EnrollmentFilterParams
+): Promise<EnrollmentListResponse> {
+  const queryParams: Record<string, unknown> = {}
+  if (params?.gradeLevel) queryParams.gradeLevel = params.gradeLevel
+  if (params?.status) queryParams.status = params.status
+  if (params?.limit) queryParams.limit = params.limit
+  if (params?.cursor) queryParams.cursor = params.cursor
+  return apiGet<EnrollmentListResponse>(
+    `/academics/schools/${schoolId}/years/${yearId}/enrollments`,
+    queryParams
+  )
+}
+
+/**
+ * Get enrollment summary for a school year
+ * GET /academics/schools/:schoolId/years/:yearId/enrollments/summary
+ */
+export async function getEnrollmentSummary(
+  schoolId: string,
+  yearId: string
+): Promise<EnrollmentSummaryResponse> {
+  return apiGet<EnrollmentSummaryResponse>(
+    `/academics/schools/${schoolId}/years/${yearId}/enrollments/summary`
+  )
+}
+
+/**
+ * Withdraw a student from enrollment
+ * POST /academics/schools/:schoolId/years/:yearId/enrollments/:studentId/withdraw
+ */
+export async function withdrawStudent(
+  schoolId: string,
+  yearId: string,
+  studentId: string,
+  data: WithdrawStudentParams
+): Promise<void> {
+  return apiPost(
+    `/academics/schools/${schoolId}/years/${yearId}/enrollments/${studentId}/withdraw`,
+    data
+  )
+}
+
+/**
+ * Transfer a student to another school
+ * POST /academics/schools/:schoolId/years/:yearId/enrollments/:studentId/transfer
+ */
+export async function transferStudent(
+  schoolId: string,
+  yearId: string,
+  studentId: string,
+  data: TransferStudentParams
+): Promise<void> {
+  return apiPost(
+    `/academics/schools/${schoolId}/years/${yearId}/enrollments/${studentId}/transfer`,
+    data
+  )
+}
+
+// ============================================================================
+// GRADING POLICY OPERATIONS
+// ============================================================================
+
+export interface GradingScaleEntry {
+  letter: string
+  minPercentage: number
+  maxPercentage: number
+  gpaValue?: number
+}
+
+export interface CategoryWeight {
+  categoryId: string
+  name: string
+  weight: number
+  dropLowest?: number
+}
+
+export interface GradingPolicyResponse {
+  policyId: string
+  schoolId: string
+  name: string
+  gradingScale: GradingScaleEntry[]
+  categoryWeights: CategoryWeight[]
+  roundingRule: 'standard' | 'up' | 'down'
+  isDefault: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateGradingPolicyParams {
+  schoolId: string
+  name: string
+  gradingScale: GradingScaleEntry[]
+  categoryWeights: CategoryWeight[]
+  roundingRule: 'standard' | 'up' | 'down'
+  isDefault?: boolean
+}
+
+export interface UpdateGradingPolicyParams {
+  name?: string
+  gradingScale?: GradingScaleEntry[]
+  categoryWeights?: CategoryWeight[]
+  roundingRule?: 'standard' | 'up' | 'down'
+  isDefault?: boolean
+}
+
+/**
+ * List grading policies for a school
+ * GET /academics/grading-policies?schoolId=
+ */
+export async function getGradingPolicies(
+  schoolId: string
+): Promise<GradingPolicyResponse[]> {
+  const result = await apiGet<GradingPolicyResponse[] | { items: GradingPolicyResponse[] }>(
+    '/academics/grading-policies',
+    { schoolId }
+  )
+  return Array.isArray(result) ? result : result.items
+}
+
+/**
+ * Get a single grading policy
+ * GET /academics/grading-policies/:id?schoolId=
+ */
+export async function getGradingPolicy(
+  policyId: string,
+  schoolId: string
+): Promise<GradingPolicyResponse> {
+  return apiGet<GradingPolicyResponse>(`/academics/grading-policies/${policyId}`, { schoolId })
+}
+
+/**
+ * Create a grading policy
+ * POST /academics/grading-policies
+ */
+export async function createGradingPolicy(
+  data: CreateGradingPolicyParams
+): Promise<GradingPolicyResponse> {
+  return apiPost<GradingPolicyResponse>('/academics/grading-policies', data)
+}
+
+/**
+ * Update a grading policy
+ * PATCH /academics/grading-policies/:id?schoolId=
+ */
+export async function updateGradingPolicy(
+  policyId: string,
+  schoolId: string,
+  data: UpdateGradingPolicyParams
+): Promise<GradingPolicyResponse> {
+  return apiPatch<GradingPolicyResponse>(
+    `/academics/grading-policies/${policyId}?schoolId=${schoolId}`,
+    data
+  )
+}
+
+// ============================================================================
+// GRADE OPERATIONS
+// ============================================================================
+
+export interface AssignmentInfo {
+  assignmentName: string
+  assignmentType: string
+  categoryId: string
+  possiblePoints: number
+}
+
+export interface RecordGradeParams {
+  studentId: string
+  courseId: string
+  sectionId: string
+  schoolId: string
+  termId: string
+  academicYearId: string
+  teacherId: string
+  assignment: AssignmentInfo
+  earnedPoints: number
+}
+
+export interface BulkGradeRecord {
+  studentId: string
+  earnedPoints: number
+}
+
+export interface RecordBulkGradesParams {
+  courseId: string
+  sectionId: string
+  schoolId: string
+  termId: string
+  academicYearId: string
+  teacherId: string
+  assignment: AssignmentInfo
+  grades: BulkGradeRecord[]
+}
+
+export interface GradeRecord {
+  gradeId: string
+  studentId: string
+  studentName?: string
+  courseId: string
+  sectionId?: string
+  termId: string
+  assignments: Array<{
+    assignmentName: string
+    assignmentType: string
+    categoryId: string
+    possiblePoints: number
+    earnedPoints: number
+    gradedAt: string
+  }>
+  numericGrade: number
+  letterGrade: string
+  gpaPoints: number
+  isFinal: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SectionGradebookResponse {
+  sectionId: string
+  termId: string
+  grades: GradeRecord[]
+}
+
+export interface StudentGradesResponse {
+  studentId: string
+  grades: GradeRecord[]
+  gpa?: {
+    termGpa: number
+    cumulativeGpa: number
+    weightedGpa: number
+  }
+}
+
+/**
+ * Record a single assignment grade
+ * POST /academics/grades/record
+ */
+export async function recordGrade(
+  data: RecordGradeParams
+): Promise<void> {
+  return apiPost('/academics/grades/record', data)
+}
+
+/**
+ * Record bulk grades for a section/assignment
+ * POST /academics/grades/record/bulk
+ */
+export async function recordBulkGrades(
+  data: RecordBulkGradesParams
+): Promise<{ recorded: number; errors: Array<{ studentId: string; error: string }> }> {
+  return apiPost('/academics/grades/record/bulk', data)
+}
+
+/**
+ * Get section gradebook (all students' grades)
+ * GET /academics/grades/section/:sectionId?schoolId=&termId=
+ */
+export async function getSectionGrades(
+  sectionId: string,
+  params: { schoolId: string; termId?: string }
+): Promise<SectionGradebookResponse> {
+  return apiGet<SectionGradebookResponse>(`/academics/grades/section/${sectionId}`, params)
+}
+
+/**
+ * Get student's grades
+ * GET /academics/students/:id/grades?academicYearId=&termId=
+ */
+export async function getStudentGrades(
+  studentId: string,
+  params?: { academicYearId?: string; termId?: string }
+): Promise<StudentGradesResponse> {
+  return apiGet<StudentGradesResponse>(`/academics/students/${studentId}/grades`, params)
+}
+
+/**
+ * Finalize a grade (lock it)
+ * PATCH /academics/grades/:gradeId/finalize
+ */
+export async function finalizeGrade(gradeId: string): Promise<void> {
+  return apiPatch(`/academics/grades/${gradeId}/finalize`, {})
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -383,10 +995,42 @@ export const academicsService = {
   deleteStudent,
   // Enrollment
   createEnrollment,
+  getEnrollments,
+  getEnrollmentSummary,
+  withdrawStudent,
+  transferStudent,
   // Course CRUD
   getCourses,
   getCourse,
   createCourse,
   updateCourse,
   deleteCourse,
+  // Section CRUD
+  getSections,
+  getSection,
+  createSection,
+  updateSection,
+  deleteSection,
+  // Section Roster
+  getSectionRoster,
+  enrollStudentInSection,
+  removeStudentFromSection,
+  // Attendance
+  recordAttendance,
+  recordBulkAttendance,
+  getAttendanceSummary,
+  getStudentAttendance,
+  getStudentAttendanceSummary,
+  updateAttendance,
+  // Grading Policies
+  getGradingPolicies,
+  getGradingPolicy,
+  createGradingPolicy,
+  updateGradingPolicy,
+  // Grades
+  recordGrade,
+  recordBulkGrades,
+  getSectionGrades,
+  getStudentGrades,
+  finalizeGrade,
 }
