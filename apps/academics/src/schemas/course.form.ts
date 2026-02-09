@@ -30,6 +30,11 @@ export const COURSE_TYPE_OPTIONS = [
   { value: 'elective', label: 'Elective' },
   { value: 'enrichment', label: 'Enrichment' },
   { value: 'remedial', label: 'Remedial' },
+  { value: 'honors', label: 'Honors' },
+  { value: 'ap', label: 'AP' },
+  { value: 'ib', label: 'IB' },
+  { value: 'dual_enrollment', label: 'Dual Enrollment' },
+  { value: 'vocational', label: 'Vocational' },
 ] as const
 
 export const CREDIT_TYPE_OPTIONS = [
@@ -38,6 +43,7 @@ export const CREDIT_TYPE_OPTIONS = [
   { value: 'honors', label: 'Honors' },
   { value: 'ap', label: 'AP' },
   { value: 'ib', label: 'IB' },
+  { value: 'dual_enrollment', label: 'Dual Enrollment' },
 ] as const
 
 export const DURATION_OPTIONS = [
@@ -94,6 +100,11 @@ export const COURSE_TYPE_COLORS: Record<string, { bg: string; text: string }> = 
   elective: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
   enrichment: { bg: 'bg-violet-50', text: 'text-violet-700' },
   remedial: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
+  honors: { bg: 'bg-sky-50', text: 'text-sky-700' },
+  ap: { bg: 'bg-blue-50', text: 'text-blue-700' },
+  ib: { bg: 'bg-cyan-50', text: 'text-cyan-700' },
+  dual_enrollment: { bg: 'bg-fuchsia-50', text: 'text-fuchsia-700' },
+  vocational: { bg: 'bg-teal-50', text: 'text-teal-700' },
 }
 
 // ============================================================================
@@ -132,11 +143,12 @@ export const courseFormSchema = z.object({
     ],
     { required_error: 'Subject area is required' }
   ),
-  courseType: z.enum(['required', 'elective', 'enrichment', 'remedial'], {
-    required_error: 'Course type is required',
-  }),
+  courseType: z.enum(
+    ['required', 'elective', 'enrichment', 'remedial', 'honors', 'ap', 'ib', 'dual_enrollment', 'vocational'],
+    { required_error: 'Course type is required' }
+  ),
   creditType: z
-    .enum(['academic', 'elective', 'honors', 'ap', 'ib'])
+    .enum(['academic', 'elective', 'honors', 'ap', 'ib', 'dual_enrollment'])
     .optional(),
   credits: z.coerce
     .number({ required_error: 'Credits are required' })

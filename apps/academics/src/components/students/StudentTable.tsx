@@ -1,18 +1,16 @@
 /**
  * StudentTable Component
  *
- * Displays a paginated table of students with sorting, row actions,
- * and navigation to student profiles.
+ * Displays a paginated table of students with sorting.
+ * Row click opens a quick-info drawer (managed by parent).
+ * Withdrawal flow managed by parent via onWithdraw callback.
  */
 
-import { useMemo, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { User, MoreVertical, Eye, Pencil, UserMinus } from 'lucide-react'
+import { useMemo } from 'react'
+import { User } from 'lucide-react'
 import { DataTable, type Column } from '@edforge/ui'
 import type { StudentResponseDto } from '@edforge/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
-import { ConfirmationDialog } from '../common'
-import { useDeleteStudent } from '../../hooks'
 
 // ============================================================================
 // TYPES
@@ -31,8 +29,8 @@ interface StudentTableProps {
   onLoadMore?: () => void
   /** Callback when "Add Student" is clicked (empty state) */
   onAddStudent?: () => void
-  /** Callback when "Edit" is clicked */
-  onEditStudent?: (student: StudentResponseDto) => void
+  /** Callback when a student row is clicked (opens drawer) */
+  onViewStudent?: (student: StudentResponseDto) => void
 }
 
 // ============================================================================
@@ -62,94 +60,11 @@ function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
 
-// ============================================================================
-// ROW ACTIONS DROPDOWN
-// ============================================================================
-
-interface RowActionsProps {
-  student: StudentResponseDto
-  onView: () => void
-  onEdit?: () => void
-  onWithdraw: () => void
-}
-
-function RowActions({ student, onView, onEdit, onWithdraw }: RowActionsProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation()
-          setIsOpen(!isOpen)
-        }}
-        className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Actions"
-      >
-        <MoreVertical className="w-4 h-4" />
-      </button>
-
-      {isOpen && (
-        <>
-          {/* Backdrop to close dropdown */}
-          <div
-            className="fixed inset-0 z-10"
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsOpen(false)
-            }}
-          />
-
-          {/* Dropdown menu */}
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onView()
-              }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
-            >
-              <Eye className="w-4 h-4" />
-              View Profile
-            </button>
-
-            {onEdit && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsOpen(false)
-                  onEdit()
-                }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
-              >
-                <Pencil className="w-4 h-4" />
-                Edit Student
-              </button>
-            )}
-
-            {student.status === 'active' && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsOpen(false)
-                  onWithdraw()
-                }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-              >
-                <UserMinus className="w-4 h-4" />
-                Withdraw Student
-              </button>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  )
+/**
+ * Generate DiceBear Adventurer avatar URL
+ */
+function getAvatarUrl(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
 }
 
 // ============================================================================
@@ -163,37 +78,8 @@ export function StudentTable({
   isFetchingMore = false,
   onLoadMore,
   onAddStudent,
-  onEditStudent,
+  onViewStudent,
 }: StudentTableProps) {
-  const navigate = useNavigate()
-  const deleteStudentMutation = useDeleteStudent()
-
-  // State for withdrawal confirmation dialog
-  const [withdrawStudent, setWithdrawStudent] = useState<StudentResponseDto | null>(null)
-
-  // Navigate to student profile
-  // Note: Use relative path since router has basepath '/academics'
-  const handleViewProfile = (student: StudentResponseDto) => {
-    navigate({ to: `/students/${student.studentId}` })
-  }
-
-  // Handle row click
-  const handleRowClick = (student: StudentResponseDto) => {
-    handleViewProfile(student)
-  }
-
-  // Handle withdraw confirmation
-  const handleWithdrawConfirm = async () => {
-    if (!withdrawStudent) return
-
-    try {
-      await deleteStudentMutation.mutateAsync(withdrawStudent.studentId)
-      setWithdrawStudent(null)
-    } catch {
-      // Error handling is done in the mutation hook
-    }
-  }
-
   // Define columns
   const columns: Column<StudentResponseDto>[] = useMemo(
     () => [
@@ -204,9 +90,14 @@ export function StudentTable({
         width: '280px',
         render: (student) => (
           <div className="flex items-center gap-3">
-            {/* Avatar */}
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center text-white font-medium text-sm">
-              {getInitials(student.firstName, student.lastName)}
+            {/* DiceBear Adventurer Avatar */}
+            <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
+              <img
+                src={getAvatarUrl(student.studentId)}
+                alt={getInitials(student.firstName, student.lastName)}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
             {/* Name and student number */}
             <div className="min-w-0">
@@ -278,56 +169,28 @@ export function StudentTable({
   )
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={students}
-        keyExtractor={(student) => student.studentId}
-        isLoading={isLoading}
-        skeletonRows={8}
-        emptyState={{
-          icon: <User className="w-12 h-12" />,
-          title: 'No students found',
-          description:
-            'Get started by adding your first student to the directory.',
-          action: onAddStudent
-            ? {
-                label: 'Add Student',
-                onClick: onAddStudent,
-              }
-            : undefined,
-        }}
-        hasMore={hasMore}
-        isFetchingMore={isFetchingMore}
-        onLoadMore={onLoadMore}
-        onRowClick={handleRowClick}
-        rowActions={(student) => (
-          <RowActions
-            student={student}
-            onView={() => handleViewProfile(student)}
-            onEdit={onEditStudent ? () => onEditStudent(student) : undefined}
-            onWithdraw={() => setWithdrawStudent(student)}
-          />
-        )}
-      />
-
-      {/* Withdrawal Confirmation Dialog */}
-      <ConfirmationDialog
-        open={!!withdrawStudent}
-        onClose={() => setWithdrawStudent(null)}
-        onConfirm={handleWithdrawConfirm}
-        title="Withdraw Student"
-        description={
-          withdrawStudent
-            ? `Are you sure you want to withdraw ${withdrawStudent.fullName}? This action can be reversed by a school administrator.`
-            : ''
-        }
-        confirmText="Withdraw"
-        cancelText="Cancel"
-        variant="destructive"
-        isLoading={deleteStudentMutation.isPending}
-        icon={<UserMinus className="w-5 h-5 text-red-600 dark:text-red-400" />}
-      />
-    </>
+    <DataTable
+      columns={columns}
+      data={students}
+      keyExtractor={(student) => student.studentId}
+      isLoading={isLoading}
+      skeletonRows={8}
+      emptyState={{
+        icon: <User className="w-12 h-12" />,
+        title: 'No students found',
+        description:
+          'Get started by adding your first student to the directory.',
+        action: onAddStudent
+          ? {
+              label: 'Add Student',
+              onClick: onAddStudent,
+            }
+          : undefined,
+      }}
+      hasMore={hasMore}
+      isFetchingMore={isFetchingMore}
+      onLoadMore={onLoadMore}
+      onRowClick={onViewStudent}
+    />
   )
 }

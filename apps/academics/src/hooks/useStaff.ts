@@ -2,10 +2,10 @@
  * useStaff Hooks
  *
  * React Query hooks for staff/teacher data fetching.
- * Used primarily by the Section form teacher selector.
+ * Used by the Section form teacher selector and the Teachers directory.
  *
- * Handles both Ed-Fi StaffResponseDto and the normalized User fallback shape
- * (both use `staffId` and `lastSurname` after normalization in staff.service.ts).
+ * Staff records use the Ed-Fi StaffResponseDto shape with `lastSurname`
+ * as the surname field.
  */
 
 import { useQuery } from '@tanstack/react-query'
@@ -33,8 +33,6 @@ export const staffKeys = {
 /**
  * Hook to fetch all staff assigned to a school.
  * Used to populate the teacher selector dropdown.
- *
- * The underlying service falls back to /users if /schools/{id}/staff is empty.
  */
 export function useSchoolStaff(schoolId: string, enabled = true) {
   return useQuery<StaffListResponseDto, Error>({
@@ -60,13 +58,12 @@ export function flattenStaffData(
 
 /**
  * Helper to get a staff display name.
- * Handles both Ed-Fi shape (`lastSurname`) and any edge cases.
+ * Uses the Ed-Fi `lastSurname` field for the surname.
  */
 export function getStaffDisplayName(staff: StaffResponseDto): string {
   const first = staff.firstName || ''
   const middle = staff.middleName || ''
-  // `lastSurname` is the Ed-Fi field. The service normalizer maps `lastName` → `lastSurname`.
-  const last = staff.lastSurname || (staff as any).lastName || ''
+  const last = staff.lastSurname || ''
 
   const parts = [first]
   if (middle) parts.push(middle)

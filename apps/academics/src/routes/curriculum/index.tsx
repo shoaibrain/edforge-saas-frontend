@@ -426,7 +426,11 @@ export function CurriculumModule() {
             )}
 
             {activeTab === 'grade-levels' && (
-              <GradeLevelsTab courses={courses} isLoading={isLoading} />
+              <GradeLevelsTab
+                courses={courses}
+                isLoading={isLoading}
+                onViewCourse={openViewDrawer}
+              />
             )}
 
             {activeTab === 'standards' && <StandardsContent />}

@@ -133,10 +133,12 @@ export function parseApiError(error: unknown): ParsedApiError {
       }
     }
 
-    // 404 - Not Found (stale data)
+    // 404 - Not Found (stale data or referenced entity missing)
     if (status === 404) {
       return {
-        message: 'This student record no longer exists. Please refresh the page.',
+        message: data?.message
+          ? getMessage(data.message)
+          : 'The requested record was not found. It may have been removed.',
         isRetryable: false,
         statusCode: 404,
       }
@@ -147,7 +149,7 @@ export function parseApiError(error: unknown): ParsedApiError {
       return {
         message: data?.message
           ? getMessage(data.message)
-          : 'A student with this identifier already exists',
+          : 'A record with this identifier already exists.',
         isRetryable: false,
         statusCode: 409,
       }

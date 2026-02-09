@@ -1,21 +1,24 @@
 /**
  * GradeLevelsTab Component
  *
- * Read-only summary of grade levels (K-12) with:
- * - Grid of grade cards showing student and course counts
- * - Derived from course data (gradeLevels field) and student data
- * - Click a grade card to navigate to Student Directory filtered by grade
+ * Enterprise-grade grade level management view with:
+ * - DataTable listing all grade levels (PK–12) with course data
+ * - Summary stats header (total grade levels, course assignments, avg per grade)
+ * - Row click opens GradeLevelDrawer for detailed view
+ * - Consistent with Courses tab design pattern
  */
 
-import { useMemo } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useMemo, useState, useCallback } from 'react'
 import {
   BookOpen,
-  ArrowRight,
   Layers,
+  BarChart3,
+  GraduationCap,
 } from 'lucide-react'
+import { DataTable, type Column } from '@edforge/ui'
 import type { CourseResponseDto } from '@edforge/shared-types'
 import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
+import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
 
 // ============================================================================
 // TYPES
@@ -26,76 +29,85 @@ interface GradeLevelsTabProps {
   courses: CourseResponseDto[]
   /** Whether course data is loading */
   isLoading?: boolean
-}
-
-interface GradeCardData {
-  value: string
-  label: string
-  courseCount: number
+  /** Callback when a course is clicked inside the drawer */
+  onViewCourse?: (course: CourseResponseDto) => void
 }
 
 // ============================================================================
-// GRADE CARD
+// STAT CARD
 // ============================================================================
 
-function GradeCard({
-  grade,
-  onNavigate,
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  accent,
+  bg,
 }: {
-  grade: GradeCardData
-  onNavigate: () => void
+  icon: typeof BookOpen
+  label: string
+  value: string | number
+  accent: string
+  bg: string
 }) {
   return (
-    <button
-      type="button"
-      onClick={onNavigate}
-      className="group flex flex-col bg-surface-primary rounded-xl border border-border-primary p-5 hover:border-teal-400 hover:shadow-md transition-all text-left"
-    >
-      {/* Grade number */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex items-center justify-center">
-          <span className="text-lg font-bold text-teal-600 dark:text-teal-400">
-            {grade.value}
-          </span>
+    <div className="bg-surface-primary rounded-xl border border-border-primary p-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${bg}`}>
+          <Icon className={`w-4 h-4 ${accent}`} />
         </div>
-        <ArrowRight className="w-4 h-4 text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity" />
-      </div>
-
-      {/* Grade name */}
-      <h4 className="text-sm font-semibold text-text-primary mb-3">
-        {grade.label}
-      </h4>
-
-      {/* Stats */}
-      <div className="space-y-1.5 mt-auto">
-        <div className="flex items-center gap-2 text-xs text-text-secondary">
-          <BookOpen className="w-3.5 h-3.5 text-text-tertiary" />
-          <span>
-            {grade.courseCount} course{grade.courseCount !== 1 ? 's' : ''}
-          </span>
+        <div>
+          <p className="text-sm text-text-secondary">{label}</p>
+          <p className="text-xl font-semibold text-text-primary">{value}</p>
         </div>
       </div>
-    </button>
+    </div>
   )
 }
 
 // ============================================================================
-// SKELETON
+// HELPER COMPONENTS
 // ============================================================================
 
-function GradeLevelsSkeleton() {
+function GradeBadge({ value, label }: { value: string; label: string }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-      {Array.from({ length: 14 }).map((_, i) => (
-        <div
+    <div className="flex items-center gap-2.5">
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
+        <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+          {value}
+        </span>
+      </div>
+      <span className="font-medium text-text-primary text-sm">{label}</span>
+    </div>
+  )
+}
+
+function CourseChips({ courses }: { courses: CourseResponseDto[] }) {
+  if (courses.length === 0) {
+    return <span className="text-text-tertiary text-sm">—</span>
+  }
+
+  const names = courses.map((c) => c.courseName)
+  const maxShow = 2
+  const display = names.slice(0, maxShow)
+  const remaining = names.length - maxShow
+
+  return (
+    <div className="flex items-center gap-1.5 flex-wrap">
+      {display.map((name, i) => (
+        <span
           key={i}
-          className="bg-surface-secondary rounded-xl border border-border-secondary p-5 animate-pulse"
+          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-tertiary text-text-secondary truncate max-w-[140px]"
+          title={name}
         >
-          <div className="w-10 h-10 rounded-lg bg-surface-tertiary mb-3" />
-          <div className="h-4 w-24 bg-surface-tertiary rounded mb-3" />
-          <div className="h-3 w-16 bg-surface-tertiary rounded" />
-        </div>
+          {name}
+        </span>
       ))}
+      {remaining > 0 && (
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+          +{remaining} more
+        </span>
+      )}
     </div>
   )
 }
@@ -104,87 +116,180 @@ function GradeLevelsSkeleton() {
 // GRADE LEVELS TAB
 // ============================================================================
 
-export function GradeLevelsTab({ courses, isLoading }: GradeLevelsTabProps) {
-  const navigate = useNavigate()
+export function GradeLevelsTab({
+  courses,
+  isLoading,
+  onViewCourse,
+}: GradeLevelsTabProps) {
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedGrade, setSelectedGrade] = useState<GradeLevelData | null>(null)
 
-  // Derive course counts per grade level from the courses data
-  const gradeData: GradeCardData[] = useMemo(() => {
-    const countMap = new Map<string, number>()
+  // Derive enriched grade level data with associated courses
+  const gradeData: GradeLevelData[] = useMemo(() => {
+    const courseMap = new Map<string, CourseResponseDto[]>()
 
-    // Initialize all known grades with 0
+    // Initialize all known grades
     for (const opt of GRADE_LEVEL_OPTIONS) {
-      countMap.set(opt.value, 0)
+      courseMap.set(opt.value, [])
     }
 
-    // Count courses per grade
+    // Group courses by grade level
     for (const course of courses) {
       if (course.gradeLevels) {
         for (const grade of course.gradeLevels) {
-          countMap.set(grade, (countMap.get(grade) ?? 0) + 1)
+          const existing = courseMap.get(grade) ?? []
+          existing.push(course)
+          courseMap.set(grade, existing)
         }
       }
     }
 
-    return GRADE_LEVEL_OPTIONS.map((opt) => ({
-      value: opt.value,
-      label: opt.label,
-      courseCount: countMap.get(opt.value) ?? 0,
-    }))
+    return GRADE_LEVEL_OPTIONS.map((opt) => {
+      const gradeCourses = courseMap.get(opt.value) ?? []
+      return {
+        value: opt.value,
+        label: opt.label,
+        courseCount: gradeCourses.length,
+        courses: gradeCourses,
+      }
+    })
   }, [courses])
 
-  const totalCourseAssignments = gradeData.reduce(
-    (sum, g) => sum + g.courseCount,
-    0
+  // Summary stats
+  const stats = useMemo(() => {
+    const totalGrades = GRADE_LEVEL_OPTIONS.length
+    const totalAssignments = gradeData.reduce((sum, g) => sum + g.courseCount, 0)
+    const avgPerGrade =
+      totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
+    const withCourses = gradeData.filter((g) => g.courseCount > 0).length
+    return { totalGrades, totalAssignments, avgPerGrade, withCourses }
+  }, [gradeData])
+
+  // Open grade detail drawer
+  const handleRowClick = useCallback((grade: GradeLevelData) => {
+    setSelectedGrade(grade)
+    setDrawerOpen(true)
+  }, [])
+
+  const handleCloseDrawer = useCallback(() => {
+    setDrawerOpen(false)
+    setSelectedGrade(null)
+  }, [])
+
+  // Handle clicking a course inside the drawer
+  const handleViewCourseFromDrawer = useCallback(
+    (course: CourseResponseDto) => {
+      handleCloseDrawer()
+      onViewCourse?.(course)
+    },
+    [handleCloseDrawer, onViewCourse]
   )
 
-  if (isLoading) return <GradeLevelsSkeleton />
+  // DataTable columns
+  const columns: Column<GradeLevelData>[] = useMemo(
+    () => [
+      {
+        key: 'value',
+        header: 'Grade Level',
+        sortable: true,
+        width: '200px',
+        render: (grade) => (
+          <GradeBadge value={grade.value} label={grade.label} />
+        ),
+      },
+      {
+        key: 'courseCount',
+        header: 'Course Count',
+        sortable: true,
+        width: '130px',
+        render: (grade) => (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-text-primary">
+              {grade.courseCount}
+            </span>
+            {grade.courseCount > 0 && (
+              <span className="text-xs text-text-tertiary">
+                course{grade.courseCount !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'courses' as any,
+        header: 'Courses',
+        width: '320px',
+        render: (grade) => <CourseChips courses={grade.courses} />,
+      },
+      {
+        key: 'students' as any,
+        header: 'Students',
+        width: '120px',
+        render: () => (
+          <span className="text-sm text-text-tertiary">&mdash;</span>
+        ),
+      },
+    ],
+    []
+  )
 
   return (
     <div className="space-y-6">
-      {/* Summary header */}
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-indigo-500/10">
-            <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-base font-semibold text-text-primary mb-1">
-              Grade Level Overview
-            </h3>
-            <p className="text-sm text-text-secondary leading-relaxed">
-              Academic progression from Pre-K through Grade 12. Click a grade
-              level to view the students enrolled at that level.
-            </p>
-          </div>
-          <div className="flex gap-6 text-center">
-            <div>
-              <p className="text-2xl font-bold text-text-primary">
-                {GRADE_LEVEL_OPTIONS.length}
-              </p>
-              <p className="text-xs text-text-tertiary">Grade Levels</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">
-                {totalCourseAssignments}
-              </p>
-              <p className="text-xs text-text-tertiary">Course Assignments</p>
-            </div>
-          </div>
-        </div>
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard
+          icon={Layers}
+          label="Total Grade Levels"
+          value={stats.totalGrades}
+          accent="text-indigo-600 dark:text-indigo-400"
+          bg="bg-indigo-500/10"
+        />
+        <StatCard
+          icon={BookOpen}
+          label="Course Assignments"
+          value={stats.totalAssignments}
+          accent="text-rose-600 dark:text-rose-400"
+          bg="bg-rose-500/10"
+        />
+        <StatCard
+          icon={BarChart3}
+          label="Avg. Courses / Grade"
+          value={stats.avgPerGrade}
+          accent="text-teal-600 dark:text-teal-400"
+          bg="bg-teal-500/10"
+        />
+        <StatCard
+          icon={GraduationCap}
+          label="Grades with Courses"
+          value={stats.withCourses}
+          accent="text-amber-600 dark:text-amber-400"
+          bg="bg-amber-500/10"
+        />
       </div>
 
-      {/* Grade cards grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {gradeData.map((grade) => (
-          <GradeCard
-            key={grade.value}
-            grade={grade}
-            onNavigate={() =>
-              navigate({ to: '/students', search: { gradeLevel: grade.value } })
-            }
-          />
-        ))}
-      </div>
+      {/* Grade Levels DataTable */}
+      <DataTable
+        columns={columns}
+        data={gradeData}
+        keyExtractor={(grade) => grade.value}
+        isLoading={isLoading}
+        skeletonRows={8}
+        emptyState={{
+          icon: <Layers className="w-12 h-12" />,
+          title: 'No grade levels found',
+          description: 'Grade levels will appear once courses are configured.',
+        }}
+        onRowClick={handleRowClick}
+      />
+
+      {/* Grade Level Drawer */}
+      <GradeLevelDrawer
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        gradeLevel={selectedGrade}
+        onViewCourse={onViewCourse ? handleViewCourseFromDrawer : undefined}
+      />
     </div>
   )
 }

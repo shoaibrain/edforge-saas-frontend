@@ -102,9 +102,6 @@ export function SectionForm({ isEdit }: SectionFormProps) {
   const courses = flattenCoursePages(coursesData)
 
   const { data: staffData } = useSchoolStaff(schoolId)
-  // Show all staff/users as potential teachers.
-  // The service layer normalizes User records to StaffResponseDto shape.
-  // Once the backend implements proper Ed-Fi Staff roles, we can re-add role filtering.
   const teachers = flattenStaffData(staffData)
 
   const { data: academicYears } = useAcademicYears(schoolId)

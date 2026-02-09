@@ -2,16 +2,11 @@
  * Staff Service
  *
  * API client for staff/teacher lookups.
- * Used primarily by the Section form's teacher selector.
+ * Used primarily by the Section form's teacher selector and the Teachers directory.
  *
- * FALLBACK STRATEGY:
- * The Ed-Fi Staff endpoint (`GET /schools/{schoolId}/staff`) may return empty
- * if the backend hasn't yet created Staff records. In that case, we fall back
- * to the Identity/Users endpoint (`GET /users`) which has the actual tenant
- * users, and normalize their shape to be compatible with our staff interfaces.
- *
- * Once the backend implements proper Staff <-> User linking, the fallback
- * can be removed.
+ * The backend bridges User → Staff automatically: when a User is assigned to a
+ * school with a staffRole, a linked Staff record is created. This service
+ * calls the Ed-Fi Staff endpoints directly.
  */
 
 import { apiGet } from '../lib/api'
@@ -21,106 +16,32 @@ import type { StaffResponseDto, StaffListResponseDto } from '@edforge/shared-typ
 export type { StaffResponseDto, StaffListResponseDto } from '@edforge/shared-types'
 
 // ============================================================================
-// USER FALLBACK TYPES
-// ============================================================================
-
-/**
- * Shape returned by the Identity/Users service (`GET /users`).
- * Different from the Ed-Fi StaffResponseDto.
- */
-interface UserResponseDto {
-  userId: string
-  email: string
-  firstName: string
-  lastName: string
-  middleName?: string
-  displayName?: string
-  phone?: string
-  globalRole: string
-  status: string
-  createdAt: string
-  updatedAt: string
-}
-
-interface UserListResponseDto {
-  items: UserResponseDto[]
-  hasMore: boolean
-  lastEvaluatedKey?: string
-}
-
-/**
- * Normalize a UserResponseDto into a partial StaffResponseDto shape
- * so that the Section form can use it in the teacher dropdown.
- */
-function userToStaffShape(user: UserResponseDto): StaffResponseDto {
-  return {
-    staffId: user.userId,
-    staffUniqueId: user.userId,
-    tenantId: '',
-    firstName: user.firstName,
-    lastSurname: user.lastName,
-    middleName: user.middleName,
-    email: user.email,
-    phone: user.phone,
-    primarySchoolId: '',
-    role: 'teacher' as any,
-    employmentType: 'full_time' as any,
-    employmentStatus: 'active' as any,
-    hireDate: user.createdAt,
-    status: user.status === 'active' ? 'active' as any : 'pending' as any,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-  }
-}
-
-// ============================================================================
 // STAFF OPERATIONS
 // ============================================================================
 
 /**
  * Get staff assigned to a school.
  *
- * Tries `GET /schools/{schoolId}/staff` first (Ed-Fi Staff).
- * If that returns empty, falls back to `GET /users` (Identity Users)
- * and normalizes the shape.
+ * GET /schools/:schoolId/staff
  *
- * GET /schools/:schoolId/staff  →  fallback → GET /users
+ * Returns Ed-Fi StaffResponseDto records linked to the school.
  */
 export async function getSchoolStaff(
   schoolId: string
 ): Promise<StaffListResponseDto> {
-  try {
-    const staffResult = await apiGet<StaffListResponseDto | { items: any[] }>(
-      `/schools/${schoolId}/staff`
-    )
-    const items = Array.isArray(staffResult) ? staffResult : (staffResult?.items ?? [])
+  const result = await apiGet<StaffListResponseDto | StaffResponseDto[]>(
+    `/schools/${schoolId}/staff`
+  )
 
-    if (items.length > 0) {
-      return Array.isArray(staffResult)
-        ? { items: staffResult, hasMore: false, total: staffResult.length } as any
-        : staffResult as StaffListResponseDto
-    }
-  } catch {
-    // Staff endpoint failed — fall through to users fallback
-  }
-
-  // Fallback: fetch from /users and normalize
-  try {
-    const usersResult = await apiGet<UserListResponseDto>('/users')
-    const users = usersResult?.items ?? []
-    const staffItems = users
-      .filter((u) => u.status === 'active' || u.status === 'pending')
-      .map(userToStaffShape)
-
+  // Handle both array and paginated response shapes
+  if (Array.isArray(result)) {
     return {
-      items: staffItems,
+      items: result,
       hasMore: false,
-      total: staffItems.length,
     } as StaffListResponseDto
-  } catch {
-    // Both endpoints failed — return empty
-    return { items: [], hasMore: false, total: 0 } as StaffListResponseDto
   }
+
+  return result as StaffListResponseDto
 }
 
 /**
@@ -130,7 +51,19 @@ export async function getSchoolStaff(
 export async function searchStaff(
   term: string
 ): Promise<StaffListResponseDto> {
-  return apiGet<StaffListResponseDto>(`/staff/search/${encodeURIComponent(term)}`)
+  const result = await apiGet<StaffListResponseDto | StaffResponseDto[]>(
+    `/staff/search/${encodeURIComponent(term)}`
+  )
+
+  // Handle both array and paginated response shapes
+  if (Array.isArray(result)) {
+    return {
+      items: result,
+      hasMore: false,
+    } as StaffListResponseDto
+  }
+
+  return result as StaffListResponseDto
 }
 
 /**

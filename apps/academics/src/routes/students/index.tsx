@@ -10,7 +10,7 @@
  * following the "Object-Oriented" navigation pattern that reduces sidebar clutter.
  */
 
-import { useMemo } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Users,
@@ -19,16 +19,20 @@ import {
   UserCheck,
   AlertCircle,
   RefreshCw,
+  UserMinus,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { StudentTable, StudentFilters } from '../../components/students'
+import { StudentTable, StudentFilters, StudentDrawer } from '../../components/students'
+import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
   flattenStudentPages,
   getTotalFromPages,
+  useDeleteStudent,
 } from '../../hooks'
 import { useActiveSchoolId } from '../../stores'
 import { useStudentFilters } from '../../stores/students.store'
+import type { StudentResponseDto } from '@edforge/shared-types'
 
 // ============================================================================
 // STAT CARD COMPONENT
@@ -185,15 +189,47 @@ export function StudentsModule() {
     }
   }, [students, totalCount])
 
+  // Student drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<StudentResponseDto | null>(null)
+
+  // Withdrawal state
+  const [withdrawStudent, setWithdrawStudent] = useState<StudentResponseDto | null>(null)
+  const deleteStudentMutation = useDeleteStudent()
+
   // Navigate to the full-page registration wizard
   const handleAddStudent = () => {
     navigate({ to: '/students/enrollment' })
   }
 
-  // Handle edit student (placeholder - will be wired to inline editing)
-  const handleEditStudent = () => {
-    // TODO: Open edit student drawer/modal
-    console.log('Edit student clicked')
+  // Open student drawer
+  const handleViewStudent = useCallback((student: StudentResponseDto) => {
+    setSelectedStudent(student)
+    setDrawerOpen(true)
+  }, [])
+
+  // Close student drawer
+  const handleCloseDrawer = useCallback(() => {
+    setDrawerOpen(false)
+    setSelectedStudent(null)
+  }, [])
+
+  // Handle withdraw from drawer
+  const handleWithdrawFromDrawer = useCallback((student: StudentResponseDto) => {
+    setDrawerOpen(false)
+    setSelectedStudent(null)
+    setWithdrawStudent(student)
+  }, [])
+
+  // Handle withdraw confirmation
+  const handleWithdrawConfirm = async () => {
+    if (!withdrawStudent) return
+    try {
+      await deleteStudentMutation.mutateAsync(withdrawStudent.studentId)
+      setWithdrawStudent(null)
+    } catch {
+      // Error handling is done in the mutation hook
+    }
   }
 
   return (
@@ -282,11 +318,37 @@ export function StudentsModule() {
               isFetchingMore={isFetchingNextPage}
               onLoadMore={() => fetchNextPage()}
               onAddStudent={handleAddStudent}
-              onEditStudent={handleEditStudent}
+              onViewStudent={handleViewStudent}
             />
           </>
         )}
       </div>
+
+      {/* Student Quick-Info Drawer */}
+      <StudentDrawer
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        student={selectedStudent}
+        onWithdraw={handleWithdrawFromDrawer}
+      />
+
+      {/* Withdrawal Confirmation Dialog */}
+      <ConfirmationDialog
+        open={!!withdrawStudent}
+        onClose={() => setWithdrawStudent(null)}
+        onConfirm={handleWithdrawConfirm}
+        title="Withdraw Student"
+        description={
+          withdrawStudent
+            ? `Are you sure you want to withdraw ${withdrawStudent.fullName}? This action can be reversed by a school administrator.`
+            : ''
+        }
+        confirmText="Withdraw"
+        cancelText="Cancel"
+        variant="destructive"
+        isLoading={deleteStudentMutation.isPending}
+        icon={<UserMinus className="w-5 h-5 text-red-600 dark:text-red-400" />}
+      />
     </div>
   )
 }
