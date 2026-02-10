@@ -202,7 +202,7 @@ export default function SchoolDetailPage() {
     mutationFn: () => tenantService.deleteSchool(schoolId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['schools'] })
-      navigate({ to: '/settings/schools', search: { create: undefined } })
+      navigate({ to: '/settings/schools', search: { create: undefined, leaId: undefined } })
     },
   })
 

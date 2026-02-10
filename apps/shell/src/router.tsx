@@ -37,6 +37,7 @@ import {
   SchoolsSettingsPage,
   SchoolDetailPage,
   OrganizationSettingsPage,
+  EducationOrgDetailPage,
   RBACSecurityPage,
   IntegrationsSettingsPage,
   BillingSettingsPage,
@@ -381,12 +382,19 @@ const settingsOrganizationRoute = createRoute({
   component: OrganizationSettingsPage,
 })
 
+const settingsEdOrgDetailRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/organization/$orgType/$orgId',
+  component: EducationOrgDetailPage,
+})
+
 const settingsSchoolsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/schools',
   component: SchoolsSettingsPage,
   validateSearch: (search: Record<string, unknown>) => ({
     create: search.create as string | undefined,
+    leaId: search.leaId as string | undefined,
   }),
 })
 
@@ -568,6 +576,7 @@ const routeTree = rootRoute.addChildren([
       settingsGeneralRoute,
       settingsWorkspaceRoute,
       settingsOrganizationRoute,
+      settingsEdOrgDetailRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
       settingsSchoolsRoute,

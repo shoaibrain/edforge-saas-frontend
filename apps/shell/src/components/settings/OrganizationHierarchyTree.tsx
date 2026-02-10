@@ -6,7 +6,9 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
+import { Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import {
   ChevronRight,
   Building2,
@@ -18,12 +20,23 @@ import {
   ChevronsDownUp,
   GraduationCap,
   Briefcase,
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Plus,
+  Trash2,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { cn } from '@/lib/utils'
 import type { HierarchyNode } from '@aibrains/shared-types'
 import { SettingsSkeleton, SettingsEmptyState } from './SettingsShared'
+
+// ============================================================================
+// ACTION TYPES
+// ============================================================================
+
+export type TreeNodeAction = 'edit' | 'view-details' | 'add-child' | 'delete'
 
 // ============================================================================
 // CONSTANTS
@@ -140,6 +153,86 @@ function CountPill({ icon: Icon, count, label }: { icon: LucideIcon; count?: num
 }
 
 // ============================================================================
+// TREE NODE ACTION MENU
+// ============================================================================
+
+function TreeNodeActionMenu({
+  node,
+  onAction,
+}: {
+  node: HierarchyNode
+  onAction: (action: TreeNodeAction, node: HierarchyNode) => void
+}) {
+  const actions: { action: TreeNodeAction; label: string; icon: LucideIcon; destructive?: boolean }[] = []
+
+  // All types can view details
+  actions.push({ action: 'view-details', label: 'View Details', icon: Eye })
+
+  // SEA, LEA, ESC can be edited (not schools — managed on their own page)
+  if (node.type !== 'school') {
+    actions.push({ action: 'edit', label: 'Edit', icon: Pencil })
+  }
+
+  // LEA can add schools
+  if (node.type === 'localEducationAgency') {
+    actions.push({ action: 'add-child', label: 'Add School', icon: Plus })
+  }
+
+  // LEA and ESC can be deleted (not SEA, not schools from here)
+  if (node.type === 'localEducationAgency' || node.type === 'educationServiceCenter') {
+    actions.push({ action: 'delete', label: 'Delete', icon: Trash2, destructive: true })
+  }
+
+  return (
+    <Menu as="div" className="relative">
+      <MenuButton
+        className="p-1 rounded-md hover:bg-[rgb(var(--surface-tertiary))] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
+        <MoreHorizontal className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+      </MenuButton>
+
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <MenuItems className="absolute right-0 z-50 mt-1 w-44 origin-top-right rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] shadow-lg focus:outline-none overflow-hidden">
+          <div className="py-1">
+            {actions.map(({ action, label, icon: Icon, destructive }) => (
+              <MenuItem key={action}>
+                {({ focus }) => (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAction(action, node)
+                    }}
+                    className={cn(
+                      'flex items-center gap-2 w-full px-3 py-2 text-sm',
+                      focus && 'bg-[rgb(var(--surface-tertiary))]',
+                      destructive
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-[rgb(var(--text-secondary))]'
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </button>
+                )}
+              </MenuItem>
+            ))}
+          </div>
+        </MenuItems>
+      </Transition>
+    </Menu>
+  )
+}
+
+// ============================================================================
 // TREE NODE
 // ============================================================================
 
@@ -149,9 +242,10 @@ interface TreeNodeProps {
   expandedIds: Set<string>
   onToggle: (id: string) => void
   searchTerm: string
+  onNodeAction?: (action: TreeNodeAction, node: HierarchyNode) => void
 }
 
-function TreeNode({ node, depth, expandedIds, onToggle, searchTerm }: TreeNodeProps) {
+function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction }: TreeNodeProps) {
   const isExpanded = expandedIds.has(node.id)
   const hasChildren = node.children && node.children.length > 0
   const config = ORG_TYPE_CONFIG[node.type]
@@ -236,6 +330,11 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm }: TreeNodePr
           <CountPill icon={GraduationCap} count={node.studentCount} label="students" />
           <CountPill icon={Briefcase} count={node.staffCount} label="staff" />
         </div>
+
+        {/* Action Menu */}
+        {onNodeAction && (
+          <TreeNodeActionMenu node={node} onAction={onNodeAction} />
+        )}
       </motion.div>
 
       {/* Children */}
@@ -256,6 +355,7 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm }: TreeNodePr
                 expandedIds={expandedIds}
                 onToggle={onToggle}
                 searchTerm={searchTerm}
+                onNodeAction={onNodeAction}
               />
             ))}
           </motion.div>
@@ -274,6 +374,7 @@ export interface OrganizationHierarchyTreeProps {
   educationServiceCenters: HierarchyNode[]
   unassigned: HierarchyNode[]
   isLoading?: boolean
+  onNodeAction?: (action: TreeNodeAction, node: HierarchyNode) => void
 }
 
 export function OrganizationHierarchyTree({
@@ -281,6 +382,7 @@ export function OrganizationHierarchyTree({
   educationServiceCenters,
   unassigned,
   isLoading,
+  onNodeAction,
 }: OrganizationHierarchyTreeProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
@@ -402,6 +504,7 @@ export function OrganizationHierarchyTree({
             expandedIds={expandedIds}
             onToggle={toggleNode}
             searchTerm={searchTerm}
+            onNodeAction={onNodeAction}
           />
         )}
 
@@ -424,6 +527,7 @@ export function OrganizationHierarchyTree({
                 expandedIds={expandedIds}
                 onToggle={toggleNode}
                 searchTerm={searchTerm}
+                onNodeAction={onNodeAction}
               />
             ))}
           </>
@@ -446,6 +550,7 @@ export function OrganizationHierarchyTree({
                 expandedIds={expandedIds}
                 onToggle={toggleNode}
                 searchTerm={searchTerm}
+                onNodeAction={onNodeAction}
               />
             ))}
           </>

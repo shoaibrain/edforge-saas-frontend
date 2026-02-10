@@ -51,6 +51,7 @@ import {
   fadeInUp,
 } from '@/components/settings/SettingsShared'
 import { DataTable, type Column } from '@/components/ui/DataTable'
+import { useLocalEducationAgencies } from '@/hooks/useEducationOrgs'
 
 // ============================================================================
 // TYPES
@@ -538,17 +539,10 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
   })
 
   // Handle URL query params
-  const search = useSearch({ strict: false }) as { create?: string }
-  useEffect(() => {
-    if (search.create === 'true' || search.create === '"true"') {
-      // Logic to show create view - actually the parent component might use this, 
-      // but here we are IN the create page component.
-      // If this component is rendered conditionally by parent, we don't need this.
-      // But looking at file structure, this seems to be the page component.
-      // Wait, the previous code didn't use search params in this component.
-      // Let's assume the router handles showing this component.
-    }
-  }, [search])
+  const search = useSearch({ strict: false }) as { create?: string; leaId?: string }
+
+  // Fetch LEAs for district dropdown
+  const { data: leaList } = useLocalEducationAgencies()
 
   // Initialize form with Zod schema
   const {
@@ -610,7 +604,13 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
     }
   }, [schoolName, schoolCode, setValue])
 
-
+  // Pre-select LEA from URL param
+  const leas = leaList?.items || []
+  useEffect(() => {
+    if (search.leaId) {
+      setValue('localEducationAgencyId', search.leaId)
+    }
+  }, [search.leaId, setValue])
 
   // Section handlers
   const handleSaveBasic = async () => {
@@ -834,6 +834,30 @@ function SchoolCreatePage({ onCancel, onSuccess }: SchoolCreatePageProps) {
                 {(errors.gradeRange?.start || errors.gradeRange?.end) && (
                   <p className="mt-1 text-xs text-rust-500">Please select valid grade range</p>
                 )}
+              </div>
+
+              {/* District (LEA) Assignment */}
+              <div className="pt-4 border-t border-[rgb(var(--border-secondary))]">
+                <p className="text-xs text-[rgb(var(--text-tertiary))] mb-3 uppercase tracking-wider font-medium">District Assignment (Optional)</p>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
+                    Local Education Agency (District)
+                  </label>
+                  <select
+                    {...register('localEducationAgencyId')}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                  >
+                    <option value="">No district assigned</option>
+                    {leas.map((lea) => (
+                      <option key={lea.id} value={lea.id}>
+                        {lea.nameOfInstitution}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
+                    Assign this school to a district for Ed-Fi reporting.
+                  </p>
+                </div>
               </div>
 
               {/* Principal Information */}
@@ -1209,17 +1233,17 @@ export default function SchoolsSettingsPage() {
   })
 
   const handleCreateSchool = () => {
-    navigate({ to: '/settings/schools', search: { create: 'true' } })
+    navigate({ to: '/settings/schools', search: { create: 'true', leaId: undefined } })
     setIsCreateMode(true)
   }
 
   const handleCancelCreate = () => {
-    navigate({ to: '/settings/schools', search: { create: undefined }, replace: true })
+    navigate({ to: '/settings/schools', search: { create: undefined, leaId: undefined }, replace: true })
     setIsCreateMode(false)
   }
 
   const handleCreateSuccess = () => {
-    navigate({ to: '/settings/schools', search: { create: undefined }, replace: true })
+    navigate({ to: '/settings/schools', search: { create: undefined, leaId: undefined }, replace: true })
     setIsCreateMode(false)
     queryClient.invalidateQueries({ queryKey: ['schools', user.tenantId] })
     setSaveSuccess(true)

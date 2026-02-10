@@ -22,4 +22,8 @@ export { HolidayManager } from './HolidayManager'
 
 // Education Organization components
 export { OrganizationHierarchyTree } from './OrganizationHierarchyTree'
+export type { TreeNodeAction } from './OrganizationHierarchyTree'
 export { OrphanedSchoolsBanner } from './OrphanedSchoolsBanner'
+export { SEASetupForm } from './SEASetupForm'
+export { LEAForm } from './LEAForm'
+export { ESCForm } from './ESCForm'

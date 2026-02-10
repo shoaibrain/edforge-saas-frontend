@@ -477,7 +477,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
 
   // Handle create school navigation
   const handleCreateSchool = () => {
-    navigate({ to: '/settings/schools', search: { create: 'true' } })
+    navigate({ to: '/settings/schools', search: { create: 'true', leaId: undefined } })
   }
 
   // ============================================================================

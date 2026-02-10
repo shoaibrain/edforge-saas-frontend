@@ -5,7 +5,8 @@
  * Includes quick actions for creating orgs and stats overview.
  */
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Building2,
@@ -15,11 +16,17 @@ import {
   GraduationCap,
   Briefcase,
   Network,
+  AlertTriangle,
   type LucideIcon,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
-import { useOrganizationHierarchy, useStateEducationAgency } from '@/hooks/useEducationOrgs'
+import {
+  useOrganizationHierarchy,
+  useStateEducationAgency,
+  useDeleteLea,
+  useDeleteEsc,
+} from '@/hooks/useEducationOrgs'
 import {
   SettingsPageHeader,
   SettingsSkeleton,
@@ -28,7 +35,12 @@ import {
   fadeInUp,
 } from '@/components/settings/SettingsShared'
 import { OrganizationHierarchyTree } from '@/components/settings/OrganizationHierarchyTree'
+import type { TreeNodeAction } from '@/components/settings/OrganizationHierarchyTree'
 import { OrphanedSchoolsBanner } from '@/components/settings/OrphanedSchoolsBanner'
+import { SEASetupForm } from '@/components/settings/SEASetupForm'
+import { LEAForm } from '@/components/settings/LEAForm'
+import { ESCForm } from '@/components/settings/ESCForm'
+import { useModalState } from '@/hooks/useModalState'
 import type { HierarchyNode } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -110,10 +122,106 @@ function TabButton({
 }
 
 // ============================================================================
+// DELETE CONFIRMATION MODAL
+// ============================================================================
+
+function DeleteEdOrgModal({
+  open,
+  onClose,
+  node,
+}: {
+  open: boolean
+  onClose: () => void
+  node: HierarchyNode | null
+}) {
+  const [confirmText, setConfirmText] = useState('')
+  const deleteLeaMutation = useDeleteLea()
+  const deleteEscMutation = useDeleteEsc()
+
+  if (!node) return null
+
+  const isLea = node.type === 'localEducationAgency'
+  const schoolCount = node.schoolCount || 0
+  const requiresTyping = isLea && schoolCount > 0
+  const entityLabel = isLea ? 'District' : 'Service Center'
+  const isPending = deleteLeaMutation.isPending || deleteEscMutation.isPending
+  const canConfirm = !requiresTyping || confirmText === node.name
+
+  const handleDelete = () => {
+    if (!canConfirm) return
+    const mutation = isLea ? deleteLeaMutation : deleteEscMutation
+    mutation.mutate(node.id, {
+      onSuccess: () => {
+        setConfirmText('')
+        onClose()
+      },
+    })
+  }
+
+  const handleClose = () => {
+    setConfirmText('')
+    onClose()
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title={`Delete ${entityLabel}`}
+      description={`Are you sure you want to delete "${node.name}"?`}
+      size="md"
+    >
+      <div className="space-y-4 py-2">
+        <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium text-red-600 dark:text-red-400">This action cannot be undone.</p>
+            {isLea && schoolCount > 0 && (
+              <p className="mt-1 text-[rgb(var(--text-secondary))]">
+                This district has <strong>{schoolCount}</strong> {schoolCount === 1 ? 'school' : 'schools'} that will become unassigned.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {requiresTyping && (
+          <div>
+            <label className="block text-sm text-[rgb(var(--text-secondary))] mb-1.5">
+              Type <strong>{node.name}</strong> to confirm:
+            </label>
+            <input
+              type="text"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={node.name}
+              className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-colors"
+            />
+          </div>
+        )}
+      </div>
+
+      <ModalFooter>
+        <Button variant="outline" onClick={handleClose} disabled={isPending}>
+          Cancel
+        </Button>
+        <Button
+          variant="danger"
+          onClick={handleDelete}
+          disabled={!canConfirm || isPending}
+          isLoading={isPending}
+        >
+          Delete {entityLabel}
+        </Button>
+      </ModalFooter>
+    </Modal>
+  )
+}
+
+// ============================================================================
 // EMPTY STATE (No Hierarchy)
 // ============================================================================
 
-function OrgEmptyState() {
+function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
   const canManage = usePermission('manage', 'education-organizations')
 
   return (
@@ -201,7 +309,10 @@ function OrgEmptyState() {
             transition={{ delay: 0.25, duration: 0.5 }}
             className="flex items-center gap-3"
           >
-            <Button className="gap-2 bg-gradient-to-r from-indigo-500 to-teal-600 hover:from-indigo-600 hover:to-teal-700 shadow-lg shadow-indigo-500/25">
+            <Button
+              onClick={onSetupSea}
+              className="gap-2 bg-gradient-to-r from-indigo-500 to-teal-600 hover:from-indigo-600 hover:to-teal-700 shadow-lg shadow-indigo-500/25"
+            >
               <Landmark className="w-4 h-4" />
               Set Up State Agency
             </Button>
@@ -219,6 +330,13 @@ function OrgEmptyState() {
 export default function OrganizationSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('hierarchy')
   const canManage = usePermission('manage', 'education-organizations')
+  const navigate = useNavigate()
+
+  // Modal state for each entity type
+  const seaModal = useModalState<null>()
+  const leaModal = useModalState<{ id: string; seaId?: string; escId?: string }>()
+  const escModal = useModalState<{ id: string }>()
+  const deleteModal = useModalState<HierarchyNode>()
 
   const {
     data: hierarchy,
@@ -227,6 +345,46 @@ export default function OrganizationSettingsPage() {
   } = useOrganizationHierarchy()
 
   const { data: sea } = useStateEducationAgency()
+
+  // Handle tree node actions
+  const handleNodeAction = useCallback(
+    (action: TreeNodeAction, node: HierarchyNode) => {
+      switch (action) {
+        case 'view-details':
+          if (node.type === 'school') {
+            navigate({ to: '/settings/schools/$schoolId', params: { schoolId: node.id } })
+          } else {
+            const orgType = node.type === 'stateEducationAgency'
+              ? 'sea'
+              : node.type === 'localEducationAgency'
+              ? 'lea'
+              : 'esc'
+            // Route will be registered in Task 2.5
+            navigate({ to: `/settings/organization/${orgType}/${node.id}` as string })
+          }
+          break
+        case 'edit':
+          if (node.type === 'stateEducationAgency') {
+            seaModal.openEdit(null)
+          } else if (node.type === 'localEducationAgency') {
+            leaModal.openEdit({ id: node.id })
+          } else if (node.type === 'educationServiceCenter') {
+            escModal.openEdit({ id: node.id })
+          }
+          break
+        case 'add-child':
+          // LEA → add school with pre-selected LEA
+          if (node.type === 'localEducationAgency') {
+            navigate({ to: '/settings/schools', search: { create: 'true', leaId: node.id } })
+          }
+          break
+        case 'delete':
+          deleteModal.openDelete(node)
+          break
+      }
+    },
+    [navigate, seaModal, leaModal, escModal, deleteModal]
+  )
 
   // Compute stats from hierarchy
   const stats = {
@@ -263,7 +421,14 @@ export default function OrganizationSettingsPage() {
   if (hasNoData && !hierarchyError) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <OrgEmptyState />
+        <OrgEmptyState onSetupSea={seaModal.openCreate} />
+
+        {/* SEA Form (still needed in empty state) */}
+        <SEASetupForm
+          open={seaModal.isOpen}
+          onClose={seaModal.close}
+          existingSea={seaModal.mode === 'edit' ? sea : undefined}
+        />
       </div>
     )
   }
@@ -284,17 +449,22 @@ export default function OrganizationSettingsPage() {
           action={
             canManage ? (
               <div className="flex items-center gap-2">
-                {!sea && (
-                  <Button size="sm" variant="ghost" className="gap-1.5">
+                {!sea ? (
+                  <Button size="sm" variant="ghost" className="gap-1.5" onClick={seaModal.openCreate}>
                     <Landmark className="w-4 h-4" />
                     Set Up SEA
                   </Button>
+                ) : (
+                  <Button size="sm" variant="ghost" className="gap-1.5" onClick={() => seaModal.openEdit(null)}>
+                    <Landmark className="w-4 h-4" />
+                    Edit SEA
+                  </Button>
                 )}
-                <Button size="sm" variant="ghost" className="gap-1.5">
+                <Button size="sm" variant="ghost" className="gap-1.5" onClick={leaModal.openCreate}>
                   <Plus className="w-4 h-4" />
                   Add District
                 </Button>
-                <Button size="sm" variant="ghost" className="gap-1.5">
+                <Button size="sm" variant="ghost" className="gap-1.5" onClick={escModal.openCreate}>
                   <Plus className="w-4 h-4" />
                   Add Service Center
                 </Button>
@@ -347,6 +517,7 @@ export default function OrganizationSettingsPage() {
                   sea={hierarchy.sea}
                   educationServiceCenters={hierarchy.educationServiceCenters || []}
                   unassigned={hierarchy.unassigned || []}
+                  onNodeAction={canManage ? handleNodeAction : undefined}
                 />
               ) : null}
             </motion.div>
@@ -374,6 +545,16 @@ export default function OrganizationSettingsPage() {
                       </h3>
                       <p className="text-xs text-[rgb(var(--text-tertiary))]">Root organization</p>
                     </div>
+                    {canManage && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="ml-auto gap-1.5"
+                        onClick={() => seaModal.openEdit(null)}
+                      >
+                        Edit
+                      </Button>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -410,7 +591,7 @@ export default function OrganizationSettingsPage() {
                   description="Set up your SEA to establish the root of your organization hierarchy."
                   action={
                     canManage ? (
-                      <Button size="sm" className="gap-1.5">
+                      <Button size="sm" className="gap-1.5" onClick={seaModal.openCreate}>
                         <Plus className="w-4 h-4" />
                         Set Up SEA
                       </Button>
@@ -422,6 +603,41 @@ export default function OrganizationSettingsPage() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* ================================================================ */}
+      {/* FORM MODALS                                                      */}
+      {/* ================================================================ */}
+
+      {/* SEA Form */}
+      <SEASetupForm
+        open={seaModal.isOpen}
+        onClose={seaModal.close}
+        existingSea={seaModal.mode === 'edit' ? sea : undefined}
+      />
+
+      {/* LEA Form */}
+      <LEAForm
+        open={leaModal.isOpen}
+        onClose={leaModal.close}
+        mode={leaModal.mode === 'edit' ? 'edit' : 'create'}
+        editId={leaModal.mode === 'edit' ? leaModal.data?.id : undefined}
+        defaultSeaId={sea?.id}
+      />
+
+      {/* ESC Form */}
+      <ESCForm
+        open={escModal.isOpen}
+        onClose={escModal.close}
+        mode={escModal.mode === 'edit' ? 'edit' : 'create'}
+        editId={escModal.mode === 'edit' ? escModal.data?.id : undefined}
+      />
+
+      {/* Delete Confirmation */}
+      <DeleteEdOrgModal
+        open={deleteModal.mode === 'delete'}
+        onClose={deleteModal.close}
+        node={deleteModal.data}
+      />
     </div>
   )
 }

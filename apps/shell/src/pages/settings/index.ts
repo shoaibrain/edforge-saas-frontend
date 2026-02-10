@@ -21,6 +21,7 @@ export { default as RBACSecurityPage } from './rbac-security'
 
 // Organization
 export { default as OrganizationSettingsPage } from './organization'
+export { default as EducationOrgDetailPage } from './education-org-detail'
 
 // Other
 export { default as IntegrationsSettingsPage } from './integrations'
