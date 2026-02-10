@@ -58,6 +58,8 @@ import {
   Baby,
   // Auth Debug
   Bug,
+  // Organization
+  Building2,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -468,6 +470,13 @@ const settingsModule: ModuleConfig = {
           icon: Settings,
           href: '/settings/workspace',
           permission: { action: 'view', resource: 'settings:tenant' },
+        },
+        {
+          id: 'organization',
+          label: 'Organization',
+          icon: Building2,
+          href: '/settings/organization',
+          permission: { action: 'view', resource: 'education-organizations' },
         },
         {
           id: 'school-settings',

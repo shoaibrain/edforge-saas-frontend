@@ -19,6 +19,9 @@ export { default as SchoolDepartmentsPage } from './school-departments'
 export { default as SchoolAcademicYearsPage } from './school-academic-years'
 export { default as RBACSecurityPage } from './rbac-security'
 
+// Organization
+export { default as OrganizationSettingsPage } from './organization'
+
 // Other
 export { default as IntegrationsSettingsPage } from './integrations'
 export { default as BillingSettingsPage } from './billing'

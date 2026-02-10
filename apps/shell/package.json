@@ -11,7 +11,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@aibrains/shared-types": "^0.1.1",
+    "@aibrains/shared-types": "^0.2.0",
     "@edforge/abac": "workspace:*",
     "@edforge/auth": "workspace:*",
     "@edforge/forms": "workspace:*",

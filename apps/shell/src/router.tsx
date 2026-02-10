@@ -36,6 +36,7 @@ import {
   WorkspaceSettingsPage,
   SchoolsSettingsPage,
   SchoolDetailPage,
+  OrganizationSettingsPage,
   RBACSecurityPage,
   IntegrationsSettingsPage,
   BillingSettingsPage,
@@ -374,6 +375,12 @@ const settingsSecurityPoliciesRoute = createRoute({
   component: RBACSecurityPage,
 })
 
+const settingsOrganizationRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/organization',
+  component: OrganizationSettingsPage,
+})
+
 const settingsSchoolsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/schools',
@@ -560,6 +567,7 @@ const routeTree = rootRoute.addChildren([
       settingsNotificationsRoute,
       settingsGeneralRoute,
       settingsWorkspaceRoute,
+      settingsOrganizationRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
       settingsSchoolsRoute,

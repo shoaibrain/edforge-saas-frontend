@@ -19,3 +19,7 @@ export { TimeRangePicker, formatTime, formatTimeRange } from './TimeRangePicker'
 export { GradingScaleEditor, type GradeLevelConfig } from './GradingScaleEditor'
 export { FeatureToggles, DEFAULT_FEATURES, type SchoolFeatures } from './FeatureToggles'
 export { HolidayManager } from './HolidayManager'
+
+// Education Organization components
+export { OrganizationHierarchyTree } from './OrganizationHierarchyTree'
+export { OrphanedSchoolsBanner } from './OrphanedSchoolsBanner'
