@@ -6,7 +6,7 @@
   "rewrites": [
     { "source": "/remotes/:path*", "destination": "/remotes/:path*" },
     { "source": "/static/:path*", "destination": "/static/:path*" },
-    { "source": "/api/:path*", "destination": "https://nw50dn25zl.execute-api.us-east-2.amazonaws.com/prod/:path*" },
+    { "source": "/api/:path*", "destination": "https://udmx0atz53.execute-api.us-east-2.amazonaws.com/prod/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

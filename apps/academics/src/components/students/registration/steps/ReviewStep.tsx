@@ -4,17 +4,29 @@
  * Final step of the student registration wizard.
  * Displays a read-only summary of all entered data with
  * "Edit" links that jump back to the relevant step.
+ *
+ * Sprint Alaska changes:
+ * - Resolves academicYearId to year name (AK-2.6)
+ * - Displays Ed-Fi descriptor fields (AK-2.6)
+ * - Enrollment summary confirmation card (AK-4.2)
  */
 
+import { useMemo } from 'react'
 import { useWizard } from '@edforge/wizard'
 import type { WizardStepProps } from '@edforge/wizard'
-import { Edit2 } from 'lucide-react'
+import { Edit2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import {
   GENDER_OPTIONS,
   GRADE_LEVEL_OPTIONS,
   RELATIONSHIP_OPTIONS,
   ENROLLMENT_TYPE_OPTIONS,
 } from '../../../../schemas/student.form'
+import {
+  ENTRY_TYPE_OPTIONS,
+  RESIDENCY_STATUS_OPTIONS,
+} from '../../../../schemas/edfi-descriptors'
+import { useAcademicYears } from '../../../../hooks/useSchool'
+import { useActiveSchoolId } from '../../../../stores/app.store'
 import type { GuardianFormData } from '../../../../schemas/student.form'
 
 // ============================================================================
@@ -121,25 +133,85 @@ export function ReviewStep({ data }: WizardStepProps) {
   const enrollment = (data.enrollment as Record<string, unknown> | undefined) ?? {}
   const guardians = (data.guardians as GuardianFormData[] | undefined) ?? []
 
+  // Resolve academic year name
+  const schoolId = useActiveSchoolId()
+  const { data: academicYears } = useAcademicYears(schoolId || '', !!schoolId)
+  const academicYearName = useMemo(() => {
+    const yearId = enrollment.academicYearId as string
+    if (!yearId || !academicYears) return '—'
+    const year = academicYears.find((y) => y.yearId === yearId)
+    return year?.name ?? yearId
+  }, [enrollment.academicYearId, academicYears])
+
   const formatAddress = (addr: Record<string, unknown>): string => {
     const parts = [
       addr.street1,
       addr.street2,
       addr.city,
       addr.state,
-      addr.postalCode,
+      addr.zipCode || addr.postalCode,
     ].filter(Boolean)
     return parts.length > 0 ? parts.join(', ') : '—'
   }
+
+  // Enrollment summary for the confirmation card
+  const hasEnrollment = Boolean(enrollment.academicYearId && enrollment.enrollmentDate)
 
   return (
     <div className="space-y-8">
       {isSubmitting && (
         <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700 flex items-center gap-3">
           <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          Creating student record...
+          Creating student record and enrollment...
         </div>
       )}
+
+      {/* Enrollment Summary Confirmation Card */}
+      <div className="rounded-xl border-2 border-teal-200 bg-teal-50/50 p-5">
+        <h3 className="text-sm font-semibold text-teal-800 mb-3">
+          What will happen when you click "Create Student"
+        </h3>
+        <div className="space-y-2">
+          <div className="flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+            <span className="text-sm text-teal-700">
+              A student record will be created for <strong>{display(data.firstName)} {display(data.lastName)}</strong>
+            </span>
+          </div>
+          {hasEnrollment ? (
+            <>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                <span className="text-sm text-teal-700">
+                  Enrolled in <strong>{academicYearName}</strong> as{' '}
+                  <strong>{labelFor(data.currentGradeLevel as string, GRADE_LEVEL_OPTIONS)}</strong>
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                <span className="text-sm text-teal-700">
+                  Enrollment type: <strong>{labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS)}</strong> — Date: <strong>{formatDate(enrollment.enrollmentDate as string)}</strong>
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <span className="text-sm text-amber-700">
+                No enrollment data — student will be created without enrollment
+              </span>
+            </div>
+          )}
+          {guardians.length === 0 && (
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <span className="text-sm text-amber-700">
+                No guardians added — consider adding at least one guardian
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Personal Information */}
       <div className="space-y-3">
@@ -250,7 +322,30 @@ export function ReviewStep({ data }: WizardStepProps) {
             label="Enrollment Date"
             value={formatDate(enrollment.enrollmentDate as string)}
           />
-          <DataField label="Academic Year" value={display(enrollment.academicYearId)} />
+          <DataField label="Academic Year" value={academicYearName} />
+
+          {/* Ed-Fi Descriptor Fields */}
+          <DataField
+            label="Entry Type"
+            value={labelFor(enrollment.entryTypeDescriptor as string, ENTRY_TYPE_OPTIONS)}
+          />
+          <DataField
+            label="Residency Status"
+            value={labelFor(enrollment.residencyStatusDescriptor as string, RESIDENCY_STATUS_OPTIONS)}
+          />
+          <DataField
+            label="Primary School"
+            value={enrollment.primarySchool === false ? 'No' : 'Yes'}
+          />
+          <DataField
+            label="Full-Time Equivalency"
+            value={enrollment.fullTimeEquivalency != null ? String(enrollment.fullTimeEquivalency) : '1.0'}
+          />
+          <DataField
+            label="Repeat Grade"
+            value={enrollment.repeatGradeIndicator ? 'Yes' : 'No'}
+          />
+
           {enrollment.enrollmentType === 'transfer' && (
             <>
               <DataField

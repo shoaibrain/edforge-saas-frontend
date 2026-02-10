@@ -49,6 +49,10 @@ import { MedicalStep } from './steps/MedicalStep'
 import { EnrollmentStep } from './steps/EnrollmentStep'
 import { ReviewStep } from './steps/ReviewStep'
 
+import {
+  GRADE_LEVEL_DESCRIPTORS,
+  ENROLLMENT_TYPE_DESCRIPTOR_MAP,
+} from '../../../schemas/edfi-descriptors'
 import type { CreateStudentDto, CreateEnrollmentDto } from '../../../services/academics.service'
 import type { GuardianFormData } from '../../../schemas/student.form'
 
@@ -94,11 +98,10 @@ const WIZARD_STEPS: WizardStep[] = [
   {
     id: 'enrollment',
     title: 'Enrollment',
-    description: 'Set the enrollment type and date.',
+    description: 'Set the enrollment type, academic year, and Ed-Fi details.',
     icon: GraduationCap,
     schema: enrollmentStepSchema,
     component: EnrollmentStep,
-    isOptional: true,
   },
   {
     id: 'review',
@@ -392,12 +395,50 @@ export function RegistrationWizard() {
   const createEnrollment = useCreateEnrollment()
   const [showCancelDialog, setShowCancelDialog] = useState(false)
 
+  /**
+   * Clean an address object: strip unknown fields (e.g., "street"),
+   * map postalCode -> zipCode as safety net, remove empty strings.
+   */
+  const cleanAddress = useCallback(
+    (addr: Record<string, unknown> | undefined) => {
+      if (!addr) return undefined
+      const cleaned: Record<string, string | undefined> = {
+        street1: (addr.street1 as string) || undefined,
+        street2: (addr.street2 as string) || undefined,
+        city: (addr.city as string) || undefined,
+        state: (addr.state as string) || undefined,
+        // Prefer zipCode; fall back to postalCode for safety
+        zipCode: (addr.zipCode as string) || (addr.postalCode as string) || undefined,
+        country: (addr.country as string) || undefined,
+      }
+      // Strip entries that are undefined or empty
+      const result = Object.fromEntries(
+        Object.entries(cleaned).filter(([, v]) => v !== undefined && v !== '')
+      )
+      return Object.keys(result).length > 0 ? result : undefined
+    },
+    []
+  )
+
   // Build CreateStudentDto from the flat wizard data
   const buildStudentPayload = useCallback(
     (data: Record<string, unknown>): CreateStudentDto => {
       const guardians = (data.guardians as GuardianFormData[] | undefined)?.filter(
         (g) => g.firstName && g.lastName
       )
+
+      // Explicit contact info mapping — strip unknown fields & normalize address
+      const rawContact = data.contactInfo as Record<string, unknown> | undefined
+      const contactInfo = rawContact
+        ? {
+            email: (rawContact.email as string) || undefined,
+            phone: (rawContact.phone as string) || undefined,
+            phoneType: (rawContact.phoneType as string) || undefined,
+            address: cleanAddress(rawContact.address as Record<string, unknown> | undefined),
+            mailingAddress: cleanAddress(rawContact.mailingAddress as Record<string, unknown> | undefined),
+            useMailingAddress: rawContact.useMailingAddress as boolean | undefined,
+          }
+        : undefined
 
       return {
         firstName: data.firstName as string,
@@ -409,7 +450,7 @@ export function RegistrationWizard() {
         gender: data.gender as 'male' | 'female' | 'other' | 'prefer_not_to_say',
         schoolId: schoolId || '',
         currentGradeLevel: data.currentGradeLevel as string,
-        contactInfo: data.contactInfo as CreateStudentDto['contactInfo'],
+        contactInfo: contactInfo as CreateStudentDto['contactInfo'],
         guardians: guardians && guardians.length > 0
           ? (guardians as CreateStudentDto['guardians'])
           : undefined,
@@ -427,7 +468,7 @@ export function RegistrationWizard() {
         notes: (data.notes as string) || undefined,
       }
     },
-    [schoolId]
+    [schoolId, cleanAddress]
   )
 
   // Build CreateEnrollmentDto from enrollment sub-object
@@ -439,25 +480,40 @@ export function RegistrationWizard() {
       const enrollment = data.enrollment as Record<string, unknown> | undefined
       if (!enrollment || !enrollment.enrollmentDate) return null
 
+      // Academic year is now required — do not fall back to random UUID
+      const academicYearId = enrollment.academicYearId as string
+      if (!academicYearId) return null
+
+      const gradeLevel = data.currentGradeLevel as string
+      const enrollmentType =
+        (enrollment.enrollmentType as 'new' | 'transfer' | 'returning' | 're_enrollment') || 'new'
+
       return {
         studentId,
         schoolId: schoolId || '',
-        academicYearId: (enrollment.academicYearId as string) || crypto.randomUUID(),
-        gradeLevel: data.currentGradeLevel as string,
-        enrollmentType:
-          (enrollment.enrollmentType as 'new' | 'transfer' | 'returning') || 'new',
+        academicYearId,
+        gradeLevel,
+        enrollmentType,
         enrollmentDate: enrollment.enrollmentDate as string,
         previousSchoolName: (enrollment.previousSchoolName as string) || undefined,
         previousSchoolAddress:
           (enrollment.previousSchoolAddress as string) || undefined,
         transferReason: (enrollment.transferReason as string) || undefined,
         notes: (enrollment.notes as string) || undefined,
+        // Ed-Fi descriptor fields
+        entryGradeLevelDescriptor: GRADE_LEVEL_DESCRIPTORS[gradeLevel] || undefined,
+        entryTypeDescriptor: (enrollment.entryTypeDescriptor as string) || undefined,
+        enrollmentTypeDescriptor: ENROLLMENT_TYPE_DESCRIPTOR_MAP[enrollmentType] || undefined,
+        residencyStatusDescriptor: (enrollment.residencyStatusDescriptor as string) || undefined,
+        primarySchool: enrollment.primarySchool as boolean ?? true,
+        fullTimeEquivalency: (enrollment.fullTimeEquivalency as number) ?? 1.0,
+        repeatGradeIndicator: (enrollment.repeatGradeIndicator as boolean) ?? false,
       }
     },
     [schoolId]
   )
 
-  // Submit handler: create student -> optionally create enrollment -> navigate
+  // Submit handler: create student -> create enrollment -> navigate
   const handleSubmit = useCallback(
     async (data: Record<string, unknown>) => {
       try {
@@ -468,15 +524,24 @@ export function RegistrationWizard() {
         if (enrollmentPayload) {
           try {
             await createEnrollment.mutateAsync(enrollmentPayload)
+            toast.success(`${student.firstName} ${student.lastName} has been registered and enrolled!`)
           } catch (enrollErr) {
             const parsed = parseApiError(enrollErr)
-            toast.warning(
-              `Student created, but enrollment failed: ${parsed.message}. You can add enrollment later.`
-            )
+            // Student was created but enrollment failed — show actionable message
+            if (parsed.statusCode === 409) {
+              toast.warning(
+                `Student created. Enrollment conflict: ${parsed.message}. The student may already be enrolled.`
+              )
+            } else {
+              toast.warning(
+                `Student created, but enrollment failed: ${parsed.message}. You can add enrollment from the student profile.`
+              )
+            }
           }
+        } else {
+          toast.success(`${student.firstName} ${student.lastName} has been registered!`)
         }
 
-        toast.success(`${student.firstName} ${student.lastName} has been registered!`)
         navigate({ to: `/students/${student.studentId}` })
       } catch (error) {
         const parsed = parseApiError(error)

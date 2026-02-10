@@ -1,12 +1,17 @@
 /**
  * WithdrawalModal Component
  *
- * Modal for withdrawing a student with reason, date, and notes.
+ * Modal for withdrawing a student with reason, date, exit type descriptor, and notes.
+ *
+ * Sprint Alaska changes:
+ * - Added exitWithdrawTypeDescriptor field (AK-2.7)
+ * - Aligned with shared-types WithdrawStudentDto
  */
 
 import { useState } from 'react'
 import { X, Loader2, AlertTriangle } from 'lucide-react'
 import { useWithdrawStudent } from '../../hooks/useEnrollments'
+import { EXIT_WITHDRAW_TYPE_OPTIONS } from '../../schemas/edfi-descriptors'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
 
 interface WithdrawalModalProps {
@@ -40,6 +45,7 @@ export function WithdrawalModal({
     new Date().toISOString().split('T')[0]
   )
   const [reason, setReason] = useState('')
+  const [exitWithdrawType, setExitWithdrawType] = useState('')
   const [notes, setNotes] = useState('')
 
   const handleSubmit = async () => {
@@ -52,6 +58,7 @@ export function WithdrawalModal({
         withdrawalDate,
         reason,
         notes: notes || undefined,
+        exitWithdrawTypeDescriptor: exitWithdrawType || undefined,
       },
     })
     onClose()
@@ -90,6 +97,26 @@ export function WithdrawalModal({
               max={new Date().toISOString().split('T')[0]}
               className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             />
+          </div>
+
+          {/* Ed-Fi Exit/Withdraw Type Descriptor */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1">
+              Exit Type
+            </label>
+            <select
+              value={exitWithdrawType}
+              onChange={(e) => setExitWithdrawType(e.target.value)}
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            >
+              <option value="">Select exit type (optional)...</option>
+              {EXIT_WITHDRAW_TYPE_OPTIONS.map((r) => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-text-tertiary">
+              Ed-Fi aligned exit/withdraw type for state reporting
+            </p>
           </div>
 
           <div>

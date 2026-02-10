@@ -23,6 +23,11 @@ export type {
   StudentStatus,
   CreateEnrollmentDto,
   EnrollmentResponseDto,
+  EnrollmentSummaryDto,
+  WithdrawStudentDto,
+  TransferStudentDto,
+  EnrollmentStatus,
+  EnrollmentType,
   CourseResponseDto,
   CourseListResponseDto,
   CourseFilterDto,
@@ -80,7 +85,11 @@ export interface ParsedApiError {
 }
 
 /**
- * Backend error response shape
+ * Backend error response shape (Sprint Alaska ErrorResponseDto)
+ *
+ * errors[] → path is an array (e.g., ["guardians", 0, "phone"])
+ * details.validationErrors[] → path is a dot-joined string (e.g., "guardians.0.phone")
+ * errorCode → machine-readable: BAD_REQUEST, NOT_FOUND, CONFLICT, VALIDATION_ERROR, INTERNAL_SERVER_ERROR
  */
 interface ApiErrorResponse {
   statusCode: number
@@ -89,11 +98,34 @@ interface ApiErrorResponse {
   errorCode?: string
   field?: string
   timestamp?: string
+  requestId?: string
+  path?: string
+  errors?: Array<{ path: (string | number)[]; message: string; code?: string }>
+  details?: {
+    validationErrors?: Array<{ path: string; message: string; code?: string }>
+  }
+}
+
+/**
+ * Build a human-friendly label from a validation error path
+ * e.g., ["contactInfo", "address", "zipCode"] -> "Contact Info > Address > Zip Code"
+ */
+function formatFieldPath(path: (string | number)[]): string {
+  return path
+    .filter((p) => typeof p === 'string')
+    .map((p) =>
+      String(p)
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (s) => s.toUpperCase())
+        .trim()
+    )
+    .join(' > ')
 }
 
 /**
  * Parse API errors into a standardized format
  * Handles all HTTP status codes with appropriate messages
+ * Supports Sprint Alaska ErrorResponseDto with errors[] and details.validationErrors[]
  */
 export function parseApiError(error: unknown): ParsedApiError {
   if (axios.isAxiosError(error)) {
@@ -108,26 +140,55 @@ export function parseApiError(error: unknown): ParsedApiError {
 
     // 400 - Bad Request / Validation error
     if (status === 400) {
-      const message = getMessage(data?.message)
-      if (data?.field) {
-        return {
-          message,
-          fieldErrors: { [data.field]: message },
-          isRetryable: false,
-          statusCode: 400,
+      const fieldErrors: Record<string, string> = {}
+
+      // Parse errors[] array (path is an array of segments)
+      if (data?.errors && Array.isArray(data.errors)) {
+        for (const err of data.errors) {
+          const key = Array.isArray(err.path) ? err.path.join('.') : String(err.path)
+          fieldErrors[key] = err.message
         }
       }
+      // Fallback: parse details.validationErrors[] (path is a dot-joined string)
+      else if (data?.details?.validationErrors && Array.isArray(data.details.validationErrors)) {
+        for (const err of data.details.validationErrors) {
+          fieldErrors[err.path] = err.message
+        }
+      }
+      // Legacy: single field error
+      else if (data?.field) {
+        fieldErrors[data.field] = getMessage(data.message)
+      }
+
+      // Build user-friendly summary
+      const errorCount = Object.keys(fieldErrors).length
+      let message: string
+      if (errorCount > 0) {
+        const summaryParts = Object.entries(fieldErrors)
+          .slice(0, 3)
+          .map(([key, msg]) => {
+            const pathParts = key.split('.')
+            const label = formatFieldPath(pathParts.map((p) => (isNaN(Number(p)) ? p : Number(p))))
+            return `${label}: ${msg}`
+          })
+        message = summaryParts.join('; ')
+        if (errorCount > 3) message += ` (+${errorCount - 3} more)`
+      } else {
+        message = getMessage(data?.message)
+      }
+
       return {
         message,
+        fieldErrors: errorCount > 0 ? fieldErrors : undefined,
         isRetryable: false,
         statusCode: 400,
       }
     }
 
-    // 403 - Forbidden (ABAC permission denied)
+    // 403 - Forbidden (ABAC permission denied or API Gateway auth issue)
     if (status === 403) {
       return {
-        message: 'You do not have permission to perform this action',
+        message: 'You do not have permission to perform this action. This feature may not be available yet.',
         isRetryable: false,
         statusCode: 403,
       }
@@ -144,7 +205,7 @@ export function parseApiError(error: unknown): ParsedApiError {
       }
     }
 
-    // 409 - Conflict (duplicate)
+    // 409 - Conflict (duplicate enrollment, student already enrolled)
     if (status === 409) {
       return {
         message: data?.message
@@ -679,18 +740,28 @@ export interface EnrollmentSummaryResponse {
   byStatus: Record<string, number>
 }
 
+/**
+ * Withdrawal params aligned with shared-types WithdrawStudentDto
+ */
 export interface WithdrawStudentParams {
   withdrawalDate: string
   reason: string
   notes?: string
-  destinationSchool?: string
+  lastDayAttended?: string
+  exitCode?: string
+  exitWithdrawTypeDescriptor?: string
 }
 
+/**
+ * Transfer params aligned with shared-types TransferStudentDto
+ */
 export interface TransferStudentParams {
-  transferDate: string
-  destinationSchoolId: string
-  reason?: string
+  newSchoolId: string
+  effectiveDate: string
+  transferReason?: string
   notes?: string
+  newGradeLevel?: string
+  sendRecords?: boolean
 }
 
 /**

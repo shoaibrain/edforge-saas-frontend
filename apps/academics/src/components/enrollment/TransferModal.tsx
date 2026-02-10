@@ -39,9 +39,9 @@ export function TransferModal({
       yearId,
       studentId: enrollment.studentId,
       data: {
-        transferDate,
-        destinationSchoolId,
-        reason: reason || undefined,
+        newSchoolId: destinationSchoolId,
+        effectiveDate: transferDate,
+        transferReason: reason || undefined,
         notes: notes || undefined,
       },
     })

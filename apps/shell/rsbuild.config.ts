@@ -8,7 +8,7 @@ import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
 const { publicVars } = loadEnv({ prefixes: ['VITE_'] })
 
 // Get API URL from environment (used for proxy target)
-const API_URL = process.env.VITE_API_URL || 'https://f3xlvrqt24.execute-api.us-east-1.amazonaws.com/prod'
+const API_URL = process.env.VITE_API_URL || 'https://udmx0atz53.execute-api.us-east-2.amazonaws.com/prod'
 
 // Production builds use same-origin relative paths for remotes (consolidated deployment).
 // Development uses localhost ports for each remote's dev server.

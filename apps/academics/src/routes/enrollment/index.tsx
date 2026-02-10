@@ -64,6 +64,12 @@ export function EnrollmentModule() {
   const { data: academicYears } = useAcademicYears(schoolId)
   const activeYearId = selectedYearId || currentYear?.yearId || ''
 
+  // Resolve the active year object for dashboard context
+  const activeYearObj = useMemo(() => {
+    if (!academicYears || !activeYearId) return null
+    return academicYears.find((y) => y.yearId === activeYearId) ?? null
+  }, [academicYears, activeYearId])
+
   // Enrollments
   const {
     data: enrollmentsData,
@@ -117,9 +123,9 @@ export function EnrollmentModule() {
                 onChange={(e) => setSelectedYearId(e.target.value)}
                 className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
               >
-                {academicYears.map((year: { yearId: string; name: string }) => (
+                {academicYears.map((year: { yearId: string; name: string; status: string }) => (
                   <option key={year.yearId} value={year.yearId}>
-                    {year.name}
+                    {year.name}{year.status === 'planning' ? ' (Planning)' : year.status === 'completed' ? ' (Completed)' : ''}
                   </option>
                 ))}
               </select>
@@ -170,6 +176,7 @@ export function EnrollmentModule() {
                 <EnrollmentDashboard
                   summary={summary}
                   isLoading={summaryLoading}
+                  activeYear={activeYearObj}
                 />
                 <EnrollmentTable
                   enrollments={enrollments}

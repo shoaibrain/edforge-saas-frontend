@@ -75,6 +75,7 @@ function formatAddress(address?: {
   street2?: string
   city?: string
   state?: string
+  zipCode?: string
   postalCode?: string
   country?: string
 }): string | null {
@@ -82,7 +83,7 @@ function formatAddress(address?: {
   const parts: string[] = []
   if (address.street1) parts.push(address.street1)
   if (address.street2) parts.push(address.street2)
-  const cityLine = [address.city, address.state, address.postalCode]
+  const cityLine = [address.city, address.state, address.zipCode || address.postalCode]
     .filter(Boolean)
     .join(', ')
   if (cityLine) parts.push(cityLine)

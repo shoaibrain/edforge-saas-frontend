@@ -57,6 +57,7 @@ export const ENROLLMENT_TYPE_OPTIONS = [
   { value: 'new', label: 'New Student' },
   { value: 'transfer', label: 'Transfer' },
   { value: 'returning', label: 'Returning Student' },
+  { value: 're_enrollment', label: 'Re-enrollment' },
 ]
 
 // ============================================================================
@@ -103,8 +104,8 @@ const addressSchema = z.object({
   street1: z.string().max(200).optional().or(z.literal('')),
   street2: z.string().max(200).optional().or(z.literal('')),
   city: z.string().max(100).optional().or(z.literal('')),
-  state: z.string().max(50).optional().or(z.literal('')),
-  postalCode: z.string().max(20).optional().or(z.literal('')),
+  state: z.string().max(100).optional().or(z.literal('')),
+  zipCode: z.string().max(20).optional().or(z.literal('')),
   country: z.string().max(100).optional().or(z.literal('')),
 }).optional()
 
@@ -192,12 +193,18 @@ export const enrollmentStepSchema = z.object({
   enrollment: z.object({
     enrollmentType: z.string().default('new'),
     enrollmentDate: z.string().min(1, 'Enrollment date is required'),
-    academicYearId: z.string().optional().or(z.literal('')),
+    academicYearId: z.string().min(1, 'Please select an academic year'),
     previousSchoolName: z.string().max(200).optional().or(z.literal('')),
     previousSchoolAddress: z.string().max(500).optional().or(z.literal('')),
     transferReason: z.string().max(500).optional().or(z.literal('')),
     notes: z.string().max(2000).optional().or(z.literal('')),
-  }).optional(),
+    // Ed-Fi descriptor fields
+    entryTypeDescriptor: z.string().max(100).optional().or(z.literal('')),
+    residencyStatusDescriptor: z.string().max(200).optional().or(z.literal('')),
+    primarySchool: z.boolean().default(true),
+    fullTimeEquivalency: z.coerce.number().min(0).max(1).default(1.0),
+    repeatGradeIndicator: z.boolean().default(false),
+  }),
 })
 
 export type EnrollmentStepData = z.infer<typeof enrollmentStepSchema>
@@ -232,7 +239,7 @@ export const defaultStudentFormData: Record<string, unknown> = {
       street2: '',
       city: '',
       state: '',
-      postalCode: '',
+      zipCode: '',
       country: '',
     },
     mailingAddress: {
@@ -240,7 +247,7 @@ export const defaultStudentFormData: Record<string, unknown> = {
       street2: '',
       city: '',
       state: '',
-      postalCode: '',
+      zipCode: '',
       country: '',
     },
     useMailingAddress: false,
@@ -277,5 +284,11 @@ export const defaultStudentFormData: Record<string, unknown> = {
     previousSchoolAddress: '',
     transferReason: '',
     notes: '',
+    // Ed-Fi descriptor fields
+    entryTypeDescriptor: '',
+    residencyStatusDescriptor: '',
+    primarySchool: true,
+    fullTimeEquivalency: 1.0,
+    repeatGradeIndicator: false,
   },
 }
