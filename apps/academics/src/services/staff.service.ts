@@ -10,10 +10,10 @@
  */
 
 import { apiGet } from '../lib/api'
-import type { StaffResponseDto, StaffListResponseDto } from '@edforge/shared-types'
+import type { StaffResponseDto, StaffListResponseDto } from '@aibrains/shared-types'
 
 // Re-export types for convenience
-export type { StaffResponseDto, StaffListResponseDto } from '@edforge/shared-types'
+export type { StaffResponseDto, StaffListResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // STAFF OPERATIONS

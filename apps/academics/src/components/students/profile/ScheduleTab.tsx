@@ -15,7 +15,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
-import type { StudentProfileResponseDto } from '@edforge/shared-types'
+import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { useStudentAttendanceSummary } from '../../../hooks/useAttendance'
 
 // ============================================================================

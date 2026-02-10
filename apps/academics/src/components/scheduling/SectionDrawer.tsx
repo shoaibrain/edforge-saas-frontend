@@ -21,7 +21,7 @@ import {
   AlertCircle,
   Pencil,
 } from 'lucide-react'
-import type { SectionResponseDto, CreateSectionDto, UpdateSectionDto } from '@edforge/shared-types'
+import type { SectionResponseDto, CreateSectionDto, UpdateSectionDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCreateSection, useUpdateSection } from '../../hooks/useSections'
 import {

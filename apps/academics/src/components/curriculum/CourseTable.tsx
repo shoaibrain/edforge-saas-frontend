@@ -16,7 +16,7 @@ import {
   ToggleRight,
 } from 'lucide-react'
 import { DataTable, type Column } from '@edforge/ui'
-import type { CourseResponseDto } from '@edforge/shared-types'
+import type { CourseResponseDto } from '@aibrains/shared-types'
 import {
   getSubjectAreaLabel,
   getCourseTypeLabel,

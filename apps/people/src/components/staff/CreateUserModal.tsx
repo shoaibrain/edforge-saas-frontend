@@ -2,7 +2,7 @@
  * CreateUserModal Component
  * 
  * Modal for creating a new user with form validation.
- * Uses @edforge/shared-types schemas for validation.
+ * Uses @aibrains/shared-types schemas for validation.
  */
 
 import { useEffect, useRef } from 'react'
@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, UserPlus } from 'lucide-react'
-import { createUserSchema, type CreateUserDto } from '@edforge/shared-types'
+import { createUserSchema, type CreateUserDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 import { peopleService, parseApiError } from '../../services/people.service'
 

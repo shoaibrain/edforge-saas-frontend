@@ -7,7 +7,7 @@
 import { useState, useMemo } from 'react'
 import { X, Loader2, Save } from 'lucide-react'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
-import type { StudentSectionResponseDto } from '@edforge/shared-types'
+import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES

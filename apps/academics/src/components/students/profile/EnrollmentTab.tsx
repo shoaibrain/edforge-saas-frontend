@@ -12,7 +12,7 @@ import {
   Building2,
   CheckCircle2,
 } from 'lucide-react'
-import type { StudentProfileResponseDto } from '@edforge/shared-types'
+import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES

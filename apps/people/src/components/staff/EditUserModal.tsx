@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
-import { updateUserSchema, type UpdateUserDto, type UserResponseDto } from '@edforge/shared-types'
+import { updateUserSchema, type UpdateUserDto, type UserResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 import { peopleService, parseApiError } from '../../services/people.service'
 

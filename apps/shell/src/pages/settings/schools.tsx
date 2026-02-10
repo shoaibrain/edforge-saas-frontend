@@ -44,7 +44,7 @@ import { tenantService } from '@/services/tenant.service'
 import type { School as SchoolType, WorkspaceSettings } from '@edforge/types'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createSchoolSchema, type CreateSchoolDto } from '@edforge/shared-types'
+import { createSchoolSchema, type CreateSchoolDto } from '@aibrains/shared-types'
 import {
   SettingsAlert,
   staggerChildren,

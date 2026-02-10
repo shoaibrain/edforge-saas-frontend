@@ -16,7 +16,7 @@ import {
   Users,
 } from 'lucide-react'
 import { DataTable, type Column } from '@edforge/ui'
-import type { SectionResponseDto } from '@edforge/shared-types'
+import type { SectionResponseDto } from '@aibrains/shared-types'
 import {
   getCapacityColor,
   getCapacityPercent,

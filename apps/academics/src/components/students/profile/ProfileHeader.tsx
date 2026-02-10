@@ -10,7 +10,7 @@
 import { useState } from 'react'
 import { Pencil, MoreHorizontal, FileText } from 'lucide-react'
 import { Button, Avatar } from '@edforge/ui'
-import type { StudentProfileResponseDto } from '@edforge/shared-types'
+import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { getStudentAvatar } from '../../../lib/avatar'
 
 // ============================================================================

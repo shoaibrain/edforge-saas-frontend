@@ -16,7 +16,7 @@ import {
   GraduationCap,
 } from 'lucide-react'
 import { DataTable, type Column } from '@edforge/ui'
-import type { CourseResponseDto } from '@edforge/shared-types'
+import type { CourseResponseDto } from '@aibrains/shared-types'
 import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
 

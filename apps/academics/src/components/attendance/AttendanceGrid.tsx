@@ -14,7 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 import type { AttendanceStatus } from '../../services/academics.service'
-import type { StudentSectionResponseDto } from '@edforge/shared-types'
+import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 import { AttendanceRow } from './AttendanceRow'
 
 // ============================================================================

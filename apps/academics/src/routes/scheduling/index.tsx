@@ -34,7 +34,7 @@ import {
 import { SectionTable } from '../../components/scheduling/SectionTable'
 import { SectionFilters } from '../../components/scheduling/SectionFilters'
 import { SectionDrawer, type DrawerMode } from '../../components/scheduling/SectionDrawer'
-import type { SectionResponseDto } from '@edforge/shared-types'
+import type { SectionResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES

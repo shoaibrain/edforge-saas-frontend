@@ -16,7 +16,7 @@ import {
   Shield,
   Heart,
 } from 'lucide-react'
-import type { StudentProfileResponseDto } from '@edforge/shared-types'
+import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES

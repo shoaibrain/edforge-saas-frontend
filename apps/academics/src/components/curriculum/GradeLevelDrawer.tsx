@@ -23,7 +23,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { CourseResponseDto } from '@edforge/shared-types'
+import type { CourseResponseDto } from '@aibrains/shared-types'
 import { getSubjectAreaLabel, SUBJECT_AREA_COLORS } from '../../schemas/course.form'
 
 // ============================================================================

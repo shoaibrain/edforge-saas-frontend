@@ -32,7 +32,7 @@ import { CourseTable } from '../../components/curriculum/CourseTable'
 import { CourseFilters } from '../../components/curriculum/CourseFilters'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
 import { GradeLevelsTab } from '../../components/curriculum/GradeLevelsTab'
-import type { CourseResponseDto } from '@edforge/shared-types'
+import type { CourseResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES

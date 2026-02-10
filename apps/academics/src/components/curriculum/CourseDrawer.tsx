@@ -27,7 +27,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { FormProvider, useForm, zodResolver } from '@edforge/forms'
-import type { CourseResponseDto, CreateCourseDto, UpdateCourseDto } from '@edforge/shared-types'
+import type { CourseResponseDto, CreateCourseDto, UpdateCourseDto } from '@aibrains/shared-types'
 import { CourseForm } from './CourseForm'
 import { useCreateCourse, useUpdateCourse } from '../../hooks/useCourses'
 import { useActiveSchoolId } from '../../stores/app.store'

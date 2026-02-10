@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { Loader2, AlertTriangle, Trash2 } from 'lucide-react'
-import type { UserResponseDto } from '@edforge/shared-types'
+import type { UserResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 
 export interface DeleteConfirmDialogProps {

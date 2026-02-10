@@ -26,7 +26,7 @@ import type { Term } from '@edforge/types'
 import type {
   CreateAcademicYearDto,
   UpdateAcademicYearDto,
-} from '@edforge/shared-types'
+} from '@aibrains/shared-types'
 import {
   SettingsSection,
   SettingsAlert,

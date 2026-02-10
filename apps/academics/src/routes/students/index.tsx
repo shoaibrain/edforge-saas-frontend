@@ -32,7 +32,7 @@ import {
 } from '../../hooks'
 import { useActiveSchoolId } from '../../stores'
 import { useStudentFilters } from '../../stores/students.store'
-import type { StudentResponseDto } from '@edforge/shared-types'
+import type { StudentResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // STAT CARD COMPONENT

@@ -2,15 +2,15 @@
  * People Service
  * 
  * Service for user/staff management with CRUD operations.
- * Uses types from @edforge/shared-types (single source of truth).
+ * Uses types from @aibrains/shared-types (single source of truth).
  */
 
 import axios from 'axios'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
-import type { AssignRoleDto } from '@edforge/shared-types'
+import type { AssignRoleDto } from '@aibrains/shared-types'
 
 // ============================================================================
-// TYPES - Import from @edforge/shared-types
+// TYPES - Import from @aibrains/shared-types
 // ============================================================================
 
 // Re-export types for convenience
@@ -21,7 +21,7 @@ export type {
   UpdateUserDto,
   UserAddressDto,
   SchoolAssignmentDto,
-} from '@edforge/shared-types'
+} from '@aibrains/shared-types'
 
 // Import for internal use
 import type {
@@ -29,7 +29,7 @@ import type {
   UserListResponseDto,
   CreateUserDto,
   UpdateUserDto,
-} from '@edforge/shared-types'
+} from '@aibrains/shared-types'
 
 // ============================================================================
 // API ERROR HANDLING

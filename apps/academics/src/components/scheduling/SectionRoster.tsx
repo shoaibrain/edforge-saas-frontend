@@ -13,7 +13,7 @@ import {
   Loader2,
   GraduationCap,
 } from 'lucide-react'
-import type { SectionResponseDto, StudentSectionResponseDto } from '@edforge/shared-types'
+import type { SectionResponseDto, StudentSectionResponseDto } from '@aibrains/shared-types'
 import { useSectionRoster, useRemoveStudent } from '../../hooks/useSections'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {

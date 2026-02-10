@@ -2,14 +2,14 @@
  * Academics Service
  *
  * Service for student management with CRUD operations.
- * Uses types from @edforge/shared-types (single source of truth).
+ * Uses types from @aibrains/shared-types (single source of truth).
  */
 
 import axios from 'axios'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
 
 // ============================================================================
-// TYPES - Import from @edforge/shared-types
+// TYPES - Import from @aibrains/shared-types
 // ============================================================================
 
 // Re-export types for convenience
@@ -45,7 +45,7 @@ export type {
   SectionRosterResponseDto,
   StudentSectionResponseDto,
   EnrollStudentInSectionDto,
-} from '@edforge/shared-types'
+} from '@aibrains/shared-types'
 
 // Import for internal use
 import type {
@@ -68,7 +68,7 @@ import type {
   CreateSectionDto,
   UpdateSectionDto,
   SectionRosterResponseDto,
-} from '@edforge/shared-types'
+} from '@aibrains/shared-types'
 
 // ============================================================================
 // API ERROR HANDLING

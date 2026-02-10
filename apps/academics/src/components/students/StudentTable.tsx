@@ -9,7 +9,7 @@
 import { useMemo } from 'react'
 import { User } from 'lucide-react'
 import { DataTable, type Column } from '@edforge/ui'
-import type { StudentResponseDto } from '@edforge/shared-types'
+import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
 
 // ============================================================================

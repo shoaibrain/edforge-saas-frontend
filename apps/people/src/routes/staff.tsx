@@ -27,7 +27,7 @@ import {
   Trash2,
   ChevronRight,
 } from 'lucide-react'
-import type { UserResponseDto } from '@edforge/shared-types'
+import type { UserResponseDto } from '@aibrains/shared-types'
 import { usePermission } from '@edforge/abac'
 
 import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'

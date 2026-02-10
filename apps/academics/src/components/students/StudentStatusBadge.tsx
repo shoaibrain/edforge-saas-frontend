@@ -4,7 +4,7 @@
  * Displays student enrollment status with appropriate color coding.
  */
 
-import type { StudentStatus } from '@edforge/shared-types'
+import type { StudentStatus } from '@aibrains/shared-types'
 
 interface StudentStatusBadgeProps {
   status: StudentStatus

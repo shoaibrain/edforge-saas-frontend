@@ -8,7 +8,7 @@
 
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
-import type { CourseSubjectArea, CourseType, CreditType } from '@edforge/shared-types'
+import type { CourseSubjectArea, CourseType, CreditType } from '@aibrains/shared-types'
 
 // ============================================================================
 // FILTER STATE

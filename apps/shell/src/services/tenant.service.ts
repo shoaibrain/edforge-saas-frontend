@@ -24,9 +24,9 @@ import type {
   CreateAcademicYearDto,
   UpdateAcademicYearDto,
   UpdateAcademicYearStatusDto
-} from '@edforge/shared-types'
+} from '@aibrains/shared-types'
 
-// Local types removed - imported from @edforge/types and @edforge/shared-types
+// Local types removed - imported from @edforge/types and @aibrains/shared-types
 
 // ============================================================================
 // TYPES

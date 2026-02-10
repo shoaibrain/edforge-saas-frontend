@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from 'react'
 import { Search, X, ChevronDown } from 'lucide-react'
-import type { StudentStatus } from '@edforge/shared-types'
+import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
 import {
   useStudentFilters,

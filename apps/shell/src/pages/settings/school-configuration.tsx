@@ -30,7 +30,7 @@ import {
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
 import type { School } from '@edforge/types'
-import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@edforge/shared-types'
+import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
 import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
 import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
 import { GradingScaleEditor, type GradeLevelConfig } from '@/components/settings/GradingScaleEditor'
@@ -311,7 +311,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           startTime: formState.startTime,
           endTime: formState.endTime,
           periodDuration: formState.periodDuration,
-          academicCalendarType: formState.termStructure as 'semester' | 'quarter' | 'trimester' | 'year',
+          academicCalendarType: formState.termStructure as 'semester' | 'quarter' | 'trimester',
           gradingScale: {
             type: formState.gradingScaleType,
             passingGrade: formState.passingGrade,

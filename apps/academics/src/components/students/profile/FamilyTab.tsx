@@ -19,7 +19,7 @@ import {
   Briefcase,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import type { StudentProfileResponseDto } from '@edforge/shared-types'
+import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES

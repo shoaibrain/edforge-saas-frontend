@@ -32,7 +32,7 @@ import {
   UserMinus,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { StudentResponseDto } from '@edforge/shared-types'
+import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
 
 // ============================================================================

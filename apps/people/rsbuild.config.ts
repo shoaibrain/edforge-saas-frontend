@@ -6,10 +6,6 @@ import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
 
 export default defineConfig({
   plugins: [pluginReact()],
-  source: {
-    // Transpile shared-types source directly (dist/ not available on Vercel)
-    include: [/types\/packages\/shared-types\/src/],
-  },
   server: {
     port: 3006,
     cors: true,
@@ -38,7 +34,6 @@ export default defineConfig({
         modules: ['node_modules', path.resolve(monorepoRoot, 'node_modules')],
         alias: {
           ...(config.resolve?.alias || {}),
-          '@edforge/shared-types': path.resolve(monorepoRoot, 'types/packages/shared-types/src'),
         },
       }
       config.output = {

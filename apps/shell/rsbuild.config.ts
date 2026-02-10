@@ -26,8 +26,6 @@ export default defineConfig({
       index: './src/main.tsx',
     },
     define: publicVars,
-    // Transpile shared-types source directly (dist/ not available on Vercel)
-    include: [/types\/packages\/shared-types\/src/],
   },
   server: {
     port: 3000,
@@ -89,7 +87,6 @@ export default defineConfig({
         modules: ['node_modules', path.resolve(monorepoRoot, 'node_modules')],
         alias: {
           ...(config.resolve?.alias || {}),
-          '@edforge/shared-types': path.resolve(monorepoRoot, 'types/packages/shared-types/src'),
         },
       }
       config.output = {

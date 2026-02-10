@@ -9,7 +9,7 @@
 
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
-import type { StudentStatus } from '@edforge/shared-types'
+import type { StudentStatus } from '@aibrains/shared-types'
 
 // ============================================================================
 // FILTER STATE
