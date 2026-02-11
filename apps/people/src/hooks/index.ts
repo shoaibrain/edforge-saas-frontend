@@ -17,3 +17,19 @@ export type {
   ModalState,
   UseModalStateResult,
 } from './useModalState'
+
+export {
+  staffKeys,
+  useStaffList,
+  useStaffDetail,
+  useStaffAssignments,
+  useStaffEmploymentHistory,
+  useCreateStaff,
+  useCreateStaffWithUser,
+  useUpdateStaff,
+  useDeleteStaff,
+  useCreateAssignment,
+  useUpdateAssignment,
+  useRemoveAssignment,
+  useUpdateEmploymentStatus,
+} from './useStaff'
