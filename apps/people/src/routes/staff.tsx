@@ -14,7 +14,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import {
   UsersRound,
   Search,
@@ -22,9 +22,6 @@ import {
   GraduationCap,
   Briefcase,
   Award,
-  Pencil,
-  Trash2,
-  ChevronRight,
   ChevronDown,
   UserPlus,
   Zap,
@@ -36,8 +33,14 @@ import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
 import { usePermission } from '@edforge/abac'
 
 import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'
-import { DataTable, Button, type Column } from '../components/ui'
-import { CreateUserModal, EditStaffModal, DeleteConfirmDialog } from '../components/staff'
+import { Button } from '../components/ui'
+import {
+  CreateUserModal,
+  EditStaffModal,
+  DeleteConfirmDialog,
+  StaffTable,
+  StaffDrawer,
+} from '../components/staff'
 import { staffService } from '../services/staff.service'
 import { parseApiError } from '../services/people.service'
 
@@ -97,36 +100,6 @@ function StatCard({
         </div>
       </div>
     </div>
-  )
-}
-
-function RoleBadge({ role }: { role: string }) {
-  const label = ROLE_FILTER_OPTIONS.find((o) => o.value === role)?.label || role
-  const isLeadership = role === 'principal' || role === 'vice_principal'
-  const style = isLeadership
-    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
-    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${style}`}>
-      {label}
-    </span>
-  )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    on_leave: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    suspended: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-    terminated: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-    retired: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-    resigned: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-  }
-  const label = STATUS_FILTER_OPTIONS.find((o) => o.value === status)?.label || status
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || styles.retired}`}>
-      {label}
-    </span>
   )
 }
 
@@ -289,52 +262,19 @@ export default function StaffPage() {
     s.role === 'principal' || s.role === 'vice_principal' || s.role === 'admin_staff',
   ).length
 
-  // Column configuration for DataTable
-  const columns: Column<StaffResponseDto>[] = [
-    {
-      key: 'name',
-      header: 'Name',
-      sortable: true,
-      render: (staff) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-accent-primary/10 flex items-center justify-center text-sm font-medium text-accent-primary">
-            {staff.firstName?.[0]}{staff.lastSurname?.[0]}
-          </div>
-          <div>
-            <div className="font-medium text-text-primary">
-              {staff.firstName ?? ''} {staff.lastSurname ?? ''}
-            </div>
-            <div className="text-sm text-text-secondary">{staff.email}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'role',
-      header: 'Role',
-      sortable: true,
-      width: '140px',
-      render: (staff) => <RoleBadge role={staff.role} />,
-    },
-    {
-      key: 'employmentStatus',
-      header: 'Status',
-      sortable: true,
-      width: '120px',
-      render: (staff) => <StatusBadge status={staff.employmentStatus} />,
-    },
-    {
-      key: 'hireDate',
-      header: 'Hired',
-      sortable: true,
-      width: '120px',
-      render: (staff) => (
-        <span className="text-text-secondary text-sm">
-          {new Date(staff.hireDate).toLocaleDateString()}
-        </span>
-      ),
-    },
-  ]
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedStaff, setSelectedStaff] = useState<StaffResponseDto | null>(null)
+
+  const handleViewStaff = (staff: StaffResponseDto) => {
+    setSelectedStaff(staff)
+    setDrawerOpen(true)
+  }
+
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false)
+    setSelectedStaff(null)
+  }
 
   // Show error state
   if (error && !isLoading) {
@@ -555,77 +495,26 @@ export default function StaffPage() {
           )}
         </div>
 
-        {/* Staff Data Table */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-text-secondary" />
-              <h3 className="text-lg font-semibold text-text-primary">
-                Staff Roster {!isLoading && `(${totalLoaded})`}
-              </h3>
-            </div>
-          </div>
-
-          <DataTable<StaffResponseDto>
-            columns={columns}
-            data={staffMembers}
-            keyExtractor={(staff) => staff.staffId}
-            isLoading={isLoading}
-            skeletonRows={5}
-            emptyState={{
-              icon: <UsersRound className="w-12 h-12" />,
-              title: search ? 'No results found' : 'No staff members yet',
-              description: search
-                ? `No staff members match "${search}"`
-                : 'Get started by adding your first staff member to your organization.',
-              action: canCreate && !search
-                ? {
-                    label: 'Add Staff Member',
-                    onClick: () => navigate({ to: '/staff/new' }),
-                  }
-                : undefined,
-            }}
-            hasMore={hasMore}
-            isFetchingMore={isFetchingNextPage}
-            onLoadMore={loadMore}
-            rowActions={(staff) => (
-              <>
-                {/* View Detail */}
-                <Link
-                  to="/staff/$userId"
-                  params={{ userId: staff.staffId }}
-                  className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-tertiary transition-colors"
-                  title="View details"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-                {/* Edit */}
-                {canEdit && (
-                  <button
-                    type="button"
-                    onClick={() => modal.openEdit(staff)}
-                    className="p-2 rounded-lg text-text-tertiary hover:text-accent-primary hover:bg-accent-primary/10 transition-colors"
-                    title="Edit staff member"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                )}
-                {/* Delete */}
-                {canDelete && (
-                  <button
-                    type="button"
-                    onClick={() => modal.openDelete(staff)}
-                    className="p-2 rounded-lg text-text-tertiary hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-                    title="Delete staff member"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </>
-            )}
-          />
-        </div>
+        {/* Staff Table */}
+        <StaffTable
+          staff={staffMembers}
+          isLoading={isLoading}
+          hasMore={hasMore}
+          isFetchingMore={isFetchingNextPage}
+          onLoadMore={loadMore}
+          onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
+          onViewStaff={handleViewStaff}
+        />
       </div>
+
+      {/* Staff Drawer */}
+      <StaffDrawer
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        staff={selectedStaff}
+        onEdit={canEdit ? (s: StaffResponseDto) => modal.openEdit(s) : undefined}
+        onDelete={canDelete ? (s: StaffResponseDto) => modal.openDelete(s) : undefined}
+      />
 
       {/* Create User Modal */}
       <CreateUserModal

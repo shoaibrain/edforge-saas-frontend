@@ -175,7 +175,7 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
     if (onSuccess) {
       onSuccess(staffId)
     } else {
-      navigate({ to: '/staff/$userId', params: { userId: staffId } })
+      navigate({ to: '/staff/$staffId', params: { staffId } })
     }
   }
 

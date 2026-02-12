@@ -15,7 +15,7 @@ export default function StaffNewPage() {
     <StaffWizard
       onCancel={() => navigate({ to: '/staff' })}
       onSuccess={(staffId) => {
-        navigate({ to: '/staff/$userId', params: { userId: staffId } })
+        navigate({ to: '/staff/$staffId', params: { staffId } })
       }}
     />
   )

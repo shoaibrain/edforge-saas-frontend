@@ -30,14 +30,18 @@ import {
     Key,
     AlertTriangle,
     CheckCircle2,
-    XCircle,
     Activity,
     Globe,
     Briefcase,
 } from 'lucide-react'
+import { staffService } from '../../services/staff.service'
+import type { StaffResponseDto, StaffAssignmentResponseDto } from '@aibrains/shared-types'
 import { peopleService } from '../../services/people.service'
-import type { SecurityOverview, UserSession, SchoolAssignment, UserResponseDto } from '../../services/people.service'
+import type { SecurityOverview, UserSession } from '../../services/people.service'
+import { StaffStatusBadge } from '../../components/staff/StaffStatusBadge'
+import { getRoleLabel } from '../../components/staff/StaffRoleBadge'
 import { getStaffAvatar } from '../../lib/avatar'
+import { formatDate, formatEmploymentType } from '../../lib/utils'
 
 // ============================================================================
 // ANIMATION VARIANTS
@@ -117,24 +121,6 @@ function CopyButton({ text }: { text: string }) {
     )
 }
 
-function StatusBadge({ status }: { status: string }) {
-    const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
-        active: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', dot: 'bg-emerald-500' },
-        inactive: { bg: 'bg-gray-500/10', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-500' },
-        pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500' },
-        suspended: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400', dot: 'bg-red-500' },
-    }
-
-    const config = statusConfig[status] || statusConfig.inactive
-
-    return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-    )
-}
-
 function DeviceIcon({ deviceType }: { deviceType: string }) {
     switch (deviceType) {
         case 'mobile':
@@ -211,7 +197,9 @@ function LoadingSkeleton() {
 // TAB CONTENT COMPONENTS
 // ============================================================================
 
-function OverviewTab({ user, security }: { user: UserResponseDto; security?: SecurityOverview }) {
+function OverviewTab({ staff, security }: { staff: StaffResponseDto; security?: SecurityOverview }) {
+    const address = staff.addresses?.[0]
+
     return (
         <motion.div
             variants={staggerChildren}
@@ -221,6 +209,44 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
         >
             {/* Profile Information */}
             <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-5">
+                {/* Employment Information */}
+                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <Briefcase className="w-3.5 h-3.5" />
+                        Employment Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Role</span>
+                            <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{getRoleLabel(staff.role)}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Employment Status</span>
+                            <div><StaffStatusBadge status={staff.employmentStatus} /></div>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Employment Type</span>
+                            <p className="text-sm text-[rgb(var(--text-secondary))]">{formatEmploymentType(staff.employmentType)}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Hire Date</span>
+                            <p className="text-sm text-[rgb(var(--text-secondary))]">{formatDate(staff.hireDate)}</p>
+                        </div>
+                        {staff.department && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Department</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.department}</p>
+                            </div>
+                        )}
+                        {staff.title && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Title</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.title}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Contact Information */}
                 <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                     <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -230,76 +256,71 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1">
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Email</span>
-                            <p className="text-sm text-[rgb(var(--text-primary))]">{user.email}</p>
+                            <p className="text-sm text-[rgb(var(--text-primary))]">{staff.email}</p>
                         </div>
-                        {user.phone && (
+                        {staff.phone && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Phone</span>
-                                <p className="text-sm text-[rgb(var(--text-primary))]">{user.phone}</p>
+                                <p className="text-sm text-[rgb(var(--text-primary))]">{staff.phone}</p>
                             </div>
                         )}
                     </div>
+                    {address && (
+                        <div className="mt-4 pt-4 border-t border-[rgb(var(--border-secondary))]">
+                            <h4 className="text-xs text-[rgb(var(--text-tertiary))] mb-2 flex items-center gap-1.5">
+                                <MapPin className="w-3 h-3" />
+                                Address
+                            </h4>
+                            <div className="text-sm text-[rgb(var(--text-secondary))] space-y-0.5">
+                                {address.streetNumberName && <p>{address.streetNumberName}</p>}
+                                <p>
+                                    {[address.city, address.stateAbbreviationDescriptor, address.postalCode]
+                                        .filter(Boolean)
+                                        .join(', ')}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Address */}
-                {user.address && (
-                    <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
-                        <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <MapPin className="w-3.5 h-3.5" />
-                            Address
-                        </h3>
-                        <div className="text-sm text-[rgb(var(--text-secondary))] space-y-0.5">
-                            {user.address.street && <p>{user.address.street}</p>}
-                            {user.address.street2 && <p>{user.address.street2}</p>}
-                            <p>
-                                {[user.address.city, user.address.state, user.address.postalCode]
-                                    .filter(Boolean)
-                                    .join(', ')}
-                            </p>
-                            {user.address.country && <p>{user.address.country}</p>}
-                        </div>
-                    </div>
-                )}
-
-                {/* Account Details */}
+                {/* Staff Identity */}
                 <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                     <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
                         <Activity className="w-3.5 h-3.5" />
-                        Account Details
+                        Staff Identity
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">User ID</span>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Staff ID</span>
                             <div className="flex items-center gap-1.5">
-                                <p className="text-xs font-mono text-[rgb(var(--text-secondary))] truncate max-w-[200px]" title={user.userId}>
-                                    {user.userId}
+                                <p className="text-xs font-mono text-[rgb(var(--text-secondary))] truncate max-w-[200px]" title={staff.staffId}>
+                                    {staff.staffId}
                                 </p>
-                                <CopyButton text={user.userId} />
+                                <CopyButton text={staff.staffId} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Global Role</span>
-                            <p className="text-sm text-teal-600 dark:text-teal-400 font-medium">{user.globalRole}</p>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Staff Unique ID</span>
+                            <p className="text-sm font-mono text-teal-600 dark:text-teal-400 font-medium">{staff.staffUniqueId}</p>
                         </div>
+                        {staff.primarySchoolName && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Primary School</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.primarySchoolName}</p>
+                            </div>
+                        )}
                         <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Created</span>
-                            <p className="text-sm text-[rgb(var(--text-secondary))]">
-                                {new Date(user.createdAt).toLocaleDateString(undefined, {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
-                            </p>
-                        </div>
-                        <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Last Updated</span>
-                            <p className="text-sm text-[rgb(var(--text-secondary))]">
-                                {new Date(user.updatedAt).toLocaleDateString(undefined, {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
-                            </p>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">System Access</span>
+                            {staff.userId ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <Key className="w-3 h-3" />
+                                    Linked
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
+                                    No Account
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -307,61 +328,65 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
 
             {/* Sidebar */}
             <motion.div variants={fadeInUp} className="space-y-5">
-                {/* Security Summary */}
-                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
-                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <Shield className="w-3.5 h-3.5" />
-                        Security Summary
-                    </h3>
-                    <div className="space-y-0">
-                        <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
-                            <span className="text-sm text-[rgb(var(--text-secondary))]">MFA Status</span>
-                            {security?.mfaEnabled ? (
-                                <span className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
-                                    Enabled
+                {/* Security Summary — only if staff has linked user */}
+                {staff.userId && (
+                    <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                        <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <Shield className="w-3.5 h-3.5" />
+                            Security Summary
+                        </h3>
+                        <div className="space-y-0">
+                            <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
+                                <span className="text-sm text-[rgb(var(--text-secondary))]">MFA Status</span>
+                                {security?.mfaEnabled ? (
+                                    <span className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        Enabled
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
+                                        <AlertTriangle className="w-3.5 h-3.5" />
+                                        Not Enabled
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
+                                <span className="text-sm text-[rgb(var(--text-secondary))]">Active Sessions</span>
+                                <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                                    {security?.activeSessions ?? 0}
                                 </span>
-                            ) : (
-                                <span className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
-                                    <AlertTriangle className="w-3.5 h-3.5" />
-                                    Not Enabled
+                            </div>
+                            <div className="flex items-center justify-between py-2.5">
+                                <span className="text-sm text-[rgb(var(--text-secondary))]">Last Login</span>
+                                <span className="text-sm text-[rgb(var(--text-primary))]">
+                                    {security?.lastLoginAt
+                                        ? new Date(security.lastLoginAt).toLocaleDateString()
+                                        : 'Never'}
                                 </span>
-                            )}
-                        </div>
-                        <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
-                            <span className="text-sm text-[rgb(var(--text-secondary))]">Active Sessions</span>
-                            <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                                {security?.activeSessions ?? 0}
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between py-2.5">
-                            <span className="text-sm text-[rgb(var(--text-secondary))]">Last Login</span>
-                            <span className="text-sm text-[rgb(var(--text-primary))]">
-                                {security?.lastLoginAt
-                                    ? new Date(security.lastLoginAt).toLocaleDateString()
-                                    : 'Never'}
-                            </span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                {/* Account Status */}
+                {/* Employment Status */}
                 <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                     <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5" />
-                        Account Status
+                        Employment Status
                     </h3>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-[rgb(var(--text-secondary))]">Status</span>
-                            <StatusBadge status={user.status} />
+                            <StaffStatusBadge status={staff.employmentStatus} />
                         </div>
-                        {security?.accountLocked && (
-                            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20">
-                                <XCircle className="w-3.5 h-3.5 text-red-500" />
-                                <span className="text-sm text-red-600 dark:text-red-400">Account Locked</span>
-                            </div>
-                        )}
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-[rgb(var(--text-secondary))]">Type</span>
+                            <span className="text-sm text-[rgb(var(--text-primary))]">{formatEmploymentType(staff.employmentType)}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-[rgb(var(--text-secondary))]">Hired</span>
+                            <span className="text-sm text-[rgb(var(--text-primary))]">{formatDate(staff.hireDate)}</span>
+                        </div>
                     </div>
                 </div>
             </motion.div>
@@ -369,12 +394,12 @@ function OverviewTab({ user, security }: { user: UserResponseDto; security?: Sec
     )
 }
 
-function AssignmentsTab({ 
-    assignments, 
-    isLoading 
-}: { 
-    assignments: SchoolAssignment[] | undefined
-    isLoading: boolean 
+function AssignmentsTab({
+    assignments,
+    isLoading
+}: {
+    assignments: StaffAssignmentResponseDto[] | undefined
+    isLoading: boolean
 }) {
     return (
         <motion.div
@@ -388,12 +413,12 @@ function AssignmentsTab({
                 <div>
                     <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">School Assignments</h3>
                     <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                        Manage role access across different schools
+                        Manage role assignments across different schools
                     </p>
                 </div>
                 <button className="flex items-center gap-2 px-4 py-2.5 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors text-sm font-medium shadow-sm">
                     <Plus className="w-4 h-4" />
-                    Assign Role
+                    Assign to School
                 </button>
             </motion.div>
 
@@ -410,14 +435,14 @@ function AssignmentsTab({
                         <School className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
                         <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Active Assignments</h4>
                         <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
-                            This user is not currently assigned to any schools. Click "Assign Role" to grant access.
+                            This staff member is not currently assigned to any schools. Click "Assign to School" to add one.
                         </p>
                     </div>
                 ) : (
                     <div className="grid gap-4">
                         {assignments.map((assignment) => (
                             <motion.div
-                                key={`${assignment.schoolId}-${assignment.role}`}
+                                key={assignment.assignmentId}
                                 variants={fadeInUp}
                                 className="flex items-center justify-between p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
                             >
@@ -429,11 +454,30 @@ function AssignmentsTab({
                                         <h4 className="font-semibold text-[rgb(var(--text-primary))]">
                                             {assignment.schoolName || 'Unknown School'}
                                         </h4>
-                                        <div className="flex items-center gap-3 mt-2">
+                                        <div className="flex items-center gap-3 mt-2 flex-wrap">
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-secondary))]">
                                                 <GraduationCap className="w-3.5 h-3.5" />
-                                                {assignment.role}
+                                                {getRoleLabel(assignment.role)}
                                             </span>
+                                            {assignment.department && (
+                                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
+                                                    {assignment.department}
+                                                </span>
+                                            )}
+                                            {assignment.isPrimary && (
+                                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                                                    Primary
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-4 mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
+                                            {assignment.positionTitle && (
+                                                <span className="flex items-center gap-1">
+                                                    <Briefcase className="w-3 h-3" />
+                                                    {assignment.positionTitle}
+                                                </span>
+                                            )}
+                                            <span>Since {formatDate(assignment.beginDate)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -639,46 +683,47 @@ function SecurityTab({
 // ============================================================================
 
 export default function StaffDetailPage() {
-    const { userId } = useParams({ from: '/staff/$userId' })
+    const { staffId } = useParams({ from: '/staff/$staffId' })
     const [activeTab, setActiveTab] = useState<StaffTab>('overview')
 
-    // Fetch User
-    const { data: user, isLoading: isLoadingUser } = useQuery({
-        queryKey: ['user', userId],
-        queryFn: () => peopleService.getUser(userId),
+    // Fetch Staff
+    const { data: staff, isLoading: isLoadingStaff } = useQuery({
+        queryKey: ['staff', staffId],
+        queryFn: () => staffService.getStaff(staffId),
     })
 
     // Fetch Assignments
     const { data: assignments, isLoading: isLoadingAssignments } = useQuery({
-        queryKey: ['user', userId, 'assignments'],
-        queryFn: () => peopleService.getUserAssignments(userId),
+        queryKey: ['staff', staffId, 'assignments'],
+        queryFn: () => staffService.getStaffAssignments(staffId),
     })
 
-    // Fetch Security (only when security tab is active or for overview)
+    // Fetch Security — only if staff has a linked user account
     const { data: security, isLoading: isLoadingSecurity } = useQuery({
-        queryKey: ['user', userId, 'security'],
-        queryFn: () => peopleService.getUserSecurity(userId),
+        queryKey: ['user', staff?.userId, 'security'],
+        queryFn: () => peopleService.getUserSecurity(staff!.userId!),
+        enabled: !!staff?.userId,
     })
 
-    // Fetch Sessions (only when security tab is active)
+    // Fetch Sessions — only when security tab is active and staff has linked user
     const { data: sessionsData, isLoading: isLoadingSessions } = useQuery({
-        queryKey: ['user', userId, 'sessions'],
-        queryFn: () => peopleService.getUserSessions(userId),
-        enabled: activeTab === 'security',
+        queryKey: ['user', staff?.userId, 'sessions'],
+        queryFn: () => peopleService.getUserSessions(staff!.userId!),
+        enabled: activeTab === 'security' && !!staff?.userId,
     })
 
-    if (isLoadingUser) {
+    if (isLoadingStaff) {
         return <LoadingSkeleton />
     }
 
-    if (!user) {
+    if (!staff) {
         return (
             <div className="min-h-full flex items-center justify-center">
                 <div className="text-center py-16">
                     <User className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
-                    <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">User Not Found</h2>
+                    <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">Staff Member Not Found</h2>
                     <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                        The requested user could not be found.
+                        The requested staff member could not be found.
                     </p>
                     <Link
                         to="/staff"
@@ -692,9 +737,11 @@ export default function StaffDetailPage() {
         )
     }
 
-    const displayName = user.displayName || [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Unknown User'
-
-    const avatarUrl = user.avatarUrl || getStaffAvatar(user.email || displayName)
+    const displayName = [staff.firstName, staff.lastSurname].filter(Boolean).join(' ') || 'Unknown Staff'
+    const avatarUrl = getStaffAvatar(staff.staffId)
+    const statusDotColor = staff.employmentStatus === 'active' ? 'bg-emerald-500'
+        : staff.employmentStatus === 'on_leave' ? 'bg-amber-500'
+        : 'bg-gray-400'
 
     return (
         <div className="min-h-full">
@@ -717,7 +764,7 @@ export default function StaffDetailPage() {
                                 alt={displayName}
                                 className="w-16 h-16 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
                             />
-                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[rgb(var(--surface-primary))] ${user.status === 'active' ? 'bg-emerald-500' : user.status === 'pending' ? 'bg-amber-500' : 'bg-gray-400'}`} />
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[rgb(var(--surface-primary))] ${statusDotColor}`} />
                         </div>
 
                         {/* Name & Meta */}
@@ -726,13 +773,13 @@ export default function StaffDetailPage() {
                                 {displayName}
                             </h1>
                             <div className="flex flex-wrap items-center gap-3 mt-1.5 text-sm">
-                                <span className="text-[rgb(var(--text-tertiary))] truncate">{user.email}</span>
+                                <span className="text-[rgb(var(--text-tertiary))] truncate">{staff.email}</span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
                                 <span className="font-medium text-teal-600 dark:text-teal-400">
-                                    {user.globalRole}
+                                    {getRoleLabel(staff.role)}
                                 </span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
-                                <StatusBadge status={user.status} />
+                                <StaffStatusBadge status={staff.employmentStatus} />
                             </div>
                         </div>
                     </div>
@@ -742,6 +789,8 @@ export default function StaffDetailPage() {
                         {TABS.map((tab) => {
                             const isActive = activeTab === tab.id
                             const Icon = tab.icon
+                            // Hide security tab if staff has no linked user
+                            if (tab.id === 'security' && !staff.userId) return null
                             return (
                                 <button
                                     key={tab.id}
@@ -785,17 +834,17 @@ export default function StaffDetailPage() {
                             transition={{ duration: 0.25, ease: 'easeOut' }}
                         >
                             {activeTab === 'overview' && (
-                                <OverviewTab user={user} security={security} />
+                                <OverviewTab staff={staff} security={security} />
                             )}
                             {activeTab === 'assignments' && (
-                                <AssignmentsTab 
-                                    assignments={assignments} 
-                                    isLoading={isLoadingAssignments} 
+                                <AssignmentsTab
+                                    assignments={assignments}
+                                    isLoading={isLoadingAssignments}
                                 />
                             )}
-                            {activeTab === 'security' && (
-                                <SecurityTab 
-                                    security={security} 
+                            {activeTab === 'security' && staff.userId && (
+                                <SecurityTab
+                                    security={security}
                                     sessions={sessionsData?.sessions}
                                     isLoading={isLoadingSecurity || isLoadingSessions}
                                 />

@@ -59,7 +59,7 @@ const staffNewRoute = createRoute({
 // Staff Detail
 const staffDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/staff/$userId',
+    path: '/staff/$staffId',
     component: StaffDetailPage,
 })
 
