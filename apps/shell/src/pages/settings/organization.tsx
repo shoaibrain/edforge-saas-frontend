@@ -5,7 +5,7 @@
  * Includes quick actions for creating orgs and stats overview.
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -22,11 +22,15 @@ import {
 } from 'lucide-react'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { apiPatch } from '@/lib/api'
 import {
   useOrganizationHierarchy,
   useStateEducationAgency,
   useDeleteLea,
   useDeleteEsc,
+  edOrgKeys,
 } from '@/hooks/useEducationOrgs'
 import {
   SettingsPageHeader,
@@ -41,10 +45,11 @@ import type { TreeNodeAction } from '@/components/settings/OrganizationHierarchy
 import { OrphanedSchoolsBanner } from '@/components/settings/OrphanedSchoolsBanner'
 import { SEASetupForm } from '@/components/settings/SEASetupForm'
 import { LEAForm } from '@/components/settings/LEAForm'
-import { LEAWizard } from '@/components/settings/lea-wizard'
 import { ESCForm } from '@/components/settings/ESCForm'
 import { OrgNetworkManager } from '@/components/settings/OrgNetworkManager'
 import { OrgSetupOnboarding } from '@/components/settings/OrgSetupOnboarding'
+import { QuickSchoolReassign } from '@/components/settings/QuickSchoolReassign'
+import { SchoolAssignmentManager } from '@/components/settings/SchoolAssignmentManager'
 import { useModalState } from '@/hooks/useModalState'
 import type { HierarchyNode } from '@aibrains/shared-types'
 
@@ -336,12 +341,20 @@ export default function OrganizationSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('hierarchy')
   const canManage = usePermission('manage', 'education-organizations')
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const [showAllSchoolsManager, setShowAllSchoolsManager] = useState(false)
 
   // Modal state for each entity type
   const seaModal = useModalState<null>()
   const leaModal = useModalState<{ id: string; seaId?: string; escId?: string }>()
   const escModal = useModalState<{ id: string }>()
   const deleteModal = useModalState<HierarchyNode>()
+  const schoolReassignModal = useModalState<{ 
+    schoolId: string
+    schoolName: string
+    currentLeaId?: string | null
+    currentLeaName?: string | null
+  }>()
 
   const {
     data: hierarchy,
@@ -350,6 +363,22 @@ export default function OrganizationSettingsPage() {
   } = useOrganizationHierarchy()
 
   const { data: sea } = useStateEducationAgency()
+
+  // Unassign school mutation
+  const unassignSchoolMutation = useMutation({
+    mutationFn: async (schoolId: string) => {
+      await apiPatch(`/schools/${schoolId}`, { localEducationAgencyId: null })
+    },
+    onSuccess: (_, schoolId) => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
+      queryClient.invalidateQueries({ queryKey: ['schools'] })
+      queryClient.invalidateQueries({ queryKey: ['schools', schoolId] })
+      toast.success('School unassigned from district')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to unassign school')
+    },
+  })
 
   // Handle tree node actions
   const handleNodeAction = useCallback(
@@ -386,10 +415,58 @@ export default function OrganizationSettingsPage() {
         case 'delete':
           deleteModal.openDelete(node)
           break
+        case 'change-district':
+          if (node.type === 'school') {
+            // Note: We don't have direct access to parent LEA info from the node
+            // The modal will handle fetching current assignment if needed
+            schoolReassignModal.openEdit({
+              schoolId: node.id,
+              schoolName: node.name,
+              currentLeaId: undefined,
+              currentLeaName: undefined,
+            })
+          }
+          break
+        case 'unassign-school':
+          if (node.type === 'school') {
+            // Confirm before unassigning
+            if (window.confirm(`Unassign "${node.name}" from its district?\n\nThe school will move to the unassigned schools list.`)) {
+              unassignSchoolMutation.mutate(node.id)
+            }
+          }
+          break
       }
     },
-    [navigate, seaModal, leaModal, escModal, deleteModal]
+    [navigate, seaModal, leaModal, escModal, deleteModal, schoolReassignModal, unassignSchoolMutation]
   )
+
+  // Extract all schools from hierarchy for bulk management
+  const allSchools = useMemo(() => {
+    if (!hierarchy) return []
+    const schools: HierarchyNode[] = []
+    
+    const extractSchools = (node: HierarchyNode) => {
+      if (node.type === 'school') {
+        schools.push(node)
+      }
+      if (node.children) {
+        node.children.forEach(extractSchools)
+      }
+    }
+    
+    // Extract from SEA tree
+    if (hierarchy.sea) {
+      extractSchools(hierarchy.sea)
+    }
+    
+    // Extract from ESCs
+    hierarchy.educationServiceCenters?.forEach(extractSchools)
+    
+    // Include unassigned schools
+    hierarchy.unassigned?.forEach((school) => schools.push(school))
+    
+    return schools
+  }, [hierarchy])
 
   // Compute stats from hierarchy
   const stats = {
@@ -442,10 +519,11 @@ export default function OrganizationSettingsPage() {
           existingSea={seaModal.mode === 'edit' ? sea : undefined}
         />
 
-        {/* LEA Wizard (needed for onboarding step 2) */}
-        <LEAWizard
+        {/* LEA Form (create mode - for onboarding step 2) */}
+        <LEAForm
           open={leaModal.isOpen && leaModal.mode !== 'edit'}
           onClose={leaModal.close}
+          mode="create"
           defaultSeaId={sea?.id}
         />
       </div>
@@ -496,6 +574,17 @@ export default function OrganizationSettingsPage() {
                   <FileJson2 className="w-4 h-4" />
                   Ed-Fi Preview
                 </Button>
+                {stats.activeSchools > 0 && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-1.5"
+                    onClick={() => setShowAllSchoolsManager(true)}
+                  >
+                    <Network className="w-4 h-4" />
+                    Manage Assignments
+                  </Button>
+                )}
               </div>
             ) : undefined
           }
@@ -660,19 +749,12 @@ export default function OrganizationSettingsPage() {
         existingSea={seaModal.mode === 'edit' ? sea : undefined}
       />
 
-      {/* LEA Wizard (create mode) */}
-      <LEAWizard
-        open={leaModal.isOpen && leaModal.mode !== 'edit'}
-        onClose={leaModal.close}
-        defaultSeaId={sea?.id}
-      />
-
-      {/* LEA Form (edit mode) */}
+      {/* LEA Form (create & edit modes) */}
       <LEAForm
-        open={leaModal.isOpen && leaModal.mode === 'edit'}
+        open={leaModal.isOpen}
         onClose={leaModal.close}
-        mode="edit"
-        editId={leaModal.data?.id}
+        mode={leaModal.mode === 'edit' ? 'edit' : 'create'}
+        editId={leaModal.mode === 'edit' ? leaModal.data?.id : undefined}
         defaultSeaId={sea?.id}
       />
 
@@ -684,11 +766,31 @@ export default function OrganizationSettingsPage() {
         editId={escModal.mode === 'edit' ? escModal.data?.id : undefined}
       />
 
+      {/* School Reassignment Modal */}
+      {schoolReassignModal.data && (
+        <QuickSchoolReassign
+          open={schoolReassignModal.isOpen}
+          onClose={schoolReassignModal.close}
+          schoolId={schoolReassignModal.data.schoolId}
+          schoolName={schoolReassignModal.data.schoolName}
+          currentLeaId={schoolReassignModal.data.currentLeaId}
+          currentLeaName={schoolReassignModal.data.currentLeaName}
+        />
+      )}
+
       {/* Delete Confirmation */}
       <DeleteEdOrgModal
         open={deleteModal.mode === 'delete'}
         onClose={deleteModal.close}
         node={deleteModal.data}
+      />
+
+      {/* All Schools Assignment Manager */}
+      <SchoolAssignmentManager
+        open={showAllSchoolsManager}
+        onClose={() => setShowAllSchoolsManager(false)}
+        schools={allSchools}
+        mode="all"
       />
     </div>
   )

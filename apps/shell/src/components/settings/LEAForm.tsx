@@ -224,7 +224,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                 <label className={labelClass}>Short Name</label>
                 <input
                   type="text"
-                  {...register('shortNameOfInstitution')}
+                  {...register('shortNameOfInstitution', { setValueAs: v => v === '' ? undefined : v })}
                   placeholder="e.g., Austin ISD"
                   className={inputClass}
                 />
@@ -233,7 +233,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                 <label className={labelClass}>Website</label>
                 <input
                   type="url"
-                  {...register('webSite')}
+                  {...register('webSite', { setValueAs: v => v === '' ? undefined : v })}
                   placeholder="https://www.austinisd.org"
                   className={inputClass}
                 />
@@ -276,7 +276,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </label>
-                  <select {...register('charterStatusDescriptor')} className={selectClass}>
+                  <select {...register('charterStatusDescriptor', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
                     <option value="">Select...</option>
                     {CHARTER_STATUS_DESCRIPTORS.map((d) => (
                       <option key={d.value} value={d.value}>{d.label}</option>
@@ -298,14 +298,14 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className={labelClass}>State Education Agency</label>
-                <select {...register('stateEducationAgencyId')} className={selectClass}>
+                <select {...register('stateEducationAgencyId', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
                   <option value="">None</option>
                   {sea && <option value={sea.id}>{sea.nameOfInstitution}</option>}
                 </select>
               </div>
               <div>
                 <label className={labelClass}>Education Service Center</label>
-                <select {...register('educationServiceCenterId')} className={selectClass}>
+                <select {...register('educationServiceCenterId', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
                   <option value="">None</option>
                   {escs.map((esc) => (
                     <option key={esc.id} value={esc.id}>{esc.nameOfInstitution}</option>
@@ -319,7 +319,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                     <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                   </Tooltip>
                 </label>
-                <select {...register('parentLocalEducationAgencyId')} className={selectClass}>
+                <select {...register('parentLocalEducationAgencyId', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
                   <option value="">None</option>
                   {parentLeaOptions.map((lea) => (
                     <option key={lea.id} value={lea.id}>{lea.nameOfInstitution}</option>

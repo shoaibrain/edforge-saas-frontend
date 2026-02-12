@@ -25,6 +25,8 @@ import {
   Pencil,
   Plus,
   Trash2,
+  X,
+  ArrowRightLeft,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
@@ -36,7 +38,7 @@ import { SettingsSkeleton, SettingsEmptyState } from './SettingsShared'
 // ACTION TYPES
 // ============================================================================
 
-export type TreeNodeAction = 'edit' | 'view-details' | 'add-child' | 'delete'
+export type TreeNodeAction = 'edit' | 'view-details' | 'add-child' | 'delete' | 'change-district' | 'unassign-school'
 
 // ============================================================================
 // CONSTANTS
@@ -171,6 +173,12 @@ function TreeNodeActionMenu({
   // SEA, LEA, ESC can be edited (not schools — managed on their own page)
   if (node.type !== 'school') {
     actions.push({ action: 'edit', label: 'Edit', icon: Pencil })
+  }
+
+  // Schools can change district or be unassigned
+  if (node.type === 'school') {
+    actions.push({ action: 'change-district', label: 'Change District', icon: ArrowRightLeft })
+    actions.push({ action: 'unassign-school', label: 'Unassign from District', icon: X, destructive: true })
   }
 
   // LEA can add schools
