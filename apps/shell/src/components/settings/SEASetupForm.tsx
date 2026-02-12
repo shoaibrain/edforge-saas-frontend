@@ -7,14 +7,16 @@
 
 import { useEffect } from 'react'
 import { useForm, FormProvider, zodResolver } from '@edforge/forms'
+import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
-import { Landmark } from 'lucide-react'
+import { Landmark, Info } from 'lucide-react'
 import {
   createStateEducationAgencySchema,
   type CreateStateEducationAgencyDto,
   type SeaResponseDto,
   OPERATIONAL_STATUS_DESCRIPTORS,
 } from '@aibrains/shared-types'
+import { Tooltip } from '@edforge/ui'
 import { useCreateOrUpdateSea } from '@/hooks/useEducationOrgs'
 import {
   AddressArraySection,
@@ -67,7 +69,8 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
     },
   })
 
-  const { register, handleSubmit, reset, formState: { errors } } = methods
+  const { register, handleSubmit, reset, formState: { errors, isDirty } } = methods
+  const { guardedClose } = useFormDirtyGuard({ isDirty, onClose })
 
   // Populate form with existing SEA data for edit mode
   useEffect(() => {
@@ -111,7 +114,7 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={guardedClose}
       title={isEdit ? 'Edit State Education Agency' : 'Set Up State Education Agency'}
       description="Configure the root organization in your Ed-Fi hierarchy."
       size="2xl"
@@ -125,10 +128,13 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
               <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Identity</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>
                   Ed-Fi ID <span className="text-red-500">*</span>
+                  <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                  </Tooltip>
                 </label>
                 <input
                   type="number"
@@ -157,7 +163,7 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Short Name</label>
                 <input
@@ -182,7 +188,12 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
             </div>
 
             <div className="w-48">
-              <label className={labelClass}>Operational Status</label>
+              <label className={labelClass}>
+                Operational Status
+                <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                  <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                </Tooltip>
+              </label>
               <select {...register('operationalStatusDescriptor')} className={selectClass}>
                 {OPERATIONAL_STATUS_DESCRIPTORS.map((d) => (
                   <option key={d.value} value={d.value}>{d.label}</option>
@@ -195,7 +206,7 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
           <div className="border-t border-[rgb(var(--border-primary))]" />
 
           {/* Categories */}
-          <CategoryArraySection />
+          <CategoryArraySection orgType="sea" />
 
           {/* Divider */}
           <div className="border-t border-[rgb(var(--border-primary))]" />
@@ -218,7 +229,7 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
       </FormProvider>
 
       <ModalFooter>
-        <Button variant="outline" onClick={onClose} disabled={mutation.isPending}>
+        <Button variant="outline" onClick={guardedClose} disabled={mutation.isPending}>
           Cancel
         </Button>
         <Button onClick={onSubmit} isLoading={mutation.isPending}>

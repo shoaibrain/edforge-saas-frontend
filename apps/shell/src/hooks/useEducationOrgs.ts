@@ -24,6 +24,15 @@ import type {
   EscResponseDto,
   EscListResponseDto,
   EscFilterDto,
+  CreateEducationOrgNetworkDto,
+  UpdateEducationOrgNetworkDto,
+  NetworkResponseDto,
+  NetworkListResponseDto,
+  NetworkFilterDto,
+  CreateNetworkAssociationDto,
+  UpdateNetworkAssociationDto,
+  NetworkAssociationResponseDto,
+  NetworkAssociationListResponseDto,
   OrganizationHierarchyResponseDto,
 } from '@aibrains/shared-types'
 import {
@@ -39,6 +48,15 @@ import {
   createEducationServiceCenter,
   updateEducationServiceCenter,
   deleteEducationServiceCenter,
+  getNetworks,
+  getNetwork,
+  createNetwork,
+  updateNetwork,
+  deleteNetwork,
+  getNetworkMembers,
+  addNetworkMember,
+  updateNetworkMember,
+  removeNetworkMember,
   getOrganizationHierarchy,
 } from '../services/education-org.service'
 
@@ -56,6 +74,10 @@ export const edOrgKeys = {
   escs: () => [...edOrgKeys.all, 'escs'] as const,
   escList: (filters?: Partial<EscFilterDto>) => [...edOrgKeys.escs(), 'list', filters] as const,
   esc: (id: string) => [...edOrgKeys.escs(), 'detail', id] as const,
+  networks: () => [...edOrgKeys.all, 'networks'] as const,
+  networkList: (filters?: Partial<NetworkFilterDto>) => [...edOrgKeys.networks(), 'list', filters] as const,
+  network: (id: string) => [...edOrgKeys.networks(), 'detail', id] as const,
+  networkMembers: (networkId: string) => [...edOrgKeys.networks(), networkId, 'members'] as const,
 }
 
 // ============================================================================
@@ -252,6 +274,150 @@ export function useDeleteEsc() {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to remove Education Service Center')
+    },
+  })
+}
+
+// ============================================================================
+// Networks (Education Organization Network)
+// ============================================================================
+
+export function useNetworks(filters?: Partial<NetworkFilterDto>, enabled = true) {
+  return useQuery<NetworkListResponseDto, Error>({
+    queryKey: edOrgKeys.networkList(filters),
+    queryFn: () => getNetworks(filters),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  })
+}
+
+export function useNetwork(id: string, enabled = true) {
+  return useQuery<NetworkResponseDto, Error>({
+    queryKey: edOrgKeys.network(id),
+    queryFn: () => getNetwork(id),
+    enabled: enabled && !!id,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useCreateNetwork() {
+  const queryClient = useQueryClient()
+
+  return useMutation<NetworkResponseDto, Error, CreateEducationOrgNetworkDto>({
+    mutationFn: (data) => createNetwork(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.networks() })
+      toast.success('Network created successfully')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create network')
+    },
+  })
+}
+
+export function useUpdateNetwork() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    NetworkResponseDto,
+    Error,
+    { id: string; data: UpdateEducationOrgNetworkDto }
+  >({
+    mutationFn: ({ id, data }) => updateNetwork(id, data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.networks() })
+      queryClient.setQueryData(edOrgKeys.network(variables.id), data)
+      toast.success('Network updated successfully')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to update network')
+    },
+  })
+}
+
+export function useDeleteNetwork() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, string>({
+    mutationFn: (id) => deleteNetwork(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.networks() })
+      queryClient.removeQueries({ queryKey: edOrgKeys.network(id) })
+      toast.success('Network removed successfully')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to remove network')
+    },
+  })
+}
+
+// ============================================================================
+// Network Members (Associations)
+// ============================================================================
+
+export function useNetworkMembers(networkId: string, enabled = true) {
+  return useQuery<NetworkAssociationListResponseDto, Error>({
+    queryKey: edOrgKeys.networkMembers(networkId),
+    queryFn: () => getNetworkMembers(networkId),
+    enabled: enabled && !!networkId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useAddNetworkMember() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    NetworkAssociationResponseDto,
+    Error,
+    { networkId: string; data: CreateNetworkAssociationDto }
+  >({
+    mutationFn: ({ networkId, data }) => addNetworkMember(networkId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.networkMembers(variables.networkId) })
+      toast.success('Member added to network')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to add member')
+    },
+  })
+}
+
+export function useUpdateNetworkMember() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    NetworkAssociationResponseDto,
+    Error,
+    { networkId: string; memberId: string; data: UpdateNetworkAssociationDto }
+  >({
+    mutationFn: ({ networkId, memberId, data }) => updateNetworkMember(networkId, memberId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.networkMembers(variables.networkId) })
+      toast.success('Member updated')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to update member')
+    },
+  })
+}
+
+export function useRemoveNetworkMember() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    void,
+    Error,
+    { networkId: string; memberId: string }
+  >({
+    mutationFn: ({ networkId, memberId }) => removeNetworkMember(networkId, memberId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.networkMembers(variables.networkId) })
+      toast.success('Member removed from network')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to remove member')
     },
   })
 }

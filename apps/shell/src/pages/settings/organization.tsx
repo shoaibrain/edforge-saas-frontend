@@ -16,6 +16,7 @@ import {
   GraduationCap,
   Briefcase,
   Network,
+  FileJson2,
   AlertTriangle,
   type LucideIcon,
 } from 'lucide-react'
@@ -34,12 +35,16 @@ import {
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
+import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
 import { OrganizationHierarchyTree } from '@/components/settings/OrganizationHierarchyTree'
 import type { TreeNodeAction } from '@/components/settings/OrganizationHierarchyTree'
 import { OrphanedSchoolsBanner } from '@/components/settings/OrphanedSchoolsBanner'
 import { SEASetupForm } from '@/components/settings/SEASetupForm'
 import { LEAForm } from '@/components/settings/LEAForm'
+import { LEAWizard } from '@/components/settings/lea-wizard'
 import { ESCForm } from '@/components/settings/ESCForm'
+import { OrgNetworkManager } from '@/components/settings/OrgNetworkManager'
+import { OrgSetupOnboarding } from '@/components/settings/OrgSetupOnboarding'
 import { useModalState } from '@/hooks/useModalState'
 import type { HierarchyNode } from '@aibrains/shared-types'
 
@@ -82,7 +87,7 @@ function StatCard({
 // TAB BUTTON
 // ============================================================================
 
-type TabId = 'hierarchy' | 'details'
+type TabId = 'hierarchy' | 'networks' | 'details'
 
 function TabButton({
   id,
@@ -420,8 +425,15 @@ export default function OrganizationSettingsPage() {
 
   if (hasNoData && !hierarchyError) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         <OrgEmptyState onSetupSea={seaModal.openCreate} />
+
+        {/* Guided Onboarding */}
+        <OrgSetupOnboarding
+          onSetupSea={seaModal.openCreate}
+          onCreateLea={leaModal.openCreate}
+          onAddSchool={() => navigate({ to: '/settings/schools' as string })}
+        />
 
         {/* SEA Form (still needed in empty state) */}
         <SEASetupForm
@@ -429,17 +441,24 @@ export default function OrganizationSettingsPage() {
           onClose={seaModal.close}
           existingSea={seaModal.mode === 'edit' ? sea : undefined}
         />
+
+        {/* LEA Wizard (needed for onboarding step 2) */}
+        <LEAWizard
+          open={leaModal.isOpen && leaModal.mode !== 'edit'}
+          onClose={leaModal.close}
+          defaultSeaId={sea?.id}
+        />
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={staggerChildren}
-        className="space-y-6"
+        className="space-y-8"
       >
         {/* Header */}
         <SettingsPageHeader
@@ -468,6 +487,15 @@ export default function OrganizationSettingsPage() {
                   <Plus className="w-4 h-4" />
                   Add Service Center
                 </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="gap-1.5"
+                  onClick={() => navigate({ to: '/settings/organization/edfi-preview' as string })}
+                >
+                  <FileJson2 className="w-4 h-4" />
+                  Ed-Fi Preview
+                </Button>
               </div>
             ) : undefined
           }
@@ -475,7 +503,7 @@ export default function OrganizationSettingsPage() {
 
         {/* Stats Bar */}
         {!hierarchyLoading && !hasNoData && (
-          <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard icon={Building2} label="Total Orgs" value={stats.totalOrgs} color="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" delay={0} />
             <StatCard icon={School} label="Active Schools" value={stats.activeSchools} color="bg-teal-500/10 text-teal-600 dark:text-teal-400" delay={1} />
             <StatCard icon={GraduationCap} label="Students" value={stats.students.toLocaleString()} color="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" delay={2} />
@@ -496,6 +524,7 @@ export default function OrganizationSettingsPage() {
         <motion.div variants={fadeInUp}>
           <div className="flex items-center border-b border-[rgb(var(--border-primary))]" role="tablist">
             <TabButton id="hierarchy" label="Hierarchy" activeTab={activeTab} onSelect={setActiveTab} />
+            <TabButton id="networks" label="Networks" activeTab={activeTab} onSelect={setActiveTab} />
             <TabButton id="details" label="Details" activeTab={activeTab} onSelect={setActiveTab} />
           </div>
         </motion.div>
@@ -510,16 +539,32 @@ export default function OrganizationSettingsPage() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2 }}
             >
-              {hierarchyLoading ? (
-                <SettingsSkeleton rows={6} showHeader={false} />
-              ) : hierarchy ? (
-                <OrganizationHierarchyTree
-                  sea={hierarchy.sea}
-                  educationServiceCenters={hierarchy.educationServiceCenters || []}
-                  unassigned={hierarchy.unassigned || []}
-                  onNodeAction={canManage ? handleNodeAction : undefined}
-                />
-              ) : null}
+              <ErrorBoundary>
+                {hierarchyLoading ? (
+                  <SettingsSkeleton rows={6} showHeader={false} />
+                ) : hierarchy ? (
+                  <OrganizationHierarchyTree
+                    sea={hierarchy.sea}
+                    educationServiceCenters={hierarchy.educationServiceCenters || []}
+                    unassigned={hierarchy.unassigned || []}
+                    onNodeAction={canManage ? handleNodeAction : undefined}
+                  />
+                ) : null}
+              </ErrorBoundary>
+            </motion.div>
+          )}
+
+          {activeTab === 'networks' && (
+            <motion.div
+              key="networks"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ErrorBoundary>
+                <OrgNetworkManager />
+              </ErrorBoundary>
             </motion.div>
           )}
 
@@ -615,12 +660,19 @@ export default function OrganizationSettingsPage() {
         existingSea={seaModal.mode === 'edit' ? sea : undefined}
       />
 
-      {/* LEA Form */}
-      <LEAForm
-        open={leaModal.isOpen}
+      {/* LEA Wizard (create mode) */}
+      <LEAWizard
+        open={leaModal.isOpen && leaModal.mode !== 'edit'}
         onClose={leaModal.close}
-        mode={leaModal.mode === 'edit' ? 'edit' : 'create'}
-        editId={leaModal.mode === 'edit' ? leaModal.data?.id : undefined}
+        defaultSeaId={sea?.id}
+      />
+
+      {/* LEA Form (edit mode) */}
+      <LEAForm
+        open={leaModal.isOpen && leaModal.mode === 'edit'}
+        onClose={leaModal.close}
+        mode="edit"
+        editId={leaModal.data?.id}
         defaultSeaId={sea?.id}
       />
 

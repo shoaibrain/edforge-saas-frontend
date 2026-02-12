@@ -19,6 +19,15 @@ import type {
   EscResponseDto,
   EscListResponseDto,
   EscFilterDto,
+  CreateEducationOrgNetworkDto,
+  UpdateEducationOrgNetworkDto,
+  NetworkResponseDto,
+  NetworkListResponseDto,
+  NetworkFilterDto,
+  CreateNetworkAssociationDto,
+  UpdateNetworkAssociationDto,
+  NetworkAssociationResponseDto,
+  NetworkAssociationListResponseDto,
   OrganizationHierarchyResponseDto,
 } from '@aibrains/shared-types'
 
@@ -116,6 +125,85 @@ export async function updateEducationServiceCenter(
 
 export async function deleteEducationServiceCenter(id: string): Promise<void> {
   return apiDelete<void>(`/education-organizations/escs/${id}`)
+}
+
+// ============================================================================
+// Networks (Education Organization Network)
+// ============================================================================
+
+export async function getNetworks(
+  filters?: Partial<NetworkFilterDto>
+): Promise<NetworkListResponseDto> {
+  return apiGet<NetworkListResponseDto>('/education-organizations/networks', filters as Record<string, unknown>)
+}
+
+export async function getNetwork(id: string): Promise<NetworkResponseDto> {
+  return apiGet<NetworkResponseDto>(`/education-organizations/networks/${id}`)
+}
+
+export async function createNetwork(
+  data: CreateEducationOrgNetworkDto
+): Promise<NetworkResponseDto> {
+  return apiPost<NetworkResponseDto, CreateEducationOrgNetworkDto>(
+    '/education-organizations/networks',
+    data
+  )
+}
+
+export async function updateNetwork(
+  id: string,
+  data: UpdateEducationOrgNetworkDto
+): Promise<NetworkResponseDto> {
+  return apiPatch<NetworkResponseDto, UpdateEducationOrgNetworkDto>(
+    `/education-organizations/networks/${id}`,
+    data
+  )
+}
+
+export async function deleteNetwork(id: string): Promise<void> {
+  return apiDelete<void>(`/education-organizations/networks/${id}`)
+}
+
+// ============================================================================
+// Network Members (Associations)
+// ============================================================================
+
+export async function getNetworkMembers(
+  networkId: string
+): Promise<NetworkAssociationListResponseDto> {
+  return apiGet<NetworkAssociationListResponseDto>(
+    `/education-organizations/networks/${networkId}/members`
+  )
+}
+
+export async function addNetworkMember(
+  networkId: string,
+  data: CreateNetworkAssociationDto
+): Promise<NetworkAssociationResponseDto> {
+  return apiPost<NetworkAssociationResponseDto, CreateNetworkAssociationDto>(
+    `/education-organizations/networks/${networkId}/members`,
+    data
+  )
+}
+
+export async function updateNetworkMember(
+  networkId: string,
+  memberId: string,
+  data: UpdateNetworkAssociationDto
+): Promise<NetworkAssociationResponseDto> {
+  return apiPatch<NetworkAssociationResponseDto, UpdateNetworkAssociationDto>(
+    `/education-organizations/networks/${networkId}/members/${memberId}`,
+    data
+  )
+}
+
+export async function removeNetworkMember(
+  networkId: string,
+  memberId: string
+): Promise<void> {
+  return apiDelete<void>(
+    `/education-organizations/networks/${networkId}/members/${memberId}`
+  )
 }
 
 // ============================================================================

@@ -22,6 +22,7 @@ export { default as RBACSecurityPage } from './rbac-security'
 // Organization
 export { default as OrganizationSettingsPage } from './organization'
 export { default as EducationOrgDetailPage } from './education-org-detail'
+export { default as EdFiExportPreviewPage } from './edfi-export-preview'
 
 // Other
 export { default as IntegrationsSettingsPage } from './integrations'

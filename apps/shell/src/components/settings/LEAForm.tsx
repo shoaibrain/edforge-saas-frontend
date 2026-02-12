@@ -8,8 +8,9 @@
 
 import { useEffect } from 'react'
 import { useForm, useWatch, FormProvider, zodResolver } from '@edforge/forms'
+import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
-import { Building2, Network } from 'lucide-react'
+import { Building2, Network, Info } from 'lucide-react'
 import {
   createLocalEducationAgencySchema,
   type CreateLocalEducationAgencyDto,
@@ -17,6 +18,7 @@ import {
   LEA_CATEGORY_DESCRIPTORS,
   CHARTER_STATUS_DESCRIPTORS,
 } from '@aibrains/shared-types'
+import { Tooltip } from '@edforge/ui'
 import {
   useCreateLea,
   useUpdateLea,
@@ -87,7 +89,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
       operationalStatusDescriptor: 'Active',
       stateEducationAgencyId: defaultSeaId || '',
       educationServiceCenterId: defaultEscId || '',
-      parentLocalEducationAgencyId: '',
+      parentLocalEducationAgencyId: undefined,
       categories: [{ educationOrganizationCategoryDescriptor: '' }],
       addresses: [],
       telephones: [],
@@ -95,7 +97,8 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
     },
   })
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors } } = methods
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isDirty } } = methods
+  const { guardedClose } = useFormDirtyGuard({ isDirty, onClose })
 
   // Watch LEA category to conditionally show charter status
   const leaCategory = useWatch({ control, name: 'leaCategoryDescriptor' })
@@ -167,7 +170,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={guardedClose}
       title={isEdit ? 'Edit District (LEA)' : 'Create District (LEA)'}
       description="Local Education Agencies manage schools and report to the state."
       size="2xl"
@@ -181,10 +184,13 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Basic Info</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>
                   Ed-Fi ID <span className="text-red-500">*</span>
+                  <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                  </Tooltip>
                 </label>
                 <input
                   type="number"
@@ -213,7 +219,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Short Name</label>
                 <input
@@ -235,10 +241,13 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className={labelClass}>
                   LEA Category <span className="text-red-500">*</span>
+                  <Tooltip content="The classification of this district. 'Independent' is the most common for standard school districts." side="top">
+                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                  </Tooltip>
                 </label>
                 <select {...register('leaCategoryDescriptor')} className={selectClass}>
                   {LEA_CATEGORY_DESCRIPTORS.map((d) => (
@@ -247,7 +256,12 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Operational Status</label>
+                <label className={labelClass}>
+                  Operational Status
+                  <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                  </Tooltip>
+                </label>
                 <select {...register('operationalStatusDescriptor')} className={selectClass}>
                   {OPERATIONAL_STATUS_DESCRIPTORS.map((d) => (
                     <option key={d.value} value={d.value}>{d.label}</option>
@@ -256,7 +270,12 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               </div>
               {showCharterField && (
                 <div>
-                  <label className={labelClass}>Charter Status</label>
+                  <label className={labelClass}>
+                    Charter Status
+                    <Tooltip content="Only applies to charter-type organizations." side="top">
+                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                    </Tooltip>
+                  </label>
                   <select {...register('charterStatusDescriptor')} className={selectClass}>
                     <option value="">Select...</option>
                     {CHARTER_STATUS_DESCRIPTORS.map((d) => (
@@ -276,7 +295,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               <Network className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
               <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Hierarchy</h3>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className={labelClass}>State Education Agency</label>
                 <select {...register('stateEducationAgencyId')} className={selectClass}>
@@ -294,7 +313,12 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Parent LEA</label>
+                <label className={labelClass}>
+                  Parent LEA
+                  <Tooltip content="Optional. Only needed if this district reports through another district (e.g., charter networks)." side="top">
+                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                  </Tooltip>
+                </label>
                 <select {...register('parentLocalEducationAgencyId')} className={selectClass}>
                   <option value="">None</option>
                   {parentLeaOptions.map((lea) => (
@@ -306,7 +330,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
           </div>
 
           <div className="border-t border-[rgb(var(--border-primary))]" />
-          <CategoryArraySection />
+          <CategoryArraySection orgType="lea" />
           <div className="border-t border-[rgb(var(--border-primary))]" />
           <AddressArraySection />
           <div className="border-t border-[rgb(var(--border-primary))]" />
@@ -317,7 +341,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
       </FormProvider>
 
       <ModalFooter>
-        <Button variant="outline" onClick={onClose} disabled={isPending}>
+        <Button variant="outline" onClick={guardedClose} disabled={isPending}>
           Cancel
         </Button>
         <Button onClick={onSubmit} isLoading={isPending}>

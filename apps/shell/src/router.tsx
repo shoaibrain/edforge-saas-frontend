@@ -38,6 +38,7 @@ import {
   SchoolDetailPage,
   OrganizationSettingsPage,
   EducationOrgDetailPage,
+  EdFiExportPreviewPage,
   RBACSecurityPage,
   IntegrationsSettingsPage,
   BillingSettingsPage,
@@ -388,6 +389,12 @@ const settingsEdOrgDetailRoute = createRoute({
   component: EducationOrgDetailPage,
 })
 
+const settingsEdFiExportPreviewRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/organization/edfi-preview',
+  component: EdFiExportPreviewPage,
+})
+
 const settingsSchoolsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/schools',
@@ -577,6 +584,7 @@ const routeTree = rootRoute.addChildren([
       settingsWorkspaceRoute,
       settingsOrganizationRoute,
       settingsEdOrgDetailRoute,
+      settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
       settingsSchoolsRoute,

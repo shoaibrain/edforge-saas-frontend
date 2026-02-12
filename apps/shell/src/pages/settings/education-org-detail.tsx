@@ -30,6 +30,7 @@ import {
   useOrganizationHierarchy,
 } from '@/hooks/useEducationOrgs'
 import { useModalState } from '@/hooks/useModalState'
+import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
 import { SettingsSkeleton, SettingsEmptyState } from '@/components/settings/SettingsShared'
 import { SEASetupForm } from '@/components/settings/SEASetupForm'
 import { LEAForm } from '@/components/settings/LEAForm'
@@ -327,6 +328,7 @@ export default function EducationOrgDetailPage() {
   const MetaIcon = meta.icon
 
   return (
+    <ErrorBoundary>
     <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
       {/* Back Button */}
       <button
@@ -561,5 +563,6 @@ export default function EducationOrgDetailPage() {
         />
       )}
     </div>
+    </ErrorBoundary>
   )
 }

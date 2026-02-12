@@ -479,13 +479,6 @@ const settingsModule: ModuleConfig = {
           permission: { action: 'view', resource: 'education-organizations' },
         },
         {
-          id: 'school-settings',
-          label: 'School Settings',
-          icon: School,
-          href: '/settings/schools',
-          permission: { action: 'view', resource: 'settings:school' },
-        },
-        {
           id: 'rbac-security',
           label: 'RBAC Security',
           icon: BrickWallShield,
