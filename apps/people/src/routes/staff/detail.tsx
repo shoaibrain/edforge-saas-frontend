@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { useParams, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 import {
     User,
     Mail,
@@ -33,6 +34,9 @@ import {
     Activity,
     Globe,
     Briefcase,
+    Edit2,
+    Trash2,
+    Loader2,
 } from 'lucide-react'
 import { staffService } from '../../services/staff.service'
 import type { StaffResponseDto, StaffAssignmentResponseDto } from '@aibrains/shared-types'
@@ -40,6 +44,9 @@ import { peopleService } from '../../services/people.service'
 import type { SecurityOverview, UserSession } from '../../services/people.service'
 import { StaffStatusBadge } from '../../components/staff/StaffStatusBadge'
 import { getRoleLabel } from '../../components/staff/StaffRoleBadge'
+import { AssignToSchoolModal } from '../../components/staff/AssignToSchoolModal'
+import { useSchools } from '../../hooks/useSchools'
+import { useRemoveAssignment } from '../../hooks'
 import { getStaffAvatar } from '../../lib/avatar'
 import { formatDate, formatEmploymentType } from '../../lib/utils'
 
@@ -197,7 +204,7 @@ function LoadingSkeleton() {
 // TAB CONTENT COMPONENTS
 // ============================================================================
 
-function OverviewTab({ staff, security }: { staff: StaffResponseDto; security?: SecurityOverview }) {
+function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; security?: SecurityOverview; schoolMap: Map<string, string> }) {
     const address = staff.addresses?.[0]
 
     return (
@@ -283,45 +290,78 @@ function OverviewTab({ staff, security }: { staff: StaffResponseDto; security?: 
                     )}
                 </div>
 
-                {/* Staff Identity */}
+                {/* Staff Identity & System Access */}
                 <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                     <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
                         <Activity className="w-3.5 h-3.5" />
-                        Staff Identity
+                        Staff Identity & System Access
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Staff ID</span>
-                            <div className="flex items-center gap-1.5">
-                                <p className="text-xs font-mono text-[rgb(var(--text-secondary))] truncate max-w-[200px]" title={staff.staffId}>
-                                    {staff.staffId}
-                                </p>
+                    <div className="space-y-4">
+                        {/* Staff Unique ID — Ed-Fi identifier (prominent) */}
+                        <div className="p-3 rounded-lg bg-teal-500/5 border border-teal-500/20">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wider">
+                                    Staff Unique ID
+                                </span>
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Ed-Fi Identifier</span>
+                            </div>
+                            <p className="text-lg font-mono font-semibold text-teal-600 dark:text-teal-400">
+                                {staff.staffUniqueId}
+                            </p>
+                            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+                                Human-readable identifier for HR and Ed-Fi reporting
+                            </p>
+                        </div>
+
+                        {/* System Staff ID — Internal UUID */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                                    System Staff ID
+                                </span>
                                 <CopyButton text={staff.staffId} />
                             </div>
+                            <p className="text-xs font-mono text-[rgb(var(--text-secondary))] break-all">
+                                {staff.staffId}
+                            </p>
+                            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+                                Internal database identifier (UUID)
+                            </p>
                         </div>
-                        <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Staff Unique ID</span>
-                            <p className="text-sm font-mono text-teal-600 dark:text-teal-400 font-medium">{staff.staffUniqueId}</p>
+
+                        {/* Platform Access */}
+                        <div className="pt-3 border-t border-[rgb(var(--border-secondary))]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
+                                        Platform Access
+                                    </span>
+                                    <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+                                        {staff.userId ? 'Linked user account for system login' : 'No user account linked — cannot log in'}
+                                    </p>
+                                </div>
+                                {staff.userId ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                        <Key className="w-3 h-3" />
+                                        Active
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
+                                        No Account
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                        {staff.primarySchoolName && (
-                            <div className="space-y-1">
+
+                        {/* Primary School */}
+                        {(staff.primarySchoolName || staff.primarySchoolId) && (
+                            <div className="pt-3 border-t border-[rgb(var(--border-secondary))]">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Primary School</span>
-                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.primarySchoolName}</p>
+                                <p className="text-sm text-[rgb(var(--text-primary))] font-medium mt-1">
+                                    {staff.primarySchoolName || schoolMap.get(staff.primarySchoolId) || staff.primarySchoolId}
+                                </p>
                             </div>
                         )}
-                        <div className="space-y-1">
-                            <span className="text-xs text-[rgb(var(--text-tertiary))]">System Access</span>
-                            {staff.userId ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                    <Key className="w-3 h-3" />
-                                    Linked
-                                </span>
-                            ) : (
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
-                                    No Account
-                                </span>
-                            )}
-                        </div>
                     </div>
                 </div>
             </motion.div>
@@ -396,11 +436,37 @@ function OverviewTab({ staff, security }: { staff: StaffResponseDto; security?: 
 
 function AssignmentsTab({
     assignments,
-    isLoading
+    isLoading,
+    staffId,
+    schoolMap,
+    onOpenAssignModal,
 }: {
     assignments: StaffAssignmentResponseDto[] | undefined
     isLoading: boolean
+    staffId: string
+    schoolMap: Map<string, string>
+    onOpenAssignModal: () => void
 }) {
+    const removeAssignment = useRemoveAssignment()
+    const [removingId, setRemovingId] = useState<string | null>(null)
+
+    const handleRemoveAssignment = async (assignmentId: string) => {
+        const confirmed = window.confirm(
+            'Are you sure you want to remove this assignment? This action cannot be undone.'
+        )
+        if (!confirmed) return
+
+        setRemovingId(assignmentId)
+        try {
+            await removeAssignment.mutateAsync({ staffId, assignmentId })
+            toast.success('Assignment removed successfully')
+        } catch {
+            toast.error('Failed to remove assignment')
+        } finally {
+            setRemovingId(null)
+        }
+    }
+
     return (
         <motion.div
             variants={staggerChildren}
@@ -416,7 +482,10 @@ function AssignmentsTab({
                         Manage role assignments across different schools
                     </p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2.5 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors text-sm font-medium shadow-sm">
+                <button
+                    onClick={onOpenAssignModal}
+                    className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+                >
                     <Plus className="w-4 h-4" />
                     Assign to School
                 </button>
@@ -435,59 +504,97 @@ function AssignmentsTab({
                         <School className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
                         <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Active Assignments</h4>
                         <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
-                            This staff member is not currently assigned to any schools. Click "Assign to School" to add one.
+                            This staff member is not currently assigned to any schools. Click &quot;Assign to School&quot; to add one.
                         </p>
                     </div>
                 ) : (
                     <div className="grid gap-4">
-                        {assignments.map((assignment) => (
-                            <motion.div
-                                key={assignment.assignmentId}
-                                variants={fadeInUp}
-                                className="flex items-center justify-between p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                                        <School className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-[rgb(var(--text-primary))]">
-                                            {assignment.schoolName || 'Unknown School'}
-                                        </h4>
-                                        <div className="flex items-center gap-3 mt-2 flex-wrap">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-secondary))]">
-                                                <GraduationCap className="w-3.5 h-3.5" />
-                                                {getRoleLabel(assignment.role)}
-                                            </span>
-                                            {assignment.department && (
-                                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
-                                                    {assignment.department}
-                                                </span>
-                                            )}
-                                            {assignment.isPrimary && (
-                                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                                                    Primary
-                                                </span>
-                                            )}
+                        {assignments.map((assignment) => {
+                            const schoolName = schoolMap.get(assignment.schoolId) || assignment.schoolName || 'Unknown School'
+                            const hasEnded = assignment.endDate && new Date(assignment.endDate) < new Date()
+                            const isRemoving = removingId === assignment.assignmentId
+
+                            return (
+                                <motion.div
+                                    key={assignment.assignmentId}
+                                    variants={fadeInUp}
+                                    className="flex items-center justify-between p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                                            <School className="w-6 h-6" />
                                         </div>
-                                        <div className="flex items-center gap-4 mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
-                                            {assignment.positionTitle && (
-                                                <span className="flex items-center gap-1">
-                                                    <Briefcase className="w-3 h-3" />
-                                                    {assignment.positionTitle}
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-semibold text-[rgb(var(--text-primary))]">
+                                                    {schoolName}
+                                                </h4>
+                                                {hasEnded && (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
+                                                        Ended
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-secondary))]">
+                                                    <GraduationCap className="w-3.5 h-3.5" />
+                                                    {getRoleLabel(assignment.role)}
                                                 </span>
-                                            )}
-                                            <span>Since {formatDate(assignment.beginDate)}</span>
+                                                {assignment.department && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
+                                                        {assignment.department}
+                                                    </span>
+                                                )}
+                                                {assignment.isPrimary && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                                                        Primary
+                                                    </span>
+                                                )}
+                                                {typeof assignment.fullTimeEquivalency === 'number' && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                                        FTE: {assignment.fullTimeEquivalency.toFixed(2)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-4 mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
+                                                {assignment.positionTitle && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Briefcase className="w-3 h-3" />
+                                                        {assignment.positionTitle}
+                                                    </span>
+                                                )}
+                                                <span>Since {formatDate(assignment.beginDate)}</span>
+                                                {assignment.endDate && (
+                                                    <span>Ended {formatDate(assignment.endDate)}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors">
-                                        <Key className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </motion.div>
-                        ))}
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={() => toast.info('Edit assignment coming soon')}
+                                            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                                            title="Edit assignment"
+                                            disabled={isRemoving}
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleRemoveAssignment(assignment.assignmentId)}
+                                            className="p-2 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                                            title="Remove assignment"
+                                            disabled={isRemoving}
+                                        >
+                                            {isRemoving ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <Trash2 className="w-4 h-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )
+                        })}
                     </div>
                 )}
             </motion.div>
@@ -685,6 +792,10 @@ function SecurityTab({
 export default function StaffDetailPage() {
     const { staffId } = useParams({ from: '/staff/$staffId' })
     const [activeTab, setActiveTab] = useState<StaffTab>('overview')
+    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
+
+    // Schools lookup for resolving schoolId → name
+    const { schoolMap } = useSchools()
 
     // Fetch Staff
     const { data: staff, isLoading: isLoadingStaff } = useQuery({
@@ -834,12 +945,15 @@ export default function StaffDetailPage() {
                             transition={{ duration: 0.25, ease: 'easeOut' }}
                         >
                             {activeTab === 'overview' && (
-                                <OverviewTab staff={staff} security={security} />
+                                <OverviewTab staff={staff} security={security} schoolMap={schoolMap} />
                             )}
                             {activeTab === 'assignments' && (
                                 <AssignmentsTab
                                     assignments={assignments}
                                     isLoading={isLoadingAssignments}
+                                    staffId={staffId}
+                                    schoolMap={schoolMap}
+                                    onOpenAssignModal={() => setIsAssignModalOpen(true)}
                                 />
                             )}
                             {activeTab === 'security' && staff.userId && (
@@ -853,6 +967,14 @@ export default function StaffDetailPage() {
                     </AnimatePresence>
                 </div>
             </div>
+
+            {/* Assign to School Modal */}
+            <AssignToSchoolModal
+                open={isAssignModalOpen}
+                onClose={() => setIsAssignModalOpen(false)}
+                staffId={staffId}
+                staffName={displayName}
+            />
         </div>
     )
 }

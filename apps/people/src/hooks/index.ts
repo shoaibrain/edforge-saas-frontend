@@ -33,3 +33,6 @@ export {
   useRemoveAssignment,
   useUpdateEmploymentStatus,
 } from './useStaff'
+
+export { useSchools } from './useSchools'
+export type { School, UseSchoolsResult } from './useSchools'
