@@ -32,6 +32,17 @@ export {
   useUpdateAssignment,
   useRemoveAssignment,
   useUpdateEmploymentStatus,
+  // Credentials
+  useStaffCredentials,
+  useCreateCredential,
+  useUpdateCredential,
+  useDeleteCredential,
+  // Leave
+  useStaffLeaveRequests,
+  useCreateLeaveRequest,
+  useApproveLeave,
+  useRejectLeave,
+  useCancelLeave,
 } from './useStaff'
 
 export { useSchools } from './useSchools'

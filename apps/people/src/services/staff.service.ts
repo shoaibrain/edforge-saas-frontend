@@ -20,6 +20,14 @@ import type {
   StaffAssignmentResponseDto,
   UpdateEmploymentStatusDto,
   EmploymentHistoryResponseDto,
+  CreateCredentialDto,
+  UpdateCredentialDto,
+  CredentialResponseDto,
+  CreateLeaveRequestDto,
+  LeaveRequestResponseDto,
+  ApproveLeaveDto,
+  RejectLeaveDto,
+  CancelLeaveDto,
 } from '@aibrains/shared-types'
 
 // Re-export types for convenience
@@ -36,6 +44,14 @@ export type {
   StaffAssignmentResponseDto,
   UpdateEmploymentStatusDto,
   EmploymentHistoryResponseDto,
+  CreateCredentialDto,
+  UpdateCredentialDto,
+  CredentialResponseDto,
+  CreateLeaveRequestDto,
+  LeaveRequestResponseDto,
+  ApproveLeaveDto,
+  RejectLeaveDto,
+  CancelLeaveDto,
 } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -212,8 +228,8 @@ export async function getEmploymentHistory(
  * Get staff credentials
  * GET /staff/:staffId/credentials
  */
-export async function getStaffCredentials(staffId: string): Promise<unknown[]> {
-  const response = await apiGet<{ items: unknown[] }>(`/staff/${staffId}/credentials`)
+export async function getStaffCredentials(staffId: string): Promise<CredentialResponseDto[]> {
+  const response = await apiGet<{ items: CredentialResponseDto[] }>(`/staff/${staffId}/credentials`)
   return response.items ?? []
 }
 
@@ -221,8 +237,11 @@ export async function getStaffCredentials(staffId: string): Promise<unknown[]> {
  * Add a credential to a staff member
  * POST /staff/:staffId/credentials
  */
-export async function addCredential(staffId: string, data: unknown): Promise<unknown> {
-  return apiPost(`/staff/${staffId}/credentials`, data)
+export async function addCredential(
+  staffId: string,
+  data: CreateCredentialDto,
+): Promise<CredentialResponseDto> {
+  return apiPost<CredentialResponseDto>(`/staff/${staffId}/credentials`, data)
 }
 
 /**
@@ -232,9 +251,9 @@ export async function addCredential(staffId: string, data: unknown): Promise<unk
 export async function updateCredential(
   staffId: string,
   credentialId: string,
-  data: unknown,
-): Promise<unknown> {
-  return apiPatch(`/staff/${staffId}/credentials/${credentialId}`, data)
+  data: UpdateCredentialDto,
+): Promise<CredentialResponseDto> {
+  return apiPatch<CredentialResponseDto>(`/staff/${staffId}/credentials/${credentialId}`, data)
 }
 
 /**
@@ -249,35 +268,63 @@ export async function deleteCredential(
 }
 
 // ============================================================================
-// LEAVE (existing backend)
+// LEAVE (existing backend — routes: /staff/:staffId/leave)
 // ============================================================================
 
 /**
  * Get leave requests for a staff member
- * GET /leave/requests
+ * GET /staff/:staffId/leave
  */
-export async function getLeaveRequests(staffId: string): Promise<unknown[]> {
-  const response = await apiGet<{ items: unknown[] }>('/leave/requests', { staffId })
+export async function getLeaveRequests(staffId: string): Promise<LeaveRequestResponseDto[]> {
+  const response = await apiGet<{ items: LeaveRequestResponseDto[] }>(`/staff/${staffId}/leave`)
   return response.items ?? []
 }
 
 /**
  * Create a leave request
- * POST /leave/requests
+ * POST /staff/:staffId/leave
  */
 export async function createLeaveRequest(
   staffId: string,
-  data: unknown,
-): Promise<unknown> {
-  return apiPost('/leave/requests', { ...data as Record<string, unknown>, staffId })
+  data: CreateLeaveRequestDto,
+): Promise<LeaveRequestResponseDto> {
+  return apiPost<LeaveRequestResponseDto>(`/staff/${staffId}/leave`, data)
 }
 
 /**
- * Get leave balance for a staff member
- * GET /leave/balance/:staffId
+ * Approve a leave request
+ * PATCH /staff/:staffId/leave/:leaveId/approve
  */
-export async function getLeaveBalance(staffId: string): Promise<unknown> {
-  return apiGet(`/leave/balance/${staffId}`)
+export async function approveLeaveRequest(
+  staffId: string,
+  leaveId: string,
+  data: ApproveLeaveDto,
+): Promise<LeaveRequestResponseDto> {
+  return apiPatch<LeaveRequestResponseDto>(`/staff/${staffId}/leave/${leaveId}/approve`, data)
+}
+
+/**
+ * Reject a leave request
+ * PATCH /staff/:staffId/leave/:leaveId/reject
+ */
+export async function rejectLeaveRequest(
+  staffId: string,
+  leaveId: string,
+  data: RejectLeaveDto,
+): Promise<LeaveRequestResponseDto> {
+  return apiPatch<LeaveRequestResponseDto>(`/staff/${staffId}/leave/${leaveId}/reject`, data)
+}
+
+/**
+ * Cancel a leave request
+ * PATCH /staff/:staffId/leave/:leaveId/cancel
+ */
+export async function cancelLeaveRequest(
+  staffId: string,
+  leaveId: string,
+  data: CancelLeaveDto,
+): Promise<LeaveRequestResponseDto> {
+  return apiPatch<LeaveRequestResponseDto>(`/staff/${staffId}/leave/${leaveId}/cancel`, data)
 }
 
 // ============================================================================
@@ -310,5 +357,7 @@ export const staffService = {
   // Leave
   getLeaveRequests,
   createLeaveRequest,
-  getLeaveBalance,
+  approveLeaveRequest,
+  rejectLeaveRequest,
+  cancelLeaveRequest,
 }

@@ -23,6 +23,14 @@ import type {
   StaffAssignmentResponseDto,
   UpdateEmploymentStatusDto,
   EmploymentHistoryResponseDto,
+  CreateCredentialDto,
+  UpdateCredentialDto,
+  CredentialResponseDto,
+  CreateLeaveRequestDto,
+  LeaveRequestResponseDto,
+  ApproveLeaveDto,
+  RejectLeaveDto,
+  CancelLeaveDto,
 } from '@aibrains/shared-types'
 import { staffService } from '../services/staff.service'
 import { usePaginatedQuery, type PaginatedResponse } from './usePaginatedQuery'
@@ -42,6 +50,10 @@ export const staffKeys = {
     [...staffKeys.all, 'assignments', id] as const,
   history: (id: string) =>
     [...staffKeys.all, 'history', id] as const,
+  credentials: (id: string) =>
+    [...staffKeys.all, 'credentials', id] as const,
+  leave: (id: string) =>
+    [...staffKeys.all, 'leave', id] as const,
 }
 
 // ============================================================================
@@ -249,6 +261,169 @@ export function useUpdateEmploymentStatus() {
       queryClient.invalidateQueries({ queryKey: staffKeys.detail(staffId) })
       queryClient.invalidateQueries({ queryKey: staffKeys.history(staffId) })
       queryClient.invalidateQueries({ queryKey: staffKeys.lists() })
+    },
+  })
+}
+
+// ============================================================================
+// CREDENTIAL HOOKS
+// ============================================================================
+
+/**
+ * Get staff credentials
+ */
+export function useStaffCredentials(staffId: string | undefined) {
+  return useQuery<CredentialResponseDto[]>({
+    queryKey: staffKeys.credentials(staffId!),
+    queryFn: () => staffService.getStaffCredentials(staffId!),
+    enabled: !!staffId,
+    staleTime: 30_000,
+  })
+}
+
+/**
+ * Create a credential
+ */
+export function useCreateCredential() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    CredentialResponseDto,
+    Error,
+    { staffId: string; data: CreateCredentialDto }
+  >({
+    mutationFn: ({ staffId, data }) =>
+      staffService.addCredential(staffId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.credentials(staffId) })
+      queryClient.invalidateQueries({ queryKey: staffKeys.detail(staffId) })
+    },
+  })
+}
+
+/**
+ * Update a credential
+ */
+export function useUpdateCredential() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    CredentialResponseDto,
+    Error,
+    { staffId: string; credentialId: string; data: UpdateCredentialDto }
+  >({
+    mutationFn: ({ staffId, credentialId, data }) =>
+      staffService.updateCredential(staffId, credentialId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.credentials(staffId) })
+    },
+  })
+}
+
+/**
+ * Delete a credential
+ */
+export function useDeleteCredential() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, { staffId: string; credentialId: string }>({
+    mutationFn: ({ staffId, credentialId }) =>
+      staffService.deleteCredential(staffId, credentialId),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.credentials(staffId) })
+      queryClient.invalidateQueries({ queryKey: staffKeys.detail(staffId) })
+    },
+  })
+}
+
+// ============================================================================
+// LEAVE HOOKS
+// ============================================================================
+
+/**
+ * Get staff leave requests
+ */
+export function useStaffLeaveRequests(staffId: string | undefined) {
+  return useQuery<LeaveRequestResponseDto[]>({
+    queryKey: staffKeys.leave(staffId!),
+    queryFn: () => staffService.getLeaveRequests(staffId!),
+    enabled: !!staffId,
+    staleTime: 30_000,
+  })
+}
+
+/**
+ * Create a leave request
+ */
+export function useCreateLeaveRequest() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    LeaveRequestResponseDto,
+    Error,
+    { staffId: string; data: CreateLeaveRequestDto }
+  >({
+    mutationFn: ({ staffId, data }) =>
+      staffService.createLeaveRequest(staffId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.leave(staffId) })
+    },
+  })
+}
+
+/**
+ * Approve a leave request
+ */
+export function useApproveLeave() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    LeaveRequestResponseDto,
+    Error,
+    { staffId: string; leaveId: string; data: ApproveLeaveDto }
+  >({
+    mutationFn: ({ staffId, leaveId, data }) =>
+      staffService.approveLeaveRequest(staffId, leaveId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.leave(staffId) })
+    },
+  })
+}
+
+/**
+ * Reject a leave request
+ */
+export function useRejectLeave() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    LeaveRequestResponseDto,
+    Error,
+    { staffId: string; leaveId: string; data: RejectLeaveDto }
+  >({
+    mutationFn: ({ staffId, leaveId, data }) =>
+      staffService.rejectLeaveRequest(staffId, leaveId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.leave(staffId) })
+    },
+  })
+}
+
+/**
+ * Cancel a leave request
+ */
+export function useCancelLeave() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    LeaveRequestResponseDto,
+    Error,
+    { staffId: string; leaveId: string; data: CancelLeaveDto }
+  >({
+    mutationFn: ({ staffId, leaveId, data }) =>
+      staffService.cancelLeaveRequest(staffId, leaveId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.leave(staffId) })
     },
   })
 }

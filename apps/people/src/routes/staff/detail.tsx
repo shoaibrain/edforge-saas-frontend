@@ -37,14 +37,27 @@ import {
     Edit2,
     Trash2,
     Loader2,
+    Award,
+    CalendarDays,
+    History,
+    BookOpen,
+    Phone,
+    Heart,
 } from 'lucide-react'
 import { staffService } from '../../services/staff.service'
 import type { StaffResponseDto, StaffAssignmentResponseDto } from '@aibrains/shared-types'
 import { peopleService } from '../../services/people.service'
 import type { SecurityOverview, UserSession } from '../../services/people.service'
-import { StaffStatusBadge } from '../../components/staff/StaffStatusBadge'
-import { getRoleLabel } from '../../components/staff/StaffRoleBadge'
-import { AssignToSchoolModal } from '../../components/staff/AssignToSchoolModal'
+import {
+    StaffStatusBadge,
+    getRoleLabel,
+    AssignToSchoolModal,
+    EditAssignmentModal,
+    CredentialsSection,
+    EmploymentHistory,
+    SectionAssociations,
+    LeaveManagement,
+} from '../../components/staff'
 import { useSchools } from '../../hooks/useSchools'
 import { useRemoveAssignment } from '../../hooks'
 import { getStaffAvatar } from '../../lib/avatar'
@@ -75,13 +88,19 @@ const fadeInUp = {
 // TYPES
 // ============================================================================
 
-type StaffTab = 'overview' | 'assignments' | 'security'
+type StaffTab = 'overview' | 'assignments' | 'credentials' | 'employment-history' | 'sections' | 'leave' | 'security'
 
-const TABS: { id: StaffTab; label: string; icon: typeof User }[] = [
+const TABS: { id: StaffTab; label: string; icon: typeof User; teachingOnly?: boolean }[] = [
     { id: 'overview', label: 'Overview', icon: User },
     { id: 'assignments', label: 'Assignments', icon: Briefcase },
+    { id: 'credentials', label: 'Credentials', icon: Award },
+    { id: 'employment-history', label: 'History', icon: History },
+    { id: 'sections', label: 'Sections', icon: BookOpen, teachingOnly: true },
+    { id: 'leave', label: 'Leave', icon: CalendarDays },
     { id: 'security', label: 'Security', icon: Shield },
 ]
+
+const TEACHING_ROLES = ['teacher', 'substitute']
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -205,7 +224,13 @@ function LoadingSkeleton() {
 // ============================================================================
 
 function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; security?: SecurityOverview; schoolMap: Map<string, string> }) {
-    const address = staff.addresses?.[0]
+    const addresses = staff.addresses ?? []
+    // These fields are stored by the backend but not yet on StaffResponseDto
+    const staffAny = staff as Record<string, unknown>
+    const telephones = staffAny.telephones as Array<{ telephoneNumber: string; telephoneNumberTypeDescriptor?: string }> | undefined
+    const emergencyContacts = staffAny.emergencyContacts as Array<{ name: string; relationship?: string; phone?: string; email?: string }> | undefined
+    const maidenName = staffAny.maidenName as string | undefined
+    const yearsOfPriorProfessionalExperience = staffAny.yearsOfPriorProfessionalExperience as number | undefined
 
     return (
         <motion.div
@@ -216,6 +241,64 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
         >
             {/* Profile Information */}
             <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-5">
+                {/* Demographics */}
+                <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                    <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <User className="w-3.5 h-3.5" />
+                        Demographics
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">First Name</span>
+                            <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{staff.firstName || '—'}</p>
+                        </div>
+                        {staff.middleName && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Middle Name</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.middleName}</p>
+                            </div>
+                        )}
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Last Name</span>
+                            <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{staff.lastSurname || '—'}</p>
+                        </div>
+                        {staff.generationCodeSuffix && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Suffix</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.generationCodeSuffix}</p>
+                            </div>
+                        )}
+                        {maidenName && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Maiden Name</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{maidenName}</p>
+                            </div>
+                        )}
+                        {staff.birthDate && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Date of Birth</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{formatDate(staff.birthDate)}</p>
+                            </div>
+                        )}
+                        {staff.gender && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Gender</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))] capitalize">{staff.gender.replace('_', ' ')}</p>
+                            </div>
+                        )}
+                        {staff.hispanicLatinoEthnicity !== undefined && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Hispanic/Latino</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.hispanicLatinoEthnicity ? 'Yes' : 'No'}</p>
+                            </div>
+                        )}
+                        <div className="space-y-1">
+                            <span className="text-xs text-[rgb(var(--text-tertiary))]">Staff Unique ID</span>
+                            <p className="text-sm font-mono text-teal-600 dark:text-teal-400 font-medium">{staff.staffUniqueId}</p>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Employment Information */}
                 <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                     <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -251,6 +334,27 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                                 <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.title}</p>
                             </div>
                         )}
+                        {typeof staff.yearsOfPriorTeachingExperience === 'number' && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Teaching Experience</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.yearsOfPriorTeachingExperience} years</p>
+                            </div>
+                        )}
+                        {typeof yearsOfPriorProfessionalExperience === 'number' && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Professional Experience</span>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{yearsOfPriorProfessionalExperience} years</p>
+                            </div>
+                        )}
+                        {staff.highlyQualifiedTeacher && (
+                            <div className="space-y-1">
+                                <span className="text-xs text-[rgb(var(--text-tertiary))]">Highly Qualified</span>
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    HQT Certified
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -263,7 +367,7 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1">
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Email</span>
-                            <p className="text-sm text-[rgb(var(--text-primary))]">{staff.email}</p>
+                            <p className="text-sm text-[rgb(var(--text-primary))]">{staff.email || '—'}</p>
                         </div>
                         {staff.phone && (
                             <div className="space-y-1">
@@ -272,23 +376,94 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                             </div>
                         )}
                     </div>
-                    {address && (
+
+                    {/* Telephones with type badges */}
+                    {telephones && telephones.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-[rgb(var(--border-secondary))]">
-                            <h4 className="text-xs text-[rgb(var(--text-tertiary))] mb-2 flex items-center gap-1.5">
-                                <MapPin className="w-3 h-3" />
-                                Address
+                            <h4 className="text-xs text-[rgb(var(--text-tertiary))] mb-3 flex items-center gap-1.5">
+                                <Phone className="w-3 h-3" />
+                                Phone Numbers
                             </h4>
-                            <div className="text-sm text-[rgb(var(--text-secondary))] space-y-0.5">
-                                {address.streetNumberName && <p>{address.streetNumberName}</p>}
-                                <p>
-                                    {[address.city, address.stateAbbreviationDescriptor, address.postalCode]
-                                        .filter(Boolean)
-                                        .join(', ')}
-                                </p>
+                            <div className="space-y-2">
+                                {telephones.map((tel, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        <p className="text-sm text-[rgb(var(--text-secondary))]">{tel.telephoneNumber}</p>
+                                        {tel.telephoneNumberTypeDescriptor && (
+                                            <span className="px-2 py-0.5 rounded-full text-xs bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+                                                {tel.telephoneNumberTypeDescriptor}
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Addresses */}
+                    {addresses.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-[rgb(var(--border-secondary))]">
+                            <h4 className="text-xs text-[rgb(var(--text-tertiary))] mb-3 flex items-center gap-1.5">
+                                <MapPin className="w-3 h-3" />
+                                {addresses.length === 1 ? 'Address' : 'Addresses'}
+                            </h4>
+                            <div className="space-y-3">
+                                {addresses.map((address, i) => (
+                                    <div key={i} className="text-sm text-[rgb(var(--text-secondary))] space-y-0.5">
+                                        {address.addressTypeDescriptor && (
+                                            <span className="inline-flex px-2 py-0.5 rounded-full text-xs bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] mb-1">
+                                                {address.addressTypeDescriptor}
+                                            </span>
+                                        )}
+                                        {address.streetNumberName && <p>{address.streetNumberName}</p>}
+                                        <p>
+                                            {[address.city, address.stateAbbreviationDescriptor, address.postalCode]
+                                                .filter(Boolean)
+                                                .join(', ')}
+                                        </p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
                 </div>
+
+                {/* Emergency Contacts */}
+                {emergencyContacts && emergencyContacts.length > 0 && (
+                    <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                        <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <Heart className="w-3.5 h-3.5" />
+                            Emergency Contacts
+                        </h3>
+                        <div className="space-y-3">
+                            {emergencyContacts.map((contact, i) => (
+                                <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))]">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{contact.name}</p>
+                                        {contact.relationship && (
+                                            <span className="px-2 py-0.5 rounded-full text-xs bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+                                                {contact.relationship}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
+                                        {contact.phone && (
+                                            <span className="flex items-center gap-1">
+                                                <Phone className="w-3 h-3" />
+                                                {contact.phone}
+                                            </span>
+                                        )}
+                                        {contact.email && (
+                                            <span className="flex items-center gap-1">
+                                                <Mail className="w-3 h-3" />
+                                                {contact.email}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Staff Identity & System Access */}
                 <div className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
@@ -449,6 +624,7 @@ function AssignmentsTab({
 }) {
     const removeAssignment = useRemoveAssignment()
     const [removingId, setRemovingId] = useState<string | null>(null)
+    const [editingAssignment, setEditingAssignment] = useState<StaffAssignmentResponseDto | null>(null)
 
     const handleRemoveAssignment = async (assignmentId: string) => {
         const confirmed = window.confirm(
@@ -466,6 +642,11 @@ function AssignmentsTab({
             setRemovingId(null)
         }
     }
+
+    // Calculate total FTE across active assignments
+    const activeAssignments = assignments?.filter(a => !a.endDate || new Date(a.endDate) >= new Date()) ?? []
+    const totalFTE = activeAssignments.reduce((sum, a) => sum + (a.fullTimeEquivalency ?? 0), 0)
+    const hasAssignments = assignments && assignments.length > 0
 
     return (
         <motion.div
@@ -491,6 +672,30 @@ function AssignmentsTab({
                 </button>
             </motion.div>
 
+            {/* FTE Indicator */}
+            {hasAssignments && activeAssignments.some(a => typeof a.fullTimeEquivalency === 'number') && (
+                <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Total FTE</span>
+                        <span className={`text-sm font-bold ${totalFTE > 1 ? 'text-red-600 dark:text-red-400' : 'text-[rgb(var(--text-primary))]'}`}>
+                            {totalFTE.toFixed(2)}
+                        </span>
+                    </div>
+                    <div className="w-full bg-[rgb(var(--surface-tertiary))] rounded-full h-2">
+                        <div
+                            className={`h-2 rounded-full transition-all ${totalFTE > 1 ? 'bg-red-500' : totalFTE > 0.8 ? 'bg-amber-500' : 'bg-teal-500'}`}
+                            style={{ width: `${Math.min(totalFTE * 100, 100)}%` }}
+                        />
+                    </div>
+                    {totalFTE > 1 && (
+                        <p className="text-xs text-red-600 dark:text-red-400 mt-1.5 flex items-center gap-1">
+                            <AlertTriangle className="w-3 h-3" />
+                            Overcommitted — total FTE exceeds 1.0
+                        </p>
+                    )}
+                </motion.div>
+            )}
+
             {/* Assignments List */}
             <motion.div variants={fadeInUp}>
                 {isLoading ? (
@@ -499,7 +704,7 @@ function AssignmentsTab({
                             <div key={i} className="animate-pulse h-24 bg-[rgb(var(--surface-secondary))] rounded-xl" />
                         ))}
                     </div>
-                ) : !assignments || assignments.length === 0 ? (
+                ) : !hasAssignments ? (
                     <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
                         <School className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
                         <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Active Assignments</h4>
@@ -572,7 +777,7 @@ function AssignmentsTab({
                                     </div>
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
-                                            onClick={() => toast.info('Edit assignment coming soon')}
+                                            onClick={() => setEditingAssignment(assignment)}
                                             className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                                             title="Edit assignment"
                                             disabled={isRemoving}
@@ -598,6 +803,14 @@ function AssignmentsTab({
                     </div>
                 )}
             </motion.div>
+
+            {/* Edit Assignment Modal */}
+            <EditAssignmentModal
+                open={!!editingAssignment}
+                onClose={() => setEditingAssignment(null)}
+                staffId={staffId}
+                assignment={editingAssignment}
+            />
         </motion.div>
     )
 }
@@ -902,6 +1115,8 @@ export default function StaffDetailPage() {
                             const Icon = tab.icon
                             // Hide security tab if staff has no linked user
                             if (tab.id === 'security' && !staff.userId) return null
+                            // Hide sections tab for non-teaching roles
+                            if (tab.teachingOnly && !TEACHING_ROLES.includes(staff.role)) return null
                             return (
                                 <button
                                     key={tab.id}
@@ -955,6 +1170,18 @@ export default function StaffDetailPage() {
                                     schoolMap={schoolMap}
                                     onOpenAssignModal={() => setIsAssignModalOpen(true)}
                                 />
+                            )}
+                            {activeTab === 'credentials' && (
+                                <CredentialsSection staffId={staffId} />
+                            )}
+                            {activeTab === 'employment-history' && (
+                                <EmploymentHistory staffId={staffId} currentStatus={staff.employmentStatus} />
+                            )}
+                            {activeTab === 'sections' && TEACHING_ROLES.includes(staff.role) && (
+                                <SectionAssociations staffId={staffId} staffRole={staff.role} />
+                            )}
+                            {activeTab === 'leave' && (
+                                <LeaveManagement staffId={staffId} staffName={displayName} />
                             )}
                             {activeTab === 'security' && staff.userId && (
                                 <SecurityTab
