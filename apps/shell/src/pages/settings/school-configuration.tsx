@@ -14,7 +14,8 @@
  */
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Building2,
@@ -24,19 +25,17 @@ import {
   ClipboardCheck,
   Bell,
   Layers,
-  Save,
-  RotateCcw,
   AlertTriangle,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
 import type { School } from '@edforge/types'
-import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@edforge/shared-types'
-import { Button } from '@edforge/ui'
+import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
 import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
 import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
 import { GradingScaleEditor, type GradeLevelConfig } from '@/components/settings/GradingScaleEditor'
 import { FeatureToggles, type SchoolFeatures, DEFAULT_FEATURES } from '@/components/settings/FeatureToggles'
+import { UnsavedChangesBar, SettingsFieldRow } from '@/components/settings/SettingsShared'
 
 // ============================================================================
 // CONSTANTS
@@ -90,32 +89,7 @@ function Section({ title, description, icon: Icon, children }: SectionProps) {
   )
 }
 
-// ============================================================================
-// FIELD ROW COMPONENT
-// ============================================================================
-
-interface FieldRowProps {
-  label: string
-  description?: string
-  children: React.ReactNode
-  inline?: boolean
-}
-
-function FieldRow({ label, description, children, inline }: FieldRowProps) {
-  return (
-    <div className={`py-4 border-b border-[rgb(var(--border-tertiary))] last:border-b-0 ${inline ? 'flex items-center justify-between gap-4' : ''}`}>
-      <div className={inline ? 'flex-1' : 'mb-2'}>
-        <label className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</label>
-        {description && (
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{description}</p>
-        )}
-      </div>
-      <div className={inline ? '' : 'mt-2'}>
-        {children}
-      </div>
-    </div>
-  )
-}
+// FieldRow is now imported as SettingsFieldRow from SettingsShared
 
 // ============================================================================
 // TOGGLE SWITCH
@@ -211,8 +185,6 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
   const [originalState, setOriginalState] = useState<typeof formState>(null)
   const [isDirty, setIsDirty] = useState(false)
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
 
   // Initialize form state from API data
   useEffect(() => {
@@ -289,8 +261,6 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
   const handleSave = async () => {
     if (!formState || !originalState) return
 
-    setSaveError(null)
-
     try {
       // Check what changed and update appropriately
       const identityChanged = 
@@ -341,7 +311,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           startTime: formState.startTime,
           endTime: formState.endTime,
           periodDuration: formState.periodDuration,
-          academicCalendarType: formState.termStructure as 'semester' | 'quarter' | 'trimester' | 'year',
+          academicCalendarType: formState.termStructure as 'semester' | 'quarter' | 'trimester',
           gradingScale: {
             type: formState.gradingScaleType,
             passingGrade: formState.passingGrade,
@@ -357,10 +327,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       setOriginalState(formState)
       setIsDirty(false)
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
+      toast.success('Configuration saved successfully')
     } catch (err: any) {
-      setSaveError(err.message || 'Failed to save changes')
+      toast.error(err.message || 'Failed to save changes')
     }
   }
 
@@ -402,48 +371,22 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
   return (
     <div className="max-w-3xl space-y-8 pb-24">
-      {/* Success/Error Alerts */}
-      <AnimatePresence>
-        {saveSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="flex items-center gap-3 p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-400"
-          >
-            <Save className="w-5 h-5" />
-            <span className="text-sm font-medium">Configuration saved successfully</span>
-          </motion.div>
-        )}
-        {saveError && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="flex items-center gap-3 p-4 rounded-xl bg-rust-500/10 border border-rust-500/20 text-rust-700 dark:text-rust-400"
-          >
-            <AlertTriangle className="w-5 h-5" />
-            <span className="text-sm font-medium">{saveError}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Identity Section */}
       <Section
         title="School Identity"
         description="Basic school information"
         icon={Building2}
       >
-        <FieldRow label="Display Name" description="Full name of the school">
+        <SettingsFieldRow label="Display Name" description="Full name of the school">
           <input
             type="text"
             value={formState.displayName}
             onChange={(e) => updateField('displayName', e.target.value)}
             className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
           />
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="School Type" description="Level of education" inline>
+        <SettingsFieldRow label="School Type" description="Level of education" inline>
           <select
             value={formState.schoolType}
             onChange={(e) => updateField('schoolType', e.target.value)}
@@ -453,9 +396,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="Website" description="School's public website">
+        <SettingsFieldRow label="Website" description="School's public website">
           <input
             type="url"
             value={formState.website}
@@ -463,7 +406,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             placeholder="https://www.school.edu"
             className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
           />
-        </FieldRow>
+        </SettingsFieldRow>
       </Section>
 
       {/* Location & Contact Section */}
@@ -472,16 +415,16 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="Physical address and contact information"
         icon={MapPin}
       >
-        <FieldRow label="Street Address">
+        <SettingsFieldRow label="Street Address">
           <input
             type="text"
             value={formState.address.street1}
             onChange={(e) => updateField('address', { ...formState.address, street1: e.target.value })}
             className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
           />
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="City, State, ZIP">
+        <SettingsFieldRow label="City, State, ZIP">
           <div className="grid grid-cols-3 gap-3">
             <input
               type="text"
@@ -505,9 +448,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
             />
           </div>
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="Phone & Email">
+        <SettingsFieldRow label="Phone & Email">
           <div className="grid grid-cols-2 gap-3">
             <input
               type="tel"
@@ -524,7 +467,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
             />
           </div>
-        </FieldRow>
+        </SettingsFieldRow>
       </Section>
 
       {/* Schedule & Operations Section */}
@@ -533,14 +476,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="School days and operating hours"
         icon={Clock}
       >
-        <FieldRow label="School Days" description="Days when school is in session">
+        <SettingsFieldRow label="School Days" description="Days when school is in session">
           <SchoolDaysSelector
             selected={formState.schoolDays}
             onChange={(days) => updateField('schoolDays', days)}
           />
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="School Hours" description="Daily start and end times">
+        <SettingsFieldRow label="School Hours" description="Daily start and end times">
           <TimeRangePicker
             startTime={formState.startTime}
             endTime={formState.endTime}
@@ -549,9 +492,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               updateField('endTime', end)
             }}
           />
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="Period Duration" description="Length of each class period" inline>
+        <SettingsFieldRow label="Period Duration" description="Length of each class period" inline>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -563,7 +506,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             />
             <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
           </div>
-        </FieldRow>
+        </SettingsFieldRow>
       </Section>
 
       {/* Academic Settings Section */}
@@ -572,7 +515,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="Grading and term structure"
         icon={GraduationCap}
       >
-        <FieldRow label="Term Structure" description="How the academic year is divided" inline>
+        <SettingsFieldRow label="Term Structure" description="How the academic year is divided" inline>
           <select
             value={formState.termStructure}
             onChange={(e) => updateField('termStructure', e.target.value)}
@@ -582,9 +525,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-        </FieldRow>
+        </SettingsFieldRow>
 
-        <FieldRow label="Grading Scale" description="Configure how grades are calculated">
+        <SettingsFieldRow label="Grading Scale" description="Configure how grades are calculated">
           <GradingScaleEditor
             scaleType={formState.gradingScaleType}
             scale={formState.gradingScale}
@@ -595,7 +538,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             }}
             onScaleTypeChange={(type) => updateField('gradingScaleType', type)}
           />
-        </FieldRow>
+        </SettingsFieldRow>
       </Section>
 
       {/* Features Section */}
@@ -618,28 +561,28 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="Configure how notifications are delivered"
         icon={Bell}
       >
-        <FieldRow label="Enable Notifications" description="Master toggle for all notifications" inline>
+        <SettingsFieldRow label="Enable Notifications" description="Master toggle for all notifications" inline>
           <ToggleSwitch
             checked={formState.notificationsEnabled}
             onChange={(checked) => updateField('notificationsEnabled', checked)}
           />
-        </FieldRow>
+        </SettingsFieldRow>
 
         {formState.notificationsEnabled && (
           <>
-            <FieldRow label="Email Notifications" description="Send notifications via email" inline>
+            <SettingsFieldRow label="Email Notifications" description="Send notifications via email" inline>
               <ToggleSwitch
                 checked={formState.emailNotifications}
                 onChange={(checked) => updateField('emailNotifications', checked)}
               />
-            </FieldRow>
+            </SettingsFieldRow>
 
-            <FieldRow label="SMS Notifications" description="Send notifications via text message" inline>
+            <SettingsFieldRow label="SMS Notifications" description="Send notifications via text message" inline>
               <ToggleSwitch
                 checked={formState.smsNotifications}
                 onChange={(checked) => updateField('smsNotifications', checked)}
               />
-            </FieldRow>
+            </SettingsFieldRow>
           </>
         )}
       </Section>
@@ -650,12 +593,12 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="Attendance tracking configuration"
         icon={ClipboardCheck}
       >
-        <FieldRow label="Attendance Required" description="Is attendance tracking mandatory for this school?" inline>
+        <SettingsFieldRow label="Attendance Required" description="Is attendance tracking mandatory for this school?" inline>
           <ToggleSwitch
             checked={formState.attendanceRequired}
             onChange={(checked) => updateField('attendanceRequired', checked)}
           />
-        </FieldRow>
+        </SettingsFieldRow>
       </Section>
 
       {/* Workspace Inheritance Notice */}
@@ -670,34 +613,12 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
       </div>
 
       {/* Floating Save Bar */}
-      <AnimatePresence>
-        {isDirty && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-2xl border border-[rgb(var(--border-primary))]"
-          >
-            <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-              You have unsaved changes
-            </span>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={handleReset}>
-                <RotateCcw className="w-4 h-4 mr-1.5" />
-                Reset
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleSave}
-                isLoading={updateSchoolMutation.isPending || updateConfigMutation.isPending}
-              >
-                <Save className="w-4 h-4 mr-1.5" />
-                Save Changes
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <UnsavedChangesBar
+        isDirty={isDirty}
+        onReset={handleReset}
+        onSave={handleSave}
+        isSaving={updateSchoolMutation.isPending || updateConfigMutation.isPending}
+      />
     </div>
   )
 }

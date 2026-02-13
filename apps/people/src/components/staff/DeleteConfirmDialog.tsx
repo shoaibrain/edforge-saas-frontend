@@ -1,19 +1,19 @@
 /**
  * DeleteConfirmDialog Component
  * 
- * Confirmation dialog for deleting a user.
+ * Confirmation dialog for deleting a staff member.
  * Uses type-to-confirm pattern for safety - user must type the email to confirm.
  */
 
 import { useState, useEffect } from 'react'
 import { Loader2, AlertTriangle, Trash2 } from 'lucide-react'
-import type { UserResponseDto } from '@edforge/shared-types'
+import type { StaffResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 
 export interface DeleteConfirmDialogProps {
   open: boolean
   onClose: () => void
-  user: UserResponseDto | null
+  staff: StaffResponseDto | null
   onConfirm: () => Promise<void>
   isDeleting?: boolean
 }
@@ -21,7 +21,7 @@ export interface DeleteConfirmDialogProps {
 export function DeleteConfirmDialog({
   open,
   onClose,
-  user,
+  staff,
   onConfirm,
   isDeleting = false,
 }: DeleteConfirmDialogProps) {
@@ -35,20 +35,22 @@ export function DeleteConfirmDialog({
   }, [open])
 
   // Check if email matches for confirmation
-  const canDelete = confirmText === user?.email
+  const canDelete = confirmText === staff?.email
 
   const handleConfirm = async () => {
     if (!canDelete) return
     await onConfirm()
   }
 
-  if (!user) return null
+  if (!staff) return null
+
+  const fullName = `${staff.firstName ?? ''} ${staff.lastSurname ?? ''}`
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title="Delete User"
+      title="Delete Staff Member"
       size="sm"
       showCloseButton={!isDeleting}
     >
@@ -63,35 +65,33 @@ export function DeleteConfirmDialog({
               This action cannot be undone
             </h4>
             <p className="mt-1 text-sm text-red-700 dark:text-red-300">
-              You are about to permanently delete the user account for{' '}
-              <strong>{user.firstName} {user.lastName}</strong>.
+              You are about to permanently delete the staff record for{' '}
+              <strong>{fullName}</strong>.
               This will remove all their data and access.
             </p>
           </div>
         </div>
 
-        {/* User info */}
+        {/* Staff info */}
         <div className="p-4 rounded-lg bg-surface-secondary border border-border-secondary">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 font-medium">
-              {user.firstName[0]}{user.lastName[0]}
+              {staff.firstName?.[0] ?? '?'}{staff.lastSurname?.[0] ?? '?'}
             </div>
             <div>
-              <p className="font-medium text-text-primary">
-                {user.firstName} {user.lastName}
-              </p>
-              <p className="text-sm text-text-secondary">{user.email}</p>
+              <p className="font-medium text-text-primary">{fullName}</p>
+              <p className="text-sm text-text-secondary">{staff.email}</p>
             </div>
           </div>
         </div>
 
         {/* Type to confirm */}
         <div>
-          <label 
-            htmlFor="confirmEmail" 
+          <label
+            htmlFor="confirmEmail"
             className="block text-sm font-medium text-text-primary mb-1.5"
           >
-            Type <span className="font-mono text-red-600 dark:text-red-400">{user.email}</span> to confirm
+            Type <span className="font-mono text-red-600 dark:text-red-400">{staff.email}</span> to confirm
           </label>
           <input
             id="confirmEmail"
@@ -143,7 +143,7 @@ export function DeleteConfirmDialog({
           ) : (
             <>
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete User
+              Delete Staff Member
             </>
           )}
         </Button>

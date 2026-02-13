@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
-import { updateUserSchema, type UpdateUserDto, type UserResponseDto } from '@edforge/shared-types'
+import { updateUserSchema, type UpdateUserDto, type UserResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 import { peopleService, parseApiError } from '../../services/people.service'
 
@@ -108,7 +108,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
       open={open}
       onClose={handleClose}
       title="Edit Staff Member"
-      description={`Update information for ${user.firstName} ${user.lastName}`}
+      description={`Update information for ${user.firstName ?? ''} ${user.lastName ?? ''}`}
       size="md"
     >
       <form onSubmit={onSubmit} className="space-y-4">

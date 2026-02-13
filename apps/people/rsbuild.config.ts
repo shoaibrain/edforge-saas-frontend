@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url'
+import path from 'path'
 import { defineConfig } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
@@ -24,6 +26,16 @@ export default defineConfig({
   },
   tools: {
     rspack: (config, { appendPlugins }) => {
+      // Ensure Rspack can resolve workspace packages from the monorepo root node_modules
+      // (fixes pnpm symlink resolution on Vercel for packages in types/packages/*)
+      const monorepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+      config.resolve = {
+        ...config.resolve,
+        modules: ['node_modules', path.resolve(monorepoRoot, 'node_modules')],
+        alias: {
+          ...(config.resolve?.alias || {}),
+        },
+      }
       config.output = {
         ...config.output,
         publicPath: 'auto',

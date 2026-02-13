@@ -1,0 +1,27 @@
+# Build artifacts
+output/
+**/dist/
+**/.turbo/
+**/.cache/
+
+# Dependencies (Vercel runs pnpm install)
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# Generated types (rebuilt during build)
+types/packages/edfi-ts-models/dist/
+types/packages/edfi-ts-models/node_modules/
+
+# Docker (not needed for Vercel)
+docker/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Module Federation type bundles
+**/@mf-types/
+**/@mf-types.zip

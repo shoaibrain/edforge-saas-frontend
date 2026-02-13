@@ -207,6 +207,7 @@ export default function SettingsPlaceholder() {
   const { user, navigate } = useShell()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+  const displayName = user?.displayName || user?.name || 'User'
 
   const filteredCategories = searchQuery
     ? SETTINGS_CATEGORIES.filter(
@@ -232,13 +233,13 @@ export default function SettingsPlaceholder() {
         >
           <img
             src={getUserAvatar(user?.name || 'User')}
-            alt={user?.name || 'User'}
+            alt={displayName}
             className="w-24 h-24 rounded-full ring-4 ring-[rgb(var(--border-primary))]"
           />
         </motion.div>
         <div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            {user?.name || 'User'}
+            {displayName}
           </h1>
           <p className="text-[rgb(var(--text-secondary))]">
             {user?.email || 'user@example.com'}

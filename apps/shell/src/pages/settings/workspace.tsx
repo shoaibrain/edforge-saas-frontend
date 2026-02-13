@@ -1,9 +1,9 @@
 /**
  * Workspace Settings Page
- * 
+ *
  * Tenant-level configuration that applies organization-wide.
  * Schools can override these settings at the school level.
- * 
+ *
  * Sections:
  * - Regional (timezone, locale, date/time format)
  * - Calendar (academic year defaults)
@@ -11,9 +11,10 @@
  * - Policies (grading, attendance defaults)
  */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Navigate } from '@tanstack/react-router'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Globe,
@@ -61,9 +62,9 @@ interface WorkspaceSettings {
 import {
   SettingsPageHeader,
   SettingsSection,
-  SettingsCard,
-  SettingsAlert,
+  SettingsFieldRow,
   SettingsSkeleton,
+  UnsavedChangesBar,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
@@ -133,39 +134,40 @@ const ATTENDANCE_POLICY_OPTIONS = [
   { value: 'both', label: 'Both Daily & Period' },
 ]
 
+const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+
+const SELECT_CLASS = 'min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+
 // ============================================================================
-// STYLED SELECT
+// DEFAULT SETTINGS (fallback when API data unavailable)
 // ============================================================================
 
-interface StyledSelectProps {
-  value: string
-  onChange: (value: string) => void
-  options: { value: string; label: string; [key: string]: string }[]
-  showExtra?: string
-  disabled?: boolean
-}
-
-function StyledSelect({ value, onChange, options, showExtra, disabled }: StyledSelectProps) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className={`
-        px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] 
-        bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] 
-        focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 
-        min-w-[200px] transition-all
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-      `}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}{showExtra && opt[showExtra] ? ` (${opt[showExtra]})` : ''}
-        </option>
-      ))}
-    </select>
-  )
+const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'tenantId'> = {
+  regional: {
+    defaultTimezone: 'America/New_York',
+    defaultLocale: 'en-US',
+    defaultDateFormat: 'MM/DD/YYYY',
+    defaultTimeFormat: '12h',
+    defaultWeekStartsOn: 'monday',
+  },
+  calendar: {
+    defaultAcademicYearStart: '08-15',
+    defaultAcademicYearEnd: '06-15',
+    defaultTermStructure: 'semester',
+  },
+  branding: {
+    organizationName: 'Demo School District',
+    logoUrl: undefined,
+    primaryColor: '#0D9488',
+    accentColor: '#F59E0B',
+  },
+  policies: {
+    defaultGradingScale: 'letter',
+    defaultAttendancePolicy: 'daily',
+  },
+  isLocked: false,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 }
 
 // ============================================================================
@@ -179,393 +181,6 @@ function LockIndicator({ reason }: { reason?: string }) {
       <span className="text-sm text-golden-700 dark:text-golden-400">
         {reason || 'Settings locked during active academic year'}
       </span>
-    </div>
-  )
-}
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
-export default function WorkspaceSettingsPage() {
-  const user = useAuthStore((s) => s.user)
-  const { activeSchoolId } = useAppStore.getState()
-  const queryClient = useQueryClient()
-  
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
-
-  // Check permissions
-  if (!user) {
-    return <Navigate to="/login" />
-  }
-
-  const hasPermission = can(user, {
-    action: 'view',
-    resource: 'settings:tenant',
-    schoolId: activeSchoolId ?? undefined,
-  })
-
-  if (!hasPermission) {
-    return <AccessDenied message="You don't have permission to view workspace settings." />
-  }
-
-  // Fetch workspace settings
-  const {
-    data: settings,
-    isLoading,
-  } = useQuery<WorkspaceSettings>({
-    queryKey: ['workspaceSettings', user.tenantId],
-    queryFn: () => tenantService.getWorkspaceSettings(user.tenantId),
-    enabled: !!user.tenantId,
-    staleTime: 5 * 60 * 1000,
-    retry: 1,
-  })
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (data: Partial<WorkspaceSettings>) =>
-      tenantService.updateWorkspaceSettings(user.tenantId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspaceSettings', user.tenantId] })
-      setSaveSuccess(true)
-      setSaveError(null)
-      setTimeout(() => setSaveSuccess(false), 3000)
-    },
-    onError: (err: Error) => {
-      setSaveError(err.message || 'Failed to save settings')
-      setSaveSuccess(false)
-    },
-  })
-
-  // Handle setting change
-  const handleChange = <K extends keyof WorkspaceSettings>(
-    section: K,
-    key: string,
-    value: unknown
-  ) => {
-    if (settings?.isLocked) return
-    
-    const sectionData = settings?.[section]
-    if (typeof sectionData === 'object' && sectionData !== null) {
-      updateMutation.mutate({
-        [section]: {
-          ...sectionData,
-          [key]: value,
-        },
-      } as Partial<WorkspaceSettings>)
-    }
-  }
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <SettingsSkeleton rows={6} showHeader />
-      </div>
-    )
-  }
-
-  // Error state - show default UI with mock data
-  const displaySettings: WorkspaceSettings = settings || {
-    tenantId: user.tenantId,
-    regional: {
-      defaultTimezone: 'America/New_York',
-      defaultLocale: 'en-US',
-      defaultDateFormat: 'MM/DD/YYYY',
-      defaultTimeFormat: '12h',
-      defaultWeekStartsOn: 'monday',
-    },
-    calendar: {
-      defaultAcademicYearStart: '08-15',
-      defaultAcademicYearEnd: '06-15',
-      defaultTermStructure: 'semester',
-    },
-    branding: {
-      organizationName: 'Demo School District',
-      logoUrl: undefined,
-      primaryColor: '#0D9488',
-      accentColor: '#F59E0B',
-    },
-    policies: {
-      defaultGradingScale: 'letter',
-      defaultAttendancePolicy: 'daily',
-    },
-    isLocked: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  }
-
-  return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerChildren}
-        className="space-y-8"
-      >
-        {/* Header */}
-        <SettingsPageHeader
-          title="Workspace Settings"
-          description="Organization-wide configuration that applies to all schools"
-          icon={Building2}
-        />
-
-        {/* Lock Warning */}
-        {displaySettings.isLocked && (
-          <motion.div variants={fadeInUp}>
-            <LockIndicator reason={displaySettings.lockReason} />
-          </motion.div>
-        )}
-
-        {/* Alerts */}
-        <AnimatePresence>
-          {saveSuccess && (
-            <SettingsAlert
-              type="success"
-              message="Settings saved"
-              onDismiss={() => setSaveSuccess(false)}
-              autoDismiss
-              autoDismissDelay={2000}
-            />
-          )}
-          {saveError && (
-            <SettingsAlert
-              type="error"
-              message={saveError}
-              onDismiss={() => setSaveError(null)}
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Regional Settings */}
-        <SettingsSection
-          title="Regional Settings"
-          icon={Globe}
-          description="Default timezone, language, and date/time formatting"
-        >
-          <div className="space-y-4">
-            <SettingsCard
-              title="Default Timezone"
-              description="Organization's primary timezone for scheduling and timestamps"
-            >
-              <StyledSelect
-                value={displaySettings.regional.defaultTimezone}
-                onChange={(v) => handleChange('regional', 'defaultTimezone', v)}
-                options={TIMEZONE_OPTIONS}
-                showExtra="offset"
-                disabled={displaySettings.isLocked}
-              />
-            </SettingsCard>
-
-            <SettingsCard
-              title="Default Language"
-              description="Primary language for new users and system communications"
-            >
-              <StyledSelect
-                value={displaySettings.regional.defaultLocale}
-                onChange={(v) => handleChange('regional', 'defaultLocale', v)}
-                options={LOCALE_OPTIONS}
-                disabled={displaySettings.isLocked}
-              />
-            </SettingsCard>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SettingsCard title="Date Format" description="How dates are displayed">
-                <StyledSelect
-                  value={displaySettings.regional.defaultDateFormat}
-                  onChange={(v) => handleChange('regional', 'defaultDateFormat', v)}
-                  options={DATE_FORMAT_OPTIONS}
-                  showExtra="example"
-                  disabled={displaySettings.isLocked}
-                />
-              </SettingsCard>
-
-              <SettingsCard title="Time Format" description="12 or 24 hour clock">
-                <StyledSelect
-                  value={displaySettings.regional.defaultTimeFormat}
-                  onChange={(v) => handleChange('regional', 'defaultTimeFormat', v)}
-                  options={TIME_FORMAT_OPTIONS}
-                  showExtra="example"
-                  disabled={displaySettings.isLocked}
-                />
-              </SettingsCard>
-            </div>
-
-            <SettingsCard
-              title="Week Starts On"
-              description="First day of the week in calendars"
-            >
-              <StyledSelect
-                value={displaySettings.regional.defaultWeekStartsOn}
-                onChange={(v) => handleChange('regional', 'defaultWeekStartsOn', v)}
-                options={WEEK_START_OPTIONS}
-                disabled={displaySettings.isLocked}
-              />
-            </SettingsCard>
-          </div>
-        </SettingsSection>
-
-        {/* Calendar Settings */}
-        <SettingsSection
-          title="Academic Calendar"
-          icon={Calendar}
-          description="Default academic year structure and schedule"
-        >
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SettingsCard
-                title="Academic Year Start"
-                description="Default start date (month-day)"
-              >
-                <input
-                  type="text"
-                  value={displaySettings.calendar.defaultAcademicYearStart}
-                  onChange={(e) => handleChange('calendar', 'defaultAcademicYearStart', e.target.value)}
-                  placeholder="MM-DD (e.g., 08-15)"
-                  disabled={displaySettings.isLocked}
-                  className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 w-full disabled:opacity-50"
-                />
-              </SettingsCard>
-
-              <SettingsCard
-                title="Academic Year End"
-                description="Default end date (month-day)"
-              >
-                <input
-                  type="text"
-                  value={displaySettings.calendar.defaultAcademicYearEnd}
-                  onChange={(e) => handleChange('calendar', 'defaultAcademicYearEnd', e.target.value)}
-                  placeholder="MM-DD (e.g., 06-15)"
-                  disabled={displaySettings.isLocked}
-                  className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 w-full disabled:opacity-50"
-                />
-              </SettingsCard>
-            </div>
-
-            <SettingsCard
-              title="Default Term Structure"
-              description="How academic years are divided into grading periods"
-            >
-              <StyledSelect
-                value={displaySettings.calendar.defaultTermStructure}
-                onChange={(v) => handleChange('calendar', 'defaultTermStructure', v)}
-                options={TERM_STRUCTURE_OPTIONS}
-                disabled={displaySettings.isLocked}
-              />
-            </SettingsCard>
-          </div>
-        </SettingsSection>
-
-        {/* Branding */}
-        <SettingsSection
-          title="Organization Branding"
-          icon={Palette}
-          description="Visual identity across the platform"
-        >
-          <div className="space-y-4">
-            <SettingsCard
-              title="Organization Name"
-              description="Display name for your organization"
-            >
-              <input
-                type="text"
-                value={displaySettings.branding.organizationName}
-                onChange={(e) => handleChange('branding', 'organizationName', e.target.value)}
-                disabled={displaySettings.isLocked}
-                className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 w-full disabled:opacity-50"
-              />
-            </SettingsCard>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SettingsCard title="Primary Color" description="Main brand color">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={displaySettings.branding.primaryColor || '#0D9488'}
-                    onChange={(e) => handleChange('branding', 'primaryColor', e.target.value)}
-                    disabled={displaySettings.isLocked}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))]"
-                  />
-                  <input
-                    type="text"
-                    value={displaySettings.branding.primaryColor || '#0D9488'}
-                    onChange={(e) => handleChange('branding', 'primaryColor', e.target.value)}
-                    disabled={displaySettings.isLocked}
-                    className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 flex-1 disabled:opacity-50"
-                  />
-                </div>
-              </SettingsCard>
-
-              <SettingsCard title="Accent Color" description="Secondary highlight color">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={displaySettings.branding.accentColor || '#F59E0B'}
-                    onChange={(e) => handleChange('branding', 'accentColor', e.target.value)}
-                    disabled={displaySettings.isLocked}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))]"
-                  />
-                  <input
-                    type="text"
-                    value={displaySettings.branding.accentColor || '#F59E0B'}
-                    onChange={(e) => handleChange('branding', 'accentColor', e.target.value)}
-                    disabled={displaySettings.isLocked}
-                    className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 flex-1 disabled:opacity-50"
-                  />
-                </div>
-              </SettingsCard>
-            </div>
-          </div>
-        </SettingsSection>
-
-        {/* Policy Defaults */}
-        <SettingsSection
-          title="Policy Defaults"
-          icon={Shield}
-          description="Default grading and attendance policies for new schools"
-        >
-          <div className="space-y-4">
-            <SettingsCard
-              title="Default Grading Scale"
-              description="Standard grading system for schools"
-            >
-              <StyledSelect
-                value={displaySettings.policies.defaultGradingScale}
-                onChange={(v) => handleChange('policies', 'defaultGradingScale', v)}
-                options={GRADING_SCALE_OPTIONS}
-                disabled={displaySettings.isLocked}
-              />
-            </SettingsCard>
-
-            <SettingsCard
-              title="Default Attendance Policy"
-              description="How attendance is tracked by default"
-            >
-              <StyledSelect
-                value={displaySettings.policies.defaultAttendancePolicy}
-                onChange={(v) => handleChange('policies', 'defaultAttendancePolicy', v)}
-                options={ATTENDANCE_POLICY_OPTIONS}
-                disabled={displaySettings.isLocked}
-              />
-            </SettingsCard>
-          </div>
-        </SettingsSection>
-
-        {/* Info Note */}
-        <motion.div variants={fadeInUp}>
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
-            <AlertTriangle className="w-5 h-5 text-golden-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-[rgb(var(--text-secondary))]">
-                <strong>Important:</strong> These settings define organization-wide defaults.
-                Individual schools can override these settings in their School Configuration.
-                Some settings become locked when an academic year is active.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
     </div>
   )
 }
@@ -588,6 +203,389 @@ function AccessDenied({ message }: { message: string }) {
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">Access Denied</h2>
         <p className="text-[rgb(var(--text-tertiary))]">{message}</p>
       </motion.div>
+    </div>
+  )
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export default function WorkspaceSettingsPage() {
+  // All hooks MUST be called before any conditional returns
+  const user = useAuthStore((s) => s.user)
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+  const queryClient = useQueryClient()
+
+  // Local form state + dirty tracking
+  const [formState, setFormState] = useState<WorkspaceSettings | null>(null)
+  const originalStateRef = useRef<WorkspaceSettings | null>(null)
+
+  // Fetch workspace settings
+  const {
+    data: settings,
+    isLoading,
+  } = useQuery<WorkspaceSettings>({
+    queryKey: ['workspaceSettings', user?.tenantId],
+    queryFn: () => tenantService.getWorkspaceSettings(user!.tenantId),
+    enabled: !!user?.tenantId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+  // Update mutation — sends full settings object
+  const updateMutation = useMutation({
+    mutationFn: (data: Partial<WorkspaceSettings>) =>
+      tenantService.updateWorkspaceSettings(user!.tenantId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspaceSettings', user?.tenantId] })
+      originalStateRef.current = formState
+      toast.success('Workspace settings saved')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to save settings')
+    },
+  })
+
+  // Initialize form state from API data
+  useEffect(() => {
+    if (settings) {
+      setFormState(settings)
+      originalStateRef.current = settings
+    }
+  }, [settings])
+
+  // Derive dirty state
+  const isDirty = formState !== null
+    && originalStateRef.current !== null
+    && JSON.stringify(formState) !== JSON.stringify(originalStateRef.current)
+
+  // Update a nested section field in local form state (no API call)
+  const updateField = <S extends 'regional' | 'calendar' | 'branding' | 'policies'>(
+    section: S,
+    key: string,
+    value: unknown
+  ) => {
+    if (formState?.isLocked) return
+    setFormState((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [key]: value,
+        },
+      }
+    })
+  }
+
+  // Save all pending changes
+  const handleSave = () => {
+    if (!formState) return
+    updateMutation.mutate({
+      regional: formState.regional,
+      calendar: formState.calendar,
+      branding: formState.branding,
+      policies: formState.policies,
+    })
+  }
+
+  // Reset to original server state
+  const handleReset = () => {
+    if (originalStateRef.current) {
+      setFormState(originalStateRef.current)
+    }
+  }
+
+  // Permission check (after all hooks)
+  if (!user) {
+    return <Navigate to="/login" />
+  }
+
+  const hasPermission = can(user, {
+    action: 'view',
+    resource: 'settings:tenant',
+    schoolId: activeSchoolId ?? undefined,
+  })
+
+  if (!hasPermission) {
+    return <AccessDenied message="You don't have permission to view workspace settings." />
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-8">
+        <SettingsSkeleton rows={6} showHeader />
+      </div>
+    )
+  }
+
+  // Use form state or fallback defaults
+  const displaySettings: WorkspaceSettings = formState || {
+    tenantId: user.tenantId,
+    ...DEFAULT_SETTINGS,
+  }
+  const isLocked = displaySettings.isLocked
+
+  return (
+    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={staggerChildren}
+        className="space-y-8"
+      >
+        {/* Header */}
+        <SettingsPageHeader
+          title="Workspace Settings"
+          description="Organization-wide configuration that applies to all schools"
+          icon={Building2}
+        />
+
+        {/* Lock Warning */}
+        {isLocked && (
+          <motion.div variants={fadeInUp}>
+            <LockIndicator reason={displaySettings.lockReason} />
+          </motion.div>
+        )}
+
+        {/* Regional Settings */}
+        <SettingsSection
+          title="Regional Settings"
+          icon={Globe}
+          description="Default timezone, language, and date/time formatting"
+        >
+          <SettingsFieldRow label="Default Timezone" description="Organization's primary timezone for scheduling and timestamps" inline>
+            <select
+              value={displaySettings.regional.defaultTimezone}
+              onChange={(e) => updateField('regional', 'defaultTimezone', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {TIMEZONE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label} ({opt.offset})
+                </option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Default Language" description="Primary language for new users and system communications" inline>
+            <select
+              value={displaySettings.regional.defaultLocale}
+              onChange={(e) => updateField('regional', 'defaultLocale', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {LOCALE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Date Format" description="How dates are displayed across the platform" inline>
+            <select
+              value={displaySettings.regional.defaultDateFormat}
+              onChange={(e) => updateField('regional', 'defaultDateFormat', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {DATE_FORMAT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label} ({opt.example})
+                </option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Time Format" description="12 or 24 hour clock" inline>
+            <select
+              value={displaySettings.regional.defaultTimeFormat}
+              onChange={(e) => updateField('regional', 'defaultTimeFormat', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {TIME_FORMAT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label} ({opt.example})
+                </option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Week Starts On" description="First day of the week in calendars" inline>
+            <select
+              value={displaySettings.regional.defaultWeekStartsOn}
+              onChange={(e) => updateField('regional', 'defaultWeekStartsOn', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {WEEK_START_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+        </SettingsSection>
+
+        {/* Calendar Settings */}
+        <SettingsSection
+          title="Academic Calendar"
+          icon={Calendar}
+          description="Default academic year structure and schedule"
+          collapsible
+          defaultOpen={false}
+        >
+          <SettingsFieldRow label="Academic Year Start" description="Default start date (month-day)" inline>
+            <input
+              type="text"
+              value={displaySettings.calendar.defaultAcademicYearStart}
+              onChange={(e) => updateField('calendar', 'defaultAcademicYearStart', e.target.value)}
+              placeholder="MM-DD (e.g., 08-15)"
+              disabled={isLocked}
+              className={INPUT_CLASS + ' max-w-[200px]'}
+            />
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Academic Year End" description="Default end date (month-day)" inline>
+            <input
+              type="text"
+              value={displaySettings.calendar.defaultAcademicYearEnd}
+              onChange={(e) => updateField('calendar', 'defaultAcademicYearEnd', e.target.value)}
+              placeholder="MM-DD (e.g., 06-15)"
+              disabled={isLocked}
+              className={INPUT_CLASS + ' max-w-[200px]'}
+            />
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Default Term Structure" description="How academic years are divided into grading periods" inline>
+            <select
+              value={displaySettings.calendar.defaultTermStructure}
+              onChange={(e) => updateField('calendar', 'defaultTermStructure', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {TERM_STRUCTURE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+        </SettingsSection>
+
+        {/* Branding */}
+        <SettingsSection
+          title="Organization Branding"
+          icon={Palette}
+          description="Visual identity across the platform"
+          collapsible
+          defaultOpen={false}
+        >
+          <SettingsFieldRow label="Organization Name" description="Display name for your organization">
+            <input
+              type="text"
+              value={displaySettings.branding.organizationName}
+              onChange={(e) => updateField('branding', 'organizationName', e.target.value)}
+              disabled={isLocked}
+              className={INPUT_CLASS}
+            />
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Primary Color" description="Main brand color" inline>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={displaySettings.branding.primaryColor || '#0D9488'}
+                onChange={(e) => updateField('branding', 'primaryColor', e.target.value)}
+                disabled={isLocked}
+                className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))] disabled:opacity-50"
+              />
+              <input
+                type="text"
+                value={displaySettings.branding.primaryColor || '#0D9488'}
+                onChange={(e) => updateField('branding', 'primaryColor', e.target.value)}
+                disabled={isLocked}
+                className={INPUT_CLASS + ' max-w-[140px]'}
+              />
+            </div>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Accent Color" description="Secondary highlight color" inline>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={displaySettings.branding.accentColor || '#F59E0B'}
+                onChange={(e) => updateField('branding', 'accentColor', e.target.value)}
+                disabled={isLocked}
+                className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))] disabled:opacity-50"
+              />
+              <input
+                type="text"
+                value={displaySettings.branding.accentColor || '#F59E0B'}
+                onChange={(e) => updateField('branding', 'accentColor', e.target.value)}
+                disabled={isLocked}
+                className={INPUT_CLASS + ' max-w-[140px]'}
+              />
+            </div>
+          </SettingsFieldRow>
+        </SettingsSection>
+
+        {/* Policy Defaults */}
+        <SettingsSection
+          title="Policy Defaults"
+          icon={Shield}
+          description="Default grading and attendance policies for new schools"
+          collapsible
+          defaultOpen={false}
+        >
+          <SettingsFieldRow label="Default Grading Scale" description="Standard grading system for schools" inline>
+            <select
+              value={displaySettings.policies.defaultGradingScale}
+              onChange={(e) => updateField('policies', 'defaultGradingScale', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {GRADING_SCALE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Default Attendance Policy" description="How attendance is tracked by default" inline>
+            <select
+              value={displaySettings.policies.defaultAttendancePolicy}
+              onChange={(e) => updateField('policies', 'defaultAttendancePolicy', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {ATTENDANCE_POLICY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+        </SettingsSection>
+
+        {/* Info Note */}
+        <motion.div variants={fadeInUp}>
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+            <AlertTriangle className="w-5 h-5 text-golden-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">
+                <strong>Important:</strong> These settings define organization-wide defaults.
+                Individual schools can override these settings in their School Configuration.
+                Some settings become locked when an academic year is active.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Floating Save Bar */}
+      <UnsavedChangesBar
+        isDirty={isDirty}
+        onReset={handleReset}
+        onSave={handleSave}
+        isSaving={updateMutation.isPending}
+      />
     </div>
   )
 }

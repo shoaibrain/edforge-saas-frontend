@@ -57,6 +57,7 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     id: 'user-001',
     email: 'admin@edforge.com',
     name: 'Sarah Chen',
+    displayName: 'Sarah',
     globalRole: 'TenantAdmin',
     tenantId: 'tenant-001',
     assignments: {
@@ -69,6 +70,7 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     id: 'user-002',
     email: 'principal@lincoln.edu',
     name: 'James Wilson',
+    displayName: 'James',
     globalRole: 'StandardUser',
     tenantId: 'tenant-001',
     assignments: {
@@ -79,6 +81,7 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     id: 'user-003',
     email: 'teacher@lincoln.edu',
     name: 'Emily Rodriguez',
+    displayName: 'Emily',
     globalRole: 'StandardUser',
     tenantId: 'tenant-001',
     assignments: {
@@ -90,6 +93,7 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     id: 'user-004',
     email: 'finance@edforge.com',
     name: 'Michael Park',
+    displayName: 'Michael',
     globalRole: 'StandardUser',
     tenantId: 'tenant-001',
     assignments: {
@@ -102,6 +106,7 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     id: 'user-005',
     email: 'alex.chen@student.lincoln.edu',
     name: 'Alex Chen',
+    displayName: 'Alex',
     globalRole: 'StandardUser',
     tenantId: 'tenant-001',
     assignments: {
@@ -112,6 +117,7 @@ const MOCK_USERS: Record<string, UserIdentity> = {
     id: 'user-006',
     email: 'robert.thompson@email.com',
     name: 'Robert Thompson',
+    displayName: 'Robert',
     globalRole: 'StandardUser',
     tenantId: 'tenant-001',
     assignments: {

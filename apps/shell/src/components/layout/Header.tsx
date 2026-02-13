@@ -61,7 +61,9 @@ function UserMenu() {
             <div className="flex items-center gap-3">
               <Avatar name={user.name} size="lg" shape="rounded" />
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[rgb(var(--text-primary))] truncate">{user.name}</p>
+                <p className="font-semibold text-[rgb(var(--text-primary))] truncate">
+                  {user.displayName || user.name}
+                </p>
                 <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{user.email}</p>
                 <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-teal-500/15 text-teal-700 dark:bg-cyan-500/20 dark:text-cyan-300">
                   {user.globalRole}

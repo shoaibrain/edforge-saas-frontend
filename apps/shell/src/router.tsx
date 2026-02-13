@@ -14,6 +14,7 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
 import { ShellProvider } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingScreen } from './components/layout/LoadingScreen'
@@ -35,6 +36,9 @@ import {
   WorkspaceSettingsPage,
   SchoolsSettingsPage,
   SchoolDetailPage,
+  OrganizationSettingsPage,
+  EducationOrgDetailPage,
+  EdFiExportPreviewPage,
   RBACSecurityPage,
   IntegrationsSettingsPage,
   BillingSettingsPage,
@@ -103,6 +107,7 @@ function RootLayout() {
   return (
     <ShellProvider>
       <ThemeSync />
+      <Toaster position="bottom-right" richColors closeButton />
       <Suspense fallback={<LoadingScreen />}>
         <Outlet />
       </Suspense>
@@ -372,12 +377,31 @@ const settingsSecurityPoliciesRoute = createRoute({
   component: RBACSecurityPage,
 })
 
+const settingsOrganizationRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/organization',
+  component: OrganizationSettingsPage,
+})
+
+const settingsEdOrgDetailRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/organization/$orgType/$orgId',
+  component: EducationOrgDetailPage,
+})
+
+const settingsEdFiExportPreviewRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/organization/edfi-preview',
+  component: EdFiExportPreviewPage,
+})
+
 const settingsSchoolsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/schools',
   component: SchoolsSettingsPage,
   validateSearch: (search: Record<string, unknown>) => ({
     create: search.create as string | undefined,
+    leaId: search.leaId as string | undefined,
   }),
 })
 
@@ -558,6 +582,9 @@ const routeTree = rootRoute.addChildren([
       settingsNotificationsRoute,
       settingsGeneralRoute,
       settingsWorkspaceRoute,
+      settingsOrganizationRoute,
+      settingsEdOrgDetailRoute,
+      settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
       settingsSchoolsRoute,

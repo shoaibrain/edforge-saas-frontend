@@ -132,6 +132,73 @@ During development, the Shell proxies `/api` calls to `VITE_API_URL` (defaulting
 - `apps/shell/src/federation/tenant-resolver.ts` — tenant-aware remote resolution
 - `docker/nginx/nginx.conf` — dev proxy for shell/remotes
 
+## Deployment
+
+### Strategy: Consolidated Single-Origin Build
+
+All 8 apps (shell + 7 remotes) are deployed as **one static site**. Remote `remoteEntry.js` files are served under `/remotes/{name}/` on the same origin as the shell, eliminating CORS.
+
+```
+output/
+├── index.html                          (Shell SPA entry)
+├── static/                             (Shell JS/CSS chunks)
+├── remotes/
+│   ├── academics/remoteEntry.js        (+ chunks)
+│   ├── edfi/remoteEntry.js
+│   ├── finance/remoteEntry.js
+│   ├── special-programs/remoteEntry.js
+│   ├── people/remoteEntry.js
+│   ├── messages/remoteEntry.js
+│   └── analytics/remoteEntry.js
+```
+
+### Build
+
+```bash
+# Consolidated build (Turbo builds all apps, then merges outputs)
+pnpm build:deploy         # runs scripts/build-deploy.sh
+
+# Local verification
+npx serve output -l 5000
+```
+
+The build script (`scripts/build-deploy.sh`) runs `turbo build`, copies the shell's `dist/` as the output root, then copies each remote's `dist/` into `output/remotes/{name}/`.
+
+### How Remote Asset Resolution Works
+
+Each remote uses `publicPath: 'auto'` in its Rsbuild config. When the browser loads `/remotes/academics/remoteEntry.js`, Rspack's auto resolver sets `__webpack_public_path__` to `/remotes/academics/`. All chunk requests resolve relative to that directory. No remote config changes are needed for deployment.
+
+The shell uses `publicPath: '/'` and switches between localhost dev URLs and relative production paths via the `remoteUrl()` helper in `apps/shell/rsbuild.config.ts`.
+
+### Vercel
+
+The project deploys to Vercel as a single project (`vercel.json` at repo root):
+
+- **Build command:** `bash scripts/build-deploy.sh`
+- **Output directory:** `output/`
+- **SPA routing:** Vercel rewrites route all non-asset requests to `/index.html`
+- **Caching:** `remoteEntry.js` files use `no-cache` (federation manifest must be fresh); all other chunks use immutable caching (content-hashed filenames)
+
+### Environment Variables (Vercel Dashboard)
+
+| Variable | Purpose |
+|---|---|
+| `NODE_ENV` | `production` — triggers relative remote URLs |
+| `VITE_API_URL` | AWS API Gateway endpoint (direct calls, no proxy) |
+| `VITE_COGNITO_REGION` | Cognito region |
+| `VITE_COGNITO_USER_POOL_ID` | Cognito user pool ID |
+| `VITE_COGNITO_CLIENT_ID` | Cognito app client ID |
+| `VITE_COGNITO_DOMAIN` | Cognito domain |
+| `VITE_REDIRECT_SIGN_IN` | Must match Cognito allowed callback URL |
+| `VITE_REDIRECT_SIGN_OUT` | Must match Cognito allowed sign-out URL |
+
+Individual remote URLs (`VITE_ACADEMICS_URL`, etc.) are not needed — the consolidated build uses relative paths.
+
+### AWS Dependencies
+
+- **Cognito:** Add the Vercel domain to allowed callback/sign-out URLs in the app client settings.
+- **API Gateway:** Add the Vercel domain to the CORS allowed origins.
+
 ## Notes & Conventions
 
 - Route segments for remotes use splat routes (`/academics/*`, `/finance/*`) to allow internal routing.

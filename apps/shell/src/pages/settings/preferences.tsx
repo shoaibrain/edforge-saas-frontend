@@ -12,6 +12,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 import { 
   Palette, 
   Sun,
@@ -30,7 +31,6 @@ import {
   SettingsPageHeader,
   SettingsSection,
   SettingsCard,
-  SettingsAlert,
   SettingsSkeleton,
   staggerChildren,
   fadeInUp,
@@ -205,8 +205,6 @@ export default function PreferencesPage() {
   const { theme: localTheme, setTheme: setLocalTheme } = useThemeStore()
   
   // Local state
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
   
   // Local form state (used for immediate UI updates)
   const [theme, setTheme] = useState<Theme>(localTheme)
@@ -229,13 +227,10 @@ export default function PreferencesPage() {
     mutationFn: (data: UpdatePreferencesDto) => usersService.updatePreferences(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['preferences', user?.id] })
-      setSaveSuccess(true)
-      setSaveError(null)
-      setTimeout(() => setSaveSuccess(false), 3000)
+      toast.success('Preferences saved')
     },
     onError: (err: Error) => {
-      setSaveError(err.message || 'Failed to save preferences')
-      setSaveSuccess(false)
+      toast.error(err.message || 'Failed to save preferences')
     },
   })
 
@@ -301,26 +296,6 @@ export default function PreferencesPage() {
           description="Personal display settings for your account"
           icon={Palette}
         />
-
-        {/* Alerts */}
-        <AnimatePresence>
-          {saveSuccess && (
-            <SettingsAlert
-              type="success"
-              message="Preferences saved"
-              onDismiss={() => setSaveSuccess(false)}
-              autoDismiss
-              autoDismissDelay={2000}
-            />
-          )}
-          {saveError && (
-            <SettingsAlert
-              type="error"
-              message={saveError}
-              onDismiss={() => setSaveError(null)}
-            />
-          )}
-        </AnimatePresence>
 
         {/* Theme Section */}
         <SettingsSection

@@ -212,7 +212,7 @@ function QuickActionCard({ action, index, onClick }: QuickActionCardProps) {
 
 export default function HomePage() {
   const { user, activeSchool, navigate } = useShell()
-  const firstName = user?.name?.split(' ')[0]
+  const firstName = user?.displayName || user?.name?.split(' ')[0]
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">

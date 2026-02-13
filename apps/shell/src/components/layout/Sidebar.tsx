@@ -441,9 +441,14 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
   // Get active school data
   const activeSchool = schoolsArray.find(s => s.id === activeSchoolId)
 
-  // Auto-select first school if none selected
+  // Auto-select a valid school if none selected or current one doesn't exist
   useEffect(() => {
-    if (!activeSchoolId && visibleSchools.length > 0) {
+    if (visibleSchools.length === 0) return
+
+    // Check if current activeSchoolId matches a real school
+    const isValid = activeSchoolId && visibleSchools.some(s => s.id === activeSchoolId)
+
+    if (!isValid) {
       // Try to restore from localStorage first
       const savedSchoolId = localStorage.getItem(`edforge-active-school-${user.id}`)
       if (savedSchoolId && visibleSchools.some(s => s.id === savedSchoolId)) {
@@ -472,7 +477,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
 
   // Handle create school navigation
   const handleCreateSchool = () => {
-    navigate({ to: '/settings/schools', search: { create: 'true' } })
+    navigate({ to: '/settings/schools', search: { create: 'true', leaId: undefined } })
   }
 
   // ============================================================================

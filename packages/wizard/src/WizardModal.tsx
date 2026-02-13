@@ -201,19 +201,22 @@ export function WizardModal({
             onClick={onClose}
           />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={cn(
-              'fixed inset-x-4 top-[10vh] z-50 mx-auto',
-              'bg-[rgb(var(--surface-secondary))] rounded-2xl shadow-2xl overflow-hidden',
-              sizeClasses[size]
-            )}
-            onClick={(e) => e.stopPropagation()}
+          {/* Full-screen container for centering */}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto pointer-events-none"
           >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className={cn(
+                'w-full pointer-events-auto',
+                'bg-[rgb(var(--surface-secondary))] rounded-2xl shadow-2xl overflow-hidden',
+                sizeClasses[size]
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
             <WizardProvider
               steps={steps}
               initialData={initialData}
@@ -227,7 +230,8 @@ export function WizardModal({
                 onClose={onClose}
               />
             </WizardProvider>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

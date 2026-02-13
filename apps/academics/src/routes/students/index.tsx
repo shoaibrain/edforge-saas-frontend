@@ -10,9 +10,228 @@
  * following the "Object-Oriented" navigation pattern that reduces sidebar clutter.
  */
 
-import { Users, Search, Filter, Plus, GraduationCap, UserCheck, AlertCircle } from 'lucide-react'
+import { useMemo, useState, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import {
+  Users,
+  Plus,
+  GraduationCap,
+  UserCheck,
+  AlertCircle,
+  RefreshCw,
+  UserMinus,
+} from 'lucide-react'
+import { Button } from '@edforge/ui'
+import { StudentTable, StudentFilters, StudentDrawer } from '../../components/students'
+import { ConfirmationDialog } from '../../components/common'
+import {
+  useStudents,
+  flattenStudentPages,
+  getTotalFromPages,
+  useDeleteStudent,
+} from '../../hooks'
+import { useActiveSchoolId } from '../../stores'
+import { useStudentFilters } from '../../stores/students.store'
+import type { StudentResponseDto } from '@aibrains/shared-types'
+
+// ============================================================================
+// STAT CARD COMPONENT
+// ============================================================================
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  accent,
+  bg,
+  isLoading = false,
+}: {
+  icon: typeof Users
+  label: string
+  value: string | number
+  accent: string
+  bg: string
+  isLoading?: boolean
+}) {
+  return (
+    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${bg}`}>
+          <Icon className={`w-4 h-4 ${accent}`} />
+        </div>
+        <div>
+          <p className="text-sm text-text-secondary">{label}</p>
+          {isLoading ? (
+            <div className="h-7 w-16 bg-surface-tertiary rounded animate-pulse mt-0.5" />
+          ) : (
+            <p className="text-xl font-semibold text-text-primary">{value}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// NO SCHOOL SELECTED STATE
+// ============================================================================
+
+function NoSchoolSelected() {
+  return (
+    <div className="min-h-[400px] flex items-center justify-center">
+      <div className="text-center max-w-md">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-text-primary mb-2">
+          No School Selected
+        </h3>
+        <p className="text-text-secondary">
+          Please select a school from the sidebar to view students.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// ERROR STATE
+// ============================================================================
+
+function ErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="min-h-[400px] flex items-center justify-center">
+      <div className="text-center max-w-md">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-text-primary mb-2">
+          Failed to Load Students
+        </h3>
+        <p className="text-text-secondary mb-4">
+          Something went wrong while loading the student directory. Please try again.
+        </p>
+        <Button onClick={onRetry} variant="outline">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Retry
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export function StudentsModule() {
+  const navigate = useNavigate()
+
+  // Get active school from shared store
+  const activeSchoolId = useActiveSchoolId()
+
+  // Get filter state from store
+  const filters = useStudentFilters()
+
+  // Fetch students with filters
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useStudents({
+    schoolId: activeSchoolId ?? '',
+    filters: {
+      searchTerm: filters.searchTerm || undefined,
+      gradeLevel: filters.gradeLevel || undefined,
+      status: filters.status || undefined,
+    },
+    enabled: !!activeSchoolId,
+  })
+
+  // Flatten paginated data
+  const students = useMemo(() => flattenStudentPages(data), [data])
+  const totalCount = getTotalFromPages(data)
+
+  // Calculate stats from data
+  const stats = useMemo(() => {
+    if (!students.length) {
+      return {
+        total: totalCount ?? 0,
+        active: 0,
+        newEnrollments: 0,
+        pendingReview: 0,
+      }
+    }
+
+    const active = students.filter((s) => s.status === 'active').length
+    // For demo purposes, estimate new enrollments as students enrolled in last 30 days
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    const newEnrollments = students.filter((s) => {
+      if (!s.enrollmentDate) return false
+      return new Date(s.enrollmentDate) >= thirtyDaysAgo
+    }).length
+
+    // Pending review could be students with incomplete profiles
+    const pendingReview = students.filter(
+      (s) => s.status === 'inactive' || !s.contactInfo?.email
+    ).length
+
+    return {
+      total: totalCount ?? students.length,
+      active,
+      newEnrollments,
+      pendingReview,
+    }
+  }, [students, totalCount])
+
+  // Student drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<StudentResponseDto | null>(null)
+
+  // Withdrawal state
+  const [withdrawStudent, setWithdrawStudent] = useState<StudentResponseDto | null>(null)
+  const deleteStudentMutation = useDeleteStudent()
+
+  // Navigate to the full-page registration wizard
+  const handleAddStudent = () => {
+    navigate({ to: '/students/enrollment' })
+  }
+
+  // Open student drawer
+  const handleViewStudent = useCallback((student: StudentResponseDto) => {
+    setSelectedStudent(student)
+    setDrawerOpen(true)
+  }, [])
+
+  // Close student drawer
+  const handleCloseDrawer = useCallback(() => {
+    setDrawerOpen(false)
+    setSelectedStudent(null)
+  }, [])
+
+  // Handle withdraw from drawer
+  const handleWithdrawFromDrawer = useCallback((student: StudentResponseDto) => {
+    setDrawerOpen(false)
+    setSelectedStudent(null)
+    setWithdrawStudent(student)
+  }, [])
+
+  // Handle withdraw confirmation
+  const handleWithdrawConfirm = async () => {
+    if (!withdrawStudent) return
+    try {
+      await deleteStudentMutation.mutateAsync(withdrawStudent.studentId)
+      setWithdrawStudent(null)
+    } catch {
+      // Error handling is done in the mutation hook
+    }
+  }
+
   return (
     <div className="min-h-full">
       {/* Page Header */}
@@ -24,133 +243,114 @@ export function StudentsModule() {
                 <Users className="w-6 h-6 text-teal-600 dark:text-cyan-400" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-text-primary">Student Directory</h1>
+                <h1 className="text-2xl font-bold text-text-primary">
+                  Student Directory
+                </h1>
                 <p className="text-text-secondary mt-1">
                   Comprehensive student roster with enrollment status, demographics, and academic standing
                 </p>
               </div>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-white rounded-lg hover:bg-accent-primary/90 transition-colors">
-              <Plus className="w-4 h-4" />
-              <span>Add Student</span>
-            </button>
+            <Button
+              onClick={handleAddStudent}
+              disabled={!activeSchoolId}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Student
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard
-            icon={Users}
-            label="Total Enrolled"
-            value="1,247"
-            accent="text-teal-600 dark:text-cyan-400"
-            bg="bg-teal-500/10"
-          />
-          <StatCard
-            icon={GraduationCap}
-            label="Active This Term"
-            value="1,198"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
-          />
-          <StatCard
-            icon={UserCheck}
-            label="New Enrollments"
-            value="23"
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
-          />
-          <StatCard
-            icon={AlertCircle}
-            label="Pending Review"
-            value="8"
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
-          />
-        </div>
+        {/* No School Selected State */}
+        {!activeSchoolId ? (
+          <NoSchoolSelected />
+        ) : isError ? (
+          <ErrorState onRetry={() => refetch()} />
+        ) : (
+          <>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <StatCard
+                icon={Users}
+                label="Total Enrolled"
+                value={stats.total.toLocaleString()}
+                accent="text-teal-600 dark:text-cyan-400"
+                bg="bg-teal-500/10"
+                isLoading={isLoading}
+              />
+              <StatCard
+                icon={GraduationCap}
+                label="Active Students"
+                value={stats.active.toLocaleString()}
+                accent="text-blue-600 dark:text-blue-400"
+                bg="bg-blue-500/10"
+                isLoading={isLoading}
+              />
+              <StatCard
+                icon={UserCheck}
+                label="New Enrollments"
+                value={stats.newEnrollments.toLocaleString()}
+                accent="text-emerald-600 dark:text-emerald-400"
+                bg="bg-emerald-500/10"
+                isLoading={isLoading}
+              />
+              <StatCard
+                icon={AlertCircle}
+                label="Pending Review"
+                value={stats.pendingReview.toLocaleString()}
+                accent="text-amber-600 dark:text-amber-400"
+                bg="bg-amber-500/10"
+                isLoading={isLoading}
+              />
+            </div>
 
-        {/* Search & Filter Bar */}
-        <div className="flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-            <input
-              type="text"
-              placeholder="Search by name, ID, or grade level..."
-              className="w-full pl-10 pr-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
+            {/* Filters */}
+            <StudentFilters />
+
+            {/* Student Table */}
+            <StudentTable
+              students={students}
+              isLoading={isLoading}
+              hasMore={hasNextPage ?? false}
+              isFetchingMore={isFetchingNextPage}
+              onLoadMore={() => fetchNextPage()}
+              onAddStudent={handleAddStudent}
+              onViewStudent={handleViewStudent}
             />
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors">
-            <Filter className="w-4 h-4" />
-            <span>Filters</span>
-          </button>
-        </div>
-
-        {/* Product Description */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-teal-500/10">
-              <Users className="w-5 h-5 text-teal-600 dark:text-cyan-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-text-primary mb-2">
-                Unified Student Records
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Access individual student profiles with complete academic history, enrollment records, 
-                and demographic information. Click any student to view their detailed profile including 
-                grades, attendance, special program participation, and family contacts. Bulk operations 
-                support mass updates for grade promotions and term transitions.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Placeholder Table */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
-          <Users className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">
-            Student Roster
-          </h4>
-          <p className="text-text-secondary max-w-md mx-auto">
-            View all enrolled students organized by grade level or homeroom.
-            Click a student row to open their full profile with academic history.
-          </p>
-        </div>
+          </>
+        )}
       </div>
-    </div>
-  )
-}
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
-}: {
-  icon: typeof Users
-  label: string
-  value: string
-  accent: string
-  bg: string
-}) {
-  return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
-        </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
-        </div>
-      </div>
+      {/* Student Quick-Info Drawer */}
+      <StudentDrawer
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        student={selectedStudent}
+        onWithdraw={handleWithdrawFromDrawer}
+      />
+
+      {/* Withdrawal Confirmation Dialog */}
+      <ConfirmationDialog
+        open={!!withdrawStudent}
+        onClose={() => setWithdrawStudent(null)}
+        onConfirm={handleWithdrawConfirm}
+        title="Withdraw Student"
+        description={
+          withdrawStudent
+            ? `Are you sure you want to withdraw ${withdrawStudent.fullName}? This action can be reversed by a school administrator.`
+            : ''
+        }
+        confirmText="Withdraw"
+        cancelText="Cancel"
+        variant="destructive"
+        isLoading={deleteStudentMutation.isPending}
+        icon={<UserMinus className="w-5 h-5 text-red-600 dark:text-red-400" />}
+      />
     </div>
   )
 }
 
 export default StudentsModule
-

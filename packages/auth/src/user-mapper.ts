@@ -55,6 +55,7 @@ export function mapCognitoToUserIdentity(
     id: payload.sub,
     email: payload.email,
     name: payload.name ?? payload.email.split('@')[0],
+    displayName: payload.given_name || payload.nickname || payload.preferred_username || undefined,
     globalRole: mapGlobalRole(payload['custom:userRole']),
     tenantId: payload['custom:tenantId'],
     assignments: mapSchoolAssignments(schoolAssignments),
@@ -65,7 +66,7 @@ export function mapCognitoToUserIdentity(
 /**
  * Creates a minimal UserIdentity from just JWT claims
  * Used when school assignments haven't been fetched yet
- * 
+ *
  * @param payload - Decoded Cognito ID token payload
  * @returns Partial UserIdentity with empty assignments
  */
@@ -76,6 +77,7 @@ export function mapCognitoToPartialUserIdentity(
     id: payload.sub,
     email: payload.email,
     name: payload.name ?? payload.email.split('@')[0],
+    displayName: payload.given_name || payload.nickname || payload.preferred_username || undefined,
     globalRole: mapGlobalRole(payload['custom:userRole']),
     tenantId: payload['custom:tenantId'],
     assignments: {}, // Will be populated after API call

@@ -14,6 +14,7 @@ import { AcademicsLayout } from './layouts/AcademicsLayout'
 import { Overview } from './routes/overview'
 import { AttendanceModule } from './routes/attendance'
 import { StudentsModule } from './routes/students'
+import { StudentProfilePage } from './routes/students/$studentId'
 import { TeachersModule } from './routes/teachers'
 import { GradebookModule } from './routes/gradebook'
 import { EnrollmentModule } from './routes/enrollment'
@@ -29,6 +30,7 @@ import { ExamsModule } from './routes/exams'
 import { CalendarModule } from './routes/calendar'
 import { GradesModule } from './routes/grades'
 import { SchedulingModule } from './routes/scheduling'
+import { SectionDetailPage } from './routes/scheduling/$sectionId'
 import { CurriculumModule } from './routes/curriculum'
 
 // ============================================================================
@@ -65,6 +67,12 @@ const studentEnrollmentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/enrollment',
     component: EnrollmentModule,
+})
+
+const studentProfileRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/students/$studentId',
+    component: StudentProfilePage,
 })
 
 const studentProfilesRoute = createRoute({
@@ -169,6 +177,13 @@ const schedulingRoute = createRoute({
     component: SchedulingModule,
 })
 
+// Section detail - individual section view
+const sectionDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/scheduling/$sectionId',
+    component: SectionDetailPage,
+})
+
 // Curriculum - Consolidated view of courses, grade levels, and standards
 const curriculumRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -184,6 +199,7 @@ const routeTree = rootRoute.addChildren([
     indexRoute,
     studentsRoute,
     studentEnrollmentRoute,
+    studentProfileRoute,
     studentProfilesRoute,
     teachersRoute,
     classroomsRoute,
@@ -200,6 +216,7 @@ const routeTree = rootRoute.addChildren([
     // Consolidated routes
     gradesRoute,
     schedulingRoute,
+    sectionDetailRoute,
     curriculumRoute,
 ])
 

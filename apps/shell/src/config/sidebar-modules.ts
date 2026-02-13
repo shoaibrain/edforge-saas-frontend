@@ -58,6 +58,8 @@ import {
   Baby,
   // Auth Debug
   Bug,
+  // Organization
+  Building2,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -470,11 +472,11 @@ const settingsModule: ModuleConfig = {
           permission: { action: 'view', resource: 'settings:tenant' },
         },
         {
-          id: 'school-settings',
-          label: 'School Settings',
-          icon: School,
-          href: '/settings/schools',
-          permission: { action: 'view', resource: 'settings:school' },
+          id: 'organization',
+          label: 'Organization',
+          icon: Building2,
+          href: '/settings/organization',
+          permission: { action: 'view', resource: 'education-organizations' },
         },
         {
           id: 'rbac-security',

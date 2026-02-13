@@ -97,6 +97,10 @@ export type Resource =
   | 'special-programs'
   | 'special-programs:ieps'
   | 'special-programs:504'
+  // Education Organizations (Sprint 1A)
+  | 'education-organizations'
+  // Employment History (Sprint 1A)
+  | 'employment-history'
 
 // ============================================================================
 // ROLE → PERMISSION MAPPING
@@ -172,6 +176,8 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     'special-programs': ['view', 'manage'],
     'special-programs:ieps': ['view', 'create', 'edit', 'delete', 'manage'],
     'special-programs:504': ['view', 'create', 'edit', 'delete', 'manage'],
+    'education-organizations': ['view', 'create', 'edit', 'delete', 'manage'],
+    'employment-history': ['view'],
   },
   Teacher: {
     dashboard: ['view'],
@@ -208,6 +214,7 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     'student-portal:assignments': ['view'],
     settings: ['view'],
     'special-programs': ['view'],
+    'education-organizations': ['view'],
   },
   Accountant: {
     dashboard: ['view'],
@@ -255,6 +262,8 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     messages: ['view', 'create', 'send'],
     notifications: ['view'],
     'special-programs': ['view'],
+    'education-organizations': ['view'],
+    'employment-history': ['view'],
   },
   Student: {
     dashboard: ['view'],

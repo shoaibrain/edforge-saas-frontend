@@ -9,6 +9,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 import { 
   Mail, 
   Camera, 
@@ -33,7 +34,6 @@ import {
   SettingsPageHeader,
   SettingsSection,
   SettingsFormCard,
-  SettingsAlert,
   SettingsSkeleton,
   SettingsDivider,
   SaveButton,
@@ -350,8 +350,6 @@ export default function AccountPage() {
   const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
   
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
 
   // Fetch user profile from API
@@ -374,13 +372,10 @@ export default function AccountPage() {
     mutationFn: (data: UpdateUserDto) => usersService.updateUser(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', user?.id] })
-      setSaveSuccess(true)
-      setSaveError(null)
-      setTimeout(() => setSaveSuccess(false), 3000)
+      toast.success('Profile updated successfully')
     },
     onError: (err: Error) => {
-      setSaveError(err.message || 'Failed to update profile')
-      setSaveSuccess(false)
+      toast.error(err.message || 'Failed to update profile')
     },
   })
 
@@ -448,8 +443,6 @@ export default function AccountPage() {
   }, [userProfile, user, reset])
 
   const onSubmit = async (data: UserProfileFormValues) => {
-    setSaveError(null)
-    
     const address: Partial<UserAddress> = {}
     if (data.address?.street) address.street = data.address.street
     if (data.address?.street2) address.street2 = data.address.street2
@@ -478,7 +471,7 @@ export default function AccountPage() {
       await usersService.uploadAvatar(user.id, file)
       queryClient.invalidateQueries({ queryKey: ['user', user.id] })
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Failed to upload photo')
+      toast.error(err instanceof Error ? err.message : 'Failed to upload photo')
     } finally {
       setAvatarUploading(false)
     }
@@ -491,7 +484,7 @@ export default function AccountPage() {
       await usersService.removeAvatar(user.id)
       queryClient.invalidateQueries({ queryKey: ['user', user.id] })
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Failed to remove photo')
+      toast.error(err instanceof Error ? err.message : 'Failed to remove photo')
     } finally {
       setAvatarUploading(false)
     }
@@ -540,32 +533,13 @@ export default function AccountPage() {
               title="My Account"
               description="Manage your personal information"
               action={
-                <SaveButton 
-                  isDirty={isDirty} 
-                  isSaving={updateMutation.isPending} 
-                  saveSuccess={saveSuccess} 
+                <SaveButton
+                  isDirty={isDirty}
+                  isSaving={updateMutation.isPending}
+                  saveSuccess={false}
                 />
               }
             />
-
-            {/* Alerts */}
-            <AnimatePresence>
-              {saveSuccess && (
-                <SettingsAlert
-                  type="success"
-                  message="Profile updated successfully"
-                  onDismiss={() => setSaveSuccess(false)}
-                  autoDismiss
-                />
-              )}
-              {saveError && (
-                <SettingsAlert
-                  type="error"
-                  message={saveError}
-                  onDismiss={() => setSaveError(null)}
-                />
-              )}
-            </AnimatePresence>
 
             {/* Profile Photo Section */}
             <motion.div variants={fadeInUp}>

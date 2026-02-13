@@ -53,6 +53,8 @@ export interface UserIdentity {
   id: string
   email: string
   name: string
+  /** User's preferred display name (e.g. first name) */
+  displayName?: string
   globalRole: GlobalRole
   tenantId: string
   /** Map of SchoolID → Role within that school */

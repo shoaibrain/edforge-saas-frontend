@@ -50,4 +50,22 @@ export {
   TableCell,
 } from './components/Table'
 export { Dropdown, type DropdownOption } from './components/Dropdown'
+export {
+  DataTable,
+  type Column,
+  type DataTableProps,
+  type DataTableEmptyState,
+} from './components/DataTable'
+export {
+  Modal,
+  ModalFooter,
+  type ModalProps,
+  type ModalFooterProps,
+} from './components/Modal'
+export {
+  Drawer,
+  DrawerFooter,
+  type DrawerProps,
+  type DrawerFooterProps,
+} from './components/Drawer'
 

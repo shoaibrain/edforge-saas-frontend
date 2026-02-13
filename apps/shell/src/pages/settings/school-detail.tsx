@@ -16,11 +16,16 @@ import {
   Settings,
   Users,
   Calendar,
+  CalendarDays,
+  Clock,
+  MapPin,
   Building2,
   Trash2,
   AlertTriangle,
   X,
+  MoreHorizontal,
 } from 'lucide-react'
+import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { useAuthStore } from '@/stores/auth.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
@@ -31,6 +36,9 @@ import { Button } from '@edforge/ui'
 import SchoolConfigurationPage from './school-configuration'
 import SchoolDepartmentsPage from './school-departments'
 import SchoolAcademicYearsPage from './school-academic-years'
+import SchoolCalendarPage from './school-calendar'
+import SchoolBellSchedulePage from './school-bell-schedule'
+import SchoolRoomsPage from './school-rooms'
 
 // ============================================================================
 // CONSTANTS
@@ -51,12 +59,15 @@ const SCHOOL_TYPE_LABELS: Record<string, string> = {
 // TYPES
 // ============================================================================
 
-type SchoolTab = 'configuration' | 'departments' | 'academic-years'
+type SchoolTab = 'configuration' | 'departments' | 'academic-years' | 'calendar' | 'bell-schedule' | 'rooms'
 
 const TABS: { id: SchoolTab; label: string; icon: typeof Settings }[] = [
   { id: 'configuration', label: 'Configuration', icon: Settings },
   { id: 'departments', label: 'Departments', icon: Users },
   { id: 'academic-years', label: 'Academic Years', icon: Calendar },
+  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  { id: 'bell-schedule', label: 'Bell Schedule', icon: Clock },
+  { id: 'rooms', label: 'Rooms', icon: MapPin },
 ]
 
 // ============================================================================
@@ -202,7 +213,7 @@ export default function SchoolDetailPage() {
     mutationFn: () => tenantService.deleteSchool(schoolId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['schools'] })
-      navigate({ to: '/settings/schools', search: { create: undefined } })
+      navigate({ to: '/settings/schools', search: { create: undefined, leaId: undefined } })
     },
   })
 
@@ -280,17 +291,35 @@ export default function SchoolDetailPage() {
           
           {/* Right: Actions */}
           {isTenantAdmin && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDeleteModal(true)}
-                className="text-rust-500 hover:text-rust-600 hover:bg-rust-500/10 border-rust-500/30"
+            <Menu as="div" className="relative">
+              <MenuButton className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/20">
+                <MoreHorizontal className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
+              </MenuButton>
+              <Transition
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
               >
-                <Trash2 className="w-4 h-4 mr-1.5" />
-                Delete
-              </Button>
-            </div>
+                <MenuItems className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+                  <div className="py-1">
+                    <MenuItem>
+                      {({ active }) => (
+                        <button
+                          onClick={() => setShowDeleteModal(true)}
+                          className={`flex items-center w-full px-3 py-2.5 text-sm text-red-600 ${active ? 'bg-red-50 dark:bg-red-500/10' : ''}`}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2.5" />
+                          Delete School
+                        </button>
+                      )}
+                    </MenuItem>
+                  </div>
+                </MenuItems>
+              </Transition>
+            </Menu>
           )}
         </div>
 
@@ -350,6 +379,9 @@ export default function SchoolDetailPage() {
               {activeTab === 'configuration' && <SchoolConfigurationPage schoolId={schoolId} school={displaySchool} />}
               {activeTab === 'departments' && <SchoolDepartmentsPage schoolId={schoolId} />}
               {activeTab === 'academic-years' && <SchoolAcademicYearsPage schoolId={schoolId} />}
+              {activeTab === 'calendar' && <SchoolCalendarPage schoolId={schoolId} />}
+              {activeTab === 'bell-schedule' && <SchoolBellSchedulePage schoolId={schoolId} />}
+              {activeTab === 'rooms' && <SchoolRoomsPage schoolId={schoolId} />}
             </motion.div>
           </AnimatePresence>
         </div>

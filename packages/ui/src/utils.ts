@@ -15,8 +15,14 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Generate a DiceBear avatar URL from a name
  */
-export function getUserAvatar(name: string, style: string = 'initials'): string {
-  const seed = encodeURIComponent(name)
-  return `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}&backgroundColor=0a9396,005f73,94d2bd&textColor=ffffff`
+export function getUserAvatar(name: string, style: string = 'lorelei'): string {
+  const params = new URLSearchParams({
+    seed: name,
+    size: '128',
+    radius: '50',
+  })
+  const bgColors = ['b6e3f4', 'c0aede', 'd1d4f9', 'ffd5dc', 'ffdfbf']
+  bgColors.forEach((color) => params.append('backgroundColor', color))
+  return `https://api.dicebear.com/7.x/${style}/svg?${params.toString()}`
 }
 

@@ -17,3 +17,33 @@ export type {
   ModalState,
   UseModalStateResult,
 } from './useModalState'
+
+export {
+  staffKeys,
+  useStaffList,
+  useStaffDetail,
+  useStaffAssignments,
+  useStaffEmploymentHistory,
+  useCreateStaff,
+  useCreateStaffWithUser,
+  useUpdateStaff,
+  useDeleteStaff,
+  useCreateAssignment,
+  useUpdateAssignment,
+  useRemoveAssignment,
+  useUpdateEmploymentStatus,
+  // Credentials
+  useStaffCredentials,
+  useCreateCredential,
+  useUpdateCredential,
+  useDeleteCredential,
+  // Leave
+  useStaffLeaveRequests,
+  useCreateLeaveRequest,
+  useApproveLeave,
+  useRejectLeave,
+  useCancelLeave,
+} from './useStaff'
+
+export { useSchools } from './useSchools'
+export type { School, UseSchoolsResult } from './useSchools'
