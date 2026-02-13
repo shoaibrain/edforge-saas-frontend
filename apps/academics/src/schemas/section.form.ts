@@ -35,6 +35,11 @@ export const sectionFormSchema = z.object({
   // Academic Session
   academicYearId: z.string().min(1, 'Please select an academic year'),
   termId: z.string().optional(),
+
+  // Master Schedule references (Sprint 3)
+  courseOfferingId: z.string().optional(),
+  classPeriodId: z.string().optional(),
+  locationId: z.string().optional(),
 })
 
 export type SectionFormData = z.infer<typeof sectionFormSchema>
@@ -53,6 +58,9 @@ export const defaultSectionFormData: Partial<SectionFormData> = {
   maxEnrollment: 30,
   academicYearId: '',
   termId: '',
+  courseOfferingId: '',
+  classPeriodId: '',
+  locationId: '',
 }
 
 // ============================================================================

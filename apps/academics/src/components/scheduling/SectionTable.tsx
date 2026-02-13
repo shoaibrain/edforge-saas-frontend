@@ -231,12 +231,22 @@ export function SectionTable({
         ),
       },
       {
+        key: 'period',
+        header: 'Period',
+        width: '120px',
+        render: (section) => (
+          <span className="text-sm text-text-secondary">
+            {section.periodName || '—'}
+          </span>
+        ),
+      },
+      {
         key: 'room',
         header: 'Room',
         width: '100px',
         render: (section) => (
           <span className="text-sm text-text-secondary">
-            {section.roomNumber || '—'}
+            {section.locationRoomNumber || section.roomNumber || '—'}
           </span>
         ),
       },

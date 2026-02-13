@@ -17,6 +17,8 @@ import {
   Users,
   Calendar,
   CalendarDays,
+  Clock,
+  MapPin,
   Building2,
   Trash2,
   AlertTriangle,
@@ -35,6 +37,8 @@ import SchoolConfigurationPage from './school-configuration'
 import SchoolDepartmentsPage from './school-departments'
 import SchoolAcademicYearsPage from './school-academic-years'
 import SchoolCalendarPage from './school-calendar'
+import SchoolBellSchedulePage from './school-bell-schedule'
+import SchoolRoomsPage from './school-rooms'
 
 // ============================================================================
 // CONSTANTS
@@ -55,13 +59,15 @@ const SCHOOL_TYPE_LABELS: Record<string, string> = {
 // TYPES
 // ============================================================================
 
-type SchoolTab = 'configuration' | 'departments' | 'academic-years' | 'calendar'
+type SchoolTab = 'configuration' | 'departments' | 'academic-years' | 'calendar' | 'bell-schedule' | 'rooms'
 
 const TABS: { id: SchoolTab; label: string; icon: typeof Settings }[] = [
   { id: 'configuration', label: 'Configuration', icon: Settings },
   { id: 'departments', label: 'Departments', icon: Users },
   { id: 'academic-years', label: 'Academic Years', icon: Calendar },
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  { id: 'bell-schedule', label: 'Bell Schedule', icon: Clock },
+  { id: 'rooms', label: 'Rooms', icon: MapPin },
 ]
 
 // ============================================================================
@@ -374,6 +380,8 @@ export default function SchoolDetailPage() {
               {activeTab === 'departments' && <SchoolDepartmentsPage schoolId={schoolId} />}
               {activeTab === 'academic-years' && <SchoolAcademicYearsPage schoolId={schoolId} />}
               {activeTab === 'calendar' && <SchoolCalendarPage schoolId={schoolId} />}
+              {activeTab === 'bell-schedule' && <SchoolBellSchedulePage schoolId={schoolId} />}
+              {activeTab === 'rooms' && <SchoolRoomsPage schoolId={schoolId} />}
             </motion.div>
           </AnimatePresence>
         </div>

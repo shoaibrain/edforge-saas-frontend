@@ -45,6 +45,15 @@ export type {
   SectionRosterResponseDto,
   StudentSectionResponseDto,
   EnrollStudentInSectionDto,
+  CourseOfferingResponseDto,
+  CourseOfferingListResponseDto,
+  CourseOfferingFilterDto,
+  CreateCourseOfferingDto,
+  UpdateCourseOfferingDto,
+  ClassPeriodResponseDto,
+  ClassPeriodListResponseDto,
+  LocationResponseDto,
+  LocationListResponseDto,
 } from '@aibrains/shared-types'
 
 // Import for internal use
@@ -68,6 +77,13 @@ import type {
   CreateSectionDto,
   UpdateSectionDto,
   SectionRosterResponseDto,
+  CourseOfferingResponseDto,
+  CourseOfferingListResponseDto,
+  CourseOfferingFilterDto,
+  CreateCourseOfferingDto,
+  UpdateCourseOfferingDto,
+  ClassPeriodListResponseDto,
+  LocationListResponseDto,
 } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -1055,6 +1071,102 @@ export async function finalizeGrade(gradeId: string): Promise<void> {
 }
 
 // ============================================================================
+// COURSE OFFERING CRUD OPERATIONS (Sprint 3)
+// ============================================================================
+
+/**
+ * List course offerings with optional filters
+ * GET /academics/course-offerings
+ */
+export async function getCourseOfferings(
+  params: CourseOfferingFilterDto & PaginationQuery
+): Promise<CourseOfferingListResponseDto> {
+  const queryParams: Record<string, unknown> = {}
+
+  if (params.schoolId) queryParams.schoolId = params.schoolId
+  if (params.courseId) queryParams.courseId = params.courseId
+  if (params.academicSessionId) queryParams.academicSessionId = params.academicSessionId
+  if (params.limit) queryParams.limit = params.limit
+  if (params.cursor) queryParams.cursor = params.cursor
+
+  return apiGet<CourseOfferingListResponseDto>('/academics/course-offerings', queryParams)
+}
+
+/**
+ * Get course offering by ID
+ * GET /academics/course-offerings/:id?schoolId=
+ */
+export async function getCourseOffering(
+  courseOfferingId: string,
+  schoolId: string
+): Promise<CourseOfferingResponseDto> {
+  return apiGet<CourseOfferingResponseDto>(
+    `/academics/course-offerings/${courseOfferingId}`,
+    { schoolId }
+  )
+}
+
+/**
+ * Create a new course offering
+ * POST /academics/course-offerings
+ */
+export async function createCourseOffering(
+  data: CreateCourseOfferingDto
+): Promise<CourseOfferingResponseDto> {
+  return apiPost<CourseOfferingResponseDto>('/academics/course-offerings', data)
+}
+
+/**
+ * Update course offering
+ * PATCH /academics/course-offerings/:id?schoolId=
+ */
+export async function updateCourseOffering(
+  courseOfferingId: string,
+  schoolId: string,
+  data: UpdateCourseOfferingDto
+): Promise<CourseOfferingResponseDto> {
+  return apiPatch<CourseOfferingResponseDto>(
+    `/academics/course-offerings/${courseOfferingId}?schoolId=${schoolId}`,
+    data
+  )
+}
+
+/**
+ * Delete course offering
+ * DELETE /academics/course-offerings/:id?schoolId=
+ */
+export async function deleteCourseOffering(
+  courseOfferingId: string,
+  schoolId: string
+): Promise<void> {
+  return apiDelete(`/academics/course-offerings/${courseOfferingId}?schoolId=${schoolId}`)
+}
+
+// ============================================================================
+// CROSS-SERVICE: IDENTITY CLASS PERIODS & LOCATIONS (Sprint 3)
+// ============================================================================
+
+/**
+ * List class periods for a school (Identity service via API Gateway)
+ * GET /schools/:schoolId/class-periods
+ */
+export async function getClassPeriods(
+  schoolId: string
+): Promise<ClassPeriodListResponseDto> {
+  return apiGet<ClassPeriodListResponseDto>(`/schools/${schoolId}/class-periods`)
+}
+
+/**
+ * List locations/rooms for a school (Identity service via API Gateway)
+ * GET /schools/:schoolId/locations
+ */
+export async function getLocations(
+  schoolId: string
+): Promise<LocationListResponseDto> {
+  return apiGet<LocationListResponseDto>(`/schools/${schoolId}/locations`)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -1088,6 +1200,15 @@ export const academicsService = {
   getSectionRoster,
   enrollStudentInSection,
   removeStudentFromSection,
+  // Course Offerings
+  getCourseOfferings,
+  getCourseOffering,
+  createCourseOffering,
+  updateCourseOffering,
+  deleteCourseOffering,
+  // Cross-service (Identity)
+  getClassPeriods,
+  getLocations,
   // Attendance
   recordAttendance,
   recordBulkAttendance,

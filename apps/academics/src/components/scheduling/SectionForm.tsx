@@ -7,9 +7,11 @@
 
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { User, BookOpen, MapPin } from 'lucide-react'
+import { User, BookOpen, MapPin, CalendarClock } from 'lucide-react'
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
+import { useCourseOfferings, flattenOfferingPages } from '../../hooks/useCourseOfferings'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
+import { useSchoolClassPeriods, useSchoolLocations } from '../../hooks/useScheduleResources'
 import { useAcademicYears } from '../../hooks/useSchool'
 import { useGradingPeriods } from '../../hooks/useSchool'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -110,6 +112,21 @@ export function SectionForm({ isEdit }: SectionFormProps) {
     academicYearId || '',
     !!academicYearId
   )
+
+  // Sprint 3: Fetch schedule resources from Identity service
+  const { data: classPeriodsData } = useSchoolClassPeriods(schoolId)
+  const classPeriods = classPeriodsData?.items || []
+  const { data: locationsData } = useSchoolLocations(schoolId)
+  const locations = (locationsData?.items || []).filter((l) => l.isActive)
+
+  // Sprint 3: Fetch course offerings filtered by selected course
+  const courseId = watch('courseId')
+  const offeringsData = useCourseOfferings({
+    schoolId,
+    courseId: courseId || undefined,
+    enabled: !!schoolId && !!courseId,
+  })
+  const offerings = flattenOfferingPages(offeringsData.data)
 
   // Auto-select current academic year on mount
   useEffect(() => {
@@ -264,6 +281,54 @@ export function SectionForm({ isEdit }: SectionFormProps) {
             </select>
           </Field>
         </div>
+      </FormSection>
+
+      {/* Master Schedule (Sprint 3) */}
+      <FormSection
+        title="Schedule"
+        description="Link to bell schedule period, room, and course offering."
+        icon={CalendarClock}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Class Period" error={errors.classPeriodId?.message}>
+            <select {...register('classPeriodId')} className={selectClass}>
+              <option value="">No period assigned</option>
+              {classPeriods
+                .sort((a, b) => a.sortOrder - b.sortOrder)
+                .map((p) => (
+                  <option key={p.periodId} value={p.periodId}>
+                    {p.classPeriodName} ({p.startTime} - {p.endTime})
+                  </option>
+                ))}
+            </select>
+          </Field>
+
+          <Field label="Location / Room" error={errors.locationId?.message}>
+            <select {...register('locationId')} className={selectClass}>
+              <option value="">No room assigned</option>
+              {locations.map((l) => (
+                <option key={l.locationId} value={l.locationId}>
+                  {l.roomNumber}{l.buildingName ? ` (${l.buildingName})` : ''}
+                  {l.capacity ? ` — ${l.capacity} seats` : ''}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
+        {courseId && (
+          <Field label="Course Offering" error={errors.courseOfferingId?.message}>
+            <select {...register('courseOfferingId')} className={selectClass}>
+              <option value="">No offering linked</option>
+              {offerings.map((o) => (
+                <option key={o.courseOfferingId} value={o.courseOfferingId}>
+                  {o.courseName || o.courseCode} — {o.sessionName || o.academicSessionId}
+                  {o.localCourseCode ? ` (${o.localCourseCode})` : ''}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
       </FormSection>
     </div>
   )
