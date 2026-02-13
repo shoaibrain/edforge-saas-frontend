@@ -62,4 +62,10 @@ export {
   type ModalProps,
   type ModalFooterProps,
 } from './components/Modal'
+export {
+  Drawer,
+  DrawerFooter,
+  type DrawerProps,
+  type DrawerFooterProps,
+} from './components/Drawer'
 
