@@ -275,7 +275,7 @@ export function AttendanceModule() {
       if (!schoolId || !selectedSectionId) return
       // Persist locally for offline resilience
       offlineState.persistLocally(
-        records.map(r => ({ ...r, status: r.status }))
+        records.map(r => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '' }))
       )
       // Then save to server
       offlineState.save()

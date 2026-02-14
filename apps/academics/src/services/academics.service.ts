@@ -1238,7 +1238,7 @@ export interface CalendarDateInfo {
 
 /**
  * Check calendar date for attendance validation
- * GET /identity/schools/:schoolId/calendar-dates/:date
+ * GET /schools/:schoolId/calendar-dates/:date
  * Returns null if the date is not found (404)
  */
 export async function getCalendarDate(
@@ -1247,7 +1247,7 @@ export async function getCalendarDate(
 ): Promise<CalendarDateInfo | null> {
   try {
     return await apiGet<CalendarDateInfo>(
-      `/identity/schools/${schoolId}/calendar-dates/${date}`
+      `/schools/${schoolId}/calendar-dates/${date}`
     )
   } catch (error: any) {
     if (error.response?.status === 404) return null

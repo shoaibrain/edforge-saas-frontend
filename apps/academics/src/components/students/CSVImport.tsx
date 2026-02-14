@@ -19,6 +19,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useImportStudentsCsv } from '../../hooks/useStudents'
+import type { CsvImportResult } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
 
 // ============================================================================
@@ -127,12 +128,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
     headers: [],
     rows: [],
   })
-  const [importResult, setImportResult] = useState<{
-    imported: number
-    skipped: number
-    errors: Array<{ row: number; field: string; message: string }>
-    duplicates: Array<{ row: number; matches: Array<{ studentId: string; name: string; confidence: string }> }>
-  } | null>(null)
+  const [importResult, setImportResult] = useState<CsvImportResult | null>(null)
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -434,7 +430,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   <ul className="text-xs text-[rgb(var(--text-secondary))] space-y-1 ml-6">
                     {importResult.duplicates.slice(0, 10).map((d) => (
                       <li key={d.row}>
-                        Row {d.row}: matched {d.matches.map((m) => m.name).join(', ')} ({d.matches[0]?.confidence} confidence)
+                        Row {d.row}: matched {d.matches.map((m) => `${m.firstName} ${m.lastName}`).join(', ')} ({d.matches[0]?.confidence} confidence)
                       </li>
                     ))}
                     {importResult.duplicates.length > 10 && (

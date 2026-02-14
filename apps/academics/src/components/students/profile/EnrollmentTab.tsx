@@ -85,7 +85,7 @@ function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollmen
             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Entry Date</p>
             <p className="text-sm text-text-primary flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-text-tertiary" />
-              {formatDate(enrollment.entryDate || enrollment.enrollmentDate)}
+              {formatDate(enrollment.enrollmentDate)}
             </p>
           </div>
           <div>
@@ -144,11 +144,11 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
                     {enrollment.academicYearName || '—'}
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
-                    {formatDate(enrollment.entryDate || enrollment.enrollmentDate, 'short')}
+                    {formatDate(enrollment.enrollmentDate, 'short')}
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
-                    {(enrollment.exitWithdrawDate || enrollment.withdrawalDate)
-                      ? formatDate(enrollment.exitWithdrawDate || enrollment.withdrawalDate!, 'short')
+                    {enrollment.withdrawalDate
+                      ? formatDate(enrollment.withdrawalDate, 'short')
                       : '—'}
                   </td>
                   <td className="py-3 px-3">

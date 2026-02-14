@@ -71,7 +71,6 @@ export function DuplicateWarning({
   if (matches.length === 0) return null
 
   const highConfidence = matches.filter((m) => m.confidence === 'high')
-  const otherMatches = matches.filter((m) => m.confidence !== 'high')
 
   return (
     <AnimatePresence>

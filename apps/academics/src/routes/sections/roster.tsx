@@ -13,7 +13,6 @@ import { useParams, useNavigate } from '@tanstack/react-router'
 import {
   ArrowLeft,
   Search,
-  UserPlus,
   UserMinus,
   Users,
   Check,
@@ -21,7 +20,6 @@ import {
   GraduationCap,
   AlertCircle,
   ChevronRight,
-  ChevronLeft,
 } from 'lucide-react'
 import { z } from 'zod'
 import { toast } from 'sonner'

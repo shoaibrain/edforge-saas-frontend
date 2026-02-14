@@ -206,11 +206,23 @@ export function ShellProvider({ children }: ShellProviderProps) {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // Fetch current school year
+  // Fetch current academic year for the active school
   const { data: schoolYear } = useQuery({
-    queryKey: ['currentSchoolYear', user?.tenantId],
-    queryFn: () => tenantService.getCurrentSchoolYear(user!.tenantId),
-    enabled: isAuthenticated && !!user?.tenantId,
+    queryKey: ['currentAcademicYear', activeSchoolId],
+    queryFn: async () => {
+      const year = await tenantService.getCurrentAcademicYear(activeSchoolId!)
+      if (!year) return null
+      // Map AcademicYear → SchoolYear for context compatibility
+      return {
+        id: year.id,
+        name: year.name,
+        startDate: year.startDate,
+        endDate: year.endDate,
+        isCurrent: year.status === 'active',
+        terms: year.terms,
+      } satisfies SchoolYear
+    },
+    enabled: isAuthenticated && !!activeSchoolId,
     retry: false,
     staleTime: 30 * 60 * 1000, // 30 minutes
   })

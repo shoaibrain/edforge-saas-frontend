@@ -51,6 +51,8 @@ export {
   useAcademicYears,
   useCurrentAcademicYear,
   useGradingPeriods,
+  useSetCurrentAcademicYear,
+  useUpdateAcademicYearStatus,
   schoolKeys,
 } from './useSchool'
 export {

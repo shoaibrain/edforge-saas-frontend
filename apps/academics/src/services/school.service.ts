@@ -5,7 +5,7 @@
  * Used by section forms and scheduling page to populate selectors.
  */
 
-import { apiGet } from '../lib/api'
+import { apiGet, apiPut } from '../lib/api'
 
 // ============================================================================
 // TYPES
@@ -92,6 +92,39 @@ export async function getGradingPeriods(
 }
 
 // ============================================================================
+// ACADEMIC YEAR MUTATIONS
+// ============================================================================
+
+/**
+ * Set an academic year as the current year for a school.
+ * Backend clears `isCurrent` from any previously-current year atomically.
+ * PUT /schools/:schoolId/academic-years/:yearId/set-current
+ */
+export async function setCurrentAcademicYear(
+  schoolId: string,
+  yearId: string
+): Promise<AcademicYearResponseDto> {
+  return apiPut<AcademicYearResponseDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/set-current`
+  )
+}
+
+/**
+ * Update the status of an academic year
+ * PUT /schools/:schoolId/academic-years/:yearId/status
+ */
+export async function updateAcademicYearStatus(
+  schoolId: string,
+  yearId: string,
+  status: AcademicYearResponseDto['status']
+): Promise<AcademicYearResponseDto> {
+  return apiPut<AcademicYearResponseDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/status`,
+    { status }
+  )
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -99,4 +132,6 @@ export const schoolService = {
   getAcademicYears,
   getCurrentAcademicYear,
   getGradingPeriods,
+  setCurrentAcademicYear,
+  updateAcademicYearStatus,
 }

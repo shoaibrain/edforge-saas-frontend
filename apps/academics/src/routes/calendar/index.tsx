@@ -1,110 +1,214 @@
 /**
  * Academic Calendar Module
  *
- * School year calendar management for the Academics domain.
- * Defines terms, holidays, and important academic dates.
+ * Academic year management page. View all academic years,
+ * set one as current, and advance statuses with business-rule enforcement.
  */
 
-import { Calendar, CalendarDays, Sun, Star, Clock, Plus } from 'lucide-react'
+import { useMemo, useState, useCallback } from 'react'
+import {
+  Calendar,
+  CalendarDays,
+  Star,
+  Clock,
+  CheckCircle2,
+  ChevronRight,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react'
+import { Button } from '@edforge/ui'
+import { ConfirmationDialog } from '../../components/common'
+import {
+  useAcademicYears,
+  useCurrentAcademicYear,
+  useSetCurrentAcademicYear,
+  useUpdateAcademicYearStatus,
+} from '../../hooks'
+import { useActiveSchoolId } from '../../stores/app.store'
+import type { AcademicYearResponseDto } from '../../services/school.service'
 
-export function CalendarModule() {
+// ============================================================================
+// STATUS CONFIG
+// ============================================================================
+
+const statusConfig: Record<
+  AcademicYearResponseDto['status'],
+  { label: string; bg: string; text: string; dot: string }
+> = {
+  planning: {
+    label: 'Planning',
+    bg: 'bg-blue-100 dark:bg-blue-500/20',
+    text: 'text-blue-700 dark:text-blue-400',
+    dot: 'bg-blue-500',
+  },
+  active: {
+    label: 'Active',
+    bg: 'bg-emerald-100 dark:bg-emerald-500/20',
+    text: 'text-emerald-700 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+  },
+  completed: {
+    label: 'Completed',
+    bg: 'bg-amber-100 dark:bg-amber-500/20',
+    text: 'text-amber-700 dark:text-amber-400',
+    dot: 'bg-amber-500',
+  },
+  archived: {
+    label: 'Archived',
+    bg: 'bg-slate-100 dark:bg-slate-500/20',
+    text: 'text-slate-600 dark:text-slate-400',
+    dot: 'bg-slate-500',
+  },
+}
+
+// Forward-only status transitions
+const NEXT_STATUS: Record<
+  AcademicYearResponseDto['status'],
+  AcademicYearResponseDto['status'] | null
+> = {
+  planning: 'active',
+  active: 'completed',
+  completed: 'archived',
+  archived: null,
+}
+
+const STATUS_ACTION_LABEL: Record<AcademicYearResponseDto['status'], string> = {
+  planning: 'Activate',
+  active: 'Complete',
+  completed: 'Archive',
+  archived: '',
+}
+
+// ============================================================================
+// STATUS BADGE
+// ============================================================================
+
+function AcademicYearStatusBadge({
+  status,
+}: {
+  status: AcademicYearResponseDto['status']
+}) {
+  const config = statusConfig[status] || statusConfig.planning
   return (
-    <div className="min-h-full">
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
-                <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">Academic Calendar</h1>
-                <p className="text-text-secondary mt-1">
-                  School year structure, terms, holidays, and important dates
-                </p>
-              </div>
-            </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-white rounded-lg hover:bg-accent-primary/90 transition-colors">
-              <Plus className="w-4 h-4" />
-              <span>Add Event</span>
-            </button>
-          </div>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+      {config.label}
+    </span>
+  )
+}
+
+// ============================================================================
+// ACADEMIC YEAR CARD
+// ============================================================================
+
+interface AcademicYearCardProps {
+  year: AcademicYearResponseDto
+  onSetCurrent: (year: AcademicYearResponseDto) => void
+  onAdvanceStatus: (year: AcademicYearResponseDto) => void
+  isSettingCurrent: boolean
+  isUpdatingStatus: boolean
+}
+
+function AcademicYearCard({
+  year,
+  onSetCurrent,
+  onAdvanceStatus,
+  isSettingCurrent,
+  isUpdatingStatus,
+}: AcademicYearCardProps) {
+  const nextStatus = NEXT_STATUS[year.status]
+  const actionLabel = STATUS_ACTION_LABEL[year.status]
+
+  // Business Rule 2: Only active or planning years can be set as current
+  const canSetCurrent =
+    !year.isCurrent && (year.status === 'active' || year.status === 'planning')
+
+  // Business Rule 5: Cannot archive a year that is current
+  const canAdvanceStatus =
+    nextStatus !== null && !(nextStatus === 'archived' && year.isCurrent)
+
+  const startDate = new Date(year.startDate).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+  const endDate = new Date(year.endDate).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return (
+    <div
+      className={`bg-surface-secondary rounded-xl border p-5 transition-all ${
+        year.isCurrent
+          ? 'border-emerald-500/50 ring-1 ring-emerald-500/20'
+          : 'border-border-secondary hover:border-border-primary'
+      }`}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-semibold text-text-primary truncate">
+            {year.name}
+          </h3>
+          <p className="text-sm text-text-secondary mt-0.5">
+            {startDate} — {endDate}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+          <AcademicYearStatusBadge status={year.status} />
+          {year.isCurrent && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+              <CheckCircle2 className="w-3 h-3" />
+              Current
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Current Term Info */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard
-            icon={CalendarDays}
-            label="Current Term"
-            value="Fall 2024"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
-          />
-          <StatCard
-            icon={Clock}
-            label="Days Remaining"
-            value="47"
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
-          />
-          <StatCard
-            icon={Sun}
-            label="Next Break"
-            value="Winter"
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
-          />
-          <StatCard
-            icon={Star}
-            label="School Days (YTD)"
-            value="89"
-            accent="text-purple-600 dark:text-purple-400"
-            bg="bg-purple-500/10"
-          />
-        </div>
-
-        {/* Product Description */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-emerald-500/10">
-              <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-text-primary mb-2">
-                School Year Structure
-              </h3>
-              <p className="text-text-secondary leading-relaxed mb-4">
-                Define the academic year with terms, grading periods, and instructional days.
-                Mark holidays, professional development days, and early dismissals. The calendar
-                drives attendance tracking, grade period close dates, and state reporting.
-              </p>
-              <ul className="text-sm text-text-secondary space-y-1">
-                <li>• Term and semester date management</li>
-                <li>• Holiday and break scheduling</li>
-                <li>• School-wide events and announcements</li>
-                <li>• State-required instructional day tracking</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Mini Calendar Placeholder */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
-          <Calendar className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">
-            Calendar View
-          </h4>
-          <p className="text-text-secondary max-w-md mx-auto">
-            View the full academic calendar with terms, holidays, and events.
-            Click any date to add or view events for that day.
+      <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border-secondary">
+        {canSetCurrent && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onSetCurrent(year)}
+            disabled={isSettingCurrent}
+            isLoading={isSettingCurrent}
+          >
+            <Star className="w-3.5 h-3.5 mr-1.5" />
+            Set as Current
+          </Button>
+        )}
+        {canAdvanceStatus && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onAdvanceStatus(year)}
+            disabled={isUpdatingStatus}
+            isLoading={isUpdatingStatus}
+          >
+            <ChevronRight className="w-3.5 h-3.5 mr-1" />
+            {actionLabel}
+          </Button>
+        )}
+        {year.isCurrent && nextStatus === 'archived' && (
+          <p className="text-xs text-text-tertiary italic">
+            Set another year as current before archiving
           </p>
-        </div>
+        )}
+        {!canSetCurrent && !canAdvanceStatus && !year.isCurrent && year.status === 'archived' && (
+          <p className="text-xs text-text-tertiary italic">Archived</p>
+        )}
       </div>
     </div>
   )
 }
+
+// ============================================================================
+// STAT CARD
+// ============================================================================
 
 function StatCard({
   icon: Icon,
@@ -112,12 +216,14 @@ function StatCard({
   value,
   accent,
   bg,
+  isLoading = false,
 }: {
   icon: typeof Calendar
   label: string
-  value: string
+  value: string | number
   accent: string
   bg: string
+  isLoading?: boolean
 }) {
   return (
     <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
@@ -127,9 +233,314 @@ function StatCard({
         </div>
         <div>
           <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
+          {isLoading ? (
+            <div className="h-7 w-16 bg-surface-primary rounded animate-pulse mt-0.5" />
+          ) : (
+            <p className="text-xl font-semibold text-text-primary">{value}</p>
+          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// EMPTY / ERROR / NO SCHOOL STATES
+// ============================================================================
+
+function NoSchoolSelected() {
+  return (
+    <div className="min-h-[400px] flex items-center justify-center">
+      <div className="text-center max-w-md">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-text-primary mb-2">
+          No School Selected
+        </h3>
+        <p className="text-text-secondary">
+          Please select a school from the sidebar to manage academic years.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function ErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="min-h-[400px] flex items-center justify-center">
+      <div className="text-center max-w-md">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-text-primary mb-2">
+          Failed to Load Academic Years
+        </h3>
+        <p className="text-text-secondary mb-4">
+          Something went wrong. Please try again.
+        </p>
+        <Button onClick={onRetry} variant="outline">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Retry
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
+      <Calendar className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+      <h4 className="text-lg font-medium text-text-primary mb-2">
+        No Academic Years
+      </h4>
+      <p className="text-text-secondary max-w-md mx-auto">
+        No academic years have been created yet. Create your first academic year
+        to get started with term and grading period management.
+      </p>
+    </div>
+  )
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export function CalendarModule() {
+  const activeSchoolId = useActiveSchoolId()
+  const schoolId = activeSchoolId ?? ''
+
+  const {
+    data: academicYears,
+    isLoading,
+    isError,
+    refetch,
+  } = useAcademicYears(schoolId, !!activeSchoolId)
+
+  const { data: currentYear } = useCurrentAcademicYear(
+    schoolId,
+    !!activeSchoolId
+  )
+
+  const setCurrentMutation = useSetCurrentAcademicYear()
+  const updateStatusMutation = useUpdateAcademicYearStatus()
+
+  // Confirmation dialog state
+  const [confirmSetCurrent, setConfirmSetCurrent] =
+    useState<AcademicYearResponseDto | null>(null)
+  const [confirmAdvanceStatus, setConfirmAdvanceStatus] =
+    useState<AcademicYearResponseDto | null>(null)
+
+  // Computed stats
+  const stats = useMemo(() => {
+    if (!academicYears || academicYears.length === 0) {
+      return { total: 0, active: 0, planning: 0, currentName: 'None set' }
+    }
+    return {
+      total: academicYears.length,
+      active: academicYears.filter((y) => y.status === 'active').length,
+      planning: academicYears.filter((y) => y.status === 'planning').length,
+      currentName: currentYear?.name ?? 'None set',
+    }
+  }, [academicYears, currentYear])
+
+  // Handlers
+  const handleSetCurrent = useCallback((year: AcademicYearResponseDto) => {
+    setConfirmSetCurrent(year)
+  }, [])
+
+  const handleConfirmSetCurrent = async () => {
+    if (!confirmSetCurrent || !activeSchoolId) return
+    try {
+      await setCurrentMutation.mutateAsync({
+        schoolId: activeSchoolId,
+        yearId: confirmSetCurrent.yearId,
+      })
+      setConfirmSetCurrent(null)
+    } catch {
+      // Error handled in mutation hook
+    }
+  }
+
+  const handleAdvanceStatus = useCallback((year: AcademicYearResponseDto) => {
+    setConfirmAdvanceStatus(year)
+  }, [])
+
+  const handleConfirmAdvanceStatus = async () => {
+    if (!confirmAdvanceStatus || !activeSchoolId) return
+    const nextStatus = NEXT_STATUS[confirmAdvanceStatus.status]
+    if (!nextStatus) return
+    try {
+      await updateStatusMutation.mutateAsync({
+        schoolId: activeSchoolId,
+        yearId: confirmAdvanceStatus.yearId,
+        status: nextStatus,
+      })
+      setConfirmAdvanceStatus(null)
+    } catch {
+      // Error handled in mutation hook
+    }
+  }
+
+  // No school selected
+  if (!activeSchoolId) {
+    return (
+      <div className="min-h-full">
+        <NoSchoolSelected />
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-full">
+      {/* Page Header */}
+      <div className="border-b border-border-secondary bg-surface-secondary/50">
+        <div className="px-6 py-8">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+              <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-text-primary">
+                Academic Calendar
+              </h1>
+              <p className="text-text-secondary mt-1">
+                Manage academic years, terms, and grading periods
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <StatCard
+            icon={CalendarDays}
+            label="Current Year"
+            value={stats.currentName}
+            accent="text-emerald-600 dark:text-emerald-400"
+            bg="bg-emerald-500/10"
+            isLoading={isLoading}
+          />
+          <StatCard
+            icon={Calendar}
+            label="Total Years"
+            value={stats.total}
+            accent="text-blue-600 dark:text-blue-400"
+            bg="bg-blue-500/10"
+            isLoading={isLoading}
+          />
+          <StatCard
+            icon={Star}
+            label="Active"
+            value={stats.active}
+            accent="text-amber-600 dark:text-amber-400"
+            bg="bg-amber-500/10"
+            isLoading={isLoading}
+          />
+          <StatCard
+            icon={Clock}
+            label="Planning"
+            value={stats.planning}
+            accent="text-purple-600 dark:text-purple-400"
+            bg="bg-purple-500/10"
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Content */}
+        {isError ? (
+          <ErrorState onRetry={() => refetch()} />
+        ) : isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-surface-secondary rounded-xl border border-border-secondary p-5 animate-pulse"
+              >
+                <div className="h-5 w-2/3 bg-surface-primary rounded mb-2" />
+                <div className="h-4 w-1/2 bg-surface-primary rounded mb-4" />
+                <div className="flex gap-2 pt-3 border-t border-border-secondary mt-3">
+                  <div className="h-6 w-16 bg-surface-primary rounded-full" />
+                  <div className="h-6 w-16 bg-surface-primary rounded-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !academicYears || academicYears.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {academicYears.map((year) => (
+              <AcademicYearCard
+                key={year.yearId}
+                year={year}
+                onSetCurrent={handleSetCurrent}
+                onAdvanceStatus={handleAdvanceStatus}
+                isSettingCurrent={
+                  setCurrentMutation.isPending &&
+                  setCurrentMutation.variables?.yearId === year.yearId
+                }
+                isUpdatingStatus={
+                  updateStatusMutation.isPending &&
+                  updateStatusMutation.variables?.yearId === year.yearId
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Set Current Confirmation Dialog */}
+      <ConfirmationDialog
+        open={!!confirmSetCurrent}
+        onClose={() => setConfirmSetCurrent(null)}
+        onConfirm={handleConfirmSetCurrent}
+        title="Set as Current Academic Year"
+        description={
+          confirmSetCurrent
+            ? currentYear && currentYear.yearId !== confirmSetCurrent.yearId
+              ? `This will replace "${currentYear.name}" as the current academic year with "${confirmSetCurrent.name}". All modules that depend on the current year (attendance, grades, scheduling) will switch to the new selection.`
+              : `Set "${confirmSetCurrent.name}" as the current academic year? This determines which year is active across all modules.`
+            : ''
+        }
+        confirmText="Set as Current"
+        cancelText="Cancel"
+        variant="default"
+        isLoading={setCurrentMutation.isPending}
+        icon={
+          <Star className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+        }
+      />
+
+      {/* Advance Status Confirmation Dialog */}
+      <ConfirmationDialog
+        open={!!confirmAdvanceStatus}
+        onClose={() => setConfirmAdvanceStatus(null)}
+        onConfirm={handleConfirmAdvanceStatus}
+        title={
+          confirmAdvanceStatus
+            ? `${STATUS_ACTION_LABEL[confirmAdvanceStatus.status]} Academic Year`
+            : 'Update Status'
+        }
+        description={
+          confirmAdvanceStatus
+            ? `Are you sure you want to change "${confirmAdvanceStatus.name}" from ${statusConfig[confirmAdvanceStatus.status].label.toLowerCase()} to ${NEXT_STATUS[confirmAdvanceStatus.status] ? statusConfig[NEXT_STATUS[confirmAdvanceStatus.status]!].label.toLowerCase() : ''}? This action cannot be reversed.`
+            : ''
+        }
+        confirmText={
+          confirmAdvanceStatus
+            ? STATUS_ACTION_LABEL[confirmAdvanceStatus.status]
+            : 'Confirm'
+        }
+        cancelText="Cancel"
+        variant={
+          confirmAdvanceStatus?.status === 'completed' ? 'destructive' : 'default'
+        }
+        isLoading={updateStatusMutation.isPending}
+      />
     </div>
   )
 }

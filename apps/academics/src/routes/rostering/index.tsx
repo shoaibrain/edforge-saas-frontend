@@ -628,16 +628,7 @@ export function BulkRosteringPage() {
         `${successCount} change${successCount !== 1 ? 's' : ''} applied, ${errorCount} failed. Review and retry failed changes.`,
       )
       // Clear only successful changes; keep failed ones
-      setPendingChanges(prev => {
-        const next = new Map(prev)
-        for (const change of changes) {
-          const key = `${change.studentId}::${change.sectionId}`
-          // If this key is still in effective state matching the action, it was successful
-          // We clear all and let the user re-assess since queries will be invalidated
-        }
-        // Simpler: just clear all since queries will refetch with new state
-        return new Map()
-      })
+      setPendingChanges(() => new Map())
     } else {
       toast.error(`All ${errorCount} changes failed. Please check your connection and try again.`)
     }

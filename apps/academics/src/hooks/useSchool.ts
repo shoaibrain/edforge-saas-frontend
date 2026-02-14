@@ -5,14 +5,18 @@
  * academic years and grading periods (terms).
  */
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   getAcademicYears,
   getCurrentAcademicYear,
   getGradingPeriods,
+  setCurrentAcademicYear,
+  updateAcademicYearStatus,
   type AcademicYearResponseDto,
   type GradingPeriodResponseDto,
 } from '../services/school.service'
+import { parseApiError } from '../services/academics.service'
 
 // ============================================================================
 // QUERY KEYS
@@ -76,5 +80,65 @@ export function useGradingPeriods(
     enabled: enabled && !!schoolId && !!yearId,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
+  })
+}
+
+// ============================================================================
+// SET CURRENT ACADEMIC YEAR
+// ============================================================================
+
+export function useSetCurrentAcademicYear() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    AcademicYearResponseDto,
+    Error,
+    { schoolId: string; yearId: string }
+  >({
+    mutationFn: ({ schoolId, yearId }) =>
+      setCurrentAcademicYear(schoolId, yearId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: schoolKeys.academicYears(variables.schoolId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: schoolKeys.currentYear(variables.schoolId),
+      })
+      toast.success('Academic year set as current')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// UPDATE ACADEMIC YEAR STATUS
+// ============================================================================
+
+export function useUpdateAcademicYearStatus() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    AcademicYearResponseDto,
+    Error,
+    { schoolId: string; yearId: string; status: AcademicYearResponseDto['status'] }
+  >({
+    mutationFn: ({ schoolId, yearId, status }) =>
+      updateAcademicYearStatus(schoolId, yearId, status),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: schoolKeys.academicYears(variables.schoolId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: schoolKeys.currentYear(variables.schoolId),
+      })
+      toast.success('Academic year status updated')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
   })
 }
