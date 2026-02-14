@@ -20,9 +20,10 @@ import {
   AlertCircle,
   RefreshCw,
   UserMinus,
+  Upload,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { StudentTable, StudentFilters, StudentDrawer } from '../../components/students'
+import { StudentTable, StudentFilters, StudentDrawer, CSVImport } from '../../components/students'
 import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
@@ -193,6 +194,9 @@ export function StudentsModule() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<StudentResponseDto | null>(null)
 
+  // CSV Import state
+  const [showImport, setShowImport] = useState(false)
+
   // Withdrawal state
   const [withdrawStudent, setWithdrawStudent] = useState<StudentResponseDto | null>(null)
   const deleteStudentMutation = useDeleteStudent()
@@ -251,13 +255,23 @@ export function StudentsModule() {
                 </p>
               </div>
             </div>
-            <Button
-              onClick={handleAddStudent}
-              disabled={!activeSchoolId}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Student
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowImport(true)}
+                disabled={!activeSchoolId}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Import CSV
+              </Button>
+              <Button
+                onClick={handleAddStudent}
+                disabled={!activeSchoolId}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Student
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -349,6 +363,14 @@ export function StudentsModule() {
         isLoading={deleteStudentMutation.isPending}
         icon={<UserMinus className="w-5 h-5 text-red-600 dark:text-red-400" />}
       />
+
+      {/* CSV Import Modal */}
+      {showImport && (
+        <CSVImport
+          onClose={() => setShowImport(false)}
+          onSuccess={() => refetch()}
+        />
+      )}
     </div>
   )
 }

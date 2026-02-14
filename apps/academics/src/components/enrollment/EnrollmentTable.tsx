@@ -213,7 +213,8 @@ export function EnrollmentTable({
                 <th className="px-4 py-3 text-left font-semibold text-text-primary">Student</th>
                 <th className="px-4 py-3 text-left font-medium text-text-secondary">Grade Level</th>
                 <th className="px-4 py-3 text-left font-medium text-text-secondary">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Enrollment Date</th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">Entry Date</th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">Exit Date</th>
                 <th className="px-4 py-3 text-left font-medium text-text-secondary">Type</th>
                 <th className="px-4 py-3 w-12" />
               </tr>
@@ -231,7 +232,10 @@ export function EnrollmentTable({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-text-secondary">
-                    {enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString() : '—'}
+                    {(enrollment.entryDate || enrollment.enrollmentDate) ? new Date(enrollment.entryDate || enrollment.enrollmentDate!).toLocaleDateString() : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-text-secondary">
+                    {(enrollment.exitWithdrawDate || enrollment.withdrawalDate) ? new Date(enrollment.exitWithdrawDate || enrollment.withdrawalDate!).toLocaleDateString() : '—'}
                   </td>
                   <td className="px-4 py-3 text-text-secondary capitalize">
                     {enrollment.enrollmentType || '—'}

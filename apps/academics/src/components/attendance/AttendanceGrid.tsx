@@ -3,6 +3,7 @@
  *
  * Bulk attendance entry grid for a section.
  * Shows all enrolled students with status toggles and a save button.
+ * Supports save status indicator and disabled state (non-instructional days).
  */
 
 import { useState, useCallback, useMemo } from 'react'
@@ -12,10 +13,14 @@ import {
   Loader2,
   Save,
   Users,
+  Check,
+  WifiOff,
+  CloudOff,
 } from 'lucide-react'
 import type { AttendanceStatus } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 import { AttendanceRow } from './AttendanceRow'
+import type { SaveStatus } from '../../hooks/useOfflineAttendance'
 
 // ============================================================================
 // TYPES
@@ -39,6 +44,51 @@ interface AttendanceGridProps {
   }>
   onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => void
   isSaving: boolean
+  disabled?: boolean
+  saveStatus?: SaveStatus
+}
+
+// ============================================================================
+// SAVE STATUS BADGE
+// ============================================================================
+
+function SaveStatusBadge({ status }: { status?: SaveStatus }) {
+  if (!status || status === 'idle') return null
+
+  const configs: Record<string, { icon: typeof Check; text: string; className: string }> = {
+    saved: {
+      icon: Check,
+      text: 'Saved',
+      className: 'text-emerald-600 dark:text-emerald-400',
+    },
+    saving: {
+      icon: Loader2,
+      text: 'Auto-saving...',
+      className: 'text-amber-600 dark:text-amber-400',
+    },
+    offline: {
+      icon: WifiOff,
+      text: 'Offline',
+      className: 'text-red-600 dark:text-red-400',
+    },
+    error: {
+      icon: CloudOff,
+      text: 'Save failed',
+      className: 'text-red-600 dark:text-red-400',
+    },
+  }
+
+  const config = configs[status]
+  if (!config) return null
+
+  const Icon = config.icon
+
+  return (
+    <span className={`flex items-center gap-1 text-xs ${config.className}`}>
+      <Icon className={`w-3 h-3 ${status === 'saving' ? 'animate-spin' : ''}`} />
+      {config.text}
+    </span>
+  )
 }
 
 // ============================================================================
@@ -51,6 +101,8 @@ export function AttendanceGrid({
   existingRecords = [],
   onSave,
   isSaving,
+  disabled = false,
+  saveStatus,
 }: AttendanceGridProps) {
   // Initialize entries from students + any existing records
   const initialEntries = useMemo(() => {
@@ -138,14 +190,15 @@ export function AttendanceGrid({
   }
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${disabled ? 'opacity-60 pointer-events-none' : ''}`}>
       {/* Quick Actions Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={markAllPresent}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 rounded-lg transition-colors"
+            disabled={disabled}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 rounded-lg transition-colors disabled:opacity-50"
           >
             <CheckCircle className="w-3.5 h-3.5" />
             All Present
@@ -153,7 +206,8 @@ export function AttendanceGrid({
           <button
             type="button"
             onClick={markAllAbsent}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 rounded-lg transition-colors"
+            disabled={disabled}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 rounded-lg transition-colors disabled:opacity-50"
           >
             <XCircle className="w-3.5 h-3.5" />
             All Absent
@@ -162,7 +216,8 @@ export function AttendanceGrid({
             <button
               type="button"
               onClick={clearAll}
-              className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+              disabled={disabled}
+              className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors disabled:opacity-50"
             >
               Clear All
             </button>
@@ -170,13 +225,14 @@ export function AttendanceGrid({
         </div>
 
         <div className="flex items-center gap-3">
+          <SaveStatusBadge status={saveStatus} />
           <span className="text-xs text-text-tertiary">
             {markedCount} / {totalCount} marked
           </span>
           <button
             type="button"
             onClick={handleSave}
-            disabled={isSaving || markedCount === 0 || !hasChanges}
+            disabled={isSaving || markedCount === 0 || !hasChanges || disabled}
             className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? (

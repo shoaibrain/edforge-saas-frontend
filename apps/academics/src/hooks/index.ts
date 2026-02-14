@@ -35,6 +35,7 @@ export {
   useDeleteSection,
   useEnrollStudent,
   useRemoveStudent,
+  useBulkSectionRosters,
   flattenSectionPages,
   getSectionTotalFromPages,
   sectionKeys,
@@ -59,8 +60,13 @@ export {
   useRecordAttendance,
   useRecordBulkAttendance,
   useUpdateAttendance,
+  useCalendarDate,
+  useAttendanceTrend,
+  useAttendanceAlerts,
   attendanceKeys,
 } from './useAttendance'
+export { useOfflineAttendance } from './useOfflineAttendance'
+export type { SaveStatus } from './useOfflineAttendance'
 export {
   useGradingPolicies,
   useGradingPolicy,

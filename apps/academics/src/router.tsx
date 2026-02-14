@@ -31,6 +31,8 @@ import { CalendarModule } from './routes/calendar'
 import { GradesModule } from './routes/grades'
 import { SchedulingModule } from './routes/scheduling'
 import { SectionDetailPage } from './routes/scheduling/$sectionId'
+import { SectionRosterPage } from './routes/sections/roster'
+import { BulkRosteringPage } from './routes/rostering'
 import { CurriculumModule } from './routes/curriculum'
 
 // ============================================================================
@@ -184,6 +186,20 @@ const sectionDetailRoute = createRoute({
     component: SectionDetailPage,
 })
 
+// Section roster management (Sprint 5)
+const sectionRosterRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/sections/$sectionId/roster',
+    component: SectionRosterPage,
+})
+
+// Bulk rostering matrix (Sprint 5)
+const rosteringRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/rostering',
+    component: BulkRosteringPage,
+})
+
 // Curriculum - Consolidated view of courses, grade levels, and standards
 const curriculumRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -217,6 +233,8 @@ const routeTree = rootRoute.addChildren([
     gradesRoute,
     schedulingRoute,
     sectionDetailRoute,
+    sectionRosterRoute,
+    rosteringRoute,
     curriculumRoute,
 ])
 

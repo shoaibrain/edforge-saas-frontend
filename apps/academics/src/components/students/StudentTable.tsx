@@ -114,6 +114,17 @@ export function StudentTable({
         ),
       },
       {
+        key: 'studentNumber',
+        header: 'Student ID',
+        sortable: true,
+        width: '160px',
+        render: (student) => (
+          <span className="text-sm font-mono text-text-secondary">
+            {student.studentNumber || '—'}
+          </span>
+        ),
+      },
+      {
         key: 'currentGradeLevel',
         header: 'Grade',
         sortable: true,

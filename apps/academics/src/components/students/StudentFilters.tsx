@@ -202,7 +202,7 @@ export function StudentFilters({ onFiltersChange }: StudentFiltersProps) {
           type="text"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search students..."
+          placeholder="Search by name or student ID..."
           className="w-full h-10 pl-10 pr-4 rounded-lg border border-border-secondary bg-surface-primary text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
         />
         {localSearch && (

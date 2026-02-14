@@ -21,6 +21,8 @@ import {
   updateStudent,
   deleteStudent,
   createEnrollment,
+  checkDuplicateStudents,
+  importStudentsCsv,
   parseApiError,
   type StudentFilterDto,
   type StudentResponseDto,
@@ -30,6 +32,9 @@ import {
   type UpdateStudentDto,
   type CreateEnrollmentDto,
   type EnrollmentResponseDto,
+  type DuplicateCheckParams,
+  type DuplicateCheckResult,
+  type CsvImportResult,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -264,6 +269,52 @@ export function useDeleteStudent() {
       queryClient.removeQueries({ queryKey: studentKeys.profile(studentId) })
 
       toast.success('Student removed successfully')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// CHECK DUPLICATE (Sprint 4)
+// ============================================================================
+
+/**
+ * Hook to check for duplicate students before registration.
+ * Returns a mutation that can be triggered manually.
+ */
+export function useCheckDuplicate() {
+  return useMutation<DuplicateCheckResult, Error, DuplicateCheckParams>({
+    mutationFn: (data) => checkDuplicateStudents(data),
+  })
+}
+
+// ============================================================================
+// CSV IMPORT (Sprint 4)
+// ============================================================================
+
+/**
+ * Hook to import students from CSV data
+ */
+export function useImportStudentsCsv() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    CsvImportResult,
+    Error,
+    { students: Record<string, unknown>[]; schoolId: string }
+  >({
+    mutationFn: (data) => importStudentsCsv(data),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      if (result.imported > 0) {
+        toast.success(`Imported ${result.imported} student${result.imported !== 1 ? 's' : ''} successfully`)
+      }
+      if (result.errors.length > 0) {
+        toast.warning(`${result.errors.length} row${result.errors.length !== 1 ? 's' : ''} had errors`)
+      }
     },
     onError: (error) => {
       const parsed = parseApiError(error)

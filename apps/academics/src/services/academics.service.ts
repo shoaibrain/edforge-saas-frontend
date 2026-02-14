@@ -377,6 +377,64 @@ export async function deleteStudent(studentId: string): Promise<void> {
 }
 
 // ============================================================================
+// STUDENT DE-DUPLICATION (Sprint 4)
+// ============================================================================
+
+export interface DuplicateMatch {
+  studentId: string
+  firstName: string
+  lastName: string
+  dateOfBirth: string
+  currentGradeLevel?: string
+  status?: string
+  confidence: 'high' | 'medium' | 'low'
+  matchReasons: string[]
+}
+
+export interface DuplicateCheckResult {
+  hasDuplicates: boolean
+  matches: DuplicateMatch[]
+}
+
+export interface DuplicateCheckParams {
+  firstName: string
+  lastName: string
+  dateOfBirth: string
+  schoolId: string
+}
+
+/**
+ * Check for potential duplicate students (detailed, POST)
+ * POST /academics/students/check-duplicate
+ */
+export async function checkDuplicateStudents(
+  data: DuplicateCheckParams
+): Promise<DuplicateCheckResult> {
+  return apiPost<DuplicateCheckResult>('/academics/students/check-duplicate', data)
+}
+
+// ============================================================================
+// CSV STUDENT IMPORT (Sprint 4)
+// ============================================================================
+
+export interface CsvImportResult {
+  imported: number
+  skipped: number
+  errors: Array<{ row: number; field: string; message: string }>
+  duplicates: Array<{ row: number; matches: DuplicateMatch[] }>
+}
+
+/**
+ * Bulk import students from CSV data
+ * POST /academics/students/import
+ */
+export async function importStudentsCsv(
+  data: { students: Record<string, unknown>[]; schoolId: string }
+): Promise<CsvImportResult> {
+  return apiPost<CsvImportResult>('/academics/students/import', data)
+}
+
+// ============================================================================
 // ENROLLMENT OPERATIONS
 // ============================================================================
 
@@ -1167,6 +1225,89 @@ export async function getLocations(
 }
 
 // ============================================================================
+// CALENDAR DATE CHECK (Sprint 5)
+// ============================================================================
+
+export interface CalendarDateInfo {
+  calendarDateId: string
+  schoolId: string
+  date: string
+  calendarEventType: string  // 'instructional' | 'holiday' | 'teacher_workday' etc.
+  description?: string
+}
+
+/**
+ * Check calendar date for attendance validation
+ * GET /identity/schools/:schoolId/calendar-dates/:date
+ * Returns null if the date is not found (404)
+ */
+export async function getCalendarDate(
+  schoolId: string,
+  date: string
+): Promise<CalendarDateInfo | null> {
+  try {
+    return await apiGet<CalendarDateInfo>(
+      `/identity/schools/${schoolId}/calendar-dates/${date}`
+    )
+  } catch (error: any) {
+    if (error.response?.status === 404) return null
+    throw error
+  }
+}
+
+// ============================================================================
+// ATTENDANCE TREND (Sprint 5)
+// ============================================================================
+
+/**
+ * Get attendance trend data (for line chart)
+ * GET /academics/attendance/trend?schoolId=&startDate=&endDate=
+ */
+export async function getAttendanceTrend(
+  schoolId: string,
+  startDate: string,
+  endDate: string,
+): Promise<DailyAttendanceSummary[]> {
+  return apiGet<DailyAttendanceSummary[]>('/academics/attendance/trend', {
+    schoolId,
+    startDate,
+    endDate,
+  })
+}
+
+// ============================================================================
+// ATTENDANCE ALERTS (Sprint 5)
+// ============================================================================
+
+export interface AttendanceAlert {
+  studentId: string
+  studentName: string
+  attendanceRate: number
+  totalDays: number
+  absentDays: number
+}
+
+/**
+ * Get students with attendance below threshold
+ * GET /academics/attendance/alerts?schoolId=&academicYearId=&threshold=&startDate=&endDate=
+ */
+export async function getAttendanceAlerts(
+  schoolId: string,
+  academicYearId: string,
+  threshold: number = 90,
+  startDate: string,
+  endDate: string,
+): Promise<AttendanceAlert[]> {
+  return apiGet<AttendanceAlert[]>('/academics/attendance/alerts', {
+    schoolId,
+    academicYearId,
+    threshold,
+    startDate,
+    endDate,
+  })
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -1206,6 +1347,10 @@ export const academicsService = {
   createCourseOffering,
   updateCourseOffering,
   deleteCourseOffering,
+  // De-duplication (Sprint 4)
+  checkDuplicateStudents,
+  // CSV Import (Sprint 4)
+  importStudentsCsv,
   // Cross-service (Identity)
   getClassPeriods,
   getLocations,
@@ -1227,4 +1372,9 @@ export const academicsService = {
   getSectionGrades,
   getStudentGrades,
   finalizeGrade,
+  // Calendar Date (Sprint 5)
+  getCalendarDate,
+  // Attendance Trend & Alerts (Sprint 5)
+  getAttendanceTrend,
+  getAttendanceAlerts,
 }

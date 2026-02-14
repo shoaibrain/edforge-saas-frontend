@@ -82,10 +82,10 @@ function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollmen
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Enrollment Date</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Entry Date</p>
             <p className="text-sm text-text-primary flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-text-tertiary" />
-              {formatDate(enrollment.enrollmentDate)}
+              {formatDate(enrollment.entryDate || enrollment.enrollmentDate)}
             </p>
           </div>
           <div>
@@ -121,8 +121,8 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Grade</th>
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">School</th>
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Academic Year</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Enrolled</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Withdrawn</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Entry Date</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Exit Date</th>
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Status</th>
             </tr>
           </thead>
@@ -144,11 +144,11 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
                     {enrollment.academicYearName || '—'}
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
-                    {formatDate(enrollment.enrollmentDate, 'short')}
+                    {formatDate(enrollment.entryDate || enrollment.enrollmentDate, 'short')}
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
-                    {enrollment.withdrawalDate
-                      ? formatDate(enrollment.withdrawalDate, 'short')
+                    {(enrollment.exitWithdrawDate || enrollment.withdrawalDate)
+                      ? formatDate(enrollment.exitWithdrawDate || enrollment.withdrawalDate!, 'short')
                       : '—'}
                   </td>
                   <td className="py-3 px-3">

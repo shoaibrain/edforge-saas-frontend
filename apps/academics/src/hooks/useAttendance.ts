@@ -17,6 +17,9 @@ import {
   getStudentAttendance,
   getStudentAttendanceSummary,
   updateAttendance,
+  getCalendarDate,
+  getAttendanceTrend,
+  getAttendanceAlerts,
   parseApiError,
   type CreateAttendanceParams,
   type BulkAttendanceParams,
@@ -25,6 +28,8 @@ import {
   type DailyAttendanceSummary,
   type StudentAttendanceSummary,
   type AttendanceStatus,
+  type CalendarDateInfo,
+  type AttendanceAlert,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -42,6 +47,12 @@ export const attendanceKeys = {
   studentSummaries: () => [...attendanceKeys.all, 'student-summary'] as const,
   studentSummary: (studentId: string) =>
     [...attendanceKeys.studentSummaries(), studentId] as const,
+  trend: (schoolId: string, startDate: string, endDate: string) =>
+    [...attendanceKeys.all, 'trend', schoolId, startDate, endDate] as const,
+  alerts: (schoolId: string) =>
+    [...attendanceKeys.all, 'alerts', schoolId] as const,
+  calendarDate: (schoolId: string, date: string) =>
+    [...attendanceKeys.all, 'calendar-date', schoolId, date] as const,
 }
 
 // ============================================================================
@@ -213,5 +224,86 @@ export function useUpdateAttendance() {
       const parsed = parseApiError(error)
       toast.error(parsed.message)
     },
+  })
+}
+
+// ============================================================================
+// CALENDAR DATE CHECK (Sprint 5)
+// ============================================================================
+
+/**
+ * Hook to check calendar date for attendance validation
+ * Returns null if no calendar entry exists for the given date
+ */
+export function useCalendarDate({
+  schoolId,
+  date,
+  enabled = true,
+}: {
+  schoolId: string
+  date: string
+  enabled?: boolean
+}) {
+  return useQuery<CalendarDateInfo | null, Error>({
+    queryKey: attendanceKeys.calendarDate(schoolId, date),
+    queryFn: () => getCalendarDate(schoolId, date),
+    enabled: enabled && !!schoolId && !!date,
+    staleTime: 5 * 60 * 1000, // 5 min - matches backend cache
+  })
+}
+
+// ============================================================================
+// ATTENDANCE TREND (Sprint 5)
+// ============================================================================
+
+/**
+ * Hook to fetch attendance trend data (30-day line chart data)
+ */
+export function useAttendanceTrend({
+  schoolId,
+  startDate,
+  endDate,
+  enabled = true,
+}: {
+  schoolId: string
+  startDate: string
+  endDate: string
+  enabled?: boolean
+}) {
+  return useQuery<DailyAttendanceSummary[], Error>({
+    queryKey: attendanceKeys.trend(schoolId, startDate, endDate),
+    queryFn: () => getAttendanceTrend(schoolId, startDate, endDate),
+    enabled: enabled && !!schoolId && !!startDate && !!endDate,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ============================================================================
+// ATTENDANCE ALERTS (Sprint 5)
+// ============================================================================
+
+/**
+ * Hook to fetch students with attendance below threshold
+ */
+export function useAttendanceAlerts({
+  schoolId,
+  academicYearId,
+  threshold = 90,
+  startDate,
+  endDate,
+  enabled = true,
+}: {
+  schoolId: string
+  academicYearId: string
+  threshold?: number
+  startDate: string
+  endDate: string
+  enabled?: boolean
+}) {
+  return useQuery<AttendanceAlert[], Error>({
+    queryKey: attendanceKeys.alerts(schoolId),
+    queryFn: () => getAttendanceAlerts(schoolId, academicYearId, threshold, startDate, endDate),
+    enabled: enabled && !!schoolId && !!academicYearId,
+    staleTime: 5 * 60 * 1000,
   })
 }

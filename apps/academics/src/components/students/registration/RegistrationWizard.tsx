@@ -11,7 +11,7 @@
  *  3. Navigate to the new student's profile
  */
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -29,9 +29,11 @@ import {
   X,
 } from 'lucide-react'
 import { WizardProvider, useWizard, type WizardStep } from '@edforge/wizard'
-import { useCreateStudent, useCreateEnrollment } from '../../../hooks/useStudents'
+import { useCreateStudent, useCreateEnrollment, useCheckDuplicate } from '../../../hooks/useStudents'
 import { useActiveSchoolId } from '../../../stores/app.store'
 import { parseApiError } from '../../../services/academics.service'
+import type { DuplicateMatch } from '../../../services/academics.service'
+import { DuplicateWarning } from './DuplicateWarning'
 import {
   personalInfoStepSchema,
   contactInfoStepSchema,
@@ -208,10 +210,18 @@ function RegistrationStepper() {
 }
 
 // ============================================================================
-// STEP CONTENT (animated transitions)
+// STEP CONTENT (animated transitions + de-dup check after Step 1)
 // ============================================================================
 
-function StepContent() {
+function StepContent({
+  duplicateMatches,
+  isDuplicateCheckLoading,
+  onDismissDuplicates,
+}: {
+  duplicateMatches: DuplicateMatch[]
+  isDuplicateCheckLoading: boolean
+  onDismissDuplicates: () => void
+}) {
   const {
     currentStep,
     currentStepData,
@@ -228,27 +238,39 @@ function StepContent() {
   const isFirst = currentStep === 0
   const isLast = currentStep === steps.length - 1
 
+  // Show duplicate warning on step 1 (Contact) after the check runs on leaving step 0
+  const showDuplicateWarning = currentStep === 1 && (isDuplicateCheckLoading || duplicateMatches.length > 0)
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={currentStep}
-        initial={{ opacity: 0, x: 30 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -30 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      >
-        <StepComponent
-          data={formData}
-          updateData={updateData}
-          onNext={goToNext}
-          onBack={goToBack}
-          isFirst={isFirst}
-          isLast={isLast}
-          errors={errors}
-          clearError={clearError}
+    <>
+      {showDuplicateWarning && (
+        <DuplicateWarning
+          matches={duplicateMatches}
+          isLoading={isDuplicateCheckLoading}
+          onDismiss={onDismissDuplicates}
         />
-      </motion.div>
-    </AnimatePresence>
+      )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
+          <StepComponent
+            data={formData}
+            updateData={updateData}
+            onNext={goToNext}
+            onBack={goToBack}
+            isFirst={isFirst}
+            isLast={isLast}
+            errors={errors}
+            clearError={clearError}
+          />
+        </motion.div>
+      </AnimatePresence>
+    </>
   )
 }
 
@@ -324,8 +346,52 @@ function RegistrationFooter() {
 // WIZARD LAYOUT (replaces WizardContainer)
 // ============================================================================
 
-function WizardLayout({ onCancel }: { onCancel: () => void }) {
-  const { currentStep, currentStepData } = useWizard()
+function WizardLayout({
+  onCancel,
+  schoolId,
+}: {
+  onCancel: () => void
+  schoolId: string
+}) {
+  const { currentStep, currentStepData, formData } = useWizard()
+  const checkDuplicate = useCheckDuplicate()
+  const [duplicateMatches, setDuplicateMatches] = useState<DuplicateMatch[]>([])
+  const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = useState(false)
+  const [duplicateDismissed, setDuplicateDismissed] = useState(false)
+  const prevStepRef = useRef(0)
+
+  // Trigger de-dup check when user moves from step 0 → step 1
+  useEffect(() => {
+    if (prevStepRef.current === 0 && currentStep === 1 && !duplicateDismissed) {
+      const firstName = formData.firstName as string
+      const lastName = formData.lastName as string
+      const dateOfBirth = formData.dateOfBirth as string
+
+      if (firstName && lastName && dateOfBirth && schoolId) {
+        setIsDuplicateCheckLoading(true)
+        checkDuplicate.mutate(
+          { firstName, lastName, dateOfBirth, schoolId },
+          {
+            onSuccess: (result) => {
+              setDuplicateMatches(result.matches || [])
+              setIsDuplicateCheckLoading(false)
+            },
+            onError: () => {
+              // Silently fail — don't block registration
+              setDuplicateMatches([])
+              setIsDuplicateCheckLoading(false)
+            },
+          },
+        )
+      }
+    }
+    prevStepRef.current = currentStep
+  }, [currentStep, formData, schoolId, checkDuplicate, duplicateDismissed])
+
+  const handleDismissDuplicates = useCallback(() => {
+    setDuplicateMatches([])
+    setDuplicateDismissed(true)
+  }, [])
 
   return (
     <div className="flex flex-col min-h-0">
@@ -375,7 +441,11 @@ function WizardLayout({ onCancel }: { onCancel: () => void }) {
 
       {/* Step content */}
       <div className="max-w-3xl mx-auto w-full px-6 pb-8 pt-4">
-        <StepContent />
+        <StepContent
+          duplicateMatches={duplicateMatches}
+          isDuplicateCheckLoading={isDuplicateCheckLoading}
+          onDismissDuplicates={handleDismissDuplicates}
+        />
       </div>
 
       {/* Sticky footer — scoped to this content area, not the viewport */}
@@ -572,7 +642,7 @@ export function RegistrationWizard() {
         onSubmit={handleSubmit}
         onCancel={handleCancel}
       >
-        <WizardLayout onCancel={handleCancel} />
+        <WizardLayout onCancel={handleCancel} schoolId={schoolId || ''} />
       </WizardProvider>
 
       <ConfirmationDialog
