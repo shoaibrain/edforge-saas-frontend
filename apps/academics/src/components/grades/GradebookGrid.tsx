@@ -1,12 +1,14 @@
 /**
  * GradebookGrid Component
  *
- * Spreadsheet-like grid for viewing section grades.
+ * Interactive spreadsheet-like grid for viewing and editing section grades.
  * Shows students as rows, assignments as columns, with category and overall averages.
+ * Supports inline cell editing with auto-save on blur/Tab.
  */
 
-import { useMemo } from 'react'
-import { GraduationCap, Lock } from 'lucide-react'
+import { useState, useMemo, useRef, useCallback } from 'react'
+import { GraduationCap, Lock, Plus } from 'lucide-react'
+import { useRecordGrade } from '../../hooks/useGrades'
 import type { GradeRecord } from '../../services/academics.service'
 
 // ============================================================================
@@ -16,6 +18,20 @@ import type { GradeRecord } from '../../services/academics.service'
 interface GradebookGridProps {
   grades: GradeRecord[]
   isLoading: boolean
+  sectionId?: string
+  courseId?: string
+  schoolId?: string
+  termId?: string
+  academicYearId?: string
+  teacherId?: string
+  disabled?: boolean
+  onAddAssignment?: () => void
+}
+
+interface EditingCell {
+  gradeId: string
+  assignmentName: string
+  value: string
 }
 
 // ============================================================================
@@ -42,7 +58,25 @@ function getGradeBg(percentage: number): string {
 // COMPONENT
 // ============================================================================
 
-export function GradebookGrid({ grades, isLoading }: GradebookGridProps) {
+export function GradebookGrid({
+  grades,
+  isLoading,
+  sectionId,
+  courseId,
+  schoolId,
+  termId,
+  academicYearId,
+  teacherId,
+  disabled,
+  onAddAssignment,
+}: GradebookGridProps) {
+  const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const recordGradeMutation = useRecordGrade()
+
+  // Can we edit? Need all required context props
+  const canEdit = !disabled && !!sectionId && !!courseId && !!schoolId && !!termId && !!academicYearId && !!teacherId
+
   // Get unique assignment names across all students
   const assignmentNames = useMemo(() => {
     const names = new Set<string>()
@@ -51,6 +85,84 @@ export function GradebookGrid({ grades, isLoading }: GradebookGridProps) {
     })
     return Array.from(names)
   }, [grades])
+
+  const handleCellClick = useCallback(
+    (gradeId: string, assignmentName: string, currentValue: number | undefined, isFinal: boolean) => {
+      if (!canEdit || isFinal) return
+      setEditingCell({
+        gradeId,
+        assignmentName,
+        value: currentValue !== undefined ? String(currentValue) : '',
+      })
+      // Focus input on next tick
+      setTimeout(() => inputRef.current?.focus(), 0)
+    },
+    [canEdit]
+  )
+
+  const handleCellSave = useCallback(
+    (grade: GradeRecord, assignmentName: string, newValue: string) => {
+      setEditingCell(null)
+      if (!canEdit) return
+
+      const assignment = grade.assignments?.find((a) => a.assignmentName === assignmentName)
+      if (!assignment) return
+
+      const earnedPoints = Number(newValue)
+      if (isNaN(earnedPoints) || earnedPoints < 0) return
+      // Skip save if value unchanged
+      if (assignment.earnedPoints === earnedPoints) return
+
+      recordGradeMutation.mutate({
+        studentId: grade.studentId,
+        courseId: courseId!,
+        sectionId: sectionId!,
+        schoolId: schoolId!,
+        termId: termId!,
+        academicYearId: academicYearId!,
+        teacherId: teacherId!,
+        assignment: {
+          assignmentName: assignment.assignmentName,
+          assignmentType: assignment.assignmentType,
+          categoryId: assignment.categoryId,
+          possiblePoints: assignment.possiblePoints,
+        },
+        earnedPoints,
+      })
+    },
+    [canEdit, courseId, sectionId, schoolId, termId, academicYearId, teacherId, recordGradeMutation]
+  )
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, grade: GradeRecord, assignmentName: string) => {
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault()
+        handleCellSave(grade, assignmentName, editingCell?.value ?? '')
+
+        // Move to next cell on Tab
+        if (e.key === 'Tab') {
+          const currentAssignmentIdx = assignmentNames.indexOf(assignmentName)
+          const currentGradeIdx = grades.indexOf(grade)
+
+          if (!e.shiftKey) {
+            // Move right, then wrap to next row
+            if (currentAssignmentIdx < assignmentNames.length - 1) {
+              const nextAssignment = assignmentNames[currentAssignmentIdx + 1]
+              const nextA = grade.assignments?.find((a) => a.assignmentName === nextAssignment)
+              handleCellClick(grade.gradeId, nextAssignment, nextA?.earnedPoints, grade.isFinal)
+            } else if (currentGradeIdx < grades.length - 1) {
+              const nextGrade = grades[currentGradeIdx + 1]
+              const firstA = nextGrade.assignments?.find((a) => a.assignmentName === assignmentNames[0])
+              handleCellClick(nextGrade.gradeId, assignmentNames[0], firstA?.earnedPoints, nextGrade.isFinal)
+            }
+          }
+        }
+      } else if (e.key === 'Escape') {
+        setEditingCell(null)
+      }
+    },
+    [editingCell, assignmentNames, grades, handleCellSave, handleCellClick]
+  )
 
   if (isLoading) {
     return (
@@ -90,13 +202,26 @@ export function GradebookGrid({ grades, isLoading }: GradebookGridProps) {
             {assignmentNames.map((name) => (
               <th
                 key={name}
-                className="px-3 py-3 text-center font-medium text-text-secondary min-w-[100px] border-r border-border-secondary last:border-r-0"
+                className="px-3 py-3 text-center font-medium text-text-secondary min-w-[100px] border-r border-border-secondary"
               >
                 <div className="truncate max-w-[120px]" title={name}>
                   {name}
                 </div>
               </th>
             ))}
+            {/* Add Assignment column */}
+            {canEdit && onAddAssignment && (
+              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-[60px]">
+                <button
+                  type="button"
+                  onClick={onAddAssignment}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 rounded transition-colors"
+                  title="Add assignment"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </th>
+            )}
             {/* Overall Grade */}
             <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-[100px] bg-surface-hover">
               Overall
@@ -125,30 +250,63 @@ export function GradebookGrid({ grades, isLoading }: GradebookGridProps) {
                 const assignment = grade.assignments?.find(
                   (a) => a.assignmentName === aName
                 )
+                const isEditing =
+                  editingCell?.gradeId === grade.gradeId &&
+                  editingCell?.assignmentName === aName
+
                 if (!assignment) {
                   return (
                     <td
                       key={aName}
-                      className="px-3 py-3 text-center text-text-tertiary border-r border-border-secondary last:border-r-0"
+                      className="px-3 py-3 text-center text-text-tertiary border-r border-border-secondary"
                     >
                       —
                     </td>
                   )
                 }
+
                 const pct = assignment.possiblePoints > 0
                   ? (assignment.earnedPoints / assignment.possiblePoints) * 100
                   : 0
+
                 return (
                   <td
                     key={aName}
-                    className="px-3 py-3 text-center border-r border-border-secondary last:border-r-0"
+                    className={`px-1 py-1 text-center border-r border-border-secondary ${
+                      canEdit && !grade.isFinal ? 'cursor-text' : ''
+                    }`}
+                    onClick={() =>
+                      handleCellClick(grade.gradeId, aName, assignment.earnedPoints, grade.isFinal)
+                    }
                   >
-                    <span className={`text-sm font-medium ${getGradeColor(pct)}`}>
-                      {assignment.earnedPoints}/{assignment.possiblePoints}
-                    </span>
+                    {isEditing ? (
+                      <input
+                        ref={inputRef}
+                        type="number"
+                        value={editingCell.value}
+                        onChange={(e) =>
+                          setEditingCell((prev) =>
+                            prev ? { ...prev, value: e.target.value } : null
+                          )
+                        }
+                        onBlur={() => handleCellSave(grade, aName, editingCell.value)}
+                        onKeyDown={(e) => handleKeyDown(e, grade, aName)}
+                        className="w-16 px-1.5 py-1 bg-white dark:bg-surface-secondary border-2 border-teal-500 rounded text-sm text-center text-text-primary focus:outline-none"
+                        min={0}
+                        step="any"
+                      />
+                    ) : (
+                      <span className={`inline-block px-2 py-1 rounded text-sm font-medium ${getGradeColor(pct)}`}>
+                        {assignment.earnedPoints}/{assignment.possiblePoints}
+                      </span>
+                    )}
                   </td>
                 )
               })}
+              {/* Add Assignment spacer */}
+              {canEdit && onAddAssignment && (
+                <td className="border-r border-border-secondary" />
+              )}
               {/* Overall grade */}
               <td className="px-4 py-3 text-center bg-surface-secondary/30">
                 <span

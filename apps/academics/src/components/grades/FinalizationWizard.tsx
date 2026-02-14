@@ -16,7 +16,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from 'lucide-react'
-import { useSectionGrades, useFinalizeGrade } from '../../hooks/useGrades'
+import { useSectionGrades, useBulkFinalizeGrades } from '../../hooks/useGrades'
 
 // ============================================================================
 // TYPES
@@ -47,8 +47,8 @@ export function FinalizationWizard({
 }: FinalizationWizardProps) {
   const [step, setStep] = useState<WizardStep>('review')
   const [finalizedCount, setFinalizedCount] = useState(0)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const finalizeMutation = useFinalizeGrade()
+  const [errorCount, setErrorCount] = useState(0)
+  const bulkFinalizeMutation = useBulkFinalizeGrades()
 
   const { data: gradebook, isLoading } = useSectionGrades(
     sectionId,
@@ -68,20 +68,21 @@ export function FinalizationWizard({
     return { unfinalizedGrades, finalizedGrades, missingGrades, total: grades.length }
   }, [grades])
 
+  const isProcessing = bulkFinalizeMutation.isPending
+
   const handleFinalize = async () => {
-    setIsProcessing(true)
-    let count = 0
-    for (const grade of analysis.unfinalizedGrades) {
-      try {
-        await finalizeMutation.mutateAsync(grade.gradeId)
-        count++
-      } catch {
-        // Continue on error
-      }
+    try {
+      const result = await bulkFinalizeMutation.mutateAsync({
+        sectionId,
+        termId,
+        schoolId,
+      })
+      setFinalizedCount(result.finalized)
+      setErrorCount(result.errors.length)
+      setStep('complete')
+    } catch {
+      // Error handled by mutation hook toast
     }
-    setFinalizedCount(count)
-    setIsProcessing(false)
-    setStep('complete')
   }
 
   if (!open) return null
@@ -220,6 +221,11 @@ export function FinalizationWizard({
                 </h4>
                 <p className="text-sm text-text-secondary">
                   Successfully finalized {finalizedCount} grade(s). These grades are now locked.
+                  {errorCount > 0 && (
+                    <span className="block mt-1 text-amber-600 dark:text-amber-400">
+                      {errorCount} grade(s) could not be finalized.
+                    </span>
+                  )}
                 </p>
               </motion.div>
             )}

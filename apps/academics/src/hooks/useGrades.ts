@@ -20,6 +20,7 @@ import {
   getSectionGrades,
   getStudentGrades,
   finalizeGrade,
+  bulkFinalizeGrades,
   parseApiError,
   type GradingPolicyResponse,
   type CreateGradingPolicyParams,
@@ -28,6 +29,8 @@ import {
   type RecordBulkGradesParams,
   type SectionGradebookResponse,
   type StudentGradesResponse,
+  type BulkFinalizeParams,
+  type BulkFinalizeResponse,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -216,6 +219,29 @@ export function useFinalizeGrade() {
       queryClient.invalidateQueries({ queryKey: gradeKeys.sectionGrades() })
       queryClient.invalidateQueries({ queryKey: gradeKeys.studentGrades() })
       toast.success('Grade finalized')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+export function useBulkFinalizeGrades() {
+  const queryClient = useQueryClient()
+
+  return useMutation<BulkFinalizeResponse, Error, BulkFinalizeParams>({
+    mutationFn: (data) => bulkFinalizeGrades(data),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: gradeKeys.sectionGrades() })
+      queryClient.invalidateQueries({ queryKey: gradeKeys.studentGrades() })
+      if (result.errors.length > 0) {
+        toast.warning(
+          `${result.finalized} grades finalized with ${result.errors.length} error(s)`
+        )
+      } else {
+        toast.success(`${result.finalized} grades finalized successfully`)
+      }
     },
     onError: (error) => {
       const parsed = parseApiError(error)

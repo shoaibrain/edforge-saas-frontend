@@ -290,6 +290,18 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     max={100}
                   />
                   <span className="text-text-tertiary text-sm">%</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={cat.dropLowest ?? 0}
+                      onChange={(e) => handleCategoryChange(i, 'dropLowest', Number(e.target.value))}
+                      className="w-14 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      min={0}
+                      max={5}
+                      title="Drop lowest N scores"
+                    />
+                    <span className="text-text-tertiary text-[10px] whitespace-nowrap">drop</span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => removeCategory(i)}

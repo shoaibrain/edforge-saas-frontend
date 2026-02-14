@@ -1,16 +1,18 @@
 /**
  * Grades & Assessments Module
  *
- * Unified gradebook management with two tabs:
- * - Gradebook: Section-based grade viewing and bulk entry
+ * Unified gradebook management with three tabs:
+ * - Gradebook: Section-based grade viewing, inline editing, and bulk entry
+ * - Dashboard: School-wide grade analytics and at-risk students
  * - Grading Policies: Policy CRUD management
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap,
   BookCheck,
+  BarChart3,
   Settings,
   Plus,
   Lock,
@@ -24,12 +26,15 @@ import { GradebookGrid } from '../../components/grades/GradebookGrid'
 import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
+import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
+
+const GradeDashboard = lazy(() => import('./dashboard'))
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type GradesTab = 'gradebook' | 'policies'
+type GradesTab = 'gradebook' | 'dashboard' | 'policies'
 
 // ============================================================================
 // TAB CONFIG
@@ -37,6 +42,7 @@ type GradesTab = 'gradebook' | 'policies'
 
 const tabs = [
   { id: 'gradebook' as const, label: 'Gradebook', icon: BookCheck },
+  { id: 'dashboard' as const, label: 'Dashboard', icon: BarChart3 },
   { id: 'policies' as const, label: 'Grading Policies', icon: Settings },
 ]
 
@@ -54,6 +60,7 @@ export function GradesModule() {
 
   const [showBulkModal, setShowBulkModal] = useState(false)
   const [showFinalize, setShowFinalize] = useState(false)
+  const [showAssignmentEditor, setShowAssignmentEditor] = useState(false)
 
   // Academic year & terms
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -87,6 +94,12 @@ export function GradesModule() {
 
   // Find selected section info
   const selectedSection = sections.find((s) => s.sectionId === selectedSectionId)
+
+  // Check if any grades are finalized (to disable editing)
+  const hasAllFinalized = useMemo(() => {
+    const grades = gradebook?.grades ?? []
+    return grades.length > 0 && grades.every((g) => g.isFinal)
+  }, [gradebook])
 
   return (
     <div className="min-h-full">
@@ -220,9 +233,45 @@ export function GradesModule() {
                   <GradebookGrid
                     grades={gradebook?.grades ?? []}
                     isLoading={gradesLoading}
+                    sectionId={selectedSectionId}
+                    courseId={selectedSection?.courseId}
+                    schoolId={schoolId}
+                    termId={selectedTermId || ''}
+                    academicYearId={currentYear?.yearId}
+                    teacherId={selectedSection?.primaryTeacherId}
+                    disabled={hasAllFinalized}
+                    onAddAssignment={() => setShowAssignmentEditor(true)}
                   />
                 )}
               </div>
+            )}
+
+            {activeTab === 'dashboard' && (
+              <Suspense
+                fallback={
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-surface-hover rounded-lg" />
+                            <div className="space-y-2">
+                              <div className="h-3 w-16 bg-surface-hover rounded" />
+                              <div className="h-6 w-12 bg-surface-hover rounded" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                }
+              >
+                <GradeDashboard
+                  schoolId={schoolId}
+                  academicYearId={currentYear?.yearId || ''}
+                  sections={sections}
+                />
+              </Suspense>
             )}
 
             {activeTab === 'policies' && <GradingPolicyList />}
@@ -242,6 +291,20 @@ export function GradesModule() {
           termId={selectedTermId || ''}
           academicYearId={currentYear?.yearId || ''}
           teacherId={selectedSection.primaryTeacherId}
+        />
+      )}
+
+      {/* Assignment Editor */}
+      {showAssignmentEditor && selectedSectionId && selectedSection && (
+        <AssignmentEditor
+          onClose={() => setShowAssignmentEditor(false)}
+          sectionId={selectedSectionId}
+          courseId={selectedSection.courseId}
+          schoolId={schoolId}
+          termId={selectedTermId || ''}
+          academicYearId={currentYear?.yearId || ''}
+          teacherId={selectedSection.primaryTeacherId}
+          students={roster?.students ?? []}
         />
       )}
 

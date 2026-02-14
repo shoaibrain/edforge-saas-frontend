@@ -1128,6 +1128,28 @@ export async function finalizeGrade(gradeId: string): Promise<void> {
   return apiPatch(`/academics/grades/${gradeId}/finalize`, {})
 }
 
+/**
+ * Bulk-finalize all grades for a section in a term
+ * POST /academics/grades/finalize/bulk
+ */
+export interface BulkFinalizeParams {
+  sectionId: string
+  termId: string
+  schoolId: string
+}
+
+export interface BulkFinalizeResponse {
+  finalized: number
+  alreadyFinalized: number
+  errors: Array<{ studentId: string; courseId: string; error: string }>
+}
+
+export async function bulkFinalizeGrades(
+  data: BulkFinalizeParams
+): Promise<BulkFinalizeResponse> {
+  return apiPost<BulkFinalizeResponse>('/academics/grades/finalize/bulk', data)
+}
+
 // ============================================================================
 // COURSE OFFERING CRUD OPERATIONS (Sprint 3)
 // ============================================================================

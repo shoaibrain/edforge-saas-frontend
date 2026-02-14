@@ -34,6 +34,7 @@ import { SectionDetailPage } from './routes/scheduling/$sectionId'
 import { SectionRosterPage } from './routes/sections/roster'
 import { BulkRosteringPage } from './routes/rostering'
 import { CurriculumModule } from './routes/curriculum'
+import { ReportCardPage } from './routes/grades/report-card'
 
 // ============================================================================
 // ROOT ROUTE
@@ -200,6 +201,13 @@ const rosteringRoute = createRoute({
     component: BulkRosteringPage,
 })
 
+// Student Report Card (Sprint 6)
+const reportCardRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/grades/report-card',
+    component: ReportCardPage,
+})
+
 // Curriculum - Consolidated view of courses, grade levels, and standards
 const curriculumRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -231,6 +239,7 @@ const routeTree = rootRoute.addChildren([
     calendarRoute,
     // Consolidated routes
     gradesRoute,
+    reportCardRoute,
     schedulingRoute,
     sectionDetailRoute,
     sectionRosterRoute,
