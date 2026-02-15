@@ -27,6 +27,7 @@ import {
   Zap,
   Filter,
   X,
+  Download,
 } from 'lucide-react'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
@@ -262,6 +263,28 @@ export default function StaffPage() {
     s.role === 'principal' || s.role === 'vice_principal' || s.role === 'admin_staff',
   ).length
 
+  // CSV export
+  const handleExportCsv = () => {
+    if (staffMembers.length === 0) return
+    const headers = ['Name', 'Email', 'Role', 'Status', 'Phone', 'Hire Date']
+    const rows = staffMembers.map((s) => [
+      `${s.firstName} ${s.lastSurname}`,
+      s.email || '',
+      s.role || '',
+      s.employmentStatus || '',
+      s.phone || '',
+      s.hireDate ? new Date(s.hireDate).toLocaleDateString() : '',
+    ])
+    const csvContent = [headers, ...rows].map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `staff-directory-${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedStaff, setSelectedStaff] = useState<StaffResponseDto | null>(null)
@@ -416,6 +439,15 @@ export default function StaffPage() {
                   {activeFilterCount}
                 </span>
               )}
+            </button>
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              disabled={staffMembers.length === 0}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-secondary bg-surface-secondary text-text-secondary hover:text-text-primary transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
             </button>
           </div>
 

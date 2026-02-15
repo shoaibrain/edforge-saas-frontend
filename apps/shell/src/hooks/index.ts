@@ -28,8 +28,11 @@ export {
 
 // Pagination hooks
 export { usePaginatedQuery } from './usePaginatedQuery'
-export type { 
-  PaginatedResponse, 
-  UsePaginatedQueryOptions, 
-  UsePaginatedQueryResult 
+export type {
+  PaginatedResponse,
+  UsePaginatedQueryOptions,
+  UsePaginatedQueryResult
 } from './usePaginatedQuery'
+
+// User management hooks
+export { useUsers, useChangeGlobalRole, useUpdateUserStatus, useDeleteUser, userKeys } from './useUsers'

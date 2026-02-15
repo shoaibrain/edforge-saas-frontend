@@ -36,7 +36,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
     // Data Fetching
     const { data: usersData } = useQuery({
         queryKey: ['users', 'list'],
-        queryFn: () => usersService.listUsers(100), // Fetch enough for search
+        queryFn: () => usersService.listUsers({ limit: 100 }), // Fetch enough for search
         staleTime: 5 * 60 * 1000,
     })
 

@@ -392,17 +392,31 @@ export async function getUser(userId: string): Promise<UserResponseDto> {
 }
 
 /**
- * List users
+ * List/search users with optional filters
  * GET /users
  */
-export async function listUsers(
-  limit: number = 20,
+export interface ListUsersParams {
+  limit?: number
   cursor?: string
-): Promise<UserListResponseDto> {
-  const params: Record<string, any> = { limit }
-  if (cursor) params.cursor = cursor
+  search?: string
+  status?: string
+  globalRole?: string
+  schoolId?: string
+  role?: string
+}
 
-  return apiGet<UserListResponseDto>('/users', params)
+export async function listUsers(
+  params: ListUsersParams = {}
+): Promise<UserListResponseDto> {
+  const query: Record<string, any> = { limit: params.limit ?? 50 }
+  if (params.cursor) query.cursor = params.cursor
+  if (params.search) query.search = params.search
+  if (params.status) query.status = params.status
+  if (params.globalRole) query.globalRole = params.globalRole
+  if (params.schoolId) query.schoolId = params.schoolId
+  if (params.role) query.role = params.role
+
+  return apiGet<UserListResponseDto>('/users', query)
 }
 
 /**
@@ -430,6 +444,25 @@ export async function updateUser(
   data: UpdateUserDto
 ): Promise<UserResponseDto> {
   return apiPatch<UserResponseDto, UpdateUserDto>(`/users/${userId}`, data)
+}
+
+/**
+ * Change user's global role
+ * PATCH /users/:id/global-role
+ */
+export async function changeGlobalRole(
+  userId: string,
+  newRole: GlobalRole
+): Promise<{ userId: string; previousRole: string; newRole: string; sessionsRevoked: number }> {
+  return apiPatch(`/users/${userId}/global-role`, { newRole })
+}
+
+/**
+ * Delete user (soft delete)
+ * DELETE /users/:id
+ */
+export async function deleteUser(userId: string): Promise<void> {
+  return apiDelete(`/users/${userId}`)
 }
 
 /**
@@ -620,6 +653,8 @@ export const usersService = {
   createUser,
   assignRole,
   updateUser,
+  changeGlobalRole,
+  deleteUser,
 
   // Preferences
   getPreferences,

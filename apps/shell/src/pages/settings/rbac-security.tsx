@@ -210,7 +210,7 @@ export default function RBACSecurityPage() {
   // Fetch Users
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['users', 'list', searchQuery], // Include searchQuery if we implement server-side search
-    queryFn: () => usersService.listUsers(50),
+    queryFn: () => usersService.listUsers({ limit: 50 }),
     staleTime: 5 * 60 * 1000,
   })
 
