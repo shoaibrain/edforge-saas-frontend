@@ -97,6 +97,10 @@ const ROUTE_LABELS: Record<string, string> = {
   financial: 'Financial Analytics',
 
   // Settings sub-routes
+  organization: 'Organization',
+  sea: 'State Education Agency',
+  lea: 'District',
+  esc: 'Service Center',
   account: 'My Account',
   preferences: 'Preferences',
   notifications: 'Notifications',
@@ -139,6 +143,7 @@ const PARAM_LABELS: Record<string, string> = {
   parentId: 'Parent Details',
   classId: 'Class Details',
   classroomId: 'Classroom Details',
+  schoolId: 'School Details',
 }
 
 /**
@@ -179,6 +184,14 @@ function isDynamicSegment(segment: string): boolean {
   return uuidPattern.test(segment) || shortIdPattern.test(segment) || numericPattern.test(segment)
 }
 
+/**
+ * Segments that are route parameters (not standalone routes).
+ * These should not be rendered as clickable breadcrumb links because
+ * navigating to their partial path would result in a 404.
+ * e.g. /settings/organization/sea/UUID — "sea" is part of $orgType param.
+ */
+const NON_NAVIGABLE_SEGMENTS = new Set(['sea', 'lea', 'esc'])
+
 // ============================================================================
 // BREADCRUMB TYPES
 // ============================================================================
@@ -194,6 +207,8 @@ interface BreadcrumbItem {
   isCurrentPage: boolean
   /** Whether this segment represents a dynamic parameter */
   isDynamic: boolean
+  /** Whether this segment should not be a clickable link */
+  isNonNavigable: boolean
   /** Route ID from TanStack Router (for debugging) */
   routeId?: string
 }
@@ -234,6 +249,7 @@ export function Breadcrumbs() {
       const path = '/' + segments.slice(0, index + 1).join('/')
       const isCurrentPage = index === segments.length - 1
       const isDynamic = isDynamicSegment(segment)
+      const isNonNavigable = NON_NAVIGABLE_SEGMENTS.has(segment)
 
       // Find the corresponding route match for this path level
       const matchingRoute = matches.find(m => m.pathname === path)
@@ -255,6 +271,7 @@ export function Breadcrumbs() {
         path,
         isCurrentPage,
         isDynamic,
+        isNonNavigable,
         routeId: matchingRoute?.routeId,
       }
     })
@@ -267,6 +284,7 @@ export function Breadcrumbs() {
         path: '/home',
         isCurrentPage: false,
         isDynamic: false,
+        isNonNavigable: false,
       },
       ...items,
     ]
@@ -302,14 +320,16 @@ export function Breadcrumbs() {
               )}
 
               {/* Breadcrumb item */}
-              {crumb.isCurrentPage ? (
+              {crumb.isCurrentPage || crumb.isNonNavigable ? (
                 <span
                   className={cn(
-                    'font-medium text-[rgb(var(--text-primary))]',
+                    crumb.isCurrentPage
+                      ? 'font-medium text-[rgb(var(--text-primary))]'
+                      : 'text-[rgb(var(--text-tertiary))]',
                     'max-w-[200px] truncate',
                     crumb.isDynamic && 'italic'
                   )}
-                  aria-current="page"
+                  aria-current={crumb.isCurrentPage ? 'page' : undefined}
                   title={crumb.label}
                 >
                   {crumb.label}

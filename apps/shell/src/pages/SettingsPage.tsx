@@ -14,7 +14,7 @@ import {
   CreditCard,
   User,
   Bell,
-  School,
+  Building2,
   Search
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth.store'
@@ -74,7 +74,7 @@ function SettingsOverviewContent({
     { label: 'My Account', icon: User, href: '/settings/account' },
     { label: 'Security', icon: Shield, href: '/settings/security' },
     { label: 'Notifications', icon: Bell, href: '/settings/notifications' },
-    { label: 'Schools', icon: School, href: '/settings/schools' },
+    { label: 'Organization', icon: Building2, href: '/settings/organization' },
     { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
   ]
 

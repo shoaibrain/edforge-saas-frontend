@@ -386,7 +386,7 @@ export default function OrganizationSettingsPage() {
       switch (action) {
         case 'view-details':
           if (node.type === 'school') {
-            navigate({ to: '/settings/schools/$schoolId', params: { schoolId: node.id } })
+            navigate({ to: '/settings/organization/schools/$schoolId', params: { schoolId: node.id } })
           } else {
             const orgType = node.type === 'stateEducationAgency'
               ? 'sea'
@@ -409,7 +409,7 @@ export default function OrganizationSettingsPage() {
         case 'add-child':
           // LEA → add school with pre-selected LEA
           if (node.type === 'localEducationAgency') {
-            navigate({ to: '/settings/schools', search: { create: 'true', leaId: node.id } })
+            navigate({ to: '/settings/organization/schools/new', search: { leaId: node.id } })
           }
           break
         case 'delete':
@@ -509,7 +509,7 @@ export default function OrganizationSettingsPage() {
         <OrgSetupOnboarding
           onSetupSea={seaModal.openCreate}
           onCreateLea={leaModal.openCreate}
-          onAddSchool={() => navigate({ to: '/settings/schools' as string })}
+          onAddSchool={() => navigate({ to: '/settings/organization/schools/new' as string })}
         />
 
         {/* SEA Form (still needed in empty state) */}

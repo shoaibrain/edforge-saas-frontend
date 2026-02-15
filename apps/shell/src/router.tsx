@@ -34,8 +34,8 @@ import {
   NotificationsPage,
   PreferencesPage,
   WorkspaceSettingsPage,
-  SchoolsSettingsPage,
   SchoolDetailPage,
+  SchoolCreatePage,
   OrganizationSettingsPage,
   EducationOrgDetailPage,
   EdFiExportPreviewPage,
@@ -395,20 +395,21 @@ const settingsEdFiExportPreviewRoute = createRoute({
   component: EdFiExportPreviewPage,
 })
 
-const settingsSchoolsRoute = createRoute({
+// New: School detail under organization hierarchy
+const settingsOrgSchoolDetailRoute = createRoute({
   getParentRoute: () => settingsRoute,
-  path: '/schools',
-  component: SchoolsSettingsPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    create: search.create as string | undefined,
-    leaId: search.leaId as string | undefined,
-  }),
+  path: '/organization/schools/$schoolId',
+  component: SchoolDetailPage,
 })
 
-const settingsSchoolDetailRoute = createRoute({
+// New: School creation under organization hierarchy
+const settingsOrgSchoolCreateRoute = createRoute({
   getParentRoute: () => settingsRoute,
-  path: '/schools/$schoolId',
-  component: SchoolDetailPage,
+  path: '/organization/schools/new',
+  component: SchoolCreatePage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    leaId: search.leaId as string | undefined,
+  }),
 })
 
 const settingsBillingRoute = createRoute({
@@ -583,12 +584,12 @@ const routeTree = rootRoute.addChildren([
       settingsGeneralRoute,
       settingsWorkspaceRoute,
       settingsOrganizationRoute,
+      settingsOrgSchoolDetailRoute,
+      settingsOrgSchoolCreateRoute,
       settingsEdOrgDetailRoute,
       settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
-      settingsSchoolsRoute,
-      settingsSchoolDetailRoute,
       settingsBillingRoute,
       settingsIntegrationsRoute,
       settingsImportExportRoute,

@@ -12,8 +12,8 @@ export { default as PreferencesPage } from './preferences'
 
 // Workspace
 export { default as WorkspaceSettingsPage } from './workspace'
-export { default as SchoolsSettingsPage } from './schools'
 export { default as SchoolDetailPage } from './school-detail'
+export { default as SchoolCreatePage } from './school-create'
 export { default as SchoolConfigurationPage } from './school-configuration'
 export { default as SchoolDepartmentsPage } from './school-departments'
 export { default as SchoolAcademicYearsPage } from './school-academic-years'
