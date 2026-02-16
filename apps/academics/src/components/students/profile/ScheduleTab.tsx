@@ -3,8 +3,10 @@
  *
  * Combines class schedule and attendance summary into one tab.
  * Clean table layout for classes, attendance stats at the top.
+ * Sprint 8: Added "Add to Section" button and "Remove from Section" action.
  */
 
+import { useState } from 'react'
 import {
   BookOpen,
   Calendar,
@@ -13,10 +15,16 @@ import {
   TrendingUp,
   GraduationCap,
   ExternalLink,
+  Plus,
+  Trash2,
+  Loader2,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { Button } from '@edforge/ui'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { useStudentAttendanceSummary } from '../../../hooks/useAttendance'
+import { useRemoveStudent } from '../../../hooks'
+import { useActiveSchoolId } from '../../../stores/app.store'
 
 // ============================================================================
 // TYPES
@@ -24,6 +32,7 @@ import { useStudentAttendanceSummary } from '../../../hooks/useAttendance'
 
 export interface ScheduleTabProps {
   student: StudentProfileResponseDto
+  onAddToSection?: () => void
 }
 
 type AttendanceSummary = NonNullable<StudentProfileResponseDto['attendanceSummary']>
@@ -136,7 +145,37 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
 // SCHEDULE TABLE
 // ============================================================================
 
-function ScheduleTable({ classrooms, student }: { classrooms: Classroom[]; student: StudentProfileResponseDto }) {
+function ScheduleTable({
+  classrooms,
+  student,
+  studentId,
+}: {
+  classrooms: Classroom[]
+  student: StudentProfileResponseDto
+  studentId: string
+}) {
+  const schoolId = useActiveSchoolId() || ''
+  const removeStudentMutation = useRemoveStudent()
+  const [removingId, setRemovingId] = useState<string | null>(null)
+
+  const handleRemove = async (classroom: Classroom) => {
+    const confirmed = window.confirm(
+      `Remove ${student.fullName} from ${classroom.name}? This will unlink the student from this section.`
+    )
+    if (!confirmed) return
+
+    setRemovingId(classroom.classroomId)
+    try {
+      await removeStudentMutation.mutateAsync({
+        sectionId: classroom.classroomId,
+        schoolId,
+        studentId,
+      })
+    } finally {
+      setRemovingId(null)
+    }
+  }
+
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -157,11 +196,13 @@ function ScheduleTable({ classrooms, student }: { classrooms: Classroom[]; stude
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Class</th>
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Subject</th>
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Teacher</th>
+              <th className="text-right py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-16"></th>
             </tr>
           </thead>
           <tbody>
             {classrooms.map((classroom, index) => {
               const subjectColor = getSubjectColor(classroom.subject)
+              const isRemoving = removingId === classroom.classroomId
               return (
                 <tr
                   key={classroom.classroomId}
@@ -189,6 +230,21 @@ function ScheduleTable({ classrooms, student }: { classrooms: Classroom[]; stude
                     ) : (
                       '—'
                     )}
+                  </td>
+                  <td className="py-3 px-3 text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(classroom)}
+                      disabled={isRemoving}
+                      className="p-1.5 text-text-tertiary hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+                      title="Remove from section"
+                    >
+                      {isRemoving ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3.5 h-3.5" />
+                      )}
+                    </button>
                   </td>
                 </tr>
               )
@@ -227,7 +283,7 @@ function ScheduleTable({ classrooms, student }: { classrooms: Classroom[]; stude
 // MAIN COMPONENT
 // ============================================================================
 
-export function ScheduleTab({ student }: ScheduleTabProps) {
+export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
   const classrooms = student.classrooms || []
   const attendanceSummary = student.attendanceSummary
 
@@ -257,8 +313,16 @@ export function ScheduleTab({ student }: ScheduleTabProps) {
         <BookOpen className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
         <p className="text-text-secondary font-medium">No schedule data</p>
         <p className="text-sm text-text-tertiary mt-1">
-          Classes and attendance data will appear here once the student is enrolled in sections.
+          {student.currentEnrollment
+            ? 'Add this student to class sections to begin tracking attendance and grades.'
+            : 'Classes and attendance data will appear here once the student is enrolled in sections.'}
         </p>
+        {onAddToSection && student.currentEnrollment && (
+          <Button variant="outline" size="sm" onClick={onAddToSection} className="mt-4">
+            <Plus className="w-4 h-4 mr-1.5" />
+            Add to Section
+          </Button>
+        )}
       </div>
     )
   }
@@ -267,28 +331,36 @@ export function ScheduleTab({ student }: ScheduleTabProps) {
     <div>
       {effectiveSummary && <AttendanceSection summary={effectiveSummary} />}
 
-      {/* Quick Links */}
-      <div className="flex items-center gap-3 mb-6">
-        <Link
-          to="/attendance"
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
-        >
-          <Calendar className="w-3.5 h-3.5" />
-          Attendance History
-          <ExternalLink className="w-3 h-3" />
-        </Link>
-        <Link
-          to="/grades"
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors"
-        >
-          <GraduationCap className="w-3.5 h-3.5" />
-          View Grades
-          <ExternalLink className="w-3 h-3" />
-        </Link>
+      {/* Quick Links + Add to Section */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/attendance"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            Attendance History
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+          <Link
+            to="/grades"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors"
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            View Grades
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+        {onAddToSection && student.currentEnrollment && (
+          <Button variant="outline" size="sm" onClick={onAddToSection}>
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Add to Section
+          </Button>
+        )}
       </div>
 
       {classrooms.length > 0 ? (
-        <ScheduleTable classrooms={classrooms} student={student} />
+        <ScheduleTable classrooms={classrooms} student={student} studentId={student.studentId} />
       ) : (
         <section>
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
@@ -301,6 +373,12 @@ export function ScheduleTab({ student }: ScheduleTabProps) {
             <p className="text-xs text-text-tertiary mt-1">
               Classes will appear here once enrolled in sections.
             </p>
+            {onAddToSection && student.currentEnrollment && (
+              <Button variant="outline" size="sm" onClick={onAddToSection} className="mt-3">
+                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                Add to Section
+              </Button>
+            )}
           </div>
         </section>
       )}

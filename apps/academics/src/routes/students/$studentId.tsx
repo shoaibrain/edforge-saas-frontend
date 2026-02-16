@@ -24,8 +24,7 @@ import {
   Award,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { toast } from 'sonner'
-import { useStudentProfile } from '../../hooks'
+import { useStudentProfile, useStudentProfileActions } from '../../hooks'
 import { NotFound } from '../../components/common'
 import {
   ProfileHeader,
@@ -37,6 +36,10 @@ import {
   ScheduleTab,
 } from '../../components/students/profile'
 import { StudentGradesView } from '../../components/grades/StudentGradesView'
+import { EnrollExistingStudentModal } from '../../components/enrollment/EnrollExistingStudentModal'
+import { EditStudentModal } from '../../components/students/EditStudentModal'
+import { AddToSectionModal } from '../../components/students/profile/AddToSectionModal'
+import { AddGuardianModal } from '../../components/students/profile/AddGuardianModal'
 
 // ============================================================================
 // CONSTANTS
@@ -127,6 +130,9 @@ export function StudentProfilePage() {
   const studentId = params.studentId
   const [activeTab, setActiveTab] = useState<TabId>('overview')
 
+  // Actions hook — must be called before any conditional returns (Rules of Hooks)
+  const actions = useStudentProfileActions()
+
   // Validate UUID format
   const isValidId = isValidUUID(studentId)
 
@@ -167,23 +173,6 @@ export function StudentProfilePage() {
   }
 
   // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
-  const handleEditStudent = () => {
-    // TODO: Sprint 2 Ticket 2.10 - Open StudentEditModal
-    toast.info('Edit functionality coming soon')
-  }
-
-  const handleAddGuardian = () => {
-    toast.info('Add guardian coming soon')
-  }
-
-  const handleEditGuardian = (_guardianId: string) => {
-    toast.info('Edit guardian coming soon')
-  }
-
-  // ============================================================================
   // RENDER
   // ============================================================================
 
@@ -194,7 +183,8 @@ export function StudentProfilePage() {
         <div className="pb-6">
           <ProfileHeader
             student={student}
-            onEdit={handleEditStudent}
+            onEdit={actions.openEdit}
+            onEnroll={actions.openEnroll}
             canEdit={true}
           />
         </div>
@@ -249,18 +239,25 @@ export function StudentProfilePage() {
                 <OverviewTab student={student} />
               )}
               {activeTab === 'enrollment' && (
-                <EnrollmentTab student={student} />
+                <EnrollmentTab
+                  student={student}
+                  onEnroll={actions.openEnroll}
+                  onAddToSection={actions.openAddToSection}
+                />
               )}
               {activeTab === 'family' && (
                 <FamilyTab
                   student={student}
-                  onAddGuardian={handleAddGuardian}
-                  onEditGuardian={handleEditGuardian}
+                  onAddGuardian={actions.openAddGuardian}
+                  onEditGuardian={actions.openEditGuardian}
                   canEdit={true}
                 />
               )}
               {activeTab === 'schedule' && (
-                <ScheduleTab student={student} />
+                <ScheduleTab
+                  student={student}
+                  onAddToSection={actions.openAddToSection}
+                />
               )}
               {activeTab === 'grades' && (
                 <StudentGradesView studentId={studentId} />
@@ -269,6 +266,28 @@ export function StudentProfilePage() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Modals */}
+      <EnrollExistingStudentModal
+        open={actions.enrollModalOpen}
+        onClose={() => actions.setEnrollModalOpen(false)}
+        student={student}
+      />
+      <EditStudentModal
+        open={actions.editModalOpen}
+        onClose={() => actions.setEditModalOpen(false)}
+        student={student}
+      />
+      <AddToSectionModal
+        open={actions.addToSectionModalOpen}
+        onClose={() => actions.setAddToSectionModalOpen(false)}
+        student={student}
+      />
+      <AddGuardianModal
+        open={actions.addGuardianModalOpen}
+        onClose={() => actions.setAddGuardianModalOpen(false)}
+        student={student}
+      />
     </div>
   )
 }

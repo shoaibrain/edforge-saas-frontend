@@ -11,7 +11,10 @@ import {
   Clock,
   Building2,
   CheckCircle2,
+  Plus,
+  BookOpen,
 } from 'lucide-react'
+import { Button } from '@edforge/ui'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -20,6 +23,8 @@ import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 export interface EnrollmentTabProps {
   student: StudentProfileResponseDto
+  onEnroll?: () => void
+  onAddToSection?: () => void
 }
 
 type CurrentEnrollment = NonNullable<StudentProfileResponseDto['currentEnrollment']>
@@ -31,6 +36,8 @@ type EnrollmentHistory = NonNullable<StudentProfileResponseDto['enrollmentHistor
 
 const statusStyles: Record<string, { bg: string; text: string }> = {
   active: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+  enrolled: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+  pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' },
   withdrawn: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400' },
   transferred: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' },
   graduated: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400' },
@@ -170,7 +177,7 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
 // MAIN COMPONENT
 // ============================================================================
 
-export function EnrollmentTab({ student }: EnrollmentTabProps) {
+export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentTabProps) {
   const currentEnrollment = student.currentEnrollment
   const enrollmentHistory = (student.enrollmentHistory || [])
     .filter((e) => e.enrollmentId !== currentEnrollment?.enrollmentId)
@@ -186,20 +193,61 @@ export function EnrollmentTab({ student }: EnrollmentTabProps) {
         <p className="text-sm text-text-tertiary mt-1">
           Enrollment data will appear here once the student is enrolled in an academic year.
         </p>
+        {onEnroll && (
+          <Button variant="outline" size="sm" onClick={onEnroll} className="mt-4">
+            <Plus className="w-4 h-4 mr-1.5" />
+            School Enrollment
+          </Button>
+        )}
       </div>
     )
   }
 
   return (
     <div>
+      {/* Action bar */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        {onEnroll && (
+          <Button variant="outline" size="sm" onClick={onEnroll}>
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            New School Enrollment
+          </Button>
+        )}
+      </div>
+
       {currentEnrollment && (
-        <CurrentEnrollmentSection enrollment={currentEnrollment} />
+        <>
+          <CurrentEnrollmentSection enrollment={currentEnrollment} />
+          {/* Success-state CTA: next step is adding to sections */}
+          {onAddToSection && (
+            <div className="mb-6 p-4 rounded-lg bg-teal-500/5 border border-teal-500/15 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-teal-600 dark:text-teal-400">
+                  Student is enrolled
+                </p>
+                <p className="text-xs text-text-tertiary mt-0.5">
+                  Next step: Add this student to class sections to enable attendance and grading.
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={onAddToSection}>
+                <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                Add to Section
+              </Button>
+            </div>
+          )}
+        </>
       )}
       {!currentEnrollment && (
-        <div className="mb-6 p-4 rounded-lg bg-amber-500/5 border border-amber-500/15">
+        <div className="mb-6 p-4 rounded-lg bg-amber-500/5 border border-amber-500/15 flex items-center justify-between">
           <p className="text-sm text-amber-600 dark:text-amber-400">
             No active enrollment on file for the current academic year.
           </p>
+          {onEnroll && (
+            <Button variant="outline" size="sm" onClick={onEnroll}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Enroll at School
+            </Button>
+          )}
         </div>
       )}
       <EnrollmentHistoryTable history={enrollmentHistory} />

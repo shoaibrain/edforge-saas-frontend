@@ -332,19 +332,12 @@ export async function getStudent(studentId: string): Promise<StudentResponseDto>
 }
 
 /**
- * Get student profile (extended with enrollment history, attendance, etc.)
- * 
- * Note: Currently uses the same endpoint as getStudent since the backend
- * doesn't have a dedicated /profile endpoint. The StudentProfileResponseDto
- * extends StudentResponseDto, so this works - additional fields like
- * enrollmentHistory, attendanceSummary will be undefined until the backend
- * implements them.
- * 
- * GET /academics/students/:id
+ * Get student profile (extended with enrollment history, attendance, classrooms)
+ *
+ * GET /academics/students/:id/profile
  */
 export async function getStudentProfile(studentId: string): Promise<StudentProfileResponseDto> {
-  // Use the base student endpoint - profile data will be added when backend supports it
-  return apiGet<StudentProfileResponseDto>(`/academics/students/${studentId}`)
+  return apiGet<StudentProfileResponseDto>(`/academics/students/${studentId}/profile`)
 }
 
 /**

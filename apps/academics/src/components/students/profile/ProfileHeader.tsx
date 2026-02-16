@@ -8,7 +8,7 @@
  */
 
 import { useState } from 'react'
-import { Pencil, MoreHorizontal, FileText } from 'lucide-react'
+import { Pencil, MoreHorizontal, FileText, GraduationCap } from 'lucide-react'
 import { Button, Avatar } from '@edforge/ui'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { getStudentAvatar } from '../../../lib/avatar'
@@ -20,6 +20,7 @@ import { getStudentAvatar } from '../../../lib/avatar'
 export interface ProfileHeaderProps {
   student: StudentProfileResponseDto
   onEdit?: () => void
+  onEnroll?: () => void
   canEdit?: boolean
 }
 
@@ -74,7 +75,15 @@ function getStatusStyle(status: string) {
 // ACTIONS DROPDOWN
 // ============================================================================
 
-function ActionsDropdown({ onEdit, canEdit }: { onEdit?: () => void; canEdit?: boolean }) {
+function ActionsDropdown({
+  onEdit,
+  onEnroll,
+  canEdit,
+}: {
+  onEdit?: () => void
+  onEnroll?: () => void
+  canEdit?: boolean
+}) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -92,7 +101,7 @@ function ActionsDropdown({ onEdit, canEdit }: { onEdit?: () => void; canEdit?: b
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
             {canEdit && (
               <button
                 type="button"
@@ -101,6 +110,16 @@ function ActionsDropdown({ onEdit, canEdit }: { onEdit?: () => void; canEdit?: b
               >
                 <Pencil className="w-4 h-4" />
                 Edit Student
+              </button>
+            )}
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => { setIsOpen(false); onEnroll?.() }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+              >
+                <GraduationCap className="w-4 h-4" />
+                School Enrollment
               </button>
             )}
           </div>
@@ -130,6 +149,7 @@ function StatusBadge({ status }: { status: string }) {
 export function ProfileHeader({
   student,
   onEdit,
+  onEnroll,
   canEdit = true,
 }: ProfileHeaderProps) {
   const statusStyle = getStatusStyle(student.status)
@@ -178,7 +198,7 @@ export function ProfileHeader({
 
       {/* Actions dropdown */}
       <div className="flex-shrink-0 self-start">
-        <ActionsDropdown onEdit={onEdit} canEdit={canEdit} />
+        <ActionsDropdown onEdit={onEdit} onEnroll={onEnroll} canEdit={canEdit} />
       </div>
     </div>
   )

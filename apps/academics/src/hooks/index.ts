@@ -89,3 +89,4 @@ export {
   useTransferStudent,
   enrollmentKeys,
 } from './useEnrollments'
+export { useStudentProfileActions } from './useStudentProfileActions'

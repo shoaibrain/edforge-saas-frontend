@@ -56,9 +56,9 @@ function PolicyCard({
       <div className="mb-3">
         <p className="text-xs text-text-tertiary mb-1.5">Grade Scale</p>
         <div className="flex flex-wrap gap-1">
-          {policy.gradingScale.map((entry) => (
+          {policy.gradingScale.map((entry, idx) => (
             <span
-              key={entry.letter}
+              key={`${entry.letter}-${idx}`}
               className="px-2 py-0.5 text-xs font-medium bg-surface-hover rounded text-text-secondary"
             >
               {entry.letter}: {entry.minPercentage}-{entry.maxPercentage}%
