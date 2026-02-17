@@ -177,10 +177,12 @@ function SectionFormView({
         sectionName: section.sectionName || '',
         primaryTeacherId: section.primaryTeacherId,
         coTeacherIds: section.coTeacherIds || [],
-        room: section.roomNumber || '',
         maxEnrollment: section.maxEnrollment,
         academicYearId: section.academicYearId,
         termId: section.termId || '',
+        locationId: section.locationId || '',
+        classPeriodId: section.classPeriodId || '',
+        courseOfferingId: section.courseOfferingId || '',
       }
     }
     return defaultSectionFormData
@@ -204,7 +206,10 @@ function SectionFormView({
           sectionName: data.sectionName || undefined,
           primaryTeacherId: data.primaryTeacherId,
           coTeacherIds: data.coTeacherIds?.length ? data.coTeacherIds : undefined,
-          roomId: undefined, // Room API deferred
+          roomId: undefined,
+          locationId: data.locationId || undefined,
+          classPeriodId: data.classPeriodId || undefined,
+          courseOfferingId: data.courseOfferingId || undefined,
           maxEnrollment: data.maxEnrollment,
         }
         await createMutation.mutateAsync(payload)
@@ -216,6 +221,9 @@ function SectionFormView({
           sectionName: data.sectionName || undefined,
           primaryTeacherId: data.primaryTeacherId,
           coTeacherIds: data.coTeacherIds?.length ? data.coTeacherIds : undefined,
+          locationId: data.locationId || undefined,
+          classPeriodId: data.classPeriodId || undefined,
+          courseOfferingId: data.courseOfferingId || undefined,
           maxEnrollment: data.maxEnrollment,
         }
         await updateMutation.mutateAsync({
