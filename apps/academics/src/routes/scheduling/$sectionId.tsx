@@ -181,7 +181,7 @@ function OverviewTab({ section }: { section: NonNullable<ReturnType<typeof useSe
     {
       icon: MapPin,
       label: 'Room',
-      value: section.roomNumber || 'Not assigned',
+      value: section.locationRoomNumber || section.roomNumber || 'Not assigned',
       sub: undefined,
       accent: 'from-emerald-500/20 to-teal-500/20',
       iconColor: 'text-emerald-600',

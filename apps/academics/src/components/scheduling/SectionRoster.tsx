@@ -89,8 +89,16 @@ function StudentRow({
           <div className="text-sm font-medium text-text-primary">
             {student.studentName || student.studentId}
           </div>
-          <div className="text-xs text-text-tertiary">
-            Enrolled {new Date(student.enrolledAt).toLocaleDateString()}
+          <div className="flex items-center gap-2 text-xs text-text-tertiary">
+            {student.studentNumber && (
+              <span>#{student.studentNumber}</span>
+            )}
+            {student.currentGradeLevel && (
+              <span className="px-1.5 py-0.5 rounded bg-surface-tertiary text-text-secondary font-medium">
+                {student.currentGradeLevel}
+              </span>
+            )}
+            <span>Enrolled {new Date(student.enrolledAt).toLocaleDateString()}</span>
           </div>
         </div>
       </div>

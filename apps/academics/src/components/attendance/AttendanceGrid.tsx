@@ -111,7 +111,7 @@ export function AttendanceGrid({
       return {
         studentId: s.studentId,
         studentName: s.studentName || s.studentId,
-        studentNumber: undefined as string | undefined,
+        studentNumber: s.studentNumber,
         status: (existing?.status ?? null) as AttendanceStatus | null,
         notes: existing?.notes ?? '',
       }
