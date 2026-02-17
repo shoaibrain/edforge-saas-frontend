@@ -3,10 +3,11 @@
  *
  * Slide-over drawer for section create/edit/view.
  * Uses framer-motion for animation (not @headlessui/react Dialog).
- * Follows the CourseDrawer pattern.
+ * Follows the CourseDrawer pattern with entity name as title.
  */
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -19,7 +20,6 @@ import {
   Users,
   MapPin,
   AlertCircle,
-  Pencil,
 } from 'lucide-react'
 import type { SectionResponseDto, CreateSectionDto, UpdateSectionDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -33,6 +33,7 @@ import {
   type SectionFormData,
 } from '../../schemas/section.form'
 import { SectionForm } from './SectionForm'
+import { DrawerFooterCTA } from '../common/DrawerFooterCTA'
 
 // ============================================================================
 // TYPES
@@ -77,42 +78,16 @@ function DetailRow({
 
 function SectionDetailView({
   section,
-  onEdit,
 }: {
   section: SectionResponseDto
-  onEdit: () => void
 }) {
   const percent = getCapacityPercent(section.currentEnrollment, section.maxEnrollment)
   const barColor = getCapacityColor(section.currentEnrollment, section.maxEnrollment)
 
   return (
     <div className="space-y-6">
-      {/* Quick edit */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-          Edit Section
-        </button>
-      </div>
-
       {/* Details */}
       <div className="divide-y divide-border-secondary">
-        <DetailRow
-          icon={BookOpen}
-          label="Course"
-          value={
-            <span>
-              {section.courseName || '—'}
-              {section.courseCode && (
-                <span className="text-text-tertiary ml-1">({section.courseCode})</span>
-              )}
-            </span>
-          }
-        />
         <DetailRow
           icon={User}
           label="Primary Teacher"
@@ -302,11 +277,12 @@ export function SectionDrawer({
   onClose,
   mode: initialMode,
   section,
-  onModeChange,
+  onModeChange: _onModeChange,
   onSuccess,
 }: SectionDrawerProps) {
   const [internalMode, setInternalMode] = useState<DrawerMode>(initialMode)
   const panelRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   // Sync internal mode with prop
   useEffect(() => {
@@ -335,11 +311,6 @@ export function SectionDrawer({
     }
   }, [open])
 
-  const switchToEdit = () => {
-    setInternalMode('edit')
-    onModeChange?.('edit')
-  }
-
   const handleClose = () => {
     setInternalMode(initialMode)
     onClose()
@@ -356,17 +327,25 @@ export function SectionDrawer({
     }
   }
 
+  // Navigate to Section Detail Page with race-condition-safe timing
+  const handleViewDetails = () => {
+    if (!section) return
+    const target = `/scheduling/${section.sectionId}`
+    handleClose()
+    queueMicrotask(() => navigate({ to: target }))
+  }
+
+  // Dynamic title: entity name in view/edit, generic in create
+  const sectionDisplayName = section?.sectionName || (section ? `Section ${section.sectionNumber}` : null)
   const title =
     internalMode === 'create'
       ? 'Add New Section'
-      : internalMode === 'edit'
-        ? 'Edit Section'
-        : 'Section Details'
+      : sectionDisplayName || 'Section Details'
 
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="section-drawer-title">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -391,18 +370,41 @@ export function SectionDrawer({
               <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex-shrink-0">
                       <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h2 className="text-lg font-semibold text-text-primary">
-                      {title}
-                    </h2>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h2
+                          id="section-drawer-title"
+                          className="text-lg font-semibold text-text-primary truncate"
+                        >
+                          {title}
+                        </h2>
+                        {internalMode === 'edit' && (
+                          <span className="flex-shrink-0 text-xs bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                            Editing
+                          </span>
+                        )}
+                      </div>
+                      {/* Subtitle: section # + course info (view/edit modes) */}
+                      {internalMode !== 'create' && section && (
+                        <div className="flex items-center gap-1.5 mt-0.5 text-xs text-text-tertiary">
+                          <span>#{section.sectionNumber}</span>
+                          <span>·</span>
+                          <span className="truncate">
+                            {section.courseName}
+                            {section.courseCode && ` (${section.courseCode})`}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
+                    className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
                     aria-label="Close drawer"
                   >
                     <X className="w-5 h-5" />
@@ -412,7 +414,7 @@ export function SectionDrawer({
                 {/* Content */}
                 {internalMode === 'view' && section ? (
                   <div className="flex-1 overflow-y-auto px-6 py-4">
-                    <SectionDetailView section={section} onEdit={switchToEdit} />
+                    <SectionDetailView section={section} />
                   </div>
                 ) : internalMode === 'create' || internalMode === 'edit' ? (
                   <SectionFormView
@@ -428,6 +430,15 @@ export function SectionDrawer({
                       <p className="text-sm">No section data available</p>
                     </div>
                   </div>
+                )}
+
+                {/* Footer CTA — view mode only */}
+                {internalMode === 'view' && section && (
+                  <DrawerFooterCTA
+                    label="View Details"
+                    onClick={handleViewDetails}
+                    entityName={sectionDisplayName || 'Section'}
+                  />
                 )}
               </div>
             </motion.div>

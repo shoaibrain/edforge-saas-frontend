@@ -34,6 +34,7 @@ import { SectionDetailPage } from './routes/scheduling/$sectionId'
 import { SectionRosterPage } from './routes/sections/roster'
 import { BulkRosteringPage } from './routes/rostering'
 import { CurriculumModule } from './routes/curriculum'
+import { CourseDetailPage } from './routes/curriculum/$courseId'
 import { ReportCardPage } from './routes/grades/report-card'
 
 // ============================================================================
@@ -215,6 +216,13 @@ const curriculumRoute = createRoute({
     component: CurriculumModule,
 })
 
+// Course detail - individual course view
+const courseDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/curriculum/$courseId',
+    component: CourseDetailPage,
+})
+
 // ============================================================================
 // ROUTE TREE
 // ============================================================================
@@ -245,6 +253,7 @@ const routeTree = rootRoute.addChildren([
     sectionRosterRoute,
     rosteringRoute,
     curriculumRoute,
+    courseDetailRoute,
 ])
 
 /**

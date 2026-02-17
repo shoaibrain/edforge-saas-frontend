@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
@@ -207,6 +208,7 @@ function PageActionsDropdown({ onAddCourse }: { onAddCourse: () => void }) {
 
 export function CurriculumModule() {
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
+  const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
   const filters = useCourseFilters()
 
@@ -282,6 +284,10 @@ export function CurriculumModule() {
     } catch {
       // Error toast handled in mutation hook
     }
+  }
+
+  const navigateToCourse = (course: CourseResponseDto) => {
+    navigate({ to: `/curriculum/${course.courseId}` })
   }
 
   const closeDrawer = () => {
@@ -421,6 +427,7 @@ export function CurriculumModule() {
                   onViewCourse={openViewDrawer}
                   onEditCourse={openEditDrawer}
                   onToggleActive={handleToggleActive}
+                  onNavigateToCourse={navigateToCourse}
                 />
               </div>
             )}

@@ -2,8 +2,8 @@
  * CourseDrawer Component
  *
  * Slide-over drawer that handles:
- * - View mode: Read-only display of all course fields
- * - Edit mode: CourseForm pre-populated with course data
+ * - View mode: Read-only display of all course fields, with course name as title
+ * - Edit mode: CourseForm pre-populated with course data, with "Editing" badge
  * - Create mode: Empty CourseForm for new course creation
  *
  * Uses framer-motion for slide animation + manual backdrop/escape handling.
@@ -13,10 +13,10 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   X,
-  Pencil,
   Loader2,
   BookOpen,
   Clock,
@@ -31,6 +31,7 @@ import type { CourseResponseDto, CreateCourseDto, UpdateCourseDto } from '@aibra
 import { CourseForm } from './CourseForm'
 import { useCreateCourse, useUpdateCourse } from '../../hooks/useCourses'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { DrawerFooterCTA } from '../common/DrawerFooterCTA'
 import {
   courseFormSchema,
   type CourseFormData,
@@ -118,48 +119,19 @@ function Badge({
 
 function CourseDetailView({
   course,
-  onEdit,
 }: {
   course: CourseResponseDto
-  onEdit: () => void
 }) {
   const subjectColors = SUBJECT_AREA_COLORS[course.subjectArea] ?? SUBJECT_AREA_COLORS.other
   const typeColors = COURSE_TYPE_COLORS[course.courseType] ?? COURSE_TYPE_COLORS.required
 
+  // Avoid showing duplicate badges when creditType label matches courseType label
+  const courseTypeLabel = getCourseTypeLabel(course.courseType)
+  const creditTypeLabel = course.creditType ? getCreditTypeLabel(course.creditType) : null
+  const showCreditBadge = creditTypeLabel && creditTypeLabel !== courseTypeLabel
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-sm font-semibold text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded">
-              {course.courseCode}
-            </span>
-            <div
-              className={`w-2 h-2 rounded-full ${
-                course.isActive ? 'bg-emerald-500' : 'bg-gray-400'
-              }`}
-            />
-          </div>
-          <h3 className="text-lg font-semibold text-text-primary">
-            {course.courseName}
-          </h3>
-          {course.departmentName && (
-            <p className="text-sm text-text-secondary mt-0.5">
-              {course.departmentName}
-            </p>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={onEdit}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-          Edit
-        </button>
-      </div>
-
       {/* Quick badges */}
       <div className="flex flex-wrap items-center gap-2">
         <Badge
@@ -168,13 +140,13 @@ function CourseDetailView({
           text={subjectColors.text}
         />
         <Badge
-          label={getCourseTypeLabel(course.courseType)}
+          label={courseTypeLabel}
           bg={typeColors.bg}
           text={typeColors.text}
         />
-        {course.creditType && (
+        {showCreditBadge && (
           <Badge
-            label={getCreditTypeLabel(course.creditType)}
+            label={creditTypeLabel}
             bg="bg-slate-50"
             text="text-slate-700"
           />
@@ -446,10 +418,11 @@ export function CourseDrawer({
   onClose,
   mode: initialMode,
   course,
-  onModeChange,
+  onModeChange: _onModeChange,
 }: CourseDrawerProps) {
   const [internalMode, setInternalMode] = useState<DrawerMode>(initialMode)
   const panelRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   // Sync internal mode with prop
   useEffect(() => {
@@ -482,11 +455,6 @@ export function CourseDrawer({
     }
   }, [open])
 
-  const switchToEdit = () => {
-    setInternalMode('edit')
-    onModeChange?.('edit')
-  }
-
   const handleClose = () => {
     setInternalMode(initialMode)
     onClose()
@@ -504,17 +472,24 @@ export function CourseDrawer({
     }
   }
 
+  // Navigate to Course Detail Page with race-condition-safe timing
+  const handleViewDetails = () => {
+    if (!course) return
+    const target = `/curriculum/${course.courseId}`
+    handleClose()
+    queueMicrotask(() => navigate({ to: target }))
+  }
+
+  // Dynamic title: entity name in view/edit, generic in create
   const title =
     internalMode === 'create'
       ? 'Add New Course'
-      : internalMode === 'edit'
-        ? 'Edit Course'
-        : 'Course Details'
+      : course?.courseName || 'Course Details'
 
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="course-drawer-title">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -539,18 +514,41 @@ export function CourseDrawer({
               <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500/20 to-pink-500/20">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex-shrink-0">
                       <BookOpen className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                     </div>
-                    <h2 className="text-lg font-semibold text-text-primary">
-                      {title}
-                    </h2>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h2
+                          id="course-drawer-title"
+                          className="text-lg font-semibold text-text-primary truncate"
+                        >
+                          {title}
+                        </h2>
+                        {internalMode === 'edit' && (
+                          <span className="flex-shrink-0 text-xs bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                            Editing
+                          </span>
+                        )}
+                      </div>
+                      {/* Subtitle: course code + status (view/edit modes) */}
+                      {internalMode !== 'create' && course && (
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="font-mono text-xs text-text-tertiary bg-surface-tertiary px-1.5 py-0.5 rounded">
+                            {course.courseCode}
+                          </span>
+                          <span className={`text-[10px] font-medium ${course.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'}`}>
+                            {course.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
+                    className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
                     aria-label="Close drawer"
                   >
                     <X className="w-5 h-5" />
@@ -560,10 +558,7 @@ export function CourseDrawer({
                 {/* Content */}
                 {internalMode === 'view' && course ? (
                   <div className="flex-1 overflow-y-auto px-6 py-4">
-                    <CourseDetailView
-                      course={course}
-                      onEdit={switchToEdit}
-                    />
+                    <CourseDetailView course={course} />
                   </div>
                 ) : (internalMode === 'create' || internalMode === 'edit') ? (
                   <CourseFormView
@@ -579,6 +574,15 @@ export function CourseDrawer({
                       <p className="text-sm">No course data available</p>
                     </div>
                   </div>
+                )}
+
+                {/* Footer CTA — view mode only */}
+                {internalMode === 'view' && course && (
+                  <DrawerFooterCTA
+                    label="View Details"
+                    onClick={handleViewDetails}
+                    entityName={course.courseName}
+                  />
                 )}
               </div>
             </motion.div>

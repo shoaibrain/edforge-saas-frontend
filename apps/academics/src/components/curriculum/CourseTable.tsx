@@ -11,6 +11,7 @@ import {
   BookOpen,
   MoreVertical,
   Eye,
+  ExternalLink,
   Pencil,
   ToggleLeft,
   ToggleRight,
@@ -40,6 +41,7 @@ interface CourseTableProps {
   onViewCourse?: (course: CourseResponseDto) => void
   onEditCourse?: (course: CourseResponseDto) => void
   onToggleActive?: (course: CourseResponseDto) => void
+  onNavigateToCourse?: (course: CourseResponseDto) => void
 }
 
 // ============================================================================
@@ -51,9 +53,10 @@ interface RowActionsProps {
   onView: () => void
   onEdit: () => void
   onToggleActive: () => void
+  onNavigate?: () => void
 }
 
-function RowActions({ course, onView, onEdit, onToggleActive }: RowActionsProps) {
+function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowActionsProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -90,8 +93,22 @@ function RowActions({ course, onView, onEdit, onToggleActive }: RowActionsProps)
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Eye className="w-4 h-4" />
-              View Details
+              Quick View
             </button>
+            {onNavigate && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onNavigate()
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                View Full Details
+              </button>
+            )}
             <button
               type="button"
               onClick={(e) => {
@@ -212,6 +229,7 @@ export function CourseTable({
   onViewCourse,
   onEditCourse,
   onToggleActive,
+  onNavigateToCourse,
 }: CourseTableProps) {
   const columns: Column<CourseResponseDto>[] = useMemo(
     () => [
@@ -327,6 +345,7 @@ export function CourseTable({
           onView={() => onViewCourse?.(course)}
           onEdit={() => onEditCourse?.(course)}
           onToggleActive={() => onToggleActive?.(course)}
+          onNavigate={onNavigateToCourse ? () => onNavigateToCourse(course) : undefined}
         />
       )}
     />

@@ -362,14 +362,6 @@ export function SectionDetailPage() {
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => navigate({ to: '/scheduling' })}
-                className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-                aria-label="Back to scheduling"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
               <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
                 <CalendarDays className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
