@@ -157,10 +157,10 @@ function DepartmentFormModal({
 
           {/* Footer */}
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="ghost" type="button" onClick={onClose}>
+            <Button variant="outline" type="button" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" isLoading={isLoading}>
+            <Button variant={'outline'} type="submit" isLoading={isLoading}>
               {mode === 'create' ? 'Create Department' : 'Save Changes'}
             </Button>
           </div>
@@ -363,7 +363,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
             Manage academic and administrative departments
           </p>
         </div>
-        <Button onClick={() => setModalState({ mode: 'create', department: null })}>
+        <Button variant={'outline'} onClick={() => setModalState({ mode: 'create', department: null })}>
           <Plus className="w-4 h-4 mr-1.5" />
           Add Department
         </Button>

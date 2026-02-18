@@ -789,7 +789,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
             Manage the temporal boundaries for academic data
           </p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <Button variant={'outline'} onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           New Academic Year
         </Button>

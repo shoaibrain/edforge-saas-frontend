@@ -23,7 +23,8 @@ import {
   Layers,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button, Drawer, DrawerFooter } from '@edforge/ui'
+import { Button, Drawer, DrawerFooter, Dropdown } from '@edforge/ui'
+import type { DropdownOption } from '@edforge/ui'
 import { tenantService } from '@/services/tenant.service'
 import {
   useCalendarStats,
@@ -31,6 +32,7 @@ import {
   useBulkUpdateCalendarDates,
   useGenerateCalendar,
 } from '@/hooks/useCalendar'
+import { useBellSchedules } from '@/hooks/useBellSchedules'
 import { MonthlyCalendarGrid } from '@/components/calendar/MonthlyCalendarGrid'
 import { SessionManager } from '@/components/calendar/SessionManager'
 import {
@@ -91,6 +93,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   const [editEventType, setEditEventType] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [editIsInstructional, setEditIsInstructional] = useState(true)
+  const [editBellScheduleId, setEditBellScheduleId] = useState<string | null>(null)
 
   // ── Fetch academic years ──
   const { data: academicYears } = useQuery({
@@ -110,6 +113,28 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   const updateDate = useUpdateCalendarDate(schoolId)
   const bulkUpdate = useBulkUpdateCalendarDates(schoolId)
   const generateCalendar = useGenerateCalendar(schoolId)
+
+  // ── Bell Schedules ──
+  const { data: schedulesData } = useBellSchedules(schoolId)
+  const bellScheduleOptions: DropdownOption[] = useMemo(() => {
+    const items = schedulesData?.items || []
+    return [
+      { id: '__none__', label: 'No Schedule', description: 'No bell schedule assigned' },
+      ...items
+        .filter((s: any) => s.isActive)
+        .map((s: any) => ({
+          id: s.bellScheduleId,
+          label: s.bellScheduleName,
+          description: s.dayType.replace(/_/g, ' '),
+        })),
+    ]
+  }, [schedulesData])
+
+  const getScheduleName = (id: string | null): string | undefined => {
+    if (!id || id === '__none__') return undefined
+    const items = schedulesData?.items || []
+    return items.find((s: any) => s.bellScheduleId === id)?.bellScheduleName
+  }
 
   // ── Stats ──
   const { data: stats } = useCalendarStats(schoolId, academicYearId, !!academicYearId)
@@ -139,18 +164,23 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   // ── Save single date edit ──
   const handleSaveDate = () => {
     if (!selectedDate || !editEventType) return
+    const bellScheduleId = editBellScheduleId && editBellScheduleId !== '__none__' ? editBellScheduleId : undefined
+    const bellScheduleName = getScheduleName(editBellScheduleId)
     updateDate.mutate(
       {
         date: selectedDate,
         data: {
           calendarEvents: [{ eventType: editEventType as any, isAllDay: true, description: editDescription || undefined }],
           isInstructionalDay: editIsInstructional,
+          bellScheduleId,
+          bellScheduleName,
         },
       },
       {
         onSuccess: () => {
           toast.success(`Updated ${selectedDate}`)
           setSelectedDate(null)
+          setEditBellScheduleId(null)
         },
       }
     )
@@ -159,12 +189,16 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   // ── Bulk update ──
   const handleBulkUpdate = () => {
     if (!selectedDates.length || !editEventType) return
+    const bellScheduleId = editBellScheduleId && editBellScheduleId !== '__none__' ? editBellScheduleId : undefined
+    const bellScheduleName = getScheduleName(editBellScheduleId)
     bulkUpdate.mutate(
       {
         dates: selectedDates,
         updates: {
           calendarEvents: [{ eventType: editEventType as any, isAllDay: true, description: editDescription || undefined }],
           isInstructionalDay: editIsInstructional,
+          bellScheduleId,
+          bellScheduleName,
         },
       },
       {
@@ -172,6 +206,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           toast.success(`Updated ${selectedDates.length} dates`)
           setSelectedDates([])
           setIsBulkMode(false)
+          setEditBellScheduleId(null)
         },
       }
     )
@@ -306,6 +341,15 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
+            {bellScheduleOptions.length > 1 && (
+              <Dropdown
+                options={bellScheduleOptions}
+                value={editBellScheduleId}
+                onChange={(id) => setEditBellScheduleId(id)}
+                placeholder="Bell schedule..."
+                buttonClassName="text-sm rounded-lg py-1.5"
+              />
+            )}
             <Button size="sm" variant="primary" onClick={handleBulkUpdate} disabled={!editEventType || bulkUpdate.isPending}>
               Apply
             </Button>
@@ -373,6 +417,20 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               <span className="text-[rgb(var(--text-secondary))]">Instructional Day</span>
             </label>
           </div>
+
+          {/* Bell Schedule */}
+          {bellScheduleOptions.length > 1 && (
+            <div>
+              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Bell Schedule</label>
+              <Dropdown
+                options={bellScheduleOptions}
+                value={editBellScheduleId}
+                onChange={(id) => setEditBellScheduleId(id)}
+                placeholder="Assign bell schedule..."
+                buttonClassName="rounded-xl py-2.5"
+              />
+            </div>
+          )}
 
           <DrawerFooter>
             <Button variant="ghost" size="sm" onClick={() => setSelectedDate(null)}>Cancel</Button>

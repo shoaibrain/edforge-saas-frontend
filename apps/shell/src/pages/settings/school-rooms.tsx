@@ -222,7 +222,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
           </div>
         </div>
 
-        <Button variant="primary" size="sm" onClick={openCreate}>
+        <Button variant="outline" size="sm" onClick={openCreate}>
           <Plus className="w-4 h-4 mr-1.5" />
           Add Room
         </Button>
@@ -440,7 +440,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
           <DrawerFooter>
             <Button variant="ghost" size="sm" onClick={closeForm}>Cancel</Button>
             <Button
-              variant="primary"
+              variant="outline"
               size="sm"
               onClick={handleSave}
               disabled={createMutation.isPending || updateMutation.isPending}

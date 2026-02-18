@@ -222,6 +222,16 @@ export function MonthlyCalendarGrid({
                 </div>
               )}
 
+              {/* Bell schedule label */}
+              {calDate?.bellScheduleName && (
+                <div
+                  className="text-[9px] leading-tight text-[rgb(var(--text-tertiary))] truncate px-1 mt-0.5"
+                  title={calDate.bellScheduleName}
+                >
+                  {calDate.bellScheduleName}
+                </div>
+              )}
+
               {/* Selection indicator */}
               {isSelected && (
                 <div className="absolute top-1 right-1">
