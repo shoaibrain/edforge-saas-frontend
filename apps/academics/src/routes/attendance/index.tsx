@@ -26,6 +26,7 @@ import {
 } from '../../stores/attendance.store'
 import {
   useAttendanceSummary,
+  useAttendanceRecords,
   useRecordBulkAttendance,
   useCalendarDate,
 } from '../../hooks/useAttendance'
@@ -241,6 +242,26 @@ export function AttendanceModule() {
     enabled: !!schoolId,
   })
 
+  // Fetch existing attendance records for the selected date
+  const { data: attendanceRecords } = useAttendanceRecords({
+    schoolId,
+    date: selectedDate,
+    enabled: !!schoolId && !!selectedSectionId && activeTab === 'daily-entry',
+  })
+
+  // Filter records to only students in the selected section's roster
+  const existingRecords = useMemo(() => {
+    if (!attendanceRecords || !roster?.students) return []
+    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
+    return attendanceRecords
+      .filter((r) => rosterStudentIds.has(r.studentId))
+      .map((r) => ({
+        studentId: r.studentId,
+        status: r.status,
+        notes: r.notes,
+      }))
+  }, [attendanceRecords, roster?.students])
+
   // Calendar date check (Sprint 5)
   const { data: calendarDate } = useCalendarDate({
     schoolId,
@@ -249,7 +270,7 @@ export function AttendanceModule() {
   })
 
   const isNonInstructional = calendarDate != null &&
-    calendarDate.calendarEventType !== 'instructional'
+    !calendarDate.isInstructionalDay
 
   // Bulk attendance mutation
   const bulkMutation = useRecordBulkAttendance()
@@ -335,8 +356,8 @@ export function AttendanceModule() {
             {/* Calendar Non-Instructional Banner */}
             {isNonInstructional && (
               <CalendarBanner
-                description={calendarDate?.description || ''}
-                eventType={calendarDate?.calendarEventType || 'non-instructional'}
+                description={calendarDate?.calendarEvents?.[0]?.description || ''}
+                eventType={calendarDate?.calendarEvents?.[0]?.eventType || 'non-instructional'}
               />
             )}
 
@@ -366,8 +387,10 @@ export function AttendanceModule() {
               </div>
             ) : (
               <AttendanceGrid
+                key={`${selectedSectionId}-${selectedDate}`}
                 students={roster?.students ?? []}
                 date={selectedDate}
+                existingRecords={existingRecords}
                 onSave={handleSave}
                 isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
                 disabled={isNonInstructional}

@@ -678,7 +678,12 @@ export interface AttendanceRecord {
 }
 
 export interface BulkAttendanceResponse {
-  recorded: number
+  success: boolean
+  date: string
+  schoolId: string
+  totalProcessed: number
+  recordsCreated: number
+  recordsUpdated: number
   errors: Array<{ studentId: string; error: string }>
 }
 
@@ -731,6 +736,20 @@ export async function recordBulkAttendance(
   data: BulkAttendanceParams
 ): Promise<BulkAttendanceResponse> {
   return apiPost<BulkAttendanceResponse>('/academics/attendance/bulk', data)
+}
+
+/**
+ * Get attendance records for a school on a specific date
+ * GET /academics/attendance?schoolId=&date=
+ */
+export async function getAttendanceByDate(
+  schoolId: string,
+  date: string
+): Promise<{ items: AttendanceRecord[]; hasMore: boolean }> {
+  return apiGet<{ items: AttendanceRecord[]; hasMore: boolean }>('/academics/attendance', {
+    schoolId,
+    date,
+  })
 }
 
 /**
@@ -1247,8 +1266,15 @@ export interface CalendarDateInfo {
   calendarDateId: string
   schoolId: string
   date: string
-  calendarEventType: string  // 'instructional' | 'holiday' | 'teacher_workday' etc.
-  description?: string
+  isInstructionalDay: boolean
+  isHoliday: boolean
+  isWeekend: boolean
+  dayOfWeek: string
+  calendarEvents?: Array<{
+    description?: string
+    isAllDay?: boolean
+    eventType: string
+  }>
 }
 
 /**
@@ -1372,6 +1398,7 @@ export const academicsService = {
   // Attendance
   recordAttendance,
   recordBulkAttendance,
+  getAttendanceByDate,
   getAttendanceSummary,
   getStudentAttendance,
   getStudentAttendanceSummary,

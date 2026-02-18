@@ -241,7 +241,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             {isBulkMode ? 'Exit Bulk' : 'Bulk Edit'}
           </Button>
           <Button
-            variant="primary"
+            variant="outline"
             size="sm"
             onClick={() => setShowGenerator(true)}
           >
@@ -425,9 +425,9 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <Button variant="ghost" onClick={() => setShowGenerator(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setShowGenerator(false)}>Cancel</Button>
                 <Button
-                  variant="primary"
+                  variant="outline"
                   onClick={handleGenerate}
                   disabled={generateCalendar.isPending}
                   isLoading={generateCalendar.isPending}

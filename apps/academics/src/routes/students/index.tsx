@@ -265,6 +265,7 @@ export function StudentsModule() {
                 Import CSV
               </Button>
               <Button
+                variant="outline"
                 onClick={handleAddStudent}
                 disabled={!activeSchoolId}
               >

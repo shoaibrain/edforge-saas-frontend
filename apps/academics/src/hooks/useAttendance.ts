@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import {
   recordAttendance,
   recordBulkAttendance,
+  getAttendanceByDate,
   getAttendanceSummary,
   getStudentAttendance,
   getStudentAttendanceSummary,
@@ -51,6 +52,8 @@ export const attendanceKeys = {
     [...attendanceKeys.all, 'trend', schoolId, startDate, endDate] as const,
   alerts: (schoolId: string) =>
     [...attendanceKeys.all, 'alerts', schoolId] as const,
+  records: (schoolId: string, date: string) =>
+    [...attendanceKeys.all, 'records', schoolId, date] as const,
   calendarDate: (schoolId: string, date: string) =>
     [...attendanceKeys.all, 'calendar-date', schoolId, date] as const,
 }
@@ -78,6 +81,35 @@ export function useAttendanceSummary({
     queryFn: () => getAttendanceSummary(schoolId, date),
     enabled: enabled && !!schoolId && !!date,
     staleTime: 30 * 1000, // 30 seconds - attendance changes frequently
+    refetchOnWindowFocus: true,
+  })
+}
+
+// ============================================================================
+// ATTENDANCE RECORDS BY DATE
+// ============================================================================
+
+/**
+ * Hook to fetch existing attendance records for a school on a specific date.
+ * Used to populate the attendance grid with previously saved records.
+ */
+export function useAttendanceRecords({
+  schoolId,
+  date,
+  enabled = true,
+}: {
+  schoolId: string
+  date: string
+  enabled?: boolean
+}) {
+  return useQuery<AttendanceRecord[], Error>({
+    queryKey: attendanceKeys.records(schoolId, date),
+    queryFn: async () => {
+      const result = await getAttendanceByDate(schoolId, date)
+      return result.items
+    },
+    enabled: enabled && !!schoolId && !!date,
+    staleTime: 30 * 1000,
     refetchOnWindowFocus: true,
   })
 }
@@ -176,6 +208,9 @@ export function useRecordBulkAttendance() {
         queryKey: attendanceKeys.summary(variables.schoolId, variables.date),
       })
       queryClient.invalidateQueries({
+        queryKey: attendanceKeys.records(variables.schoolId, variables.date),
+      })
+      queryClient.invalidateQueries({
         queryKey: attendanceKeys.studentHistories(),
       })
       queryClient.invalidateQueries({
@@ -184,7 +219,7 @@ export function useRecordBulkAttendance() {
       if (result.errors.length > 0) {
         toast.warning(`Attendance saved with ${result.errors.length} error(s)`)
       } else {
-        toast.success(`Attendance recorded for ${result.recorded} students`)
+        toast.success(`Attendance recorded for ${result.totalProcessed} students`)
       }
     },
     onError: (error) => {

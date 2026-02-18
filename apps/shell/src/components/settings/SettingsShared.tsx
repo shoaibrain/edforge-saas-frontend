@@ -481,6 +481,7 @@ export interface SaveButtonProps {
 export function SaveButton({ isDirty, isSaving, saveSuccess, className }: SaveButtonProps) {
   return (
     <Button 
+    variant="outline"
       type="submit" 
       disabled={!isDirty || isSaving} 
       className={cn('min-w-[110px]', className)}
