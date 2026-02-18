@@ -9,6 +9,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   ClipboardCheck,
   Loader2,
@@ -39,7 +40,12 @@ import { DailySummary } from '../../components/attendance/DailySummary'
 import { AttendanceDashboard } from './dashboard'
 import type { AttendanceStatus } from '../../services/academics.service'
 
-type TabId = 'daily-entry' | 'dashboard'
+type TabId = 'overview' | 'daily-entry'
+
+const TABS: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
+  { id: 'overview', label: 'Overview', icon: BarChart3 },
+  { id: 'daily-entry', label: 'Daily Entry', icon: ClipboardCheck },
+]
 
 // ============================================================================
 // SAVE STATUS INDICATOR
@@ -94,7 +100,7 @@ function SaveStatusIndicator({
 }
 
 // ============================================================================
-// TAB BAR
+// TAB BAR (framer-motion animated underline — consistent with other modules)
 // ============================================================================
 
 function TabBar({
@@ -104,32 +110,39 @@ function TabBar({
   activeTab: TabId
   onTabChange: (tab: TabId) => void
 }) {
-  const tabs = [
-    { id: 'daily-entry' as const, label: 'Daily Entry', icon: ClipboardCheck },
-    { id: 'dashboard' as const, label: 'Dashboard', icon: BarChart3 },
-  ]
-
   return (
-    <div className="flex gap-1 bg-surface-secondary/50 rounded-lg p-1">
-      {tabs.map((tab) => {
+    <nav className="flex gap-1" aria-label="Attendance tabs">
+      {TABS.map((tab) => {
         const isActive = activeTab === tab.id
         return (
           <button
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-surface-primary text-text-primary shadow-sm'
-                : 'text-text-secondary hover:text-text-primary'
+                ? 'text-text-primary'
+                : 'text-text-tertiary hover:text-text-secondary'
             }`}
           >
-            <tab.icon className="w-4 h-4" />
+            <tab.icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : ''}`} />
             {tab.label}
+            {isActive && (
+              <motion.div
+                layoutId="attendanceTab"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                initial={false}
+                transition={{
+                  type: 'spring',
+                  stiffness: 500,
+                  damping: 30,
+                }}
+              />
+            )}
           </button>
         )
       })}
-    </div>
+    </nav>
   )
 }
 
@@ -208,7 +221,7 @@ export function AttendanceModule() {
   const selectedSectionId = useAttendanceStore((s) => s.selectedSectionId)
   const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
   const dateActions = useAttendanceDateActions()
-  const [activeTab, setActiveTab] = useState<TabId>('daily-entry')
+  const [activeTab, setActiveTab] = useState<TabId>('overview')
 
   // Fetch current academic year for sections query
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -308,25 +321,22 @@ export function AttendanceModule() {
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-                <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
-                <p className="text-text-secondary mt-0.5">
-                  Record and review attendance by class section
-                </p>
-              </div>
+        <div className="px-6 pt-6 pb-0">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+              <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
             </div>
-            <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+            <div>
+              <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
+              <p className="text-text-secondary mt-0.5">
+                Record and review attendance by class section
+              </p>
+            </div>
           </div>
 
           {/* Controls Row (only for daily entry) */}
           {activeTab === 'daily-entry' && (
-            <div className="flex items-center gap-6 flex-wrap">
+            <div className="flex items-center gap-6 flex-wrap mb-4">
               <SectionSelector
                 sections={sections}
                 selectedId={selectedSectionId}
@@ -346,66 +356,80 @@ export function AttendanceModule() {
               />
             </div>
           )}
+
+          {/* Tab Navigation */}
+          <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="p-6 space-y-6">
-        {activeTab === 'daily-entry' ? (
-          <>
-            {/* Calendar Non-Instructional Banner */}
-            {isNonInstructional && (
-              <CalendarBanner
-                description={calendarDate?.calendarEvents?.[0]?.description || ''}
-                eventType={calendarDate?.calendarEvents?.[0]?.eventType || 'non-instructional'}
+      {/* Tab Content */}
+      <div className="p-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+          >
+            {activeTab === 'overview' && (
+              <AttendanceDashboard
+                schoolId={schoolId}
+                academicYearId={currentYear?.yearId || ''}
+                currentDate={selectedDate}
               />
             )}
 
-            {/* Daily Summary */}
-            <DailySummary summary={summary} isLoading={summaryLoading} />
-
-            {/* Attendance Grid */}
-            {!selectedSectionId ? (
-              <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
-                <ClipboardCheck className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-                <h4 className="text-lg font-medium text-text-primary mb-2">
-                  Select a Class Section
-                </h4>
-                <p className="text-text-secondary max-w-md mx-auto">
-                  Choose a section from the dropdown above to record today's attendance.
-                  Use quick actions to mark all present, then adjust individual students.
-                </p>
-              </div>
-            ) : rosterLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-14 bg-surface-secondary rounded-lg animate-pulse"
+            {activeTab === 'daily-entry' && (
+              <div className="space-y-6">
+                {/* Calendar Non-Instructional Banner */}
+                {isNonInstructional && (
+                  <CalendarBanner
+                    description={calendarDate?.calendarEvents?.[0]?.description || ''}
+                    eventType={calendarDate?.calendarEvents?.[0]?.eventType || 'non-instructional'}
                   />
-                ))}
+                )}
+
+                {/* Daily Summary */}
+                <DailySummary summary={summary} isLoading={summaryLoading} />
+
+                {/* Attendance Grid */}
+                {!selectedSectionId ? (
+                  <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
+                    <ClipboardCheck className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+                    <h4 className="text-lg font-medium text-text-primary mb-2">
+                      Select a Class Section
+                    </h4>
+                    <p className="text-text-secondary max-w-md mx-auto">
+                      Choose a section from the dropdown above to record today's attendance.
+                      Use quick actions to mark all present, then adjust individual students.
+                    </p>
+                  </div>
+                ) : rosterLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-14 bg-surface-secondary rounded-lg animate-pulse"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <AttendanceGrid
+                    key={`${selectedSectionId}-${selectedDate}`}
+                    students={roster?.students ?? []}
+                    date={selectedDate}
+                    existingRecords={existingRecords}
+                    onSave={handleSave}
+                    isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
+                    disabled={isNonInstructional}
+                    saveStatus={offlineState.saveStatus}
+                  />
+                )}
               </div>
-            ) : (
-              <AttendanceGrid
-                key={`${selectedSectionId}-${selectedDate}`}
-                students={roster?.students ?? []}
-                date={selectedDate}
-                existingRecords={existingRecords}
-                onSave={handleSave}
-                isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
-                disabled={isNonInstructional}
-                saveStatus={offlineState.saveStatus}
-              />
             )}
-          </>
-        ) : (
-          /* Dashboard Tab */
-          <AttendanceDashboard
-            schoolId={schoolId}
-            academicYearId={currentYear?.yearId || ''}
-            currentDate={selectedDate}
-          />
-        )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   )
