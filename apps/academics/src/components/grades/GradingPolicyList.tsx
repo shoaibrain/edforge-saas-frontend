@@ -34,7 +34,7 @@ function PolicyCard({
     <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:border-teal-500/30 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <h4 className="text-sm font-semibold text-text-primary">{policy.name}</h4>
+          <h4 className="text-sm font-semibold text-text-primary">{policy.policyName}</h4>
           {policy.isDefault && (
             <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-full">
               <Star className="w-3 h-3" />
@@ -82,7 +82,7 @@ function PolicyCard({
                 />
               </div>
               <span className="text-xs text-text-secondary w-24 text-right">
-                {cat.name} ({cat.weight}%)
+                {cat.categoryName} ({cat.weight}%)
               </span>
             </div>
           ))}

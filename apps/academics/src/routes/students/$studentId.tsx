@@ -24,7 +24,8 @@ import {
   Award,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { useStudentProfile, useStudentProfileActions } from '../../hooks'
+import { useStudentProfile, useStudentProfileActions, useCurrentAcademicYear } from '../../hooks'
+import { useActiveSchoolId } from '../../stores/app.store'
 import { NotFound } from '../../components/common'
 import {
   ProfileHeader,
@@ -129,6 +130,8 @@ export function StudentProfilePage() {
   const params = useParams({ from: '/students/$studentId' })
   const studentId = params.studentId
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const schoolId = useActiveSchoolId() || ''
+  const { data: currentYear } = useCurrentAcademicYear(schoolId)
 
   // Actions hook — must be called before any conditional returns (Rules of Hooks)
   const actions = useStudentProfileActions()
@@ -260,7 +263,7 @@ export function StudentProfilePage() {
                 />
               )}
               {activeTab === 'grades' && (
-                <StudentGradesView studentId={studentId} />
+                <StudentGradesView studentId={studentId} academicYearId={currentYear?.yearId} />
               )}
             </motion.div>
           </AnimatePresence>

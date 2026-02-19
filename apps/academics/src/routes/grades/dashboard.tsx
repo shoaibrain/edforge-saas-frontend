@@ -45,6 +45,7 @@ interface GradeDashboardProps {
   schoolId: string
   academicYearId: string
   sections: SectionResponseDto[]
+  isLoadingSections?: boolean
 }
 
 interface CoursePerformance {
@@ -187,13 +188,13 @@ function exportAtRiskCsv(students: AtRiskStudent[], schoolId: string) {
 // ============================================================================
 
 function useAggregatedGrades(schoolId: string, sections: SectionResponseDto[]) {
-  // Query the first 20 active sections (reasonable dashboard scope)
   const sectionIds = useMemo(
-    () => sections.slice(0, 20).map((s) => s.sectionId),
+    () => sections.map((s) => s.sectionId),
     [sections]
   )
 
   // Use useQueries for dynamic parallel queries (avoids hooks-in-loop)
+  // No termId filter — dashboard shows school-wide overview across all terms
   const gradeQueries = useQueries({
     queries: sectionIds.map((sid) => ({
       queryKey: gradeKeys.sectionGrade(sid, { schoolId }),
@@ -235,10 +236,14 @@ function useAggregatedGrades(schoolId: string, sections: SectionResponseDto[]) {
       passCount: number
     }>()
 
+    let gpaCount = 0
     for (const grade of allGrades) {
-      const pct = grade.numericGrade
+      const pct = grade.numericGrade ?? 0
       totalGrade += pct
-      totalGpa += grade.gpaPoints
+      if (grade.gpaPoints != null) {
+        totalGpa += grade.gpaPoints
+        gpaCount++
+      }
       if (pct >= 60) passCount++
 
       // Distribution
@@ -262,10 +267,11 @@ function useAggregatedGrades(schoolId: string, sections: SectionResponseDto[]) {
       }
 
       // Course aggregation
+      const gpa = grade.gpaPoints ?? 0
       const existing = courseMap.get(grade.courseId)
       if (existing) {
         existing.grades.push(pct)
-        existing.gpas.push(grade.gpaPoints)
+        existing.gpas.push(gpa)
         if (pct >= 60) existing.passCount++
         if (grade.sectionId) existing.sectionIds.add(grade.sectionId)
       } else {
@@ -275,7 +281,7 @@ function useAggregatedGrades(schoolId: string, sections: SectionResponseDto[]) {
           courseName: section?.courseName || grade.courseId.slice(0, 12),
           sectionIds: new Set(grade.sectionId ? [grade.sectionId] : []),
           grades: [pct],
-          gpas: [grade.gpaPoints],
+          gpas: [gpa],
           passCount: pct >= 60 ? 1 : 0,
         })
       }
@@ -298,7 +304,7 @@ function useAggregatedGrades(schoolId: string, sections: SectionResponseDto[]) {
     return {
       totalStudents: allGrades.length,
       avgGrade: totalGrade / allGrades.length,
-      avgGpa: totalGpa / allGrades.length,
+      avgGpa: gpaCount > 0 ? totalGpa / gpaCount : 0,
       passRate: (passCount / allGrades.length) * 100,
       atRiskCount: atRisk.length,
       distribution,
@@ -319,6 +325,7 @@ export function GradeDashboard({
   schoolId,
   academicYearId: _academicYearId,
   sections,
+  isLoadingSections,
 }: GradeDashboardProps) {
   const { data, isLoading, hasError } = useAggregatedGrades(schoolId, sections)
 
@@ -334,6 +341,10 @@ export function GradeDashboard({
         Failed to load grade data. Please try refreshing.
       </div>
     )
+  }
+
+  if (isLoadingSections) {
+    return <SkeletonCards />
   }
 
   if (!sections.length) {

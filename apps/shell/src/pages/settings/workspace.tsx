@@ -121,13 +121,6 @@ const TERM_STRUCTURE_OPTIONS = [
   { value: 'quarter', label: 'Quarter (4 terms)' },
 ]
 
-const GRADING_SCALE_OPTIONS = [
-  { value: 'letter', label: 'Letter Grades (A-F)' },
-  { value: 'percentage', label: 'Percentage (0-100%)' },
-  { value: 'points', label: 'Points-based' },
-  { value: 'custom', label: 'Custom Scale' },
-]
-
 const ATTENDANCE_POLICY_OPTIONS = [
   { value: 'daily', label: 'Daily Attendance' },
   { value: 'period', label: 'Period-by-Period' },
@@ -529,27 +522,14 @@ export default function WorkspaceSettingsPage() {
           </SettingsFieldRow>
         </SettingsSection>
 
-        {/* Policy Defaults */}
+        {/* Attendance Defaults */}
         <SettingsSection
-          title="Policy Defaults"
+          title="Attendance Defaults"
           icon={Shield}
-          description="Default grading and attendance policies for new schools"
+          description="Default attendance tracking policy for new schools"
           collapsible
           defaultOpen={false}
         >
-          <SettingsFieldRow label="Default Grading Scale" description="Standard grading system for schools" inline>
-            <select
-              value={displaySettings.policies.defaultGradingScale}
-              onChange={(e) => updateField('policies', 'defaultGradingScale', e.target.value)}
-              disabled={isLocked}
-              className={SELECT_CLASS}
-            >
-              {GRADING_SCALE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </SettingsFieldRow>
-
           <SettingsFieldRow label="Default Attendance Policy" description="How attendance is tracked by default" inline>
             <select
               value={displaySettings.policies.defaultAttendancePolicy}

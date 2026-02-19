@@ -7,7 +7,7 @@
  * - Grading Policies: Policy CRUD management
  */
 
-import { useState, useMemo, lazy, Suspense } from 'react'
+import { useState, useMemo, useEffect, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap,
@@ -16,12 +16,13 @@ import {
   Settings,
   Plus,
   Lock,
+  AlertTriangle,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useGradesStore } from '../../stores/grades.store'
 import { useSections, flattenSectionPages, useSectionRoster } from '../../hooks'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
-import { useSectionGrades } from '../../hooks/useGrades'
+import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
 import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
@@ -70,6 +71,19 @@ export function GradesModule() {
     !!currentYear?.yearId
   )
 
+  // Determine if grading periods are available
+  const hasGradingPeriods = !!gradingPeriods && gradingPeriods.length > 0
+
+  // Auto-set term to academic year when no grading periods exist
+  useEffect(() => {
+    if (!hasGradingPeriods && currentYear?.yearId && !selectedTermId) {
+      setSelectedTermId(currentYear.yearId)
+    }
+  }, [hasGradingPeriods, currentYear?.yearId, selectedTermId, setSelectedTermId])
+
+  // Effective term ID: selected term, or academic year as fallback
+  const effectiveTermId = selectedTermId || (hasGradingPeriods ? null : currentYear?.yearId) || null
+
   // Sections
   const { data: sectionsData, isLoading: sectionsLoading } = useSections({
     schoolId,
@@ -81,16 +95,32 @@ export function GradesModule() {
   // Section grades
   const { data: gradebook, isLoading: gradesLoading } = useSectionGrades(
     selectedSectionId || '',
-    { schoolId, termId: selectedTermId || undefined },
+    { schoolId, termId: effectiveTermId || undefined },
     !!selectedSectionId && !!schoolId
   )
 
-  // Section roster (for bulk grade modal)
+  // Section roster (always loaded when section selected)
   const { data: roster } = useSectionRoster({
     sectionId: selectedSectionId || '',
     schoolId,
-    enabled: !!selectedSectionId && !!schoolId && showBulkModal,
+    enabled: !!selectedSectionId && !!schoolId,
   })
+
+  // Grading policies — fetch to get default policy categories
+  const { data: policies } = useGradingPolicies(schoolId)
+  const defaultPolicy = useMemo(
+    () => policies?.find((p) => p.isDefault),
+    [policies]
+  )
+  const policyCategories = useMemo(
+    () => defaultPolicy?.categoryWeights?.map((c) => ({
+      id: c.categoryId,
+      label: c.categoryName,
+    })) ?? [],
+    [defaultPolicy]
+  )
+  const hasNoPolicies = policies !== undefined && policies.length === 0
+  const hasNoDefaultPolicy = policies !== undefined && policies.length > 0 && !defaultPolicy
 
   // Find selected section info
   const selectedSection = sections.find((s) => s.sectionId === selectedSectionId)
@@ -161,9 +191,10 @@ export function GradesModule() {
           >
             {activeTab === 'gradebook' && (
               <div className="space-y-6">
-                {/* Section & Term Selectors */}
-                <div className="flex items-center gap-4 flex-wrap">
-                  <div>
+                {/* Section & Term Selectors + Actions */}
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  {/* Selectors */}
+                  <div className="flex items-center gap-3">
                     <select
                       value={selectedSectionId ?? ''}
                       onChange={(e) => setSelectedSectionId(e.target.value || null)}
@@ -177,31 +208,36 @@ export function GradesModule() {
                         </option>
                       ))}
                     </select>
-                  </div>
 
-                  {gradingPeriods && gradingPeriods.length > 0 && (
-                    <div>
+                    {gradingPeriods && gradingPeriods.length > 0 && (
                       <select
                         value={selectedTermId ?? ''}
                         onChange={(e) => setSelectedTermId(e.target.value || null)}
                         className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                       >
-                        <option value="">All Terms</option>
+                        <option value="">Select grading period...</option>
                         {gradingPeriods.map((gp: { periodId: string; name: string }) => (
                           <option key={gp.periodId} value={gp.periodId}>
                             {gp.name}
                           </option>
                         ))}
                       </select>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
+                  {/* Actions — require both section and term */}
                   {selectedSectionId && (
-                    <>
+                    <div className="flex items-center gap-2">
+                      {hasGradingPeriods && !selectedTermId && (
+                        <span className="text-xs text-amber-600 dark:text-amber-400 mr-1">
+                          Select a grading period to record grades
+                        </span>
+                      )}
                       <button
                         type="button"
                         onClick={() => setShowBulkModal(true)}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+                        disabled={!effectiveTermId || !currentYear?.yearId}
+                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-4 h-4" />
                         Record Grades
@@ -209,17 +245,68 @@ export function GradesModule() {
                       <button
                         type="button"
                         onClick={() => setShowFinalize(true)}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors"
+                        disabled={!effectiveTermId || !currentYear?.yearId}
+                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Lock className="w-4 h-4" />
                         Finalize Grades
                       </button>
-                    </>
+                    </div>
                   )}
                 </div>
 
+                {/* No Grading Policy Warning */}
+                {hasNoPolicies && selectedSectionId && (
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-text-primary font-medium">No grading policy configured</p>
+                      <p className="text-xs text-text-secondary mt-0.5">
+                        Grades will use simple averaging without letter grades or category weights.{' '}
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('policies')}
+                          className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
+                        >
+                          Create a policy
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* No Default Policy Warning */}
+                {hasNoDefaultPolicy && selectedSectionId && (
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+                    <AlertTriangle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-text-primary font-medium">No default grading policy set</p>
+                      <p className="text-xs text-text-secondary mt-0.5">
+                        You have {policies?.length} grading {policies?.length === 1 ? 'policy' : 'policies'}, but none is marked as default.{' '}
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('policies')}
+                          className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
+                        >
+                          Set a default policy
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Gradebook Content */}
-                {!selectedSectionId ? (
+                {!currentYear?.yearId ? (
+                  <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20 p-12 text-center">
+                    <GraduationCap className="w-12 h-12 mx-auto text-amber-500 mb-4" />
+                    <h4 className="text-lg font-medium text-text-primary mb-2">
+                      No Academic Year Configured
+                    </h4>
+                    <p className="text-text-secondary max-w-md mx-auto">
+                      Set up an academic year in school settings before recording grades.
+                    </p>
+                  </div>
+                ) : !selectedSectionId ? (
                   <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
                     <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
                     <h4 className="text-lg font-medium text-text-primary mb-2">
@@ -232,15 +319,16 @@ export function GradesModule() {
                 ) : (
                   <GradebookGrid
                     grades={gradebook?.grades ?? []}
+                    roster={roster?.students ?? []}
                     isLoading={gradesLoading}
                     sectionId={selectedSectionId}
                     courseId={selectedSection?.courseId}
                     schoolId={schoolId}
-                    termId={selectedTermId || ''}
+                    termId={effectiveTermId || ''}
                     academicYearId={currentYear?.yearId}
                     teacherId={selectedSection?.primaryTeacherId}
-                    disabled={hasAllFinalized}
-                    onAddAssignment={() => setShowAssignmentEditor(true)}
+                    disabled={hasAllFinalized || !effectiveTermId}
+                    onAddAssignment={effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
                   />
                 )}
               </div>
@@ -270,6 +358,7 @@ export function GradesModule() {
                   schoolId={schoolId}
                   academicYearId={currentYear?.yearId || ''}
                   sections={sections}
+                  isLoadingSections={sectionsLoading}
                 />
               </Suspense>
             )}
@@ -279,8 +368,8 @@ export function GradesModule() {
         </AnimatePresence>
       </div>
 
-      {/* Bulk Grade Modal */}
-      {showBulkModal && selectedSectionId && selectedSection && (
+      {/* Bulk Grade Modal — only open when term is available */}
+      {showBulkModal && selectedSectionId && selectedSection && effectiveTermId && currentYear?.yearId && (
         <BulkGradeModal
           open={showBulkModal}
           onClose={() => setShowBulkModal(false)}
@@ -288,34 +377,36 @@ export function GradesModule() {
           sectionId={selectedSectionId}
           courseId={selectedSection.courseId}
           schoolId={schoolId}
-          termId={selectedTermId || ''}
-          academicYearId={currentYear?.yearId || ''}
+          termId={effectiveTermId}
+          academicYearId={currentYear.yearId}
           teacherId={selectedSection.primaryTeacherId}
+          categories={policyCategories}
         />
       )}
 
-      {/* Assignment Editor */}
-      {showAssignmentEditor && selectedSectionId && selectedSection && (
+      {/* Assignment Editor — only open when term is available */}
+      {showAssignmentEditor && selectedSectionId && selectedSection && effectiveTermId && currentYear?.yearId && (
         <AssignmentEditor
           onClose={() => setShowAssignmentEditor(false)}
           sectionId={selectedSectionId}
           courseId={selectedSection.courseId}
           schoolId={schoolId}
-          termId={selectedTermId || ''}
-          academicYearId={currentYear?.yearId || ''}
+          termId={effectiveTermId}
+          academicYearId={currentYear.yearId}
           teacherId={selectedSection.primaryTeacherId}
           students={roster?.students ?? []}
+          categories={policyCategories}
         />
       )}
 
-      {/* Finalization Wizard */}
-      {showFinalize && selectedSectionId && (
+      {/* Finalization Wizard — only open when term is available */}
+      {showFinalize && selectedSectionId && effectiveTermId && (
         <FinalizationWizard
           open={showFinalize}
           onClose={() => setShowFinalize(false)}
           sectionId={selectedSectionId}
           schoolId={schoolId}
-          termId={selectedTermId || ''}
+          termId={effectiveTermId}
         />
       )}
     </div>

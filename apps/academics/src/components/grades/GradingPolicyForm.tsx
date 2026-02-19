@@ -1,7 +1,7 @@
 /**
  * GradingPolicyForm Component
  *
- * Create/edit grading policy with scale, category weights, and rounding.
+ * Create/edit grading policy with scale, category weights, rounding, and passing grade.
  */
 
 import { useState, useMemo } from 'react'
@@ -27,19 +27,19 @@ interface GradingPolicyFormProps {
 }
 
 const defaultScale: GradingScaleEntry[] = [
-  { letter: 'A', minPercentage: 90, maxPercentage: 100, gpaValue: 4.0 },
-  { letter: 'B', minPercentage: 80, maxPercentage: 89, gpaValue: 3.0 },
-  { letter: 'C', minPercentage: 70, maxPercentage: 79, gpaValue: 2.0 },
-  { letter: 'D', minPercentage: 60, maxPercentage: 69, gpaValue: 1.0 },
-  { letter: 'F', minPercentage: 0, maxPercentage: 59, gpaValue: 0.0 },
+  { letter: 'A', minPercentage: 90, maxPercentage: 100, gpaPoints: 4.0 },
+  { letter: 'B', minPercentage: 80, maxPercentage: 89, gpaPoints: 3.0 },
+  { letter: 'C', minPercentage: 70, maxPercentage: 79, gpaPoints: 2.0 },
+  { letter: 'D', minPercentage: 60, maxPercentage: 69, gpaPoints: 1.0 },
+  { letter: 'F', minPercentage: 0, maxPercentage: 59, gpaPoints: 0.0 },
 ]
 
 const defaultCategories: CategoryWeight[] = [
-  { categoryId: 'tests', name: 'Tests', weight: 30 },
-  { categoryId: 'quizzes', name: 'Quizzes', weight: 20 },
-  { categoryId: 'homework', name: 'Homework', weight: 20 },
-  { categoryId: 'participation', name: 'Participation', weight: 10 },
-  { categoryId: 'projects', name: 'Projects', weight: 20 },
+  { categoryId: 'tests', categoryName: 'Tests', weight: 30 },
+  { categoryId: 'quizzes', categoryName: 'Quizzes', weight: 20 },
+  { categoryId: 'homework', categoryName: 'Homework', weight: 20 },
+  { categoryId: 'participation', categoryName: 'Participation', weight: 10 },
+  { categoryId: 'projects', categoryName: 'Projects', weight: 20 },
 ]
 
 // ============================================================================
@@ -52,9 +52,13 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   const createMutation = useCreateGradingPolicy()
   const updateMutation = useUpdateGradingPolicy()
 
-  const [name, setName] = useState(policy?.name ?? '')
-  const [roundingRule, setRoundingRule] = useState<'standard' | 'up' | 'down'>(
-    policy?.roundingRule ?? 'standard'
+  const [policyName, setPolicyName] = useState(policy?.policyName ?? '')
+  const [description, setDescription] = useState(policy?.description ?? '')
+  const [roundingRule, setRoundingRule] = useState<'up' | 'down' | 'nearest'>(
+    policy?.roundingRule ?? 'nearest'
+  )
+  const [minimumPassingGrade, setMinimumPassingGrade] = useState(
+    policy?.minimumPassingGrade ?? 60
   )
   const [isDefault, setIsDefault] = useState(policy?.isDefault ?? false)
   const [scale, setScale] = useState<GradingScaleEntry[]>(
@@ -89,7 +93,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   const addCategory = () => {
     setCategories((prev) => [
       ...prev,
-      { categoryId: `custom_${Date.now()}`, name: '', weight: 0 },
+      { categoryId: `custom_${Date.now()}`, categoryName: '', weight: 0 },
     ])
   }
 
@@ -98,14 +102,16 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   }
 
   const handleSubmit = async () => {
-    if (!name.trim() || !isWeightValid) return
+    if (!policyName.trim() || !isWeightValid) return
 
     const payload = {
       schoolId,
-      name: name.trim(),
+      policyName: policyName.trim(),
+      description: description.trim() || undefined,
       gradingScale: scale,
       categoryWeights: categories,
       roundingRule,
+      minimumPassingGrade,
       isDefault,
     }
 
@@ -114,10 +120,12 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
         policyId: policy.policyId,
         schoolId,
         data: {
-          name: payload.name,
+          policyName: payload.policyName,
+          description: payload.description,
           gradingScale: payload.gradingScale,
           categoryWeights: payload.categoryWeights,
           roundingRule: payload.roundingRule,
+          minimumPassingGrade: payload.minimumPassingGrade,
           isDefault: payload.isDefault,
         },
       })
@@ -154,28 +162,58 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={policyName}
+              onChange={(e) => setPolicyName(e.target.value)}
               placeholder="e.g., Standard A-F Scale"
               className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             />
           </div>
 
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              Description
+            </label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description of this policy"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            />
+          </div>
+
           {/* Options Row */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1.5">
                 Rounding Rule
               </label>
               <select
                 value={roundingRule}
-                onChange={(e) => setRoundingRule(e.target.value as 'standard' | 'up' | 'down')}
+                onChange={(e) => setRoundingRule(e.target.value as 'up' | 'down' | 'nearest')}
                 className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
               >
-                <option value="standard">Standard</option>
+                <option value="nearest">Round to Nearest</option>
                 <option value="up">Round Up</option>
                 <option value="down">Round Down</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1.5">
+                Passing Grade
+              </label>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  value={minimumPassingGrade}
+                  onChange={(e) => setMinimumPassingGrade(Number(e.target.value))}
+                  min={0}
+                  max={100}
+                  className="w-20 px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                />
+                <span className="text-sm text-text-tertiary">%</span>
+              </div>
             </div>
             <label className="flex items-center gap-2 cursor-pointer mt-5">
               <input
@@ -221,8 +259,8 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                   <span className="text-text-tertiary text-sm">%</span>
                   <input
                     type="number"
-                    value={entry.gpaValue ?? 0}
-                    onChange={(e) => handleScaleChange(i, 'gpaValue', Number(e.target.value))}
+                    value={entry.gpaPoints}
+                    onChange={(e) => handleScaleChange(i, 'gpaPoints', Number(e.target.value))}
                     className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     step={0.1}
                     min={0}
@@ -266,7 +304,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     width: `${cat.weight}%`,
                     backgroundColor: `hsl(${(i * 60) % 360}, 60%, 50%)`,
                   }}
-                  title={`${cat.name}: ${cat.weight}%`}
+                  title={`${cat.categoryName}: ${cat.weight}%`}
                 />
               ))}
             </div>
@@ -276,8 +314,8 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                 <div key={cat.categoryId} className="flex items-center gap-3">
                   <input
                     type="text"
-                    value={cat.name}
-                    onChange={(e) => handleCategoryChange(i, 'name', e.target.value)}
+                    value={cat.categoryName}
+                    onChange={(e) => handleCategoryChange(i, 'categoryName', e.target.value)}
                     className="flex-1 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     placeholder="Category name"
                   />
@@ -336,7 +374,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isSaving || !name.trim() || !isWeightValid}
+            disabled={isSaving || !policyName.trim() || !isWeightValid}
             className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}

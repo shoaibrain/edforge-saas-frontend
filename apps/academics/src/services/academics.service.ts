@@ -923,12 +923,12 @@ export interface GradingScaleEntry {
   letter: string
   minPercentage: number
   maxPercentage: number
-  gpaValue?: number
+  gpaPoints: number
 }
 
 export interface CategoryWeight {
   categoryId: string
-  name: string
+  categoryName: string
   weight: number
   dropLowest?: number
 }
@@ -936,29 +936,36 @@ export interface CategoryWeight {
 export interface GradingPolicyResponse {
   policyId: string
   schoolId: string
-  name: string
+  policyName: string
+  description?: string
   gradingScale: GradingScaleEntry[]
   categoryWeights: CategoryWeight[]
-  roundingRule: 'standard' | 'up' | 'down'
+  roundingRule: 'up' | 'down' | 'nearest'
+  minimumPassingGrade: number
   isDefault: boolean
+  isActive: boolean
   createdAt: string
   updatedAt: string
 }
 
 export interface CreateGradingPolicyParams {
   schoolId: string
-  name: string
+  policyName: string
+  description?: string
   gradingScale: GradingScaleEntry[]
   categoryWeights: CategoryWeight[]
-  roundingRule: 'standard' | 'up' | 'down'
+  roundingRule: 'up' | 'down' | 'nearest'
+  minimumPassingGrade: number
   isDefault?: boolean
 }
 
 export interface UpdateGradingPolicyParams {
-  name?: string
+  policyName?: string
+  description?: string
   gradingScale?: GradingScaleEntry[]
   categoryWeights?: CategoryWeight[]
-  roundingRule?: 'standard' | 'up' | 'down'
+  roundingRule?: 'up' | 'down' | 'nearest'
+  minimumPassingGrade?: number
   isDefault?: boolean
 }
 
@@ -1017,31 +1024,36 @@ export async function updateGradingPolicy(
 // ============================================================================
 
 export interface AssignmentInfo {
+  assignmentId?: string
   assignmentName: string
   assignmentType: string
   categoryId: string
   possiblePoints: number
+  earnedPoints?: number
 }
 
 export interface RecordGradeParams {
   studentId: string
+  studentName?: string
   courseId: string
+  courseName?: string
   sectionId: string
   schoolId: string
   termId: string
   academicYearId: string
   teacherId: string
   assignment: AssignmentInfo
-  earnedPoints: number
 }
 
 export interface BulkGradeRecord {
   studentId: string
-  earnedPoints: number
+  studentName?: string
+  earnedPoints?: number
 }
 
 export interface RecordBulkGradesParams {
   courseId: string
+  courseName?: string
   sectionId: string
   schoolId: string
   termId: string
@@ -1056,14 +1068,16 @@ export interface GradeRecord {
   studentId: string
   studentName?: string
   courseId: string
+  courseName?: string
   sectionId?: string
   termId: string
   assignments: Array<{
+    assignmentId: string
     assignmentName: string
     assignmentType: string
     categoryId: string
     possiblePoints: number
-    earnedPoints: number
+    earnedPoints?: number
     gradedAt: string
   }>
   numericGrade: number
@@ -1113,12 +1127,27 @@ export async function recordBulkGrades(
 /**
  * Get section gradebook (all students' grades)
  * GET /academics/grades/section/:sectionId?schoolId=&termId=
+ *
+ * Backend returns GradeResponseDto[] (plain array).
+ * We normalize to SectionGradebookResponse for consistent frontend consumption.
  */
 export async function getSectionGrades(
   sectionId: string,
   params: { schoolId: string; termId?: string }
 ): Promise<SectionGradebookResponse> {
-  return apiGet<SectionGradebookResponse>(`/academics/grades/section/${sectionId}`, params)
+  const response = await apiGet<GradeRecord[] | SectionGradebookResponse>(
+    `/academics/grades/section/${sectionId}`,
+    params
+  )
+  // Normalize: backend returns plain array, frontend expects { grades: [] }
+  if (Array.isArray(response)) {
+    return {
+      sectionId,
+      termId: params.termId || '',
+      grades: response,
+    }
+  }
+  return response
 }
 
 /**

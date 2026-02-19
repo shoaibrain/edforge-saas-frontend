@@ -6,7 +6,7 @@
  */
 
 import { useState, useMemo } from 'react'
-import { X, Loader2, Save, ClipboardPaste, BarChart2 } from 'lucide-react'
+import { X, Loader2, Save, Plus, ClipboardPaste, BarChart2 } from 'lucide-react'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
@@ -23,9 +23,10 @@ interface AssignmentEditorProps {
   academicYearId: string
   teacherId: string
   students: StudentSectionResponseDto[]
+  categories?: { id: string; label: string }[]
 }
 
-const CATEGORY_OPTIONS = [
+const DEFAULT_CATEGORY_OPTIONS = [
   { value: 'tests', label: 'Tests' },
   { value: 'quizzes', label: 'Quizzes' },
   { value: 'homework', label: 'Homework' },
@@ -48,7 +49,11 @@ export function AssignmentEditor({
   academicYearId,
   teacherId,
   students,
+  categories,
 }: AssignmentEditorProps) {
+  const displayCategories = categories?.length
+    ? categories.map((c) => ({ value: c.id, label: c.label }))
+    : DEFAULT_CATEGORY_OPTIONS
   const [assignmentName, setAssignmentName] = useState('')
   const [possiblePoints, setPossiblePoints] = useState('100')
   const [categoryId, setCategoryId] = useState('homework')
@@ -130,33 +135,63 @@ export function AssignmentEditor({
     setPasteText('')
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (saveAssignmentOnly = false) => {
     if (!assignmentName.trim() || possiblePts <= 0) return
 
-    const grades = Object.entries(scores)
-      .filter(([, v]) => v !== '' && !isNaN(Number(v)))
-      .map(([studentId, earned]) => ({
-        studentId,
-        earnedPoints: Number(earned),
-      }))
+    if (saveAssignmentOnly) {
+      // Create assignment column for all rostered students without scores
+      if (students.length === 0) return
 
-    if (grades.length === 0) return
+      await bulkGradeMutation.mutateAsync({
+        courseId,
+        sectionId,
+        schoolId,
+        termId,
+        academicYearId,
+        teacherId,
+        assignment: {
+          assignmentName: assignmentName.trim(),
+          assignmentType: categoryId,
+          categoryId,
+          possiblePoints: possiblePts,
+        },
+        grades: students.map((s) => ({
+          studentId: s.studentId,
+          studentName: s.studentName,
+          earnedPoints: undefined,
+        })),
+      })
+    } else {
+      // Save with entered scores
+      const grades = Object.entries(scores)
+        .filter(([, v]) => v !== '' && !isNaN(Number(v)))
+        .map(([studentId, earned]) => {
+          const student = students.find((s) => s.studentId === studentId)
+          return {
+            studentId,
+            studentName: student?.studentName,
+            earnedPoints: Number(earned),
+          }
+        })
 
-    await bulkGradeMutation.mutateAsync({
-      courseId,
-      sectionId,
-      schoolId,
-      termId,
-      academicYearId,
-      teacherId,
-      assignment: {
-        assignmentName: assignmentName.trim(),
-        assignmentType: categoryId,
-        categoryId,
-        possiblePoints: possiblePts,
-      },
-      grades,
-    })
+      if (grades.length === 0) return
+
+      await bulkGradeMutation.mutateAsync({
+        courseId,
+        sectionId,
+        schoolId,
+        termId,
+        academicYearId,
+        teacherId,
+        assignment: {
+          assignmentName: assignmentName.trim(),
+          assignmentType: categoryId,
+          categoryId,
+          possiblePoints: possiblePts,
+        },
+        grades,
+      })
+    }
 
     onClose()
   }
@@ -207,7 +242,7 @@ export function AssignmentEditor({
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                 >
-                  {CATEGORY_OPTIONS.map((opt) => (
+                  {displayCategories.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
@@ -331,9 +366,14 @@ export function AssignmentEditor({
             </div>
 
             {students.length === 0 ? (
-              <p className="text-xs text-text-tertiary py-4 text-center">
-                No students in roster. Open "Record Grades" to load roster first.
-              </p>
+              <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between px-3 py-2.5 animate-pulse">
+                    <div className="h-4 w-28 bg-surface-hover rounded" />
+                    <div className="h-7 w-20 bg-surface-hover rounded" />
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary max-h-[300px] overflow-y-auto">
                 {students.map((student) => (
@@ -342,7 +382,7 @@ export function AssignmentEditor({
                     className="flex items-center justify-between px-3 py-2"
                   >
                     <span className="text-sm text-text-primary truncate mr-2">
-                      {student.studentName || student.studentId.slice(0, 8)}
+                      {student.studentName || student.studentNumber || `Student`}
                     </span>
                     <input
                       type="number"
@@ -364,27 +404,38 @@ export function AssignmentEditor({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-border-secondary">
+        <div className="flex items-center justify-between px-5 py-4 border-t border-border-secondary">
           <button
             type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+            onClick={() => handleSubmit(true)}
+            disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || students.length === 0}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cancel
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            Create Assignment
           </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || filledCount === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSaving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-            Save Assignment ({filledCount})
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSubmit(false)}
+              disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || filledCount === 0}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              Save with Scores ({filledCount})
+            </button>
+          </div>
         </div>
       </div>
     </div>

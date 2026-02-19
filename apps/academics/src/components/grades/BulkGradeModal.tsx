@@ -4,7 +4,7 @@
  * Modal for entering grades for an entire class on a single assignment.
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { X, Loader2, Save } from 'lucide-react'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
@@ -23,6 +23,7 @@ interface BulkGradeModalProps {
   termId: string
   academicYearId: string
   teacherId: string
+  categories?: { id: string; label: string }[]
 }
 
 interface StudentGradeEntry {
@@ -31,7 +32,7 @@ interface StudentGradeEntry {
   earnedPoints: string
 }
 
-const categoryOptions = [
+const DEFAULT_CATEGORIES = [
   { id: 'tests', label: 'Tests' },
   { id: 'quizzes', label: 'Quizzes' },
   { id: 'homework', label: 'Homework' },
@@ -53,19 +54,30 @@ export function BulkGradeModal({
   termId,
   academicYearId,
   teacherId,
+  categories,
 }: BulkGradeModalProps) {
+  const displayCategories = categories?.length ? categories : DEFAULT_CATEGORIES
   const bulkMutation = useRecordBulkGrades()
 
   const [assignmentName, setAssignmentName] = useState('')
   const [categoryId, setCategoryId] = useState('homework')
   const [possiblePoints, setPossiblePoints] = useState('100')
-  const [entries, setEntries] = useState<StudentGradeEntry[]>(
-    students.map((s) => ({
-      studentId: s.studentId,
-      studentName: s.studentName || s.studentId,
-      earnedPoints: '',
-    }))
-  )
+  const [entries, setEntries] = useState<StudentGradeEntry[]>([])
+
+  // Update entries when students are loaded or change
+  useEffect(() => {
+    if (students.length > 0) {
+      setEntries((prev) => {
+        // Preserve any already-entered scores
+        const existingMap = new Map(prev.map((e) => [e.studentId, e.earnedPoints]))
+        return students.map((s, idx) => ({
+          studentId: s.studentId,
+          studentName: s.studentName || s.studentNumber || `Student #${idx + 1}`,
+          earnedPoints: existingMap.get(s.studentId) ?? '',
+        }))
+      })
+    }
+  }, [students])
 
   const validEntries = useMemo(
     () => entries.filter((e) => e.earnedPoints !== '' && !isNaN(Number(e.earnedPoints))),
@@ -96,6 +108,7 @@ export function BulkGradeModal({
       },
       grades: validEntries.map((e) => ({
         studentId: e.studentId,
+        studentName: e.studentName,
         earnedPoints: Number(e.earnedPoints),
       })),
     })
@@ -103,6 +116,8 @@ export function BulkGradeModal({
   }
 
   if (!open) return null
+
+  const isStudentsLoading = students.length === 0 && entries.length === 0
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -155,7 +170,7 @@ export function BulkGradeModal({
               onChange={(e) => setCategoryId(e.target.value)}
               className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             >
-              {categoryOptions.map((opt) => (
+              {displayCategories.map((opt) => (
                 <option key={opt.id} value={opt.id}>{opt.label}</option>
               ))}
             </select>
@@ -170,26 +185,40 @@ export function BulkGradeModal({
               </span>
             </div>
             <div className="rounded-xl border border-border-secondary overflow-hidden divide-y divide-border-secondary">
-              {entries.map((entry) => (
-                <div
-                  key={entry.studentId}
-                  className="flex items-center justify-between px-4 py-2.5"
-                >
-                  <span className="text-sm text-text-primary">{entry.studentName}</span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={entry.earnedPoints}
-                      onChange={(e) => handlePointsChange(entry.studentId, e.target.value)}
-                      placeholder="—"
-                      min={0}
-                      max={Number(possiblePoints) * 1.5}
-                      className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-                    />
-                    <span className="text-xs text-text-tertiary">/ {possiblePoints}</span>
+              {isStudentsLoading ? (
+                /* Loading skeleton */
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between px-4 py-2.5 animate-pulse">
+                    <div className="h-4 w-32 bg-surface-hover rounded" />
+                    <div className="h-8 w-20 bg-surface-hover rounded" />
                   </div>
+                ))
+              ) : entries.length === 0 ? (
+                <div className="px-4 py-8 text-center text-sm text-text-tertiary">
+                  No students enrolled in this section.
                 </div>
-              ))}
+              ) : (
+                entries.map((entry) => (
+                  <div
+                    key={entry.studentId}
+                    className="flex items-center justify-between px-4 py-2.5"
+                  >
+                    <span className="text-sm text-text-primary">{entry.studentName}</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={entry.earnedPoints}
+                        onChange={(e) => handlePointsChange(entry.studentId, e.target.value)}
+                        placeholder="—"
+                        min={0}
+                        max={Number(possiblePoints) * 1.5}
+                        className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      />
+                      <span className="text-xs text-text-tertiary">/ {possiblePoints}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

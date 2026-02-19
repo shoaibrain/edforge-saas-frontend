@@ -33,7 +33,9 @@ import type { School } from '@edforge/types'
 import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
 import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
 import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
-import { GradingScaleEditor, type GradeLevelConfig } from '@/components/settings/GradingScaleEditor'
+// GradingScaleEditor removed — grading scales are now managed exclusively via Grading Policies
+// in the Grades & Assessments module (see GradingPolicyForm component)
+import type { GradeLevelConfig } from '@/components/settings/GradingScaleEditor'
 import { FeatureToggles, type SchoolFeatures, DEFAULT_FEATURES } from '@/components/settings/FeatureToggles'
 import { UnsavedChangesBar, SettingsFieldRow } from '@/components/settings/SettingsShared'
 
@@ -527,17 +529,19 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           </select>
         </SettingsFieldRow>
 
-        <SettingsFieldRow label="Grading Scale" description="Configure how grades are calculated">
-          <GradingScaleEditor
-            scaleType={formState.gradingScaleType}
-            scale={formState.gradingScale}
-            passingGrade={formState.passingGrade}
-            onChange={(scale, passingGrade) => {
-              updateField('gradingScale', scale)
-              updateField('passingGrade', passingGrade)
-            }}
-            onScaleTypeChange={(type) => updateField('gradingScaleType', type)}
-          />
+        <SettingsFieldRow label="Grading Scale" description="Grading policies are managed in the Grades & Assessments module">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4">
+            <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
+              Grading scales, category weights, and calculation rules are configured through Grading Policies in the Grades & Assessments module.
+            </p>
+            <a
+              href="/academics/grades"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-500/10 hover:bg-teal-100 dark:hover:bg-teal-500/20 rounded-lg transition-colors"
+            >
+              <GraduationCap className="w-4 h-4" />
+              Manage Grading Policies
+            </a>
+          </div>
         </SettingsFieldRow>
       </Section>
 
