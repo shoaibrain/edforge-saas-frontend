@@ -145,13 +145,15 @@ const homeModule: ModuleConfig = {
           href: '/academics',
           permission: { action: 'view', resource: 'students' },
         },
-        {
-          id: 'special-programs',
-          label: 'Special Programs',
-          icon: ShieldCheck,
-          href: '/special-programs',
-          permission: { action: 'view', resource: 'special-programs' },
-        },
+        // [MVP-PARKED] Special Programs
+        // {
+        //   id: 'special-programs',
+        //   label: 'Special Programs',
+        //   icon: ShieldCheck,
+        //   href: '/special-programs',
+        //   permission: { action: 'view', resource: 'special-programs' },
+        // },
+        // [/MVP-PARKED]
         {
           id: 'people',
           label: 'People & HR',
@@ -166,28 +168,30 @@ const homeModule: ModuleConfig = {
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
-        {
-          id: 'messages',
-          label: 'Messages',
-          icon: MessageCircleMore,
-          href: '/messages',
-          permission: { action: 'view', resource: 'communications' },
-        },
-        {
-          id: 'analytics',
-          label: 'Analytics',
-          icon: BarChart3,
-          href: '/analytics',
-          permission: { action: 'view', resource: 'analytics' },
-        },
-        {
-          id: 'edfi',
-          label: 'State Reporting',
-          icon: Database,
-          href: '/edfi',
-          permission: { action: 'view', resource: 'edfi' },
-          tenantRoles: ['TenantAdmin'],
-        },
+        // [MVP-PARKED] Messages, Analytics, State Reporting
+        // {
+        //   id: 'messages',
+        //   label: 'Messages',
+        //   icon: MessageCircleMore,
+        //   href: '/messages',
+        //   permission: { action: 'view', resource: 'communications' },
+        // },
+        // {
+        //   id: 'analytics',
+        //   label: 'Analytics',
+        //   icon: BarChart3,
+        //   href: '/analytics',
+        //   permission: { action: 'view', resource: 'analytics' },
+        // },
+        // {
+        //   id: 'edfi',
+        //   label: 'State Reporting',
+        //   icon: Database,
+        //   href: '/edfi',
+        //   permission: { action: 'view', resource: 'edfi' },
+        //   tenantRoles: ['TenantAdmin'],
+        // },
+        // [/MVP-PARKED]
         {
           id: 'settings',
           label: 'System Admin',
