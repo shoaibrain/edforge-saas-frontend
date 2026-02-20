@@ -15,16 +15,14 @@
 
 import {
   GraduationCap,
-  DollarSign,
+  // [MVP-PARKED] DollarSign,
   GalleryVerticalEnd,
   Users,
   Settings,
   MessageCircleMore,
-
-
   Layers,
   ShieldCheck,
-  Link2,
+  // [MVP-PARKED] Link2,
   School,
   HandCoins,
   UsersRound,
@@ -34,31 +32,23 @@ import {
   Database,
   TriangleAlert,
   ClipboardList,
-  BarChart3,
+  // [MVP-PARKED] BarChart3,
   type LucideIcon,
   BrickWallShield,
   Calendars,
   ClipboardPlus,
-  // New imports for Analytics
-  Megaphone,
-  Mail,
-  TrendingUp,
-  PieChart,
-  LineChart,
-  // Parent Portal
+  // [MVP-PARKED] Megaphone,
+  // [MVP-PARKED] Mail,
+  // [MVP-PARKED] TrendingUp,
+  // [MVP-PARKED] PieChart,
+  // [MVP-PARKED] LineChart,
   Home,
-  // Meeting Hub
-  Video,
-
-  // Student Portal
+  // [MVP-PARKED] Video,
   BookOpen,
   Calendar,
   FileText,
-  // Additional icons
   Baby,
-  // Auth Debug
   Bug,
-  // Organization
   Building2,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
