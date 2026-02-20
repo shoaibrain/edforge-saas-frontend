@@ -19,6 +19,7 @@ import { ShellProvider } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingScreen } from './components/layout/LoadingScreen'
 import { NotFound } from './components/layout/NotFound'
+import { ComingSoon } from './components/layout/ComingSoon'
 // Pages
 import { LoginPage } from './components/layout/LoginPage'
 import { useThemeStore } from './stores/theme.store'
@@ -558,6 +559,36 @@ const parentPortalRoute = createRoute({
 // [/MVP-PARKED]
 
 // ============================================================================
+// [MVP-PARKED] COMING SOON CATCH-ALL ROUTES
+// ============================================================================
+
+const messagesComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/messages/$',
+  component: () => <ComingSoon moduleName="Messages" />,
+})
+
+const analyticsComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/analytics/$',
+  component: () => <ComingSoon moduleName="Analytics" />,
+})
+
+const edfiComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/edfi/$',
+  component: () => <ComingSoon moduleName="State Reporting" />,
+})
+
+const specialProgramsComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/special-programs/$',
+  component: () => <ComingSoon moduleName="Special Programs" />,
+})
+
+// [/MVP-PARKED]
+
+// ============================================================================
 // ROUTE TREE
 // ============================================================================
 
@@ -590,11 +621,16 @@ const routeTree = rootRoute.addChildren([
     academicsRoute,
     financeRoute,
     peopleRoute,
-    // [MVP-PARKED] Parked module routes removed from tree
+    // [MVP-PARKED] Original module routes removed from tree
     // messagesRoute,
     // analyticsRoute,
     // edfiRoute,
     // specialProgramsRoute,
+    // Coming Soon catch-all routes for parked modules
+    messagesComingSoonRoute,
+    analyticsComingSoonRoute,
+    edfiComingSoonRoute,
+    specialProgramsComingSoonRoute,
     // [/MVP-PARKED]
     studentPortalRoute,
     parentPortalRoute,
