@@ -16,7 +16,7 @@ import {
   GraduationCap,
   Briefcase,
   Network,
-  FileJson2,
+  // [MVP-PARKED] FileJson2,
   AlertTriangle,
   type LucideIcon,
 } from 'lucide-react'
@@ -565,6 +565,7 @@ export default function OrganizationSettingsPage() {
                   <Plus className="w-4 h-4" />
                   Add Service Center
                 </Button>
+                {/* [MVP-PARKED] Ed-Fi Preview button
                 <Button
                   size="sm"
                   variant="ghost"
@@ -574,6 +575,7 @@ export default function OrganizationSettingsPage() {
                   <FileJson2 className="w-4 h-4" />
                   Ed-Fi Preview
                 </Button>
+                [/MVP-PARKED] */}
                 {stats.activeSchools > 0 && (
                   <Button
                     size="sm"

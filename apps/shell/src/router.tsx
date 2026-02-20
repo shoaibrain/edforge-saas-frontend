@@ -38,7 +38,7 @@ import {
   SchoolCreatePage,
   OrganizationSettingsPage,
   EducationOrgDetailPage,
-  EdFiExportPreviewPage,
+  // [MVP-PARKED] EdFiExportPreviewPage,
   RBACSecurityPage,
   IntegrationsSettingsPage,
   BillingSettingsPage,
@@ -393,11 +393,13 @@ const settingsEdOrgDetailRoute = createRoute({
   component: EducationOrgDetailPage,
 })
 
-const settingsEdFiExportPreviewRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/organization/edfi-preview',
-  component: EdFiExportPreviewPage,
-})
+// [MVP-PARKED] Ed-Fi export preview settings route
+// const settingsEdFiExportPreviewRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/organization/edfi-preview',
+//   component: EdFiExportPreviewPage,
+// })
+// [/MVP-PARKED]
 
 // New: School detail under organization hierarchy
 const settingsOrgSchoolDetailRoute = createRoute({
@@ -577,7 +579,7 @@ const routeTree = rootRoute.addChildren([
       settingsOrgSchoolDetailRoute,
       settingsOrgSchoolCreateRoute,
       settingsEdOrgDetailRoute,
-      settingsEdFiExportPreviewRoute,
+      // [MVP-PARKED] settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
       settingsBillingRoute,

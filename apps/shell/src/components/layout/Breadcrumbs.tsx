@@ -34,13 +34,17 @@ const ROUTE_LABELS: Record<string, string> = {
   academics: 'Academics',
   finance: 'Finance & Billing',
   people: 'People & HR',
-  messages: 'Messages',
-  analytics: 'Analytics',
+  // [MVP-PARKED] Parked module breadcrumb labels
+  // messages: 'Messages',
+  // analytics: 'Analytics',
+  // [/MVP-PARKED]
   settings: 'Settings',
   'student-portal': 'Student Portal',
   'parent-portal': 'Family Portal',
-  'special-programs': 'Special Programs',
-  edfi: 'State Reporting',
+  // [MVP-PARKED] Parked module breadcrumb labels
+  // 'special-programs': 'Special Programs',
+  // edfi: 'State Reporting',
+  // [/MVP-PARKED]
 
   // Academics sub-routes
   students: 'Students',

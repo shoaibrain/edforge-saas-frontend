@@ -46,8 +46,8 @@ export const WELCOME_TIPS: Record<RoleCategory, WelcomeTip> = {
   administrator: {
     title: 'Welcome to EdForge',
     description: 'Your all-in-one education management platform. Connect your video conferencing tools, manage students, track attendance, and streamline your school operations.',
-    actionLabel: 'Connect your meeting tools',
-    actionHref: '/messages',
+    actionLabel: 'Manage your students',
+    actionHref: '/academics/students',
     icon: Sparkles,
     gradient: 'from-teal-500/5 via-transparent to-golden-400/5 dark:from-cyan-500/10 dark:to-golden-400/10',
     iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
@@ -199,28 +199,30 @@ export const MODULE_TIPS: Record<string, WelcomeTip> = {
     iconColor: 'text-aqua-700 dark:text-aqua-400',
     linkColor: 'text-aqua-700 dark:text-aqua-400',
   },
-  analytics: {
-    title: 'Insights & Analytics',
-    description: 'Get actionable insights into academic performance, financial health, and attendance patterns. Make data-driven decisions.',
-    actionLabel: 'Explore analytics',
-    actionHref: '/analytics/academic',
-    icon: Sparkles,
-    gradient: 'from-caramel-400/5 via-transparent to-orange-400/5 dark:from-caramel-400/10 dark:to-orange-400/10',
-    iconBg: 'bg-caramel-400/15 dark:bg-caramel-400/20',
-    iconColor: 'text-caramel-600 dark:text-caramel-400',
-    linkColor: 'text-caramel-600 dark:text-caramel-400',
-  },
-  messages: {
-    title: 'Stay Connected',
-    description: 'Schedule meetings, send messages, and share announcements. Keep everyone informed with our integrated communication tools.',
-    actionLabel: 'Start communicating',
-    actionHref: '/messages',
-    icon: Sparkles,
-    gradient: 'from-violet-500/5 via-transparent to-purple-400/5 dark:from-violet-500/10 dark:to-purple-400/10',
-    iconBg: 'bg-violet-500/15 dark:bg-violet-400/20',
-    iconColor: 'text-violet-600 dark:text-violet-400',
-    linkColor: 'text-violet-600 dark:text-violet-400',
-  },
+  // [MVP-PARKED] Analytics & Messages module tips
+  // analytics: {
+  //   title: 'Insights & Analytics',
+  //   description: 'Get actionable insights into academic performance, financial health, and attendance patterns. Make data-driven decisions.',
+  //   actionLabel: 'Explore analytics',
+  //   actionHref: '/analytics/academic',
+  //   icon: Sparkles,
+  //   gradient: 'from-caramel-400/5 via-transparent to-orange-400/5 dark:from-caramel-400/10 dark:to-orange-400/10',
+  //   iconBg: 'bg-caramel-400/15 dark:bg-caramel-400/20',
+  //   iconColor: 'text-caramel-600 dark:text-caramel-400',
+  //   linkColor: 'text-caramel-600 dark:text-caramel-400',
+  // },
+  // messages: {
+  //   title: 'Stay Connected',
+  //   description: 'Schedule meetings, send messages, and share announcements. Keep everyone informed with our integrated communication tools.',
+  //   actionLabel: 'Start communicating',
+  //   actionHref: '/messages',
+  //   icon: Sparkles,
+  //   gradient: 'from-violet-500/5 via-transparent to-purple-400/5 dark:from-violet-500/10 dark:to-purple-400/10',
+  //   iconBg: 'bg-violet-500/15 dark:bg-violet-400/20',
+  //   iconColor: 'text-violet-600 dark:text-violet-400',
+  //   linkColor: 'text-violet-600 dark:text-violet-400',
+  // },
+  // [/MVP-PARKED]
 }
 
 /**

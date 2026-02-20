@@ -460,13 +460,15 @@ export function CarouselWidget({
 
 // Extended mock data for demo
 const EXTENDED_MOCK_PAGES: VisitedPage[] = [
-  {
-    path: '/messages',
-    title: 'Messages',
-    icon: 'Mail',
-    module: 'messages',
-    visitedAt: new Date().toISOString(),
-  },
+  // [MVP-PARKED] Messages mock entry
+  // {
+  //   path: '/messages',
+  //   title: 'Messages',
+  //   icon: 'Mail',
+  //   module: 'messages',
+  //   visitedAt: new Date().toISOString(),
+  // },
+  // [/MVP-PARKED]
   {
     path: '/settings',
     title: 'Settings',
@@ -502,13 +504,15 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
     module: 'people',
     visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
   },
-  {
-    path: '/analytics',
-    title: 'Analytics',
-    icon: 'BarChart3',
-    module: 'analytics',
-    visitedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  },
+  // [MVP-PARKED] Analytics mock entry
+  // {
+  //   path: '/analytics',
+  //   title: 'Analytics',
+  //   icon: 'BarChart3',
+  //   module: 'analytics',
+  //   visitedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  // },
+  // [/MVP-PARKED]
   {
     path: '/academics/classrooms',
     title: 'Classrooms',

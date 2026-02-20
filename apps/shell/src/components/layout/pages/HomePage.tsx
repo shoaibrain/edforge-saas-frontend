@@ -99,12 +99,14 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: DollarSign, 
     href: '/finance/billing/new' 
   },
-  { 
-    label: 'Send Message', 
-    description: 'Contact parents or staff',
-    icon: Users, 
-    href: '/messages/compose' 
-  },
+  // [MVP-PARKED] Messages quick action
+  // {
+  //   label: 'Send Message',
+  //   description: 'Contact parents or staff',
+  //   icon: Users,
+  //   href: '/messages/compose'
+  // },
+  // [/MVP-PARKED]
 ]
 
 // ============================================================================

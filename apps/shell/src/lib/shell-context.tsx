@@ -70,10 +70,10 @@ const MOCK_TENANT: Tenant = {
   schools: ['school-001', 'school-002', 'school-003'],
   activeSchoolYear: '2024-2025',
   features: {
-    edfiEnabled: true,
+    edfiEnabled: false, // [MVP-PARKED] disabled for MVP
     googleWorkspaceEnabled: true,
     microsoftEnabled: false,
-    advancedAnalytics: true,
+    advancedAnalytics: false, // [MVP-PARKED] disabled for MVP
   },
 }
 
