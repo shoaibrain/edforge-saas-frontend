@@ -39,6 +39,8 @@ export interface GradingPeriodResponseDto {
   endDate: string
   sequence: number
   isCurrent: boolean
+  gradesDueDate?: string
+  reportCardDate?: string
   createdAt: string
   updatedAt: string
 }
