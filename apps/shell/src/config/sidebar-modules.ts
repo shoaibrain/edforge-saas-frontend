@@ -267,26 +267,15 @@ const studentHomeModule: ModuleConfig = {
         },
       ],
     },
-    {
-      id: 'communication',
-      label: 'COMMUNICATION',
-      items: [
-        {
-          id: 'messages',
-          label: 'Messages',
-          icon: Mail,
-          href: '/messages',
-          permission: { action: 'view', resource: 'messages' },
-        },
-        {
-          id: 'announcements',
-          label: 'Announcements',
-          icon: Megaphone,
-          href: '/messages/announcements',
-          permission: { action: 'view', resource: 'announcements' },
-        },
-      ],
-    },
+    // [MVP-PARKED] Communication group (Messages module parked)
+    // {
+    //   id: 'communication', label: 'COMMUNICATION',
+    //   items: [
+    //     { id: 'messages', label: 'Messages', icon: Mail, href: '/messages', permission: { action: 'view', resource: 'messages' } },
+    //     { id: 'announcements', label: 'Announcements', icon: Megaphone, href: '/messages/announcements', permission: { action: 'view', resource: 'announcements' } },
+    //   ],
+    // },
+    // [/MVP-PARKED]
     {
       id: 'account',
       items: [
@@ -371,26 +360,15 @@ const parentHomeModule: ModuleConfig = {
         },
       ],
     },
-    {
-      id: 'communication',
-      label: 'COMMUNICATION',
-      items: [
-        {
-          id: 'messages',
-          label: 'Messages',
-          icon: Mail,
-          href: '/messages',
-          permission: { action: 'view', resource: 'messages' },
-        },
-        {
-          id: 'announcements',
-          label: 'Announcements',
-          icon: Megaphone,
-          href: '/messages/announcements',
-          permission: { action: 'view', resource: 'announcements' },
-        },
-      ],
-    },
+    // [MVP-PARKED] Communication group (Messages module parked)
+    // {
+    //   id: 'communication', label: 'COMMUNICATION',
+    //   items: [
+    //     { id: 'messages', label: 'Messages', icon: Mail, href: '/messages', permission: { action: 'view', resource: 'messages' } },
+    //     { id: 'announcements', label: 'Announcements', icon: Megaphone, href: '/messages/announcements', permission: { action: 'view', resource: 'announcements' } },
+    //   ],
+    // },
+    // [/MVP-PARKED]
     {
       id: 'account',
       items: [
@@ -804,26 +782,15 @@ const studentPortalModule: ModuleConfig = {
         },
       ],
     },
-    {
-      id: 'communication',
-      label: 'COMMUNICATION',
-      items: [
-        {
-          id: 'messages-portal',
-          label: 'Messages',
-          icon: Mail,
-          href: '/communications/messages',
-          permission: { action: 'view', resource: 'messages' },
-        },
-        {
-          id: 'announcements-portal',
-          label: 'Announcements',
-          icon: Megaphone,
-          href: '/communications/announcements',
-          permission: { action: 'view', resource: 'announcements' },
-        },
-      ],
-    },
+    // [MVP-PARKED] Communication group (Messages module parked)
+    // {
+    //   id: 'communication', label: 'COMMUNICATION',
+    //   items: [
+    //     { id: 'messages-portal', label: 'Messages', icon: Mail, href: '/communications/messages', permission: { action: 'view', resource: 'messages' } },
+    //     { id: 'announcements-portal', label: 'Announcements', icon: Megaphone, href: '/communications/announcements', permission: { action: 'view', resource: 'announcements' } },
+    //   ],
+    // },
+    // [/MVP-PARKED]
   ],
 }
 
@@ -889,26 +856,15 @@ const parentPortalModule: ModuleConfig = {
         },
       ],
     },
-    {
-      id: 'communication',
-      label: 'COMMUNICATION',
-      items: [
-        {
-          id: 'messages-portal',
-          label: 'Messages',
-          icon: Mail,
-          href: '/communications/messages',
-          permission: { action: 'view', resource: 'messages' },
-        },
-        {
-          id: 'announcements-portal',
-          label: 'Announcements',
-          icon: Megaphone,
-          href: '/communications/announcements',
-          permission: { action: 'view', resource: 'announcements' },
-        },
-      ],
-    },
+    // [MVP-PARKED] Communication group (Messages module parked)
+    // {
+    //   id: 'communication', label: 'COMMUNICATION',
+    //   items: [
+    //     { id: 'messages-portal', label: 'Messages', icon: Mail, href: '/communications/messages', permission: { action: 'view', resource: 'messages' } },
+    //     { id: 'announcements-portal', label: 'Announcements', icon: Megaphone, href: '/communications/announcements', permission: { action: 'view', resource: 'announcements' } },
+    //   ],
+    // },
+    // [/MVP-PARKED]
   ],
 }
 
