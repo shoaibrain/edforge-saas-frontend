@@ -58,31 +58,35 @@ const FinanceModule = React.lazy(async () => {
   if (!module) throw new Error('Failed to load Finance remote')
   return module
 })
-const SpecialProgramsModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('special-programs/SpecialProgramsModule')
-  if (!module) throw new Error('Failed to load Special Programs remote')
-  return module
-})
+// [MVP-PARKED] Special Programs module
+// const SpecialProgramsModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('special-programs/SpecialProgramsModule')
+//   if (!module) throw new Error('Failed to load Special Programs remote')
+//   return module
+// })
+// [/MVP-PARKED]
 const PeopleModule = React.lazy(async () => {
   const module = await loadRemote<{ default: React.ComponentType }>('people/PeopleModule')
   if (!module) throw new Error('Failed to load People remote')
   return module
 })
-const MessagesModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('messages/MessagesModule')
-  if (!module) throw new Error('Failed to load Messages remote')
-  return module
-})
-const AnalyticsModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
-  if (!module) throw new Error('Failed to load Analytics remote')
-  return module
-})
-const EdFiModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('edfi/EdFiModule')
-  if (!module) throw new Error('Failed to load Ed-Fi remote')
-  return module
-})
+// [MVP-PARKED] Messages, Analytics, Ed-Fi modules
+// const MessagesModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('messages/MessagesModule')
+//   if (!module) throw new Error('Failed to load Messages remote')
+//   return module
+// })
+// const AnalyticsModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
+//   if (!module) throw new Error('Failed to load Analytics remote')
+//   return module
+// })
+// const EdFiModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('edfi/EdFiModule')
+//   if (!module) throw new Error('Failed to load Ed-Fi remote')
+//   return module
+// })
+// [/MVP-PARKED]
 
 // ============================================================================
 // THEME SYNC COMPONENT
@@ -483,47 +487,35 @@ const peopleRoute = createRoute({
   ),
 })
 
-// ============================================================================
-// MESSAGES ROUTES
-// ============================================================================
-
-const messagesRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/messages/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <MessagesModule />
-    </Suspense>
-  ),
-})
-
-// ============================================================================
-// ANALYTICS ROUTES
-// ============================================================================
-
-const analyticsRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/analytics/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <AnalyticsModule />
-    </Suspense>
-  ),
-})
-
-// ============================================================================
-// ED-FI / STATE REPORTING ROUTES
-// ============================================================================
-
-const edfiRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/edfi/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <EdFiModule />
-    </Suspense>
-  ),
-})
+// [MVP-PARKED] Messages, Analytics, Ed-Fi route definitions
+// const messagesRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/messages/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <MessagesModule />
+//     </Suspense>
+//   ),
+// })
+// const analyticsRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/analytics/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <AnalyticsModule />
+//     </Suspense>
+//   ),
+// })
+// const edfiRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/edfi/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <EdFiModule />
+//     </Suspense>
+//   ),
+// })
+// [/MVP-PARKED]
 
 // ============================================================================
 // AUTH DEBUG ROUTE
@@ -551,19 +543,17 @@ const parentPortalRoute = createRoute({
   component: () => <div className="p-6"><h1 className="text-2xl font-bold">Parent Portal</h1><p className="text-gray-500 mt-2">Parent portal coming soon...</p></div>,
 })
 
-// ============================================================================
-// SPECIAL PROGRAMS ROUTES
-// ============================================================================
-
-const specialProgramsRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/special-programs/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <SpecialProgramsModule />
-    </Suspense>
-  ),
-})
+// [MVP-PARKED] Special Programs route definition
+// const specialProgramsRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/special-programs/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <SpecialProgramsModule />
+//     </Suspense>
+//   ),
+// })
+// [/MVP-PARKED]
 
 // ============================================================================
 // ROUTE TREE
@@ -598,10 +588,12 @@ const routeTree = rootRoute.addChildren([
     academicsRoute,
     financeRoute,
     peopleRoute,
-    messagesRoute,
-    analyticsRoute,
-    edfiRoute,
-    specialProgramsRoute,
+    // [MVP-PARKED] Parked module routes removed from tree
+    // messagesRoute,
+    // analyticsRoute,
+    // edfiRoute,
+    // specialProgramsRoute,
+    // [/MVP-PARKED]
     studentPortalRoute,
     parentPortalRoute,
     authDebugRoute2,
