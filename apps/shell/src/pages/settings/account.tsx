@@ -30,21 +30,20 @@ import {
   type UserProfileFormValues 
 } from '@/schemas/person.schema'
 import { getUserAvatar } from '@/lib/avatar'
-import { 
+import {
   SettingsPageHeader,
   SettingsSection,
   SettingsFormCard,
   SettingsSkeleton,
   SettingsDivider,
-  SaveButton,
+  UnsavedChangesBar,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { 
-  usersService, 
-  type UpdateUserDto, 
+import {
+  usersService,
+  type UpdateUserDto,
   type UserResponseDto,
-  type UserAddress,
 } from '@/services/users.service'
 
 // ============================================================================
@@ -385,7 +384,6 @@ export default function AccountPage() {
     defaultValues: {
       firstName: '',
       lastName: '',
-      middleName: '',
       displayName: '',
       email: '',
       phone: '',
@@ -402,13 +400,16 @@ export default function AccountPage() {
 
   const { handleSubmit, formState: { isDirty }, reset } = methods
 
+  const handleReset = useCallback(() => {
+    reset()
+  }, [reset])
+
   // Update form when profile data loads
   useEffect(() => {
     if (userProfile) {
       reset({
         firstName: userProfile.firstName || '',
         lastName: userProfile.lastName || '',
-        middleName: userProfile.middleName || '',
         displayName: userProfile.displayName || '',
         email: userProfile.email || '',
         phone: userProfile.phone || '',
@@ -426,7 +427,6 @@ export default function AccountPage() {
       reset({
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
-        middleName: '',
         displayName: '',
         email: user.email || '',
         phone: '',
@@ -443,23 +443,21 @@ export default function AccountPage() {
   }, [userProfile, user, reset])
 
   const onSubmit = async (data: UserProfileFormValues) => {
-    const address: Partial<UserAddress> = {}
-    if (data.address?.street) address.street = data.address.street
-    if (data.address?.street2) address.street2 = data.address.street2
-    if (data.address?.city) address.city = data.address.city
-    if (data.address?.state) address.state = data.address.state
-    if (data.address?.postalCode) address.postalCode = data.address.postalCode
-    if (data.address?.country) address.country = data.address.country
-    
     const updateData: UpdateUserDto = {
       firstName: data.firstName,
       lastName: data.lastName,
-      middleName: data.middleName || undefined,
       displayName: data.displayName || undefined,
       phone: data.phone || undefined,
-      address: Object.keys(address).length > 0 ? address : undefined,
+      address: {
+        street: data.address?.street || '',
+        street2: data.address?.street2 || '',
+        city: data.address?.city || '',
+        state: data.address?.state || '',
+        postalCode: data.address?.postalCode || '',
+        country: data.address?.country || '',
+      },
     }
-    
+
     updateMutation.mutate(updateData)
   }
 
@@ -519,7 +517,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <motion.div
@@ -532,13 +530,6 @@ export default function AccountPage() {
             <SettingsPageHeader
               title="My Account"
               description="Manage your personal information"
-              action={
-                <SaveButton
-                  isDirty={isDirty}
-                  isSaving={updateMutation.isPending}
-                  saveSuccess={false}
-                />
-              }
             />
 
             {/* Profile Photo Section */}
@@ -587,15 +578,12 @@ export default function AccountPage() {
                 <TextField name="firstName" label="First Name" placeholder="Enter first name" required />
                 <TextField name="lastName" label="Last Name" placeholder="Enter last name" required />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextField name="middleName" label="Middle Name" placeholder="Enter middle name (optional)" />
-                <TextField 
-                  name="displayName" 
-                  label="Display Name" 
-                  placeholder="How you want to be called"
-                  helperText="This is how your name appears to others"
-                />
-              </div>
+              <TextField
+                name="displayName"
+                label="Display Name"
+                placeholder="How you want to be called"
+                helperText="This is how your name appears to others"
+              />
             </SettingsSection>
 
             {/* Contact Information Section */}
@@ -706,6 +694,13 @@ export default function AccountPage() {
               </>
             )}
           </motion.div>
+
+          <UnsavedChangesBar
+            isDirty={isDirty}
+            onReset={handleReset}
+            onSave={() => handleSubmit(onSubmit)()}
+            isSaving={updateMutation.isPending}
+          />
         </form>
       </FormProvider>
     </div>

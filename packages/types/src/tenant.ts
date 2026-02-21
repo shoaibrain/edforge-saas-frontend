@@ -130,12 +130,6 @@ export interface WorkspaceSettings {
     defaultTimeFormat: '12h' | '24h'
     defaultWeekStartsOn: 'sunday' | 'monday'
   }
-  /** Academic calendar defaults */
-  calendar: {
-    defaultAcademicYearStart: string // e.g., "08-15" (month-day)
-    defaultAcademicYearEnd: string   // e.g., "06-15"
-    defaultTermStructure: 'semester' | 'trimester' | 'quarter'
-  }
   /** Organization branding */
   branding: {
     organizationName: string
@@ -145,7 +139,6 @@ export interface WorkspaceSettings {
   }
   /** Policy defaults */
   policies: {
-    defaultGradingScale: 'letter' | 'percentage' | 'points' | 'custom'
     defaultAttendancePolicy: 'daily' | 'period' | 'both'
   }
   /** Lock status - prevents changes when academic year is active */

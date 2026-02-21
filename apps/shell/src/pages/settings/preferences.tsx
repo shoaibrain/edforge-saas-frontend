@@ -10,7 +10,7 @@
  * - Notification category preferences (MVP: Announcements, Attendance, Grades, Calendar)
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
@@ -31,7 +31,8 @@ import {
   Calendar,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
+import { useAuthStore } from '@/stores/auth.store'
+import { useShell } from '@/lib/shell-context'
 import { useThemeStore, type Theme } from '@/stores/theme.store'
 import {
   SettingsPageHeader,
@@ -39,6 +40,7 @@ import {
   SettingsCard,
   SettingsToggleRow,
   SettingsSkeleton,
+  UnsavedChangesBar,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
@@ -221,6 +223,7 @@ function WorkspaceSettingsLink() {
 
 export default function PreferencesPage() {
   const user = useAuthStore((s) => s.user)
+  const { availableSchools } = useShell()
   const queryClient = useQueryClient()
   
   // Theme store for local theme sync
@@ -241,6 +244,13 @@ export default function PreferencesPage() {
     security: true,    // preserved for backend compat (parked in UI)
   })
 
+  // Track server state for dirty detection
+  const serverStateRef = useRef<{
+    theme: Theme
+    defaultSchoolId: string | undefined
+    categories: NotificationCategorySettings
+  } | null>(null)
+
   // Fetch preferences from API
   const {
     data: preferences,
@@ -258,6 +268,8 @@ export default function PreferencesPage() {
     mutationFn: (data: UpdatePreferencesDto) => usersService.updatePreferences(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['preferences', user?.id] })
+      // Immediately sync server ref so isDirty becomes false
+      serverStateRef.current = { theme, defaultSchoolId, categories }
       toast.success('Preferences saved')
     },
     onError: (err: Error) => {
@@ -268,63 +280,91 @@ export default function PreferencesPage() {
   // Update local state when preferences load
   useEffect(() => {
     if (preferences) {
-      setTheme(preferences.theme)
-      setDefaultSchoolId(preferences.defaultSchoolId)
-      setLocalTheme(preferences.theme)
+      const serverTheme = preferences.theme as Theme
+      const serverSchoolId = preferences.defaultSchoolId
+      const serverCategories = preferences.notifications?.categories ?? {
+        announcements: true, attendance: true, grades: true,
+        messages: true, calendar: true, billing: true, security: true,
+      }
 
-      // Sync notification categories from API
-      if (preferences.notifications?.categories) {
-        setCategories(preferences.notifications.categories)
+      setTheme(serverTheme)
+      setDefaultSchoolId(serverSchoolId)
+      setLocalTheme(serverTheme)
+      setCategories(serverCategories)
+
+      serverStateRef.current = {
+        theme: serverTheme,
+        defaultSchoolId: serverSchoolId,
+        categories: serverCategories,
       }
     }
   }, [preferences, setLocalTheme])
 
-  // Handle theme change with immediate local update
+  // Dirty detection — plain expression (not memoized) so it recalculates when ref updates
+  const isDirty = serverStateRef.current !== null
+    && (theme !== serverStateRef.current.theme
+      || defaultSchoolId !== serverStateRef.current.defaultSchoolId
+      || JSON.stringify(categories) !== JSON.stringify(serverStateRef.current.categories))
+
+  // Handle theme change with immediate visual feedback (no auto-save)
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
-    setLocalTheme(newTheme) // Immediate local update
-    
-    // Save to backend
-    updateMutation.mutate({ theme: newTheme })
+    setLocalTheme(newTheme) // Immediate visual update
   }
 
-  // Save preference changes
-  const handlePreferenceChange = <K extends keyof UpdatePreferencesDto>(
-    key: K,
-    value: UpdatePreferencesDto[K]
-  ) => {
-    updateMutation.mutate({ [key]: value })
-  }
-
-  // Handle notification category toggle
+  // Handle notification category toggle (local only)
   const handleCategoryToggle = useCallback((
     category: keyof NotificationCategorySettings,
     enabled: boolean,
   ) => {
-    const newCategories = { ...categories, [category]: enabled }
-    setCategories(newCategories)
+    setCategories(prev => ({ ...prev, [category]: enabled }))
+  }, [])
 
-    // Preserve full notification structure (channels + all 7 categories)
-    // so parked categories keep their values in the backend
-    const notifications: NotificationSettings = {
-      channels: preferences?.notifications?.channels ?? {
-        email: { enabled: true, digest: 'immediate' as const },
-        push: { enabled: true },
-        sms: { enabled: false, phone: '' },
-      },
-      categories: newCategories,
+  // Save all pending changes in a single API call
+  const handleSave = useCallback(() => {
+    const dto: UpdatePreferencesDto = {}
+    const server = serverStateRef.current
+    if (!server) return
+
+    if (theme !== server.theme) {
+      dto.theme = theme
     }
-    updateMutation.mutate({ notifications })
-  }, [categories, preferences, updateMutation])
+    if (defaultSchoolId !== server.defaultSchoolId) {
+      dto.defaultSchoolId = defaultSchoolId
+    }
+    if (JSON.stringify(categories) !== JSON.stringify(server.categories)) {
+      const notifications: NotificationSettings = {
+        channels: preferences?.notifications?.channels ?? {
+          email: { enabled: true, digest: 'immediate' as const },
+          push: { enabled: true },
+          sms: { enabled: false, phone: '' },
+        },
+        categories,
+      }
+      dto.notifications = notifications
+    }
 
-  // Get schools for selector (from user assignments)
+    updateMutation.mutate(dto)
+  }, [theme, defaultSchoolId, categories, preferences, updateMutation])
+
+  // Reset all local state to server values
+  const handleReset = useCallback(() => {
+    if (!serverStateRef.current) return
+    const server = serverStateRef.current
+    setTheme(server.theme)
+    setLocalTheme(server.theme) // Revert visual theme
+    setDefaultSchoolId(server.defaultSchoolId)
+    setCategories(server.categories)
+  }, [setLocalTheme])
+
+  // Get schools for selector (from real school data via shell context)
   const schools = useMemo(() => {
-    if (!user?.assignments) return []
-    return Object.keys(user.assignments).map((schoolId) => ({
-      id: schoolId,
-      name: MOCK_SCHOOLS[schoolId]?.name || `School ${schoolId}`,
+    if (!availableSchools || availableSchools.length === 0) return []
+    return availableSchools.map((school) => ({
+      id: school.id,
+      name: school.name,
     }))
-  }, [user?.assignments])
+  }, [availableSchools])
 
   // Loading state
   if (isLoading) {
@@ -338,7 +378,7 @@ export default function PreferencesPage() {
   // Error state - show UI anyway with local theme
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -373,7 +413,6 @@ export default function PreferencesPage() {
                 value={defaultSchoolId}
                 onChange={(value) => {
                   setDefaultSchoolId(value || undefined)
-                  handlePreferenceChange('defaultSchoolId', value || undefined)
                 }}
                 schools={schools}
               />
@@ -396,7 +435,6 @@ export default function PreferencesPage() {
                 description={cat.description}
                 checked={categories[cat.key]}
                 onChange={(checked) => handleCategoryToggle(cat.key, checked)}
-                loading={updateMutation.isPending}
               />
             ))}
           </div>
@@ -416,6 +454,13 @@ export default function PreferencesPage() {
           <WorkspaceSettingsLink />
         </motion.div>
       </motion.div>
+
+      <UnsavedChangesBar
+        isDirty={isDirty}
+        onReset={handleReset}
+        onSave={handleSave}
+        isSaving={updateMutation.isPending}
+      />
     </div>
   )
 }

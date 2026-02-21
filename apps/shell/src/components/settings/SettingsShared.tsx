@@ -704,11 +704,11 @@ export function UnsavedChangesBar({
             {message}
           </span>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={onReset} disabled={isSaving}>
+            <Button type="button" variant="outline" size="sm" onClick={onReset} disabled={isSaving}>
               <RotateCcw className="w-4 h-4 mr-1.5" />
               Reset
             </Button>
-            <Button size="sm" onClick={onSave} isLoading={isSaving}>
+            <Button type="button" variant="outline" size="sm" onClick={onSave} isLoading={isSaving}>
               <Save className="w-4 h-4 mr-1.5" />
               Save Changes
             </Button>
