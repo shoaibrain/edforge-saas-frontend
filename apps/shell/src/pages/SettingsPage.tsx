@@ -11,11 +11,12 @@ import { motion } from 'framer-motion'
 import {
   Camera,
   Shield,
-  CreditCard,
+  // [MVP-PARKED] CreditCard,
   User,
   Bell,
   Building2,
-  Search
+  Search,
+  Settings,
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth.store'
 import { getUserAvatar } from '../lib/avatar'
@@ -73,9 +74,10 @@ function SettingsOverviewContent({
   const quickActions: QuickActionProps[] = [
     { label: 'My Account', icon: User, href: '/settings/account' },
     { label: 'Security', icon: Shield, href: '/settings/security' },
-    { label: 'Notifications', icon: Bell, href: '/settings/notifications' },
+    { label: 'Preferences', icon: Bell, href: '/settings/preferences' },
     { label: 'Organization', icon: Building2, href: '/settings/organization' },
-    { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
+    { label: 'Workspace', icon: Settings, href: '/settings/workspace' },
+    // [MVP-PARKED] { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
   ]
 
   return (

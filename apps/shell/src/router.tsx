@@ -32,7 +32,7 @@ import AuthDebugPage from './pages/AuthDebugPage'
 import {
   AccountPage,
   SecurityPage,
-  NotificationsPage,
+  // [MVP-PARKED] NotificationsPage,  // merged into PreferencesPage
   PreferencesPage,
   WorkspaceSettingsPage,
   SchoolDetailPage,
@@ -41,10 +41,10 @@ import {
   EducationOrgDetailPage,
   // [MVP-PARKED] EdFiExportPreviewPage,
   RBACSecurityPage,
-  IntegrationsSettingsPage,
-  BillingSettingsPage,
+  // [MVP-PARKED] IntegrationsSettingsPage,
+  // [MVP-PARKED] BillingSettingsPage,
   PeopleSettingsPage,
-  DangerZonePage,
+  // [MVP-PARKED] DangerZonePage,
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React from 'react'
@@ -354,11 +354,15 @@ const settingsSecurityRoute = createRoute({
   component: SecurityPage,
 })
 
+// [MVP-PARKED] Notifications merged into Preferences page — redirect for bookmarks
 const settingsNotificationsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/notifications',
-  component: NotificationsPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/settings/preferences' })
+  },
 })
+// [/MVP-PARKED]
 
 const settingsGeneralRoute = createRoute({
   getParentRoute: () => settingsRoute,
@@ -421,29 +425,31 @@ const settingsOrgSchoolCreateRoute = createRoute({
   }),
 })
 
-const settingsBillingRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/billing',
-  component: BillingSettingsPage,
-})
-
-const settingsIntegrationsRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/integrations',
-  component: IntegrationsSettingsPage,
-})
-
-const settingsImportExportRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/import-export',
-  component: IntegrationsSettingsPage, // Import/Export as part of Integrations
-})
-
-const settingsDangerZoneRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/danger-zone',
-  component: DangerZonePage,
-})
+// [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
+// const settingsBillingRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/billing',
+//   component: BillingSettingsPage,
+// })
+//
+// const settingsIntegrationsRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/integrations',
+//   component: IntegrationsSettingsPage,
+// })
+//
+// const settingsImportExportRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/import-export',
+//   component: IntegrationsSettingsPage,
+// })
+//
+// const settingsDangerZoneRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/danger-zone',
+//   component: DangerZonePage,
+// })
+// [/MVP-PARKED]
 
 // ============================================================================
 // ACADEMICS ROUTES
@@ -619,10 +625,10 @@ const routeTree = rootRoute.addChildren([
       // [MVP-PARKED] settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
-      settingsBillingRoute,
-      settingsIntegrationsRoute,
-      settingsImportExportRoute,
-      settingsDangerZoneRoute,
+      // [MVP-PARKED] settingsBillingRoute,
+      // [MVP-PARKED] settingsIntegrationsRoute,
+      // [MVP-PARKED] settingsImportExportRoute,
+      // [MVP-PARKED] settingsDangerZoneRoute,
     ]),
     academicsRoute,
     // [MVP-PARKED] financeRoute,

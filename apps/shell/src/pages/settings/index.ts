@@ -7,7 +7,7 @@
 // Account
 export { default as AccountPage } from './account'
 export { default as SecurityPage } from './security'
-export { default as NotificationsPage } from './notifications'
+// [MVP-PARKED] export { default as NotificationsPage } from './notifications'  // merged into PreferencesPage
 export { default as PreferencesPage } from './preferences'
 
 // Workspace
@@ -25,8 +25,8 @@ export { default as EducationOrgDetailPage } from './education-org-detail'
 // [MVP-PARKED] export { default as EdFiExportPreviewPage } from './edfi-export-preview'
 
 // Other
-export { default as IntegrationsSettingsPage } from './integrations'
-export { default as BillingSettingsPage } from './billing'
+// [MVP-PARKED] export { default as IntegrationsSettingsPage } from './integrations'
+// [MVP-PARKED] export { default as BillingSettingsPage } from './billing'
 export { default as PeopleSettingsPage } from './people'
-export { default as DangerZonePage } from './danger'
+// [MVP-PARKED] export { default as DangerZonePage } from './danger'
 

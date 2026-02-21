@@ -1,20 +1,21 @@
 /**
- * User Preferences Page
- * 
- * Personal display preferences for the logged-in user.
+ * Preferences & Notifications Page
+ *
+ * Personal display preferences and notification settings for the logged-in user.
  * Organization-wide settings have been moved to Workspace Settings.
- * 
+ *
  * User-specific settings:
  * - Theme (light/dark/system)
  * - Default School (for multi-school users)
+ * - Notification category preferences (MVP: Announcements, Attendance, Grades, Calendar)
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { 
-  Palette, 
+import {
+  Palette,
   Sun,
   Moon,
   Monitor,
@@ -23,6 +24,11 @@ import {
   ArrowRight,
   Building2,
   Info,
+  Bell,
+  Megaphone,
+  ClipboardCheck,
+  GraduationCap,
+  Calendar,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
@@ -31,14 +37,17 @@ import {
   SettingsPageHeader,
   SettingsSection,
   SettingsCard,
+  SettingsToggleRow,
   SettingsSkeleton,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { 
-  usersService, 
-  type UserPreferences, 
-  type UpdatePreferencesDto 
+import {
+  usersService,
+  type UserPreferences,
+  type UpdatePreferencesDto,
+  type NotificationSettings,
+  type NotificationCategorySettings,
 } from '@/services/users.service'
 
 // ============================================================================
@@ -49,6 +58,19 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun; descriptio
   { value: 'light', label: 'Light', icon: Sun, description: 'Always use light mode' },
   { value: 'dark', label: 'Dark', icon: Moon, description: 'Always use dark mode' },
   { value: 'system', label: 'System', icon: Monitor, description: 'Match your system settings' },
+]
+
+/** MVP notification categories — core school operations only */
+const MVP_NOTIFICATION_CATEGORIES: {
+  key: keyof NotificationCategorySettings
+  label: string
+  description: string
+  icon: typeof Bell
+}[] = [
+  { key: 'announcements', label: 'Announcements', description: 'School-wide and class announcements', icon: Megaphone },
+  { key: 'attendance', label: 'Attendance', description: 'Attendance alerts and absence notifications', icon: ClipboardCheck },
+  { key: 'grades', label: 'Grades & Assessments', description: 'Grade updates and assessment results', icon: GraduationCap },
+  { key: 'calendar', label: 'Calendar & Events', description: 'Upcoming events and schedule changes', icon: Calendar },
 ]
 
 // ============================================================================
@@ -204,11 +226,20 @@ export default function PreferencesPage() {
   // Theme store for local theme sync
   const { theme: localTheme, setTheme: setLocalTheme } = useThemeStore()
   
-  // Local state
-  
   // Local form state (used for immediate UI updates)
   const [theme, setTheme] = useState<Theme>(localTheme)
   const [defaultSchoolId, setDefaultSchoolId] = useState<string | undefined>()
+
+  // Notification category state
+  const [categories, setCategories] = useState<NotificationCategorySettings>({
+    announcements: true,
+    attendance: true,
+    grades: true,
+    messages: true,    // preserved for backend compat (parked in UI)
+    calendar: true,
+    billing: true,     // preserved for backend compat (parked in UI)
+    security: true,    // preserved for backend compat (parked in UI)
+  })
 
   // Fetch preferences from API
   const {
@@ -239,9 +270,12 @@ export default function PreferencesPage() {
     if (preferences) {
       setTheme(preferences.theme)
       setDefaultSchoolId(preferences.defaultSchoolId)
-      
-      // Sync theme with local store
       setLocalTheme(preferences.theme)
+
+      // Sync notification categories from API
+      if (preferences.notifications?.categories) {
+        setCategories(preferences.notifications.categories)
+      }
     }
   }, [preferences, setLocalTheme])
 
@@ -261,6 +295,27 @@ export default function PreferencesPage() {
   ) => {
     updateMutation.mutate({ [key]: value })
   }
+
+  // Handle notification category toggle
+  const handleCategoryToggle = useCallback((
+    category: keyof NotificationCategorySettings,
+    enabled: boolean,
+  ) => {
+    const newCategories = { ...categories, [category]: enabled }
+    setCategories(newCategories)
+
+    // Preserve full notification structure (channels + all 7 categories)
+    // so parked categories keep their values in the backend
+    const notifications: NotificationSettings = {
+      channels: preferences?.notifications?.channels ?? {
+        email: { enabled: true, digest: 'immediate' as const },
+        push: { enabled: true },
+        sms: { enabled: false, phone: '' },
+      },
+      categories: newCategories,
+    }
+    updateMutation.mutate({ notifications })
+  }, [categories, preferences, updateMutation])
 
   // Get schools for selector (from user assignments)
   const schools = useMemo(() => {
@@ -292,8 +347,8 @@ export default function PreferencesPage() {
       >
         {/* Header */}
         <SettingsPageHeader
-          title="My Preferences"
-          description="Personal display settings for your account"
+          title="Preferences & Notifications"
+          description="Personal display and notification settings"
           icon={Palette}
         />
 
@@ -325,6 +380,27 @@ export default function PreferencesPage() {
             </SettingsCard>
           </SettingsSection>
         )}
+
+        {/* Notification Preferences */}
+        <SettingsSection
+          title="Notification Preferences"
+          icon={Bell}
+          description="Choose which notifications you'd like to receive"
+        >
+          <div className="space-y-1">
+            {MVP_NOTIFICATION_CATEGORIES.map((cat) => (
+              <SettingsToggleRow
+                key={cat.key}
+                icon={cat.icon}
+                title={cat.label}
+                description={cat.description}
+                checked={categories[cat.key]}
+                onChange={(checked) => handleCategoryToggle(cat.key, checked)}
+                loading={updateMutation.isPending}
+              />
+            ))}
+          </div>
+        </SettingsSection>
 
         {/* Link to Workspace Settings */}
         <motion.div variants={fadeInUp}>
