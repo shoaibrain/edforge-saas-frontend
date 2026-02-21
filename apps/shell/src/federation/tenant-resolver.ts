@@ -12,7 +12,7 @@ interface TenantConfig {
   remoteUrls: {
     // [MVP-PARKED] edfi?: string
     academics?: string
-    finance?: string
+    // [MVP-PARKED] finance?: string
     people?: string
     portal?: string
     integrations?: string
@@ -26,7 +26,7 @@ declare global {
       remotes?: {
         // [MVP-PARKED] edfi?: string
         academics?: string
-        finance?: string
+        // [MVP-PARKED] finance?: string
         people?: string
         portal?: string
         integrations?: string
@@ -54,7 +54,7 @@ function getTenantConfig(): TenantConfig {
       remoteUrls: {
         // [MVP-PARKED] edfi: 'http://localhost:3001',
         academics: 'http://localhost:3002',
-        finance: 'http://localhost:3003',
+        // [MVP-PARKED] finance: 'http://localhost:3003',
         people: 'http://localhost:3004',
         portal: 'http://localhost:3005',
         integrations: 'http://localhost:3006',
@@ -70,7 +70,7 @@ function getTenantConfig(): TenantConfig {
     remoteUrls: {
       // [MVP-PARKED] edfi: `${import.meta.env.VITE_EDFI_URL || ''}/remoteEntry.js`,
       academics: `${import.meta.env.VITE_ACADEMICS_URL || ''}/remoteEntry.js`,
-      finance: `${import.meta.env.VITE_FINANCE_URL || ''}/remoteEntry.js`,
+      // [MVP-PARKED] finance: `${import.meta.env.VITE_FINANCE_URL || ''}/remoteEntry.js`,
       people: `${import.meta.env.VITE_PEOPLE_URL || ''}/remoteEntry.js`,
       portal: `${import.meta.env.VITE_PORTAL_URL || ''}/remoteEntry.js`,
       integrations: `${import.meta.env.VITE_INTEGRATIONS_URL || ''}/remoteEntry.js`,

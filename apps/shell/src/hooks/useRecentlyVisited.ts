@@ -88,10 +88,12 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/academics/classrooms': { title: 'Classrooms', icon: 'BookOpen', module: 'academics' },
   '/academics/attendance': { title: 'Attendance', icon: 'ClipboardList', module: 'academics' },
   '/academics/gradebooks': { title: 'Gradebooks', icon: 'GraduationCap', module: 'academics' },
-  '/finance': { title: 'Finance', icon: 'DollarSign', module: 'finance' },
-  '/finance/tuition': { title: 'Tuition', icon: 'DollarSign', module: 'finance' },
-  '/finance/fees': { title: 'Fees', icon: 'DollarSign', module: 'finance' },
-  '/finance/reports': { title: 'Reports', icon: 'BarChart3', module: 'finance' },
+  // [MVP-PARKED] Finance page metadata
+  // '/finance': { title: 'Finance', icon: 'DollarSign', module: 'finance' },
+  // '/finance/tuition': { title: 'Tuition', icon: 'DollarSign', module: 'finance' },
+  // '/finance/fees': { title: 'Fees', icon: 'DollarSign', module: 'finance' },
+  // '/finance/reports': { title: 'Reports', icon: 'BarChart3', module: 'finance' },
+  // [/MVP-PARKED]
   '/people': { title: 'People', icon: 'Users', module: 'people' },
   '/people/staff': { title: 'Staff', icon: 'UserCog', module: 'people' },
   '/people/parents': { title: 'Parents', icon: 'Users', module: 'people' },
@@ -213,13 +215,15 @@ export const MOCK_RECENT_PAGES: VisitedPage[] = [
     module: 'academics',
     visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
   },
-  {
-    path: '/finance/tuition',
-    title: 'Tuition',
-    icon: 'DollarSign',
-    module: 'finance',
-    visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
-  },
+  // [MVP-PARKED] Finance mock entry
+  // {
+  //   path: '/finance/tuition',
+  //   title: 'Tuition',
+  //   icon: 'DollarSign',
+  //   module: 'finance',
+  //   visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
+  // },
+  // [/MVP-PARKED]
   {
     path: '/people/staff',
     title: 'Staff',

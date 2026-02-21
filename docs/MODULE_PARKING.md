@@ -2,16 +2,17 @@
 
 ## Overview
 
-For the MVP release, 4 modules have been parked (disabled from build/deployment):
+For the MVP release, 5 modules have been parked (disabled from build/deployment):
 
 | Module | Path | Status |
 |--------|------|--------|
+| Finance | `/finance` | Parked |
 | Messages | `/messages` | Parked |
 | Analytics | `/analytics` | Parked |
 | Special Programs | `/special-programs` | Parked |
 | State Reporting (Ed-Fi) | `/edfi` | Parked |
 
-Active MVP modules: **Academics**, **Finance**, **People & HR**, **Shell/System Admin**
+Active MVP modules: **Academics**, **People & HR**, **Shell/System Admin**
 
 ## How It Works
 

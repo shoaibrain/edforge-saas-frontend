@@ -24,11 +24,11 @@ import {
   ShieldCheck,
   // [MVP-PARKED] Link2,
   School,
-  HandCoins,
+  // [MVP-PARKED] HandCoins,
   UsersRound,
   CreditCard,
   Zap,
-  Landmark,
+  // [MVP-PARKED] Landmark,
   Database,
   TriangleAlert,
   ClipboardList,
@@ -106,7 +106,7 @@ export type SidebarModule =
   | 'home-parent'
   | 'settings'
   | 'academics'
-  | 'finance'
+  // [MVP-PARKED] | 'finance'
   | 'people'
   // [MVP-PARKED] | 'messages'
   // [MVP-PARKED] | 'analytics'
@@ -151,13 +151,15 @@ const homeModule: ModuleConfig = {
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
         },
-        {
-          id: 'finance',
-          label: 'Finance',
-          icon: HandCoins,
-          href: '/finance',
-          permission: { action: 'view', resource: 'billing' },
-        },
+        // [MVP-PARKED] Finance
+        // {
+        //   id: 'finance',
+        //   label: 'Finance',
+        //   icon: HandCoins,
+        //   href: '/finance',
+        //   permission: { action: 'view', resource: 'billing' },
+        // },
+        // [/MVP-PARKED]
         // [MVP-PARKED] Messages, Analytics, State Reporting
         // {
         //   id: 'messages',
@@ -584,58 +586,25 @@ const academicsModule: ModuleConfig = {
   ],
 }
 
-// ============================================================================
-// FINANCE MODULE - Financial management (Consolidated: 12 → 3 items)
-// Design: Workflow-oriented with Reports accessible from page headers
-// ============================================================================
-
-const financeModule: ModuleConfig = {
-  id: 'finance',
-  title: 'Finance',
-  icon: HandCoins,
-  backTo: { path: '/home', label: 'Back to Home' },
-  groups: [
-    {
-      id: 'main',
-      items: [
-        {
-          id: 'finance-home',
-          label: 'Overview',
-          icon: GalleryVerticalEnd,
-          href: '/finance',
-          permission: { action: 'view', resource: 'billing' },
-        },
-        {
-          // Ledger: GL/AP/AR as tabs for specialists
-          id: 'ledger',
-          label: 'Ledger',
-          icon: Landmark,
-          href: '/finance/ledger',
-          permission: { action: 'view', resource: 'billing' },
-          requiresActiveSchool: true,
-        },
-        {
-          // Billing: Tuition main view; Fee Structures behind "Configure" gear
-          id: 'billing',
-          label: 'Billing',
-          icon: CreditCard,
-          href: '/finance/billing',
-          permission: { action: 'view', resource: 'billing' },
-          requiresActiveSchool: true,
-        },
-        {
-          // Expenses: Tracking main view; Approvals as filter, Budgets as tab
-          id: 'expenses',
-          label: 'Expenses',
-          icon: ClipboardList,
-          href: '/finance/expenses',
-          permission: { action: 'view', resource: 'expenses' },
-          requiresActiveSchool: true,
-        },
-      ],
-    },
-  ],
-}
+// [MVP-PARKED] Finance module config
+// const financeModule: ModuleConfig = {
+//   id: 'finance',
+//   title: 'Finance',
+//   icon: HandCoins,
+//   backTo: { path: '/home', label: 'Back to Home' },
+//   groups: [
+//     {
+//       id: 'main',
+//       items: [
+//         { id: 'finance-home', label: 'Overview', icon: GalleryVerticalEnd, href: '/finance', permission: { action: 'view', resource: 'billing' } },
+//         { id: 'ledger', label: 'Ledger', icon: Landmark, href: '/finance/ledger', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+//         { id: 'billing', label: 'Billing', icon: CreditCard, href: '/finance/billing', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+//         { id: 'expenses', label: 'Expenses', icon: ClipboardList, href: '/finance/expenses', permission: { action: 'view', resource: 'expenses' }, requiresActiveSchool: true },
+//       ],
+//     },
+//   ],
+// }
+// [/MVP-PARKED]
 
 // ============================================================================
 // PEOPLE MODULE - Staff and user management (Consolidated: 10 → 2 items)
@@ -931,7 +900,7 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   'home-parent': parentHomeModule,
   settings: settingsModule,
   academics: academicsModule,
-  finance: financeModule,
+  // [MVP-PARKED] finance: financeModule,
   people: peopleModule,
   // [MVP-PARKED] messages: messagesModule,
   // [MVP-PARKED] analytics: analyticsModule,
@@ -998,7 +967,7 @@ export function getHomeModuleForSchoolRole(schoolRole: SchoolRole | null): Sideb
 export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/settings')) return 'settings'
   if (pathname.startsWith('/academics')) return 'academics'
-  if (pathname.startsWith('/finance')) return 'finance'
+  // [MVP-PARKED] if (pathname.startsWith('/finance')) return 'finance'
   if (pathname.startsWith('/people')) return 'people'
   // [MVP-PARKED] if (pathname.startsWith('/messages')) return 'messages'
   // [MVP-PARKED] if (pathname.startsWith('/analytics')) return 'analytics'

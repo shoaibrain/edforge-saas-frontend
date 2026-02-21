@@ -13,9 +13,9 @@
  */
 export const MODULE_AVAILABILITY = {
   academics: true,
-  finance: true,
   people: true,
   // [MVP-PARKED] — These modules will be re-enabled post-MVP
+  finance: false,
   'special-programs': false,
   messages: false,
   analytics: false,
@@ -34,6 +34,7 @@ export function isModuleEnabled(moduleId: string): boolean {
 
 /** List of all parked module path prefixes for guard routes */
 export const PARKED_MODULE_PATHS = [
+  '/finance',
   '/messages',
   '/analytics',
   '/special-programs',

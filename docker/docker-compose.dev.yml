@@ -18,12 +18,12 @@ services:
     environment:
       # [MVP-PARKED] - VITE_EDFI_URL=http://edfi:3001
       - VITE_ACADEMICS_URL=http://academics:3002
-      - VITE_FINANCE_URL=http://finance:3003
+      # [MVP-PARKED] - VITE_FINANCE_URL=http://finance:3003
       - VITE_PEOPLE_URL=http://people:3006
     depends_on:
       # [MVP-PARKED] - edfi
       - academics
-      - finance
+      # [MVP-PARKED] - finance
       - people
     networks:
       - edforge-network
@@ -63,22 +63,23 @@ services:
     networks:
       - edforge-network
 
-  # Finance Module
-  finance:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.dev
-      args:
-        APP_NAME: finance
-        APP_PORT: 3003
-    ports:
-      - "3003:3003"
-    volumes:
-      - ../apps/finance/src:/app/apps/finance/src
-      - ../packages:/app/packages
-      - /app/node_modules
-    networks:
-      - edforge-network
+  # [MVP-PARKED] Finance Module
+  # finance:
+  #   build:
+  #     context: ..
+  #     dockerfile: docker/Dockerfile.dev
+  #     args:
+  #       APP_NAME: finance
+  #       APP_PORT: 3003
+  #   ports:
+  #     - "3003:3003"
+  #   volumes:
+  #     - ../apps/finance/src:/app/apps/finance/src
+  #     - ../packages:/app/packages
+  #     - /app/node_modules
+  #   networks:
+  #     - edforge-network
+  # [/MVP-PARKED]
 
   # People Module
   people:
@@ -108,7 +109,7 @@ services:
       - shell
       # [MVP-PARKED] - edfi
       - academics
-      - finance
+      # [MVP-PARKED] - finance
       - people
     networks:
       - edforge-network

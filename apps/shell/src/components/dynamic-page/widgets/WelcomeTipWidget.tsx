@@ -177,17 +177,19 @@ export const MODULE_TIPS: Record<string, WelcomeTip> = {
     iconColor: 'text-teal-600 dark:text-cyan-400',
     linkColor: 'text-teal-600 dark:text-cyan-400',
   },
-  finance: {
-    title: 'Financial Overview',
-    description: 'Track tuition, manage payments, handle payroll, and monitor expenses. Get comprehensive financial insights for your institution.',
-    actionLabel: 'View finances',
-    actionHref: '/finance/billing',
-    icon: Sparkles,
-    gradient: 'from-golden-400/5 via-transparent to-amber-400/5 dark:from-golden-400/10 dark:to-amber-400/10',
-    iconBg: 'bg-golden-400/15 dark:bg-golden-400/20',
-    iconColor: 'text-golden-600 dark:text-golden-400',
-    linkColor: 'text-golden-600 dark:text-golden-400',
-  },
+  // [MVP-PARKED] Finance module tip
+  // finance: {
+  //   title: 'Financial Overview',
+  //   description: 'Track tuition, manage payments, handle payroll, and monitor expenses. Get comprehensive financial insights for your institution.',
+  //   actionLabel: 'View finances',
+  //   actionHref: '/finance/billing',
+  //   icon: Sparkles,
+  //   gradient: 'from-golden-400/5 via-transparent to-amber-400/5 dark:from-golden-400/10 dark:to-amber-400/10',
+  //   iconBg: 'bg-golden-400/15 dark:bg-golden-400/20',
+  //   iconColor: 'text-golden-600 dark:text-golden-400',
+  //   linkColor: 'text-golden-600 dark:text-golden-400',
+  // },
+  // [/MVP-PARKED]
   people: {
     title: 'People Management',
     description: 'Manage staff, teachers, parents, and guardians. Track assignments, permissions, and communication preferences.',

@@ -32,7 +32,7 @@ const ROUTE_LABELS: Record<string, string> = {
   // Top-level modules
   home: 'Home',
   academics: 'Academics',
-  finance: 'Finance & Billing',
+  // [MVP-PARKED] finance: 'Finance & Billing',
   people: 'People & HR',
   // [MVP-PARKED] Parked module breadcrumb labels
   // messages: 'Messages',

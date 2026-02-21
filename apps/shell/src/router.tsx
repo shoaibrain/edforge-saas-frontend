@@ -54,11 +54,13 @@ const AcademicsModule = React.lazy(async () => {
   if (!module) throw new Error('Failed to load Academics remote')
   return module
 })
-const FinanceModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('finance/FinanceModule')
-  if (!module) throw new Error('Failed to load Finance remote')
-  return module
-})
+// [MVP-PARKED] Finance module
+// const FinanceModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('finance/FinanceModule')
+//   if (!module) throw new Error('Failed to load Finance remote')
+//   return module
+// })
+// [/MVP-PARKED]
 // [MVP-PARKED] Special Programs module
 // const SpecialProgramsModule = React.lazy(async () => {
 //   const module = await loadRemote<{ default: React.ComponentType }>('special-programs/SpecialProgramsModule')
@@ -459,19 +461,17 @@ const academicsRoute = createRoute({
 
 
 
-// ============================================================================
-// FINANCE ROUTES
-// ============================================================================
-
-const financeRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/finance/$', // Splat route
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <FinanceModule />
-    </Suspense>
-  ),
-})
+// [MVP-PARKED] Finance route definition
+// const financeRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/finance/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <FinanceModule />
+//     </Suspense>
+//   ),
+// })
+// [/MVP-PARKED]
 
 
 
@@ -586,6 +586,12 @@ const specialProgramsComingSoonRoute = createRoute({
   component: () => <ComingSoon moduleName="Special Programs" />,
 })
 
+const financeComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/finance/$',
+  component: () => <ComingSoon moduleName="Finance" />,
+})
+
 // [/MVP-PARKED]
 
 // ============================================================================
@@ -619,7 +625,7 @@ const routeTree = rootRoute.addChildren([
       settingsDangerZoneRoute,
     ]),
     academicsRoute,
-    financeRoute,
+    // [MVP-PARKED] financeRoute,
     peopleRoute,
     // [MVP-PARKED] Original module routes removed from tree
     // messagesRoute,
@@ -631,6 +637,7 @@ const routeTree = rootRoute.addChildren([
     analyticsComingSoonRoute,
     edfiComingSoonRoute,
     specialProgramsComingSoonRoute,
+    financeComingSoonRoute,
     // [/MVP-PARKED]
     studentPortalRoute,
     parentPortalRoute,
