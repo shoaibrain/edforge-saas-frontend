@@ -1,17 +1,19 @@
 /**
  * Grade Overview
  *
- * School-wide grade analytics showing:
+ * School-wide grade analytics dashboard showing:
+ * - Academic year context bar with 3-dot actions menu
  * - Summary stat cards (avg GPA, pass rate, at-risk count, total graded)
- * - Grade distribution bar chart (Recharts)
- * - Course performance table with averages
+ * - Grading completion donut chart
+ * - Assessment type performance with ring indicators
+ * - Grade distribution bar chart
+ * - Category & course performance tables
  * - At-risk students table (below 60%)
- * - CSV export for at-risk data
  *
  * Data is fetched from a single backend aggregation endpoint.
  */
 
-import { useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import {
   GraduationCap,
   TrendingUp,
@@ -23,6 +25,7 @@ import {
   BookOpen,
   ClipboardList,
   Layers,
+  MoreHorizontal,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -33,6 +36,8 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  PieChart,
+  Pie,
 } from 'recharts'
 import { useGradeOverview } from '../../hooks/useGrades'
 import type { GradeOverviewResponse } from '../../services/academics.service'
@@ -47,7 +52,6 @@ interface GradeOverviewProps {
 }
 
 type AtRiskStudent = GradeOverviewResponse['atRiskStudents'][number]
-type CoursePerformance = GradeOverviewResponse['coursePerformance'][number]
 
 // ============================================================================
 // STAT CARD
@@ -109,6 +113,116 @@ function SkeletonCards() {
   )
 }
 
+// ============================================================================
+// ACTIONS DROPDOWN (3-dot menu)
+// ============================================================================
+
+function ActionsDropdown({
+  onExportGradebook,
+  onExportAtRisk,
+  gradebookDisabled,
+  atRiskDisabled,
+}: {
+  onExportGradebook: () => void
+  onExportAtRisk: () => void
+  gradebookDisabled: boolean
+  atRiskDisabled: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [open])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
+        aria-label="More actions"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-52 bg-surface-primary border border-border-secondary rounded-xl shadow-lg z-20 py-1 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => { onExportGradebook(); setOpen(false) }}
+            disabled={gradebookDisabled}
+            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Export Gradebook CSV
+          </button>
+          <button
+            type="button"
+            onClick={() => { onExportAtRisk(); setOpen(false) }}
+            disabled={atRiskDisabled}
+            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Export At-Risk CSV
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// ASSESSMENT RING (SVG circular progress)
+// ============================================================================
+
+function AssessmentRing({
+  percentage,
+  size = 80,
+  strokeWidth = 6,
+  color,
+}: {
+  percentage: number
+  size?: number
+  strokeWidth?: number
+  color: string
+}) {
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (percentage / 100) * circumference
+
+  return (
+    <svg width={size} height={size} className="transform -rotate-90">
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="var(--color-border-secondary, #e5e7eb)"
+        strokeWidth={strokeWidth}
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+        className="transition-all duration-700 ease-out"
+      />
+    </svg>
+  )
+}
 
 // ============================================================================
 // GRADE COLOR HELPERS
@@ -214,28 +328,6 @@ export function GradeOverview({
 
   return (
     <div className="space-y-6">
-      {/* Export Buttons */}
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={handleExportGradebook}
-          disabled={!data?.coursePerformance?.length}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-surface-secondary border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <Download className="w-4 h-4" />
-          Export Gradebook CSV
-        </button>
-        <button
-          type="button"
-          onClick={handleExportAtRisk}
-          disabled={!data?.atRiskStudents?.length}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-surface-secondary border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <Download className="w-4 h-4" />
-          Export At-Risk CSV
-        </button>
-      </div>
-
       {/* Summary Stat Cards */}
       {isLoading ? (
         <SkeletonCards />
@@ -246,6 +338,16 @@ export function GradeOverview({
         </div>
       ) : (
         <>
+          {/* Actions */}
+          <div className="flex justify-end">
+            <ActionsDropdown
+              onExportGradebook={handleExportGradebook}
+              onExportAtRisk={handleExportAtRisk}
+              gradebookDisabled={!data.coursePerformance?.length}
+              atRiskDisabled={!data.atRiskStudents?.length}
+            />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
               icon={Users}
@@ -281,42 +383,182 @@ export function GradeOverview({
             />
           </div>
 
-          {/* Grading Progress */}
-          {data.gradingProgress && data.gradingProgress.totalAssignmentEntries > 0 && (
-            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <ClipboardList className="w-4 h-4 text-violet-500" />
-                <h3 className="text-sm font-semibold text-text-primary">
-                  Grading Progress
-                </h3>
-              </div>
-              <div className="flex items-center gap-4 mb-2">
-                <div className="flex-1 h-3 bg-surface-hover rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-violet-500 to-teal-500 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(data.gradingProgress.completionRate, 100)}%` }}
-                  />
+          {/* Grading Completion + Assessment Performance — side by side on lg */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            {/* Grading Completion — Donut Chart */}
+            {data.gradingProgress && data.gradingProgress.totalAssignmentEntries > 0 && (
+              <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <ClipboardList className="w-4 h-4 text-violet-500" />
+                  <h3 className="text-sm font-semibold text-text-primary">
+                    Grading Completion
+                  </h3>
                 </div>
-                <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
-                  {data.gradingProgress.completionRate.toFixed(1)}%
-                </span>
+                <p className="text-xs text-text-tertiary mb-5">
+                  Assignment entries graded across all active sections
+                </p>
+
+                <div className="flex items-center gap-8">
+                  {/* Donut */}
+                  <div className="relative flex-shrink-0">
+                    <ResponsiveContainer width={150} height={150}>
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { value: data.gradingProgress.gradedEntries },
+                            { value: data.gradingProgress.ungradedStubs },
+                          ]}
+                          innerRadius={50}
+                          outerRadius={68}
+                          paddingAngle={data.gradingProgress.ungradedStubs > 0 ? 3 : 0}
+                          dataKey="value"
+                          startAngle={90}
+                          endAngle={-270}
+                          stroke="none"
+                        >
+                          <Cell fill="#8b5cf6" />
+                          <Cell fill="var(--color-surface-hover, #e5e7eb)" />
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xl font-bold text-text-primary">
+                        {data.gradingProgress.completionRate.toFixed(0)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-violet-500 flex-shrink-0" />
+                      <span className="text-sm text-text-secondary">Graded</span>
+                      <span className="text-sm font-semibold text-text-primary ml-auto">
+                        {data.gradingProgress.gradedEntries}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
+                      <span className="text-sm text-text-secondary">Remaining</span>
+                      <span className="text-sm font-semibold text-text-primary ml-auto">
+                        {data.gradingProgress.ungradedStubs}
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t border-border-secondary">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-text-tertiary">Total entries</span>
+                        <span className="text-xs font-semibold text-text-primary ml-auto">
+                          {data.gradingProgress.totalAssignmentEntries}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-6 text-xs text-text-secondary">
-                <span>{data.gradingProgress.gradedEntries} graded</span>
-                <span>{data.gradingProgress.ungradedStubs} ungraded</span>
-                <span>{data.gradingProgress.totalAssignmentEntries} total</span>
+            )}
+
+            {/* Assessment Type Performance — Ring Indicators */}
+            {data.assessmentBreakdown && (data.assessmentBreakdown.formative.count > 0 || data.assessmentBreakdown.summative.count > 0) && (
+              <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className="w-4 h-4 text-indigo-500" />
+                  <h3 className="text-sm font-semibold text-text-primary">
+                    Assessment Performance
+                  </h3>
+                </div>
+                <p className="text-xs text-text-tertiary mb-5">
+                  Average scores by assessment type
+                </p>
+
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Formative */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative mb-3">
+                      <AssessmentRing
+                        percentage={data.assessmentBreakdown.formative.count > 0 ? data.assessmentBreakdown.formative.avgScore : 0}
+                        size={88}
+                        strokeWidth={7}
+                        color={data.assessmentBreakdown.formative.count > 0 ? '#6366f1' : '#d1d5db'}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className={`text-base font-bold ${data.assessmentBreakdown.formative.count > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-tertiary'}`}>
+                          {data.assessmentBreakdown.formative.count > 0
+                            ? `${data.assessmentBreakdown.formative.avgScore.toFixed(0)}%`
+                            : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <h4 className="text-sm font-semibold text-text-primary">Formative</h4>
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium leading-none bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full">
+                        {data.assessmentBreakdown.formative.count}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-text-tertiary leading-tight">
+                      Quizzes, homework, participation
+                    </p>
+                  </div>
+
+                  {/* Summative */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative mb-3">
+                      <AssessmentRing
+                        percentage={data.assessmentBreakdown.summative.count > 0 ? data.assessmentBreakdown.summative.avgScore : 0}
+                        size={88}
+                        strokeWidth={7}
+                        color={data.assessmentBreakdown.summative.count > 0 ? '#0d9488' : '#d1d5db'}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className={`text-base font-bold ${data.assessmentBreakdown.summative.count > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-text-tertiary'}`}>
+                          {data.assessmentBreakdown.summative.count > 0
+                            ? `${data.assessmentBreakdown.summative.avgScore.toFixed(0)}%`
+                            : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <h4 className="text-sm font-semibold text-text-primary">Summative</h4>
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium leading-none bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full">
+                        {data.assessmentBreakdown.summative.count}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-text-tertiary leading-tight">
+                      Tests, exams, projects
+                    </p>
+                  </div>
+                </div>
+
+                {/* Comparison insight */}
+                {data.assessmentBreakdown.formative.count > 0 && data.assessmentBreakdown.summative.count > 0 && (
+                  <p className="text-xs text-text-secondary mt-4 pt-3 border-t border-border-secondary text-center">
+                    {data.assessmentBreakdown.formative.avgScore > data.assessmentBreakdown.summative.avgScore
+                      ? `Students score ${(data.assessmentBreakdown.formative.avgScore - data.assessmentBreakdown.summative.avgScore).toFixed(1)}% higher on formative than summative`
+                      : data.assessmentBreakdown.summative.avgScore > data.assessmentBreakdown.formative.avgScore
+                        ? `Students score ${(data.assessmentBreakdown.summative.avgScore - data.assessmentBreakdown.formative.avgScore).toFixed(1)}% higher on summative than formative`
+                        : 'Formative and summative scores are equal'}
+                  </p>
+                )}
+                {data.assessmentBreakdown.unclassified.count > 0 && (
+                  <p className="text-[11px] text-text-tertiary mt-2 text-center">
+                    +{data.assessmentBreakdown.unclassified.count} unclassified (avg {data.assessmentBreakdown.unclassified.avgScore.toFixed(1)}%)
+                  </p>
+                )}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Grade Distribution Chart */}
           <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-1">
               <GraduationCap className="w-4 h-4 text-teal-500" />
               <h3 className="text-sm font-semibold text-text-primary">
                 Grade Distribution
               </h3>
             </div>
+            <p className="text-xs text-text-tertiary mb-4">
+              Number of students in each grade range based on their overall course averages
+            </p>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart
                 data={data.gradeDistribution}
@@ -349,69 +591,18 @@ export function GradeOverview({
             </ResponsiveContainer>
           </div>
 
-          {/* Assessment Type Performance */}
-          {data.assessmentBreakdown && (data.assessmentBreakdown.formative.count > 0 || data.assessmentBreakdown.summative.count > 0) && (
-            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <BookOpen className="w-4 h-4 text-indigo-500" />
-                <h3 className="text-sm font-semibold text-text-primary">
-                  Assessment Type Performance
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Formative */}
-                <div className="rounded-lg border border-border-secondary p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Formative</span>
-                    <span className="text-xs text-text-tertiary">
-                      {data.assessmentBreakdown.formative.count} assessment{data.assessmentBreakdown.formative.count !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                  <p className={`text-2xl font-bold ${data.assessmentBreakdown.formative.count > 0 ? getGradeColor(data.assessmentBreakdown.formative.avgScore) : 'text-text-tertiary'}`}>
-                    {data.assessmentBreakdown.formative.count > 0 ? `${data.assessmentBreakdown.formative.avgScore.toFixed(1)}%` : 'N/A'}
-                  </p>
-                  <p className="text-xs text-text-secondary mt-1">Quizzes, homework, participation</p>
-                </div>
-                {/* Summative */}
-                <div className="rounded-lg border border-border-secondary p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Summative</span>
-                    <span className="text-xs text-text-tertiary">
-                      {data.assessmentBreakdown.summative.count} assessment{data.assessmentBreakdown.summative.count !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                  <p className={`text-2xl font-bold ${data.assessmentBreakdown.summative.count > 0 ? getGradeColor(data.assessmentBreakdown.summative.avgScore) : 'text-text-tertiary'}`}>
-                    {data.assessmentBreakdown.summative.count > 0 ? `${data.assessmentBreakdown.summative.avgScore.toFixed(1)}%` : 'N/A'}
-                  </p>
-                  <p className="text-xs text-text-secondary mt-1">Tests, exams, projects</p>
-                </div>
-              </div>
-              {data.assessmentBreakdown.formative.count > 0 && data.assessmentBreakdown.summative.count > 0 && (
-                <p className="text-xs text-text-secondary mt-3">
-                  {data.assessmentBreakdown.formative.avgScore > data.assessmentBreakdown.summative.avgScore
-                    ? `Students score ${(data.assessmentBreakdown.formative.avgScore - data.assessmentBreakdown.summative.avgScore).toFixed(1)}% higher on formative assessments than summative.`
-                    : data.assessmentBreakdown.summative.avgScore > data.assessmentBreakdown.formative.avgScore
-                      ? `Students score ${(data.assessmentBreakdown.summative.avgScore - data.assessmentBreakdown.formative.avgScore).toFixed(1)}% higher on summative assessments than formative.`
-                      : 'Formative and summative scores are equal.'}
-                </p>
-              )}
-              {data.assessmentBreakdown.unclassified.count > 0 && (
-                <p className="text-xs text-text-tertiary mt-2">
-                  {data.assessmentBreakdown.unclassified.count} unclassified assessment{data.assessmentBreakdown.unclassified.count !== 1 ? 's' : ''} (avg {data.assessmentBreakdown.unclassified.avgScore.toFixed(1)}%)
-                </p>
-              )}
-            </div>
-          )}
-
           {/* Category Performance */}
           {data.categoryPerformance && data.categoryPerformance.length > 0 && (
             <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-1">
                 <Layers className="w-4 h-4 text-amber-500" />
                 <h3 className="text-sm font-semibold text-text-primary">
                   Category Performance
                 </h3>
               </div>
+              <p className="text-xs text-text-tertiary mb-3">
+                Average scores by grading policy category (e.g. homework, exams, projects)
+              </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -444,9 +635,12 @@ export function GradeOverview({
           {/* Course Performance Table */}
           {data.coursePerformance.length > 0 && (
             <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <h3 className="text-sm font-semibold text-text-primary mb-3">
+              <h3 className="text-sm font-semibold text-text-primary mb-1">
                 Course Performance
               </h3>
+              <p className="text-xs text-text-tertiary mb-3">
+                Aggregated grade metrics for each course across all its sections
+              </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -549,6 +743,7 @@ export function GradeOverview({
               </div>
             )}
           </div>
+
         </>
       )}
     </div>

@@ -18,6 +18,8 @@ import {
   Plus,
   Lock,
   AlertTriangle,
+  Calendar,
+  RefreshCw,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useGradesStore } from '../../stores/grades.store'
@@ -147,18 +149,32 @@ export function GradesModule() {
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-              <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-text-primary">
+                  Grades & Assessments
+                </h1>
+                <p className="text-text-secondary mt-0.5">
+                  Manage gradebook, record grades, and configure grading policies
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">
-                Grades & Assessments
-              </h1>
-              <p className="text-text-secondary mt-0.5">
-                Manage gradebook, record grades, and configure grading policies
-              </p>
-            </div>
+            {currentYear?.name && (
+              <div className="flex items-center gap-4 text-text-tertiary">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span className="text-xs">{currentYear.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span className="text-xs">Updated just now</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
