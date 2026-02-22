@@ -22,6 +22,7 @@ interface GradebookGridProps {
   isLoading: boolean
   sectionId?: string
   courseId?: string
+  courseName?: string
   schoolId?: string
   termId?: string
   academicYearId?: string
@@ -73,6 +74,7 @@ export function GradebookGrid({
   isLoading,
   sectionId,
   courseId,
+  courseName,
   schoolId,
   termId,
   academicYearId,
@@ -171,6 +173,7 @@ export function GradebookGrid({
         studentId: student.studentId,
         studentName: student.studentName,
         courseId: courseId!,
+        courseName,
         sectionId: sectionId!,
         schoolId: schoolId!,
         termId: termId!,
@@ -186,7 +189,7 @@ export function GradebookGrid({
         },
       })
     },
-    [canEdit, courseId, sectionId, schoolId, termId, academicYearId, teacherId, recordGradeMutation, grades]
+    [canEdit, courseId, courseName, sectionId, schoolId, termId, academicYearId, teacherId, recordGradeMutation, grades]
   )
 
   const handleKeyDown = useCallback(

@@ -14,12 +14,13 @@ import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 // TYPES
 // ============================================================================
 
-interface BulkGradeModalProps {
+export interface BulkGradeModalProps {
   open: boolean
   onClose: () => void
   students: StudentSectionResponseDto[]
   sectionId: string
   courseId: string
+  courseName?: string
   schoolId: string
   termId: string
   academicYearId: string
@@ -51,6 +52,7 @@ export function BulkGradeModal({
   students,
   sectionId,
   courseId,
+  courseName,
   schoolId,
   termId,
   academicYearId,
@@ -97,6 +99,7 @@ export function BulkGradeModal({
 
     await bulkMutation.mutateAsync({
       courseId,
+      courseName,
       sectionId,
       schoolId,
       termId,

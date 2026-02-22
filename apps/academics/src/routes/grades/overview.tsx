@@ -13,7 +13,7 @@
  * Data is fetched from a single backend aggregation endpoint.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   GraduationCap,
   TrendingUp,
@@ -38,6 +38,7 @@ import {
   Cell,
   PieChart,
   Pie,
+  LabelList,
 } from 'recharts'
 import { useGradeOverview } from '../../hooks/useGrades'
 import type { GradeOverviewResponse } from '../../services/academics.service'
@@ -46,9 +47,16 @@ import type { GradeOverviewResponse } from '../../services/academics.service'
 // TYPES
 // ============================================================================
 
+interface PolicyWeight {
+  categoryId: string
+  categoryName: string
+  weight: number
+}
+
 interface GradeOverviewProps {
   schoolId: string
   academicYearId: string
+  policyWeights?: PolicyWeight[]
 }
 
 type AtRiskStudent = GradeOverviewResponse['atRiskStudents'][number]
@@ -188,39 +196,154 @@ function AssessmentRing({
   size = 80,
   strokeWidth = 6,
   color,
+  label,
+  count,
 }: {
   percentage: number
   size?: number
   strokeWidth?: number
   color: string
+  label?: string
+  count?: number
 }) {
+  const [hovered, setHovered] = useState(false)
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (percentage / 100) * circumference
 
   return (
-    <svg width={size} height={size} className="transform -rotate-90">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="var(--color-border-secondary, #e5e7eb)"
-        strokeWidth={strokeWidth}
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-        className="transition-all duration-700 ease-out"
-      />
-    </svg>
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--color-border-secondary, #e5e7eb)"
+          strokeWidth={strokeWidth}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={hovered ? strokeWidth + 1 : strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-700 ease-out"
+        />
+      </svg>
+      {hovered && label && (
+        <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-2.5 py-1.5 whitespace-nowrap z-10">
+          <p className="text-xs font-medium text-text-primary">{label}: {count} assessments</p>
+          <p className="text-[11px] text-text-tertiary">Avg score: {percentage.toFixed(1)}%</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// SORTABLE COURSE PERFORMANCE TABLE
+// ============================================================================
+
+type CourseSortKey = 'courseName' | 'studentCount' | 'avgGrade' | 'avgGpa' | 'passRate'
+
+function CoursePerformanceTable({
+  courses,
+}: {
+  courses: GradeOverviewResponse['coursePerformance']
+}) {
+  const [sortKey, setSortKey] = useState<CourseSortKey>('avgGrade')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+
+  const toggleSort = (key: CourseSortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))
+    } else {
+      setSortKey(key)
+      setSortDir('desc')
+    }
+  }
+
+  const sorted = useMemo(() => {
+    return [...courses].sort((a, b) => {
+      const aVal = sortKey === 'courseName' ? a.courseName.toLowerCase() : a[sortKey]
+      const bVal = sortKey === 'courseName' ? b.courseName.toLowerCase() : b[sortKey]
+      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [courses, sortKey, sortDir])
+
+  const arrow = (key: CourseSortKey) =>
+    sortKey === key ? (sortDir === 'desc' ? ' \u2193' : ' \u2191') : ''
+
+  const thClass = 'py-2 text-text-tertiary font-medium cursor-pointer select-none hover:text-text-primary transition-colors'
+
+  return (
+    <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+      <h3 className="text-sm font-semibold text-text-primary mb-1">
+        Course Performance
+      </h3>
+      <p className="text-xs text-text-tertiary mb-3">
+        Aggregated grade metrics for each course across all its sections
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border-secondary">
+              <th className={`text-left pr-4 ${thClass}`} onClick={() => toggleSort('courseName')}>
+                Course{arrow('courseName')}
+              </th>
+              <th className={`text-right px-4 ${thClass}`}>Sections</th>
+              <th className={`text-right px-4 ${thClass}`} onClick={() => toggleSort('studentCount')}>
+                Students{arrow('studentCount')}
+              </th>
+              <th className={`text-right px-4 ${thClass}`} onClick={() => toggleSort('avgGrade')}>
+                Avg Grade{arrow('avgGrade')}
+              </th>
+              <th className={`text-right px-4 ${thClass}`} onClick={() => toggleSort('avgGpa')}>
+                Avg GPA{arrow('avgGpa')}
+              </th>
+              <th className={`text-right pl-4 ${thClass}`} onClick={() => toggleSort('passRate')}>
+                Pass Rate{arrow('passRate')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((course) => (
+              <tr key={course.courseId} className="border-b border-border-secondary last:border-b-0">
+                <td className="py-2.5 pr-4 text-text-primary font-medium">
+                  {course.courseName}
+                </td>
+                <td className="py-2.5 px-4 text-right text-text-secondary">
+                  {course.sectionCount}
+                </td>
+                <td className="py-2.5 px-4 text-right text-text-secondary">
+                  {course.studentCount}
+                </td>
+                <td className={`py-2.5 px-4 text-right font-medium ${getGradeColor(course.avgGrade)}`}>
+                  {course.avgGrade.toFixed(1)}%
+                </td>
+                <td className="py-2.5 px-4 text-right text-text-secondary">
+                  {course.avgGpa.toFixed(2)}
+                </td>
+                <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(course.passRate)}`}>
+                  {course.passRate.toFixed(1)}%
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   )
 }
 
@@ -242,13 +365,29 @@ const DISTRIBUTION_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef444
 // CHART TOOLTIP
 // ============================================================================
 
-function ChartTooltip({ active, payload, label }: any) {
+function DistributionTooltip({ active, payload, label, totalStudents }: any) {
   if (!active || !payload?.length) return null
+  const count = payload[0].value
+  const pct = totalStudents > 0 ? ((count / totalStudents) * 100).toFixed(0) : '0'
   return (
     <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
-      <p className="text-xs text-text-tertiary mb-1">{label}</p>
-      <p className="text-sm font-semibold text-text-primary">
-        {payload[0].value} student{payload[0].value !== 1 ? 's' : ''}
+      <p className="text-xs font-medium text-text-primary mb-0.5">{label}</p>
+      <p className="text-sm font-bold text-text-primary">
+        {count} student{count !== 1 ? 's' : ''}
+      </p>
+      <p className="text-xs text-text-tertiary">{pct}% of graded students</p>
+    </div>
+  )
+}
+
+function CompletionTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null
+  const { name, value } = payload[0]
+  return (
+    <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
+      <p className="text-xs font-medium text-text-primary">{name}</p>
+      <p className="text-sm font-bold text-text-primary">
+        {value} {value === 1 ? 'entry' : 'entries'}
       </p>
     </div>
   )
@@ -303,6 +442,7 @@ function downloadCsv(csv: string, filename: string) {
 export function GradeOverview({
   schoolId,
   academicYearId,
+  policyWeights,
 }: GradeOverviewProps) {
   const { data, isLoading, isError } = useGradeOverview(schoolId, academicYearId)
 
@@ -353,7 +493,7 @@ export function GradeOverview({
               icon={Users}
               label="Students Graded"
               value={data.totalStudentsGraded}
-              subValue={`Across ${data.totalSections} section${data.totalSections !== 1 ? 's' : ''}`}
+              subValue={`${data.sectionsWithGrades} of ${data.totalSections} section${data.totalSections !== 1 ? 's' : ''} graded`}
               accent="text-blue-600 dark:text-blue-400"
               bg="bg-blue-500/10"
             />
@@ -406,8 +546,8 @@ export function GradeOverview({
                       <PieChart>
                         <Pie
                           data={[
-                            { value: data.gradingProgress.gradedEntries },
-                            { value: data.gradingProgress.ungradedStubs },
+                            { name: 'Graded', value: data.gradingProgress.gradedEntries },
+                            { name: 'Remaining', value: data.gradingProgress.ungradedStubs },
                           ]}
                           innerRadius={50}
                           outerRadius={68}
@@ -416,10 +556,14 @@ export function GradeOverview({
                           startAngle={90}
                           endAngle={-270}
                           stroke="none"
+                          isAnimationActive={true}
+                          animationDuration={800}
+                          animationEasing="ease-out"
                         >
                           <Cell fill="#8b5cf6" />
                           <Cell fill="var(--color-surface-hover, #e5e7eb)" />
                         </Pie>
+                        <Tooltip content={<CompletionTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -447,7 +591,7 @@ export function GradeOverview({
                     </div>
                     <div className="pt-2 border-t border-border-secondary">
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-text-tertiary">Total entries</span>
+                        <span className="text-xs text-text-tertiary">Assignment entries</span>
                         <span className="text-xs font-semibold text-text-primary ml-auto">
                           {data.gradingProgress.totalAssignmentEntries}
                         </span>
@@ -480,6 +624,8 @@ export function GradeOverview({
                         size={88}
                         strokeWidth={7}
                         color={data.assessmentBreakdown.formative.count > 0 ? '#6366f1' : '#d1d5db'}
+                        label="Formative"
+                        count={data.assessmentBreakdown.formative.count}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className={`text-base font-bold ${data.assessmentBreakdown.formative.count > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-tertiary'}`}>
@@ -508,6 +654,8 @@ export function GradeOverview({
                         size={88}
                         strokeWidth={7}
                         color={data.assessmentBreakdown.summative.count > 0 ? '#0d9488' : '#d1d5db'}
+                        label="Summative"
+                        count={data.assessmentBreakdown.summative.count}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className={`text-base font-bold ${data.assessmentBreakdown.summative.count > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-text-tertiary'}`}>
@@ -581,11 +729,19 @@ export function GradeOverview({
                   axisLine={false}
                   allowDecimals={false}
                 />
-                <Tooltip content={<ChartTooltip />} />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]} maxBarSize={60}>
+                <Tooltip content={<DistributionTooltip totalStudents={data.totalStudentsGraded} />} />
+                <Bar
+                  dataKey="count"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={60}
+                  isAnimationActive={true}
+                  animationDuration={800}
+                  animationEasing="ease-out"
+                >
                   {data.gradeDistribution.map((_, index) => (
                     <Cell key={index} fill={DISTRIBUTION_COLORS[index]} />
                   ))}
+                  <LabelList dataKey="count" position="top" fontSize={11} fill="var(--color-text-tertiary, #9ca3af)" />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -608,24 +764,37 @@ export function GradeOverview({
                   <thead>
                     <tr className="border-b border-border-secondary">
                       <th className="text-left py-2 pr-4 text-text-tertiary font-medium">Category</th>
+                      {policyWeights && policyWeights.length > 0 && (
+                        <th className="text-right py-2 px-4 text-text-tertiary font-medium">Weight</th>
+                      )}
                       <th className="text-right py-2 px-4 text-text-tertiary font-medium">Assignments</th>
                       <th className="text-right py-2 pl-4 text-text-tertiary font-medium">Avg Score</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.categoryPerformance.map((cat) => (
-                      <tr key={cat.categoryId} className="border-b border-border-secondary last:border-b-0">
-                        <td className="py-2.5 pr-4 text-text-primary font-medium capitalize">
-                          {cat.categoryName}
-                        </td>
-                        <td className="py-2.5 px-4 text-right text-text-secondary">
-                          {cat.assignmentCount}
-                        </td>
-                        <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(cat.avgScore)}`}>
-                          {cat.avgScore.toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
+                    {data.categoryPerformance.map((cat) => {
+                      const matchedWeight = policyWeights?.find(
+                        (w) => w.categoryId === cat.categoryId
+                      )
+                      return (
+                        <tr key={cat.categoryId} className="border-b border-border-secondary last:border-b-0">
+                          <td className="py-2.5 pr-4 text-text-primary font-medium">
+                            {matchedWeight?.categoryName || cat.categoryName.charAt(0).toUpperCase() + cat.categoryName.slice(1)}
+                          </td>
+                          {policyWeights && policyWeights.length > 0 && (
+                            <td className="py-2.5 px-4 text-right text-text-tertiary">
+                              {matchedWeight ? `${matchedWeight.weight}%` : '\u2014'}
+                            </td>
+                          )}
+                          <td className="py-2.5 px-4 text-right text-text-secondary">
+                            {cat.assignmentCount}
+                          </td>
+                          <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(cat.avgScore)}`}>
+                            {cat.avgScore.toFixed(1)}%
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -634,52 +803,7 @@ export function GradeOverview({
 
           {/* Course Performance Table */}
           {data.coursePerformance.length > 0 && (
-            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <h3 className="text-sm font-semibold text-text-primary mb-1">
-                Course Performance
-              </h3>
-              <p className="text-xs text-text-tertiary mb-3">
-                Aggregated grade metrics for each course across all its sections
-              </p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border-secondary">
-                      <th className="text-left py-2 pr-4 text-text-tertiary font-medium">Course</th>
-                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Sections</th>
-                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Students</th>
-                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Avg Grade</th>
-                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Avg GPA</th>
-                      <th className="text-right py-2 pl-4 text-text-tertiary font-medium">Pass Rate</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.coursePerformance.map((course) => (
-                      <tr key={course.courseId} className="border-b border-border-secondary last:border-b-0">
-                        <td className="py-2.5 pr-4 text-text-primary font-medium">
-                          {course.courseName}
-                        </td>
-                        <td className="py-2.5 px-4 text-right text-text-secondary">
-                          {course.sectionCount}
-                        </td>
-                        <td className="py-2.5 px-4 text-right text-text-secondary">
-                          {course.studentCount}
-                        </td>
-                        <td className={`py-2.5 px-4 text-right font-medium ${getGradeColor(course.avgGrade)}`}>
-                          {course.avgGrade.toFixed(1)}%
-                        </td>
-                        <td className="py-2.5 px-4 text-right text-text-secondary">
-                          {course.avgGpa.toFixed(2)}
-                        </td>
-                        <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(course.passRate)}`}>
-                          {course.passRate.toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <CoursePerformanceTable courses={data.coursePerformance} />
           )}
 
           {/* At-Risk Students */}

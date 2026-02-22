@@ -354,6 +354,7 @@ export function GradesModule() {
                     isLoading={gradesLoading}
                     sectionId={selectedSectionId}
                     courseId={selectedSection?.courseId}
+                    courseName={selectedSection?.courseName}
                     schoolId={schoolId}
                     termId={effectiveTermId || ''}
                     academicYearId={currentYear?.yearId}
@@ -371,6 +372,7 @@ export function GradesModule() {
                 <GradeOverview
                   schoolId={schoolId}
                   academicYearId={currentYear.yearId}
+                  policyWeights={defaultPolicy?.categoryWeights}
                 />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -402,6 +404,7 @@ export function GradesModule() {
           students={roster?.students ?? []}
           sectionId={selectedSectionId}
           courseId={selectedSection.courseId}
+          courseName={selectedSection.courseName}
           schoolId={schoolId}
           termId={effectiveTermId}
           academicYearId={currentYear.yearId}
