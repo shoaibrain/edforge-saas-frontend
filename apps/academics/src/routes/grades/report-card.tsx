@@ -9,7 +9,7 @@
  * - Print-friendly layout with CSS @media print
  */
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import {
   GraduationCap,
   Printer,
@@ -72,7 +72,16 @@ export function ReportCardPage() {
   )
 
   const grades = data?.grades ?? []
-  const gpa = data?.gpa
+
+  // Compute GPA from grades if the endpoint doesn't return it
+  const gpa = useMemo(() => {
+    if (data?.gpa) return data.gpa
+    if (grades.length === 0) return null
+    const withGpa = grades.filter((g) => g.gpaPoints != null)
+    if (withGpa.length === 0) return null
+    const avg = withGpa.reduce((sum, g) => sum + g.gpaPoints, 0) / withGpa.length
+    return { termGpa: avg, cumulativeGpa: avg, weightedGpa: avg }
+  }, [data, grades])
 
   const handlePrint = () => {
     window.print()
@@ -234,7 +243,7 @@ export function ReportCardPage() {
                         <div className="flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-text-tertiary print:hidden" />
                           <span className="font-medium text-text-primary print:text-gray-900">
-                            {grade.courseId.slice(0, 12)}
+                            {grade.courseName || grade.courseId.slice(0, 12)}
                           </span>
                         </div>
                       </td>

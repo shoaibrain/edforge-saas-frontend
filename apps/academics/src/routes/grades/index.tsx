@@ -2,12 +2,13 @@
  * Grades & Assessments Module
  *
  * Unified gradebook management with three tabs:
+ * - Overview: School-wide grade analytics and at-risk students
  * - Gradebook: Section-based grade viewing, inline editing, and bulk entry
- * - Dashboard: School-wide grade analytics and at-risk students
  * - Grading Policies: Policy CRUD management
  */
 
-import { useState, useMemo, useEffect, lazy, Suspense } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap,
@@ -28,22 +29,21 @@ import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
 import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
-
-const GradeDashboard = lazy(() => import('./dashboard'))
+import { GradeOverview } from './overview'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type GradesTab = 'gradebook' | 'dashboard' | 'policies'
+type GradesTab = 'overview' | 'gradebook' | 'policies'
 
 // ============================================================================
 // TAB CONFIG
 // ============================================================================
 
 const tabs = [
+  { id: 'overview' as const, label: 'Overview', icon: BarChart3 },
   { id: 'gradebook' as const, label: 'Gradebook', icon: BookCheck },
-  { id: 'dashboard' as const, label: 'Dashboard', icon: BarChart3 },
   { id: 'policies' as const, label: 'Grading Policies', icon: Settings },
 ]
 
@@ -52,7 +52,8 @@ const tabs = [
 // ============================================================================
 
 export function GradesModule() {
-  const [activeTab, setActiveTab] = useState<GradesTab>('gradebook')
+  const [activeTab, setActiveTab] = useState<GradesTab>('overview')
+  const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
   const selectedSectionId = useGradesStore((s) => s.selectedSectionId)
   const setSelectedSectionId = useGradesStore((s) => s.setSelectedSectionId)
@@ -131,6 +132,16 @@ export function GradesModule() {
     return grades.length > 0 && grades.every((g) => g.isFinal)
   }, [gradebook])
 
+  const handleViewReportCard = useCallback(
+    (studentId: string, studentName: string) => {
+      navigate({
+        to: '/grades/report-card',
+        search: { studentId, studentName },
+      })
+    },
+    [navigate]
+  )
+
   return (
     <div className="min-h-full">
       {/* Page Header */}
@@ -153,10 +164,14 @@ export function GradesModule() {
 
         {/* Tab Navigation */}
         <div className="px-6">
-          <nav className="flex items-center space-x-1 border-b border-border-primary relative" aria-label="Grades tabs">
+          <nav className="flex items-center space-x-1 border-b border-border-primary relative" aria-label="Grades tabs" role="tablist">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === tab.id
@@ -180,7 +195,7 @@ export function GradesModule() {
       </div>
 
       {/* Tab Content */}
-      <div className="p-6 min-h-[500px]">
+      <div className="p-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -329,38 +344,33 @@ export function GradesModule() {
                     teacherId={selectedSection?.primaryTeacherId}
                     disabled={hasAllFinalized || !effectiveTermId}
                     onAddAssignment={effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
+                    onViewReportCard={handleViewReportCard}
                   />
                 )}
               </div>
             )}
 
-            {activeTab === 'dashboard' && (
-              <Suspense
-                fallback={
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-surface-hover rounded-lg" />
-                            <div className="space-y-2">
-                              <div className="h-3 w-16 bg-surface-hover rounded" />
-                              <div className="h-6 w-12 bg-surface-hover rounded" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                }
-              >
-                <GradeDashboard
+            {activeTab === 'overview' && (
+              currentYear?.yearId ? (
+                <GradeOverview
                   schoolId={schoolId}
-                  academicYearId={currentYear?.yearId || ''}
-                  sections={sections}
-                  isLoadingSections={sectionsLoading}
+                  academicYearId={currentYear.yearId}
                 />
-              </Suspense>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-surface-hover rounded-lg" />
+                        <div className="space-y-2">
+                          <div className="h-3 w-16 bg-surface-hover rounded" />
+                          <div className="h-6 w-12 bg-surface-hover rounded" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
             )}
 
             {activeTab === 'policies' && <GradingPolicyList />}

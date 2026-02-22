@@ -1,5 +1,5 @@
 /**
- * Grade Dashboard
+ * Grade Overview
  *
  * School-wide grade analytics showing:
  * - Summary stat cards (avg GPA, pass rate, at-risk count, total graded)
@@ -8,11 +8,10 @@
  * - At-risk students table (below 60%)
  * - CSV export for at-risk data
  *
- * All data is client-side aggregated from section grades.
+ * Data is fetched from a single backend aggregation endpoint.
  */
 
-import { useMemo, useCallback } from 'react'
-import { useQueries } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import {
   GraduationCap,
   TrendingUp,
@@ -21,6 +20,9 @@ import {
   Download,
   Users,
   Award,
+  BookOpen,
+  ClipboardList,
+  Layers,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -32,40 +34,20 @@ import {
   Tooltip,
   Cell,
 } from 'recharts'
-import { gradeKeys } from '../../hooks/useGrades'
-import { getSectionGrades } from '../../services/academics.service'
-import type { SectionGradebookResponse } from '../../services/academics.service'
-import type { SectionResponseDto } from '@aibrains/shared-types'
+import { useGradeOverview } from '../../hooks/useGrades'
+import type { GradeOverviewResponse } from '../../services/academics.service'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface GradeDashboardProps {
+interface GradeOverviewProps {
   schoolId: string
   academicYearId: string
-  sections: SectionResponseDto[]
-  isLoadingSections?: boolean
 }
 
-interface CoursePerformance {
-  courseId: string
-  courseName: string
-  sectionCount: number
-  studentCount: number
-  avgGrade: number
-  avgGpa: number
-  passRate: number
-}
-
-interface AtRiskStudent {
-  studentId: string
-  studentName: string
-  courseId: string
-  courseName: string
-  numericGrade: number
-  letterGrade: string
-}
+type AtRiskStudent = GradeOverviewResponse['atRiskStudents'][number]
+type CoursePerformance = GradeOverviewResponse['coursePerformance'][number]
 
 // ============================================================================
 // STAT CARD
@@ -167,16 +149,33 @@ function exportAtRiskCsv(students: AtRiskStudent[], schoolId: string) {
   const rows = students
     .map(
       (s) =>
-        `"${s.studentName}","${s.courseName}",${s.numericGrade.toFixed(1)},${s.letterGrade}`
+        `"${s.studentName}","${s.courseName}",${s.numericGrade.toFixed(1)},${s.letterGrade ?? ''}`
     )
     .join('\n')
 
   const csv = header + rows
+  downloadCsv(csv, `at-risk-students-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`)
+}
+
+function exportFullGradebookCsv(data: GradeOverviewResponse, schoolId: string) {
+  const header = 'Course,Students,Avg Grade,Avg GPA,Pass Rate\n'
+  const rows = data.coursePerformance
+    .map(
+      (c) =>
+        `"${c.courseName}",${c.studentCount},${c.avgGrade.toFixed(1)}%,${c.avgGpa.toFixed(2)},${c.passRate.toFixed(1)}%`
+    )
+    .join('\n')
+
+  const csv = header + rows
+  downloadCsv(csv, `gradebook-overview-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`)
+}
+
+function downloadCsv(csv: string, filename: string) {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `at-risk-students-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`
+  link.download = filename
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -184,158 +183,28 @@ function exportAtRiskCsv(students: AtRiskStudent[], schoolId: string) {
 }
 
 // ============================================================================
-// AGGREGATE HOOK — queries all section grades and combines
-// ============================================================================
-
-function useAggregatedGrades(schoolId: string, sections: SectionResponseDto[]) {
-  const sectionIds = useMemo(
-    () => sections.map((s) => s.sectionId),
-    [sections]
-  )
-
-  // Use useQueries for dynamic parallel queries (avoids hooks-in-loop)
-  // No termId filter — dashboard shows school-wide overview across all terms
-  const gradeQueries = useQueries({
-    queries: sectionIds.map((sid) => ({
-      queryKey: gradeKeys.sectionGrade(sid, { schoolId }),
-      queryFn: () => getSectionGrades(sid, { schoolId }),
-      enabled: !!sid && !!schoolId,
-      staleTime: 60 * 1000,
-    })),
-  })
-
-  const isLoading = gradeQueries.some((q) => q.isLoading)
-  const hasError = gradeQueries.some((q) => q.isError)
-
-  const aggregated = useMemo(() => {
-    if (isLoading) return null
-
-    const allGrades = gradeQueries
-      .flatMap((q) => (q.data as SectionGradebookResponse | undefined)?.grades ?? [])
-
-    if (allGrades.length === 0) return null
-
-    // Grade distribution buckets
-    const distribution = [
-      { range: 'A (90-100)', count: 0 },
-      { range: 'B (80-89)', count: 0 },
-      { range: 'C (70-79)', count: 0 },
-      { range: 'D (60-69)', count: 0 },
-      { range: 'F (0-59)', count: 0 },
-    ]
-    let totalGrade = 0
-    let totalGpa = 0
-    let passCount = 0
-    const atRisk: AtRiskStudent[] = []
-    const courseMap = new Map<string, {
-      courseId: string
-      courseName: string
-      sectionIds: Set<string>
-      grades: number[]
-      gpas: number[]
-      passCount: number
-    }>()
-
-    let gpaCount = 0
-    for (const grade of allGrades) {
-      const pct = grade.numericGrade ?? 0
-      totalGrade += pct
-      if (grade.gpaPoints != null) {
-        totalGpa += grade.gpaPoints
-        gpaCount++
-      }
-      if (pct >= 60) passCount++
-
-      // Distribution
-      if (pct >= 90) distribution[0].count++
-      else if (pct >= 80) distribution[1].count++
-      else if (pct >= 70) distribution[2].count++
-      else if (pct >= 60) distribution[3].count++
-      else distribution[4].count++
-
-      // At-risk (below 60%)
-      if (pct < 60) {
-        const section = sections.find((s) => s.sectionId === grade.sectionId)
-        atRisk.push({
-          studentId: grade.studentId,
-          studentName: grade.studentName || grade.studentId.slice(0, 8),
-          courseId: grade.courseId,
-          courseName: section?.courseName || grade.courseId.slice(0, 12),
-          numericGrade: pct,
-          letterGrade: grade.letterGrade,
-        })
-      }
-
-      // Course aggregation
-      const gpa = grade.gpaPoints ?? 0
-      const existing = courseMap.get(grade.courseId)
-      if (existing) {
-        existing.grades.push(pct)
-        existing.gpas.push(gpa)
-        if (pct >= 60) existing.passCount++
-        if (grade.sectionId) existing.sectionIds.add(grade.sectionId)
-      } else {
-        const section = sections.find((s) => s.sectionId === grade.sectionId)
-        courseMap.set(grade.courseId, {
-          courseId: grade.courseId,
-          courseName: section?.courseName || grade.courseId.slice(0, 12),
-          sectionIds: new Set(grade.sectionId ? [grade.sectionId] : []),
-          grades: [pct],
-          gpas: [gpa],
-          passCount: pct >= 60 ? 1 : 0,
-        })
-      }
-    }
-
-    const coursePerformance: CoursePerformance[] = Array.from(courseMap.values())
-      .map((c) => ({
-        courseId: c.courseId,
-        courseName: c.courseName,
-        sectionCount: c.sectionIds.size,
-        studentCount: c.grades.length,
-        avgGrade: c.grades.reduce((a, b) => a + b, 0) / c.grades.length,
-        avgGpa: c.gpas.reduce((a, b) => a + b, 0) / c.gpas.length,
-        passRate: (c.passCount / c.grades.length) * 100,
-      }))
-      .sort((a, b) => b.avgGrade - a.avgGrade)
-
-    const sortedAtRisk = [...atRisk].sort((a, b) => a.numericGrade - b.numericGrade)
-
-    return {
-      totalStudents: allGrades.length,
-      avgGrade: totalGrade / allGrades.length,
-      avgGpa: gpaCount > 0 ? totalGpa / gpaCount : 0,
-      passRate: (passCount / allGrades.length) * 100,
-      atRiskCount: atRisk.length,
-      distribution,
-      coursePerformance,
-      atRisk: sortedAtRisk,
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, sections])
-
-  return { data: aggregated, isLoading, hasError }
-}
-
-// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-export function GradeDashboard({
+export function GradeOverview({
   schoolId,
-  academicYearId: _academicYearId,
-  sections,
-  isLoadingSections,
-}: GradeDashboardProps) {
-  const { data, isLoading, hasError } = useAggregatedGrades(schoolId, sections)
+  academicYearId,
+}: GradeOverviewProps) {
+  const { data, isLoading, isError } = useGradeOverview(schoolId, academicYearId)
 
-  const handleExport = useCallback(() => {
-    if (data?.atRisk && data.atRisk.length > 0) {
-      exportAtRiskCsv(data.atRisk, schoolId)
+  const handleExportAtRisk = useCallback(() => {
+    if (data?.atRiskStudents && data.atRiskStudents.length > 0) {
+      exportAtRiskCsv(data.atRiskStudents, schoolId)
     }
   }, [data, schoolId])
 
-  if (hasError) {
+  const handleExportGradebook = useCallback(() => {
+    if (data && data.coursePerformance.length > 0) {
+      exportFullGradebookCsv(data, schoolId)
+    }
+  }, [data, schoolId])
+
+  if (isError) {
     return (
       <div className="rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-6 text-sm text-red-700 dark:text-red-400 text-center">
         Failed to load grade data. Please try refreshing.
@@ -343,32 +212,23 @@ export function GradeDashboard({
     )
   }
 
-  if (isLoadingSections) {
-    return <SkeletonCards />
-  }
-
-  if (!sections.length) {
-    return (
-      <div className="py-16 text-center">
-        <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">
-          No Active Sections
-        </h4>
-        <p className="text-text-secondary max-w-md mx-auto">
-          Grade analytics will appear here once sections have been created and grades recorded.
-        </p>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
-      {/* Export Button */}
-      <div className="flex justify-end">
+      {/* Export Buttons */}
+      <div className="flex justify-end gap-2">
         <button
           type="button"
-          onClick={handleExport}
-          disabled={!data?.atRisk?.length}
+          onClick={handleExportGradebook}
+          disabled={!data?.coursePerformance?.length}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-surface-secondary border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" />
+          Export Gradebook CSV
+        </button>
+        <button
+          type="button"
+          onClick={handleExportAtRisk}
+          disabled={!data?.atRiskStudents?.length}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-surface-secondary border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Download className="w-4 h-4" />
@@ -379,7 +239,7 @@ export function GradeDashboard({
       {/* Summary Stat Cards */}
       {isLoading ? (
         <SkeletonCards />
-      ) : !data ? (
+      ) : !data || data.totalStudentsGraded === 0 ? (
         <div className="py-12 text-center">
           <GraduationCap className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
           <p className="text-sm text-text-secondary">No grades recorded yet across sections.</p>
@@ -390,16 +250,16 @@ export function GradeDashboard({
             <StatCard
               icon={Users}
               label="Students Graded"
-              value={data.totalStudents}
-              subValue={`Across ${sections.length} section${sections.length !== 1 ? 's' : ''}`}
+              value={data.totalStudentsGraded}
+              subValue={`Across ${data.totalSections} section${data.totalSections !== 1 ? 's' : ''}`}
               accent="text-blue-600 dark:text-blue-400"
               bg="bg-blue-500/10"
             />
             <StatCard
               icon={Award}
               label="Average GPA"
-              value={data.avgGpa.toFixed(2)}
-              subValue={`Avg grade: ${data.avgGrade.toFixed(1)}%`}
+              value={data.averageGpa.toFixed(2)}
+              subValue={`Avg grade: ${data.averageGrade.toFixed(1)}%`}
               accent="text-emerald-600 dark:text-emerald-400"
               bg="bg-emerald-500/10"
             />
@@ -421,6 +281,34 @@ export function GradeDashboard({
             />
           </div>
 
+          {/* Grading Progress */}
+          {data.gradingProgress && data.gradingProgress.totalAssignmentEntries > 0 && (
+            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <ClipboardList className="w-4 h-4 text-violet-500" />
+                <h3 className="text-sm font-semibold text-text-primary">
+                  Grading Progress
+                </h3>
+              </div>
+              <div className="flex items-center gap-4 mb-2">
+                <div className="flex-1 h-3 bg-surface-hover rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-violet-500 to-teal-500 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(data.gradingProgress.completionRate, 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
+                  {data.gradingProgress.completionRate.toFixed(1)}%
+                </span>
+              </div>
+              <div className="flex items-center gap-6 text-xs text-text-secondary">
+                <span>{data.gradingProgress.gradedEntries} graded</span>
+                <span>{data.gradingProgress.ungradedStubs} ungraded</span>
+                <span>{data.gradingProgress.totalAssignmentEntries} total</span>
+              </div>
+            </div>
+          )}
+
           {/* Grade Distribution Chart */}
           <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -431,7 +319,7 @@ export function GradeDashboard({
             </div>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart
-                data={data.distribution}
+                data={data.gradeDistribution}
                 margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
               >
                 <CartesianGrid
@@ -453,13 +341,105 @@ export function GradeDashboard({
                 />
                 <Tooltip content={<ChartTooltip />} />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]} maxBarSize={60}>
-                  {data.distribution.map((_, index) => (
+                  {data.gradeDistribution.map((_, index) => (
                     <Cell key={index} fill={DISTRIBUTION_COLORS[index]} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          {/* Assessment Type Performance */}
+          {data.assessmentBreakdown && (data.assessmentBreakdown.formative.count > 0 || data.assessmentBreakdown.summative.count > 0) && (
+            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="w-4 h-4 text-indigo-500" />
+                <h3 className="text-sm font-semibold text-text-primary">
+                  Assessment Type Performance
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Formative */}
+                <div className="rounded-lg border border-border-secondary p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Formative</span>
+                    <span className="text-xs text-text-tertiary">
+                      {data.assessmentBreakdown.formative.count} assessment{data.assessmentBreakdown.formative.count !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <p className={`text-2xl font-bold ${data.assessmentBreakdown.formative.count > 0 ? getGradeColor(data.assessmentBreakdown.formative.avgScore) : 'text-text-tertiary'}`}>
+                    {data.assessmentBreakdown.formative.count > 0 ? `${data.assessmentBreakdown.formative.avgScore.toFixed(1)}%` : 'N/A'}
+                  </p>
+                  <p className="text-xs text-text-secondary mt-1">Quizzes, homework, participation</p>
+                </div>
+                {/* Summative */}
+                <div className="rounded-lg border border-border-secondary p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Summative</span>
+                    <span className="text-xs text-text-tertiary">
+                      {data.assessmentBreakdown.summative.count} assessment{data.assessmentBreakdown.summative.count !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <p className={`text-2xl font-bold ${data.assessmentBreakdown.summative.count > 0 ? getGradeColor(data.assessmentBreakdown.summative.avgScore) : 'text-text-tertiary'}`}>
+                    {data.assessmentBreakdown.summative.count > 0 ? `${data.assessmentBreakdown.summative.avgScore.toFixed(1)}%` : 'N/A'}
+                  </p>
+                  <p className="text-xs text-text-secondary mt-1">Tests, exams, projects</p>
+                </div>
+              </div>
+              {data.assessmentBreakdown.formative.count > 0 && data.assessmentBreakdown.summative.count > 0 && (
+                <p className="text-xs text-text-secondary mt-3">
+                  {data.assessmentBreakdown.formative.avgScore > data.assessmentBreakdown.summative.avgScore
+                    ? `Students score ${(data.assessmentBreakdown.formative.avgScore - data.assessmentBreakdown.summative.avgScore).toFixed(1)}% higher on formative assessments than summative.`
+                    : data.assessmentBreakdown.summative.avgScore > data.assessmentBreakdown.formative.avgScore
+                      ? `Students score ${(data.assessmentBreakdown.summative.avgScore - data.assessmentBreakdown.formative.avgScore).toFixed(1)}% higher on summative assessments than formative.`
+                      : 'Formative and summative scores are equal.'}
+                </p>
+              )}
+              {data.assessmentBreakdown.unclassified.count > 0 && (
+                <p className="text-xs text-text-tertiary mt-2">
+                  {data.assessmentBreakdown.unclassified.count} unclassified assessment{data.assessmentBreakdown.unclassified.count !== 1 ? 's' : ''} (avg {data.assessmentBreakdown.unclassified.avgScore.toFixed(1)}%)
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Category Performance */}
+          {data.categoryPerformance && data.categoryPerformance.length > 0 && (
+            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Layers className="w-4 h-4 text-amber-500" />
+                <h3 className="text-sm font-semibold text-text-primary">
+                  Category Performance
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border-secondary">
+                      <th className="text-left py-2 pr-4 text-text-tertiary font-medium">Category</th>
+                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Assignments</th>
+                      <th className="text-right py-2 pl-4 text-text-tertiary font-medium">Avg Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.categoryPerformance.map((cat) => (
+                      <tr key={cat.categoryId} className="border-b border-border-secondary last:border-b-0">
+                        <td className="py-2.5 pr-4 text-text-primary font-medium capitalize">
+                          {cat.categoryName}
+                        </td>
+                        <td className="py-2.5 px-4 text-right text-text-secondary">
+                          {cat.assignmentCount}
+                        </td>
+                        <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(cat.avgScore)}`}>
+                          {cat.avgScore.toFixed(1)}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Course Performance Table */}
           {data.coursePerformance.length > 0 && (
@@ -517,9 +497,9 @@ export function GradeDashboard({
                   At-Risk Students
                 </h3>
               </div>
-              {data.atRisk.length > 0 && (
+              {data.atRiskStudents.length > 0 && (
                 <span className="text-xs text-text-tertiary">
-                  {data.atRisk.length} student{data.atRisk.length !== 1 ? 's' : ''}
+                  {data.atRiskStudents.length} student{data.atRiskStudents.length !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
@@ -527,7 +507,7 @@ export function GradeDashboard({
               Students scoring below 60% in any course
             </p>
 
-            {data.atRisk.length === 0 ? (
+            {data.atRiskStudents.length === 0 ? (
               <div className="py-8 text-center">
                 <CheckCircle className="w-10 h-10 mx-auto text-emerald-500 mb-3" />
                 <p className="text-sm text-text-secondary">
@@ -546,7 +526,7 @@ export function GradeDashboard({
                     </tr>
                   </thead>
                   <tbody>
-                    {data.atRisk.map((student, i) => (
+                    {data.atRiskStudents.map((student, i) => (
                       <tr key={`${student.studentId}-${student.courseId}-${i}`} className="border-b border-border-secondary last:border-b-0">
                         <td className="py-2.5 pr-4 text-text-primary font-medium">
                           {student.studentName}
@@ -575,4 +555,4 @@ export function GradeDashboard({
   )
 }
 
-export default GradeDashboard
+export default GradeOverview

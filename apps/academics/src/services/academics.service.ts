@@ -916,58 +916,28 @@ export async function transferStudent(
 }
 
 // ============================================================================
-// GRADING POLICY OPERATIONS
+// GRADING POLICY & GRADE TYPES (from @aibrains/shared-types)
 // ============================================================================
 
-export interface GradingScaleEntry {
-  letter: string
-  minPercentage: number
-  maxPercentage: number
-  gpaPoints: number
-}
+import type {
+  AssessmentCategory,
+  GradingPolicyResponseDto,
+  CreateGradingPolicyDto,
+  UpdateGradingPolicyDto,
+  GradingScaleEntryDto,
+  CategoryWeightDto,
+  GradeOverviewResponseDto,
+  BulkFinalizeParamsDto,
+  BulkFinalizeResponseDto,
+} from '@aibrains/shared-types'
+export type { AssessmentCategory } from '@aibrains/shared-types'
 
-export interface CategoryWeight {
-  categoryId: string
-  categoryName: string
-  weight: number
-  dropLowest?: number
-}
-
-export interface GradingPolicyResponse {
-  policyId: string
-  schoolId: string
-  policyName: string
-  description?: string
-  gradingScale: GradingScaleEntry[]
-  categoryWeights: CategoryWeight[]
-  roundingRule: 'up' | 'down' | 'nearest'
-  minimumPassingGrade: number
-  isDefault: boolean
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateGradingPolicyParams {
-  schoolId: string
-  policyName: string
-  description?: string
-  gradingScale: GradingScaleEntry[]
-  categoryWeights: CategoryWeight[]
-  roundingRule: 'up' | 'down' | 'nearest'
-  minimumPassingGrade: number
-  isDefault?: boolean
-}
-
-export interface UpdateGradingPolicyParams {
-  policyName?: string
-  description?: string
-  gradingScale?: GradingScaleEntry[]
-  categoryWeights?: CategoryWeight[]
-  roundingRule?: 'up' | 'down' | 'nearest'
-  minimumPassingGrade?: number
-  isDefault?: boolean
-}
+// Backward-compatible aliases for existing consumers
+export type GradingScaleEntry = GradingScaleEntryDto
+export type CategoryWeight = CategoryWeightDto
+export type GradingPolicyResponse = GradingPolicyResponseDto
+export type CreateGradingPolicyParams = CreateGradingPolicyDto
+export type UpdateGradingPolicyParams = UpdateGradingPolicyDto
 
 /**
  * List grading policies for a school
@@ -1028,6 +998,7 @@ export interface AssignmentInfo {
   assignmentName: string
   assignmentType: string
   categoryId: string
+  assessmentCategory?: AssessmentCategory
   possiblePoints: number
   earnedPoints?: number
 }
@@ -1076,6 +1047,7 @@ export interface GradeRecord {
     assignmentName: string
     assignmentType: string
     categoryId: string
+    assessmentCategory?: AssessmentCategory
     possiblePoints: number
     earnedPoints?: number
     gradedAt: string
@@ -1150,6 +1122,21 @@ export async function getSectionGrades(
   return response
 }
 
+// GradeOverviewResponse and BulkFinalize types aliased from shared-types (see imports above)
+export type GradeOverviewResponse = GradeOverviewResponseDto
+export type BulkFinalizeParams = BulkFinalizeParamsDto
+export type BulkFinalizeResponse = BulkFinalizeResponseDto
+
+/**
+ * Get grade overview for a school
+ * GET /academics/grades/overview?schoolId=&academicYearId=
+ */
+export async function getGradeOverview(
+  params: { schoolId: string; academicYearId: string }
+): Promise<GradeOverviewResponse> {
+  return apiGet<GradeOverviewResponse>('/academics/grades/overview', params)
+}
+
 /**
  * Get student's grades
  * GET /academics/students/:id/grades?academicYearId=&termId=
@@ -1173,18 +1160,6 @@ export async function finalizeGrade(gradeId: string): Promise<void> {
  * Bulk-finalize all grades for a section in a term
  * POST /academics/grades/finalize/bulk
  */
-export interface BulkFinalizeParams {
-  sectionId: string
-  termId: string
-  schoolId: string
-}
-
-export interface BulkFinalizeResponse {
-  finalized: number
-  alreadyFinalized: number
-  errors: Array<{ studentId: string; courseId: string; error: string }>
-}
-
 export async function bulkFinalizeGrades(
   data: BulkFinalizeParams
 ): Promise<BulkFinalizeResponse> {

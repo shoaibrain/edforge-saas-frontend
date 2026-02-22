@@ -31,6 +31,8 @@ import {
   type StudentGradesResponse,
   type BulkFinalizeParams,
   type BulkFinalizeResponse,
+  getGradeOverview,
+  type GradeOverviewResponse,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -43,6 +45,8 @@ export const gradeKeys = {
   policyList: (schoolId: string) => [...gradeKeys.policies(), schoolId] as const,
   policy: (policyId: string, schoolId: string) =>
     [...gradeKeys.policies(), policyId, schoolId] as const,
+  overview: (schoolId: string, academicYearId: string) =>
+    [...gradeKeys.all, 'overview', schoolId, academicYearId] as const,
   sectionGrades: () => [...gradeKeys.all, 'section-grades'] as const,
   sectionGrade: (sectionId: string, params?: { schoolId?: string; termId?: string }) =>
     [...gradeKeys.sectionGrades(), sectionId, params] as const,
@@ -70,6 +74,23 @@ export function useGradingPolicy(policyId: string, schoolId: string, enabled = t
     queryFn: () => getGradingPolicy(policyId, schoolId),
     enabled: enabled && !!policyId && !!schoolId,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ============================================================================
+// GRADE OVERVIEW
+// ============================================================================
+
+export function useGradeOverview(
+  schoolId: string,
+  academicYearId: string,
+  enabled = true
+) {
+  return useQuery<GradeOverviewResponse, Error>({
+    queryKey: gradeKeys.overview(schoolId, academicYearId),
+    queryFn: () => getGradeOverview({ schoolId, academicYearId }),
+    enabled: enabled && !!schoolId && !!academicYearId,
+    staleTime: 60 * 1000,
   })
 }
 

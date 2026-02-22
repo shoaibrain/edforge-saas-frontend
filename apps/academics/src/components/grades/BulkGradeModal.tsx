@@ -7,6 +7,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { X, Loader2, Save } from 'lucide-react'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
+import type { AssessmentCategory } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -61,6 +62,7 @@ export function BulkGradeModal({
 
   const [assignmentName, setAssignmentName] = useState('')
   const [categoryId, setCategoryId] = useState('homework')
+  const [assessmentPurpose, setAssessmentPurpose] = useState<AssessmentCategory | ''>('')
   const [possiblePoints, setPossiblePoints] = useState('100')
   const [entries, setEntries] = useState<StudentGradeEntry[]>([])
 
@@ -104,6 +106,7 @@ export function BulkGradeModal({
         assignmentName: assignmentName.trim(),
         assignmentType: categoryId,
         categoryId,
+        assessmentCategory: assessmentPurpose || undefined,
         possiblePoints: Number(possiblePoints),
       },
       grades: validEntries.map((e) => ({
@@ -161,19 +164,35 @@ export function BulkGradeModal({
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              Category
-            </label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-            >
-              {displayCategories.map((opt) => (
-                <option key={opt.id} value={opt.id}>{opt.label}</option>
-              ))}
-            </select>
+          <div className="flex items-end gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">
+                Category
+              </label>
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              >
+                {displayCategories.map((opt) => (
+                  <option key={opt.id} value={opt.id}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">
+                Assessment Purpose
+              </label>
+              <select
+                value={assessmentPurpose}
+                onChange={(e) => setAssessmentPurpose(e.target.value as AssessmentCategory | '')}
+                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              >
+                <option value="">Auto-detect</option>
+                <option value="formative">Formative</option>
+                <option value="summative">Summative</option>
+              </select>
+            </div>
           </div>
 
           {/* Student Grade Entries */}
