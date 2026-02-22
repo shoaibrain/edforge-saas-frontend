@@ -47,3 +47,6 @@ export {
 
 export { useSchools } from './useSchools'
 export type { School, UseSchoolsResult } from './useSchools'
+
+export { useCurrentAcademicYear } from './useAcademicYear'
+export type { AcademicYear } from './useAcademicYear'

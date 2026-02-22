@@ -1,9 +1,12 @@
 /**
  * SectionAssociations Component
  *
+ * @deprecated Teaching sections are now rendered inline within the
+ * AssignmentsTab on the staff detail page (detail.tsx). This standalone
+ * component is retained for backward compatibility but is no longer used.
+ *
  * Read-only table showing teacher's class/section associations.
  * Cross-service pattern: calls Academics service directly.
- * Only shown for teaching roles (teacher, substitute).
  */
 
 import { motion } from 'framer-motion'

@@ -1,4 +1,8 @@
 /**
+ * @deprecated This component has been superseded by the OverviewTab academic dashboard.
+ * Schedule and attendance data are now displayed in the Overview tab.
+ * Kept for backward compatibility — do not use in new code.
+ *
  * ScheduleTab Component
  *
  * Combines class schedule and attendance summary into one tab.

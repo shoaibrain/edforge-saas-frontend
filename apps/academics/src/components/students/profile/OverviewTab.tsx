@@ -1,22 +1,44 @@
 /**
- * OverviewTab Component
+ * OverviewTab Component — Academic Dashboard
  *
- * The default tab content for the student profile.
- * Displays demographics, contact info, medical/programs, and quick stats
- * in a clean, scannable grid layout.
+ * Clean, chart-driven student overview. No redundancy — each metric once.
+ * - Stat cards: attendance rate, classes, term GPA, cumulative GPA (live data)
+ * - Attendance trend: minimal area chart with 90% reference line
+ * - Course performance: horizontal bar chart, color-coded by grade band
+ * - Current classes: read-only table
+ *
+ * No destructive actions. No redundant data.
  */
 
+import { useMemo } from 'react'
 import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  ReferenceLine,
+} from 'recharts'
+import {
+  BookOpen,
   Calendar,
-  Globe,
-  MapPin,
-  Mail,
-  Phone,
+  User,
+  TrendingDown,
+  TrendingUp,
   GraduationCap,
-  Shield,
-  Heart,
+  ExternalLink,
+  BarChart3,
+  Target,
 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
+import { useStudentAttendanceSummary, useStudentAttendance } from '../../../hooks/useAttendance'
+import { useStudentGrades, useCurrentAcademicYear } from '../../../hooks'
+import { useActiveSchoolId } from '../../../stores/app.store'
 
 // ============================================================================
 // TYPES
@@ -26,115 +48,381 @@ export interface OverviewTabProps {
   student: StudentProfileResponseDto
 }
 
+type Classroom = NonNullable<StudentProfileResponseDto['classrooms']>[number]
+
 // ============================================================================
-// HELPERS
+// COLOR HELPERS
 // ============================================================================
 
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '—'
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return '—'
-  }
+function getRateTheme(rate: number) {
+  if (rate >= 95) return { accent: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', label: 'Excellent' }
+  if (rate >= 90) return { accent: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-500/10', label: 'Good' }
+  if (rate >= 85) return { accent: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10', label: 'At Risk' }
+  return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', label: 'Critical' }
 }
 
-function calculateAge(dateOfBirth?: string): number | null {
-  if (!dateOfBirth) return null
-  try {
-    const today = new Date()
-    const birth = new Date(dateOfBirth)
-    let age = today.getFullYear() - birth.getFullYear()
-    const monthDiff = today.getMonth() - birth.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--
-    }
-    return age
-  } catch {
-    return null
-  }
+function getGpaTheme(gpa: number) {
+  if (gpa >= 3.5) return { accent: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' }
+  if (gpa >= 3.0) return { accent: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500/10' }
+  if (gpa >= 2.0) return { accent: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' }
+  return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10' }
 }
 
-function formatGender(gender?: string): string {
-  if (!gender) return '—'
-  const labels: Record<string, string> = {
-    male: 'Male',
-    female: 'Female',
-    other: 'Other',
-    prefer_not_to_say: 'Prefer not to say',
-  }
-  return labels[gender] || gender
+function getGradeBarColor(numericGrade: number): string {
+  if (numericGrade >= 90) return '#10b981'
+  if (numericGrade >= 80) return '#3b82f6'
+  if (numericGrade >= 70) return '#f59e0b'
+  if (numericGrade >= 60) return '#f97316'
+  return '#ef4444'
 }
 
-function formatAddress(address?: {
-  street1?: string
-  street2?: string
-  city?: string
-  state?: string
-  zipCode?: string
-  postalCode?: string
-  country?: string
-}): string | null {
-  if (!address) return null
-  const parts: string[] = []
-  if (address.street1) parts.push(address.street1)
-  if (address.street2) parts.push(address.street2)
-  const cityLine = [address.city, address.state, address.zipCode || address.postalCode]
-    .filter(Boolean)
-    .join(', ')
-  if (cityLine) parts.push(cityLine)
-  if (address.country && address.country !== 'United States') {
-    parts.push(address.country)
-  }
-  return parts.length > 0 ? parts.join('\n') : null
+function getSubjectColor(subject?: string): { bg: string; text: string } {
+  if (!subject) return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
+  const s = subject.toLowerCase()
+  if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
+    return { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400' }
+  if (s.includes('english') || s.includes('language') || s.includes('literature'))
+    return { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400' }
+  if (s.includes('science') || s.includes('biology') || s.includes('chemistry') || s.includes('physics'))
+    return { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' }
+  if (s.includes('history') || s.includes('social') || s.includes('geography'))
+    return { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' }
+  if (s.includes('art') || s.includes('music') || s.includes('drama'))
+    return { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400' }
+  if (s.includes('physical') || s.includes('pe') || s.includes('health'))
+    return { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400' }
+  if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
+    return { bg: 'bg-cyan-500/10', text: 'text-cyan-600 dark:text-cyan-400' }
+  return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
 }
 
 // ============================================================================
-// DATA FIELD COMPONENT
+// STAT CARD
 // ============================================================================
 
-interface DataFieldProps {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  subLabel,
+  accent,
+  bg,
+}: {
+  icon: typeof GraduationCap
   label: string
-  value?: React.ReactNode
-  icon?: React.ReactNode
-}
-
-function DataField({ label, value, icon }: DataFieldProps) {
+  value: string | number
+  subLabel?: string
+  accent: string
+  bg: string
+}) {
   return (
-    <div className="min-w-0">
-      <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">
-        {label}
-      </dt>
-      <dd className="text-sm text-text-primary flex items-start gap-1.5">
-        {icon && <span className="text-text-tertiary mt-0.5 flex-shrink-0">{icon}</span>}
-        <span className={value ? '' : 'text-text-tertiary'}>
-          {value || '—'}
-        </span>
-      </dd>
+    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${bg}`}>
+          <Icon className={`w-4 h-4 ${accent}`} />
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs text-text-tertiary uppercase tracking-wide">{label}</p>
+          <p className="text-xl font-bold text-text-primary">{value}</p>
+          {subLabel && <p className={`text-xs ${accent}`}>{subLabel}</p>}
+        </div>
+      </div>
     </div>
   )
 }
 
 // ============================================================================
-// SECTION HEADER
+// CHART TOOLTIPS
 // ============================================================================
 
-interface SectionHeaderProps {
-  icon: React.ReactNode
-  title: string
-  iconColor?: string
+function TrendTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null
+  const point = payload[0].payload
+  return (
+    <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
+      <p className="text-xs text-text-tertiary">{point.displayDate}</p>
+      <p className="text-sm font-semibold text-text-primary">{point.rate.toFixed(1)}%</p>
+      <p className="text-xs text-text-tertiary mt-0.5">
+        {point.present} of {point.total} present
+      </p>
+    </div>
+  )
 }
 
-function SectionHeader({ icon, title, iconColor = 'text-text-tertiary' }: SectionHeaderProps) {
+function GradeTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null
+  const point = payload[0].payload
   return (
-    <div className="flex items-center gap-2 mb-4">
-      <span className={iconColor}>{icon}</span>
-      <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
+    <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
+      <p className="text-xs text-text-tertiary">{point.name}</p>
+      <p className="text-sm font-semibold text-text-primary">
+        {point.grade != null ? `${point.grade.toFixed(1)}%` : '—'}
+      </p>
+      {point.letterGrade && (
+        <p className="text-xs text-text-tertiary mt-0.5">Grade: {point.letterGrade}</p>
+      )}
     </div>
+  )
+}
+
+// ============================================================================
+// ATTENDANCE TREND CHART (minimal, no grid)
+// ============================================================================
+
+function AttendanceTrendChart({ studentId }: { studentId: string }) {
+  const thirtyDaysAgo = useMemo(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 30)
+    return d.toISOString().split('T')[0]
+  }, [])
+  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+
+  const { data: records, isLoading } = useStudentAttendance({
+    studentId,
+    startDate: thirtyDaysAgo,
+    endDate: today,
+    enabled: !!studentId,
+  })
+
+  const chartData = useMemo(() => {
+    if (!records || records.length === 0) return []
+    const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date))
+    let totalDays = 0
+    let presentDays = 0
+    return sorted.map((record) => {
+      totalDays++
+      if (record.status === 'present' || record.status === 'late' || record.status === 'remote') {
+        presentDays++
+      }
+      const rate = totalDays > 0 ? (presentDays / totalDays) * 100 : 0
+      return {
+        date: record.date,
+        displayDate: new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        rate: Math.round(rate * 10) / 10,
+        present: presentDays,
+        total: totalDays,
+      }
+    })
+  }, [records])
+
+  if (isLoading) {
+    return <div className="h-[160px] bg-surface-secondary rounded-xl animate-pulse" />
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <div className="h-[120px] flex items-center justify-center rounded-xl border border-border-secondary bg-surface-secondary/30">
+        <p className="text-sm text-text-tertiary">No attendance data recorded yet</p>
+      </div>
+    )
+  }
+
+  return (
+    <figure role="img" aria-label="Student attendance trend">
+      <ResponsiveContainer width="100%" height={160}>
+        <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+          <defs>
+            <linearGradient id="studentAttGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#005f73" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#005f73" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          <XAxis
+            dataKey="displayDate"
+            tick={{ fontSize: 10, fill: 'var(--color-text-tertiary, #9ca3af)' }}
+            tickLine={false}
+            axisLine={false}
+            interval="preserveStartEnd"
+          />
+          <YAxis
+            domain={[0, 100]}
+            tick={{ fontSize: 10, fill: 'var(--color-text-tertiary, #9ca3af)' }}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(v: number) => `${v}%`}
+            ticks={[0, 50, 90, 100]}
+          />
+          <ReferenceLine
+            y={90}
+            stroke="#f59e0b"
+            strokeDasharray="6 3"
+            strokeOpacity={0.5}
+            label={{ value: '90%', position: 'right', fontSize: 10, fill: '#f59e0b', opacity: 0.7 }}
+          />
+          <Tooltip content={<TrendTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="rate"
+            stroke="#005f73"
+            strokeWidth={2}
+            fill="url(#studentAttGrad)"
+            dot={false}
+            activeDot={{ r: 4, fill: '#005f73', stroke: '#fff', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </figure>
+  )
+}
+
+// ============================================================================
+// COURSE PERFORMANCE CHART
+// ============================================================================
+
+function CoursePerformanceChart({
+  grades,
+}: {
+  grades: Array<{ gradeId: string; courseName?: string; courseId: string; numericGrade: number; letterGrade: string; isFinal: boolean }>
+}) {
+  const chartData = useMemo(() => {
+    return grades
+      .filter((g) => g.numericGrade != null)
+      .map((g) => ({
+        name: g.courseName || g.courseId.slice(0, 12),
+        grade: g.numericGrade,
+        letterGrade: g.letterGrade,
+      }))
+  }, [grades])
+
+  if (chartData.length === 0) {
+    return (
+      <section>
+        <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
+          <BarChart3 className="w-4 h-4 text-blue-500" />
+          Course Performance
+        </h3>
+        <div className="py-8 text-center rounded-xl border border-border-secondary bg-surface-secondary/30">
+          <GraduationCap className="w-8 h-8 mx-auto text-text-tertiary mb-2" />
+          <p className="text-sm text-text-secondary">No grades recorded yet</p>
+          <p className="text-xs text-text-tertiary mt-1">
+            Grades will appear here once recorded by teachers.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  const chartHeight = Math.max(120, chartData.length * 40 + 20)
+
+  return (
+    <section>
+      <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
+        <BarChart3 className="w-4 h-4 text-blue-500" />
+        Course Performance
+      </h3>
+      <div className="rounded-xl border border-border-secondary bg-surface-secondary/30 p-4">
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
+            <XAxis
+              type="number"
+              domain={[0, 100]}
+              tick={{ fontSize: 10, fill: 'var(--color-text-tertiary, #9ca3af)' }}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(v: number) => `${v}%`}
+            />
+            <YAxis
+              type="category"
+              dataKey="name"
+              tick={{ fontSize: 11, fill: 'var(--color-text-tertiary, #9ca3af)' }}
+              tickLine={false}
+              axisLine={false}
+              width={100}
+            />
+            <Tooltip content={<GradeTooltip />} />
+            <Bar dataKey="grade" radius={[0, 4, 4, 0]} barSize={18}>
+              {chartData.map((entry, index) => (
+                <Cell key={index} fill={getGradeBarColor(entry.grade)} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-border-secondary">
+          {[
+            { label: 'A (90+)', color: '#10b981' },
+            { label: 'B (80-89)', color: '#3b82f6' },
+            { label: 'C (70-79)', color: '#f59e0b' },
+            { label: 'D (60-69)', color: '#f97316' },
+            { label: 'F (<60)', color: '#ef4444' },
+          ].map((item) => (
+            <span key={item.label} className="flex items-center gap-1.5 text-[10px] text-text-tertiary">
+              <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color }} />
+              {item.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================================
+// CLASSES LIST (read-only)
+// ============================================================================
+
+function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
+  if (classrooms.length === 0) {
+    return (
+      <section>
+        <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
+          <BookOpen className="w-4 h-4 text-indigo-500" />
+          Current Classes
+        </h3>
+        <div className="text-center py-8 rounded-xl border border-border-secondary bg-surface-secondary/30">
+          <BookOpen className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
+          <p className="text-sm text-text-secondary">No classes scheduled</p>
+          <p className="text-xs text-text-tertiary mt-1">
+            Classes will appear here once enrolled in sections.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section>
+      <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
+        <BookOpen className="w-4 h-4 text-indigo-500" />
+        Current Classes
+        <span className="text-xs text-text-tertiary font-normal ml-1">({classrooms.length})</span>
+      </h3>
+      <div className="overflow-x-auto rounded-xl border border-border-secondary">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-surface-secondary">
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">#</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Class</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Subject</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Teacher</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border-secondary">
+            {classrooms.map((classroom, index) => {
+              const subjectColor = getSubjectColor(classroom.subject)
+              return (
+                <tr key={classroom.classroomId} className="hover:bg-surface-secondary/50 transition-colors">
+                  <td className="py-3 px-3">
+                    <div className={`w-7 h-7 rounded-lg ${subjectColor.bg} flex items-center justify-center`}>
+                      <span className={`text-xs font-semibold ${subjectColor.text}`}>{index + 1}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3 font-medium text-text-primary">{classroom.name}</td>
+                  <td className="py-3 px-3 text-text-secondary">{classroom.subject || '—'}</td>
+                  <td className="py-3 px-3 text-text-secondary">
+                    {classroom.teacherName ? (
+                      <span className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-text-tertiary" />
+                        {classroom.teacherName}
+                      </span>
+                    ) : '—'}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
   )
 }
 
@@ -143,234 +431,133 @@ function SectionHeader({ icon, title, iconColor = 'text-text-tertiary' }: Sectio
 // ============================================================================
 
 export function OverviewTab({ student }: OverviewTabProps) {
-  const age = calculateAge(student.dateOfBirth)
-  const physicalAddress = formatAddress(student.contactInfo?.address)
-  const mailingAddress =
-    student.contactInfo?.useMailingAddress
-      ? formatAddress(student.contactInfo?.mailingAddress)
-      : null
+  const classrooms = student.classrooms || []
+  const schoolId = useActiveSchoolId() || ''
+
+  const { data: liveAttendance } = useStudentAttendanceSummary({
+    studentId: student.studentId,
+    enabled: !!student.studentId,
+  })
+
+  const { data: currentYear } = useCurrentAcademicYear(schoolId)
+
+  const { data: gradesData, isLoading: gradesLoading } = useStudentGrades(
+    student.studentId,
+    { academicYearId: currentYear?.yearId },
+    !!student.studentId,
+  )
+
+  const effectiveSummary = liveAttendance
+    ? {
+        attendanceRate: liveAttendance.attendanceRate,
+        totalDays: liveAttendance.totalDays,
+        present: liveAttendance.present,
+        absent: liveAttendance.absent,
+        late: liveAttendance.late,
+        excused: liveAttendance.excused,
+      }
+    : student.attendanceSummary
+
+  const hasNoData = classrooms.length === 0 && !effectiveSummary
+
+  const attendanceRate = effectiveSummary?.attendanceRate
+  const rateTheme = attendanceRate != null ? getRateTheme(attendanceRate) : null
+
+  const gpa = gradesData?.gpa
+  const grades = gradesData?.grades ?? []
+
+  const termGpaTheme = gpa?.termGpa != null ? getGpaTheme(gpa.termGpa) : null
+  const cumGpaTheme = gpa?.cumulativeGpa != null ? getGpaTheme(gpa.cumulativeGpa) : null
+
+  if (hasNoData) {
+    return (
+      <div className="text-center py-16">
+        <BarChart3 className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
+        <p className="text-text-secondary font-medium">No academic data yet</p>
+        <p className="text-sm text-text-tertiary mt-1">
+          {student.currentEnrollment
+            ? 'This student has no class sections or attendance data yet.'
+            : 'Enroll this student first, then add to class sections.'}
+        </p>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Personal Information */}
-      <section>
-        <SectionHeader
-          icon={<Calendar className="w-4 h-4" />}
-          title="Personal Information"
-          iconColor="text-blue-500"
+    <div className="space-y-6">
+      {/* Stat Cards — each metric exactly once */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <StatCard
+          icon={Target}
+          label="Attendance"
+          value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
+          subLabel={rateTheme?.label}
+          accent={rateTheme?.accent || 'text-text-tertiary'}
+          bg={rateTheme?.bg || 'bg-surface-tertiary'}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-          <DataField
-            label="Date of Birth"
-            value={
-              student.dateOfBirth ? (
-                <span>
-                  {formatDate(student.dateOfBirth)}
-                  {age !== null && (
-                    <span className="text-text-tertiary ml-1">({age} yrs)</span>
-                  )}
-                </span>
-              ) : undefined
-            }
-          />
-          <DataField label="Gender" value={formatGender(student.gender)} />
-          <DataField label="Ethnicity" value={student.ethnicity} />
-          <DataField
-            label="Primary Language"
-            value={student.primaryLanguage}
-            icon={student.primaryLanguage ? <Globe className="w-3.5 h-3.5" /> : undefined}
-          />
-          {student.homeLanguage && student.homeLanguage !== student.primaryLanguage && (
-            <DataField label="Home Language" value={student.homeLanguage} />
-          )}
-          <DataField label="Country of Birth" value={student.countryOfBirth} />
-        </div>
-      </section>
-
-      {/* Contact Information */}
-      <section>
-        <SectionHeader
-          icon={<Mail className="w-4 h-4" />}
-          title="Contact Information"
-          iconColor="text-teal-500"
+        <StatCard
+          icon={BookOpen}
+          label="Classes"
+          value={classrooms.length}
+          accent="text-indigo-600 dark:text-indigo-400"
+          bg="bg-indigo-500/10"
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-          <DataField
-            label="Email"
-            value={
-              student.contactInfo?.email ? (
-                <a
-                  href={`mailto:${student.contactInfo.email}`}
-                  className="text-brand-600 dark:text-brand-400 hover:underline truncate"
-                >
-                  {student.contactInfo.email}
-                </a>
-              ) : undefined
-            }
-          />
-          <DataField
-            label="Phone"
-            value={
-              student.contactInfo?.phone ? (
-                <a
-                  href={`tel:${student.contactInfo.phone}`}
-                  className="hover:underline"
-                >
-                  {student.contactInfo.phone}
-                </a>
-              ) : undefined
-            }
-            icon={student.contactInfo?.phone ? <Phone className="w-3.5 h-3.5" /> : undefined}
-          />
-          <DataField
-            label="Address"
-            value={
-              physicalAddress ? (
-                <span className="whitespace-pre-line">{physicalAddress}</span>
-              ) : undefined
-            }
-            icon={physicalAddress ? <MapPin className="w-3.5 h-3.5" /> : undefined}
-          />
-          {mailingAddress && (
-            <DataField
-              label="Mailing Address"
-              value={<span className="whitespace-pre-line">{mailingAddress}</span>}
-              icon={<MapPin className="w-3.5 h-3.5" />}
-            />
-          )}
-        </div>
-      </section>
-
-      {/* Academic Information */}
-      <section>
-        <SectionHeader
-          icon={<GraduationCap className="w-4 h-4" />}
-          title="Academic Information"
-          iconColor="text-emerald-500"
+        <StatCard
+          icon={GraduationCap}
+          label="Term GPA"
+          value={gpa?.termGpa != null ? gpa.termGpa.toFixed(2) : gradesLoading ? '...' : '—'}
+          accent={termGpaTheme?.accent || 'text-text-tertiary'}
+          bg={termGpaTheme?.bg || 'bg-surface-tertiary'}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-          <DataField label="Current Grade" value={student.currentGradeLevel ? `Grade ${student.currentGradeLevel}` : undefined} />
-          <DataField
-            label="Status"
-            value={
-              <span className="capitalize">{student.status}</span>
-            }
-          />
-          <DataField label="Enrollment Date" value={formatDate(student.enrollmentDate)} />
-          <DataField label="Student Number" value={student.studentNumber} />
-          <DataField label="State Student ID" value={student.stateStudentId} />
-          {student.previousSchool && (
-            <DataField label="Previous School" value={student.previousSchool} />
-          )}
-        </div>
-      </section>
-
-      {/* Programs & Health */}
-      <section>
-        <SectionHeader
-          icon={<Shield className="w-4 h-4" />}
-          title="Programs & Accommodations"
-          iconColor="text-purple-500"
+        <StatCard
+          icon={GraduationCap}
+          label="Cum. GPA"
+          value={gpa?.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : gradesLoading ? '...' : '—'}
+          accent={cumGpaTheme?.accent || 'text-text-tertiary'}
+          bg={cumGpaTheme?.bg || 'bg-surface-tertiary'}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-          <DataField
-            label="IEP"
-            value={student.medicalInfo?.hasIEP ? 'Yes' : 'No'}
-          />
-          <DataField
-            label="504 Plan"
-            value={student.medicalInfo?.has504Plan ? 'Yes' : 'No'}
-          />
-          <DataField
-            label="Special Programs"
-            value={
-              student.specialPrograms && student.specialPrograms.length > 0
-                ? student.specialPrograms.join(', ')
-                : undefined
-            }
-          />
-          <DataField
-            label="Accommodations"
-            value={
-              student.accommodations && student.accommodations.length > 0
-                ? student.accommodations.join(', ')
-                : undefined
-            }
-          />
-        </div>
-      </section>
+      </div>
 
-      {/* Medical Information (if any data present) */}
-      {student.medicalInfo && (
-        <section>
-          <SectionHeader
-            icon={<Heart className="w-4 h-4" />}
-            title="Medical Information"
-            iconColor="text-red-500"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-            <DataField
-              label="Allergies"
-              value={
-                student.medicalInfo.allergies && student.medicalInfo.allergies.length > 0
-                  ? student.medicalInfo.allergies.join(', ')
-                  : undefined
-              }
-            />
-            <DataField
-              label="Medications"
-              value={
-                student.medicalInfo.medications && student.medicalInfo.medications.length > 0
-                  ? student.medicalInfo.medications.join(', ')
-                  : undefined
-              }
-            />
-            <DataField
-              label="Conditions"
-              value={
-                student.medicalInfo.conditions && student.medicalInfo.conditions.length > 0
-                  ? student.medicalInfo.conditions.join(', ')
-                  : undefined
-              }
-            />
-            <DataField
-              label="Dietary Restrictions"
-              value={
-                student.medicalInfo.dietaryRestrictions && student.medicalInfo.dietaryRestrictions.length > 0
-                  ? student.medicalInfo.dietaryRestrictions.join(', ')
-                  : undefined
-              }
-            />
-            <DataField label="Blood Type" value={student.medicalInfo.bloodType} />
-            <DataField label="Physician" value={student.medicalInfo.physicianName} />
-            {student.medicalInfo.physicianPhone && (
-              <DataField label="Physician Phone" value={student.medicalInfo.physicianPhone} />
-            )}
-            {student.medicalInfo.insuranceProvider && (
-              <DataField label="Insurance" value={student.medicalInfo.insuranceProvider} />
-            )}
-            {student.medicalInfo.notes && (
-              <div className="sm:col-span-2 lg:col-span-3">
-                <DataField label="Medical Notes" value={student.medicalInfo.notes} />
-              </div>
-            )}
+      {/* Attendance Trend */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-amber-500" />
+            Attendance Trend
+          </h3>
+          <Link
+            to="/attendance"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            History
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+        <AttendanceTrendChart studentId={student.studentId} />
+        {effectiveSummary && effectiveSummary.attendanceRate < 90 && (
+          <div className="mt-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">
+            <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
+              <TrendingDown className="w-4 h-4 flex-shrink-0" />
+              Attendance below 90% may affect academic performance. Consider follow-up.
+            </p>
           </div>
-        </section>
-      )}
+        )}
+        {effectiveSummary && effectiveSummary.attendanceRate >= 98 && (
+          <div className="mt-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
+            <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 flex-shrink-0" />
+              Outstanding attendance record!
+            </p>
+          </div>
+        )}
+      </section>
 
-      {/* Notes */}
-      {student.notes && (
-        <section>
-          <SectionHeader
-            icon={<Calendar className="w-4 h-4" />}
-            title="Notes"
-            iconColor="text-slate-500"
-          />
-          <p className="text-sm text-text-secondary whitespace-pre-wrap">
-            {student.notes}
-          </p>
-        </section>
-      )}
+      {/* Course Performance + Classes — side by side on large screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CoursePerformanceChart grades={grades} />
+        <ClassesList classrooms={classrooms} />
+      </div>
     </div>
   )
 }
@@ -381,23 +568,21 @@ export function OverviewTab({ student }: OverviewTabProps) {
 
 export function OverviewTabSkeleton() {
   return (
-    <div className="space-y-8">
-      {[...Array(3)].map((_, sectionIdx) => (
-        <section key={sectionIdx}>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-4 h-4 rounded bg-surface-tertiary animate-pulse" />
-            <div className="h-4 w-32 bg-surface-tertiary rounded animate-pulse" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-            {[...Array(sectionIdx === 0 ? 5 : 3)].map((_, i) => (
-              <div key={i}>
-                <div className="h-3 w-20 bg-surface-tertiary rounded animate-pulse mb-2" />
-                <div className="h-4 w-32 bg-surface-tertiary rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-20 bg-surface-secondary rounded-xl animate-pulse" />
+        ))}
+      </div>
+      <div className="h-[180px] bg-surface-secondary rounded-xl animate-pulse" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="h-[200px] bg-surface-secondary rounded-xl animate-pulse" />
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-14 bg-surface-tertiary rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

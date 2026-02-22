@@ -20,12 +20,10 @@ import {
   User,
   GraduationCap,
   Users,
-  BookOpen,
-  Award,
+  BarChart3,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { useStudentProfile, useStudentProfileActions, useCurrentAcademicYear } from '../../hooks'
-import { useActiveSchoolId } from '../../stores/app.store'
+import { useStudentProfile, useStudentProfileActions } from '../../hooks'
 import { NotFound } from '../../components/common'
 import {
   ProfileHeader,
@@ -34,9 +32,8 @@ import {
   OverviewTabSkeleton,
   EnrollmentTab,
   FamilyTab,
-  ScheduleTab,
+  ProfileTab,
 } from '../../components/students/profile'
-import { StudentGradesView } from '../../components/grades/StudentGradesView'
 import { EnrollExistingStudentModal } from '../../components/enrollment/EnrollExistingStudentModal'
 import { EditStudentModal } from '../../components/students/EditStudentModal'
 import { AddToSectionModal } from '../../components/students/profile/AddToSectionModal'
@@ -46,14 +43,13 @@ import { AddGuardianModal } from '../../components/students/profile/AddGuardianM
 // CONSTANTS
 // ============================================================================
 
-type TabId = 'overview' | 'enrollment' | 'family' | 'schedule' | 'grades'
+type TabId = 'overview' | 'profile' | 'enrollment' | 'family'
 
 const TABS: { id: TabId; label: string; icon: typeof User }[] = [
-  { id: 'overview', label: 'Overview', icon: User },
+  { id: 'overview', label: 'Overview', icon: BarChart3 },
+  { id: 'profile', label: 'Profile', icon: User },
   { id: 'enrollment', label: 'Enrollment', icon: GraduationCap },
   { id: 'family', label: 'Family', icon: Users },
-  { id: 'schedule', label: 'Schedule', icon: BookOpen },
-  { id: 'grades', label: 'Grades', icon: Award },
 ]
 
 // ============================================================================
@@ -130,8 +126,6 @@ export function StudentProfilePage() {
   const params = useParams({ from: '/students/$studentId' })
   const studentId = params.studentId
   const [activeTab, setActiveTab] = useState<TabId>('overview')
-  const schoolId = useActiveSchoolId() || ''
-  const { data: currentYear } = useCurrentAcademicYear(schoolId)
 
   // Actions hook — must be called before any conditional returns (Rules of Hooks)
   const actions = useStudentProfileActions()
@@ -241,6 +235,9 @@ export function StudentProfilePage() {
               {activeTab === 'overview' && (
                 <OverviewTab student={student} />
               )}
+              {activeTab === 'profile' && (
+                <ProfileTab student={student} />
+              )}
               {activeTab === 'enrollment' && (
                 <EnrollmentTab
                   student={student}
@@ -255,15 +252,6 @@ export function StudentProfilePage() {
                   onEditGuardian={actions.openEditGuardian}
                   canEdit={true}
                 />
-              )}
-              {activeTab === 'schedule' && (
-                <ScheduleTab
-                  student={student}
-                  onAddToSection={actions.openAddToSection}
-                />
-              )}
-              {activeTab === 'grades' && (
-                <StudentGradesView studentId={studentId} academicYearId={currentYear?.yearId} />
               )}
             </motion.div>
           </AnimatePresence>
