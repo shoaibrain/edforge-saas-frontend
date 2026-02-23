@@ -3,23 +3,61 @@
  *
  * Single student row in the attendance grid with status toggle buttons.
  * Supports keyboard shortcuts: P=Present, A=Absent, L=Late, E=Excused, R=Remote
+ *
+ * Sprint 4 enhancements:
+ * - Task 4.4: Keyboard navigation (Enter/Space toggles, arrow keys between rows)
+ * - Task 4.5: Structured absence reason selector
+ * - Task 4.6: Correction workflow (view mode for past dates)
+ * - Task 4.8: Previous day status indicator
+ * - Task 5.2: ARIA labels on status buttons and notes toggle
  */
 
-import { useState, useRef } from 'react'
-import { MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
+import { MessageSquare, Edit2, X } from 'lucide-react'
+import { StatusBadge } from './StatusBadge'
 import type { AttendanceStatus } from '../../services/academics.service'
 
-interface AttendanceRowProps {
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface AttendanceRowProps {
   studentId: string
   studentName: string
   studentNumber?: string
   currentStatus: AttendanceStatus | null
   notes: string
+  excuseType?: string
   onStatusChange: (status: AttendanceStatus) => void
   onNotesChange: (notes: string) => void
+  onExcuseTypeChange?: (excuseType: string) => void
+  /** Task 4.6: Past date mode — row starts read-only, user clicks Edit */
+  isPastDate?: boolean
+  /** Task 4.6: Callback for correction save (PATCH) */
+  onCorrectionSave?: () => void
+  onCorrectionCancel?: () => void
+  /** Task 4.8: Previous day's status */
+  previousDayStatus?: AttendanceStatus | null
+  /** Task 4.4: Arrow key navigation */
+  onArrowUp?: () => void
+  onArrowDown?: () => void
 }
 
-const statusButtons: { status: AttendanceStatus; label: string; shortcut: string; color: string; activeColor: string }[] = [
+export interface AttendanceRowRef {
+  focus: () => void
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const statusButtons: {
+  status: AttendanceStatus
+  label: string
+  shortcut: string
+  color: string
+  activeColor: string
+}[] = [
   { status: 'present', label: 'P', shortcut: 'P', color: 'hover:bg-emerald-100 hover:text-emerald-700 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400', activeColor: 'bg-emerald-500 text-white' },
   { status: 'absent', label: 'A', shortcut: 'A', color: 'hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-500/20 dark:hover:text-red-400', activeColor: 'bg-red-500 text-white' },
   { status: 'late', label: 'L', shortcut: 'L', color: 'hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-500/20 dark:hover:text-amber-400', activeColor: 'bg-amber-500 text-white' },
@@ -27,24 +65,98 @@ const statusButtons: { status: AttendanceStatus; label: string; shortcut: string
   { status: 'remote', label: 'R', shortcut: 'R', color: 'hover:bg-indigo-100 hover:text-indigo-700 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-400', activeColor: 'bg-indigo-500 text-white' },
 ]
 
-export function AttendanceRow({
-  studentName,
-  studentNumber,
-  currentStatus,
-  notes,
-  onStatusChange,
-  onNotesChange,
-}: AttendanceRowProps) {
+// Task 4.5: Structured absence reasons
+const EXCUSE_TYPES = [
+  { value: '', label: 'Select reason...' },
+  { value: 'medical', label: 'Medical' },
+  { value: 'family_emergency', label: 'Family Emergency' },
+  { value: 'religious', label: 'Religious' },
+  { value: 'school_activity', label: 'School Activity' },
+  { value: 'weather', label: 'Weather' },
+  { value: 'transportation', label: 'Transportation' },
+  { value: 'other', label: 'Other' },
+]
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(function AttendanceRow(
+  {
+    studentName,
+    studentNumber,
+    currentStatus,
+    notes,
+    excuseType,
+    onStatusChange,
+    onNotesChange,
+    onExcuseTypeChange,
+    isPastDate = false,
+    onCorrectionSave,
+    onCorrectionCancel,
+    previousDayStatus,
+    onArrowUp,
+    onArrowDown,
+  },
+  ref
+) {
   const [showNotes, setShowNotes] = useState(false)
+  // Task 4.6: Editing state for past-date corrections
+  const [isEditing, setIsEditing] = useState(false)
   const rowRef = useRef<HTMLDivElement>(null)
 
+  // Task 4.4: Expose focus method
+  useImperativeHandle(ref, () => ({
+    focus: () => rowRef.current?.focus(),
+  }))
+
+  // Task 4.6: In past-date mode, start read-only unless editing
+  const isViewMode = isPastDate && !isEditing
+
+  // Task 4.5: Show reason selector when absent or excused
+  const showReasonSelector = (currentStatus === 'absent' || currentStatus === 'excused') && !isViewMode
+
+  // Task 4.4: Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Arrow navigation
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      onArrowUp?.()
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      onArrowDown?.()
+      return
+    }
+    // Escape closes notes
+    if (e.key === 'Escape' && showNotes) {
+      setShowNotes(false)
+      return
+    }
+
+    // Don't process shortcuts in view mode
+    if (isViewMode) return
+
     const key = e.key.toUpperCase()
     const match = statusButtons.find((b) => b.shortcut === key)
     if (match) {
       e.preventDefault()
       onStatusChange(match.status)
     }
+  }
+
+  // Task 4.6: Correction handlers
+  const handleStartEdit = () => {
+    setIsEditing(true)
+  }
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    onCorrectionCancel?.()
+  }
+  const handleSaveCorrection = () => {
+    setIsEditing(false)
+    onCorrectionSave?.()
   }
 
   return (
@@ -54,59 +166,127 @@ export function AttendanceRow({
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="row"
+      aria-label={`Attendance for ${studentName}`}
     >
-      <div className="flex items-center gap-4 py-3 px-4">
+      {/* Task 5.5: Responsive layout — stack on mobile (<768px), inline on desktop */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 py-3 px-4">
         {/* Student Info */}
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-text-primary truncate">
-            {studentName}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-text-primary truncate">
+              {studentName}
+            </span>
+            {/* Task 4.8: Previous day status indicator */}
+            {previousDayStatus && (
+              <span title={`Yesterday: ${previousDayStatus}`}>
+                <StatusBadge status={previousDayStatus} variant="compact" />
+              </span>
+            )}
           </div>
           {studentNumber && (
             <div className="text-xs text-text-tertiary">{studentNumber}</div>
           )}
         </div>
 
-        {/* Status Buttons */}
-        <div className="flex items-center gap-1.5">
-          {statusButtons.map((btn) => (
-            <button
-              key={btn.status}
-              type="button"
-              onClick={() => onStatusChange(btn.status)}
-              className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
-                currentStatus === btn.status
-                  ? btn.activeColor
-                  : `bg-surface-secondary text-text-tertiary ${btn.color}`
-              }`}
-              title={`${btn.status} (${btn.shortcut})`}
-            >
-              {btn.label}
-            </button>
-          ))}
-        </div>
+        {/* Status Buttons or View-Mode Badge */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          {isViewMode ? (
+            <>
+              {currentStatus && <StatusBadge status={currentStatus} />}
+              {/* Task 4.6: Edit button for corrections */}
+              <button
+                type="button"
+                onClick={handleStartEdit}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+                aria-label={`Edit attendance for ${studentName}`}
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                Edit
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              {statusButtons.map((btn) => (
+                <button
+                  key={btn.status}
+                  type="button"
+                  onClick={() => onStatusChange(btn.status)}
+                  className={`w-11 h-11 sm:w-9 sm:h-9 rounded-lg text-sm font-bold transition-all ${
+                    currentStatus === btn.status
+                      ? btn.activeColor
+                      : `bg-surface-secondary text-text-tertiary ${btn.color}`
+                  }`}
+                  title={`${btn.status} (${btn.shortcut})`}
+                  aria-label={`Mark ${btn.status}`}
+                  aria-pressed={currentStatus === btn.status}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+          )}
 
-        {/* Notes Toggle */}
-        <button
-          type="button"
-          onClick={() => setShowNotes(!showNotes)}
-          className={`p-2 rounded-lg transition-colors ${
-            notes
-              ? 'text-teal-500 bg-teal-50 dark:bg-teal-500/10'
-              : 'text-text-tertiary hover:text-text-secondary hover:bg-surface-secondary'
-          }`}
-          title="Add notes"
-        >
-          <MessageSquare className="w-4 h-4" />
-          {showNotes ? (
-            <ChevronUp className="w-3 h-3 absolute -bottom-0.5 -right-0.5" />
-          ) : notes ? (
-            <ChevronDown className="w-3 h-3 absolute -bottom-0.5 -right-0.5" />
-          ) : null}
-        </button>
+          {/* Notes Toggle */}
+          {!isViewMode && (
+            <button
+              type="button"
+              onClick={() => setShowNotes(!showNotes)}
+              className={`relative p-2 rounded-lg transition-colors ${
+                notes
+                  ? 'text-teal-500 bg-teal-50 dark:bg-teal-500/10'
+                  : 'text-text-tertiary hover:text-text-secondary hover:bg-surface-secondary'
+              }`}
+              title="Add notes"
+              aria-label={notes ? 'Edit notes' : 'Add notes'}
+              aria-expanded={showNotes}
+            >
+              <MessageSquare className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Task 4.6: Save/Cancel for correction */}
+          {isPastDate && isEditing && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleSaveCorrection}
+                className="px-3 py-1.5 text-xs font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="p-1.5 text-text-tertiary hover:text-text-primary hover:bg-surface-hover rounded-lg transition-colors"
+                aria-label="Cancel edit"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Task 4.5: Absence Reason Selector */}
+      {showReasonSelector && (
+        <div className="px-4 pb-2">
+          <select
+            value={excuseType || ''}
+            onChange={(e) => onExcuseTypeChange?.(e.target.value)}
+            className="w-full max-w-xs px-3 py-1.5 text-xs bg-surface-secondary border border-border-secondary rounded-lg text-text-primary appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            aria-label="Absence reason"
+          >
+            {EXCUSE_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* Notes Input */}
-      {showNotes && (
+      {showNotes && !isViewMode && (
         <div className="px-4 pb-3">
           <input
             type="text"
@@ -114,9 +294,17 @@ export function AttendanceRow({
             onChange={(e) => onNotesChange(e.target.value)}
             placeholder="Add a note..."
             className="w-full px-3 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            aria-label="Attendance note"
           />
+        </div>
+      )}
+
+      {/* View mode: show notes as read-only if present */}
+      {isViewMode && notes && (
+        <div className="px-4 pb-3">
+          <p className="text-xs text-text-secondary italic">{notes}</p>
         </div>
       )}
     </div>
   )
-}
+})

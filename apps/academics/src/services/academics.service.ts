@@ -654,6 +654,7 @@ export interface CreateAttendanceParams {
 
 export interface BulkAttendanceRecord {
   studentId: string
+  studentName?: string
   status: AttendanceStatus
   notes?: string
 }
@@ -691,11 +692,13 @@ export interface DailyAttendanceSummary {
   date: string
   schoolId: string
   totalStudents: number
+  totalRecorded?: number
   present: number
   absent: number
   late: number
   excused: number
   halfDay: number
+  remote?: number
   attendanceRate: number
   byGradeLevel?: Record<string, {
     total: number
@@ -758,12 +761,12 @@ export async function getAttendanceByDate(
  */
 export async function getAttendanceSummary(
   schoolId: string,
-  date: string
+  date: string,
+  academicYearId?: string
 ): Promise<DailyAttendanceSummary> {
-  return apiGet<DailyAttendanceSummary>('/academics/attendance/summary', {
-    schoolId,
-    date,
-  })
+  const params: Record<string, string> = { schoolId, date }
+  if (academicYearId) params.academicYearId = academicYearId
+  return apiGet<DailyAttendanceSummary>('/academics/attendance/summary', params)
 }
 
 /**
@@ -1327,9 +1330,43 @@ export async function getAttendanceTrend(
 export interface AttendanceAlert {
   studentId: string
   studentName: string
+  gradeLevel?: string
   attendanceRate: number
   totalDays: number
   absentDays: number
+  trend: 'improving' | 'declining' | 'stable'
+}
+
+export interface AttendanceOverviewResponse {
+  todaySummary: DailyAttendanceSummary & { totalRecorded: number; remote?: number }
+  sectionCompletion: {
+    totalSections: number
+    sectionsWithAttendance: number
+    sections: Array<{
+      sectionId: string
+      sectionNumber: string
+      courseName: string
+      studentCount: number
+      recordedCount: number
+      isComplete: boolean
+    }>
+  }
+  trend: DailyAttendanceSummary[]
+  periodAverages: {
+    last7Days: number
+    last30Days: number
+    academicYear: number
+  }
+  atRiskStudents: AttendanceAlert[]
+  totalAtRiskCount: number
+  absenceBreakdown: {
+    unexcused: number
+    excused: number
+    late: number
+    halfDay: number
+    remote: number
+  }
+  dayOfWeekPattern: Record<string, { avgRate: number; avgAbsent: number }>
 }
 
 /**
@@ -1350,6 +1387,20 @@ export async function getAttendanceAlerts(
     startDate,
     endDate,
   })
+}
+
+// ============================================================================
+// ATTENDANCE OVERVIEW (Task 1.13)
+// ============================================================================
+
+/**
+ * Get attendance overview (aggregate dashboard endpoint)
+ * GET /academics/attendance/overview?schoolId=&academicYearId=&date=
+ */
+export async function getAttendanceOverview(
+  params: { schoolId: string; academicYearId: string; date: string }
+): Promise<AttendanceOverviewResponse> {
+  return apiGet<AttendanceOverviewResponse>('/academics/attendance/overview', params)
 }
 
 // ============================================================================

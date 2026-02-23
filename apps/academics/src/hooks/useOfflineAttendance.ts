@@ -6,10 +6,13 @@
  * - Auto-saves to server every 30 seconds
  * - Tracks online/offline state
  * - Retries failed saves on reconnect
+ *
+ * Task 1.15: Fix partial-save data loss — only clear entries that succeeded
+ * Task 5.1: localStorage cleanup + quota handling
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { AttendanceStatus } from '../services/academics.service'
+import type { AttendanceStatus, BulkAttendanceResponse } from '../services/academics.service'
 
 export type SaveStatus = 'idle' | 'saved' | 'saving' | 'offline' | 'error'
 
@@ -27,6 +30,7 @@ interface OfflineAttendanceState {
 
 const STORAGE_PREFIX = 'attendance:'
 const AUTO_SAVE_INTERVAL_MS = 30 * 1000 // 30 seconds
+const CLEANUP_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 function getStorageKey(schoolId: string, sectionId: string, date: string) {
   return `${STORAGE_PREFIX}${schoolId}:${sectionId}:${date}`
@@ -45,8 +49,18 @@ function loadFromStorage(key: string): OfflineAttendanceState | null {
 function saveToStorage(key: string, state: OfflineAttendanceState) {
   try {
     localStorage.setItem(key, JSON.stringify(state))
-  } catch (error) {
-    console.warn('Failed to save attendance to localStorage:', error)
+  } catch (error: any) {
+    // Task 5.1: Handle QuotaExceededError
+    if (error?.name === 'QuotaExceededError' || error?.code === 22) {
+      cleanupOldEntries()
+      try {
+        localStorage.setItem(key, JSON.stringify(state))
+      } catch {
+        console.warn('Failed to save attendance to localStorage after cleanup:', error)
+      }
+    } else {
+      console.warn('Failed to save attendance to localStorage:', error)
+    }
   }
 }
 
@@ -58,11 +72,44 @@ function clearStorage(key: string) {
   }
 }
 
+/**
+ * Task 5.1: Clean up old attendance entries from localStorage
+ * Removes clean (non-dirty) entries older than 7 days
+ */
+function cleanupOldEntries() {
+  try {
+    const now = Date.now()
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key?.startsWith(STORAGE_PREFIX)) {
+        keys.push(key)
+      }
+    }
+    for (const key of keys) {
+      try {
+        const raw = localStorage.getItem(key)
+        if (!raw) continue
+        const state = JSON.parse(raw) as OfflineAttendanceState
+        // Only evict clean (non-dirty) entries older than 7 days
+        if (!state.dirty && state.lastSavedAt && (now - state.lastSavedAt) > CLEANUP_MAX_AGE_MS) {
+          localStorage.removeItem(key)
+        }
+      } catch {
+        // Skip malformed entries
+      }
+    }
+  } catch {
+    // Silently ignore cleanup errors
+  }
+}
+
 interface UseOfflineAttendanceOptions {
   schoolId: string
   sectionId: string
   date: string
-  onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => Promise<void>
+  // Task 1.15: Updated to return BulkAttendanceResponse so we can inspect errors
+  onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string }>) => Promise<BulkAttendanceResponse | void>
 }
 
 export function useOfflineAttendance({
@@ -79,9 +126,9 @@ export function useOfflineAttendance({
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Flush to server
-  const flushToServer = useCallback(async () => {
+  const flushToServer = useCallback(async (enrichedRecords?: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string }>) => {
     const entries = entriesRef.current
-    const records = entries
+    const records = enrichedRecords || entries
       .filter(e => e.status !== null)
       .map(e => ({
         studentId: e.studentId,
@@ -93,7 +140,26 @@ export function useOfflineAttendance({
 
     setSaveStatus('saving')
     try {
-      await onSave(records)
+      const result = await onSave(records)
+
+      // Task 1.15: Check for partial failures
+      if (result && 'errors' in result && Array.isArray(result.errors) && result.errors.length > 0) {
+        // Some records failed — keep dirty flag, preserve failed entries
+        const failedStudentIds = new Set(result.errors.map((e: any) => e.studentId))
+        const failedEntries = entriesRef.current.filter(e => failedStudentIds.has(e.studentId))
+
+        // Only keep failed entries in localStorage
+        saveToStorage(storageKey, {
+          entries: failedEntries,
+          lastSavedAt: Date.now(),
+          dirty: true,
+        })
+        dirtyRef.current = true
+        setSaveStatus('error')
+        return
+      }
+
+      // All records succeeded
       dirtyRef.current = false
       saveToStorage(storageKey, {
         entries: entriesRef.current,
@@ -128,8 +194,11 @@ export function useOfflineAttendance({
     }
   }, [flushToServer])
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount + cleanup old entries
   useEffect(() => {
+    // Task 5.1: Clean up old entries on mount
+    cleanupOldEntries()
+
     const saved = loadFromStorage(storageKey)
     if (saved && saved.entries.length > 0) {
       entriesRef.current = saved.entries
@@ -172,9 +241,9 @@ export function useOfflineAttendance({
   }, [storageKey, isOnline])
 
   // Manual save trigger
-  const save = useCallback(() => {
+  const save = useCallback((enrichedRecords?: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string }>) => {
     if (isOnline) {
-      return flushToServer()
+      return flushToServer(enrichedRecords)
     }
     setSaveStatus('offline')
     return Promise.resolve()

@@ -19,6 +19,8 @@ import {
   WifiOff,
   Check,
   CloudOff,
+  Calendar,
+  RefreshCw,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -29,7 +31,9 @@ import {
   useAttendanceSummary,
   useAttendanceRecords,
   useRecordBulkAttendance,
+  useUpdateAttendance,
   useCalendarDate,
+  useAttendanceOverview,
 } from '../../hooks/useAttendance'
 import { useSections, flattenSectionPages, useSectionRoster } from '../../hooks'
 import { useCurrentAcademicYear } from '../../hooks'
@@ -181,11 +185,14 @@ function SectionSelector({
   selectedId,
   onSelect,
   isLoading,
+  completedSectionIds,
 }: {
   sections: Array<{ sectionId: string; sectionNumber: string; courseName?: string; courseCode?: string }>
   selectedId: string | null
   onSelect: (id: string | null) => void
   isLoading: boolean
+  /** Task 4.1: Section IDs that have completed attendance today */
+  completedSectionIds?: Set<string>
 }) {
   return (
     <div className="relative">
@@ -198,6 +205,7 @@ function SectionSelector({
         <option value="">Select a section...</option>
         {sections.map((s) => (
           <option key={s.sectionId} value={s.sectionId}>
+            {completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}
             {s.courseName || s.courseCode || 'Section'} - {s.sectionNumber}
           </option>
         ))}
@@ -248,10 +256,11 @@ export function AttendanceModule() {
     enabled: !!selectedSectionId && !!schoolId,
   })
 
-  // Fetch daily summary
+  // Fetch daily summary (with academicYearId for enrollment-based totalStudents)
   const { data: summary, isLoading: summaryLoading } = useAttendanceSummary({
     schoolId,
     date: selectedDate,
+    academicYearId: currentYear?.yearId,
     enabled: !!schoolId,
   })
 
@@ -288,6 +297,51 @@ export function AttendanceModule() {
   // Bulk attendance mutation
   const bulkMutation = useRecordBulkAttendance()
 
+  // Task 4.6: Update attendance mutation for corrections
+  const updateMutation = useUpdateAttendance()
+
+  // Task 4.1: Fetch overview for section completion indicators
+  const { data: overviewData } = useAttendanceOverview({
+    schoolId,
+    academicYearId: currentYear?.yearId || '',
+    date: selectedDate,
+    enabled: !!schoolId && !!currentYear?.yearId && activeTab === 'daily-entry',
+  })
+
+  // Task 4.1: Build completed section IDs set
+  const completedSectionIds = useMemo(() => {
+    const ids = new Set<string>()
+    if (overviewData?.sectionCompletion?.sections) {
+      for (const s of overviewData.sectionCompletion.sections) {
+        if (s.isComplete) ids.add(s.sectionId)
+      }
+    }
+    return ids
+  }, [overviewData])
+
+  // Task 4.8: Compute previous day's date
+  const previousDate = useMemo(() => {
+    const d = new Date(selectedDate)
+    d.setDate(d.getDate() - 1)
+    return d.toISOString().split('T')[0]
+  }, [selectedDate])
+
+  // Task 4.8: Fetch previous day's attendance records (lazy — delay 2s)
+  const { data: previousDayAttendanceRecords } = useAttendanceRecords({
+    schoolId,
+    date: previousDate,
+    enabled: !!schoolId && !!selectedSectionId && activeTab === 'daily-entry',
+  })
+
+  // Task 4.8: Filter previous day records to section roster
+  const previousDayRecords = useMemo(() => {
+    if (!previousDayAttendanceRecords || !roster?.students) return undefined
+    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
+    return previousDayAttendanceRecords
+      .filter((r) => rosterStudentIds.has(r.studentId))
+      .map((r) => ({ studentId: r.studentId, status: r.status as AttendanceStatus }))
+  }, [previousDayAttendanceRecords, roster?.students])
+
   // Offline resilience (Sprint 5)
   const offlineState = useOfflineAttendance({
     schoolId,
@@ -317,21 +371,52 @@ export function AttendanceModule() {
     [schoolId, selectedSectionId, offlineState]
   )
 
+  // Task 4.6: Correction handler for past-date individual updates
+  const handleCorrection = useCallback(
+    (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => {
+      if (!schoolId) return
+      updateMutation.mutate({
+        date: selectedDate,
+        studentId: record.studentId,
+        status: record.status,
+        notes: record.notes,
+        excuseType: record.excuseType,
+        schoolId,
+      })
+    },
+    [schoolId, selectedDate, updateMutation]
+  )
+
   return (
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 pt-6 pb-0">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-              <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
+                <p className="text-text-secondary mt-0.5">
+                  Record and review attendance by class section
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
-              <p className="text-text-secondary mt-0.5">
-                Record and review attendance by class section
-              </p>
-            </div>
+            {/* Task 2.1: Academic Year Context Bar */}
+            {currentYear && (
+              <div className="flex items-center gap-4 text-xs text-text-tertiary">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>{currentYear.name || 'Academic Year'}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Controls Row (only for daily entry) */}
@@ -342,6 +427,7 @@ export function AttendanceModule() {
                 selectedId={selectedSectionId}
                 onSelect={setSelectedSectionId}
                 isLoading={sectionsLoading}
+                completedSectionIds={completedSectionIds}
               />
               <DateSelector
                 selectedDate={selectedDate}
@@ -424,6 +510,8 @@ export function AttendanceModule() {
                     isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
                     disabled={isNonInstructional}
                     saveStatus={offlineState.saveStatus}
+                    onCorrection={handleCorrection}
+                    previousDayRecords={previousDayRecords}
                   />
                 )}
               </div>
