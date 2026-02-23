@@ -8,7 +8,7 @@
  * Sprint 5 — Rostering & Attendance
  */
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ClipboardCheck,
@@ -230,6 +230,7 @@ export function AttendanceModule() {
   const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
   const dateActions = useAttendanceDateActions()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const exportPortalRef = useRef<HTMLDivElement>(null)
 
   // Fetch current academic year for sections query
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -404,19 +405,23 @@ export function AttendanceModule() {
                 </p>
               </div>
             </div>
-            {/* Task 2.1: Academic Year Context Bar */}
-            {currentYear && (
-              <div className="flex items-center gap-4 text-xs text-text-tertiary">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{currentYear.name || 'Academic Year'}</span>
+            {/* Task 2.1: Academic Year Context Bar + Export portal */}
+            <div className="flex items-center gap-4">
+              {currentYear && (
+                <div className="flex items-center gap-4 text-xs text-text-tertiary">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{currentYear.name || 'Academic Year'}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-              </div>
-            )}
+              )}
+              {/* Portal target for dashboard Export button */}
+              <div ref={exportPortalRef} />
+            </div>
           </div>
 
           {/* Controls Row (only for daily entry) */}
@@ -463,6 +468,7 @@ export function AttendanceModule() {
                 schoolId={schoolId}
                 academicYearId={currentYear?.yearId || ''}
                 currentDate={selectedDate}
+                exportPortalRef={exportPortalRef}
               />
             )}
 

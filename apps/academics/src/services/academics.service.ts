@@ -1380,13 +1380,12 @@ export async function getAttendanceAlerts(
   startDate: string,
   endDate: string,
 ): Promise<AttendanceAlert[]> {
-  return apiGet<AttendanceAlert[]>('/academics/attendance/alerts', {
-    schoolId,
-    academicYearId,
-    threshold,
-    startDate,
-    endDate,
-  })
+  const res = await apiGet<{ alerts: AttendanceAlert[]; totalAtRiskCount: number } | AttendanceAlert[]>(
+    '/academics/attendance/alerts',
+    { schoolId, academicYearId, threshold, startDate, endDate },
+  )
+  // Backend returns { alerts, totalAtRiskCount } — unwrap to array
+  return Array.isArray(res) ? res : res.alerts
 }
 
 // ============================================================================

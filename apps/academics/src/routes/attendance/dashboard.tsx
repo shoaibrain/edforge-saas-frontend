@@ -16,7 +16,8 @@
  *  - Loading skeletons for every section (2.9)
  */
 
-import { useState, useMemo, useCallback, useRef, useEffect, Component, type ReactNode, type ErrorInfo } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect, Component, type ReactNode, type ErrorInfo, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import {
   UserCheck,
   UserX,
@@ -64,6 +65,7 @@ interface AttendanceDashboardProps {
   schoolId: string
   academicYearId: string
   currentDate: string
+  exportPortalRef?: RefObject<HTMLDivElement | null>
 }
 
 type SortDir = 'asc' | 'desc'
@@ -139,34 +141,32 @@ function StatCard({
   trend?: { delta: number; direction: 'up' | 'down' | 'neutral' }
 }) {
   return (
-    <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-      <div className="flex items-center gap-3">
-        <div className={`p-2.5 rounded-lg ${bg}`}>
-          <Icon className={`w-5 h-5 ${accent}`} />
+    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-surface-primary border border-border-secondary min-w-0">
+      <div className={`p-1.5 rounded-md ${bg} shrink-0`}>
+        <Icon className={`w-4 h-4 ${accent}`} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] text-text-tertiary uppercase tracking-wide leading-tight">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <span className="text-lg font-bold text-text-primary leading-tight">{value}</span>
+          {trend && trend.direction !== 'neutral' && (
+            <span
+              className={`flex items-center gap-0.5 text-[10px] font-medium ${
+                trend.direction === 'up'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-red-600 dark:text-red-400'
+              }`}
+            >
+              {trend.direction === 'up' ? (
+                <TrendingUp className="w-2.5 h-2.5" />
+              ) : (
+                <TrendingDown className="w-2.5 h-2.5" />
+              )}
+              {Math.abs(trend.delta).toFixed(1)}%
+            </span>
+          )}
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs text-text-tertiary uppercase tracking-wide">{label}</p>
-          <div className="flex items-center gap-2">
-            <p className="text-2xl font-bold text-text-primary">{value}</p>
-            {trend && trend.direction !== 'neutral' && (
-              <span
-                className={`flex items-center gap-0.5 text-xs font-medium ${
-                  trend.direction === 'up'
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-red-600 dark:text-red-400'
-                }`}
-              >
-                {trend.direction === 'up' ? (
-                  <TrendingUp className="w-3 h-3" />
-                ) : (
-                  <TrendingDown className="w-3 h-3" />
-                )}
-                {Math.abs(trend.delta).toFixed(1)}%
-              </span>
-            )}
-          </div>
-          {subValue && <p className="text-xs text-text-secondary mt-0.5">{subValue}</p>}
-        </div>
+        {subValue && <p className="text-[10px] text-text-secondary leading-tight truncate">{subValue}</p>}
       </div>
     </div>
   )
@@ -178,18 +178,16 @@ function StatCard({
 
 function SkeletonStatCards() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="flex flex-wrap gap-2">
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
-          className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-surface-primary border border-border-secondary animate-pulse"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-surface-hover rounded-lg" />
-            <div className="space-y-2">
-              <div className="h-3 w-16 bg-surface-hover rounded" />
-              <div className="h-6 w-12 bg-surface-hover rounded" />
-            </div>
+          <div className="w-7 h-7 bg-surface-hover rounded-md" />
+          <div className="space-y-1">
+            <div className="h-2.5 w-12 bg-surface-hover rounded" />
+            <div className="h-4 w-8 bg-surface-hover rounded" />
           </div>
         </div>
       ))}
@@ -202,17 +200,6 @@ function SkeletonChart() {
     <div className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
       <div className="h-4 w-48 bg-surface-hover rounded mb-4" />
       <div className="h-64 bg-surface-hover rounded" />
-    </div>
-  )
-}
-
-function SkeletonDonut() {
-  return (
-    <div className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
-      <div className="h-4 w-40 bg-surface-hover rounded mb-4" />
-      <div className="flex items-center justify-center py-4">
-        <div className="w-40 h-40 rounded-full bg-surface-hover" />
-      </div>
     </div>
   )
 }
@@ -510,7 +497,7 @@ function AlertsTable({
   }
 
   return (
-    <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
+    <div className="bg-surface-primary rounded-xl border border-border-secondary p-4">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-500" />
@@ -522,7 +509,7 @@ function AlertsTable({
           </span>
         )}
       </div>
-      <p className="text-xs text-text-tertiary mb-4">Students below 90% attendance rate</p>
+      <p className="text-xs text-text-tertiary mb-3">Students below 90% attendance rate</p>
 
       {alerts.length === 0 ? (
         <div className="py-8 text-center">
@@ -845,27 +832,41 @@ function AbsenceBreakdown({
   totalAbsent: number
 }) {
   const categories = [
-    { label: 'Unexcused', count: breakdown.unexcused, color: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400' },
-    { label: 'Excused', count: breakdown.excused, color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' },
-    { label: 'Late', count: breakdown.late, color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' },
-    { label: 'Half Day', count: breakdown.halfDay, color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400' },
-    { label: 'Remote', count: breakdown.remote, color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400' },
+    { label: 'Unexcused', count: breakdown.unexcused, bar: 'bg-red-500', dot: 'bg-red-500' },
+    { label: 'Excused', count: breakdown.excused, bar: 'bg-blue-500', dot: 'bg-blue-500' },
+    { label: 'Late', count: breakdown.late, bar: 'bg-amber-500', dot: 'bg-amber-500' },
+    { label: 'Half Day', count: breakdown.halfDay, bar: 'bg-purple-500', dot: 'bg-purple-500' },
+    { label: 'Remote', count: breakdown.remote, bar: 'bg-indigo-500', dot: 'bg-indigo-500' },
   ]
+  const nonZero = categories.filter((c) => c.count > 0)
+
+  if (totalAbsent === 0) {
+    return <p className="text-xs text-text-tertiary">No absences recorded today.</p>
+  }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {categories.map((cat) => (
-        <span
-          key={cat.label}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${cat.color}`}
-        >
-          {cat.label}
-          <span className="font-bold">{cat.count}</span>
-          {totalAbsent > 0 && (
-            <span className="opacity-70">({((cat.count / totalAbsent) * 100).toFixed(0)}%)</span>
-          )}
-        </span>
-      ))}
+    <div className="space-y-2">
+      {/* Stacked bar */}
+      <div className="flex h-2.5 rounded-full overflow-hidden bg-surface-hover">
+        {nonZero.map((cat) => (
+          <div
+            key={cat.label}
+            className={`${cat.bar} transition-all`}
+            style={{ width: `${(cat.count / totalAbsent) * 100}%` }}
+            title={`${cat.label}: ${cat.count}`}
+          />
+        ))}
+      </div>
+      {/* Legend */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {nonZero.map((cat) => (
+          <span key={cat.label} className="inline-flex items-center gap-1.5 text-xs text-text-secondary">
+            <span className={`w-2 h-2 rounded-full ${cat.dot}`} />
+            {cat.label} <span className="font-semibold text-text-primary">{cat.count}</span>
+            <span className="text-text-tertiary">({((cat.count / totalAbsent) * 100).toFixed(0)}%)</span>
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
@@ -892,7 +893,6 @@ function DayOfWeekPattern({
   const range = maxRate - minRate || 1
 
   const getIntensity = (rate: number) => {
-    // Higher rate = greener; lower rate = redder
     const norm = (rate - minRate) / range
     if (norm >= 0.8) return 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
     if (norm >= 0.6) return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
@@ -902,17 +902,17 @@ function DayOfWeekPattern({
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-1.5">
       {days.map((day) => {
         const d = pattern[day]
         return (
           <div
             key={day}
-            className={`flex-1 rounded-lg px-3 py-2.5 text-center ${getIntensity(d.avgRate)} group relative`}
-            title={`${DAY_SHORT[day]}: ${d.avgRate.toFixed(1)}% avg rate, ${d.avgAbsent.toFixed(1)} avg absent`}
+            className={`flex-1 rounded-md px-1 py-1.5 text-center ${getIntensity(d.avgRate)}`}
+            title={`${DAY_SHORT[day]}: ${d.avgRate.toFixed(1)}% avg, ${d.avgAbsent.toFixed(1)} avg absent`}
           >
-            <p className="text-xs font-medium">{DAY_SHORT[day]}</p>
-            <p className="text-sm font-bold mt-0.5">{d.avgRate.toFixed(1)}%</p>
+            <p className="text-[10px] font-medium leading-tight">{DAY_SHORT[day]}</p>
+            <p className="text-xs font-bold leading-tight">{d.avgRate.toFixed(1)}%</p>
           </div>
         )
       })}
@@ -928,6 +928,7 @@ export function AttendanceDashboard({
   schoolId,
   academicYearId,
   currentDate,
+  exportPortalRef,
 }: AttendanceDashboardProps) {
   // Task 3.4: Student drill-down modal state
   const [selectedStudent, setSelectedStudent] = useState<{
@@ -999,76 +1000,107 @@ export function AttendanceDashboard({
   }
 
   return (
-    <div className="space-y-6">
-      {/* EXPORT DROPDOWN (Task 3.5) */}
-      <div className="flex justify-end">
-        <ExportDropdown data={data} schoolId={schoolId} />
-      </div>
+    <div className="space-y-4">
+      {/* EXPORT DROPDOWN — portaled into page header */}
+      {exportPortalRef?.current && data && createPortal(
+        <ExportDropdown data={data} schoolId={schoolId} />,
+        exportPortalRef.current,
+      )}
 
-      {/* STAT CARDS (Task 2.5) */}
+      {/* QUICK STATS + INSIGHTS — single cohesive card */}
       {isLoading ? (
         <SkeletonStatCards />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <StatCard
-            icon={UserCheck}
-            label="Present"
-            value={summary?.present ?? '--'}
-            subValue={summary ? `${summary.totalRecorded ?? summary.present} of ${summary.totalStudents} recorded` : undefined}
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
-          />
-          <StatCard
-            icon={UserX}
-            label="Absent"
-            value={summary?.absent ?? '--'}
-            subValue={summary ? pct(summary.absent) : undefined}
-            accent="text-red-600 dark:text-red-400"
-            bg="bg-red-500/10"
-          />
-          <StatCard
-            icon={Clock}
-            label="Late / Tardy"
-            value={summary?.late ?? '--'}
-            subValue={summary ? pct(summary.late) : undefined}
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
-          />
-          <StatCard
-            icon={ShieldCheck}
-            label="Excused"
-            value={summary?.excused ?? '--'}
-            subValue={summary ? pct(summary.excused) : undefined}
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
-          />
-          <StatCard
-            icon={Activity}
-            label="School Average"
-            value={data?.periodAverages ? `${data.periodAverages.academicYear.toFixed(1)}%` : '--'}
-            subValue={data?.periodAverages ? `7-day: ${data.periodAverages.last7Days.toFixed(1)}% · 30-day: ${data.periodAverages.last30Days.toFixed(1)}%` : undefined}
-            accent="text-teal-600 dark:text-teal-400"
-            bg="bg-teal-500/10"
-            trend={
-              trendDeltas
-                ? {
-                    delta: trendDeltas.presentDelta,
-                    direction: trendDeltas.presentDelta > 0.5 ? 'up' : trendDeltas.presentDelta < -0.5 ? 'down' : 'neutral',
-                  }
-                : undefined
-            }
-          />
+        <div className="bg-surface-primary rounded-xl border border-border-secondary p-4">
+          {/* Row 1: Stat cards */}
+          <div className="flex flex-wrap gap-2">
+            <StatCard
+              icon={UserCheck}
+              label="Present"
+              value={summary?.present ?? '--'}
+              subValue={summary ? `${summary.totalRecorded ?? summary.present} of ${summary.totalStudents} recorded` : undefined}
+              accent="text-emerald-600 dark:text-emerald-400"
+              bg="bg-emerald-500/10"
+            />
+            <StatCard
+              icon={UserX}
+              label="Absent"
+              value={summary?.absent ?? '--'}
+              subValue={summary ? pct(summary.absent) : undefined}
+              accent="text-red-600 dark:text-red-400"
+              bg="bg-red-500/10"
+            />
+            <StatCard
+              icon={Clock}
+              label="Late / Tardy"
+              value={summary?.late ?? '--'}
+              subValue={summary ? pct(summary.late) : undefined}
+              accent="text-amber-600 dark:text-amber-400"
+              bg="bg-amber-500/10"
+            />
+            <StatCard
+              icon={ShieldCheck}
+              label="Excused"
+              value={summary?.excused ?? '--'}
+              subValue={summary ? pct(summary.excused) : undefined}
+              accent="text-blue-600 dark:text-blue-400"
+              bg="bg-blue-500/10"
+            />
+            <StatCard
+              icon={Activity}
+              label="School Average"
+              value={data?.periodAverages ? `${data.periodAverages.academicYear.toFixed(1)}%` : '--'}
+              subValue={data?.periodAverages ? `7-day: ${data.periodAverages.last7Days.toFixed(1)}% · 30-day: ${data.periodAverages.last30Days.toFixed(1)}%` : undefined}
+              accent="text-teal-600 dark:text-teal-400"
+              bg="bg-teal-500/10"
+              trend={
+                trendDeltas
+                  ? {
+                      delta: trendDeltas.presentDelta,
+                      direction: trendDeltas.presentDelta > 0.5 ? 'up' : trendDeltas.presentDelta < -0.5 ? 'down' : 'neutral',
+                    }
+                  : undefined
+              }
+            />
+          </div>
+
+          {/* Row 2: Absence Breakdown + Day-of-Week Pattern */}
+          {data && (data.absenceBreakdown || (data.dayOfWeekPattern && Object.keys(data.dayOfWeekPattern).length > 0)) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-3 pt-3 border-t border-border-secondary">
+              {data.absenceBreakdown && (
+                <div>
+                  <h3 className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1.5">Today's Absence Breakdown</h3>
+                  <AbsenceBreakdown
+                    breakdown={data.absenceBreakdown}
+                    totalAbsent={
+                      data.absenceBreakdown.unexcused +
+                      data.absenceBreakdown.excused +
+                      data.absenceBreakdown.late +
+                      data.absenceBreakdown.halfDay +
+                      data.absenceBreakdown.remote
+                    }
+                  />
+                </div>
+              )}
+              {data.dayOfWeekPattern && Object.keys(data.dayOfWeekPattern).length > 0 && (
+                <div>
+                  <h3 className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-1.5">Day-of-Week Pattern</h3>
+                  <DayOfWeekPattern pattern={data.dayOfWeekPattern} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
       {/* TWO-COLUMN: GRADE TABLE + SECTION DONUT/TABLE */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* GRADE-LEVEL BREAKDOWN TABLE (Task 2.3) */}
         {isLoading ? (
           <SkeletonGradeTable />
         ) : (
-          <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-surface-primary rounded-xl border border-border-secondary p-4">
+            <div className="flex items-center gap-2 mb-2">
               <BarChart3 className="w-4 h-4 text-teal-500" />
               <h3 className="text-sm font-semibold text-text-primary">
                 Attendance by Grade Level
@@ -1116,49 +1148,40 @@ export function AttendanceDashboard({
           </div>
         )}
 
-        {/* SECTION COMPLETION (Tasks 2.4 + 2.6) */}
+        {/* SECTION COMPLETION (Tasks 2.4 + 2.6) — donut + table in one card */}
         {isLoading ? (
-          <div className="space-y-6">
-            <SkeletonDonut />
-            <SkeletonSectionTable />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Donut chart */}
-            {data?.sectionCompletion && (
-              <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="w-4 h-4 text-teal-500" />
-                  <h3 className="text-sm font-semibold text-text-primary">
-                    Section Completion
-                  </h3>
-                </div>
+          <SkeletonSectionTable />
+        ) : data?.sectionCompletion ? (
+          <div className="bg-surface-primary rounded-xl border border-border-secondary p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-teal-500" />
+              <h3 className="text-sm font-semibold text-text-primary">
+                Section Completion
+              </h3>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0">
                 <CompletionDonut
                   completed={data.sectionCompletion.sectionsWithAttendance}
                   total={data.sectionCompletion.totalSections}
                 />
               </div>
-            )}
-
-            {/* Section table */}
-            {data?.sectionCompletion?.sections && data.sectionCompletion.sections.length > 0 && (
-              <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-                <h3 className="text-sm font-semibold text-text-primary mb-3">
-                  Section Details
-                </h3>
-                <SectionCompletionTable sections={data.sectionCompletion.sections} />
-              </div>
-            )}
+              {data.sectionCompletion.sections.length > 0 && (
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <SectionCompletionTable sections={data.sectionCompletion.sections} />
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* 30-DAY TREND CHART (Task 3.1) */}
       {isLoading ? (
         <SkeletonChart />
       ) : (
-        <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="bg-surface-primary rounded-xl border border-border-secondary p-4">
+          <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-teal-500" />
             <h3 className="text-sm font-semibold text-text-primary">
               30-Day Attendance Rate
@@ -1166,12 +1189,12 @@ export function AttendanceDashboard({
           </div>
 
           {chartData.length === 0 ? (
-            <div className="h-64 flex items-center justify-center text-text-tertiary text-sm">
+            <div className="h-48 flex items-center justify-center text-text-tertiary text-sm">
               No trend data available for the selected period.
             </div>
           ) : (
             <ChartErrorBoundary>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                 <defs>
                   <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
@@ -1180,8 +1203,9 @@ export function AttendanceDashboard({
                   </linearGradient>
                 </defs>
                 <CartesianGrid
-                  strokeDasharray="3 3"
+                  strokeDasharray="4 8"
                   stroke="var(--color-border-secondary, #e5e7eb)"
+                  strokeOpacity={0.3}
                   vertical={false}
                 />
                 {/* Task 5.6: X-axis shows BS dates */}
@@ -1222,40 +1246,6 @@ export function AttendanceDashboard({
               </AreaChart>
             </ResponsiveContainer>
             </ChartErrorBoundary>
-          )}
-        </div>
-      )}
-
-      {/* ABSENCE BREAKDOWN + DAY-OF-WEEK PATTERN */}
-      {!isLoading && data && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Absence Breakdown (Task 2.7) */}
-          {data.absenceBreakdown && (
-            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <h3 className="text-sm font-semibold text-text-primary mb-3">
-                Today's Absence Breakdown
-              </h3>
-              <AbsenceBreakdown
-                breakdown={data.absenceBreakdown}
-                totalAbsent={
-                  data.absenceBreakdown.unexcused +
-                  data.absenceBreakdown.excused +
-                  data.absenceBreakdown.late +
-                  data.absenceBreakdown.halfDay +
-                  data.absenceBreakdown.remote
-                }
-              />
-            </div>
-          )}
-
-          {/* Day-of-Week Pattern (Task 2.8) */}
-          {data.dayOfWeekPattern && Object.keys(data.dayOfWeekPattern).length > 0 && (
-            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <h3 className="text-sm font-semibold text-text-primary mb-3">
-                Day-of-Week Pattern
-              </h3>
-              <DayOfWeekPattern pattern={data.dayOfWeekPattern} />
-            </div>
           )}
         </div>
       )}
