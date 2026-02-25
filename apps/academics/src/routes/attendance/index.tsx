@@ -8,7 +8,7 @@
  * Sprint 5 — Rostering & Attendance
  */
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePermission } from '@edforge/abac'
 import {
@@ -195,6 +195,21 @@ function SectionSelector({
   /** Task 4.1: Section IDs that have completed attendance today */
   completedSectionIds?: Set<string>
 }) {
+  // Auto-select first section when sections load and nothing is selected
+  useEffect(() => {
+    if (!selectedId && sections.length > 0 && sections.length <= 5) {
+      onSelect(sections[0].sectionId)
+    }
+  }, [sections, selectedId, onSelect])
+
+  if (!isLoading && sections.length === 0) {
+    return (
+      <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg max-w-xs">
+        No sections assigned. Contact your administrator.
+      </div>
+    )
+  }
+
   return (
     <div className="relative">
       <select

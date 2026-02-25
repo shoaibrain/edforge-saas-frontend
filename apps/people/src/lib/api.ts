@@ -98,9 +98,12 @@ api.interceptors.response.use(
         if (status === 403 && !isRedirecting) {
             const errorData = error.response?.data as Record<string, unknown> | undefined
             const message = (errorData?.message as string) || 'You don\'t have permission to perform this action'
+            const method = error.config?.method?.toUpperCase()
 
+            // Only toast on write operations (user explicitly took an action)
+            // For reads (GET), let the error bubble to the component for graceful degradation
             const meta = (error.config as any)?.meta as { gracefulDegradation?: boolean } | undefined
-            if (!meta?.gracefulDegradation) {
+            if (!meta?.gracefulDegradation && method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
                 toast.error('Access Denied', { description: message })
             }
         }

@@ -325,10 +325,12 @@ export async function getStudents(
 
 /**
  * Get student by ID
- * GET /academics/students/:id
+ * GET /academics/students/:id?schoolId=
  */
-export async function getStudent(studentId: string): Promise<StudentResponseDto> {
-  return apiGet<StudentResponseDto>(`/academics/students/${studentId}`)
+export async function getStudent(studentId: string, schoolId?: string): Promise<StudentResponseDto> {
+  const params: Record<string, unknown> = {}
+  if (schoolId) params.schoolId = schoolId
+  return apiGet<StudentResponseDto>(`/academics/students/${studentId}`, params)
 }
 
 /**
@@ -344,13 +346,17 @@ export async function getStudentProfile(studentId: string, schoolId?: string): P
 
 /**
  * Update student
- * PATCH /academics/students/:id
+ * PATCH /academics/students/:id?schoolId=
  */
 export async function updateStudent(
   studentId: string,
-  data: UpdateStudentDto
+  data: UpdateStudentDto,
+  schoolId?: string,
 ): Promise<StudentResponseDto> {
-  return apiPatch<StudentResponseDto>(`/academics/students/${studentId}`, data)
+  const url = schoolId
+    ? `/academics/students/${studentId}?schoolId=${schoolId}`
+    : `/academics/students/${studentId}`
+  return apiPatch<StudentResponseDto>(url, data)
 }
 
 /**
@@ -365,10 +371,13 @@ export async function createStudent(
 
 /**
  * Delete student
- * DELETE /academics/students/:id
+ * DELETE /academics/students/:id?schoolId=
  */
-export async function deleteStudent(studentId: string): Promise<void> {
-  return apiDelete(`/academics/students/${studentId}`)
+export async function deleteStudent(studentId: string, schoolId?: string): Promise<void> {
+  const url = schoolId
+    ? `/academics/students/${studentId}?schoolId=${schoolId}`
+    : `/academics/students/${studentId}`
+  return apiDelete(url)
 }
 
 // ============================================================================
@@ -773,13 +782,14 @@ export async function getAttendanceSummary(
 
 /**
  * Get student attendance history
- * GET /academics/attendance/student/:id?startDate=&endDate=
+ * GET /academics/attendance/student/:id?schoolId=&startDate=&endDate=
  */
 export async function getStudentAttendance(
   studentId: string,
-  params?: { startDate?: string; endDate?: string }
+  params?: { schoolId?: string; startDate?: string; endDate?: string }
 ): Promise<AttendanceRecord[]> {
   const queryParams: Record<string, unknown> = {}
+  if (params?.schoolId) queryParams.schoolId = params.schoolId
   if (params?.startDate) queryParams.startDate = params.startDate
   if (params?.endDate) queryParams.endDate = params.endDate
   return apiGet<AttendanceRecord[]>(`/academics/attendance/student/${studentId}`, queryParams)
@@ -787,12 +797,15 @@ export async function getStudentAttendance(
 
 /**
  * Get student attendance summary (rate + counts)
- * GET /academics/attendance/student/:id/summary
+ * GET /academics/attendance/student/:id/summary?schoolId=
  */
 export async function getStudentAttendanceSummary(
-  studentId: string
+  studentId: string,
+  schoolId?: string,
 ): Promise<StudentAttendanceSummary> {
-  return apiGet<StudentAttendanceSummary>(`/academics/attendance/student/${studentId}/summary`)
+  const params: Record<string, string> = {}
+  if (schoolId) params.schoolId = schoolId
+  return apiGet<StudentAttendanceSummary>(`/academics/attendance/student/${studentId}/summary`, params)
 }
 
 /**
@@ -802,9 +815,13 @@ export async function getStudentAttendanceSummary(
 export async function updateAttendance(
   date: string,
   studentId: string,
-  data: { status: AttendanceStatus; notes?: string }
+  data: { status: AttendanceStatus; notes?: string },
+  schoolId?: string,
 ): Promise<AttendanceRecord> {
-  return apiPatch<AttendanceRecord>(`/academics/attendance/${date}/${studentId}`, data)
+  const url = schoolId
+    ? `/academics/attendance/${date}/${studentId}?schoolId=${schoolId}`
+    : `/academics/attendance/${date}/${studentId}`
+  return apiPatch<AttendanceRecord>(url, data)
 }
 
 // ============================================================================
@@ -1144,21 +1161,24 @@ export async function getGradeOverview(
 
 /**
  * Get student's grades
- * GET /academics/students/:id/grades?academicYearId=&termId=
+ * GET /academics/students/:id/grades?schoolId=&academicYearId=&termId=
  */
 export async function getStudentGrades(
   studentId: string,
-  params?: { academicYearId?: string; termId?: string }
+  params?: { schoolId?: string; academicYearId?: string; termId?: string }
 ): Promise<StudentGradesResponse> {
   return apiGet<StudentGradesResponse>(`/academics/students/${studentId}/grades`, params)
 }
 
 /**
  * Finalize a grade (lock it)
- * PATCH /academics/grades/:gradeId/finalize
+ * PATCH /academics/grades/:gradeId/finalize?schoolId=
  */
-export async function finalizeGrade(gradeId: string): Promise<void> {
-  return apiPatch(`/academics/grades/${gradeId}/finalize`, {})
+export async function finalizeGrade(gradeId: string, schoolId?: string): Promise<void> {
+  const url = schoolId
+    ? `/academics/grades/${gradeId}/finalize?schoolId=${schoolId}`
+    : `/academics/grades/${gradeId}/finalize`
+  return apiPatch(url, {})
 }
 
 /**

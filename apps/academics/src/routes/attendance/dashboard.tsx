@@ -52,6 +52,7 @@ import {
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { StudentAttendanceModal } from '../../components/attendance/StudentAttendanceModal'
 import { toBSString, toBSShort, BS_MONTH_NAMES, adToBS } from '../../lib/bikram-sambat'
+import { usePermission } from '@edforge/abac'
 import type {
   AttendanceAlert,
   AttendanceOverviewResponse,
@@ -936,6 +937,9 @@ export function AttendanceDashboard({
     studentName: string
   } | null>(null)
 
+  // Scope indicator: manage = school-wide (principal/VP), otherwise = teacher's sections
+  const isSchoolWide = usePermission('manage', 'attendance')
+
   // Single aggregate data source (Task 2.2)
   const {
     data,
@@ -1012,6 +1016,14 @@ export function AttendanceDashboard({
         <SkeletonStatCards />
       ) : (
         <div className="bg-surface-primary rounded-xl border border-border-secondary p-4">
+          {/* Scope indicator */}
+          {!isSchoolWide && summary && (
+            <div className="mb-3 pb-3 border-b border-border-secondary">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-500/10 rounded-full">
+                Showing data for your sections ({summary.totalStudents} students)
+              </span>
+            </div>
+          )}
           {/* Row 1: Stat cards */}
           <div className="flex flex-wrap gap-2">
             <StatCard

@@ -162,7 +162,7 @@ export function useSectionGrades(
 
 export function useStudentGrades(
   studentId: string,
-  params?: { academicYearId?: string; termId?: string },
+  params?: { schoolId?: string; academicYearId?: string; termId?: string },
   enabled = true
 ) {
   return useQuery<StudentGradesResponse, Error>({

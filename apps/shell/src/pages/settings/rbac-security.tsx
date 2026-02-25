@@ -265,7 +265,7 @@ export default function RBACSecurityPage() {
   }
 
   const hasPermission = can(user, {
-    action: 'view',
+    action: 'manage',
     resource: 'settings',
     schoolId: activeSchoolId ?? undefined,
   })

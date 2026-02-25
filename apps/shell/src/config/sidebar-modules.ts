@@ -459,7 +459,7 @@ const settingsModule: ModuleConfig = {
           label: 'RBAC Security',
           icon: BrickWallShield,
           href: '/settings/security-policies',
-          permission: { action: 'view', resource: 'settings' },
+          permission: { action: 'manage', resource: 'settings' },
         },
         // [MVP-PARKED] Billing, Integrations, Import/Export — not needed for MVP pilot schools
         // {

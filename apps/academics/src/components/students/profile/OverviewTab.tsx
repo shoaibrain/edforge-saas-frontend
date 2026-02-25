@@ -33,6 +33,7 @@ import {
   ExternalLink,
   BarChart3,
   Target,
+  Lock,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
@@ -49,6 +50,25 @@ export interface OverviewTabProps {
 }
 
 type Classroom = NonNullable<StudentProfileResponseDto['classrooms']>[number]
+
+// ============================================================================
+// PERMISSION ERROR HELPERS
+// ============================================================================
+
+function is403Error(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const axiosError = error as { response?: { status?: number } }
+  return axiosError.response?.status === 403
+}
+
+function AccessRestricted({ label }: { label: string }) {
+  return (
+    <div className="py-6 text-center rounded-xl border border-border-secondary bg-surface-secondary/30">
+      <Lock className="w-6 h-6 mx-auto text-text-tertiary mb-2" />
+      <p className="text-sm text-text-secondary">No {label} available for your assigned sections</p>
+    </div>
+  )
+}
 
 // ============================================================================
 // COLOR HELPERS
@@ -177,7 +197,7 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
   }, [])
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
 
-  const { data: records, isLoading } = useStudentAttendance({
+  const { data: records, isLoading, error: trendError } = useStudentAttendance({
     studentId,
     startDate: thirtyDaysAgo,
     endDate: today,
@@ -207,6 +227,10 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
 
   if (isLoading) {
     return <div className="h-[160px] bg-surface-secondary rounded-xl animate-pulse" />
+  }
+
+  if (is403Error(trendError)) {
+    return <AccessRestricted label="attendance data" />
   }
 
   if (chartData.length === 0) {
@@ -434,16 +458,17 @@ export function OverviewTab({ student }: OverviewTabProps) {
   const classrooms = student.classrooms || []
   const schoolId = useActiveSchoolId() || ''
 
-  const { data: liveAttendance } = useStudentAttendanceSummary({
+  const { data: liveAttendance, error: attendanceError } = useStudentAttendanceSummary({
     studentId: student.studentId,
+    schoolId,
     enabled: !!student.studentId,
   })
 
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
 
-  const { data: gradesData, isLoading: gradesLoading } = useStudentGrades(
+  const { data: gradesData, isLoading: gradesLoading, error: gradesError } = useStudentGrades(
     student.studentId,
-    { academicYearId: currentYear?.yearId },
+    { schoolId, academicYearId: currentYear?.yearId },
     !!student.studentId,
   )
 
@@ -458,7 +483,8 @@ export function OverviewTab({ student }: OverviewTabProps) {
       }
     : student.attendanceSummary
 
-  const hasNoData = classrooms.length === 0 && !effectiveSummary
+  const hasPermissionError = is403Error(attendanceError) || is403Error(gradesError)
+  const hasNoData = classrooms.length === 0 && !effectiveSummary && !hasPermissionError
 
   const attendanceRate = effectiveSummary?.attendanceRate
   const rateTheme = attendanceRate != null ? getRateTheme(attendanceRate) : null
@@ -555,7 +581,17 @@ export function OverviewTab({ student }: OverviewTabProps) {
 
       {/* Course Performance + Classes — side by side on large screens */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CoursePerformanceChart grades={grades} />
+        {is403Error(gradesError) ? (
+          <section>
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
+              <BarChart3 className="w-4 h-4 text-blue-500" />
+              Course Performance
+            </h3>
+            <AccessRestricted label="grade data" />
+          </section>
+        ) : (
+          <CoursePerformanceChart grades={grades} />
+        )}
         <ClassesList classrooms={classrooms} />
       </div>
     </div>

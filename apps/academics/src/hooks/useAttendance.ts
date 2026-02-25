@@ -156,6 +156,7 @@ export function useStudentAttendance({
 
 interface UseStudentAttendanceSummaryOptions {
   studentId: string
+  schoolId?: string
   enabled?: boolean
 }
 
@@ -164,11 +165,12 @@ interface UseStudentAttendanceSummaryOptions {
  */
 export function useStudentAttendanceSummary({
   studentId,
+  schoolId,
   enabled = true,
 }: UseStudentAttendanceSummaryOptions) {
   return useQuery<StudentAttendanceSummary, Error>({
     queryKey: attendanceKeys.studentSummary(studentId),
-    queryFn: () => getStudentAttendanceSummary(studentId),
+    queryFn: () => getStudentAttendanceSummary(studentId, schoolId),
     enabled: enabled && !!studentId,
     staleTime: 2 * 60 * 1000,
   })
@@ -254,8 +256,8 @@ export function useUpdateAttendance() {
     Error,
     { date: string; studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string; schoolId: string; expectedVersion?: number }
   >({
-    mutationFn: ({ date, studentId, status, notes, excuseType, expectedVersion }) =>
-      updateAttendance(date, studentId, { status, notes, excuseType, expectedVersion } as any),
+    mutationFn: ({ date, studentId, status, notes, excuseType, expectedVersion, schoolId }) =>
+      updateAttendance(date, studentId, { status, notes, excuseType, expectedVersion } as any, schoolId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: attendanceKeys.summary(variables.schoolId, variables.date),
