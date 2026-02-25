@@ -12,6 +12,7 @@ import {
   ArrowRightLeft,
   Users,
   X,
+  UserX,
 } from 'lucide-react'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
 import { useDebounce } from '../../hooks'
@@ -33,6 +34,7 @@ interface EnrollmentTableProps {
   onStatusChange: (status: string | null) => void
   onWithdraw?: (enrollment: EnrollmentResponseDto) => void
   onTransfer?: (enrollment: EnrollmentResponseDto) => void
+  onMarkNoShow?: (enrollment: EnrollmentResponseDto) => void
 }
 
 const gradeLevels = [
@@ -67,10 +69,12 @@ function ActionMenu({
   enrollment,
   onWithdraw,
   onTransfer,
+  onMarkNoShow,
 }: {
   enrollment: EnrollmentResponseDto
   onWithdraw: () => void
   onTransfer: () => void
+  onMarkNoShow?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const isActive = enrollment.status === 'enrolled' || enrollment.status === 'active' || enrollment.status === 'pending'
@@ -106,6 +110,16 @@ function ActionMenu({
               <ArrowRightLeft className="w-4 h-4 text-blue-500" />
               Transfer
             </button>
+            {onMarkNoShow && (
+              <button
+                type="button"
+                onClick={() => { onMarkNoShow(); setOpen(false) }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              >
+                <UserX className="w-4 h-4 text-orange-500" />
+                Mark No-Show
+              </button>
+            )}
           </div>
         </>
       )}
@@ -130,6 +144,7 @@ export function EnrollmentTable({
   onStatusChange,
   onWithdraw,
   onTransfer,
+  onMarkNoShow,
 }: EnrollmentTableProps) {
   // Client-side search filter
   const debouncedSearch = useDebounce(searchTerm, 300)
@@ -241,10 +256,11 @@ export function EnrollmentTable({
                     {enrollment.enrollmentType || '—'}
                   </td>
                   <td className="px-4 py-3">
-                    {(onWithdraw || onTransfer) && <ActionMenu
+                    {(onWithdraw || onTransfer || onMarkNoShow) && <ActionMenu
                       enrollment={enrollment}
                       onWithdraw={() => onWithdraw?.(enrollment)}
                       onTransfer={() => onTransfer?.(enrollment)}
+                      onMarkNoShow={onMarkNoShow ? () => onMarkNoShow(enrollment) : undefined}
                     />}
                   </td>
                 </tr>

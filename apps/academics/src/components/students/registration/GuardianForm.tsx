@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDown,
@@ -30,6 +31,10 @@ interface GuardianFormProps {
 export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const prefix = `guardians.${index}`
+
+  // Watch portal access to conditionally require email
+  const { watch } = useFormContext()
+  const hasPortalAccess = watch(`${prefix}.hasPortalAccess`) as boolean
 
   return (
     <div className="rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-primary))] overflow-hidden">
@@ -111,6 +116,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                   label="Email"
                   type="email"
                   placeholder="email@example.com"
+                  required={hasPortalAccess}
                 />
                 <PhoneField
                   name={`${prefix}.phone`}

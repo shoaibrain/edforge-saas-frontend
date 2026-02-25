@@ -300,8 +300,6 @@ export function ReviewStep({ data }: WizardStepProps) {
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
-          <DataField label="IEP" value={medicalInfo.hasIEP ? 'Yes' : 'No'} />
-          <DataField label="504 Plan" value={medicalInfo.has504Plan ? 'Yes' : 'No'} />
           <DataField label="Physician" value={display(medicalInfo.physicianName)} />
           <DataField label="Ethnicity" value={display(data.ethnicity)} />
           <DataField label="Primary Language" value={display(data.primaryLanguage)} />

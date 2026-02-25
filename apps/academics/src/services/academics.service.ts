@@ -937,6 +937,44 @@ export async function transferStudent(
   )
 }
 
+/**
+ * Mark an enrollment as no-show
+ * POST /academics/schools/:schoolId/years/:yearId/students/:studentId/no-show
+ */
+export async function markNoShow(
+  schoolId: string,
+  yearId: string,
+  studentId: string,
+): Promise<EnrollmentResponseDto> {
+  return apiPost(
+    `/academics/schools/${schoolId}/years/${yearId}/students/${studentId}/no-show`,
+    {}
+  )
+}
+
+/**
+ * Close all open enrollments for a completed academic year
+ * POST /academics/schools/:schoolId/years/:yearId/enrollments/close-year
+ */
+export async function closeAcademicYearEnrollments(
+  schoolId: string,
+  yearId: string,
+  lastDayOfSchool: string,
+): Promise<{ closed: number; alreadyClosed: number; errors: number }> {
+  return apiPost(
+    `/academics/schools/${schoolId}/years/${yearId}/enrollments/close-year`,
+    { lastDayOfSchool }
+  )
+}
+
+/**
+ * Export enrollments as CSV file download
+ * GET /academics/schools/:schoolId/years/:yearId/enrollments/export
+ */
+export function getEnrollmentExportUrl(schoolId: string, yearId: string): string {
+  return `/academics/schools/${schoolId}/years/${yearId}/enrollments/export`
+}
+
 // ============================================================================
 // GRADING POLICY & GRADE TYPES (from @aibrains/shared-types)
 // ============================================================================
@@ -1425,6 +1463,50 @@ export async function getAttendanceOverview(
 }
 
 // ============================================================================
+// PARENT PORTAL ACCESS
+// ============================================================================
+
+/**
+ * Create a parent portal account via Identity service
+ */
+export async function createParentAccount(data: {
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  schoolId: string
+  studentId: string
+  guardianId?: string
+}): Promise<{ userId: string; email: string; schoolRole: string }> {
+  return apiPost('/identity/users/parent-accounts', data)
+}
+
+/**
+ * Create a student portal account via Identity service
+ */
+export async function createStudentAccount(data: {
+  email: string
+  firstName: string
+  lastName: string
+  schoolId: string
+  studentId: string
+}): Promise<{ userId: string; email: string; schoolRole: string }> {
+  return apiPost('/identity/users/student-accounts', data)
+}
+
+/**
+ * Link a guardian record to a user account (portal access)
+ */
+export async function linkGuardianToUser(
+  studentId: string,
+  data: { userId: string; guardianId?: string; guardianEmail: string },
+  schoolId?: string
+): Promise<{ linked: boolean }> {
+  const qs = schoolId ? `?schoolId=${schoolId}` : ''
+  return apiPost(`/academics/students/${studentId}/link-guardian${qs}`, data)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -1442,6 +1524,9 @@ export const academicsService = {
   getEnrollmentSummary,
   withdrawStudent,
   transferStudent,
+  markNoShow,
+  closeAcademicYearEnrollments,
+  getEnrollmentExportUrl,
   // Course CRUD
   getCourses,
   getCourse,
@@ -1495,4 +1580,8 @@ export const academicsService = {
   // Attendance Trend & Alerts (Sprint 5)
   getAttendanceTrend,
   getAttendanceAlerts,
+  // Portal Access
+  createParentAccount,
+  createStudentAccount,
+  linkGuardianToUser,
 }

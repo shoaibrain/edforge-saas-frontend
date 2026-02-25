@@ -17,6 +17,8 @@ import {
   getEnrollmentSummary,
   withdrawStudent,
   transferStudent,
+  markNoShow,
+  closeAcademicYearEnrollments,
   parseApiError,
   type EnrollmentListResponse,
   type EnrollmentSummaryResponse,
@@ -159,6 +161,62 @@ export function useTransferStudent() {
         queryKey: enrollmentKeys.summary(variables.schoolId, variables.yearId),
       })
       toast.success('Student transferred successfully')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// MARK NO-SHOW
+// ============================================================================
+
+export function useMarkNoShow() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    EnrollmentResponseDto,
+    Error,
+    { schoolId: string; yearId: string; studentId: string }
+  >({
+    mutationFn: ({ schoolId, yearId, studentId }) =>
+      markNoShow(schoolId, yearId, studentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() })
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.summary(variables.schoolId, variables.yearId),
+      })
+      toast.success('Student marked as no-show')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// CLOSE ACADEMIC YEAR ENROLLMENTS
+// ============================================================================
+
+export function useCloseAcademicYear() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    { closed: number; alreadyClosed: number; errors: number },
+    Error,
+    { schoolId: string; yearId: string; lastDayOfSchool: string }
+  >({
+    mutationFn: ({ schoolId, yearId, lastDayOfSchool }) =>
+      closeAcademicYearEnrollments(schoolId, yearId, lastDayOfSchool),
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() })
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.summary(variables.schoolId, variables.yearId),
+      })
+      toast.success(`Year-end closure complete: ${result.closed} enrollments closed`)
     },
     onError: (error) => {
       const parsed = parseApiError(error)

@@ -23,6 +23,9 @@ import {
   createEnrollment,
   checkDuplicateStudents,
   importStudentsCsv,
+  createParentAccount,
+  createStudentAccount,
+  linkGuardianToUser,
   parseApiError,
   type StudentFilterDto,
   type StudentResponseDto,
@@ -317,6 +320,102 @@ export function useImportStudentsCsv() {
       if (result.errors.length > 0) {
         toast.warning(`${result.errors.length} row${result.errors.length !== 1 ? 's' : ''} had errors`)
       }
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// GRANT PORTAL ACCESS (Parent Account)
+// ============================================================================
+
+interface GrantPortalAccessParams {
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  schoolId: string
+  studentId: string
+  guardianId?: string
+}
+
+/**
+ * Hook to create a parent portal account and link to guardian.
+ * Two-step: (1) create parent account in Identity, (2) link guardian in Academics.
+ */
+export function useGrantPortalAccess() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    { userId: string; email: string },
+    Error,
+    GrantPortalAccessParams
+  >({
+    mutationFn: async (params) => {
+      // Step 1: Create parent account
+      const result = await createParentAccount(params)
+
+      // Step 2: Link guardian to the new user
+      await linkGuardianToUser(
+        params.studentId,
+        {
+          userId: result.userId,
+          guardianId: params.guardianId,
+          guardianEmail: params.email,
+        },
+        params.schoolId,
+      )
+
+      return { userId: result.userId, email: result.email }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: studentKeys.profile(variables.studentId),
+      })
+      toast.success('Parent portal account created successfully')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// CREATE STUDENT PORTAL ACCOUNT
+// ============================================================================
+
+interface CreateStudentAccountParams {
+  email: string
+  firstName: string
+  lastName: string
+  schoolId: string
+  studentId: string
+}
+
+/**
+ * Hook to create a student portal account.
+ */
+export function useCreateStudentAccount() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    { userId: string; email: string },
+    Error,
+    CreateStudentAccountParams
+  >({
+    mutationFn: async (params) => {
+      const result = await createStudentAccount(params)
+      return { userId: result.userId, email: result.email }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: studentKeys.profile(variables.studentId),
+      })
+      toast.success('Student portal account created successfully')
     },
     onError: (error) => {
       const parsed = parseApiError(error)

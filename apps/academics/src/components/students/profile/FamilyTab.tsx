@@ -12,11 +12,13 @@ import {
   Mail,
   Shield,
   UserCheck,
+  KeyRound,
   AlertTriangle,
   Plus,
   ChevronDown,
   ChevronUp,
   Briefcase,
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
@@ -29,6 +31,8 @@ export interface FamilyTabProps {
   student: StudentProfileResponseDto
   onAddGuardian?: () => void
   onEditGuardian?: (guardianId: string) => void
+  onGrantPortalAccess?: (guardian: NonNullable<StudentProfileResponseDto['guardians']>[number]) => void
+  isGrantingAccess?: boolean
   canEdit?: boolean
 }
 
@@ -57,10 +61,14 @@ const relationshipLabels: Record<string, string> = {
 function GuardianRow({
   guardian,
   onEdit,
+  onGrantAccess,
+  isGrantingAccess,
   canEdit,
 }: {
   guardian: Guardian
   onEdit?: () => void
+  onGrantAccess?: () => void
+  isGrantingAccess?: boolean
   canEdit?: boolean
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -169,11 +177,28 @@ function GuardianRow({
               </p>
             </div>
           )}
-          {canEdit && onEdit && (
-            <div className="sm:col-span-2">
-              <Button variant="ghost" size="sm" onClick={onEdit} className="mt-1">
-                Edit Guardian
-              </Button>
+          {canEdit && (
+            <div className="sm:col-span-2 flex items-center gap-2 mt-1">
+              {onEdit && (
+                <Button variant="ghost" size="sm" onClick={onEdit}>
+                  Edit Guardian
+                </Button>
+              )}
+              {onGrantAccess && !guardian.hasPortalAccess && guardian.email && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onGrantAccess}
+                  disabled={isGrantingAccess}
+                >
+                  {isGrantingAccess ? (
+                    <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <KeyRound className="w-3.5 h-3.5 mr-1" />
+                  )}
+                  Grant Portal Access
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -215,6 +240,8 @@ export function FamilyTab({
   student,
   onAddGuardian,
   onEditGuardian,
+  onGrantPortalAccess,
+  isGrantingAccess,
   canEdit = true,
 }: FamilyTabProps) {
   const guardians = student.guardians || []
@@ -277,6 +304,12 @@ export function FamilyTab({
                     ? () => onEditGuardian?.(guardian.guardianId!)
                     : undefined
                 }
+                onGrantAccess={
+                  onGrantPortalAccess
+                    ? () => onGrantPortalAccess(guardian)
+                    : undefined
+                }
+                isGrantingAccess={isGrantingAccess}
                 canEdit={canEdit}
               />
             ))}

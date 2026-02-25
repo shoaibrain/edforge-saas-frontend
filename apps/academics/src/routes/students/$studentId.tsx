@@ -24,7 +24,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { useStudentProfile, useStudentProfileActions } from '../../hooks'
+import { useStudentProfile, useStudentProfileActions, useGrantPortalAccess } from '../../hooks'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { NotFound, PermissionDenied } from '../../components/common'
 import {
@@ -136,6 +136,7 @@ export function StudentProfilePage() {
 
   // Actions hook — must be called before any conditional returns (Rules of Hooks)
   const actions = useStudentProfileActions()
+  const grantPortalAccess = useGrantPortalAccess()
 
   // Validate UUID format
   const isValidId = isValidUUID(studentId)
@@ -268,6 +269,23 @@ export function StudentProfilePage() {
                   student={student}
                   onAddGuardian={canEdit ? actions.openAddGuardian : undefined}
                   onEditGuardian={canEdit ? actions.openEditGuardian : undefined}
+                  onGrantPortalAccess={
+                    canEdit
+                      ? (guardian) => {
+                          if (!guardian.email || !schoolId) return
+                          grantPortalAccess.mutate({
+                            email: guardian.email,
+                            firstName: guardian.firstName,
+                            lastName: guardian.lastName,
+                            phone: guardian.phone,
+                            schoolId,
+                            studentId: student.studentId,
+                            guardianId: guardian.guardianId,
+                          })
+                        }
+                      : undefined
+                  }
+                  isGrantingAccess={grantPortalAccess.isPending}
                   canEdit={canEdit}
                 />
               )}

@@ -5,7 +5,7 @@
  * Supports step navigation, validation, and data persistence.
  */
 
-import { createContext, useContext, useCallback, useMemo, useState } from 'react'
+import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ZodError } from 'zod'
 
 // ============================================================================
@@ -44,13 +44,42 @@ export function WizardProvider({
   steps,
   initialData = {},
   onSubmit,
+  autoSaveKey,
   children,
 }: WizardProviderProps) {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [formData, setFormData] = useState<Record<string, unknown>>(initialData)
+  // Restore from auto-save on initial mount
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (!autoSaveKey) return 0
+    try {
+      const saved = localStorage.getItem(autoSaveKey)
+      if (saved) return JSON.parse(saved).step ?? 0
+    } catch { /* ignore */ }
+    return 0
+  })
+  const [formData, setFormData] = useState<Record<string, unknown>>(() => {
+    if (!autoSaveKey) return initialData
+    try {
+      const saved = localStorage.getItem(autoSaveKey)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return { ...initialData, ...parsed.data }
+      }
+    } catch { /* ignore */ }
+    return initialData
+  })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
+
+  // Auto-save to localStorage when formData or currentStep changes
+  const autoSaveRef = useRef(autoSaveKey)
+  autoSaveRef.current = autoSaveKey
+  useEffect(() => {
+    if (!autoSaveRef.current) return
+    try {
+      localStorage.setItem(autoSaveRef.current, JSON.stringify({ step: currentStep, data: formData }))
+    } catch { /* ignore quota errors */ }
+  }, [formData, currentStep])
 
   const currentStepData = steps[currentStep]
 
@@ -85,7 +114,7 @@ export function WizardProvider({
     setCompletedSteps((prev) => new Set([...prev, currentStep]))
 
     if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1)
+      setCurrentStep((prev: number) => prev + 1)
       setErrors({})
     }
 
@@ -95,7 +124,7 @@ export function WizardProvider({
   // Go to previous step
   const goToBack = useCallback(() => {
     if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1)
+      setCurrentStep((prev: number) => prev - 1)
       setErrors({})
     }
   }, [currentStep])
@@ -108,9 +137,34 @@ export function WizardProvider({
     }
   }, [steps.length])
 
-  // Update form data
+  // Update form data (deep merge for nested objects to prevent data loss)
   const updateData = useCallback((data: Record<string, unknown>) => {
-    setFormData((prev) => ({ ...prev, ...data }))
+    setFormData((prev) => {
+      const merged = { ...prev }
+      for (const key of Object.keys(data)) {
+        const incoming = data[key]
+        const existing = prev[key]
+        // Deep merge plain objects (not arrays, dates, or null)
+        if (
+          incoming != null &&
+          existing != null &&
+          typeof incoming === 'object' &&
+          typeof existing === 'object' &&
+          !Array.isArray(incoming) &&
+          !Array.isArray(existing) &&
+          !(incoming instanceof Date) &&
+          !(existing instanceof Date)
+        ) {
+          merged[key] = {
+            ...(existing as Record<string, unknown>),
+            ...(incoming as Record<string, unknown>),
+          }
+        } else {
+          merged[key] = incoming
+        }
+      }
+      return merged
+    })
   }, [])
 
   // Submit wizard
@@ -127,10 +181,14 @@ export function WizardProvider({
     setIsSubmitting(true)
     try {
       await onSubmit(formData)
+      // Clear auto-save on successful submit
+      if (autoSaveKey) {
+        try { localStorage.removeItem(autoSaveKey) } catch { /* ignore */ }
+      }
     } finally {
       setIsSubmitting(false)
     }
-  }, [steps.length, validateStep, onSubmit, formData])
+  }, [steps.length, validateStep, onSubmit, formData, autoSaveKey])
 
   // Clear specific error
   const clearError = useCallback((field: string) => {
@@ -147,7 +205,11 @@ export function WizardProvider({
     setFormData(initialData)
     setErrors({})
     setCompletedSteps(new Set())
-  }, [initialData])
+    // Clear auto-save
+    if (autoSaveKey) {
+      try { localStorage.removeItem(autoSaveKey) } catch { /* ignore */ }
+    }
+  }, [initialData, autoSaveKey])
 
   // Get step status
   const getStepStatus = useCallback((index: number): WizardStepStatus => {

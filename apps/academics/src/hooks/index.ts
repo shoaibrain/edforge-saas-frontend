@@ -11,6 +11,8 @@ export {
   useCreateEnrollment,
   useUpdateStudent,
   useDeleteStudent,
+  useGrantPortalAccess,
+  useCreateStudentAccount,
   flattenStudentPages,
   getTotalFromPages,
   studentKeys,
@@ -87,6 +89,8 @@ export {
   useEnrollmentSummary,
   useWithdrawStudent,
   useTransferStudent,
+  useMarkNoShow,
+  useCloseAcademicYear,
   enrollmentKeys,
 } from './useEnrollments'
 export { useStudentProfileActions } from './useStudentProfileActions'

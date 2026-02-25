@@ -123,6 +123,8 @@ export interface WizardProviderProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>
   /** Called when wizard is cancelled */
   onCancel?: () => void
+  /** localStorage key for auto-save. If set, wizard state is saved/restored automatically. */
+  autoSaveKey?: string
   /** Children */
   children: ReactNode
 }

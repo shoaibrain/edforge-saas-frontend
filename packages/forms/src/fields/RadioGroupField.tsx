@@ -38,6 +38,8 @@ export interface RadioGroupFieldProps {
   direction?: 'horizontal' | 'vertical'
   /** Size variant */
   size?: 'sm' | 'md' | 'lg'
+  /** Override class name for the options container (e.g. "grid grid-cols-2 gap-4") */
+  optionsClassName?: string
 }
 
 // Spring transition configs
@@ -57,6 +59,7 @@ export const RadioGroupField = forwardRef<HTMLDivElement, RadioGroupFieldProps>(
       rules,
       direction = 'vertical',
       size = 'md',
+      optionsClassName,
     },
     ref
   ) => {
@@ -96,8 +99,9 @@ export const RadioGroupField = forwardRef<HTMLDivElement, RadioGroupFieldProps>(
               role="radiogroup"
               aria-labelledby={label ? `${name}-label` : undefined}
               className={cn(
-                'flex gap-4',
-                direction === 'vertical' ? 'flex-col' : 'flex-row flex-wrap'
+                'gap-4',
+                direction === 'vertical' ? 'flex flex-col' : 'flex flex-row flex-wrap',
+                optionsClassName
               )}
             >
               {options.map((option) => {

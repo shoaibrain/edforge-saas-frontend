@@ -6,14 +6,17 @@
  * - New Student Registration: The existing RegistrationWizard
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useResourcePermissions } from '@edforge/abac'
 import {
   Users,
   UserPlus,
   LayoutDashboard,
+  Download,
+  Lock,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
   useEnrollmentStore,
@@ -25,7 +28,10 @@ import {
   useEnrollments,
   flattenEnrollmentPages,
   useEnrollmentSummary,
+  useMarkNoShow,
+  useCloseAcademicYear,
 } from '../../hooks/useEnrollments'
+import { getEnrollmentExportUrl } from '../../services/academics.service'
 import { RegistrationWizard } from '../../components/students/registration'
 import { EnrollmentDashboard } from '../../components/enrollment/EnrollmentDashboard'
 import { EnrollmentTable } from '../../components/enrollment/EnrollmentTable'
@@ -62,6 +68,10 @@ export function EnrollmentModule() {
   // Withdrawal / Transfer modals
   const [withdrawTarget, setWithdrawTarget] = useState<EnrollmentResponseDto | null>(null)
   const [transferTarget, setTransferTarget] = useState<EnrollmentResponseDto | null>(null)
+
+  // No-Show & Close Year mutations
+  const markNoShowMutation = useMarkNoShow()
+  const closeYearMutation = useCloseAcademicYear()
 
   // Academic years
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -102,6 +112,37 @@ export function EnrollmentModule() {
     enabled: !!schoolId && !!activeYearId,
   })
 
+  // Handlers
+  const handleMarkNoShow = useCallback((enrollment: EnrollmentResponseDto) => {
+    const studentName = (enrollment as Record<string, unknown>).studentName || enrollment.studentId.slice(0, 8)
+    if (!window.confirm(`Mark ${studentName} as no-show? This will withdraw the enrollment.`)) return
+    markNoShowMutation.mutate({
+      schoolId,
+      yearId: activeYearId,
+      studentId: enrollment.studentId,
+    })
+  }, [schoolId, activeYearId, markNoShowMutation])
+
+  const handleExportCSV = useCallback(() => {
+    if (!schoolId || !activeYearId) return
+    const url = getEnrollmentExportUrl(schoolId, activeYearId)
+    // Open in new tab — the endpoint sets Content-Disposition: attachment
+    window.open(`/api${url}`, '_blank')
+  }, [schoolId, activeYearId])
+
+  const handleCloseYear = useCallback(() => {
+    if (!activeYearObj) return
+    const yearName = activeYearObj.name
+    if (!window.confirm(
+      `Close all open enrollments for ${yearName}? This will mark all enrolled students as graduated for this year. This action cannot be undone.`
+    )) return
+    closeYearMutation.mutate({
+      schoolId,
+      yearId: activeYearId,
+      lastDayOfSchool: activeYearObj.endDate,
+    })
+  }, [schoolId, activeYearId, activeYearObj, closeYearMutation])
+
   return (
     <div className="min-h-full">
       {/* Page Header */}
@@ -120,19 +161,44 @@ export function EnrollmentModule() {
               </div>
             </div>
 
-            {/* Academic Year Selector */}
+            {/* Academic Year Selector + Actions */}
             {activeTab === 'dashboard' && academicYears && academicYears.length > 0 && (
-              <select
-                value={activeYearId}
-                onChange={(e) => setSelectedYearId(e.target.value)}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-              >
-                {academicYears.map((year: { yearId: string; name: string; status: string }) => (
-                  <option key={year.yearId} value={year.yearId}>
-                    {year.name}{year.status === 'planning' ? ' (Planning)' : year.status === 'completed' ? ' (Completed)' : ''}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                <select
+                  value={activeYearId}
+                  onChange={(e) => setSelectedYearId(e.target.value)}
+                  className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                >
+                  {academicYears.map((year: { yearId: string; name: string; status: string }) => (
+                    <option key={year.yearId} value={year.yearId}>
+                      {year.name}{year.status === 'planning' ? ' (Planning)' : year.status === 'completed' ? ' (Completed)' : ''}
+                    </option>
+                  ))}
+                </select>
+                {enrollPerms.view && (
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover border border-border-secondary rounded-lg transition-colors"
+                    title="Export enrollments as CSV"
+                  >
+                    <Download className="w-4 h-4" />
+                    Export
+                  </button>
+                )}
+                {enrollPerms.edit && activeYearObj?.status === 'completed' && (
+                  <button
+                    type="button"
+                    onClick={handleCloseYear}
+                    disabled={closeYearMutation.isPending}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30 rounded-lg transition-colors disabled:opacity-50"
+                    title="Close all open enrollments for this year"
+                  >
+                    <Lock className="w-4 h-4" />
+                    {closeYearMutation.isPending ? 'Closing...' : 'Close Year'}
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -195,6 +261,7 @@ export function EnrollmentModule() {
                   onStatusChange={filterActions.setStatus}
                   onWithdraw={enrollPerms.edit ? setWithdrawTarget : undefined}
                   onTransfer={enrollPerms.edit ? setTransferTarget : undefined}
+                  onMarkNoShow={enrollPerms.edit ? handleMarkNoShow : undefined}
                 />
               </div>
             )}
