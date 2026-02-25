@@ -8,6 +8,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useResourcePermissions } from '@edforge/abac'
 import {
   Users,
   UserPlus,
@@ -50,6 +51,9 @@ const tabs = [
 export function EnrollmentModule() {
   const [activeTab, setActiveTab] = useState<EnrollmentTab>('dashboard')
   const schoolId = useActiveSchoolId() || ''
+
+  // ABAC: check enrollment permissions
+  const enrollPerms = useResourcePermissions('enrollment')
   const selectedYearId = useEnrollmentStore((s) => s.selectedYearId)
   const setSelectedYearId = useEnrollmentStore((s) => s.setSelectedYearId)
   const filters = useEnrollmentFilters()
@@ -136,7 +140,7 @@ export function EnrollmentModule() {
         {/* Tab Navigation */}
         <div className="px-6">
           <nav className="flex items-center space-x-1 border-b border-border-primary relative" aria-label="Enrollment tabs">
-            {tabs.map((tab) => (
+            {tabs.filter((tab) => tab.id !== 'registration' || enrollPerms.create).map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -189,8 +193,8 @@ export function EnrollmentModule() {
                   onGradeLevelChange={filterActions.setGradeLevel}
                   statusFilter={filters.status}
                   onStatusChange={filterActions.setStatus}
-                  onWithdraw={setWithdrawTarget}
-                  onTransfer={setTransferTarget}
+                  onWithdraw={enrollPerms.edit ? setWithdrawTarget : undefined}
+                  onTransfer={enrollPerms.edit ? setTransferTarget : undefined}
                 />
               </div>
             )}

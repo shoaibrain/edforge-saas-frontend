@@ -1,21 +1,20 @@
 // ... imports
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { Navigate, Link } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import {
   Shield,
   Users,
   Key,
-  ChevronRight,
   Search,
-  Plus,
   Check,
   X,
   Eye,
   Edit,
   UserPlus,
-  Settings,
+  Activity,
+  ChevronRight,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
@@ -35,6 +34,8 @@ import {
 // TYPES
 // ============================================================================
 
+type TabId = 'roles' | 'users' | 'audit'
+
 interface RoleInfo {
   id: SchoolRole
   name: string
@@ -45,8 +46,14 @@ interface RoleInfo {
 }
 
 // ============================================================================
-// ROLE DATA
+// CONSTANTS
 // ============================================================================
+
+const TABS: { id: TabId; label: string; icon: typeof Key }[] = [
+  { id: 'roles', label: 'Roles & Permissions', icon: Key },
+  { id: 'users', label: 'User Assignments', icon: Users },
+  { id: 'audit', label: 'Audit Log', icon: Eye },
+]
 
 const SYSTEM_ROLES: RoleInfo[] = [
   {
@@ -99,16 +106,34 @@ const SYSTEM_ROLES: RoleInfo[] = [
   },
 ]
 
+const RESOURCE_CATEGORIES: { label: string; resources: string[] }[] = [
+  {
+    label: 'Academics',
+    resources: ['students', 'grades', 'attendance', 'enrollment', 'courses', 'scheduling', 'assessments', 'gradebook', 'calendar'],
+  },
+  {
+    label: 'People',
+    resources: ['staff', 'teachers', 'guardians', 'parents', 'departments'],
+  },
+  {
+    label: 'Settings',
+    resources: ['settings'],
+  },
+]
+
+const MATRIX_ACTIONS = ['view', 'create', 'edit', 'delete', 'manage'] as const
+
 // ============================================================================
 // ROLE CARD COMPONENT
 // ============================================================================
 
 interface RoleCardProps {
   role: RoleInfo
-  onViewDetails: () => void
+  isSelected: boolean
+  onSelect: () => void
 }
 
-function RoleCard({ role, onViewDetails }: RoleCardProps) {
+function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
   const colorClasses: Record<string, string> = {
     teal: 'bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20',
     cyan: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20',
@@ -121,8 +146,12 @@ function RoleCard({ role, onViewDetails }: RoleCardProps) {
   return (
     <motion.button
       variants={fadeInUp}
-      onClick={onViewDetails}
-      className="w-full p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500/30 transition-all text-left group"
+      onClick={onSelect}
+      className={`w-full p-4 rounded-xl border transition-all text-left group ${
+        isSelected
+          ? 'border-teal-500/40 ring-1 ring-teal-500/20 bg-[rgb(var(--surface-secondary))]'
+          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30'
+      }`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3">
@@ -149,12 +178,11 @@ function RoleCard({ role, onViewDetails }: RoleCardProps) {
 }
 
 // ============================================================================
-// PERMISSION MATRIX PREVIEW
+// PERMISSION MATRIX
 // ============================================================================
 
-function PermissionMatrixPreview() {
-  const resources = ['students', 'grades', 'attendance', 'staff', 'billing']
-  const actions = ['view', 'create', 'edit', 'delete']
+function PermissionMatrix({ selectedRole }: { selectedRole: SchoolRole }) {
+  const rolePerms = ROLE_PERMISSIONS[selectedRole]
 
   return (
     <div className="overflow-x-auto">
@@ -162,7 +190,7 @@ function PermissionMatrixPreview() {
         <thead>
           <tr className="border-b border-[rgb(var(--border-primary))]">
             <th className="text-left py-3 px-4 font-medium text-[rgb(var(--text-secondary))]">Resource</th>
-            {actions.map((action) => (
+            {MATRIX_ACTIONS.map((action) => (
               <th key={action} className="text-center py-3 px-2 font-medium text-[rgb(var(--text-secondary))] capitalize">
                 {action}
               </th>
@@ -170,28 +198,45 @@ function PermissionMatrixPreview() {
           </tr>
         </thead>
         <tbody>
-          {resources.map((resource) => {
-            const permissions = ROLE_PERMISSIONS.Principal[resource as keyof typeof ROLE_PERMISSIONS.Principal] || []
+          {RESOURCE_CATEGORIES.map((category) => {
+            const categoryResources = category.resources.filter(
+              (r) => rolePerms[r as keyof typeof rolePerms],
+            )
+            if (categoryResources.length === 0) return null
             return (
-              <tr key={resource} className="border-b border-[rgb(var(--border-secondary))]">
-                <td className="py-3 px-4 font-medium text-[rgb(var(--text-primary))] capitalize">{resource}</td>
-                {actions.map((action) => (
-                  <td key={action} className="text-center py-3 px-2">
-                    {permissions.includes(action as any) ? (
-                      <Check className="w-4 h-4 text-teal-500 mx-auto" />
-                    ) : (
-                      <X className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto opacity-30" />
-                    )}
+              <Fragment key={category.label}>
+                <tr>
+                  <td
+                    colSpan={MATRIX_ACTIONS.length + 1}
+                    className="py-2 px-4 text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider bg-[rgb(var(--surface-tertiary))]"
+                  >
+                    {category.label}
                   </td>
-                ))}
-              </tr>
+                </tr>
+                {categoryResources.map((resource) => {
+                  const actions = rolePerms[resource as keyof typeof rolePerms] || []
+                  return (
+                    <tr key={resource} className="border-b border-[rgb(var(--border-secondary))]">
+                      <td className="py-2.5 px-4 font-medium text-[rgb(var(--text-primary))] capitalize">
+                        {resource.replace(':', ' / ')}
+                      </td>
+                      {MATRIX_ACTIONS.map((action) => (
+                        <td key={action} className="text-center py-2.5 px-2">
+                          {(actions as readonly string[]).includes(action) ? (
+                            <Check className="w-4 h-4 text-teal-500 mx-auto" />
+                          ) : (
+                            <X className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto opacity-20" />
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  )
+                })}
+              </Fragment>
             )
           })}
         </tbody>
       </table>
-      <p className="text-xs text-[rgb(var(--text-tertiary))] mt-3 text-center">
-        Showing Principal role permissions (preview). Click on a role to see full details.
-      </p>
     </div>
   )
 }
@@ -204,16 +249,16 @@ export default function RBACSecurityPage() {
   const user = useAuthStore((s) => s.user)
   const { activeSchoolId } = useAppStore.getState()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTab, setSelectedTab] = useState<'roles' | 'users' | 'audit'>('roles')
+  const [selectedTab, setSelectedTab] = useState<TabId>('roles')
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
+  const [matrixRole, setMatrixRole] = useState<SchoolRole>('Principal')
 
   // Fetch Users
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
-    queryKey: ['users', 'list', searchQuery], // Include searchQuery if we implement server-side search
+    queryKey: ['users', 'list', searchQuery],
     queryFn: () => usersService.listUsers({ limit: 50 }),
     staleTime: 5 * 60 * 1000,
   })
-
 
   if (!user) {
     return <Navigate to="/login" />
@@ -234,6 +279,11 @@ export default function RBACSecurityPage() {
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
   ) || []
 
+  // Select a role card → update the Permission Matrix
+  const handleSelectRole = (roleId: SchoolRole) => {
+    setMatrixRole(roleId)
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <AssignUserModal
@@ -245,186 +295,206 @@ export default function RBACSecurityPage() {
         initial="hidden"
         animate="visible"
         variants={staggerChildren}
-        className="space-y-8"
+        className="space-y-0"
       >
         {/* Header */}
-        <SettingsPageHeader
-          title="RBAC Security"
-          description="Manage roles, permissions, and user access across your organization"
-          icon={Shield}
-        />
+        <div className="mb-6">
+          <SettingsPageHeader
+            title="Security Policies"
+            description="Manage roles, permissions, and user access across your organization"
+            icon={Shield}
+          />
+        </div>
 
-        {/* Tab Navigation */}
-        <motion.div variants={fadeInUp} className="flex items-center gap-2 p-1 bg-[rgb(var(--surface-secondary))] rounded-xl">
-          {[
-            { id: 'roles', label: 'Roles & Permissions', icon: Key },
-            { id: 'users', label: 'User Assignments', icon: Users },
-            { id: 'audit', label: 'Audit Log', icon: Eye },
-          ].map((tab) => {
+        {/* Tab Navigation — EdForge standard pattern */}
+        <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
+          {TABS.map((tab) => {
             const Icon = tab.icon
             const isActive = selectedTab === tab.id
             return (
               <button
                 key={tab.id}
-                onClick={() => setSelectedTab(tab.id as typeof selectedTab)}
+                onClick={() => setSelectedTab(tab.id)}
                 className={`
-                  flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                  relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
                   ${isActive
-                    ? 'bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] shadow-sm'
+                    ? 'text-[rgb(var(--text-primary))]'
                     : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
                   }
                 `}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <span className="relative z-10 flex items-center gap-2">
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
+                  {tab.label}
+                </span>
+
+                {/* Animated underline indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="securityPolicyTab"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                    initial={false}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
               </button>
             )
           })}
-        </motion.div>
+        </div>
 
-        {/* Roles Tab */}
-        {selectedTab === 'roles' && (
-          <>
-            {/* System Roles */}
-            <SettingsSection
-              title="System Roles"
-              icon={Shield}
-              description="Pre-defined roles provided by EdForge"
+        {/* Tab Content with AnimatePresence */}
+        <div className="min-h-[400px] pt-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedTab}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={staggerChildren}
+              className="space-y-6"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {SYSTEM_ROLES.map((role) => (
-                  <RoleCard
-                    key={role.id}
-                    role={role}
-                    onViewDetails={() => console.log('View role:', role.id)}
-                  />
-                ))}
-              </div>
-            </SettingsSection>
-
-            {/* Permission Matrix Preview */}
-            <SettingsSection
-              title="Permission Matrix"
-              icon={Key}
-              description="Overview of resource access by role"
-            >
-              <PermissionMatrixPreview />
-            </SettingsSection>
-
-            {/* Custom Roles */}
-            <SettingsSection
-              title="Custom Roles"
-              icon={Settings}
-              description="Tenant-defined roles for specific needs"
-            >
-              <div className="text-center py-8">
-                <div className="p-4 rounded-full bg-[rgb(var(--surface-tertiary))] inline-flex mb-4">
-                  <Plus className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
-                </div>
-                <h3 className="font-medium text-[rgb(var(--text-primary))] mb-1">No Custom Roles</h3>
-                <p className="text-sm text-[rgb(var(--text-tertiary))] mb-4">
-                  Create custom roles to match your organization's specific needs
-                </p>
-                <button className="px-4 py-2 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors inline-flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  Create Custom Role
-                </button>
-              </div>
-            </SettingsSection>
-          </>
-        )}
-
-        {/* Users Tab */}
-        {selectedTab === 'users' && (
-          <SettingsSection
-            title="User Assignments"
-            icon={Users}
-            description="Users and their role assignments"
-          >
-            {/* Search and Add */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
-                />
-              </div>
-              <button
-                onClick={() => setIsAssignModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors inline-flex items-center gap-2"
-              >
-                <UserPlus className="w-4 h-4" />
-                Assign User
-              </button>
-            </div>
-
-            {/* User List */}
-            <div className="space-y-1">
-              {isLoadingUsers ? (
-                <div className="py-8 text-center text-[rgb(var(--text-secondary))]">Loading users...</div>
-              ) : filteredUsers.length === 0 ? (
-                <div className="py-8 text-center text-[rgb(var(--text-secondary))]">No users found.</div>
-              ) : (
-                filteredUsers.map((user) => (
-                  <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-medium">
-                        {user.firstName?.charAt(0) || user.email.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-[rgb(var(--text-primary))]">{user.firstName} {user.lastName}</p>
-                        <p className="text-sm text-[rgb(var(--text-tertiary))]">{user.email}</p>
-                      </div>
+              {/* Roles Tab */}
+              {selectedTab === 'roles' && (
+                <>
+                  {/* System Roles */}
+                  <SettingsSection
+                    title="System Roles"
+                    icon={Shield}
+                    description="Click a role to view its permissions in the matrix below"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {SYSTEM_ROLES.map((role) => (
+                        <RoleCard
+                          key={role.id}
+                          role={role}
+                          isSelected={matrixRole === role.id}
+                          onSelect={() => handleSelectRole(role.id)}
+                        />
+                      ))}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">{user.globalRole === 'TenantAdmin' ? 'Tenant Admin' : 'Standard User'}</p>
-                        {/* NOTE: We don't have assignment details in listUsers yet. 
-                              Displaying placeholder or fetching details would be next step. 
-                              For now, we show the global role and 'Details' button. 
-                           */}
-                        <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                          {/* Placeholder for school name or count of assignments */}
-                          Click Details to view assignments
-                        </p>
-                      </div>
-                      <Link
-                        to="/people/$"
-                        params={{ _splat: `staff/${user.userId}` }}
-                        className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Link>
-                    </div>
-                  </div>
-                ))
+                  </SettingsSection>
+
+                  {/* Permission Matrix */}
+                  <SettingsSection
+                    title="Permission Matrix"
+                    icon={Key}
+                    description={`Showing permissions for ${matrixRole}`}
+                  >
+                    <PermissionMatrix selectedRole={matrixRole} />
+                  </SettingsSection>
+                </>
               )}
-            </div>
-          </SettingsSection>
-        )}
 
-        {/* Audit Tab */}
-        {selectedTab === 'audit' && (
-          <SettingsSection
-            title="Access Audit Log"
-            icon={Eye}
-            description="History of role and permission changes"
-          >
-            <div className="text-center py-12">
-              <div className="p-4 rounded-full bg-[rgb(var(--surface-tertiary))] inline-flex mb-4">
-                <Eye className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
-              </div>
-              <h3 className="font-medium text-[rgb(var(--text-primary))] mb-1">Audit Log Coming Soon</h3>
-              <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                Track who accessed what and when with detailed audit logs
-              </p>
-            </div>
-          </SettingsSection>
-        )}
+              {/* Users Tab */}
+              {selectedTab === 'users' && (
+                <SettingsSection
+                  title="User Assignments"
+                  icon={Users}
+                  description="Users and their role assignments"
+                >
+                  {/* Search and Add */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                      <input
+                        type="text"
+                        placeholder="Search users..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
+                      />
+                    </div>
+                    <button
+                      onClick={() => setIsAssignModalOpen(true)}
+                      className="px-4 py-2.5 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors inline-flex items-center gap-2"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Assign User
+                    </button>
+                  </div>
+
+                  {/* User List */}
+                  <div className="space-y-1">
+                    {isLoadingUsers ? (
+                      <div className="py-8 text-center text-[rgb(var(--text-secondary))]">Loading users...</div>
+                    ) : filteredUsers.length === 0 ? (
+                      <div className="py-8 text-center text-[rgb(var(--text-secondary))]">No users found.</div>
+                    ) : (
+                      filteredUsers.map((user) => (
+                        <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-medium">
+                              {user.firstName?.charAt(0) || user.email.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-medium text-[rgb(var(--text-primary))]">{user.firstName} {user.lastName}</p>
+                              <p className="text-sm text-[rgb(var(--text-tertiary))]">{user.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+                              {user.globalRole === 'TenantAdmin' ? 'Tenant Admin' : 'Standard User'}
+                            </p>
+                            <Link
+                              to="/people/$"
+                              params={{ _splat: `staff/${user.userId}` }}
+                              className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </SettingsSection>
+              )}
+
+              {/* Audit Tab */}
+              {selectedTab === 'audit' && (
+                <SettingsSection
+                  title="Access Audit Trail"
+                  icon={Eye}
+                  description="Security events are automatically logged for compliance"
+                >
+                  <div className="space-y-3">
+                    {[
+                      { icon: Shield, label: 'Permission Denials', desc: 'Blocked access attempts with user, resource, and endpoint details', severity: 'HIGH' },
+                      { icon: UserPlus, label: 'Role Assignments', desc: 'When a user is assigned or removed from a school role', severity: 'HIGH' },
+                      { icon: Users, label: 'User Lifecycle', desc: 'User creation, updates, disabling, and deletion events', severity: 'MEDIUM' },
+                      { icon: Activity, label: 'Authentication Events', desc: 'Login successes, failures, password changes, and MFA changes', severity: 'HIGH' },
+                    ].map((item) => {
+                      const Icon = item.icon
+                      return (
+                        <div
+                          key={item.label}
+                          className="flex items-start gap-3 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]"
+                        >
+                          <div className="p-1.5 rounded-md bg-teal-500/10">
+                            <Icon className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{item.label}</p>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                                item.severity === 'HIGH'
+                                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                                  : 'bg-blue-500/10 text-blue-700 dark:text-blue-400'
+                              }`}>
+                                {item.severity}
+                              </span>
+                            </div>
+                            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{item.desc}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </SettingsSection>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </motion.div>
     </div>
   )

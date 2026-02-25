@@ -10,6 +10,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useResourcePermissions } from '@edforge/abac'
 import {
   GraduationCap,
   BookCheck,
@@ -57,6 +58,9 @@ export function GradesModule() {
   const [activeTab, setActiveTab] = useState<GradesTab>('overview')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+
+  // ABAC: check what this user can do with grades
+  const gradePerms = useResourcePermissions('grades')
   const selectedSectionId = useGradesStore((s) => s.selectedSectionId)
   const setSelectedSectionId = useGradesStore((s) => s.setSelectedSectionId)
   const selectedTermId = useGradesStore((s) => s.selectedTermId)
@@ -264,24 +268,28 @@ export function GradesModule() {
                           Select a grading period to record grades
                         </span>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => setShowBulkModal(true)}
-                        disabled={!effectiveTermId || !currentYear?.yearId}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Record Grades
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowFinalize(true)}
-                        disabled={!effectiveTermId || !currentYear?.yearId}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Lock className="w-4 h-4" />
-                        Finalize Grades
-                      </button>
+                      {gradePerms.create && (
+                        <button
+                          type="button"
+                          onClick={() => setShowBulkModal(true)}
+                          disabled={!effectiveTermId || !currentYear?.yearId}
+                          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Record Grades
+                        </button>
+                      )}
+                      {gradePerms.edit && (
+                        <button
+                          type="button"
+                          onClick={() => setShowFinalize(true)}
+                          disabled={!effectiveTermId || !currentYear?.yearId}
+                          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Lock className="w-4 h-4" />
+                          Finalize Grades
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -359,8 +367,8 @@ export function GradesModule() {
                     termId={effectiveTermId || ''}
                     academicYearId={currentYear?.yearId}
                     teacherId={selectedSection?.primaryTeacherId}
-                    disabled={hasAllFinalized || !effectiveTermId}
-                    onAddAssignment={effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
+                    disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
+                    onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
                     onViewReportCard={handleViewReportCard}
                   />
                 )}

@@ -12,6 +12,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useResourcePermissions } from '@edforge/abac'
 import {
   Calendar,
   CalendarDays,
@@ -152,6 +153,9 @@ export function SchedulingModule() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<SchedulingTab>('schedules')
 
+  // ABAC: check scheduling/section permissions
+  const schedPerms = useResourcePermissions('scheduling')
+
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<DrawerMode>('create')
@@ -251,7 +255,9 @@ export function SchedulingModule() {
                 </p>
               </div>
             </div>
-            <PageActionsDropdown onAddSection={openCreateDrawer} />
+            {schedPerms.create && (
+              <PageActionsDropdown onAddSection={openCreateDrawer} />
+            )}
           </div>
         </div>
 
@@ -349,8 +355,8 @@ export function SchedulingModule() {
                   isFetchingMore={isFetchingNextPage}
                   onLoadMore={() => fetchNextPage()}
                   onViewSection={openViewDrawer}
-                  onEditSection={openEditDrawer}
-                  onToggleActive={handleToggleActive}
+                  onEditSection={schedPerms.edit ? openEditDrawer : undefined}
+                  onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
                   onViewRoster={handleViewRoster}
                 />
               </div>

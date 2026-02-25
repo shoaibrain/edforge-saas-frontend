@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { z } from 'zod'
+import { useResourcePermissions } from '@edforge/abac'
 import { useSection, useUpdateSection } from '../../hooks/useSections'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -294,6 +295,9 @@ export function SectionDetailPage() {
   const [activeTab, setActiveTab] = useState<SectionTab>('overview')
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  // ABAC: check scheduling permissions
+  const schedPerms = useResourcePermissions('scheduling')
+
   // Validate sectionId
   const isValidId = useMemo(() => {
     try {
@@ -393,11 +397,13 @@ export function SectionDetailPage() {
                 />
                 {section.isActive ? 'Active' : 'Inactive'}
               </div>
-              <ActionsDropdown
-                onEdit={() => setDrawerOpen(true)}
-                onToggleActive={handleToggleActive}
-                isActive={section.isActive}
-              />
+              {schedPerms.edit && (
+                <ActionsDropdown
+                  onEdit={() => setDrawerOpen(true)}
+                  onToggleActive={handleToggleActive}
+                  isActive={section.isActive}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -454,13 +460,15 @@ export function SectionDetailPage() {
         </AnimatePresence>
       </div>
 
-      {/* Edit Drawer */}
-      <SectionDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        mode="edit"
-        section={section}
-      />
+      {/* Edit Drawer — only render when user has edit permission */}
+      {schedPerms.edit && (
+        <SectionDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          mode="edit"
+          section={section}
+        />
+      )}
     </div>
   )
 }

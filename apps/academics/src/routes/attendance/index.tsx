@@ -10,6 +10,7 @@
 
 import { useState, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePermission } from '@edforge/abac'
 import {
   ClipboardCheck,
   Loader2,
@@ -230,6 +231,9 @@ export function AttendanceModule() {
   const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
   const dateActions = useAttendanceDateActions()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+
+  // ABAC: check if user can create/edit attendance
+  const canCreateAttendance = usePermission('create', 'attendance')
   const exportPortalRef = useRef<HTMLDivElement>(null)
 
   // Fetch current academic year for sections query
@@ -514,7 +518,7 @@ export function AttendanceModule() {
                     existingRecords={existingRecords}
                     onSave={handleSave}
                     isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
-                    disabled={isNonInstructional}
+                    disabled={isNonInstructional || !canCreateAttendance}
                     saveStatus={offlineState.saveStatus}
                     onCorrection={handleCorrection}
                     previousDayRecords={previousDayRecords}

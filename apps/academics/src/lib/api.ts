@@ -5,6 +5,7 @@
  */
 
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import { toast } from 'sonner'
 import { getIdToken } from '@edforge/auth'
 
 // ============================================================================
@@ -90,6 +91,18 @@ api.interceptors.response.use(
       setTimeout(() => {
         isRedirecting = false
       }, 2000)
+    }
+
+    // Handle authorization errors
+    if (status === 403 && !isRedirecting) {
+      const errorData = error.response?.data as Record<string, unknown> | undefined
+      const message = (errorData?.message as string) || 'You don\'t have permission to perform this action'
+
+      // Only show toast if caller hasn't opted for graceful degradation
+      const meta = (error.config as any)?.meta as { gracefulDegradation?: boolean } | undefined
+      if (!meta?.gracefulDegradation) {
+        toast.error('Access Denied', { description: message })
+      }
     }
 
     return Promise.reject(error)

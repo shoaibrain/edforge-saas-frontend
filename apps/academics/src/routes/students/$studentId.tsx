@@ -13,6 +13,7 @@
 
 import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
+import { useResourcePermissions } from '@edforge/abac'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -24,7 +25,8 @@ import {
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { useStudentProfile, useStudentProfileActions } from '../../hooks'
-import { NotFound } from '../../components/common'
+import { useActiveSchoolId } from '../../stores/app.store'
+import { NotFound, PermissionDenied } from '../../components/common'
 import {
   ProfileHeader,
   ProfileHeaderSkeleton,
@@ -125,7 +127,12 @@ function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
 export function StudentProfilePage() {
   const params = useParams({ from: '/students/$studentId' })
   const studentId = params.studentId
+  const schoolId = useActiveSchoolId()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+
+  // ABAC: check student permissions
+  const studentPerms = useResourcePermissions('students')
+  const canEdit = !!studentPerms.edit
 
   // Actions hook — must be called before any conditional returns (Rules of Hooks)
   const actions = useStudentProfileActions()
@@ -133,7 +140,7 @@ export function StudentProfilePage() {
   // Validate UUID format
   const isValidId = isValidUUID(studentId)
 
-  // Fetch student profile
+  // Fetch student profile — pass schoolId to avoid "School context required" 403
   const {
     data: student,
     isLoading,
@@ -142,6 +149,7 @@ export function StudentProfilePage() {
     refetch,
   } = useStudentProfile({
     studentId,
+    schoolId: schoolId || undefined,
     enabled: isValidId,
   })
 
@@ -160,6 +168,16 @@ export function StudentProfilePage() {
     const status = (error as any)?.response?.status
     if (status === 404) {
       return <NotFound type="student" />
+    }
+    if (status === 403) {
+      return (
+        <PermissionDenied
+          resource="student profile"
+          action="view"
+          message="You don't have permission to view this student's profile. This student may not be in your assigned sections."
+          showBackButton
+        />
+      )
     }
     return <ProfileErrorState onRetry={() => refetch()} />
   }
@@ -180,9 +198,9 @@ export function StudentProfilePage() {
         <div className="pb-6">
           <ProfileHeader
             student={student}
-            onEdit={actions.openEdit}
-            onEnroll={actions.openEnroll}
-            canEdit={true}
+            onEdit={canEdit ? actions.openEdit : undefined}
+            onEnroll={canEdit ? actions.openEnroll : undefined}
+            canEdit={canEdit}
           />
         </div>
 
@@ -241,16 +259,16 @@ export function StudentProfilePage() {
               {activeTab === 'enrollment' && (
                 <EnrollmentTab
                   student={student}
-                  onEnroll={actions.openEnroll}
-                  onAddToSection={actions.openAddToSection}
+                  onEnroll={canEdit ? actions.openEnroll : undefined}
+                  onAddToSection={canEdit ? actions.openAddToSection : undefined}
                 />
               )}
               {activeTab === 'family' && (
                 <FamilyTab
                   student={student}
-                  onAddGuardian={actions.openAddGuardian}
-                  onEditGuardian={actions.openEditGuardian}
-                  canEdit={true}
+                  onAddGuardian={canEdit ? actions.openAddGuardian : undefined}
+                  onEditGuardian={canEdit ? actions.openEditGuardian : undefined}
+                  canEdit={canEdit}
                 />
               )}
             </motion.div>
@@ -258,27 +276,31 @@ export function StudentProfilePage() {
         </div>
       </div>
 
-      {/* Modals */}
-      <EnrollExistingStudentModal
-        open={actions.enrollModalOpen}
-        onClose={() => actions.setEnrollModalOpen(false)}
-        student={student}
-      />
-      <EditStudentModal
-        open={actions.editModalOpen}
-        onClose={() => actions.setEditModalOpen(false)}
-        student={student}
-      />
-      <AddToSectionModal
-        open={actions.addToSectionModalOpen}
-        onClose={() => actions.setAddToSectionModalOpen(false)}
-        student={student}
-      />
-      <AddGuardianModal
-        open={actions.addGuardianModalOpen}
-        onClose={() => actions.setAddGuardianModalOpen(false)}
-        student={student}
-      />
+      {/* Modals — only rendered when user has edit permission */}
+      {canEdit && (
+        <>
+          <EnrollExistingStudentModal
+            open={actions.enrollModalOpen}
+            onClose={() => actions.setEnrollModalOpen(false)}
+            student={student}
+          />
+          <EditStudentModal
+            open={actions.editModalOpen}
+            onClose={() => actions.setEditModalOpen(false)}
+            student={student}
+          />
+          <AddToSectionModal
+            open={actions.addToSectionModalOpen}
+            onClose={() => actions.setAddToSectionModalOpen(false)}
+            student={student}
+          />
+          <AddGuardianModal
+            open={actions.addGuardianModalOpen}
+            onClose={() => actions.setAddGuardianModalOpen(false)}
+            student={student}
+          />
+        </>
+      )}
     </div>
   )
 }

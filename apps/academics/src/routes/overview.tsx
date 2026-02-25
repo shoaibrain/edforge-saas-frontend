@@ -8,6 +8,7 @@
 
 import { useMemo, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { usePermission } from '@edforge/abac'
 import {
   GraduationCap,
   Users,
@@ -41,6 +42,7 @@ import { EnrollmentDistributionChart } from '../components/overview/EnrollmentDi
 import { AttendanceTrendWidget } from '../components/overview/AttendanceTrendWidget'
 import { ActivityFeedWidget } from '../components/overview/ActivityFeedWidget'
 import { AcademicYearLabel } from '../components/overview/AcademicCalendarBar'
+import { MySectionsWidget } from '../components/overview/MySectionsWidget'
 
 // ============================================================================
 // GUARD: No School Selected
@@ -103,6 +105,9 @@ export function Overview() {
 function OverviewContent({ schoolId }: { schoolId: string }) {
   const queryClient = useQueryClient()
 
+  // ABAC: check if user can view enrollment data
+  const canViewEnrollment = usePermission('view', 'enrollment', schoolId)
+
   // Academic year context
   const {
     data: currentYear,
@@ -156,19 +161,24 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
   // ---- Build stats array ----
   const stats: ModuleStat[] = [
-    {
-      label: 'Total Enrolled',
-      value:
-        overviewData.totalEnrolled != null
-          ? overviewData.totalEnrolled.toLocaleString()
-          : '—',
-      change: 'this academic year',
-      changeType: 'neutral',
-      icon: Users,
-      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
-      iconColor: 'text-teal-600 dark:text-cyan-400',
-      loading: overviewData.isLoading,
-    },
+    // Only show enrollment stat when user has enrollment view permission
+    ...(canViewEnrollment
+      ? [
+          {
+            label: 'Total Enrolled',
+            value:
+              overviewData.totalEnrolled != null
+                ? overviewData.totalEnrolled.toLocaleString()
+                : '—',
+            change: 'this academic year',
+            changeType: 'neutral' as const,
+            icon: Users,
+            iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
+            iconColor: 'text-teal-600 dark:text-cyan-400',
+            loading: overviewData.isLoading,
+          },
+        ]
+      : []),
     {
       label: 'Active Sections',
       value:
@@ -241,15 +251,21 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       onRefresh={handleRefresh}
       calendarLabel={<AcademicYearLabel context={calendarContext} />}
     >
-      {/* Charts grid — left: enrollment, right: attendance + alerts stacked */}
+      {/* Charts grid — left: enrollment or My Sections (role-based), right: attendance + alerts stacked */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <WidgetErrorBoundary name="Enrollment Chart">
-          <EnrollmentDistributionChart
-            data={enrollmentDistribution.data}
-            total={enrollmentDistribution.total}
-            loading={overviewData.isLoading}
-          />
-        </WidgetErrorBoundary>
+        {canViewEnrollment ? (
+          <WidgetErrorBoundary name="Enrollment Chart">
+            <EnrollmentDistributionChart
+              data={enrollmentDistribution.data}
+              total={enrollmentDistribution.total}
+              loading={overviewData.isLoading}
+            />
+          </WidgetErrorBoundary>
+        ) : (
+          <WidgetErrorBoundary name="My Sections">
+            <MySectionsWidget schoolId={schoolId} />
+          </WidgetErrorBoundary>
+        )}
 
         <div className="flex flex-col gap-6">
           <WidgetErrorBoundary name="Attendance Trend">

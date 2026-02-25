@@ -23,6 +23,7 @@ import {
   Upload,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useResourcePermissions } from '@edforge/abac'
 import { StudentTable, StudentFilters, StudentDrawer, CSVImport } from '../../components/students'
 import { ConfirmationDialog } from '../../components/common'
 import {
@@ -130,6 +131,9 @@ export function StudentsModule() {
 
   // Get active school from shared store
   const activeSchoolId = useActiveSchoolId()
+
+  // ABAC: check what this user can do with students
+  const studentPerms = useResourcePermissions('students')
 
   // Get filter state from store
   const filters = useStudentFilters()
@@ -256,22 +260,26 @@ export function StudentsModule() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowImport(true)}
-                disabled={!activeSchoolId}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Import CSV
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleAddStudent}
-                disabled={!activeSchoolId}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Student
-              </Button>
+              {studentPerms.create && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowImport(true)}
+                  disabled={!activeSchoolId}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import CSV
+                </Button>
+              )}
+              {studentPerms.create && (
+                <Button
+                  variant="outline"
+                  onClick={handleAddStudent}
+                  disabled={!activeSchoolId}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Student
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -344,7 +352,7 @@ export function StudentsModule() {
         open={drawerOpen}
         onClose={handleCloseDrawer}
         student={selectedStudent}
-        onWithdraw={handleWithdrawFromDrawer}
+        onWithdraw={studentPerms.delete ? handleWithdrawFromDrawer : undefined}
       />
 
       {/* Withdrawal Confirmation Dialog */}

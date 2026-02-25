@@ -248,7 +248,7 @@ const studentHomeModule: ModuleConfig = {
           label: 'Curriculum',
           icon: BookOpen,
           href: '/academics/curriculum',
-          permission: { action: 'view', resource: 'curriculum' },
+          permission: { action: 'view', resource: 'courses' },
         },
         {
           id: 'calendar',
@@ -584,7 +584,7 @@ const academicsModule: ModuleConfig = {
           label: 'Curriculum',
           icon: BookOpen,
           href: '/academics/curriculum',
-          permission: { action: 'view', resource: 'curriculum' },
+          permission: { action: 'view', resource: 'courses' },
           requiresActiveSchool: true,
         },
       ],

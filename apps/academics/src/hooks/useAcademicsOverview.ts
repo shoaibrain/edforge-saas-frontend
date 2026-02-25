@@ -7,6 +7,7 @@
 
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { usePermission } from '@edforge/abac'
 import {
   getEnrollmentSummary,
   getSections,
@@ -98,11 +99,14 @@ export function useAcademicsOverview(
   const today = useMemo(() => getTodayISO(), [])
   const enabled = !!schoolId && !!academicYearId
 
-  // 1. Enrollment summary
+  // ABAC: skip enrollment API if user lacks enrollment:view permission
+  const canViewEnrollment = usePermission('view', 'enrollment', schoolId ?? undefined)
+
+  // 1. Enrollment summary — only fetch if user has enrollment:view permission
   const enrollment = useQuery<EnrollmentSummaryResponse, Error>({
     queryKey: overviewKeys.enrollment(schoolId!, academicYearId!),
     queryFn: () => getEnrollmentSummary(schoolId!, academicYearId!),
-    enabled,
+    enabled: enabled && canViewEnrollment,
     staleTime: 5 * 60 * 1000,
   })
 

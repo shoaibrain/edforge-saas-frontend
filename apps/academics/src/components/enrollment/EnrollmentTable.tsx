@@ -31,8 +31,8 @@ interface EnrollmentTableProps {
   onGradeLevelChange: (level: string | null) => void
   statusFilter: string | null
   onStatusChange: (status: string | null) => void
-  onWithdraw: (enrollment: EnrollmentResponseDto) => void
-  onTransfer: (enrollment: EnrollmentResponseDto) => void
+  onWithdraw?: (enrollment: EnrollmentResponseDto) => void
+  onTransfer?: (enrollment: EnrollmentResponseDto) => void
 }
 
 const gradeLevels = [
@@ -241,11 +241,11 @@ export function EnrollmentTable({
                     {enrollment.enrollmentType || '—'}
                   </td>
                   <td className="px-4 py-3">
-                    <ActionMenu
+                    {(onWithdraw || onTransfer) && <ActionMenu
                       enrollment={enrollment}
-                      onWithdraw={() => onWithdraw(enrollment)}
-                      onTransfer={() => onTransfer(enrollment)}
-                    />
+                      onWithdraw={() => onWithdraw?.(enrollment)}
+                      onTransfer={() => onTransfer?.(enrollment)}
+                    />}
                   </td>
                 </tr>
               ))}

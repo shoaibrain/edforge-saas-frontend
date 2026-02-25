@@ -140,6 +140,7 @@ export function useStudent({ studentId, enabled = true }: UseStudentOptions) {
 
 interface UseStudentProfileOptions {
   studentId: string
+  schoolId?: string
   enabled?: boolean
 }
 
@@ -149,11 +150,12 @@ interface UseStudentProfileOptions {
  */
 export function useStudentProfile({
   studentId,
+  schoolId,
   enabled = true,
 }: UseStudentProfileOptions) {
   return useQuery<StudentProfileResponseDto, Error>({
     queryKey: studentKeys.profile(studentId),
-    queryFn: () => getStudentProfile(studentId),
+    queryFn: () => getStudentProfile(studentId, schoolId),
     enabled: enabled && !!studentId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

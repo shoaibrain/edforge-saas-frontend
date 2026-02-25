@@ -40,6 +40,7 @@ import {
   Pie,
   LabelList,
 } from 'recharts'
+import { useResourcePermissions } from '@edforge/abac'
 import { useGradeOverview } from '../../hooks/useGrades'
 import type { GradeOverviewResponse } from '../../services/academics.service'
 
@@ -444,6 +445,7 @@ export function GradeOverview({
   academicYearId,
   policyWeights,
 }: GradeOverviewProps) {
+  const gradePerms = useResourcePermissions('grades')
   const { data, isLoading, isError } = useGradeOverview(schoolId, academicYearId)
 
   const handleExportAtRisk = useCallback(() => {
@@ -478,15 +480,17 @@ export function GradeOverview({
         </div>
       ) : (
         <>
-          {/* Actions */}
-          <div className="flex justify-end">
-            <ActionsDropdown
-              onExportGradebook={handleExportGradebook}
-              onExportAtRisk={handleExportAtRisk}
-              gradebookDisabled={!data.coursePerformance?.length}
-              atRiskDisabled={!data.atRiskStudents?.length}
-            />
-          </div>
+          {/* Actions — only show export for users with view permission */}
+          {gradePerms.view && (
+            <div className="flex justify-end">
+              <ActionsDropdown
+                onExportGradebook={handleExportGradebook}
+                onExportAtRisk={handleExportAtRisk}
+                gradebookDisabled={!data.coursePerformance?.length}
+                atRiskDisabled={!data.atRiskStudents?.length}
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard

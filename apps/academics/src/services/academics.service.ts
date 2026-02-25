@@ -336,8 +336,10 @@ export async function getStudent(studentId: string): Promise<StudentResponseDto>
  *
  * GET /academics/students/:id/profile
  */
-export async function getStudentProfile(studentId: string): Promise<StudentProfileResponseDto> {
-  return apiGet<StudentProfileResponseDto>(`/academics/students/${studentId}/profile`)
+export async function getStudentProfile(studentId: string, schoolId?: string): Promise<StudentProfileResponseDto> {
+  const params: Record<string, unknown> = {}
+  if (schoolId) params.schoolId = schoolId
+  return apiGet<StudentProfileResponseDto>(`/academics/students/${studentId}/profile`, params)
 }
 
 /**

@@ -51,8 +51,8 @@ interface CourseTableProps {
 interface RowActionsProps {
   course: CourseResponseDto
   onView: () => void
-  onEdit: () => void
-  onToggleActive: () => void
+  onEdit?: () => void
+  onToggleActive?: () => void
   onNavigate?: () => void
 }
 
@@ -109,43 +109,47 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
                 View Full Details
               </button>
             )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onEdit()
-              }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
-            >
-              <Pencil className="w-4 h-4" />
-              Edit Course
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onToggleActive()
-              }}
-              className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${
-                course.isActive
-                  ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10'
-                  : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-              }`}
-            >
-              {course.isActive ? (
-                <>
-                  <ToggleLeft className="w-4 h-4" />
-                  Deactivate
-                </>
-              ) : (
-                <>
-                  <ToggleRight className="w-4 h-4" />
-                  Activate
-                </>
-              )}
-            </button>
+            {onEdit && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onEdit()
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              >
+                <Pencil className="w-4 h-4" />
+                Edit Course
+              </button>
+            )}
+            {onToggleActive && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onToggleActive()
+                }}
+                className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${
+                  course.isActive
+                    ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10'
+                    : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                }`}
+              >
+                {course.isActive ? (
+                  <>
+                    <ToggleLeft className="w-4 h-4" />
+                    Deactivate
+                  </>
+                ) : (
+                  <>
+                    <ToggleRight className="w-4 h-4" />
+                    Activate
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </>
       )}

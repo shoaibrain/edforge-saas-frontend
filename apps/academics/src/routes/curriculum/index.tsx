@@ -11,6 +11,7 @@
 
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useResourcePermissions } from '@edforge/abac'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
@@ -210,6 +211,9 @@ export function CurriculumModule() {
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+
+  // ABAC: check course/curriculum permissions
+  const coursePerms = useResourcePermissions('courses')
   const filters = useCourseFilters()
 
   // Drawer state
@@ -316,7 +320,7 @@ export function CurriculumModule() {
               </div>
             </div>
 
-            {activeTab === 'courses' && (
+            {activeTab === 'courses' && coursePerms.create && (
               <PageActionsDropdown onAddCourse={openCreateDrawer} />
             )}
           </div>
@@ -423,10 +427,10 @@ export function CurriculumModule() {
                   hasMore={!!hasNextPage}
                   isFetchingMore={isFetchingNextPage}
                   onLoadMore={() => fetchNextPage()}
-                  onAddCourse={openCreateDrawer}
+                  onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
                   onViewCourse={openViewDrawer}
-                  onEditCourse={openEditDrawer}
-                  onToggleActive={handleToggleActive}
+                  onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
+                  onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
                   onNavigateToCourse={navigateToCourse}
                 />
               </div>

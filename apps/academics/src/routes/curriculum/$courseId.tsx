@@ -31,6 +31,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { z } from 'zod'
+import { useResourcePermissions } from '@edforge/abac'
 import { useCourse, useUpdateCourse } from '../../hooks/useCourses'
 import {
   useSections,
@@ -591,6 +592,9 @@ export function CourseDetailPage() {
     }
   }, [courseId])
 
+  // ABAC: check course permissions
+  const coursePerms = useResourcePermissions('courses')
+
   const { data: course, isLoading, error } = useCourse({
     courseId,
     schoolId,
@@ -701,11 +705,13 @@ export function CourseDetailPage() {
                 />
                 {course.isActive ? 'Active' : 'Inactive'}
               </div>
-              <ActionsDropdown
-                onEdit={() => setCourseDrawerOpen(true)}
-                onToggleActive={handleToggleActive}
-                isActive={course.isActive}
-              />
+              {coursePerms.edit && (
+                <ActionsDropdown
+                  onEdit={() => setCourseDrawerOpen(true)}
+                  onToggleActive={handleToggleActive}
+                  isActive={course.isActive}
+                />
+              )}
             </div>
           </div>
         </div>
