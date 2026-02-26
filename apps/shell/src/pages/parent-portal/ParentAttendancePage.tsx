@@ -12,28 +12,12 @@ import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
 import { Card, CardContent, CardHeader, Skeleton, Button } from '@edforge/ui'
 import { CalendarCheck, CalendarX, Clock, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react'
+import type {
+  StudentAttendanceSummaryDto,
+  AttendanceResponseDto,
+} from '@aibrains/shared-types'
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface AttendanceSummary {
-  totalDays: number
-  present: number
-  absent: number
-  late: number
-  excused: number
-  attendanceRate: number
-}
-
-interface AttendanceRecord {
-  attendanceId: string
-  date: string
-  status: string
-  periodName?: string
-  courseName?: string
-  notes?: string
-}
+type AttendanceRecord = AttendanceResponseDto & { periodName?: string }
 
 // ============================================================================
 // COMPONENT
@@ -59,7 +43,7 @@ export default function ParentAttendancePage() {
   const { data: summary, isLoading: isSummaryLoading } = useQuery({
     queryKey: ['parent-child-attendance-summary', studentId, activeSchoolId, activeSchoolYear?.id],
     queryFn: () =>
-      apiGet<AttendanceSummary>(`/academics/students/${studentId}/attendance/summary`, {
+      apiGet<StudentAttendanceSummaryDto>(`/academics/students/${studentId}/attendance/summary`, {
         schoolId: activeSchoolId,
         ...(activeSchoolYear?.id && { academicYearId: activeSchoolYear.id }),
       }),

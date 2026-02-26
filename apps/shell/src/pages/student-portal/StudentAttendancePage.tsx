@@ -23,33 +23,12 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import type {
+  StudentAttendanceSummaryDto,
+  AttendanceResponseDto,
+} from '@aibrains/shared-types'
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface AttendanceSummary {
-  totalDays: number
-  present: number
-  absent: number
-  late: number
-  excused: number
-  attendanceRate: number
-}
-
-interface AttendanceRecord {
-  attendanceId: string
-  date: string
-  status: 'present' | 'absent' | 'late' | 'excused' | string
-  periodId?: string
-  periodName?: string
-  courseName?: string
-  notes?: string
-}
-
-interface AttendanceResponse {
-  items: AttendanceRecord[]
-}
+type AttendanceRecord = AttendanceResponseDto & { periodName?: string }
 
 // ============================================================================
 // COMPONENT
@@ -76,7 +55,7 @@ export default function StudentAttendancePage() {
   const { data: summary, isLoading: isSummaryLoading } = useQuery({
     queryKey: ['student-attendance-summary', studentId, activeSchoolId, activeSchoolYear?.id],
     queryFn: () =>
-      apiGet<AttendanceSummary>(
+      apiGet<StudentAttendanceSummaryDto>(
         `/academics/students/${studentId}/attendance/summary`,
         {
           schoolId: activeSchoolId,
@@ -91,7 +70,7 @@ export default function StudentAttendancePage() {
   const { data: recordsData, isLoading: isRecordsLoading } = useQuery({
     queryKey: ['student-attendance-records', studentId, activeSchoolId, startDate, endDate],
     queryFn: () =>
-      apiGet<AttendanceResponse>(
+      apiGet<{ items: AttendanceRecord[] }>(
         `/academics/students/${studentId}/attendance`,
         {
           schoolId: activeSchoolId,

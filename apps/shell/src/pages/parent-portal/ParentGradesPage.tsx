@@ -12,36 +12,7 @@ import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
 import { Card, CardContent, CardHeader, Skeleton } from '@edforge/ui'
 import { GraduationCap, TrendingUp, BookOpen, Award } from 'lucide-react'
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface GradeResponseDto {
-  gradeId: string
-  courseId: string
-  courseName: string
-  termId?: string
-  numericGrade?: number
-  letterGrade?: string
-  gpaPoints?: number
-  credits?: number
-  isFinal?: boolean
-}
-
-interface GpaResult {
-  cumulativeGpa: number | null
-  weightedGpa?: number | null
-  totalCredits: number
-  termGpas?: Array<{ termId: string; termName?: string; gpa: number; credits: number }>
-}
-
-interface StudentGradesResponse {
-  studentId: string
-  academicYearId: string
-  grades: GradeResponseDto[]
-  gpa: GpaResult | null
-}
+import type { StudentGradesResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // COMPONENT
@@ -57,7 +28,7 @@ export default function ParentGradesPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['parent-child-grades-detail', studentId, activeSchoolId, activeSchoolYear?.id],
     queryFn: () =>
-      apiGet<StudentGradesResponse>(
+      apiGet<StudentGradesResponseDto>(
         `/academics/students/${studentId}/grades`,
         {
           schoolId: activeSchoolId,
@@ -199,7 +170,7 @@ function StatusBadge({ status }: { status?: string | null }) {
   const n = status.toLowerCase()
   let cls = 'inline-flex px-2 py-0.5 rounded-full text-xs font-medium '
   if (n === 'final' || n === 'completed') cls += 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-  else if (n === 'in_progress' || n === 'active') cls += 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+  else if (n === 'in_progress' || n === 'in progress' || n === 'active') cls += 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
   else cls += 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
   return <span className={cls}>{status}</span>
 }

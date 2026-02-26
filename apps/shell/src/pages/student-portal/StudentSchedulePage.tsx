@@ -14,22 +14,9 @@ import { useStudentPortal } from './StudentPortalLayout'
 import { Card, CardContent, Skeleton } from '@edforge/ui'
 import { Calendar, Clock, MapPin, User, LayoutList, LayoutGrid } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface StudentSection {
-  studentId: string
-  studentName?: string
-  studentNumber?: string
-  currentGradeLevel?: string
-  sectionId: string
-  sectionName?: string
-  courseName?: string
-  courseId?: string
-  teacherName?: string
-  roomNumber?: string
+type StudentSection = StudentSectionResponseDto & {
   periodId?: string
   periodName?: string
   dayOfWeek?: string
@@ -37,7 +24,6 @@ interface StudentSection {
   endTime?: string
   termId?: string
   termName?: string
-  enrolledAt?: string
 }
 
 // ============================================================================

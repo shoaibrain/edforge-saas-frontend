@@ -11,22 +11,10 @@ import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
 import { Card, CardContent, Skeleton } from '@edforge/ui'
 import { GraduationCap, CalendarCheck, BookOpen, User } from 'lucide-react'
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface ChildGrades {
-  studentId: string
-  gpa: { cumulativeGpa: number; totalCredits: number } | null
-  grades: Array<{ gradeId: string; courseName: string; letterGrade?: string }>
-}
-
-interface ChildAttendanceSummary {
-  totalDays: number
-  present: number
-  attendanceRate: number
-}
+import type {
+  StudentGradesResponseDto,
+  StudentAttendanceSummaryDto,
+} from '@aibrains/shared-types'
 
 // ============================================================================
 // COMPONENT
@@ -86,7 +74,7 @@ function ChildCard({
   const { data: gradesData, isLoading: isGradesLoading } = useQuery({
     queryKey: ['parent-child-grades', studentId, schoolId, academicYearId],
     queryFn: () =>
-      apiGet<ChildGrades>(`/academics/students/${studentId}/grades`, {
+      apiGet<StudentGradesResponseDto>(`/academics/students/${studentId}/grades`, {
         schoolId,
         ...(academicYearId && { academicYearId }),
       }),
@@ -98,7 +86,7 @@ function ChildCard({
   const { data: attendanceData, isLoading: isAttendanceLoading } = useQuery({
     queryKey: ['parent-child-attendance', studentId, schoolId, academicYearId],
     queryFn: () =>
-      apiGet<ChildAttendanceSummary>(`/academics/students/${studentId}/attendance/summary`, {
+      apiGet<StudentAttendanceSummaryDto>(`/academics/students/${studentId}/attendance/summary`, {
         schoolId,
         ...(academicYearId && { academicYearId }),
       }),

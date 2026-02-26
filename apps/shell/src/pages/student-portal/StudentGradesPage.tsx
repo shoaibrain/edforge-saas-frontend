@@ -12,49 +12,7 @@ import { useShell } from '../../lib/shell-context'
 import { useStudentPortal } from './StudentPortalLayout'
 import { Card, CardContent, CardHeader, Skeleton } from '@edforge/ui'
 import { GraduationCap, TrendingUp, BookOpen, Award } from 'lucide-react'
-
-// ============================================================================
-// TYPES
-// Note: These match backend DTOs. Once @aibrains/shared-types is linked as a
-// local workspace dependency (not npm), replace with shared type imports.
-// ============================================================================
-
-interface GradeResponseDto {
-  gradeId: string
-  studentId: string
-  courseId: string
-  courseName: string
-  sectionId?: string
-  teacherId?: string
-  academicYearId: string
-  termId?: string
-  numericGrade?: number
-  letterGrade?: string
-  gpaPoints?: number
-  credits?: number
-  isFinal?: boolean
-}
-
-interface GpaResult {
-  studentId: string
-  academicYearId: string
-  cumulativeGpa: number | null
-  weightedGpa?: number | null
-  totalCredits: number
-  termGpas?: Array<{
-    termId: string
-    termName?: string
-    gpa: number
-    credits: number
-  }>
-}
-
-interface StudentGradesResponse {
-  studentId: string
-  academicYearId: string
-  grades: GradeResponseDto[]
-  gpa: GpaResult | null
-}
+import type { StudentGradesResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // COMPONENT
@@ -68,7 +26,7 @@ export default function StudentGradesPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['student-grades', studentId, activeSchoolId, activeSchoolYear?.id],
     queryFn: () =>
-      apiGet<StudentGradesResponse>(
+      apiGet<StudentGradesResponseDto>(
         `/academics/students/${studentId}/grades`,
         {
           schoolId: activeSchoolId,
@@ -236,7 +194,7 @@ export default function StudentGradesPage() {
                   className="p-4 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]"
                 >
                   <p className="text-sm text-[rgb(var(--text-secondary))]">
-                    {term.termName ?? term.termId}
+                    {term.termId}
                   </p>
                   <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
                     {(term.gpa ?? 0).toFixed(2)}
@@ -300,7 +258,7 @@ function StatusBadge({ status }: { status?: string | null }) {
 
   if (normalized === 'final' || normalized === 'completed') {
     className += 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-  } else if (normalized === 'in_progress' || normalized === 'active') {
+  } else if (normalized === 'in_progress' || normalized === 'in progress' || normalized === 'active') {
     className += 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
   } else if (normalized === 'incomplete' || normalized === 'missing') {
     className += 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'

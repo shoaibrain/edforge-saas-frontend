@@ -11,20 +11,12 @@ import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
 import { Card, CardContent, Skeleton } from '@edforge/ui'
 import { Calendar, Clock, MapPin, User } from 'lucide-react'
+import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface StudentSection {
-  sectionId: string
-  sectionName?: string
-  courseId: string
-  courseName?: string
-  teacherName?: string
-  roomNumber?: string
+type StudentSection = StudentSectionResponseDto & {
   periodId?: string
   periodName?: string
+  dayOfWeek?: string
   startTime?: string
   endTime?: string
 }
