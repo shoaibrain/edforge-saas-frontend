@@ -42,7 +42,7 @@ import {
   // [MVP-PARKED] TrendingUp,
   // [MVP-PARKED] PieChart,
   // [MVP-PARKED] LineChart,
-  Home,
+  // Home, — removed with Dashboard links in Sprint 1.4
   // [MVP-PARKED] Video,
   BookOpen,
   Calendar,
@@ -247,27 +247,18 @@ const studentHomeModule: ModuleConfig = {
           id: 'curriculum',
           label: 'Curriculum',
           icon: BookOpen,
-          href: '/academics/curriculum',
+          href: '/student-portal/curriculum',
           permission: { action: 'view', resource: 'courses' },
         },
         {
           id: 'calendar',
           label: 'School Calendar',
           icon: Calendars,
-          href: '/academics/schoolcalendar',
+          href: '/student-portal/calendar',
           permission: { action: 'view', resource: 'calendar' },
         },
       ],
     },
-    // [MVP-PARKED] Communication group (Messages module parked)
-    // {
-    //   id: 'communication', label: 'COMMUNICATION',
-    //   items: [
-    //     { id: 'messages', label: 'Messages', icon: Mail, href: '/messages', permission: { action: 'view', resource: 'messages' } },
-    //     { id: 'announcements', label: 'Announcements', icon: Megaphone, href: '/messages/announcements', permission: { action: 'view', resource: 'announcements' } },
-    //   ],
-    // },
-    // [/MVP-PARKED]
     {
       id: 'account',
       items: [
@@ -347,20 +338,11 @@ const parentHomeModule: ModuleConfig = {
           id: 'calendar',
           label: 'School Calendar',
           icon: Calendars,
-          href: '/academics/schoolcalendar',
+          href: '/parent-portal/calendar',
           permission: { action: 'view', resource: 'calendar' },
         },
       ],
     },
-    // [MVP-PARKED] Communication group (Messages module parked)
-    // {
-    //   id: 'communication', label: 'COMMUNICATION',
-    //   items: [
-    //     { id: 'messages', label: 'Messages', icon: Mail, href: '/messages', permission: { action: 'view', resource: 'messages' } },
-    //     { id: 'announcements', label: 'Announcements', icon: Megaphone, href: '/messages/announcements', permission: { action: 'view', resource: 'announcements' } },
-    //   ],
-    // },
-    // [/MVP-PARKED]
     {
       id: 'account',
       items: [
@@ -702,18 +684,6 @@ const studentPortalModule: ModuleConfig = {
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {
-      id: 'overview',
-      items: [
-        {
-          id: 'portal-home',
-          label: 'Dashboard',
-          icon: Home,
-          href: '/student-portal',
-          permission: { action: 'view', resource: 'student-portal' },
-        },
-      ],
-    },
-    {
       id: 'academics',
       label: 'MY ACADEMICS',
       items: [
@@ -769,18 +739,6 @@ const parentPortalModule: ModuleConfig = {
   icon: Baby,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
-    {
-      id: 'overview',
-      items: [
-        {
-          id: 'portal-home',
-          label: 'Dashboard',
-          icon: Home,
-          href: '/parent-portal',
-          permission: { action: 'view', resource: 'parent-portal' },
-        },
-      ],
-    },
     {
       id: 'children',
       label: 'MY CHILDREN',

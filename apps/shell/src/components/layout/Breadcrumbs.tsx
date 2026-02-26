@@ -60,7 +60,7 @@ const ROUTE_LABELS: Record<string, string> = {
   assessments: 'Assessments',
   exams: 'Exams',
   calendar: 'Academic Calendar',
-  attendance: 'Student Attendance',
+  attendance: 'My Attendance',
 
   // Finance sub-routes
   accounting: 'Accounting',
@@ -86,7 +86,6 @@ const ROUTE_LABELS: Record<string, string> = {
   'performance-reviews': 'Performance Reviews',
   department: 'Departments',
   tasks: 'Staff Tasks',
-  assignments: 'Duty Assignments',
   parents: 'Parent Directory',
   '504-plans': '504 Plans',
 
@@ -117,11 +116,13 @@ const ROUTE_LABELS: Record<string, string> = {
   danger: 'Danger Zone',
 
   // Student Portal
-  grades: 'Grades',
-  schedule: 'Schedule',
+  grades: 'My Grades',
+  schedule: 'My Schedule',
+  assignments: 'Assignments',
 
   // Parent Portal
   fees: 'Fee Payments',
+  overview: 'Overview',
 
   // Special Programs sub-routes
   ieps: 'IEPs',

@@ -13,6 +13,7 @@ import {
   Outlet,
   redirect,
   useNavigate,
+  type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { ShellProvider } from './lib/shell-context'
@@ -29,6 +30,15 @@ import { isAuthenticated } from '@edforge/auth'
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
 import AuthDebugPage from './pages/AuthDebugPage'
+import StudentPortalLayout from './pages/student-portal/StudentPortalLayout'
+import StudentGradesPage from './pages/student-portal/StudentGradesPage'
+import StudentAttendancePage from './pages/student-portal/StudentAttendancePage'
+import StudentSchedulePage from './pages/student-portal/StudentSchedulePage'
+import ParentPortalLayout from './pages/parent-portal/ParentPortalLayout'
+import ParentOverviewPage from './pages/parent-portal/ParentOverviewPage'
+import ParentGradesPage from './pages/parent-portal/ParentGradesPage'
+import ParentAttendancePage from './pages/parent-portal/ParentAttendancePage'
+import ParentSchedulePage from './pages/parent-portal/ParentSchedulePage'
 import {
   AccountPage,
   SecurityPage,
@@ -537,19 +547,155 @@ const authDebugRoute2 = createRoute({
 })
 
 // ============================================================================
+// PORTAL ERROR COMPONENT
+// ============================================================================
+
+function PortalPageError({ error, reset }: ErrorComponentProps) {
+  return (
+    <div className="min-h-[400px] flex items-center justify-center p-6">
+      <div className="max-w-lg w-full text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
+          Something went wrong
+        </h2>
+        <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
+          This page encountered an error. Other pages should still work — try navigating away and back.
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={reset}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-medium text-sm transition-colors"
+          >
+            Try Again
+          </button>
+          <a
+            href="/home"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+          >
+            Go Home
+          </a>
+        </div>
+        {import.meta.env.DEV && error && (
+          <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+            <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">Developer Info</summary>
+            <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-red-500 font-mono overflow-x-auto max-h-40">
+              {error.message}
+              {'\n\n'}
+              {error.stack}
+            </pre>
+          </details>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
 // PORTAL ROUTES
 // ============================================================================
 
 const studentPortalRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/student-portal',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Student Portal</h1><p className="text-gray-500 mt-2">Student portal coming soon...</p></div>,
+  component: StudentPortalLayout,
+})
+
+const studentPortalIndexRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/',
+  beforeLoad: () => {
+    throw redirect({ to: '/student-portal/grades' })
+  },
+  component: () => null,
+})
+
+const studentPortalGradesRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/grades',
+  component: StudentGradesPage,
+  errorComponent: PortalPageError,
+})
+
+const studentPortalAttendanceRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/attendance',
+  component: StudentAttendancePage,
+  errorComponent: PortalPageError,
+})
+
+const studentPortalScheduleRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/schedule',
+  component: StudentSchedulePage,
+  errorComponent: PortalPageError,
+})
+
+const studentPortalAssignmentsRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/assignments',
+  component: () => <ComingSoon moduleName="Assignments" />,
+})
+
+const studentPortalCurriculumRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/curriculum',
+  component: () => <ComingSoon moduleName="Curriculum" />,
+})
+
+const studentPortalCalendarRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/calendar',
+  component: () => <ComingSoon moduleName="School Calendar" />,
 })
 
 const parentPortalRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/parent-portal',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Parent Portal</h1><p className="text-gray-500 mt-2">Parent portal coming soon...</p></div>,
+  component: ParentPortalLayout,
+})
+
+const parentPortalIndexRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/',
+  component: ParentOverviewPage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalGradesRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/grades',
+  component: ParentGradesPage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalAttendanceRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/attendance',
+  component: ParentAttendancePage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalScheduleRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/schedule',
+  component: ParentSchedulePage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalFeesRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/fees',
+  component: () => <ComingSoon moduleName="Fee Payments" />,
+})
+
+const parentPortalCalendarRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/calendar',
+  component: () => <ComingSoon moduleName="School Calendar" />,
 })
 
 // [MVP-PARKED] Special Programs route definition
@@ -645,8 +791,23 @@ const routeTree = rootRoute.addChildren([
     specialProgramsComingSoonRoute,
     financeComingSoonRoute,
     // [/MVP-PARKED]
-    studentPortalRoute,
-    parentPortalRoute,
+    studentPortalRoute.addChildren([
+      studentPortalIndexRoute,
+      studentPortalGradesRoute,
+      studentPortalAttendanceRoute,
+      studentPortalScheduleRoute,
+      studentPortalAssignmentsRoute,
+      studentPortalCurriculumRoute,
+      studentPortalCalendarRoute,
+    ]),
+    parentPortalRoute.addChildren([
+      parentPortalIndexRoute,
+      parentPortalGradesRoute,
+      parentPortalAttendanceRoute,
+      parentPortalScheduleRoute,
+      parentPortalFeesRoute,
+      parentPortalCalendarRoute,
+    ]),
     authDebugRoute2,
   ]),
 ])
