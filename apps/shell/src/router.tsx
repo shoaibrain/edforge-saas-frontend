@@ -27,6 +27,16 @@ import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
 
+// Landing Pages (public)
+import { PublicLayout } from './components/landing/PublicLayout'
+import { PublicErrorBoundary } from './components/landing/PublicErrorBoundary'
+import LandingPage from './components/landing/pages/LandingPage'
+import AboutPage from './components/landing/pages/AboutPage'
+import ContactPage from './components/landing/pages/ContactPage'
+import PrivacyPage from './components/landing/pages/PrivacyPage'
+import TermsPage from './components/landing/pages/TermsPage'
+import SecurityLandingPage from './components/landing/pages/SecurityPage'
+
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
 import AuthDebugPage from './pages/AuthDebugPage'
@@ -242,7 +252,7 @@ function OAuthCallbackHandler() {
 
 function IndexPage() {
   const navigate = useNavigate()
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const isAuthenticatedState = useAuthStore((s) => s.isAuthenticated)
   const isLoading = useAuthStore((s) => s.isLoading)
   const user = useAuthStore((s) => s.user)
 
@@ -255,15 +265,20 @@ function IndexPage() {
       return
     }
 
-    if (isAuthenticated && user) {
+    // If authenticated, redirect to home. Otherwise show landing page.
+    if (isAuthenticatedState && user) {
       navigate({ to: '/home', replace: true })
-    } else {
-      navigate({ to: '/login', replace: true })
     }
-  }, [isAuthenticated, isLoading, user, navigate, isOAuthCallback])
+    // Unauthenticated users see the landing page (no redirect to /login)
+  }, [isAuthenticatedState, isLoading, user, navigate, isOAuthCallback])
 
   if (isOAuthCallback) {
     return <OAuthCallbackHandler />
+  }
+
+  // Show landing page for unauthenticated users
+  if (!isLoading && !isAuthenticatedState) {
+    return <LandingPage />
   }
 
   return <LoadingScreen message="Loading..." />
@@ -273,6 +288,47 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: IndexPage,
+})
+
+// ============================================================================
+// PUBLIC ROUTES - Landing page sub-pages (about, contact, etc.)
+// ============================================================================
+
+const publicRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: '_public',
+  component: PublicLayout,
+  errorComponent: PublicErrorBoundary,
+})
+
+const aboutRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/about',
+  component: AboutPage,
+})
+
+const contactRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/contact',
+  component: ContactPage,
+})
+
+const privacyRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/privacy',
+  component: PrivacyPage,
+})
+
+const termsRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/terms',
+  component: TermsPage,
+})
+
+const securityLandingRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/security',
+  component: SecurityLandingPage,
 })
 
 // Keep the /auth/callback route as a fallback
@@ -754,6 +810,13 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   authCallbackRoute,
+  publicRoute.addChildren([
+    aboutRoute,
+    contactRoute,
+    privacyRoute,
+    termsRoute,
+    securityLandingRoute,
+  ]),
   protectedRoute.addChildren([
     homeRoute,
     settingsRoute.addChildren([
