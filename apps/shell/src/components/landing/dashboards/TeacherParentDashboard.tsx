@@ -1,4 +1,5 @@
 import { BookOpen, MessageCircle, TrendingUp, Users, Calendar, CheckCircle, Bell, Award } from 'lucide-react'
+import { getUserAvatar, getStudentAvatar } from '../../../lib/avatar'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
@@ -21,7 +22,7 @@ export function TeacherParentDashboard({ activeState }: TeacherParentDashboardPr
         {/* Sidebar — hidden on mobile */}
         <div
           className="hidden md:block w-20"
-          style={{ backgroundColor: 'rgba(var(--surface-secondary),0.5)', borderRight: '1px solid rgba(var(--brand-primary),0.1)' }}
+          style={{ backgroundColor: 'rgba(var(--surface-secondary),0.5)', borderRight: '1px solid rgb(var(--border-primary))' }}
         >
           <div className="flex h-full flex-col items-center gap-6 py-8">
             <div
@@ -76,12 +77,12 @@ export function TeacherParentDashboard({ activeState }: TeacherParentDashboardPr
                 <Bell className="h-5 w-5" style={{ color: 'rgb(var(--text-tertiary))' }} />
                 <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full" style={{ backgroundColor: 'var(--lp-chart-primary)' }} />
               </div>
-              <div
-                className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{ backgroundColor: 'rgba(var(--brand-primary),0.08)', borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)', color: 'rgb(var(--text-tertiary))' }}
-              >
-                TU
-              </div>
+              <img
+                src={getUserAvatar('Teacher User')}
+                alt="Teacher User"
+                className="h-8 w-8 rounded-full"
+                style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)' }}
+              />
             </div>
           </div>
 
@@ -174,13 +175,12 @@ export function TeacherParentDashboard({ activeState }: TeacherParentDashboardPr
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
-                        <div
-                          className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold"
-                          style={{ backgroundColor: 'rgba(var(--brand-primary),0.08)', borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)', color: 'rgb(var(--text-tertiary))' }}
-                        >
-                          {msg.from.charAt(0)}
-                          {msg.from.split(' ')[1]?.charAt(0) || ''}
-                        </div>
+                        <img
+                          src={getUserAvatar(msg.from)}
+                          alt={msg.from}
+                          className="h-10 w-10 rounded-full"
+                          style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)' }}
+                        />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <span style={{ fontWeight: 'var(--lp-weight-subheading)', color: 'rgb(var(--text-primary))' }}>{msg.from}</span>
@@ -271,12 +271,12 @@ export function TeacherParentDashboard({ activeState }: TeacherParentDashboardPr
                         style={{ backgroundColor: 'rgba(var(--brand-primary),0.04)', borderRadius: 'var(--lp-radius-sm)' }}
                       >
                         <div className="flex items-center gap-3">
-                          <div
-                            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-                            style={{ background: 'linear-gradient(to bottom right, #2a9d8f, #1a6b7a)' }}
-                          >
-                            {i + 1}
-                          </div>
+                          <img
+                            src={getStudentAvatar(student.name)}
+                            alt={student.name}
+                            className="h-10 w-10 rounded-full"
+                            style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)' }}
+                          />
                           <div>
                             <div style={{ fontSize: 'var(--lp-font-label)', fontWeight: 'var(--lp-weight-label)', color: 'rgb(var(--text-primary))' }}>{student.name}</div>
                             <div style={{ fontSize: 'var(--lp-font-label)', color: 'rgb(var(--text-secondary))' }}>{student.achievement}</div>
@@ -349,12 +349,12 @@ export function TeacherParentDashboard({ activeState }: TeacherParentDashboardPr
                         style={{ backgroundColor: 'rgba(var(--brand-primary),0.04)', borderRadius: 'var(--lp-radius-sm)' }}
                       >
                         <div className="flex items-center gap-3">
-                          <div
-                            className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold"
-                            style={{ backgroundColor: 'rgba(var(--brand-primary),0.08)', borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)', color: 'rgb(var(--text-tertiary))' }}
-                          >
-                            {conf.parent.charAt(0)}{conf.parent.split(' ').pop()?.charAt(0) || ''}
-                          </div>
+                          <img
+                            src={getUserAvatar(conf.parent)}
+                            alt={conf.parent}
+                            className="h-10 w-10 rounded-full"
+                            style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)' }}
+                          />
                           <div>
                             <div style={{ fontSize: 'var(--lp-font-label)', fontWeight: 'var(--lp-weight-label)', color: 'rgb(var(--text-primary))' }}>{conf.parent}</div>
                             <div style={{ fontSize: 'var(--lp-font-label)', color: 'rgb(var(--text-secondary))' }}>Re: {conf.student}</div>

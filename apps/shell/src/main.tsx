@@ -21,7 +21,7 @@ const amplifyConfigured = configureAmplify()
 if (amplifyConfigured) {
   console.log('[EdForge] Amplify configured successfully')
 } else {
-  console.log('[EdForge] Running in dev mode without Cognito - use mock users')
+  console.warn('[EdForge] Amplify not configured — authentication will not work')
 }
 
 // Query client for data fetching

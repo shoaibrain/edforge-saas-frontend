@@ -1,4 +1,5 @@
 import { BookOpen, Trophy, Star, Target, Zap } from 'lucide-react'
+import { getStudentAvatar } from '../../../lib/avatar'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '../hooks/useReducedMotion'
@@ -33,7 +34,7 @@ export function StudentDashboard({ activeState }: StudentDashboardProps) {
         {/* Sidebar — hidden on mobile */}
         <div
           className="hidden md:block w-20"
-          style={{ borderRight: '1px solid rgba(var(--brand-primary),0.1)', backgroundColor: 'rgba(var(--surface-secondary),0.5)' }}
+          style={{ borderRight: '1px solid rgb(var(--border-primary))', backgroundColor: 'rgba(var(--surface-secondary),0.5)' }}
         >
           <div className="flex h-full flex-col items-center gap-6 py-8">
             <div
@@ -91,12 +92,12 @@ export function StudentDashboard({ activeState }: StudentDashboardProps) {
                 <Star className="h-4 w-4" style={{ color: 'var(--lp-chart-primary)' }} />
                 <span style={{ fontSize: 'var(--lp-font-label)', fontWeight: 'var(--lp-weight-subheading)', color: 'var(--lp-chart-primary)' }}>Level 12</span>
               </div>
-              <div
-                className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{ backgroundColor: 'rgba(var(--brand-primary),0.08)', borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)', color: 'rgb(var(--text-tertiary))' }}
-              >
-                SU
-              </div>
+              <img
+                src={getStudentAvatar('Student User')}
+                alt="Student User"
+                className="h-8 w-8 rounded-full"
+                style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)' }}
+              />
             </div>
           </div>
 

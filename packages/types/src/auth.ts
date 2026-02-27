@@ -89,8 +89,6 @@ export interface AuthState {
 export interface LoginCredentials {
   email: string
   password?: string
-  /** For demo/mock mode */
-  mockUserId?: string
 }
 
 /**

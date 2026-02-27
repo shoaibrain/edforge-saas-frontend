@@ -560,12 +560,17 @@ export async function getSecurityOverview(userId: string): Promise<SecurityOverv
 /**
  * Change user password
  * POST /users/:id/security/change-password
+ *
+ * Uses skipAuthRedirect because the backend may return 401 for "wrong
+ * current password" — that is a validation error, not a session expiry.
  */
 export async function changePassword(
   userId: string,
   data: ChangePasswordDto
 ): Promise<{ success: boolean; message: string }> {
-  return apiPost(`/users/${userId}/security/change-password`, data)
+  return apiPost(`/users/${userId}/security/change-password`, data, {
+    meta: { skipAuthRedirect: true },
+  })
 }
 
 /**

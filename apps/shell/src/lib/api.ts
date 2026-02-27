@@ -1,13 +1,25 @@
 /**
  * API Client
- * 
+ *
  * Axios-based HTTP client with automatic Cognito JWT token injection.
  * Handles authentication errors and token refresh.
  */
 
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios'
 import { toast } from 'sonner'
 import { getIdToken } from '@edforge/auth'
+
+// ============================================================================
+// REQUEST META — per-request behavior overrides
+// ============================================================================
+
+export interface ApiRequestMeta {
+  /** Skip the global 401 → logout redirect for this request.
+   *  Use for endpoints where 401 means "wrong input" (e.g. change-password). */
+  skipAuthRedirect?: boolean
+  /** Skip the global 403 toast for this request. */
+  gracefulDegradation?: boolean
+}
 
 // ============================================================================
 // API CLIENT SETUP
@@ -81,8 +93,17 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const status = error.response?.status
 
+    // Read per-request meta for behavior overrides
+    const meta = (error.config as AxiosRequestConfig & { meta?: ApiRequestMeta })?.meta
+
     // Handle authentication errors
     if (status === 401 && !isRedirecting) {
+      // If this request opted out of the global auth redirect (e.g. change-password
+      // where 401 means "wrong current password"), just reject normally.
+      if (meta?.skipAuthRedirect) {
+        return Promise.reject(error)
+      }
+
       // Import auth store and signOut dynamically to avoid circular dependency
       const { useAuthStore } = await import('../stores/auth.store')
       const { signOut } = await import('aws-amplify/auth')
@@ -101,8 +122,10 @@ api.interceptors.response.use(
         error: 'Session expired. Please log in again.',
       })
 
-      // Clear persisted auth data
-      localStorage.removeItem('edforge-auth')
+      // Clear persisted auth cookie (store uses cookie, not localStorage)
+      if (typeof document !== 'undefined') {
+        document.cookie = 'edforge-auth=; path=/; max-age=0'
+      }
 
       // Sign out from Cognito (local only - no global redirect)
       // This clears Amplify's local session so user can login again
@@ -137,7 +160,6 @@ api.interceptors.response.use(
 
       // Only toast on write operations (user explicitly took an action)
       // For reads (GET), let the error bubble to the component for graceful degradation
-      const meta = (error.config as any)?.meta as { gracefulDegradation?: boolean } | undefined
       if (!meta?.gracefulDegradation && method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
         toast.error('Access Denied', { description: message })
       }
@@ -186,43 +208,46 @@ function unwrapResponse<T>(response: any): T {
   return response as T
 }
 
+/** Optional extra config forwarded to Axios (e.g. meta overrides). */
+type ExtraConfig = AxiosRequestConfig & { meta?: ApiRequestMeta }
+
 /**
  * GET request with typed response
  */
-export async function apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
-  const response = await api.get<T>(url, { params })
+export async function apiGet<T>(url: string, params?: Record<string, unknown>, config?: ExtraConfig): Promise<T> {
+  const response = await api.get<T>(url, { ...config, params })
   return unwrapResponse<T>(response.data)
 }
 
 /**
  * POST request with typed body and response
  */
-export async function apiPost<T, B = unknown>(url: string, body?: B): Promise<T> {
-  const response = await api.post<T>(url, body)
+export async function apiPost<T, B = unknown>(url: string, body?: B, config?: ExtraConfig): Promise<T> {
+  const response = await api.post<T>(url, body, config)
   return unwrapResponse<T>(response.data)
 }
 
 /**
  * PUT request with typed body and response
  */
-export async function apiPut<T, B = unknown>(url: string, body?: B): Promise<T> {
-  const response = await api.put<T>(url, body)
+export async function apiPut<T, B = unknown>(url: string, body?: B, config?: ExtraConfig): Promise<T> {
+  const response = await api.put<T>(url, body, config)
   return unwrapResponse<T>(response.data)
 }
 
 /**
  * PATCH request with typed body and response
  */
-export async function apiPatch<T, B = unknown>(url: string, body?: B): Promise<T> {
-  const response = await api.patch<T>(url, body)
+export async function apiPatch<T, B = unknown>(url: string, body?: B, config?: ExtraConfig): Promise<T> {
+  const response = await api.patch<T>(url, body, config)
   return unwrapResponse<T>(response.data)
 }
 
 /**
  * DELETE request with typed response
  */
-export async function apiDelete<T>(url: string): Promise<T> {
-  const response = await api.delete<T>(url)
+export async function apiDelete<T>(url: string, config?: ExtraConfig): Promise<T> {
+  const response = await api.delete<T>(url, config)
   return unwrapResponse<T>(response.data)
 }
 

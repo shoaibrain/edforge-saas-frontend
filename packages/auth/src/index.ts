@@ -21,6 +21,7 @@ export {
   getAuthenticatedUser,
   subscribeToAuthChanges,
   handleAuthCallback,
+  getForgotPasswordUrl,
 } from './service'
 
 // User mapping utilities

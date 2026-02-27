@@ -48,7 +48,6 @@ import {
   Calendar,
   FileText,
   Baby,
-  Bug,
   Building2,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
@@ -487,19 +486,6 @@ const settingsModule: ModuleConfig = {
     //   ],
     // },
     // [/MVP-PARKED]
-    {
-      id: 'developer',
-      label: 'DEVELOPER',
-      items: [
-        {
-          id: 'auth-debug',
-          label: 'Auth Debug',
-          icon: Bug,
-          href: '/auth-debug',
-          tenantRoles: ['TenantAdmin'],
-        },
-      ],
-    },
   ],
 }
 

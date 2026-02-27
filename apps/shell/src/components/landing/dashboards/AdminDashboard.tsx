@@ -25,14 +25,14 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
-  DollarSign,
   AlertCircle,
-  Search,
   Bell,
   School,
   ArrowRight,
   BrainCircuit,
+  MoreHorizontal,
 } from 'lucide-react'
+import { getStaffAvatar } from '../../../lib/avatar'
 
 type AdminDashboardState = 'overview' | 'multi-campus' | 'hr' | 'analytics'
 
@@ -87,7 +87,7 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
           className={`relative z-10 hidden backdrop-blur-xl transition-all duration-500 ease-in-out md:block ${
             isSidebarCollapsed ? 'w-20' : 'w-64'
           }`}
-          style={{ backgroundColor: 'rgba(var(--surface-secondary),0.5)', borderRight: '1px solid rgba(var(--brand-primary),0.1)' }}
+          style={{ backgroundColor: 'rgba(var(--surface-secondary),0.5)', borderRight: '1px solid rgb(var(--border-primary))' }}
         >
           <div className="flex h-full flex-col py-6">
             {/* Logo Area */}
@@ -160,23 +160,6 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
               >
                 {isSidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </button>
-              <div className="relative hidden lg:block">
-                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2" style={{ color: 'rgb(var(--text-secondary))' }} />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="h-8 w-48 pl-9 text-xs outline-none transition-all"
-                  style={{
-                    backgroundColor: 'rgba(var(--surface-primary),0.5)',
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderColor: 'rgba(var(--brand-primary),0.1)',
-                    borderRadius: 'var(--lp-radius-sm)',
-                    color: 'rgb(var(--text-primary))',
-                  }}
-                  readOnly
-                />
-              </div>
             </div>
             <div className="flex items-center gap-4">
               <button className="relative p-1.5 transition-colors" style={{ borderRadius: 'var(--lp-radius-sm)' }}>
@@ -192,12 +175,12 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                   <div className="mt-0.5" style={{ fontSize: '10px', color: 'rgb(var(--text-secondary))' }}>Superintendent</div>
                 </div>
                 <div className="relative">
-                  <div
-                    className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ backgroundColor: 'rgb(var(--surface-tertiary))', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)', color: 'rgb(var(--text-secondary))' }}
-                  >
-                    RW
-                  </div>
+                  <img
+                    src={getStaffAvatar('Dr. R. Wilson')}
+                    alt="Dr. R. Wilson"
+                    className="h-8 w-8 rounded-full"
+                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)' }}
+                  />
                   <span
                     className="absolute bottom-0 right-0 h-2 w-2 rounded-full"
                     style={{ backgroundColor: 'var(--lp-chart-success)', border: '1px solid rgb(var(--surface-primary))' }}
@@ -226,10 +209,10 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                   <p style={{ fontSize: 'var(--lp-font-label)', color: 'rgb(var(--text-secondary))' }}>Real-time performance metrics.</p>
                 </div>
                 <button
-                  className="px-3 py-1.5 font-medium transition-colors"
-                  style={{ fontSize: 'var(--lp-font-label)', backgroundColor: 'rgb(var(--surface-primary))', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(var(--brand-primary),0.1)', borderRadius: 'var(--lp-radius-sm)', color: 'rgb(var(--text-primary))' }}
+                  className="p-1.5 transition-colors"
+                  style={{ borderRadius: 'var(--lp-radius-sm)', color: 'rgb(var(--text-secondary))' }}
                 >
-                  Export
+                  <MoreHorizontal className="h-5 w-5" />
                 </button>
               </div>
 

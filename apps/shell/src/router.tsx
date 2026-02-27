@@ -39,7 +39,7 @@ import SecurityLandingPage from './components/landing/pages/SecurityPage'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
-import AuthDebugPage from './pages/AuthDebugPage'
+// AuthDebugPage removed — dev-only utility not needed in production
 import StudentPortalLayout from './pages/student-portal/StudentPortalLayout'
 import StudentGradesPage from './pages/student-portal/StudentGradesPage'
 import StudentAttendancePage from './pages/student-portal/StudentAttendancePage'
@@ -592,15 +592,7 @@ const peopleRoute = createRoute({
 // })
 // [/MVP-PARKED]
 
-// ============================================================================
-// AUTH DEBUG ROUTE
-// ============================================================================
-
-const authDebugRoute2 = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/auth-debug',
-  component: AuthDebugPage,
-})
+// [REMOVED] AuthDebugPage — dev-only utility removed for production
 
 // ============================================================================
 // PORTAL ERROR COMPONENT
@@ -871,7 +863,6 @@ const routeTree = rootRoute.addChildren([
       parentPortalFeesRoute,
       parentPortalCalendarRoute,
     ]),
-    authDebugRoute2,
   ]),
 ])
 

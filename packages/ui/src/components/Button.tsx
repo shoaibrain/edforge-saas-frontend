@@ -3,22 +3,22 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../utils'
 
 const buttonVariants = cva(
-  // Base styles
-  'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+  // Base styles — use theme-aware focus ring
+  'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
   {
     variants: {
       variant: {
         primary:
-          'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-sm',
+          'bg-teal-600 text-white hover:bg-teal-700 active:bg-teal-800 shadow-sm',
         secondary:
-          'bg-slate-100 text-slate-900 hover:bg-slate-200 active:bg-slate-300',
+          'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-elevated))] active:opacity-80',
         outline:
-          'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:bg-slate-100',
+          'border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-tertiary))] active:opacity-80',
         ghost:
-          'text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200',
+          'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
         danger:
           'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
-        link: 'text-brand-600 underline-offset-4 hover:underline',
+        link: 'text-teal-600 underline-offset-4 hover:underline',
       },
       size: {
         sm: 'h-8 px-3 text-sm rounded-lg gap-1.5',
