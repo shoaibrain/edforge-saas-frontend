@@ -12,9 +12,9 @@ function BelowFoldFallback() {
   return (
     <div className="min-h-[200vh]">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="border-t border-border px-6 py-24 text-center">
-          <div className="mx-auto h-6 w-48 rounded-full landing-skeleton bg-muted/30" />
-          <div className="mx-auto mt-4 h-10 w-96 max-w-full rounded-lg landing-skeleton bg-muted/20" />
+        <div key={i} className="px-6 py-24 text-center">
+          <div className="mx-auto h-6 w-48 rounded-full landing-skeleton" style={{ backgroundColor: 'rgba(42,157,143,0.1)' }} />
+          <div className="mx-auto mt-4 h-10 w-96 max-w-full rounded-lg landing-skeleton" style={{ backgroundColor: 'rgba(42,157,143,0.06)' }} />
         </div>
       ))}
     </div>
@@ -50,7 +50,7 @@ export default function LandingPage() {
   const [sentinelRef, belowFoldVisible] = useInView('200px')
 
   return (
-    <div className="landing-page relative min-h-screen bg-background text-foreground">
+    <div className="landing-page relative min-h-screen">
       {/* Skip to content link */}
       <a
         href="#main-content"

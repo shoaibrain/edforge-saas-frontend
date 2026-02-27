@@ -1,17 +1,12 @@
 export function SocialProofSection() {
   return (
     <div
-      className="relative"
-      style={{ background: '#0d1e27' }}
+      className="relative w-full pointer-events-none"
       aria-hidden="true"
-    >
-      <div
-        className="h-px mx-auto max-w-4xl"
-        style={{
-          background:
-            'linear-gradient(to right, transparent, rgba(42,157,143,0.15), transparent)',
-        }}
-      />
-    </div>
+      style={{
+        height: '8rem',
+        background: 'linear-gradient(to bottom, #0d1e27, #0a1a24)',
+      }}
+    />
   )
 }

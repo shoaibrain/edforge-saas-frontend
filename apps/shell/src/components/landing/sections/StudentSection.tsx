@@ -7,30 +7,30 @@ const sections: ScrollSection<StudentState>[] = [
   {
     id: 1,
     state: 'learning',
-    headline: 'Interactive Skill Mastery',
-    body: 'Go beyond textbooks with interactive simulations and virtual models. Explore ancient cities or conduct safe chemistry experiments. Build and create projects that encourage deeper exploration and mastery of academic concepts.',
-    badge: 'Deep Learning',
+    headline: 'All your courses, one place',
+    body: 'See every class, track progress by subject, and pick up where you left off. No hunting through multiple apps.',
+    badge: 'My Courses',
   },
   {
     id: 2,
     state: 'engagement',
-    headline: 'Growth Mindset & Grit',
-    body: 'Frame mistakes as opportunities to learn. Develop a toolkit of strategies to apply when faced with challenges. We reward persistence and tenacity, helping you build the resilience needed to solve difficult problems.',
-    badge: 'Build Character',
+    headline: 'Earn as you learn',
+    body: 'Points, streaks, and badges for consistent effort. See where you rank in your class. Build habits that last.',
+    badge: 'Achievements',
   },
   {
     id: 3,
     state: 'achievements',
-    headline: 'Lifelong Learning Toolkit',
-    body: 'Develop non-cognitive skills that are critical for long-term success. Track your growth in creativity, collaboration, and critical thinking alongside your academic achievements. Believe in your ability to improve and succeed.',
-    badge: 'Skills for Life',
+    headline: 'Grades you can understand',
+    body: 'See your overall GPA, subject breakdown, and recent achievements in one clean view. No surprises at report card time.',
+    badge: 'My Grades',
   },
   {
     id: 4,
     state: 'personalized',
-    headline: 'Future Pathways',
-    body: 'Plan your future with college-to-career maps and interactive course planning. Connect with alumni in fields that interest you to gain perspective and advice. Visualize your path to graduation and beyond.',
-    badge: 'Your Future',
+    headline: 'Know what to focus on',
+    body: 'Personalized recommendations based on your performance. See which subjects need attention and what to study next.',
+    badge: 'For You',
   },
 ]
 
@@ -41,10 +41,11 @@ export function StudentSection() {
       sectionTag="For Students"
       sectionTitle={
         <>
-          Learn, Grow, and Achieve Your <span className="text-primary">Dreams</span>
+          Students see their{' '}
+          <span style={{ color: '#2a9d8f' }}>own progress.</span>
         </>
       }
-      sectionSubtitle="A learning platform that makes education fun, engaging, and perfectly tailored to help you succeed"
+      sectionSubtitle="Grades, assignments, schedules, and achievements — all in a student portal built for clarity, not clutter."
       dashboard={StudentDashboard}
       variant="skeleton"
     />

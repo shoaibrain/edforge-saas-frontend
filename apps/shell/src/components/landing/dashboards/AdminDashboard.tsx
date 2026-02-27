@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import {
   Area,
   AreaChart,
@@ -13,6 +13,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useReducedMotion } from '../hooks/useReducedMotion'
 import {
   Building2,
   GraduationCap,
@@ -66,30 +68,41 @@ const hrData = [
 
 export function AdminDashboard({ activeState }: AdminDashboardProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true)
+  const prefersReducedMotion = useReducedMotion()
 
   return (
-    <div role="img" aria-label="Administrative dashboard demonstration showing school management features" className="relative overflow-hidden rounded-2xl border border-border/50 bg-card shadow-2xl shadow-black/20 transition-all duration-500 flex flex-col h-[min(500px,70vh)] md:h-[min(600px,75vh)]">
+    <div
+      role="img"
+      aria-label="Administrative dashboard demonstration showing school management features"
+      className="relative overflow-hidden rounded-2xl shadow-xl shadow-black/40 transition-all duration-500 flex flex-col h-[min(480px,65vh)] md:h-[min(560px,70vh)]"
+      style={{ backgroundColor: '#102630', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+    >
       {/* Glass Overlay Effect */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-accent/5" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[#2a9d8f]/5 via-transparent to-[#2a9d8f]/5" />
 
       {/* Dashboard Container */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <div
-          className={`relative z-10 hidden border-r border-border/50 bg-card/50 backdrop-blur-xl transition-all duration-500 ease-in-out md:block ${
+          className={`relative z-10 hidden backdrop-blur-xl transition-all duration-500 ease-in-out md:block ${
             isSidebarCollapsed ? 'w-20' : 'w-64'
           }`}
+          style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderRight: '1px solid rgba(42,157,143,0.1)' }}
         >
           <div className="flex h-full flex-col py-6">
             {/* Logo Area */}
             <div className={`mb-8 flex items-center gap-3 px-6 ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}>
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-lg"
+                style={{ backgroundColor: '#2a9d8f', color: '#050b0f', boxShadow: '0 10px 15px -3px rgba(42,157,143,0.2)' }}
+              >
                 <Building2 className="h-5 w-5" />
               </div>
               <span
                 className={`font-bold text-lg tracking-tight transition-opacity duration-300 ${
                   isSidebarCollapsed ? 'hidden opacity-0' : 'opacity-100'
                 }`}
+                style={{ color: '#e8edf0' }}
               >
                 EdForge
               </span>
@@ -106,10 +119,13 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                 <div
                   key={item.state}
                   className={`group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-all ${
+                    isSidebarCollapsed ? 'justify-center px-0' : ''
+                  }`}
+                  style={
                     activeState === item.state
-                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  } ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
+                      ? { backgroundColor: '#2a9d8f', color: '#050b0f', boxShadow: '0 4px 6px -1px rgba(42,157,143,0.2)' }
+                      : { color: '#8aafbf' }
+                  }
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   <span
@@ -126,41 +142,64 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-1 flex-col overflow-hidden bg-background/30 backdrop-blur-sm">
+        <div
+          className="flex flex-1 flex-col overflow-hidden backdrop-blur-sm"
+          style={{ backgroundColor: 'rgba(10,26,36,0.3)' }}
+        >
           {/* Top Navigation */}
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/50 px-6 backdrop-blur-md">
+          <div
+            className="flex h-14 shrink-0 items-center justify-between px-6 backdrop-blur-md"
+            style={{ borderBottom: '1px solid rgba(42,157,143,0.1)' }}
+          >
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                className="hidden rounded-lg p-1.5 hover:bg-muted md:block"
+                className="hidden rounded-lg p-1.5 md:block"
+                style={{ color: '#8aafbf' }}
               >
                 {isSidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </button>
               <div className="relative hidden lg:block">
-                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2" style={{ color: '#8aafbf' }} />
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="h-8 w-48 rounded-lg border border-border/50 bg-background/50 pl-9 text-xs outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                  className="h-8 w-48 rounded-lg pl-9 text-xs outline-none transition-all"
+                  style={{
+                    backgroundColor: 'rgba(10,26,36,0.5)',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'rgba(42,157,143,0.1)',
+                    color: '#e8edf0',
+                  }}
                   readOnly
                 />
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button className="relative rounded-lg p-1.5 hover:bg-muted transition-colors">
-                <Bell className="h-4 w-4 text-muted-foreground" />
-                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-background" />
+              <button className="relative rounded-lg p-1.5 transition-colors">
+                <Bell className="h-4 w-4" style={{ color: '#8aafbf' }} />
+                <span
+                  className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-red-500"
+                  style={{ boxShadow: '0 0 0 2px #0a1a24' }}
+                />
               </button>
               <div className="flex items-center gap-3 pl-2">
                 <div className="text-right hidden sm:block">
-                  <div className="text-sm font-semibold leading-none">Dr. R. Wilson</div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5">Superintendent</div>
+                  <div className="text-sm font-semibold leading-none" style={{ color: '#e8edf0' }}>Dr. R. Wilson</div>
+                  <div className="text-[10px] mt-0.5" style={{ color: '#8aafbf' }}>Superintendent</div>
                 </div>
                 <div className="relative">
-                  <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-bold text-muted-foreground">
+                  <div
+                    className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ backgroundColor: '#162e3b', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)', color: '#8aafbf' }}
+                  >
                     RW
                   </div>
-                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-background bg-green-500" />
+                  <span
+                    className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-500"
+                    style={{ border: '1px solid #0a1a24' }}
+                  />
                 </div>
               </div>
             </div>
@@ -168,36 +207,52 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
 
           {/* Content Area */}
           <div className="relative flex-1 overflow-hidden p-5">
+            <AnimatePresence mode="wait">
             {activeState === 'overview' && (
-            <div className="absolute inset-0 p-5 overflow-y-auto animate-[fadeIn_0.3s_ease-out]">
+            <motion.div
+              key="overview"
+              className="absolute inset-0 p-5 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
+            >
 
               <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold tracking-tight text-foreground">District Overview</h2>
-                  <p className="text-xs text-muted-foreground">Real-time performance metrics.</p>
+                  <h2 className="text-lg font-bold tracking-tight" style={{ color: '#e8edf0' }}>District Overview</h2>
+                  <p className="text-xs" style={{ color: '#8aafbf' }}>Real-time performance metrics.</p>
                 </div>
-                <button className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors">
+                <button
+                  className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{ backgroundColor: '#0a1a24', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)', color: '#e8edf0' }}
+                >
                   Export
                 </button>
               </div>
 
-              <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
                 <MetricCard title="Total Students" value="45,231" trend="+2.5%" trendUp icon={GraduationCap} color="text-blue-500" bgColor="bg-blue-500/10" />
                 <MetricCard title="Total Staff" value="3,402" trend="+1.2%" trendUp icon={Users} color="text-purple-500" bgColor="bg-purple-500/10" />
-                <MetricCard title="Budget Utilized" value="68%" trend="-4.1%" trendUp={false} icon={DollarSign} color="text-green-500" bgColor="bg-green-500/10" />
                 <MetricCard title="Avg Attendance" value="94.2%" trend="+0.8%" trendUp icon={UserCheck} color="text-orange-500" bgColor="bg-orange-500/10" />
               </div>
 
               <div className="mt-5 grid gap-5 md:grid-cols-7">
-                <div className="col-span-4 rounded-xl border border-border/50 bg-card/50 p-4 shadow-sm backdrop-blur-sm">
+                <div
+                  className="col-span-4 rounded-xl p-4 shadow-sm backdrop-blur-sm"
+                  style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                >
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="font-semibold text-sm">Financial Performance</h3>
-                    <select className="rounded-md border border-border bg-background px-2 py-0.5 text-[10px] outline-none">
+                    <h3 className="font-semibold text-sm" style={{ color: '#e8edf0' }}>Financial Performance</h3>
+                    <select
+                      className="rounded-md px-2 py-0.5 text-[10px] outline-none"
+                      style={{ backgroundColor: '#0a1a24', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)', color: '#e8edf0' }}
+                    >
                       <option>This Year</option>
                       <option>Last Year</option>
                     </select>
                   </div>
-                  <div className="h-[200px] w-full">
+                  <div className="h-[160px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={overviewData}>
                         <defs>
@@ -206,12 +261,12 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                             <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} dx={-10} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(42,157,143,0.1)" opacity={0.4} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dx={-10} />
                         <Tooltip
-                          contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
-                          itemStyle={{ color: 'hsl(var(--foreground))' }}
+                          contentStyle={{ backgroundColor: '#102630', borderColor: 'rgba(42,157,143,0.1)', borderRadius: '8px', fontSize: '12px' }}
+                          itemStyle={{ color: '#e8edf0' }}
                         />
                         <Area type="monotone" dataKey="actual" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorBudget)" />
                         <Area type="monotone" dataKey="budget" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" fill="none" />
@@ -219,56 +274,79 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="col-span-3 rounded-xl border border-border/50 bg-card/50 p-4 shadow-sm backdrop-blur-sm">
-                  <h3 className="mb-3 font-semibold text-sm">Action Items</h3>
+                <div
+                  className="col-span-3 rounded-xl p-4 shadow-sm backdrop-blur-sm"
+                  style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                >
+                  <h3 className="mb-3 font-semibold text-sm" style={{ color: '#e8edf0' }}>Action Items</h3>
                   <div className="space-y-2.5">
                     {[
                       { title: 'Budget Review', desc: 'Q3 allocation pending', color: 'bg-red-500' },
                       { title: 'Staff Hiring', desc: '3 Science positions', color: 'bg-yellow-500' },
-                      { title: 'Facility Check', desc: 'North Wing maint.', color: 'bg-blue-500' },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 rounded-lg border border-border/50 bg-background/50 p-2.5 transition-colors hover:bg-muted/50">
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 rounded-lg p-2.5 transition-colors"
+                        style={{ backgroundColor: 'rgba(10,26,36,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                      >
                         <div className={`mt-1 h-1.5 w-1.5 rounded-full ${item.color} shadow-sm`} />
                         <div>
-                          <div className="text-xs font-medium text-foreground">{item.title}</div>
-                          <div className="text-[10px] text-muted-foreground">{item.desc}</div>
+                          <div className="text-xs font-medium" style={{ color: '#e8edf0' }}>{item.title}</div>
+                          <div className="text-[10px]" style={{ color: '#8aafbf' }}>{item.desc}</div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
             )}
 
             {activeState === 'multi-campus' && (
-            <div className="absolute inset-0 p-5 overflow-y-auto animate-[fadeIn_0.3s_ease-out]">
+            <motion.div
+              key="multi-campus"
+              className="absolute inset-0 p-5 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
+            >
 
               <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold tracking-tight text-foreground">Campus Operations</h2>
-                  <p className="text-xs text-muted-foreground">Live status of all educational facilities.</p>
+                  <h2 className="text-lg font-bold tracking-tight" style={{ color: '#e8edf0' }}>Campus Operations</h2>
+                  <p className="text-xs" style={{ color: '#8aafbf' }}>Live status of all educational facilities.</p>
                 </div>
-                <button className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors">
+                <button
+                  className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{ backgroundColor: '#0a1a24', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)', color: '#e8edf0' }}
+                >
                   Filter
                 </button>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {campusData.map((campus, i) => (
-                  <div key={i} className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
-                    <div className="h-20 w-full relative overflow-hidden bg-gradient-to-br from-primary/20 to-accent/10">
+                {campusData.slice(0, 3).map((campus, i) => (
+                  <div
+                    key={i}
+                    className="group relative overflow-hidden rounded-xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-[#2a9d8f]/5"
+                    style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                  >
+                    <div className="h-20 w-full relative overflow-hidden bg-gradient-to-br from-[#2a9d8f]/20 to-[#2a9d8f]/10">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                     </div>
                     <div className="p-4">
-                      <div className="absolute top-14 left-4 z-20 flex h-10 w-10 items-center justify-center rounded-xl border-4 border-background bg-card shadow-sm">
-                        <campus.icon className="h-5 w-5 text-foreground" />
+                      <div
+                        className="absolute top-14 left-4 z-20 flex h-10 w-10 items-center justify-center rounded-xl shadow-sm"
+                        style={{ backgroundColor: '#102630', border: '4px solid #0a1a24' }}
+                      >
+                        <campus.icon className="h-5 w-5" style={{ color: '#e8edf0' }} />
                       </div>
                       <div className="mt-6">
                         <div className="flex items-start justify-between">
                           <div className="pr-2">
-                            <h3 className="font-bold text-base leading-tight truncate max-w-[120px]" title={campus.name}>{campus.name}</h3>
-                            <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{campus.type}</p>
+                            <h3 className="font-bold text-base leading-tight truncate max-w-[120px]" title={campus.name} style={{ color: '#e8edf0' }}>{campus.name}</h3>
+                            <p className="text-[10px] mt-0.5 truncate" style={{ color: '#8aafbf' }}>{campus.type}</p>
                           </div>
                           <span
                             className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
@@ -283,34 +361,37 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                           </span>
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-2">
-                          <div className="rounded-lg bg-muted/50 p-2.5">
-                            <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
+                          <div className="rounded-lg p-2.5" style={{ backgroundColor: 'rgba(22,46,59,0.5)' }}>
+                            <div className="flex items-center gap-1.5 mb-0.5" style={{ color: '#8aafbf' }}>
                               <GraduationCap className="h-3 w-3" />
                               <span className="text-[10px] font-medium">Students</span>
                             </div>
-                            <div className="text-base font-bold">{campus.students}</div>
+                            <div className="text-base font-bold" style={{ color: '#e8edf0' }}>{campus.students}</div>
                           </div>
-                          <div className="rounded-lg bg-muted/50 p-2.5">
-                            <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
+                          <div className="rounded-lg p-2.5" style={{ backgroundColor: 'rgba(22,46,59,0.5)' }}>
+                            <div className="flex items-center gap-1.5 mb-0.5" style={{ color: '#8aafbf' }}>
                               <Users className="h-3 w-3" />
                               <span className="text-[10px] font-medium">Staff</span>
                             </div>
-                            <div className="text-base font-bold">{campus.staff}</div>
+                            <div className="text-base font-bold" style={{ color: '#e8edf0' }}>{campus.staff}</div>
                           </div>
                         </div>
                         <div className="mt-3">
                           <div className="flex items-center justify-between text-[10px] mb-1">
-                            <span className="font-medium text-muted-foreground">Health Score</span>
-                            <span className="font-bold">{campus.health}%</span>
+                            <span className="font-medium" style={{ color: '#8aafbf' }}>Health Score</span>
+                            <span className="font-bold" style={{ color: '#e8edf0' }}>{campus.health}%</span>
                           </div>
-                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: '#162e3b' }}>
                             <div
                               className={`h-full rounded-full transition-all duration-1000 ${campus.health > 90 ? 'bg-green-500' : 'bg-yellow-500'}`}
                               style={{ width: `${campus.health}%` }}
                             />
                           </div>
                         </div>
-                        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/50 py-1.5 text-xs font-medium transition-colors hover:bg-muted hover:text-primary group-hover:border-primary/20">
+                        <button
+                          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg py-1.5 text-xs font-medium transition-colors"
+                          style={{ backgroundColor: 'rgba(10,26,36,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)', color: '#e8edf0' }}
+                        >
                           View Dashboard
                           <ArrowRight className="h-3 w-3" />
                         </button>
@@ -319,20 +400,30 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
             )}
 
             {activeState === 'hr' && (
-            <div className="absolute inset-0 p-5 overflow-y-auto animate-[fadeIn_0.3s_ease-out]">
+            <motion.div
+              key="hr"
+              className="absolute inset-0 p-5 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
+            >
 
               <div className="mb-5">
-                <h2 className="text-xl font-bold tracking-tight text-foreground">Workforce Analytics</h2>
-                <p className="text-xs text-muted-foreground">Staff distribution and retention metrics.</p>
+                <h2 className="text-lg font-bold tracking-tight" style={{ color: '#e8edf0' }}>Workforce Analytics</h2>
+                <p className="text-xs" style={{ color: '#8aafbf' }}>Staff distribution and retention metrics.</p>
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
-                <div className="rounded-xl border border-border/50 bg-card/50 p-5 shadow-sm backdrop-blur-sm">
-                  <h3 className="mb-4 font-semibold text-sm">Role Distribution</h3>
+                <div
+                  className="rounded-xl p-5 shadow-sm backdrop-blur-sm"
+                  style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                >
+                  <h3 className="mb-4 font-semibold text-sm" style={{ color: '#e8edf0' }}>Role Distribution</h3>
                   <div className="flex items-center justify-center">
                     <div className="h-[200px] w-[200px]">
                       <ResponsiveContainer width="100%" height="100%">
@@ -351,42 +442,47 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                     {hrData.map((entry, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                        <span className="text-[10px] font-medium text-muted-foreground">{entry.name}</span>
+                        <span className="text-[10px] font-medium" style={{ color: '#8aafbf' }}>{entry.name}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-border/50 bg-card/50 p-5 shadow-sm backdrop-blur-sm">
+                  <div
+                    className="rounded-xl p-5 shadow-sm backdrop-blur-sm"
+                    style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                  >
                     <div className="mb-3 flex items-center justify-between">
-                      <h3 className="font-semibold text-sm">Retention Rate</h3>
+                      <h3 className="font-semibold text-sm" style={{ color: '#e8edf0' }}>Retention Rate</h3>
                       <span className="text-green-500 font-bold text-base">96.5%</span>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: '#162e3b' }}>
                       <div className="h-full w-[96.5%] rounded-full bg-green-500" />
                     </div>
-                    <p className="mt-2 text-[10px] text-muted-foreground">Top 5% of districts in the state</p>
+                    <p className="mt-2 text-[10px]" style={{ color: '#8aafbf' }}>Top 5% of districts in the state</p>
                   </div>
 
-                  <div className="rounded-xl border border-border/50 bg-card/50 p-5 shadow-sm backdrop-blur-sm">
+                  <div
+                    className="rounded-xl p-5 shadow-sm backdrop-blur-sm"
+                    style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                  >
                     <div className="mb-3 flex items-center justify-between">
-                      <h3 className="font-semibold text-sm">Professional Development</h3>
+                      <h3 className="font-semibold text-sm" style={{ color: '#e8edf0' }}>Professional Development</h3>
                       <span className="text-blue-500 font-bold text-base">842 hrs</span>
                     </div>
                     <div className="space-y-3">
                       {[
                         { name: 'Advanced Pedagogy', progress: 75 },
                         { name: 'Digital Literacy', progress: 45 },
-                        { name: 'Inclusive Classroom', progress: 90 },
                       ].map((course, i) => (
                         <div key={i}>
-                          <div className="mb-1 flex justify-between text-[10px] font-medium">
+                          <div className="mb-1 flex justify-between text-[10px] font-medium" style={{ color: '#e8edf0' }}>
                             <span>{course.name}</span>
                             <span>{course.progress}%</span>
                           </div>
-                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${course.progress}%` }} />
+                          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: '#162e3b' }}>
+                            <div className="h-full rounded-full" style={{ width: `${course.progress}%`, backgroundColor: '#2a9d8f' }} />
                           </div>
                         </div>
                       ))}
@@ -394,29 +490,39 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
             )}
 
             {activeState === 'analytics' && (
-            <div className="absolute inset-0 p-5 overflow-y-auto animate-[fadeIn_0.3s_ease-out]">
+            <motion.div
+              key="analytics"
+              className="absolute inset-0 p-5 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.25 }}
+            >
 
               <div className="mb-5">
-                <h2 className="text-xl font-bold tracking-tight text-foreground">Predictive Insights</h2>
-                <p className="text-xs text-muted-foreground">AI-driven analysis for future planning.</p>
+                <h2 className="text-lg font-bold tracking-tight" style={{ color: '#e8edf0' }}>Predictive Insights</h2>
+                <p className="text-xs" style={{ color: '#8aafbf' }}>AI-driven analysis for future planning.</p>
               </div>
 
               <div className="grid gap-5 md:grid-cols-3">
-                <div className="col-span-2 rounded-xl border border-border/50 bg-card/50 p-5 shadow-sm backdrop-blur-sm">
-                  <h3 className="mb-4 font-semibold text-sm">Student Performance Forecast</h3>
-                  <div className="h-[250px] w-full">
+                <div
+                  className="col-span-2 rounded-xl p-5 shadow-sm backdrop-blur-sm"
+                  style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                >
+                  <h3 className="mb-4 font-semibold text-sm" style={{ color: '#e8edf0' }}>Student Performance Forecast</h3>
+                  <div className="h-[180px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={overviewData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} dx={-10} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(42,157,143,0.1)" opacity={0.4} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dx={-10} />
                         <Tooltip
-                          contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
-                          itemStyle={{ color: 'hsl(var(--foreground))' }}
+                          contentStyle={{ backgroundColor: '#102630', borderColor: 'rgba(42,157,143,0.1)', borderRadius: '8px', fontSize: '12px' }}
+                          itemStyle={{ color: '#e8edf0' }}
                         />
                         <Line type="monotone" dataKey="actual" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 0 }} activeDot={{ r: 6 }} />
                         <Line type="monotone" dataKey="budget" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 5" dot={false} />
@@ -426,24 +532,36 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 to-accent/10 p-5 shadow-sm backdrop-blur-sm">
-                    <div className="mb-3 flex items-center gap-2 text-primary">
+                  <div
+                    className="rounded-xl p-5 shadow-sm backdrop-blur-sm bg-gradient-to-br from-[#2a9d8f]/10 to-[#2a9d8f]/10"
+                    style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                  >
+                    <div className="mb-3 flex items-center gap-2" style={{ color: '#2a9d8f' }}>
                       <BrainCircuit className="h-5 w-5" />
                       <h3 className="font-semibold text-sm">Intelligent Insight</h3>
                     </div>
-                    <p className="text-xs leading-relaxed text-foreground/80 text-pretty">
+                    <p className="text-xs leading-relaxed text-pretty" style={{ color: 'rgba(232,237,240,0.8)' }}>
                       Enrollment projection models indicate a <strong>12% surge in STEM demand</strong> for Q3.
                     </p>
-                    <div className="mt-2 rounded-lg bg-background/50 p-2 text-[10px] border border-primary/10">
-                      <span className="font-semibold text-primary">Recommended Action:</span> Reallocate <strong>$45k</strong> from surplus to secure 3 adjunct lab instructors.
+                    <div
+                      className="mt-2 rounded-lg p-2 text-[10px]"
+                      style={{ backgroundColor: 'rgba(10,26,36,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)', color: '#e8edf0' }}
+                    >
+                      <span className="font-semibold" style={{ color: '#2a9d8f' }}>Recommended Action:</span> Reallocate <strong>$45k</strong> from surplus to secure 3 adjunct lab instructors.
                     </div>
-                    <button className="mt-4 w-full rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                    <button
+                      className="mt-4 w-full rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                      style={{ backgroundColor: '#2a9d8f', color: '#050b0f', boxShadow: '0 10px 15px -3px rgba(42,157,143,0.2)' }}
+                    >
                       Execute Allocation
                     </button>
                   </div>
 
-                  <div className="rounded-xl border border-border/50 bg-card/50 p-5 shadow-sm backdrop-blur-sm">
-                    <h3 className="mb-3 font-semibold text-sm">Risk Assessment</h3>
+                  <div
+                    className="rounded-xl p-5 shadow-sm backdrop-blur-sm"
+                    style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+                  >
+                    <h3 className="mb-3 font-semibold text-sm" style={{ color: '#e8edf0' }}>Risk Assessment</h3>
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between rounded-lg bg-red-500/10 p-2.5 text-red-600">
                         <div className="flex items-center gap-2">
@@ -463,8 +581,9 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
             )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -472,7 +591,7 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
   )
 }
 
-function MetricCard({
+const MetricCard = memo(function MetricCard({
   title,
   value,
   trend,
@@ -490,7 +609,10 @@ function MetricCard({
   bgColor: string
 }) {
   return (
-    <div className="rounded-xl border border-border/50 bg-card/50 p-4 shadow-sm backdrop-blur-sm transition-all hover:shadow-lg hover:-translate-y-1">
+    <div
+      className="rounded-xl p-4 shadow-sm backdrop-blur-sm transition-all hover:shadow-lg hover:-translate-y-1"
+      style={{ backgroundColor: 'rgba(16,38,48,0.5)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(42,157,143,0.1)' }}
+    >
       <div className="mb-3 flex items-center justify-between">
         <div className={`rounded-lg p-2 ${bgColor}`}>
           <Icon className={`h-4 w-4 ${color}`} />
@@ -501,9 +623,9 @@ function MetricCard({
         </span>
       </div>
       <div>
-        <div className="text-xl font-bold text-foreground tracking-tight">{value}</div>
-        <div className="mt-0.5 text-[10px] text-muted-foreground">{title}</div>
+        <div className="text-lg font-bold tracking-tight" style={{ color: '#e8edf0' }}>{value}</div>
+        <div className="mt-0.5 text-[10px]" style={{ color: '#8aafbf' }}>{title}</div>
       </div>
     </div>
   )
-}
+})

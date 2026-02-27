@@ -7,30 +7,30 @@ const sections: ScrollSection<AdminState>[] = [
   {
     id: 1,
     state: 'overview',
-    headline: 'Strategic Resource Allocation',
-    body: 'Transform financial data into actionable insights. Monitor real-time budget utilization across all departments, identify cost-saving opportunities, and ensure every dollar directly contributes to student success. Our predictive models help you plan for future fiscal years with confidence.',
-    badge: 'Financial Intelligence',
+    headline: 'Budget clarity, not spreadsheets',
+    body: 'Track real-time spending against allocations for every department and campus. Surface variances before they become problems. Export board-ready reports in one click.',
+    badge: 'Financial Overview',
   },
   {
     id: 2,
     state: 'multi-campus',
-    headline: 'Unified District Operations',
-    body: 'Orchestrate operations across your entire district from a single pane of glass. Standardize best practices, monitor campus health metrics in real-time, and ensure equitable resource distribution while respecting the unique culture of each school community.',
-    badge: 'District-Wide Control',
+    headline: 'Every campus at a glance',
+    body: 'Monitor enrollment, attendance, and operational health across all schools simultaneously. Drill into any campus without leaving the dashboard. Standardize reporting district-wide.',
+    badge: 'Multi-Campus Ops',
   },
   {
     id: 3,
     state: 'hr',
-    headline: 'High-Performance Workforce',
-    body: 'Build and retain a world-class educational team. Track certification compliance, analyze teacher retention trends, and identify professional development needs. Empower your HR team to make data-backed hiring decisions that elevate educational outcomes.',
-    badge: 'Talent Management',
+    headline: 'Know your workforce',
+    body: 'Track certification status, retention rates, and professional development hours. Identify staffing gaps before they affect classrooms. Data-driven hiring decisions.',
+    badge: 'Staff & HR',
   },
   {
     id: 4,
     state: 'analytics',
-    headline: 'Predictive Decision Intelligence',
-    body: 'Move from reactive to proactive management. Leverage AI-driven analytics to forecast enrollment trends, predict student performance outcomes, and intervene early. Turn complex data sets into clear, strategic narratives for stakeholders and board meetings.',
-    badge: 'Future-Ready Insights',
+    headline: 'Forecast, don\u2019t react',
+    body: 'Enrollment projections, performance trends, and resource demand models. Surface risks early. Present data-backed narratives to your board with confidence.',
+    badge: 'Predictive Analytics',
   },
 ]
 
@@ -41,10 +41,11 @@ export function DistrictLeadersSection() {
       sectionTag="For District Leaders"
       sectionTitle={
         <>
-          Command Your District with <span className="text-primary">Confidence</span>
+          See your entire district.{' '}
+          <span style={{ color: '#2a9d8f' }}>In one place.</span>
         </>
       }
-      sectionSubtitle="A comprehensive command center designed for superintendents and administrators to drive operational excellence and educational equity."
+      sectionSubtitle="Budget, staffing, enrollment, and performance across every school — one dashboard, zero tab-switching."
       dashboard={AdminDashboard}
     />
   )

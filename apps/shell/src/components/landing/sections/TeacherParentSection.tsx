@@ -7,30 +7,30 @@ const sections: ScrollSection<TeacherParentState>[] = [
   {
     id: 1,
     state: 'classroom',
-    headline: 'Actionable Formative Assessment',
-    body: "Get quick and continual snapshots of student progress. Embedded assessments provide just-in-time feedback, allowing you to personalize learning pathways and strategically adjust instruction to meet every student's needs.",
-    badge: 'Real-Time Insight',
+    headline: 'Your class, organized',
+    body: "See today's schedule, mark attendance, and log formative assessments without switching tools. One screen for your entire teaching day.",
+    badge: 'Classroom Hub',
   },
   {
     id: 2,
     state: 'communication',
-    headline: 'Real-Time Family Connection',
-    body: 'Bridge the home-school gap with daily progress updates and easy communication tools. Empower parents to become active, informed advocates for their children, reinforcing that learning happens everywhere, not just in school.',
-    badge: 'Family Engagement',
+    headline: 'Messages that reach families',
+    body: 'Send updates to parents directly from the gradebook. Parents get real-time notifications when grades post or attendance is recorded.',
+    badge: 'Communication',
   },
   {
     id: 3,
     state: 'progress',
-    headline: 'Inclusive Support Network',
-    body: 'Ensure success for every student, including those with learning disabilities or diverse backgrounds. Provide resources in home languages and help families navigate the school system, creating a truly inclusive community.',
-    badge: 'Access for All',
+    headline: 'Student progress, visualized',
+    body: 'Track mastery by subject with clear progress bars. Identify students who need attention before parent-teacher conferences.',
+    badge: 'Progress Tracking',
   },
   {
     id: 4,
     state: 'collaboration',
-    headline: 'Collaborative Learning Ecosystem',
-    body: 'Foster partnership between educators and families through shared goals. Connect school learning to practical home activities, ensuring a supportive environment where every student can thrive academically and emotionally.',
-    badge: 'Work Together',
+    headline: 'Parents stay involved',
+    body: "Parents see the same data teachers see. Conference scheduling, assignment tracking, and daily summaries — no phone tag required.",
+    badge: 'Family Portal',
   },
 ]
 
@@ -41,10 +41,11 @@ export function TeacherParentSection() {
       sectionTag="For Teachers & Parents"
       sectionTitle={
         <>
-          Empower Learning Through <span className="text-primary">Partnership</span>
+          Teachers and parents.{' '}
+          <span style={{ color: '#2a9d8f' }}>Same page, same data.</span>
         </>
       }
-      sectionSubtitle="Tools designed for educators and families to collaborate, communicate, and celebrate student success together"
+      sectionSubtitle="Real-time grades, attendance, and class schedules — visible to both teachers and families, updated as it happens."
       dashboard={TeacherParentDashboard}
       reversed
       variant="skeleton"

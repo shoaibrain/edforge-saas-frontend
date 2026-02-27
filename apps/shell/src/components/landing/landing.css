@@ -8,16 +8,36 @@
 .landing-page {
   scroll-behavior: smooth;
   contain: paint;
+  background-color: #0a1a24;
+  color: #e8edf0;
+
+  /* Override theme CSS variables to match hero palette */
+  --surface-primary: 10 26 36;       /* #0a1a24 — base background */
+  --surface-secondary: 16 38 48;     /* #102630 — elevated surfaces */
+  --surface-tertiary: 22 46 59;      /* #162e3b — interactive surfaces */
+  --surface-elevated: 22 46 59;      /* #162e3b */
+  --text-primary: 232 237 240;       /* #e8edf0 — primary text */
+  --text-secondary: 138 175 191;     /* #8aafbf — secondary text */
+  --text-tertiary: 77 127 143;       /* #4d7f8f — muted text */
+  --text-inverted: 10 26 36;         /* #0a1a24 */
+  --border-primary: 42 157 143;      /* #2a9d8f at full, use with alpha */
+  --border-secondary: 42 157 143;    /* #2a9d8f */
+  --brand-primary: 42 157 143;       /* #2a9d8f — teal accent */
+  --brand-secondary: 94 196 182;     /* #5ec4b6 */
+  --brand-accent: 233 196 106;       /* #e9c46a — warm accent */
+  --interactive-hover: 22 46 59;     /* #162e3b */
+  --interactive-active: 42 157 143;  /* #2a9d8f */
 }
 
-/* Mesh Gradient Background — scoped, non-compositing (no blur filter) */
+/* Mesh gradient & grid overlays — limited to hero viewport only */
 .landing-page::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  max-height: 100vh;
   pointer-events: none;
   z-index: -2;
   background:
@@ -26,14 +46,14 @@
     radial-gradient(circle 700px at 50% 80%, oklch(0.60 0.14 175 / 0.12), transparent);
 }
 
-/* Grid & Noise Overlay — scoped, non-compositing */
 .landing-page::after {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  max-height: 100vh;
   pointer-events: none;
   z-index: -1;
   background-image:
