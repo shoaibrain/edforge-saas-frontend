@@ -42,7 +42,7 @@ export function StudentSection() {
       sectionTitle={
         <>
           Students see their{' '}
-          <span style={{ color: '#2a9d8f' }}>own progress.</span>
+          <span style={{ color: 'var(--lp-chart-primary)' }}>own progress.</span>
         </>
       }
       sectionSubtitle="Grades, assignments, schedules, and achievements — all in a student portal built for clarity, not clutter."

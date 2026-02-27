@@ -42,7 +42,7 @@ export function TeacherParentSection() {
       sectionTitle={
         <>
           Teachers and parents.{' '}
-          <span style={{ color: '#2a9d8f' }}>Same page, same data.</span>
+          <span style={{ color: 'var(--lp-chart-primary)' }}>Same page, same data.</span>
         </>
       }
       sectionSubtitle="Real-time grades, attendance, and class schedules — visible to both teachers and families, updated as it happens."

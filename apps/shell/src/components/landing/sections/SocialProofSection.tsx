@@ -5,7 +5,7 @@ export function SocialProofSection() {
       aria-hidden="true"
       style={{
         height: '8rem',
-        background: 'linear-gradient(to bottom, #0d1e27, #0a1a24)',
+        background: 'linear-gradient(to bottom, rgb(var(--surface-secondary)), rgb(var(--surface-primary)))',
       }}
     />
   )

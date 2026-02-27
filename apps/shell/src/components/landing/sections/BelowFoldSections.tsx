@@ -12,7 +12,7 @@ export default function BelowFoldSections() {
       <TeacherParentSection />
       <SectionTransition from="#0c1f2a" to="#0a1a24" />
       <StudentSection />
-      <SectionTransition from="#0a1a24" to="#0a1a24" height="3rem" />
+      <SectionTransition from="#0a1a24" to="#0a1a24" />
       <MidPageCTA />
     </>
   )

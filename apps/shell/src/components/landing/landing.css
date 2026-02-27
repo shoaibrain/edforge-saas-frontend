@@ -11,7 +11,7 @@
   background-color: #0a1a24;
   color: #e8edf0;
 
-  /* Override theme CSS variables to match hero palette */
+  /* ── Theme Palette (RGB channels for alpha composition) ── */
   --surface-primary: 10 26 36;       /* #0a1a24 — base background */
   --surface-secondary: 16 38 48;     /* #102630 — elevated surfaces */
   --surface-tertiary: 22 46 59;      /* #162e3b — interactive surfaces */
@@ -27,6 +27,45 @@
   --brand-accent: 233 196 106;       /* #e9c46a — warm accent */
   --interactive-hover: 22 46 59;     /* #162e3b */
   --interactive-active: 42 157 143;  /* #2a9d8f */
+
+  /* ── Typography Scale ── */
+  --lp-font-section-title: clamp(1.75rem, 3vw, 2.75rem);
+  --lp-font-feature-title: clamp(1.25rem, 2vw, 1.5rem);
+  --lp-font-body: clamp(0.9375rem, 1.5vw, 1.125rem);
+  --lp-font-label: 0.75rem;
+  --lp-font-dashboard-title: clamp(1rem, 1.5vw, 1.25rem);
+  --lp-font-dashboard-value: clamp(1.125rem, 2vw, 1.5rem);
+
+  /* ── Font Weights ── */
+  --lp-weight-heading: 700;
+  --lp-weight-subheading: 600;
+  --lp-weight-body: 400;
+  --lp-weight-label: 500;
+
+  /* ── Spacing ── */
+  --lp-section-gap: clamp(4rem, 8vw, 8rem);
+  --lp-card-padding: clamp(1rem, 2vw, 1.5rem);
+  --lp-card-padding-lg: clamp(1.25rem, 2.5vw, 2rem);
+
+  /* ── Border Radius ── */
+  --lp-radius-sm: 8px;
+  --lp-radius-md: 12px;
+  --lp-radius-lg: 16px;
+  --lp-radius-xl: 20px;
+
+  /* ── Shadows ── */
+  --lp-shadow-card: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
+  --lp-shadow-elevated: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
+  --lp-shadow-dashboard: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3);
+
+  /* ── Data Visualization Palette (brand-aligned) ── */
+  --lp-chart-primary: #2a9d8f;
+  --lp-chart-secondary: #5ec4b6;
+  --lp-chart-accent: #e9c46a;
+  --lp-chart-success: #34d399;
+  --lp-chart-warning: #f4a261;
+  --lp-chart-danger: #e76f51;
+  --lp-chart-neutral: #8aafbf;
 }
 
 /* Mesh gradient & grid overlays — limited to hero viewport only */
@@ -137,6 +176,18 @@
 
 .landing-page .landing-skeleton {
   animation: landing-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ── GPU compositing hints ──────────────────────────────── */
+
+/* Promote scroll-animated elements to compositor layers during animation */
+.landing-page [data-scroll-animated] {
+  will-change: transform, opacity;
+}
+
+/* Release GPU memory after animation completes */
+.landing-page [data-scroll-animated="complete"] {
+  will-change: auto;
 }
 
 /* ── Accessibility ───────────────────────────────────────── */

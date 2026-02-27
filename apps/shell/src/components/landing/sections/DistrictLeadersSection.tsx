@@ -42,7 +42,7 @@ export function DistrictLeadersSection() {
       sectionTitle={
         <>
           See your entire district.{' '}
-          <span style={{ color: '#2a9d8f' }}>In one place.</span>
+          <span style={{ color: 'var(--lp-chart-primary)' }}>In one place.</span>
         </>
       }
       sectionSubtitle="Budget, staffing, enrollment, and performance across every school — one dashboard, zero tab-switching."
