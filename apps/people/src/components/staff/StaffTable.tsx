@@ -8,6 +8,7 @@
 
 import { useMemo } from 'react'
 import { UsersRound, Key } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { DataTable, type Column } from '../ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleBadge } from './StaffRoleBadge'
@@ -42,11 +43,13 @@ export function StaffTable({
   onAddStaff,
   onViewStaff,
 }: StaffTableProps) {
+  const { t } = useTranslation('people')
+
   const columns: Column<StaffResponseDto>[] = useMemo(
     () => [
       {
         key: 'name',
-        header: 'Staff',
+        header: t('tableHeaders.staff'),
         sortable: true,
         width: '280px',
         render: (s) => (
@@ -70,21 +73,21 @@ export function StaffTable({
       },
       {
         key: 'role',
-        header: 'Role',
+        header: t('tableHeaders.role'),
         sortable: true,
         width: '140px',
         render: (s) => <StaffRoleBadge role={s.role} />,
       },
       {
         key: 'employmentStatus',
-        header: 'Status',
+        header: t('tableHeaders.status'),
         sortable: true,
         width: '120px',
         render: (s) => <StaffStatusBadge status={s.employmentStatus} />,
       },
       {
         key: 'hireDate',
-        header: 'Hired',
+        header: t('tableHeaders.hired'),
         sortable: true,
         width: '120px',
         render: (s) => (
@@ -93,7 +96,7 @@ export function StaffTable({
       },
       {
         key: 'department',
-        header: 'Department',
+        header: t('tableHeaders.department'),
         width: '140px',
         render: (s) => (
           <span className="text-text-secondary text-sm">
@@ -103,22 +106,22 @@ export function StaffTable({
       },
       {
         key: 'systemAccess',
-        header: 'System Access',
+        header: t('tableHeaders.systemAccess'),
         width: '130px',
         render: (s) =>
           s.userId ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">
               <Key className="w-3 h-3" />
-              Active
+              {t('systemAccess.active')}
             </span>
           ) : (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-500/20 dark:text-slate-400">
-              No Access
+              {t('systemAccess.noAccess')}
             </span>
           ),
       },
     ],
-    [],
+    [t],
   )
 
   return (
@@ -130,11 +133,10 @@ export function StaffTable({
       skeletonRows={8}
       emptyState={{
         icon: <UsersRound className="w-12 h-12" />,
-        title: 'No staff members found',
-        description:
-          'Get started by adding your first staff member to the directory.',
+        title: t('empty.noStaff'),
+        description: t('empty.getStarted'),
         action: onAddStaff
-          ? { label: 'Add Staff Member', onClick: onAddStaff }
+          ? { label: t('staffDirectory.addStaff'), onClick: onAddStaff }
           : undefined,
       }}
       hasMore={hasMore}

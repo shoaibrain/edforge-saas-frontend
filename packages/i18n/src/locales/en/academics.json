@@ -164,7 +164,8 @@
   "guardian": {
     "primary": "Primary",
     "portalAccess": "Portal Access",
-    "pickupAuth": "Pickup Auth"
+    "pickupAuth": "Pickup Auth",
+    "atEmployer": "at {{employer}}"
   },
   "privacy": {
     "showSensitive": "Show sensitive details",

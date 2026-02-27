@@ -21,6 +21,8 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
+import { DateDisplay } from '@edforge/ui'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -34,19 +36,6 @@ export interface ProfileTabProps {
 // ============================================================================
 // HELPERS
 // ============================================================================
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '—'
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return '—'
-  }
-}
 
 function calculateAge(dateOfBirth?: string): number | null {
   if (!dateOfBirth) return null
@@ -62,17 +51,6 @@ function calculateAge(dateOfBirth?: string): number | null {
   } catch {
     return null
   }
-}
-
-function formatGender(gender?: string): string {
-  if (!gender) return '—'
-  const labels: Record<string, string> = {
-    male: 'Male',
-    female: 'Female',
-    other: 'Other',
-    prefer_not_to_say: 'Prefer not to say',
-  }
-  return labels[gender] || gender
 }
 
 function formatAddress(address?: {
@@ -149,6 +127,7 @@ function SectionHeader({ icon, title, iconColor = 'text-text-tertiary' }: Sectio
 
 export function ProfileTab({ student }: ProfileTabProps) {
   const [showSensitive, setShowSensitive] = useState(false)
+  const { t } = useTranslation('academics')
 
   const mask = (value: string | undefined | null): string =>
     !showSensitive && value ? '••••••••' : (value || '—')
@@ -159,6 +138,20 @@ export function ProfileTab({ student }: ProfileTabProps) {
     student.contactInfo?.useMailingAddress
       ? formatAddress(student.contactInfo?.mailingAddress)
       : null
+
+  /** Translate gender values via academics namespace */
+  const formatGender = (gender?: string): string => {
+    if (!gender) return '—'
+    // Map snake_case keys to translation keys
+    const keyMap: Record<string, string> = {
+      male: 'male',
+      female: 'female',
+      other: 'other',
+      prefer_not_to_say: 'preferNotToSay',
+    }
+    const key = keyMap[gender]
+    return key ? t(`gender.${key}`) : gender
+  }
 
   return (
     <div className="space-y-8">
@@ -173,7 +166,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
           ) : (
             <Eye className="w-3.5 h-3.5" />
           )}
-          {showSensitive ? 'Hide sensitive details' : 'Show sensitive details'}
+          {showSensitive ? t('privacy.hideSensitive') : t('privacy.showSensitive')}
         </button>
       </div>
 
@@ -181,36 +174,36 @@ export function ProfileTab({ student }: ProfileTabProps) {
       <section>
         <SectionHeader
           icon={<Calendar className="w-4 h-4" />}
-          title="Personal Information"
+          title={t('sections.personalInfo')}
           iconColor="text-blue-500"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField
-            label="Date of Birth"
+            label={t('fields.dateOfBirth')}
             value={
               student.dateOfBirth ? (
                 showSensitive ? (
                   <span>
-                    {formatDate(student.dateOfBirth)}
+                    <DateDisplay date={student.dateOfBirth} format="long" />
                     {age !== null && (
-                      <span className="text-text-tertiary ml-1">({age} yrs)</span>
+                      <span className="text-text-tertiary ml-1">({t('ageLabel', { age })})</span>
                     )}
                   </span>
                 ) : '••••••••'
               ) : undefined
             }
           />
-          <DataField label="Gender" value={mask(formatGender(student.gender))} />
-          <DataField label="Ethnicity" value={mask(student.ethnicity)} />
+          <DataField label={t('fields.gender')} value={mask(formatGender(student.gender))} />
+          <DataField label={t('fields.ethnicity')} value={mask(student.ethnicity)} />
           <DataField
-            label="Primary Language"
+            label={t('fields.primaryLanguage')}
             value={mask(student.primaryLanguage)}
             icon={student.primaryLanguage && showSensitive ? <Globe className="w-3.5 h-3.5" /> : undefined}
           />
           {student.homeLanguage && student.homeLanguage !== student.primaryLanguage && (
-            <DataField label="Home Language" value={mask(student.homeLanguage)} />
+            <DataField label={t('fields.homeLanguage')} value={mask(student.homeLanguage)} />
           )}
-          <DataField label="Country of Birth" value={mask(student.countryOfBirth)} />
+          <DataField label={t('fields.countryOfBirth')} value={mask(student.countryOfBirth)} />
         </div>
       </section>
 
@@ -218,12 +211,12 @@ export function ProfileTab({ student }: ProfileTabProps) {
       <section>
         <SectionHeader
           icon={<Mail className="w-4 h-4" />}
-          title="Contact Information"
+          title={t('sections.contactInfo')}
           iconColor="text-teal-500"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField
-            label="Email"
+            label={t('fields.email')}
             value={
               student.contactInfo?.email ? (
                 showSensitive ? (
@@ -238,7 +231,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
             }
           />
           <DataField
-            label="Phone"
+            label={t('fields.phone')}
             value={
               student.contactInfo?.phone ? (
                 showSensitive ? (
@@ -254,7 +247,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
             icon={student.contactInfo?.phone && showSensitive ? <Phone className="w-3.5 h-3.5" /> : undefined}
           />
           <DataField
-            label="Address"
+            label={t('fields.address')}
             value={
               physicalAddress ? (
                 showSensitive ? (
@@ -266,7 +259,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
           />
           {mailingAddress && (
             <DataField
-              label="Mailing Address"
+              label={t('fields.mailingAddress')}
               value={
                 showSensitive ? (
                   <span className="whitespace-pre-line">{mailingAddress}</span>
@@ -282,22 +275,22 @@ export function ProfileTab({ student }: ProfileTabProps) {
       <section>
         <SectionHeader
           icon={<GraduationCap className="w-4 h-4" />}
-          title="Academic Information"
+          title={t('sections.academicInfo')}
           iconColor="text-emerald-500"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-          <DataField label="Current Grade" value={student.currentGradeLevel ? `Grade ${student.currentGradeLevel}` : undefined} />
+          <DataField label={t('fields.currentGrade')} value={student.currentGradeLevel ? t('gradeLabel', { level: student.currentGradeLevel }) : undefined} />
           <DataField
-            label="Status"
+            label={t('tableHeaders.status')}
             value={
-              <span className="capitalize">{student.status}</span>
+              <span className="capitalize">{t(`status.${student.status}`, { defaultValue: student.status })}</span>
             }
           />
-          <DataField label="Enrollment Date" value={formatDate(student.enrollmentDate)} />
-          <DataField label="Student Number" value={student.studentNumber} />
-          <DataField label="State Student ID" value={student.stateStudentId} />
+          <DataField label={t('fields.enrollmentDate')} value={student.enrollmentDate ? <DateDisplay date={student.enrollmentDate} format="long" /> : undefined} />
+          <DataField label={t('fields.studentNumber')} value={student.studentNumber} />
+          <DataField label={t('fields.stateStudentId')} value={student.stateStudentId} />
           {student.previousSchool && (
-            <DataField label="Previous School" value={student.previousSchool} />
+            <DataField label={t('fields.previousSchool')} value={student.previousSchool} />
           )}
         </div>
       </section>
@@ -306,20 +299,20 @@ export function ProfileTab({ student }: ProfileTabProps) {
       <section>
         <SectionHeader
           icon={<Shield className="w-4 h-4" />}
-          title="Programs & Accommodations"
+          title={t('sections.programsAccommodations')}
           iconColor="text-purple-500"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField
-            label="IEP"
-            value={student.medicalInfo?.hasIEP ? 'Yes' : 'No'}
+            label={t('programs.iep')}
+            value={student.medicalInfo?.hasIEP ? t('yesNo.yes') : t('yesNo.no')}
           />
           <DataField
-            label="504 Plan"
-            value={student.medicalInfo?.has504Plan ? 'Yes' : 'No'}
+            label={t('programs.plan504')}
+            value={student.medicalInfo?.has504Plan ? t('yesNo.yes') : t('yesNo.no')}
           />
           <DataField
-            label="Special Programs"
+            label={t('programs.specialPrograms')}
             value={
               student.specialPrograms && student.specialPrograms.length > 0
                 ? student.specialPrograms.join(', ')
@@ -327,7 +320,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
             }
           />
           <DataField
-            label="Accommodations"
+            label={t('programs.accommodations')}
             value={
               student.accommodations && student.accommodations.length > 0
                 ? student.accommodations.join(', ')
@@ -342,12 +335,12 @@ export function ProfileTab({ student }: ProfileTabProps) {
         <section>
           <SectionHeader
             icon={<Heart className="w-4 h-4" />}
-            title="Medical Information"
+            title={t('sections.medicalInfo')}
             iconColor="text-red-500"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
             <DataField
-              label="Allergies"
+              label={t('medical.allergies')}
               value={
                 student.medicalInfo.allergies && student.medicalInfo.allergies.length > 0
                   ? mask(student.medicalInfo.allergies.join(', '))
@@ -355,7 +348,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
               }
             />
             <DataField
-              label="Medications"
+              label={t('medical.medications')}
               value={
                 student.medicalInfo.medications && student.medicalInfo.medications.length > 0
                   ? mask(student.medicalInfo.medications.join(', '))
@@ -363,7 +356,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
               }
             />
             <DataField
-              label="Conditions"
+              label={t('medical.conditions')}
               value={
                 student.medicalInfo.conditions && student.medicalInfo.conditions.length > 0
                   ? mask(student.medicalInfo.conditions.join(', '))
@@ -371,24 +364,24 @@ export function ProfileTab({ student }: ProfileTabProps) {
               }
             />
             <DataField
-              label="Dietary Restrictions"
+              label={t('medical.dietaryRestrictions')}
               value={
                 student.medicalInfo.dietaryRestrictions && student.medicalInfo.dietaryRestrictions.length > 0
                   ? mask(student.medicalInfo.dietaryRestrictions.join(', '))
                   : undefined
               }
             />
-            <DataField label="Blood Type" value={mask(student.medicalInfo.bloodType)} />
-            <DataField label="Physician" value={mask(student.medicalInfo.physicianName)} />
+            <DataField label={t('medical.bloodType')} value={mask(student.medicalInfo.bloodType)} />
+            <DataField label={t('medical.physician')} value={mask(student.medicalInfo.physicianName)} />
             {student.medicalInfo.physicianPhone && (
-              <DataField label="Physician Phone" value={mask(student.medicalInfo.physicianPhone)} />
+              <DataField label={t('medical.physicianPhone')} value={mask(student.medicalInfo.physicianPhone)} />
             )}
             {student.medicalInfo.insuranceProvider && (
-              <DataField label="Insurance" value={mask(student.medicalInfo.insuranceProvider)} />
+              <DataField label={t('medical.insurance')} value={mask(student.medicalInfo.insuranceProvider)} />
             )}
             {student.medicalInfo.notes && (
               <div className="sm:col-span-2 lg:col-span-3">
-                <DataField label="Medical Notes" value={mask(student.medicalInfo.notes)} />
+                <DataField label={t('medical.medicalNotes')} value={mask(student.medicalInfo.notes)} />
               </div>
             )}
           </div>
@@ -400,7 +393,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
         <section>
           <SectionHeader
             icon={<Calendar className="w-4 h-4" />}
-            title="Notes"
+            title={t('sections.notes')}
             iconColor="text-slate-500"
           />
           <p className="text-sm text-text-secondary whitespace-pre-wrap">

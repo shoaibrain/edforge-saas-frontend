@@ -164,7 +164,8 @@
   "guardian": {
     "primary": "प्राथमिक",
     "portalAccess": "पोर्टल पहुँच",
-    "pickupAuth": "लिन अधिकृत"
+    "pickupAuth": "लिन अधिकृत",
+    "atEmployer": "{{employer}} मा"
   },
   "privacy": {
     "showSensitive": "संवेदनशील विवरण देखाउनुहोस्",

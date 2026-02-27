@@ -3,8 +3,8 @@
   "description": "Manage staff, roles, and organizational structure",
   "staffDirectory": {
     "title": "Staff Directory",
-    "description": "View and manage all staff members",
-    "searchPlaceholder": "Search staff...",
+    "description": "Manage your organization's staff members and their access",
+    "searchPlaceholder": "Search by name or email...",
     "addStaff": "Add Staff Member"
   },
   "quickAccess": {
@@ -22,6 +22,7 @@
   "stats": {
     "totalStaff": "Total Staff",
     "activeTeachers": "Active Teachers",
+    "teachers": "Teachers",
     "supportStaff": "Support Staff",
     "administrators": "Administrators"
   },
@@ -47,7 +48,10 @@
     "title": "Staff Details",
     "viewFullProfile": "View Full Profile",
     "editStaff": "Edit Staff Member",
-    "deleteStaff": "Delete Staff Member"
+    "deleteStaff": "Delete Staff Member",
+    "since": "Since {{date}}",
+    "type": "Type",
+    "primary": "Primary"
   },
   "sections": {
     "employmentInfo": "Employment Information",
@@ -147,6 +151,28 @@
     "resetDefault": "Reset to default",
     "quickStats": "Quick stats",
     "quickAccess": "Quick access"
+  },
+  "filters": {
+    "label": "Filters",
+    "allRoles": "All Roles",
+    "allStatuses": "All Statuses",
+    "filterByDepartment": "Filter by department...",
+    "clearAll": "Clear all",
+    "exportCsv": "Export CSV",
+    "role": "Role",
+    "employmentStatus": "Employment Status",
+    "department": "Department"
+  },
+  "quickAdd": {
+    "title": "Quick Add User",
+    "description": "Create user account only"
+  },
+  "error": {
+    "failedToLoad": "Failed to load staff",
+    "tryAgain": "Try Again"
+  },
+  "toast": {
+    "deleteSuccess": "Staff member deleted successfully"
   },
   "bootstrap": {
     "selectSchool": "Select a School",
