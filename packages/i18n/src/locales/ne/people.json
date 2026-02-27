@@ -1,0 +1,160 @@
+{
+  "title": "कर्मचारी",
+  "description": "कर्मचारी, भूमिका, र संगठनात्मक संरचना व्यवस्थापन गर्नुहोस्",
+  "staffDirectory": {
+    "title": "कर्मचारी निर्देशिका",
+    "description": "सबै कर्मचारी सदस्यहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्",
+    "searchPlaceholder": "कर्मचारी खोज्नुहोस्...",
+    "addStaff": "कर्मचारी सदस्य थप्नुहोस्"
+  },
+  "quickAccess": {
+    "addNew": "नयाँ व्यक्ति थप्नुहोस्",
+    "addNewDescription": "नयाँ कर्मचारी सदस्य भर्ना गर्नुहोस्",
+    "departments": "विभागहरू",
+    "departmentsDescription": "संगठनात्मक संरचना व्यवस्थापन गर्नुहोस्",
+    "roles": "भूमिका र अनुमतिहरू",
+    "rolesDescription": "पहुँच र अनुमतिहरू कन्फिगर गर्नुहोस्",
+    "profileSettings": "प्रोफाइल सेटिङहरू",
+    "profileSettingsDescription": "प्रोफाइल कन्फिगरेसनहरू व्यवस्थापन गर्नुहोस्",
+    "analytics": "कर्मचारी विश्लेषण",
+    "analyticsDescription": "कार्यबल विश्लेषण हेर्नुहोस्"
+  },
+  "stats": {
+    "totalStaff": "कुल कर्मचारी",
+    "activeTeachers": "सक्रिय शिक्षकहरू",
+    "supportStaff": "सहयोगी कर्मचारी",
+    "administrators": "प्रशासकहरू"
+  },
+  "tableHeaders": {
+    "staff": "कर्मचारी",
+    "role": "भूमिका",
+    "status": "स्थिति",
+    "hired": "नियुक्ति मिति",
+    "department": "विभाग",
+    "systemAccess": "प्रणाली पहुँच"
+  },
+  "systemAccess": {
+    "active": "सक्रिय",
+    "noAccess": "पहुँच छैन",
+    "linkedAccount": "लिङ्क गरिएको प्रयोगकर्ता खाता",
+    "noAccountLinked": "कुनै प्रयोगकर्ता खाता लिङ्क गरिएको छैन"
+  },
+  "empty": {
+    "noStaff": "कुनै कर्मचारी सदस्य फेला परेन",
+    "getStarted": "निर्देशिकामा आफ्नो पहिलो कर्मचारी सदस्य थपेर सुरु गर्नुहोस्।"
+  },
+  "drawer": {
+    "title": "कर्मचारी विवरण",
+    "viewFullProfile": "पूर्ण प्रोफाइल हेर्नुहोस्",
+    "editStaff": "कर्मचारी सदस्य सम्पादन गर्नुहोस्",
+    "deleteStaff": "कर्मचारी सदस्य मेटाउनुहोस्"
+  },
+  "sections": {
+    "employmentInfo": "रोजगारी जानकारी",
+    "contactInfo": "सम्पर्क जानकारी",
+    "schoolAssignments": "विद्यालय नियुक्तिहरू",
+    "systemAccess": "प्रणाली पहुँच"
+  },
+  "fields": {
+    "firstName": "पहिलो नाम",
+    "lastName": "थर",
+    "middleName": "बीचको नाम",
+    "maidenName": "विवाहपूर्व थर",
+    "suffix": "उपसर्ग",
+    "staffId": "कर्मचारी विशिष्ट ID",
+    "hireDate": "नियुक्ति मिति",
+    "employmentType": "रोजगारी प्रकार",
+    "title": "पद",
+    "primarySchool": "प्राथमिक विद्यालय",
+    "email": "इमेल",
+    "phone": "फोन",
+    "address": "ठेगाना",
+    "city": "शहर",
+    "state": "राज्य/प्रदेश",
+    "postalCode": "हुलाक कोड",
+    "department": "विभाग",
+    "positionTitle": "पद शीर्षक",
+    "fte": "FTE",
+    "isPrimary": "प्राथमिक हो"
+  },
+  "employmentStatus": {
+    "active": "सक्रिय",
+    "onLeave": "बिदामा",
+    "suspended": "निलम्बित",
+    "terminated": "बर्खास्त",
+    "retired": "सेवानिवृत्त",
+    "resigned": "राजीनामा दिएको"
+  },
+  "roles": {
+    "teacher": "शिक्षक",
+    "principal": "प्रधानाध्यापक",
+    "vicePrincipal": "उप-प्रधानाध्यापक",
+    "counselor": "परामर्शदाता",
+    "librarian": "पुस्तकालय अध्यक्ष",
+    "nurse": "नर्स",
+    "adminStaff": "प्रशासनिक कर्मचारी",
+    "supportStaff": "सहयोगी कर्मचारी",
+    "itStaff": "IT कर्मचारी",
+    "substitute": "स्थानापन्न",
+    "contractor": "ठेकेदार"
+  },
+  "wizard": {
+    "steps": {
+      "personalInfo": "व्यक्तिगत जानकारी",
+      "personalInfoDescription": "नाम, ID, र जनसांख्यिकी",
+      "contact": "सम्पर्क",
+      "contactDescription": "इमेल, फोन, ठेगाना, र आपतकालीन सम्पर्कहरू",
+      "employment": "रोजगारी",
+      "employmentDescription": "भूमिका, प्रकार, विभाग, र खाता सेटअप",
+      "assignment": "नियुक्ति",
+      "assignmentDescription": "प्राथमिक विद्यालय र अतिरिक्त नियुक्तिहरू",
+      "review": "समीक्षा र सिर्जना",
+      "reviewDescription": "विवरण पुष्टि गर्नुहोस् र कर्मचारी रेकर्ड सिर्जना गर्नुहोस्"
+    },
+    "employmentDetails": "रोजगारी विवरण",
+    "teachingQualifications": "शिक्षण योग्यता",
+    "reviewSubmit": "समीक्षा र पेश गर्नुहोस्",
+    "edit": "सम्पादन गर्नुहोस्"
+  },
+  "tabs": {
+    "overview": "अवलोकन",
+    "profile": "प्रोफाइल",
+    "assignments": "नियुक्तिहरू",
+    "credentials": "प्रमाणपत्रहरू",
+    "employmentHistory": "रोजगारी इतिहास",
+    "leave": "बिदा",
+    "security": "सुरक्षा"
+  },
+  "delete": {
+    "title": "कर्मचारी सदस्य मेटाउनुहोस्",
+    "warning": "यो कार्य पूर्ववत गर्न सकिँदैन",
+    "confirmation": "तपाईं {{name}} को कर्मचारी रेकर्ड स्थायी रूपमा मेटाउन लाग्नुभएको छ। यसले तिनीहरूको सबै डाटा र पहुँच हटाउनेछ।",
+    "typeToConfirm": "पुष्टि गर्न {{email}} टाइप गर्नुहोस्",
+    "emailPlaceholder": "पुष्टि गर्न इमेल प्रविष्ट गर्नुहोस्",
+    "emailMismatch": "इमेल मेल खाँदैन",
+    "deleting": "मेटाउँदै..."
+  },
+  "actions": {
+    "cancel": "रद्द गर्नुहोस्",
+    "save": "सुरक्षित गर्नुहोस्",
+    "saving": "सुरक्षित गर्दै...",
+    "updateStatus": "स्थिति अद्यावधिक गर्नुहोस्",
+    "assignToSchool": "विद्यालयमा नियुक्त गर्नुहोस्",
+    "addCredential": "प्रमाणपत्र थप्नुहोस्"
+  },
+  "widgets": {
+    "showHide": "विजेटहरू देखाउनुहोस्/लुकाउनुहोस्",
+    "resetDefault": "पूर्वनिर्धारितमा रिसेट गर्नुहोस्",
+    "quickStats": "द्रुत तथ्याङ्क",
+    "quickAccess": "द्रुत पहुँच"
+  },
+  "bootstrap": {
+    "selectSchool": "विद्यालय छान्नुहोस्",
+    "selectSchoolDescription": "यो सुविधा पहुँच गर्न हेडरबाट विद्यालय छान्नुहोस्।",
+    "comingSoon": "सुविधा चाँडै आउँदैछ",
+    "scaffolded": "यो मोड्युल स्क्याफोल्ड गरिएको छ र विकासको लागि तयार छ।",
+    "planned": "योजनाबद्ध",
+    "inProgress": "प्रगतिमा",
+    "plannedFeatures": "योजनाबद्ध सुविधाहरू"
+  }
+}

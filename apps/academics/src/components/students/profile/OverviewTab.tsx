@@ -36,6 +36,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { useStudentAttendanceSummary, useStudentAttendance } from '../../../hooks/useAttendance'
 import { useStudentGrades, useCurrentAcademicYear } from '../../../hooks'
@@ -62,10 +63,11 @@ function is403Error(error: unknown): boolean {
 }
 
 function AccessRestricted({ label }: { label: string }) {
+  const { t } = useTranslation('academics')
   return (
     <div className="py-6 text-center rounded-xl border border-border-secondary bg-surface-secondary/30">
       <Lock className="w-6 h-6 mx-auto text-text-tertiary mb-2" />
-      <p className="text-sm text-text-secondary">No {label} available for your assigned sections</p>
+      <p className="text-sm text-text-secondary">{t('empty.noSectionsAvailable', { label })}</p>
     </div>
   )
 }
@@ -75,10 +77,10 @@ function AccessRestricted({ label }: { label: string }) {
 // ============================================================================
 
 function getRateTheme(rate: number) {
-  if (rate >= 95) return { accent: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', label: 'Excellent' }
-  if (rate >= 90) return { accent: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-500/10', label: 'Good' }
-  if (rate >= 85) return { accent: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10', label: 'At Risk' }
-  return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', label: 'Critical' }
+  if (rate >= 95) return { accent: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', labelKey: 'performance.excellent' }
+  if (rate >= 90) return { accent: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-500/10', labelKey: 'performance.good' }
+  if (rate >= 85) return { accent: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10', labelKey: 'performance.atRisk' }
+  return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', labelKey: 'performance.critical' }
 }
 
 function getGpaTheme(gpa: number) {
@@ -190,6 +192,7 @@ function GradeTooltip({ active, payload }: any) {
 // ============================================================================
 
 function AttendanceTrendChart({ studentId }: { studentId: string }) {
+  const { t: tAcad } = useTranslation('academics')
   const thirtyDaysAgo = useMemo(() => {
     const d = new Date()
     d.setDate(d.getDate() - 30)
@@ -236,7 +239,7 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
   if (chartData.length === 0) {
     return (
       <div className="h-[120px] flex items-center justify-center rounded-xl border border-border-secondary bg-surface-secondary/30">
-        <p className="text-sm text-text-tertiary">No attendance data recorded yet</p>
+        <p className="text-sm text-text-tertiary">{tAcad('empty.noAttendance')}</p>
       </div>
     )
   }
@@ -296,8 +299,9 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
 function CoursePerformanceChart({
   grades,
 }: {
-  grades: Array<{ gradeId: string; courseName?: string; courseId: string; numericGrade: number; letterGrade: string; isFinal: boolean }>
+  grades: Array<{ gradeId: string; courseName?: string; courseId: string; numericGrade: number; letterGrade: string; isFinal: boolean }>;
 }) {
+  const { t: tAcad } = useTranslation('academics')
   const chartData = useMemo(() => {
     return grades
       .filter((g) => g.numericGrade != null)
@@ -313,13 +317,13 @@ function CoursePerformanceChart({
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
           <BarChart3 className="w-4 h-4 text-blue-500" />
-          Course Performance
+          {tAcad('sections.coursePerformance')}
         </h3>
         <div className="py-8 text-center rounded-xl border border-border-secondary bg-surface-secondary/30">
           <GraduationCap className="w-8 h-8 mx-auto text-text-tertiary mb-2" />
-          <p className="text-sm text-text-secondary">No grades recorded yet</p>
+          <p className="text-sm text-text-secondary">{tAcad('empty.noGrades')}</p>
           <p className="text-xs text-text-tertiary mt-1">
-            Grades will appear here once recorded by teachers.
+            {tAcad('empty.gradesWillAppear')}
           </p>
         </div>
       </section>
@@ -332,7 +336,7 @@ function CoursePerformanceChart({
     <section>
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <BarChart3 className="w-4 h-4 text-blue-500" />
-        Course Performance
+        {tAcad('sections.coursePerformance')}
       </h3>
       <div className="rounded-xl border border-border-secondary bg-surface-secondary/30 p-4">
         <ResponsiveContainer width="100%" height={chartHeight}>
@@ -363,15 +367,15 @@ function CoursePerformanceChart({
         </ResponsiveContainer>
         <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-border-secondary">
           {[
-            { label: 'A (90+)', color: '#10b981' },
-            { label: 'B (80-89)', color: '#3b82f6' },
-            { label: 'C (70-79)', color: '#f59e0b' },
-            { label: 'D (60-69)', color: '#f97316' },
-            { label: 'F (<60)', color: '#ef4444' },
+            { key: 'gradeLegend.a', color: '#10b981' },
+            { key: 'gradeLegend.b', color: '#3b82f6' },
+            { key: 'gradeLegend.c', color: '#f59e0b' },
+            { key: 'gradeLegend.d', color: '#f97316' },
+            { key: 'gradeLegend.f', color: '#ef4444' },
           ].map((item) => (
-            <span key={item.label} className="flex items-center gap-1.5 text-[10px] text-text-tertiary">
+            <span key={item.key} className="flex items-center gap-1.5 text-[10px] text-text-tertiary">
               <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color }} />
-              {item.label}
+              {tAcad(item.key)}
             </span>
           ))}
         </div>
@@ -385,18 +389,19 @@ function CoursePerformanceChart({
 // ============================================================================
 
 function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
+  const { t: tAcad } = useTranslation('academics')
   if (classrooms.length === 0) {
     return (
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
           <BookOpen className="w-4 h-4 text-indigo-500" />
-          Current Classes
+          {tAcad('sections.currentClasses')}
         </h3>
         <div className="text-center py-8 rounded-xl border border-border-secondary bg-surface-secondary/30">
           <BookOpen className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
-          <p className="text-sm text-text-secondary">No classes scheduled</p>
+          <p className="text-sm text-text-secondary">{tAcad('empty.noClasses')}</p>
           <p className="text-xs text-text-tertiary mt-1">
-            Classes will appear here once enrolled in sections.
+            {tAcad('empty.classesWillAppear')}
           </p>
         </div>
       </section>
@@ -407,17 +412,17 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
     <section>
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <BookOpen className="w-4 h-4 text-indigo-500" />
-        Current Classes
+        {tAcad('sections.currentClasses')}
         <span className="text-xs text-text-tertiary font-normal ml-1">({classrooms.length})</span>
       </h3>
       <div className="overflow-x-auto rounded-xl border border-border-secondary">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-surface-secondary">
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">#</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Class</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Subject</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Teacher</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">{tAcad('tableHeaders.number')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{tAcad('tableHeaders.class')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{tAcad('tableHeaders.subject')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{tAcad('tableHeaders.teacher')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-secondary">
@@ -455,6 +460,7 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
 // ============================================================================
 
 export function OverviewTab({ student }: OverviewTabProps) {
+  const { t: tAcad } = useTranslation('academics')
   const classrooms = student.classrooms || []
   const schoolId = useActiveSchoolId() || ''
 
@@ -499,11 +505,11 @@ export function OverviewTab({ student }: OverviewTabProps) {
     return (
       <div className="text-center py-16">
         <BarChart3 className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-        <p className="text-text-secondary font-medium">No academic data yet</p>
+        <p className="text-text-secondary font-medium">{tAcad('empty.noAcademicData')}</p>
         <p className="text-sm text-text-tertiary mt-1">
           {student.currentEnrollment
-            ? 'This student has no class sections or attendance data yet.'
-            : 'Enroll this student first, then add to class sections.'}
+            ? tAcad('empty.noDataDescription')
+            : tAcad('empty.enrollFirst')}
         </p>
       </div>
     )
@@ -515,29 +521,29 @@ export function OverviewTab({ student }: OverviewTabProps) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           icon={Target}
-          label="Attendance"
+          label={tAcad('stats.attendance')}
           value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
-          subLabel={rateTheme?.label}
+          subLabel={rateTheme?.labelKey ? tAcad(rateTheme.labelKey) : undefined}
           accent={rateTheme?.accent || 'text-text-tertiary'}
           bg={rateTheme?.bg || 'bg-surface-tertiary'}
         />
         <StatCard
           icon={BookOpen}
-          label="Classes"
+          label={tAcad('stats.classes')}
           value={classrooms.length}
           accent="text-indigo-600 dark:text-indigo-400"
           bg="bg-indigo-500/10"
         />
         <StatCard
           icon={GraduationCap}
-          label="Term GPA"
+          label={tAcad('stats.termGpa')}
           value={gpa?.termGpa != null ? gpa.termGpa.toFixed(2) : gradesLoading ? '...' : '—'}
           accent={termGpaTheme?.accent || 'text-text-tertiary'}
           bg={termGpaTheme?.bg || 'bg-surface-tertiary'}
         />
         <StatCard
           icon={GraduationCap}
-          label="Cum. GPA"
+          label={tAcad('stats.cumGpa')}
           value={gpa?.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : gradesLoading ? '...' : '—'}
           accent={cumGpaTheme?.accent || 'text-text-tertiary'}
           bg={cumGpaTheme?.bg || 'bg-surface-tertiary'}
@@ -549,14 +555,14 @@ export function OverviewTab({ student }: OverviewTabProps) {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
             <Calendar className="w-4 h-4 text-amber-500" />
-            Attendance Trend
+            {tAcad('sections.attendanceTrend')}
           </h3>
           <Link
             to="/attendance"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
-            History
+            {tAcad('sections.history')}
             <ExternalLink className="w-3 h-3" />
           </Link>
         </div>
@@ -565,7 +571,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
           <div className="mt-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">
             <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
               <TrendingDown className="w-4 h-4 flex-shrink-0" />
-              Attendance below 90% may affect academic performance. Consider follow-up.
+              {tAcad('alerts.lowAttendance')}
             </p>
           </div>
         )}
@@ -573,7 +579,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
           <div className="mt-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
             <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 flex-shrink-0" />
-              Outstanding attendance record!
+              {tAcad('alerts.highAttendance')}
             </p>
           </div>
         )}
@@ -585,7 +591,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
           <section>
             <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
               <BarChart3 className="w-4 h-4 text-blue-500" />
-              Course Performance
+              {tAcad('sections.coursePerformance')}
             </h3>
             <AccessRestricted label="grade data" />
           </section>

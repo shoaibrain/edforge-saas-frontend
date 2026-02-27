@@ -32,6 +32,7 @@ import { useSidebarModule, useActiveNavItem } from '../../hooks/useSidebarModule
 import { useSecureNavGroups } from '../../hooks/useSecureNavItems'
 import type { NavItem, NavItemGroup } from '../../config/sidebar-modules'
 import { Tooltip } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { SidebarEdgeTrigger } from './SidebarEdgeTrigger'
 import { getSchoolAvatar } from '../../lib/avatar'
 import { cn } from '../../lib/utils'
@@ -100,8 +101,10 @@ function NavItemLink({
   isActive: boolean
   index: number
 }) {
+  const { t: tNav } = useTranslation('nav')
   const [isHovered, setIsHovered] = useState(false)
   const isDanger = item.variant === 'danger'
+  const translatedLabel = tNav(`sidebar.${item.id}`, { defaultValue: item.label })
 
   const linkContent = (
     <Link
@@ -182,7 +185,7 @@ function NavItemLink({
                 !isActive && isDanger && 'text-rust-500/80'
               )}
             >
-              {item.label}
+              {translatedLabel}
             </motion.span>
           )}
         </AnimatePresence>
@@ -206,7 +209,7 @@ function NavItemLink({
 
   if (collapsed) {
     return (
-      <Tooltip content={item.label} side="right" sideOffset={12}>
+      <Tooltip content={translatedLabel} side="right" sideOffset={12}>
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -244,6 +247,8 @@ function NavGroup({
   activeItemId: string | null
   startIndex: number
 }) {
+  const { t: tNav } = useTranslation('nav')
+
   return (
     <div className="space-y-0.5">
       {/* Group header */}
@@ -253,7 +258,7 @@ function NavGroup({
           animate={{ opacity: 1 }}
           className="px-3 pt-4 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]"
         >
-          {group.label}
+          {tNav(`group.${group.id}`, { defaultValue: group.label })}
         </motion.p>
       )}
 
@@ -295,6 +300,7 @@ function HomeNavButton({
   collapsed: boolean
   isSubModule: boolean
 }) {
+  const { t: tNav } = useTranslation('nav')
   const pathname = useSidebarPathname()
   const [isHovered, setIsHovered] = useState(false)
 
@@ -305,7 +311,7 @@ function HomeNavButton({
 
   // Dynamic icon and label
   const CurrentIcon = showBackMode ? ArrowLeft : Home
-  const label = showBackMode ? 'Back to Home' : 'Home'
+  const label = showBackMode ? tNav('backToHome') : tNav('home')
 
   const linkContent = (
     <Link
@@ -403,6 +409,7 @@ function HomeNavButton({
 // ============================================================================
 
 function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
+  const { t } = useTranslation('common')
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)

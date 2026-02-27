@@ -14,6 +14,7 @@
 import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useResourcePermissions } from '@edforge/abac'
+import { useTranslation } from '@edforge/i18n'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -47,11 +48,11 @@ import { AddGuardianModal } from '../../components/students/profile/AddGuardianM
 
 type TabId = 'overview' | 'profile' | 'enrollment' | 'family'
 
-const TABS: { id: TabId; label: string; icon: typeof User }[] = [
-  { id: 'overview', label: 'Overview', icon: BarChart3 },
-  { id: 'profile', label: 'Profile', icon: User },
-  { id: 'enrollment', label: 'Enrollment', icon: GraduationCap },
-  { id: 'family', label: 'Family', icon: Users },
+const TAB_IDS: { id: TabId; icon: typeof User }[] = [
+  { id: 'overview', icon: BarChart3 },
+  { id: 'profile', icon: User },
+  { id: 'enrollment', icon: GraduationCap },
+  { id: 'family', icon: Users },
 ]
 
 // ============================================================================
@@ -99,6 +100,7 @@ function ProfileLoadingState() {
 // ============================================================================
 
 function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation('academics')
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
@@ -106,14 +108,14 @@ function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
           <User className="w-7 h-7 text-red-600 dark:text-red-400" />
         </div>
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
-          Failed to Load Profile
+          {t('error.failedToLoad')}
         </h2>
         <p className="text-[rgb(var(--text-secondary))] mb-6">
-          We couldn&apos;t load this student&apos;s profile. Please try again.
+          {t('error.failedToLoadDescription')}
         </p>
         <Button onClick={onRetry} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
-          Retry
+          {t('error.retry')}
         </Button>
       </div>
     </div>
@@ -129,6 +131,7 @@ export function StudentProfilePage() {
   const studentId = params.studentId
   const schoolId = useActiveSchoolId()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const { t } = useTranslation('academics')
 
   // ABAC: check student permissions
   const studentPerms = useResourcePermissions('students')
@@ -175,7 +178,7 @@ export function StudentProfilePage() {
         <PermissionDenied
           resource="student profile"
           action="view"
-          message="You don't have permission to view this student's profile. This student may not be in your assigned sections."
+          message={t('error.noPermission')}
           showBackButton
         />
       )
@@ -207,7 +210,7 @@ export function StudentProfilePage() {
 
         {/* Tab Navigation — aligned with Staff Detail pattern */}
         <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
-          {TABS.map((tab) => {
+          {TAB_IDS.map((tab) => {
             const isActive = activeTab === tab.id
             const Icon = tab.icon
             return (
@@ -224,7 +227,7 @@ export function StudentProfilePage() {
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <Icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
-                  {tab.label}
+                  {t(`tabs.${tab.id}`)}
                 </span>
 
                 {/* Animated underline indicator */}

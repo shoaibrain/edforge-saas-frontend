@@ -7,10 +7,14 @@
 
 import { ArrowLeft, Home, ShieldX } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useAuthStore } from '../../stores/auth.store'
 import { useAppStore } from '../../stores/app.store'
 
 export function AccessDenied() {
+  const { t } = useTranslation('errors')
+  const { t: tCommon } = useTranslation('common')
+  const { t: tNav } = useTranslation('nav')
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
 
@@ -25,10 +29,10 @@ export function AccessDenied() {
       : '/home'
 
   const portalLabel = isStudent
-    ? 'Go to My Portal'
+    ? t('accessDenied.goMyPortal')
     : isParent
-      ? 'Go to Family Portal'
-      : 'Dashboard'
+      ? t('accessDenied.goFamilyPortal')
+      : tNav('dashboard')
 
   const handleGoBack = () => {
     if (window.history.length > 1) {
@@ -46,10 +50,10 @@ export function AccessDenied() {
         </div>
 
         <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
-          Access Denied
+          {t('accessDenied.title')}
         </h1>
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-8">
-          You don't have permission to view this page. If you believe this is an error, please contact your school administrator.
+          {t('accessDenied.description')}
         </p>
 
         <div className="flex items-center justify-center gap-3">
@@ -59,7 +63,7 @@ export function AccessDenied() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Go Back
+            {tCommon('goBack')}
           </Button>
           <Button
             onClick={() => window.location.href = portalPath}

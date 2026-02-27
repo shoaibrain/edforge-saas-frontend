@@ -1,0 +1,184 @@
+{
+  "tabs": {
+    "overview": "Overview",
+    "profile": "Profile",
+    "enrollment": "Enrollment",
+    "family": "Family"
+  },
+  "error": {
+    "failedToLoad": "Failed to Load Profile",
+    "failedToLoadDescription": "We couldn't load this student's profile. Please try again.",
+    "retry": "Retry",
+    "noPermission": "You don't have permission to view this student's profile. This student may not be in your assigned sections."
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "graduated": "Graduated",
+    "transferred": "Transferred",
+    "withdrawn": "Withdrawn",
+    "suspended": "Suspended",
+    "enrolled": "Enrolled",
+    "pending": "Pending",
+    "completed": "Completed"
+  },
+  "actions": {
+    "editStudent": "Edit Student",
+    "schoolEnrollment": "School Enrollment",
+    "addToSection": "Add to Section",
+    "addGuardian": "Add Guardian",
+    "enrollAtSchool": "Enroll at School",
+    "newSchoolEnrollment": "New School Enrollment",
+    "grantPortalAccess": "Grant Portal Access",
+    "editGuardian": "Edit Guardian",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "adding": "Adding...",
+    "add": "Add"
+  },
+  "stats": {
+    "attendance": "Attendance",
+    "classes": "Classes",
+    "termGpa": "Term GPA",
+    "cumGpa": "Cum. GPA"
+  },
+  "sections": {
+    "attendanceTrend": "Attendance Trend",
+    "coursePerformance": "Course Performance",
+    "currentClasses": "Current Classes",
+    "history": "History",
+    "personalInfo": "Personal Information",
+    "contactInfo": "Contact Information",
+    "academicInfo": "Academic Information",
+    "programsAccommodations": "Programs & Accommodations",
+    "medicalInfo": "Medical Information",
+    "notes": "Notes",
+    "currentEnrollment": "Current Enrollment",
+    "enrollmentHistory": "Enrollment History",
+    "guardians": "Guardians",
+    "emergencyContacts": "Emergency Contacts"
+  },
+  "empty": {
+    "noAttendance": "No attendance data recorded yet",
+    "noGrades": "No grades recorded yet",
+    "gradesWillAppear": "Grades will appear here once recorded by teachers.",
+    "noClasses": "No classes scheduled",
+    "classesWillAppear": "Classes will appear here once enrolled in sections.",
+    "noAcademicData": "No academic data yet",
+    "noDataDescription": "This student has no class sections or attendance data yet.",
+    "enrollFirst": "Enroll this student first, then add to class sections.",
+    "noEnrollment": "No enrollment records",
+    "enrollmentWillAppear": "Enrollment data will appear here once the student is enrolled in an academic year.",
+    "noGuardians": "No guardians on file",
+    "addGuardianDescription": "Add a parent or guardian to this student's profile.",
+    "noEmergencyContacts": "No emergency contacts on file",
+    "noSectionsAvailable": "No {{label}} available for your assigned sections"
+  },
+  "performance": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "atRisk": "At Risk",
+    "critical": "Critical"
+  },
+  "alerts": {
+    "lowAttendance": "Attendance below 90% may affect academic performance. Consider follow-up.",
+    "highAttendance": "Outstanding attendance record!"
+  },
+  "gradeLegend": {
+    "a": "A (90+)",
+    "b": "B (80-89)",
+    "c": "C (70-79)",
+    "d": "D (60-69)",
+    "f": "F (<60)"
+  },
+  "tableHeaders": {
+    "number": "#",
+    "class": "Class",
+    "subject": "Subject",
+    "teacher": "Teacher",
+    "grade": "Grade",
+    "school": "School",
+    "academicYear": "Academic Year",
+    "entryDate": "Entry Date",
+    "exitDate": "Exit Date",
+    "status": "Status"
+  },
+  "fields": {
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "ethnicity": "Ethnicity",
+    "primaryLanguage": "Primary Language",
+    "homeLanguage": "Home Language",
+    "countryOfBirth": "Country of Birth",
+    "email": "Email",
+    "phone": "Phone",
+    "altPhone": "Alt. Phone",
+    "address": "Address",
+    "mailingAddress": "Mailing Address",
+    "currentGrade": "Current Grade",
+    "enrollmentDate": "Enrollment Date",
+    "studentNumber": "Student Number",
+    "stateStudentId": "State Student ID",
+    "previousSchool": "Previous School",
+    "gradeLevel": "Grade Level",
+    "homeroom": "Homeroom",
+    "occupation": "Occupation",
+    "firstName": "First Name",
+    "middleName": "Middle Name",
+    "lastName": "Last Name"
+  },
+  "programs": {
+    "iep": "IEP",
+    "plan504": "504 Plan",
+    "specialPrograms": "Special Programs",
+    "accommodations": "Accommodations"
+  },
+  "medical": {
+    "allergies": "Allergies",
+    "medications": "Medications",
+    "conditions": "Conditions",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "bloodType": "Blood Type",
+    "physician": "Physician",
+    "physicianPhone": "Physician Phone",
+    "insurance": "Insurance",
+    "medicalNotes": "Medical Notes"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "preferNotToSay": "Prefer not to say"
+  },
+  "relationships": {
+    "mother": "Mother",
+    "father": "Father",
+    "legalGuardian": "Legal Guardian",
+    "grandparent": "Grandparent",
+    "sibling": "Sibling",
+    "aunt": "Aunt",
+    "uncle": "Uncle",
+    "other": "Other"
+  },
+  "guardian": {
+    "primary": "Primary",
+    "portalAccess": "Portal Access",
+    "pickupAuth": "Pickup Auth"
+  },
+  "privacy": {
+    "showSensitive": "Show sensitive details",
+    "hideSensitive": "Hide sensitive details"
+  },
+  "enrollment": {
+    "studentIsEnrolled": "Student is enrolled",
+    "nextStepAddSection": "Next step: Add this student to class sections to enable attendance and grading.",
+    "noActiveEnrollment": "No active enrollment on file for the current academic year."
+  },
+  "yesNo": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "gradeLabel": "Grade {{level}}",
+  "ageLabel": "{{age}} yrs"
+}

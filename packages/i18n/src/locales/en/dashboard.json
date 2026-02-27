@@ -1,0 +1,85 @@
+{
+  "greeting": {
+    "morning": "Good Morning",
+    "afternoon": "Good Afternoon",
+    "evening": "Good Evening"
+  },
+  "recentlyVisited": "Recently Visited",
+  "upcomingEvents": "Upcoming Events",
+  "noUpcomingEvents": "No upcoming events",
+  "enjoyFreeTime": "Enjoy your free time!",
+  "quickActions": "Quick Actions",
+  "today": "Today",
+  "tomorrow": "Tomorrow",
+  "yesterday": "Yesterday",
+  "widgets": {
+    "customize": "Customize Dashboard",
+    "showWidget": "Show",
+    "hideWidget": "Hide"
+  },
+  "events": {
+    "calendars": "Calendars",
+    "includeEvents": "Include events",
+    "days": "{{count}} days",
+    "allDayEvents": "All-day events",
+    "hideFromHome": "Hide from Home",
+    "back": "Back",
+    "join": "Join"
+  },
+  "quickAction": {
+    "addStudent": "Add Student",
+    "enrollNewStudent": "Enroll new student",
+    "attendance": "Attendance",
+    "markDailyAttendance": "Mark daily attendance",
+    "markClassAttendance": "Mark class attendance",
+    "myClasses": "My Classes",
+    "viewYourClasses": "View your classes",
+    "gradebook": "Gradebook",
+    "enterGrades": "Enter grades",
+    "grades": "Grades",
+    "viewPerformance": "View performance",
+    "schedule": "Schedule",
+    "upcomingClasses": "Upcoming classes",
+    "assignments": "Assignments",
+    "pendingHomework": "Pending homework",
+    "children": "Children",
+    "viewProgress": "View progress",
+    "academicReports": "Academic reports",
+    "fees": "Fees",
+    "payments": "Payments"
+  },
+  "welcomeTip": {
+    "administrator": {
+      "title": "Welcome to EdForge",
+      "description": "Your all-in-one education management platform. Connect your video conferencing tools, manage students, track attendance, and streamline your school operations.",
+      "action": "Manage your students"
+    },
+    "educator": {
+      "title": "Ready to Teach",
+      "description": "Access your class rosters, enter grades, and track attendance all in one place. Stay connected with parents through our integrated messaging system.",
+      "action": "View your classes"
+    },
+    "student": {
+      "title": "Welcome to Your Portal",
+      "description": "Track your academic progress, view assignments, check your schedule, and stay up to date with school announcements.",
+      "action": "Check your grades"
+    },
+    "parent": {
+      "title": "Stay Connected",
+      "description": "Monitor your children's academic progress, view attendance records, pay school fees, and communicate with teachers all in one place.",
+      "action": "View your children"
+    }
+  },
+  "moduleTip": {
+    "academics": {
+      "title": "Academic Management",
+      "description": "Manage students, teachers, classes, and curriculum all in one place. Track grades, attendance, and academic performance.",
+      "action": "Explore academics"
+    },
+    "people": {
+      "title": "People Management",
+      "description": "Manage staff, teachers, parents, and guardians. Track assignments, permissions, and communication preferences.",
+      "action": "Manage people"
+    }
+  }
+}

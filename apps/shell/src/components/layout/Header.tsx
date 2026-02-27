@@ -14,7 +14,8 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
-import { Avatar } from '@edforge/ui'
+import { Avatar, LanguageSwitcher } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 
 import { Breadcrumbs } from './Breadcrumbs'
 
@@ -27,13 +28,16 @@ function UserMenu() {
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
   const { theme, setTheme } = useThemeStore()
+  const { t: tNav } = useTranslation('nav')
+  const { t: tCommon } = useTranslation('common')
+  const { t: tSettings } = useTranslation('settings')
 
   if (!user) return null
 
   const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
+    { value: 'light', icon: Sun, label: tSettings('preferences.themeLight') },
+    { value: 'dark', icon: Moon, label: tSettings('preferences.themeDark') },
+    { value: 'system', icon: Monitor, label: tSettings('preferences.themeSystem') },
   ]
 
   return (
@@ -75,7 +79,7 @@ function UserMenu() {
           {/* Theme Picker */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">Theme</span>
+              <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{tCommon('theme')}</span>
               <div className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]">
                 {themes.map(({ value, icon: Icon, label }) => (
                   <button
@@ -109,8 +113,8 @@ function UserMenu() {
                     <User className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">My Profile</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">View and edit profile</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('myProfile')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('viewEditProfile')}</p>
                   </div>
                 </button>
               )}
@@ -125,8 +129,8 @@ function UserMenu() {
                     <Settings className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Settings</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">Manage preferences</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('settings')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('managePreferences')}</p>
                   </div>
                 </button>
               )}
@@ -138,8 +142,8 @@ function UserMenu() {
                     <HelpCircle className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Help & Support</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">Get help with Edforge</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('helpSupport')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('getHelp')}</p>
                   </div>
                 </button>
               )}
@@ -156,7 +160,7 @@ function UserMenu() {
                   <div className="w-8 h-8 rounded-lg bg-rust-100 dark:bg-rust-900/30 flex items-center justify-center">
                     <LogOut className="w-4 h-4 text-rust-500" />
                   </div>
-                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">Sign out</span>
+                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">{tNav('signOut')}</span>
                 </button>
               )}
             </MenuItem>
@@ -172,6 +176,8 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
+  const { t: tNav } = useTranslation('nav')
+
   return (
     <>
       <header
@@ -185,10 +191,13 @@ export function Header() {
 
         {/* Right Section - All header actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Language Switcher */}
+          <LanguageSwitcher variant="default" />
+
           {/* Documentation */}
           <button
             className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label="Documentation"
+            aria-label={tNav('documentation')}
           >
             <FileText className="w-5 h-5" />
           </button>
@@ -196,7 +205,7 @@ export function Header() {
           {/* Notifications */}
           <button
             className="relative p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label="Notifications"
+            aria-label={tNav('notifications')}
           >
             <Bell className="w-5 h-5" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-rust-500 rounded-full ring-2 ring-[rgb(var(--surface-secondary))]" />

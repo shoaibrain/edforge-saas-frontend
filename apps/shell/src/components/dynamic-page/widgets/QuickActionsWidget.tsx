@@ -26,6 +26,7 @@ import {
   CloudLightning,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { useAuthStore, getUserRoleCategory } from '../../../stores/auth.store'
 import { useAppStore } from '../../../stores/app.store'
 import type { RoleCategory } from '@edforge/types'
@@ -39,6 +40,10 @@ export interface QuickAction {
   id: string
   label: string
   description: string
+  /** i18n key for label (under dashboard:quickAction.*) */
+  labelKey?: string
+  /** i18n key for description (under dashboard:quickAction.*) */
+  descriptionKey?: string
   icon: LucideIcon
   href: string
   color: {
@@ -59,6 +64,8 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
     id: 'add-student',
     label: 'Add Student',
     description: 'Enroll new student',
+    labelKey: 'quickAction.addStudent',
+    descriptionKey: 'quickAction.enrollNewStudent',
     icon: Users,
     href: '/academics/students',
     color: {
@@ -71,6 +78,8 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
     id: 'record-attendance',
     label: 'Attendance',
     description: 'Mark daily attendance',
+    labelKey: 'quickAction.attendance',
+    descriptionKey: 'quickAction.markDailyAttendance',
     icon: Calendar,
     href: '/academics/attendance',
     color: {
@@ -112,6 +121,8 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     id: 'my-classes',
     label: 'My Classes',
     description: 'View your classes',
+    labelKey: 'quickAction.myClasses',
+    descriptionKey: 'quickAction.viewYourClasses',
     icon: BookOpen,
     href: '/academics/gradebooks',
     color: {
@@ -124,6 +135,8 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     id: 'record-attendance',
     label: 'Attendance',
     description: 'Mark class attendance',
+    labelKey: 'quickAction.attendance',
+    descriptionKey: 'quickAction.markClassAttendance',
     icon: ClipboardCheck,
     href: '/academics/attendance',
     color: {
@@ -136,6 +149,8 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     id: 'gradebook',
     label: 'Gradebook',
     description: 'Enter grades',
+    labelKey: 'quickAction.gradebook',
+    descriptionKey: 'quickAction.enterGrades',
     icon: GraduationCap,
     href: '/academics/gradebooks',
     color: {
@@ -165,6 +180,8 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     id: 'my-grades',
     label: 'Grades',
     description: 'View performance',
+    labelKey: 'quickAction.grades',
+    descriptionKey: 'quickAction.viewPerformance',
     icon: GraduationCap,
     href: '/student-portal/grades',
     color: {
@@ -177,6 +194,8 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     id: 'my-schedule',
     label: 'Schedule',
     description: 'Upcoming classes',
+    labelKey: 'quickAction.schedule',
+    descriptionKey: 'quickAction.upcomingClasses',
     icon: Calendar,
     href: '/student-portal/schedule',
     color: {
@@ -189,6 +208,8 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     id: 'assignments',
     label: 'Assignments',
     description: 'Pending homework',
+    labelKey: 'quickAction.assignments',
+    descriptionKey: 'quickAction.pendingHomework',
     icon: FileText,
     href: '/student-portal/assignments',
     color: {
@@ -218,6 +239,8 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     id: 'children-overview',
     label: 'Children',
     description: 'View progress',
+    labelKey: 'quickAction.children',
+    descriptionKey: 'quickAction.viewProgress',
     icon: Baby,
     href: '/parent-portal',
     color: {
@@ -230,6 +253,8 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     id: 'children-grades',
     label: 'Grades',
     description: 'Academic reports',
+    labelKey: 'quickAction.grades',
+    descriptionKey: 'quickAction.academicReports',
     icon: GraduationCap,
     href: '/parent-portal/grades',
     color: {
@@ -242,6 +267,8 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     id: 'fee-payments',
     label: 'Fees',
     description: 'Payments',
+    labelKey: 'quickAction.fees',
+    descriptionKey: 'quickAction.payments',
     icon: CreditCard,
     href: '/parent-portal/fees',
     color: {
@@ -287,6 +314,9 @@ interface QuickActionCardProps {
 
 function QuickActionCard({ action }: QuickActionCardProps) {
   const Icon = action.icon
+  const { t } = useTranslation('dashboard')
+  const label = action.labelKey ? t(action.labelKey, { defaultValue: action.label }) : action.label
+  const description = action.descriptionKey ? t(action.descriptionKey, { defaultValue: action.description }) : action.description
 
   return (
     <motion.div
@@ -327,10 +357,10 @@ function QuickActionCard({ action }: QuickActionCardProps) {
           {/* Content */}
           <div className="mt-auto">
             <h3 className="font-semibold text-base text-[rgb(var(--text-primary))] mb-1">
-              {action.label}
+              {label}
             </h3>
             <p className="text-xs text-[rgb(var(--text-tertiary))] font-medium">
-              {action.description}
+              {description}
             </p>
           </div>
         </div>
@@ -354,6 +384,7 @@ export function QuickActionsWidget({
 }: QuickActionsWidgetProps) {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+  const { t } = useTranslation('dashboard')
 
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const quickActions = actions || getQuickActionsForRole(roleCategory)
@@ -365,7 +396,7 @@ export function QuickActionsWidget({
   return (
     <WidgetSection
       widgetId="quick-actions"
-      label="Quick actions"
+      label={t('quickActions')}
       icon={CloudLightning}
     >
       <div className={`grid ${gridCols} gap-4`}>

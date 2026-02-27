@@ -17,6 +17,7 @@ import {
   Lightbulb,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { useAuthStore, getUserRoleCategory } from '../../../stores/auth.store'
 import { useAppStore } from '../../../stores/app.store'
 import type { RoleCategory } from '@edforge/types'
@@ -36,6 +37,8 @@ export interface WelcomeTip {
   iconBg: string
   iconColor: string
   linkColor: string
+  /** i18n prefix key under dashboard namespace (e.g. 'welcomeTip.administrator') */
+  i18nKey?: string
 }
 
 // ============================================================================
@@ -53,6 +56,7 @@ export const WELCOME_TIPS: Record<RoleCategory, WelcomeTip> = {
     iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
     iconColor: 'text-teal-600 dark:text-cyan-400',
     linkColor: 'text-teal-600 dark:text-cyan-400',
+    i18nKey: 'welcomeTip.administrator',
   },
   educator: {
     title: 'Ready to Teach',
@@ -64,6 +68,7 @@ export const WELCOME_TIPS: Record<RoleCategory, WelcomeTip> = {
     iconBg: 'bg-amber-500/15 dark:bg-amber-400/20',
     iconColor: 'text-amber-600 dark:text-amber-400',
     linkColor: 'text-amber-600 dark:text-amber-400',
+    i18nKey: 'welcomeTip.educator',
   },
   student: {
     title: 'Welcome to Your Portal',
@@ -75,6 +80,7 @@ export const WELCOME_TIPS: Record<RoleCategory, WelcomeTip> = {
     iconBg: 'bg-sky-500/15 dark:bg-sky-400/20',
     iconColor: 'text-sky-600 dark:text-sky-400',
     linkColor: 'text-sky-600 dark:text-sky-400',
+    i18nKey: 'welcomeTip.student',
   },
   parent: {
     title: 'Stay Connected',
@@ -86,6 +92,7 @@ export const WELCOME_TIPS: Record<RoleCategory, WelcomeTip> = {
     iconBg: 'bg-rose-500/15 dark:bg-rose-400/20',
     iconColor: 'text-rose-600 dark:text-rose-400',
     linkColor: 'text-rose-600 dark:text-rose-400',
+    i18nKey: 'welcomeTip.parent',
   },
 }
 
@@ -99,6 +106,11 @@ interface WelcomeTipCardProps {
 
 function WelcomeTipCard({ tip }: WelcomeTipCardProps) {
   const WelcomeIcon = tip.icon
+  const { t } = useTranslation('dashboard')
+
+  const title = tip.i18nKey ? t(`${tip.i18nKey}.title`, { defaultValue: tip.title }) : tip.title
+  const description = tip.i18nKey ? t(`${tip.i18nKey}.description`, { defaultValue: tip.description }) : tip.description
+  const actionLabel = tip.i18nKey ? t(`${tip.i18nKey}.action`, { defaultValue: tip.actionLabel }) : tip.actionLabel
 
   return (
     <motion.div
@@ -113,17 +125,17 @@ function WelcomeTipCard({ tip }: WelcomeTipCardProps) {
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1">
-            {tip.title}
+            {title}
           </h3>
           <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
-            {tip.description}
+            {description}
           </p>
           <Link
             to={tip.actionHref}
             className={`inline-flex items-center gap-2 text-sm font-medium ${tip.linkColor} hover:underline`}
           >
             <Plus className="w-4 h-4" />
-            {tip.actionLabel}
+            {actionLabel}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -176,6 +188,7 @@ export const MODULE_TIPS: Record<string, WelcomeTip> = {
     iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
     iconColor: 'text-teal-600 dark:text-cyan-400',
     linkColor: 'text-teal-600 dark:text-cyan-400',
+    i18nKey: 'moduleTip.academics',
   },
   // [MVP-PARKED] Finance module tip
   // finance: {
@@ -200,6 +213,7 @@ export const MODULE_TIPS: Record<string, WelcomeTip> = {
     iconBg: 'bg-aqua-400/15 dark:bg-aqua-400/20',
     iconColor: 'text-aqua-700 dark:text-aqua-400',
     linkColor: 'text-aqua-700 dark:text-aqua-400',
+    i18nKey: 'moduleTip.people',
   },
   // [MVP-PARKED] Analytics & Messages module tips
   // analytics: {

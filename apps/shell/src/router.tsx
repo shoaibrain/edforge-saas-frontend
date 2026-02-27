@@ -26,6 +26,7 @@ import { LoginPage } from './components/layout/LoginPage'
 import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
+import { useLocaleEffect, useTranslation } from '@edforge/i18n'
 
 // Landing Pages (public)
 import { PublicLayout } from './components/landing/PublicLayout'
@@ -131,6 +132,9 @@ function ThemeSync() {
 // ============================================================================
 
 function RootLayout() {
+  // Sync <html lang> attribute and Devanagari font loading with i18n locale
+  useLocaleEffect()
+
   return (
     <ShellProvider>
       <ThemeSync />
@@ -599,6 +603,8 @@ const peopleRoute = createRoute({
 // ============================================================================
 
 function PortalPageError({ error, reset }: ErrorComponentProps) {
+  const { t } = useTranslation('errors')
+
   return (
     <div className="min-h-[400px] flex items-center justify-center p-6">
       <div className="max-w-lg w-full text-center">
@@ -608,28 +614,28 @@ function PortalPageError({ error, reset }: ErrorComponentProps) {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
-          Something went wrong
+          {t('generic')}
         </h2>
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
-          This page encountered an error. Other pages should still work — try navigating away and back.
+          {t('genericDescription')}
         </p>
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={reset}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-medium text-sm transition-colors"
           >
-            Try Again
+            {t('tryAgain', { ns: 'common' })}
           </button>
           <a
             href="/home"
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
           >
-            Go Home
+            {t('goHome', { ns: 'common' })}
           </a>
         </div>
         {import.meta.env.DEV && error && (
           <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
-            <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">Developer Info</summary>
+            <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">{t('developerInfo')}</summary>
             <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-red-500 font-mono overflow-x-auto max-h-40">
               {error.message}
               {'\n\n'}

@@ -10,6 +10,7 @@
 import { useState } from 'react'
 import { Pencil, MoreHorizontal, FileText, GraduationCap } from 'lucide-react'
 import { Button, Avatar } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { getStudentAvatar } from '../../../lib/avatar'
 
@@ -28,42 +29,36 @@ export interface ProfileHeaderProps {
 // STATUS HELPERS
 // ============================================================================
 
-const statusStyles: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
   active: {
     bg: 'bg-emerald-500/10',
     text: 'text-emerald-600 dark:text-emerald-400',
     dot: 'bg-emerald-500',
-    label: 'Active',
   },
   inactive: {
     bg: 'bg-slate-500/10',
     text: 'text-slate-600 dark:text-slate-400',
     dot: 'bg-gray-400',
-    label: 'Inactive',
   },
   graduated: {
     bg: 'bg-blue-500/10',
     text: 'text-blue-600 dark:text-blue-400',
     dot: 'bg-blue-500',
-    label: 'Graduated',
   },
   transferred: {
     bg: 'bg-amber-500/10',
     text: 'text-amber-600 dark:text-amber-400',
     dot: 'bg-amber-500',
-    label: 'Transferred',
   },
   withdrawn: {
     bg: 'bg-red-500/10',
     text: 'text-red-600 dark:text-red-400',
     dot: 'bg-red-500',
-    label: 'Withdrawn',
   },
   suspended: {
     bg: 'bg-orange-500/10',
     text: 'text-orange-600 dark:text-orange-400',
     dot: 'bg-amber-500',
-    label: 'Suspended',
   },
 }
 
@@ -85,6 +80,7 @@ function ActionsDropdown({
   canEdit?: boolean
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation('academics')
 
   return (
     <div className="relative">
@@ -109,7 +105,7 @@ function ActionsDropdown({
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
               >
                 <Pencil className="w-4 h-4" />
-                Edit Student
+                {t('actions.editStudent')}
               </button>
             )}
             {canEdit && (
@@ -119,7 +115,7 @@ function ActionsDropdown({
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
               >
                 <GraduationCap className="w-4 h-4" />
-                School Enrollment
+                {t('actions.schoolEnrollment')}
               </button>
             )}
           </div>
@@ -135,9 +131,10 @@ function ActionsDropdown({
 
 function StatusBadge({ status }: { status: string }) {
   const style = getStatusStyle(status)
+  const { t } = useTranslation('academics')
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
-      {style.label}
+      {t(`status.${status}`, { defaultValue: status })}
     </span>
   )
 }
@@ -154,6 +151,7 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   const statusStyle = getStatusStyle(student.status)
   const avatarUrl = getStudentAvatar(student.fullName)
+  const { t } = useTranslation('academics')
 
   return (
     <div className="flex items-start gap-5 pb-2">
@@ -188,7 +186,7 @@ export function ProfileHeader({
           )}
           {student.currentGradeLevel && (
             <span className="font-medium text-teal-600 dark:text-teal-400">
-              Grade {student.currentGradeLevel}
+              {t('gradeLabel', { level: student.currentGradeLevel })}
             </span>
           )}
           <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />

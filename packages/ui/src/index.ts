@@ -69,3 +69,9 @@ export {
   type DrawerFooterProps,
 } from './components/Drawer'
 
+// i18n
+export { LanguageSwitcher } from './components/LanguageSwitcher'
+
+// Date
+export { DateDisplay } from './components/DateDisplay'
+

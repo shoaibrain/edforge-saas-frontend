@@ -25,6 +25,7 @@ import {
   MapPin,
   Calendar,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { formatRelativeDate } from '../../../lib/greeting'
 import { WidgetSection } from '../WidgetSection'
 import { useDynamicPage } from '../DynamicPageContext'
@@ -334,12 +335,13 @@ function ToggleSwitch({ checked, onChange, disabled }: { checked: boolean; onCha
 
 // --- Empty State ---
 function EmptyState() {
+  const { t } = useTranslation('dashboard')
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 py-6 px-4 text-[rgb(var(--text-tertiary))]">
       <CalendarIcon className="w-8 h-8 opacity-20" />
       <div>
-        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))]">No upcoming events</h4>
-        <p className="text-xs">Enjoy your free time!</p>
+        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('noUpcomingEvents')}</h4>
+        <p className="text-xs">{t('enjoyFreeTime')}</p>
       </div>
     </motion.div>
   )
@@ -357,6 +359,7 @@ function EventsOptionsMenu({
   onUpdateFilters: (updates: Partial<EventFilters>) => void
   onHideWidget?: () => void
 }) {
+  const { t } = useTranslation('dashboard')
   const [isOpen, setIsOpen] = useState(false)
   const [activeSubmenu, setActiveSubmenu] = useState<'calendars' | 'days' | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -392,31 +395,31 @@ function EventsOptionsMenu({
             {activeSubmenu === null ? (
               <>
                 <button onClick={() => setActiveSubmenu('calendars')} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                  <span>Calendars</span>
+                  <span>{t('events.calendars')}</span>
                   <ChevronRight className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                 </button>
                 <button onClick={() => setActiveSubmenu('days')} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                  <span>Include events</span>
+                  <span>{t('events.includeEvents')}</span>
                   <div className="flex items-center gap-1 text-[rgb(var(--text-tertiary))]">
-                    <span>{filters.includeDays} days</span>
+                    <span>{t('events.days', { count: filters.includeDays })}</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </button>
                 <div className="border-t border-[rgb(var(--border-secondary))] my-1" />
                 <div className="px-3 py-2 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">All-day events</span>
+                    <span className="text-sm">{t('events.allDayEvents')}</span>
                     <ToggleSwitch checked={filters.showAllDay} onChange={() => onUpdateFilters({ showAllDay: !filters.showAllDay })} />
                   </div>
                 </div>
                 <div className="border-t border-[rgb(var(--border-secondary))] my-1" />
-                <button onClick={() => { onHideWidget?.(); setIsOpen(false) }} className="w-full text-left px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">Hide from Home</button>
+                <button onClick={() => { onHideWidget?.(); setIsOpen(false) }} className="w-full text-left px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">{t('events.hideFromHome')}</button>
               </>
             ) : (
               <div>
                 <button onClick={() => setActiveSubmenu(null)} className="flex items-center px-3 py-2 text-sm font-medium border-b border-[rgb(var(--border-secondary))] w-full hover:bg-[rgb(var(--surface-hover))]">
                   <ChevronRight className="w-4 h-4 rotate-180 mr-2" />
-                  Back
+                  {t('events.back')}
                 </button>
                 {activeSubmenu === 'calendars' && calendars.map(cal => (
                   <button key={cal} onClick={() => {
@@ -534,10 +537,12 @@ function EventItem({ event }: { event: UpcomingEvent }) {
 export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { events?: UpcomingEvent[]; maxDays?: number }) {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  const { toggleWidget } = useDynamicPage() // Hook into dynamic page context
+  const { toggleWidget } = useDynamicPage()
+  const { t, i18n } = useTranslation('dashboard')
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const events = propEvents || getEventsForRole(roleCategory ?? undefined)
   const calendars = Array.from(new Set(events.map(e => e.calendar).filter(Boolean) as string[]))
+  const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
 
   const [filters, setFilters] = useState<EventFilters>({
     calendars: new Set(calendars),
@@ -554,7 +559,7 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
   return (
     <WidgetSection
       widgetId="upcoming-events"
-      label="Upcoming events"
+      label={t('upcomingEvents')}
       overflowVisible={true}
       icon={Calendar}
       headerActions={
@@ -577,17 +582,17 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
           {dayGroups.map(([dateKey, dayEvents]) => {
             const date = new Date(dateKey)
             const isToday = new Date().toDateString() === date.toDateString()
-            const relativeDate = formatRelativeDate(date)
+            const relativeDate = formatRelativeDate(date, t)
 
             return (
               <div key={dateKey} className="flex gap-4">
                 {/* Left Column: Date */}
                 <div className="w-24 flex-shrink-0 pt-2">
                   <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
-                    {relativeDate === 'Today' || relativeDate === 'Tomorrow' ? relativeDate : date.toLocaleDateString('en-US', { weekday: 'short' })}
+                    {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
                   </div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))]">
-                    {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
 

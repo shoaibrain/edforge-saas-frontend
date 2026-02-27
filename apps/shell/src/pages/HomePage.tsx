@@ -19,6 +19,7 @@
  */
 
 import { useAuthStore } from '../stores/auth.store'
+import { useTranslation } from '@edforge/i18n'
 import { getGreeting } from '../lib/greeting'
 
 // Dynamic Page Components
@@ -41,9 +42,10 @@ import {
 
 export default function HomePage() {
   const user = useAuthStore((s) => s.user)
-  
+  const { t } = useTranslation('dashboard')
+
   const firstName = user?.displayName || user?.name?.split(' ')[0]
-  const greeting = getGreeting(firstName)
+  const greeting = getGreeting(firstName, t)
   
   return (
     <DynamicPageLayout

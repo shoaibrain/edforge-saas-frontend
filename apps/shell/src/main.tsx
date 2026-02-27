@@ -9,11 +9,15 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { configureAmplify } from '@edforge/auth'
+import { initI18n } from '@edforge/i18n'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { router } from './router'
 import '@edforge/theme'
 import './index.css'
+
+// Initialize i18n for internationalization (must be before React render)
+initI18n()
 
 // Initialize AWS Amplify for Cognito authentication
 // This must be called before any auth operations

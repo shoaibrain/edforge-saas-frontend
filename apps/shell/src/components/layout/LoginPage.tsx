@@ -2,19 +2,22 @@
  * Login Page
  *
  * Production authentication flow via AWS Cognito Hosted UI.
+ * Fully localized via @edforge/i18n.
  */
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from '@tanstack/react-router'
 import { LogIn, Loader2, AlertCircle } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, LanguageSwitcher } from '@edforge/ui'
 import { login as cognitoLogin, getForgotPasswordUrl } from '@edforge/auth'
+import { useTranslation } from '@edforge/i18n'
 import { useAuthStore } from '../../stores/auth.store'
 
 export function LoginPage() {
   const isStoreAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const navigate = useNavigate()
+  const { t } = useTranslation('auth')
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,7 +49,7 @@ export function LoginPage() {
       // User will be redirected to Cognito Hosted UI
     } catch (err) {
       console.error('Login failed:', err)
-      setError(err instanceof Error ? err.message : 'Failed to initiate login')
+      setError(err instanceof Error ? err.message : t('loginError'))
       setIsLoading(false)
     }
   }
@@ -55,6 +58,11 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ink-500 via-ink-400 to-teal-800 flex items-center justify-center p-6">
+      {/* Language switcher — top right corner */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher variant="ghost" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,7 +85,7 @@ export function LoginPage() {
             transition={{ delay: 0.1 }}
             className="text-3xl font-bold text-white mb-2"
           >
-            EdForge
+            {t('title')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -85,7 +93,7 @@ export function LoginPage() {
             transition={{ delay: 0.15 }}
             className="text-teal-100 text-sm"
           >
-            Next-Generation Education Management
+            {t('subtitle')}
           </motion.p>
         </div>
 
@@ -96,9 +104,9 @@ export function LoginPage() {
           transition={{ delay: 0.2 }}
           className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl shadow-black/30 p-8"
         >
-          <h2 className="text-xl font-semibold text-white mb-1">Welcome Back</h2>
+          <h2 className="text-xl font-semibold text-white mb-1">{t('welcomeBack')}</h2>
           <p className="text-slate-300 text-sm mb-8">
-            Sign in to access your education management system
+            {t('signInDescription')}
           </p>
 
           {/* Error Message */}
@@ -116,7 +124,7 @@ export function LoginPage() {
                   onClick={() => setError(null)}
                   className="block text-xs text-red-400/80 hover:text-red-300 mt-1 underline underline-offset-2"
                 >
-                  Try again
+                  {t('tryAgain')}
                 </button>
               </div>
             </motion.div>
@@ -128,17 +136,17 @@ export function LoginPage() {
             disabled={isLoading}
             className="w-full bg-teal-500 hover:bg-teal-400 active:bg-teal-600 text-white font-semibold"
             size="lg"
-            aria-label="Sign in with EdForge via Cognito"
+            aria-label={t('signIn')}
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Redirecting...
+                {t('signingIn')}
               </>
             ) : (
               <>
                 <LogIn className="w-4 h-4 mr-2" />
-                Sign In with EdForge
+                {t('signIn')}
               </>
             )}
           </Button>
@@ -150,7 +158,7 @@ export function LoginPage() {
                 href={forgotPasswordUrl}
                 className="text-sm text-teal-200 hover:text-white transition-colors underline underline-offset-2"
               >
-                Forgot your password?
+                {t('forgotPassword')}
               </a>
             </div>
           )}
@@ -163,7 +171,7 @@ export function LoginPage() {
           transition={{ delay: 0.4 }}
           className="text-center text-slate-400 text-xs mt-8"
         >
-          Secure authentication powered by AWS Cognito
+          {t('secureAuth')}
         </motion.p>
       </motion.div>
     </div>

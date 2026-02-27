@@ -13,6 +13,7 @@ import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import {
   useRecentlyVisited,
   getIconComponent,
@@ -526,6 +527,7 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
 
 export function RecentlyVisitedWidget() {
   const { recentPages } = useRecentlyVisited()
+  const { t } = useTranslation('dashboard')
 
   // Use extended mock data if less than 3 real pages
   const pages: VisitedPage[] = recentPages.length >= 3
@@ -537,22 +539,22 @@ export function RecentlyVisitedWidget() {
     })()
 
   // Convert to CarouselCard format - memoized to prevent infinite re-renders
-  const cards: CarouselCard[] = useMemo(() => 
+  const cards: CarouselCard[] = useMemo(() =>
     pages.map((page: VisitedPage) => ({
       id: page.path,
       title: page.title,
-      subtitle: formatRelativeDate(new Date(page.visitedAt)),
+      subtitle: formatRelativeDate(new Date(page.visitedAt), t),
       icon: page.icon,
       href: page.path,
       module: page.module,
     })),
-    [pages]
+    [pages, t]
   )
 
   return (
     <WidgetSection
       widgetId="recently-visited"
-      label="Recently visited"
+      label={t('recentlyVisited')}
       icon={Clock}
       animationDelay={0.1}
       showHeader={true}

@@ -1,0 +1,160 @@
+{
+  "title": "People",
+  "description": "Manage staff, roles, and organizational structure",
+  "staffDirectory": {
+    "title": "Staff Directory",
+    "description": "View and manage all staff members",
+    "searchPlaceholder": "Search staff...",
+    "addStaff": "Add Staff Member"
+  },
+  "quickAccess": {
+    "addNew": "Add New Person",
+    "addNewDescription": "Onboard a new staff member",
+    "departments": "Departments",
+    "departmentsDescription": "Manage organizational structure",
+    "roles": "Roles & Permissions",
+    "rolesDescription": "Configure access and permissions",
+    "profileSettings": "Profile Settings",
+    "profileSettingsDescription": "Manage profile configurations",
+    "analytics": "People Analytics",
+    "analyticsDescription": "View workforce analytics"
+  },
+  "stats": {
+    "totalStaff": "Total Staff",
+    "activeTeachers": "Active Teachers",
+    "supportStaff": "Support Staff",
+    "administrators": "Administrators"
+  },
+  "tableHeaders": {
+    "staff": "Staff",
+    "role": "Role",
+    "status": "Status",
+    "hired": "Hired",
+    "department": "Department",
+    "systemAccess": "System Access"
+  },
+  "systemAccess": {
+    "active": "Active",
+    "noAccess": "No Access",
+    "linkedAccount": "Linked User Account",
+    "noAccountLinked": "No user account linked"
+  },
+  "empty": {
+    "noStaff": "No staff members found",
+    "getStarted": "Get started by adding your first staff member to the directory."
+  },
+  "drawer": {
+    "title": "Staff Details",
+    "viewFullProfile": "View Full Profile",
+    "editStaff": "Edit Staff Member",
+    "deleteStaff": "Delete Staff Member"
+  },
+  "sections": {
+    "employmentInfo": "Employment Information",
+    "contactInfo": "Contact Information",
+    "schoolAssignments": "School Assignments",
+    "systemAccess": "System Access"
+  },
+  "fields": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "middleName": "Middle Name",
+    "maidenName": "Maiden Name",
+    "suffix": "Suffix",
+    "staffId": "Staff Unique ID",
+    "hireDate": "Hire Date",
+    "employmentType": "Employment Type",
+    "title": "Title",
+    "primarySchool": "Primary School",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "city": "City",
+    "state": "State",
+    "postalCode": "Postal Code",
+    "department": "Department",
+    "positionTitle": "Position Title",
+    "fte": "FTE",
+    "isPrimary": "Is Primary"
+  },
+  "employmentStatus": {
+    "active": "Active",
+    "onLeave": "On Leave",
+    "suspended": "Suspended",
+    "terminated": "Terminated",
+    "retired": "Retired",
+    "resigned": "Resigned"
+  },
+  "roles": {
+    "teacher": "Teacher",
+    "principal": "Principal",
+    "vicePrincipal": "Vice Principal",
+    "counselor": "Counselor",
+    "librarian": "Librarian",
+    "nurse": "Nurse",
+    "adminStaff": "Admin Staff",
+    "supportStaff": "Support Staff",
+    "itStaff": "IT Staff",
+    "substitute": "Substitute",
+    "contractor": "Contractor"
+  },
+  "wizard": {
+    "steps": {
+      "personalInfo": "Personal Info",
+      "personalInfoDescription": "Name, ID, and demographics",
+      "contact": "Contact",
+      "contactDescription": "Email, phone, addresses, and emergency contacts",
+      "employment": "Employment",
+      "employmentDescription": "Role, type, department, and account setup",
+      "assignment": "Assignment",
+      "assignmentDescription": "Primary school and additional assignments",
+      "review": "Review & Create",
+      "reviewDescription": "Confirm details and create staff record"
+    },
+    "employmentDetails": "Employment Details",
+    "teachingQualifications": "Teaching Qualifications",
+    "reviewSubmit": "Review & Submit",
+    "edit": "Edit"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "profile": "Profile",
+    "assignments": "Assignments",
+    "credentials": "Credentials",
+    "employmentHistory": "Employment History",
+    "leave": "Leave",
+    "security": "Security"
+  },
+  "delete": {
+    "title": "Delete Staff Member",
+    "warning": "This action cannot be undone",
+    "confirmation": "You are about to permanently delete the staff record for {{name}}. This will remove all their data and access.",
+    "typeToConfirm": "Type {{email}} to confirm",
+    "emailPlaceholder": "Enter email to confirm",
+    "emailMismatch": "Email doesn't match",
+    "deleting": "Deleting..."
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "updateStatus": "Update Status",
+    "assignToSchool": "Assign to School",
+    "addCredential": "Add Credential"
+  },
+  "widgets": {
+    "showHide": "Show/hide widgets",
+    "resetDefault": "Reset to default",
+    "quickStats": "Quick stats",
+    "quickAccess": "Quick access"
+  },
+  "bootstrap": {
+    "selectSchool": "Select a School",
+    "selectSchoolDescription": "Choose a school from the header to access this feature.",
+    "comingSoon": "Feature Coming Soon",
+    "scaffolded": "This module is scaffolded and ready for development.",
+    "planned": "Planned",
+    "inProgress": "In Progress",
+    "plannedFeatures": "Planned Features"
+  }
+}

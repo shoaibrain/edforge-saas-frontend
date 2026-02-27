@@ -1,6 +1,6 @@
 /**
  * Settings Layout
- * 
+ *
  * Provides nested routing support for the Settings module.
  * Renders the overview page at /settings and child routes via Outlet.
  * Features a Google Account-inspired overview with Account/Workspace sections.
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../stores/auth.store'
 import { getUserAvatar } from '../lib/avatar'
+import { useTranslation } from '@edforge/i18n'
 import { QuickActionPill, type QuickActionProps } from '../components/settings/SettingsShared'
 
 // ============================================================================
@@ -30,11 +31,11 @@ export default function SettingsPage() {
   const location = useLocation()
   // Check if we're at exactly /settings (not a child route like /settings/account)
   const isExactRoute = location.pathname === '/settings'
-  
+
   if (isExactRoute) {
     return <SettingsOverviewPage />
   }
-  
+
   // Render child routes (account, security, etc.)
   return <Outlet />
 }
@@ -70,13 +71,15 @@ function SettingsOverviewContent({
   userEmail?: string
   userRole?: string
 }) {
+  const { t } = useTranslation('settings')
+
   // Quick action items for the pill row
   const quickActions: QuickActionProps[] = [
-    { label: 'My Account', icon: User, href: '/settings/account' },
-    { label: 'Security', icon: Shield, href: '/settings/security' },
-    { label: 'Preferences', icon: Bell, href: '/settings/preferences' },
-    { label: 'Organization', icon: Building2, href: '/settings/organization' },
-    { label: 'Workspace', icon: Settings, href: '/settings/workspace' },
+    { label: t('account.title'), icon: User, href: '/settings/account' },
+    { label: t('security.title'), icon: Shield, href: '/settings/security' },
+    { label: t('preferences.title'), icon: Bell, href: '/settings/preferences' },
+    { label: t('organization.title'), icon: Building2, href: '/settings/organization' },
+    { label: t('workspace.title'), icon: Settings, href: '/settings/workspace' },
     // [MVP-PARKED] { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
   ]
 
@@ -157,7 +160,7 @@ function SettingsOverviewContent({
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
-            placeholder="Search settings..."
+            placeholder={t('searchPlaceholder')}
             className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all focus:shadow-lg"
           />
         </motion.div>
@@ -183,9 +186,9 @@ function SettingsOverviewContent({
         className="text-center pt-4"
       >
         <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-md mx-auto">
-          Only you can see your settings. Edforge keeps your data private, safe, and secure.{' '}
+          {t('privacyNote')}{' '}
           <a href="#" className="text-teal-600 dark:text-cyan-400 hover:underline">
-            Learn more
+            {t('privacyLearnMore')}
           </a>
         </p>
       </motion.div>

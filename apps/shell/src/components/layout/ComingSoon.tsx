@@ -7,12 +7,17 @@
 
 import { ArrowLeft, Home, Rocket } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 
 interface ComingSoonProps {
   moduleName?: string
 }
 
 export function ComingSoon({ moduleName }: ComingSoonProps) {
+  const { t } = useTranslation('errors')
+  const { t: tCommon } = useTranslation('common')
+  const { t: tNav } = useTranslation('nav')
+
   const handleGoBack = () => {
     if (window.history.length > 1) {
       window.history.back()
@@ -29,10 +34,12 @@ export function ComingSoon({ moduleName }: ComingSoonProps) {
         </div>
 
         <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
-          {moduleName ? `${moduleName} — Coming Soon` : 'Coming Soon'}
+          {moduleName
+            ? t('comingSoon.titleWithModule', { module: moduleName })
+            : t('comingSoon.title')}
         </h1>
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-8">
-          This module is under development and will be available in a future release.
+          {t('comingSoon.description')}
         </p>
 
         <div className="flex items-center justify-center gap-3">
@@ -42,14 +49,14 @@ export function ComingSoon({ moduleName }: ComingSoonProps) {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Go Back
+            {tCommon('goBack')}
           </Button>
           <Button
             onClick={() => window.location.href = '/home'}
             className="flex items-center gap-2"
           >
             <Home className="w-4 h-4" />
-            Dashboard
+            {tNav('dashboard')}
           </Button>
         </div>
       </div>

@@ -14,6 +14,8 @@
     "@aibrains/shared-types": "^0.9.1",
     "@edforge/abac": "workspace:*",
     "@edforge/auth": "workspace:*",
+    "@edforge/date-utils": "workspace:*",
+    "@edforge/i18n": "workspace:*",
     "@edforge/forms": "workspace:*",
     "@edforge/theme": "workspace:*",
     "@edforge/types": "workspace:*",

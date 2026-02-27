@@ -27,6 +27,9 @@ export default defineConfig({
       '@edforge/forms': resolve(__dirname, 'packages/forms/src'),
       '@edforge/wizard': resolve(__dirname, 'packages/wizard/src'),
       '@edforge/theme': resolve(__dirname, 'packages/theme/src'),
+      '@edforge/i18n': resolve(__dirname, 'packages/i18n/src'),
+      '@edforge/date-utils': resolve(__dirname, 'packages/date-utils/src'),
+      '@edforge/config': resolve(__dirname, 'packages/config'),
     },
   },
 })
