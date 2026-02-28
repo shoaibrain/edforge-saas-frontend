@@ -1,0 +1,249 @@
+{
+  "title": "शुल्क भुक्तानी",
+  "description": "बीजक हेर्नुहोस्, भुक्तानी गर्नुहोस्, र रसिद डाउनलोड गर्नुहोस्",
+
+  "invoices": {
+    "title": "बीजकहरू",
+    "description": "शुल्क बीजकहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्",
+    "outstanding": "बाँकी",
+    "paid": "भुक्तानी भएको",
+    "overdue": "म्याद सकिएको",
+    "all": "सबै बीजकहरू",
+    "invoiceNumber": "बीजक नं.",
+    "dueDate": "भुक्तानी मिति",
+    "issuedDate": "जारी मिति",
+    "billingPeriod": "बिलिङ अवधि",
+    "amountDue": "बाँकी रकम",
+    "grandTotal": "जम्मा",
+    "noInvoices": "कुनै बीजक फेला परेन",
+    "noInvoicesDescription": "चयन गरिएको अवधिको लागि कुनै बीजक छैन।",
+    "noOutstanding": "सबै मिलाइएको छ!",
+    "noOutstandingDescription": "यस समय कुनै बाँकी बीजक छैन।",
+    "generateInvoice": "बीजक सिर्जना गर्नुहोस्",
+    "selectFees": "समावेश गर्ने शुल्कहरू छान्नुहोस्",
+    "selectStudent": "विद्यार्थी छान्नुहोस्",
+    "generated": "बीजक सफलतापूर्वक सिर्जना भयो"
+  },
+
+  "lineItems": {
+    "description": "विवरण",
+    "amount": "रकम",
+    "quantity": "मात्रा",
+    "discount": "छुट",
+    "tax": "कर",
+    "total": "जम्मा"
+  },
+
+  "summary": {
+    "subtotal": "उपजम्मा",
+    "taxTotal": "कर",
+    "discountTotal": "छुट",
+    "grandTotal": "कुल जम्मा",
+    "amountPaid": "भुक्तानी रकम",
+    "amountDue": "बाँकी रकम",
+    "balanceDue": "बाँकी शेष"
+  },
+
+  "gateway": {
+    "selectMethod": "भुक्तानी विधि छान्नुहोस्",
+    "selectMethodDescription": "तपाईं कसरी भुक्तानी गर्न चाहनुहुन्छ छान्नुहोस्",
+    "esewa": "eSewa",
+    "esewaDescription": "तपाईंको eSewa डिजिटल वालेटबाट भुक्तानी गर्नुहोस्",
+    "khalti": "Khalti",
+    "khaltiDescription": "तपाईंको Khalti डिजिटल वालेटबाट भुक्तानी गर्नुहोस्",
+    "fonepay": "Fonepay",
+    "fonepayDescription": "Fonepay QR वा मोबाइल बैंकिङबाट भुक्तानी गर्नुहोस्",
+    "connectips": "ConnectIPS",
+    "connectipsDescription": "तपाईंको बैंक खाताबाट सिधै भुक्तानी गर्नुहोस्",
+    "stripe": "कार्ड भुक्तानी",
+    "stripeDescription": "Visa, Mastercard, वा अन्य कार्डबाट भुक्तानी गर्नुहोस्",
+    "cash": "नगद",
+    "cashDescription": "विद्यालय कार्यालयमा भुक्तानी गर्नुहोस्",
+    "bankTransfer": "बैंक ट्रान्सफर",
+    "bankTransferDescription": "विद्यालय बैंक खातामा ट्रान्सफर गर्नुहोस्",
+    "cheque": "चेक",
+    "chequeDescription": "विद्यालय कार्यालयमा चेकबाट भुक्तानी गर्नुहोस्",
+    "testMode": "परीक्षण मोड",
+    "productionMode": "उत्पादन",
+    "configured": "कन्फिगर गरिएको",
+    "notConfigured": "कन्फिगर गरिएको छैन"
+  },
+
+  "flow": {
+    "confirmPayment": "भुक्तानी पुष्टि गर्नुहोस्",
+    "confirmDescription": "तपाईं {{gateway}} मार्फत {{amount}} भुक्तानी गर्न लाग्नुभएको छ",
+    "redirecting": "{{gateway}} मा पठाउँदै...",
+    "redirectDescription": "तपाईंलाई भुक्तानी पूरा गर्न {{gateway}} मा पठाइनेछ",
+    "verifying": "भुक्तानी प्रमाणित गर्दै...",
+    "verifyDescription": "कृपया {{gateway}} सँग तपाईंको भुक्तानी प्रमाणित हुँदा पर्खनुहोस्",
+    "processingPayment": "भुक्तानी प्रक्रिया गर्दै...",
+    "paymentSuccessful": "भुक्तानी सफल भयो!",
+    "paymentFailed": "भुक्तानी असफल भयो",
+    "paymentCancelled": "भुक्तानी रद्द भयो",
+    "failedDescription": "तपाईंको भुक्तानी प्रक्रिया गर्न सकिएन। कुनै रकम काटिएको छैन।",
+    "cancelledDescription": "तपाईंले भुक्तानी रद्द गर्नुभयो। कुनै रकम काटिएको छैन।",
+    "tryAgain": "पुन: प्रयास गर्नुहोस्",
+    "returnToInvoices": "बीजकहरूमा फर्कनुहोस्",
+    "sessionExpired": "भुक्तानी सत्र समाप्त भएको छ। कृपया पुन: प्रयास गर्नुहोस्।"
+  },
+
+  "receipt": {
+    "title": "भुक्तानी रसिद",
+    "receiptNumber": "रसिद नं.",
+    "transactionId": "कारोबार ID",
+    "paymentDate": "भुक्तानी मिति",
+    "paymentMethod": "भुक्तानी विधि",
+    "paidBy": "भुक्तानीकर्ता",
+    "studentName": "विद्यार्थी",
+    "schoolName": "विद्यालय",
+    "downloadPdf": "PDF डाउनलोड गर्नुहोस्",
+    "print": "रसिद प्रिन्ट गर्नुहोस्",
+    "emailReceipt": "रसिद इमेल गर्नुहोस्",
+    "taxInvoice": "कर बीजक",
+    "panNumber": "PAN",
+    "vatNumber": "VAT दर्ता",
+    "taxableAmount": "करयोग्य रकम",
+    "taxAmount": "कर रकम",
+    "thankYou": "तपाईंको भुक्तानीको लागि धन्यवाद!"
+  },
+
+  "status": {
+    "draft": "मस्यौदा",
+    "issued": "जारी",
+    "partially_paid": "आंशिक भुक्तानी",
+    "paid": "भुक्तानी भएको",
+    "overdue": "म्याद सकिएको",
+    "cancelled": "रद्द",
+    "written_off": "मिनाहा",
+    "pending": "पेन्डिङ",
+    "processing": "प्रक्रिया गर्दै",
+    "completed": "सम्पन्न",
+    "failed": "असफल",
+    "refunded": "फिर्ता भएको",
+    "partially_refunded": "आंशिक फिर्ता"
+  },
+
+  "feeStructure": {
+    "title": "शुल्क संरचनाहरू",
+    "description": "तपाईंको विद्यालयको शुल्क प्रकार र रकम कन्फिगर गर्नुहोस्",
+    "addFee": "शुल्क संरचना थप्नुहोस्",
+    "editFee": "शुल्क संरचना सम्पादन गर्नुहोस्",
+    "deleteFee": "शुल्क संरचना मेटाउनुहोस्",
+    "deleteConfirmation": "के तपाईं यो शुल्क संरचना मेटाउन निश्चित हुनुहुन्छ? यो पूर्ववत गर्न सकिँदैन।",
+    "name": "शुल्कको नाम",
+    "type": "शुल्क प्रकार",
+    "amount": "रकम (रू)",
+    "frequency": "आवृत्ति",
+    "taxRate": "कर दर (%)",
+    "taxType": "कर प्रकार",
+    "gradeLevels": "कक्षा तहहरू",
+    "allGrades": "सबै कक्षाहरू",
+    "effectiveFrom": "लागू मिति",
+    "effectiveTo": "अन्तिम मिति",
+    "academicYear": "शैक्षिक वर्ष",
+    "noFeeStructures": "कुनै शुल्क संरचना कन्फिगर गरिएको छैन",
+    "noFeeStructuresDescription": "बीजक सिर्जना गर्न सुरु गर्न तपाईंको विद्यालयको शुल्क संरचनाहरू थप्नुहोस्।",
+    "created": "शुल्क संरचना सफलतापूर्वक सिर्जना भयो",
+    "updated": "शुल्क संरचना सफलतापूर्वक अद्यावधिक भयो",
+    "deleted": "शुल्क संरचना सफलतापूर्वक मेटाइयो",
+    "types": {
+      "tuition": "शिक्षण शुल्क",
+      "admission": "भर्ना शुल्क",
+      "exam": "परीक्षा शुल्क",
+      "transport": "यातायात शुल्क",
+      "library": "पुस्तकालय शुल्क",
+      "lab": "प्रयोगशाला शुल्क",
+      "hostel": "छात्रावास शुल्क",
+      "uniform": "पोशाक शुल्क",
+      "miscellaneous": "विविध शुल्क",
+      "custom": "अनुकूल शुल्क"
+    },
+    "frequencies": {
+      "one_time": "एक पटक",
+      "monthly": "मासिक",
+      "quarterly": "त्रैमासिक",
+      "annual": "वार्षिक"
+    }
+  },
+
+  "gatewayConfig": {
+    "title": "भुक्तानी गेटवेहरू",
+    "description": "तपाईंको विद्यालयको भुक्तानी गेटवे कन्फिगर गर्नुहोस्",
+    "enable": "सक्रिय गर्नुहोस्",
+    "disable": "निष्क्रिय गर्नुहोस्",
+    "merchantCode": "मर्चेन्ट कोड",
+    "apiKey": "API कुञ्जी",
+    "secretKey": "गोप्य कुञ्जी",
+    "publicKey": "सार्वजनिक कुञ्जी",
+    "saveConfig": "कन्फिगरेसन सुरक्षित गर्नुहोस्",
+    "testPayment": "परीक्षण भुक्तानी",
+    "testPaymentDescription": "कन्फिगरेसन प्रमाणित गर्न रू १ को परीक्षण कारोबार गर्नुहोस्",
+    "saved": "गेटवे कन्फिगरेसन सफलतापूर्वक सुरक्षित भयो",
+    "credentialsMasked": "सुरक्षाको लागि प्रमाणहरू लुकाइएको छ"
+  },
+
+  "studentAccount": {
+    "title": "विद्यार्थी खाता",
+    "balance": "बाँकी शेष",
+    "totalPaid": "कुल भुक्तानी",
+    "lastPayment": "अन्तिम भुक्तानी",
+    "ledger": "खाता लेजर",
+    "noTransactions": "अहिलेसम्म कुनै कारोबार छैन"
+  },
+
+  "currency": {
+    "npr": "रू",
+    "symbol": "रू"
+  },
+
+  "actions": {
+    "payNow": "अहिले भुक्तानी गर्नुहोस्",
+    "viewReceipt": "रसिद हेर्नुहोस्",
+    "viewInvoice": "बीजक हेर्नुहोस्",
+    "downloadPdf": "PDF डाउनलोड गर्नुहोस्",
+    "exportCsv": "CSV निर्यात गर्नुहोस्",
+    "cancel": "रद्द गर्नुहोस्",
+    "confirm": "पुष्टि गर्नुहोस्",
+    "save": "सुरक्षित गर्नुहोस्",
+    "saving": "सुरक्षित गर्दै...",
+    "close": "बन्द गर्नुहोस्",
+    "back": "पछाडि",
+    "next": "अर्को",
+    "retry": "पुन: प्रयास"
+  },
+
+  "filters": {
+    "label": "फिल्टरहरू",
+    "allStatuses": "सबै स्थितिहरू",
+    "dateRange": "मिति दायरा",
+    "academicYear": "शैक्षिक वर्ष",
+    "clearAll": "सबै हटाउनुहोस्"
+  },
+
+  "empty": {
+    "noPayments": "कुनै भुक्तानी फेला परेन",
+    "noPaymentsDescription": "भुक्तानी गरेपछि भुक्तानी रेकर्डहरू यहाँ देखिनेछ।"
+  },
+
+  "error": {
+    "failedToLoad": "भुक्तानी डाटा लोड गर्न असफल",
+    "failedToInitiate": "भुक्तानी सुरु गर्न असफल",
+    "failedToVerify": "भुक्तानी प्रमाणित गर्न असफल",
+    "tryAgain": "कृपया पुन: प्रयास गर्नुहोस्",
+    "networkError": "नेटवर्क त्रुटि। कृपया तपाईंको जडान जाँच गर्नुहोस्।",
+    "serverError": "सर्भर त्रुटि। कृपया पछि पुन: प्रयास गर्नुहोस्।"
+  },
+
+  "toast": {
+    "paymentSuccess": "भुक्तानी सफलतापूर्वक सम्पन्न भयो",
+    "paymentFailed": "भुक्तानी असफल भयो। कृपया पुन: प्रयास गर्नुहोस्।",
+    "invoiceGenerated": "बीजक सफलतापूर्वक सिर्जना भयो",
+    "receiptDownloaded": "रसिद डाउनलोड भयो"
+  },
+
+  "widgets": {
+    "outstandingFees": "बाँकी शुल्कहरू",
+    "recentPayments": "हालका भुक्तानीहरू",
+    "paymentHistory": "भुक्तानी इतिहास"
+  }
+}

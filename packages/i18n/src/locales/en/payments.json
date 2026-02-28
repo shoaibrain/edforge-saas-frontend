@@ -1,0 +1,249 @@
+{
+  "title": "Fee Payments",
+  "description": "View invoices, make payments, and download receipts",
+
+  "invoices": {
+    "title": "Invoices",
+    "description": "View and manage fee invoices",
+    "outstanding": "Outstanding",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "all": "All Invoices",
+    "invoiceNumber": "Invoice #",
+    "dueDate": "Due Date",
+    "issuedDate": "Issued Date",
+    "billingPeriod": "Billing Period",
+    "amountDue": "Amount Due",
+    "grandTotal": "Total",
+    "noInvoices": "No invoices found",
+    "noInvoicesDescription": "There are no invoices for the selected period.",
+    "noOutstanding": "All caught up!",
+    "noOutstandingDescription": "There are no outstanding invoices at this time.",
+    "generateInvoice": "Generate Invoice",
+    "selectFees": "Select fees to include",
+    "selectStudent": "Select student",
+    "generated": "Invoice generated successfully"
+  },
+
+  "lineItems": {
+    "description": "Description",
+    "amount": "Amount",
+    "quantity": "Qty",
+    "discount": "Discount",
+    "tax": "Tax",
+    "total": "Total"
+  },
+
+  "summary": {
+    "subtotal": "Subtotal",
+    "taxTotal": "Tax",
+    "discountTotal": "Discount",
+    "grandTotal": "Grand Total",
+    "amountPaid": "Amount Paid",
+    "amountDue": "Amount Due",
+    "balanceDue": "Balance Due"
+  },
+
+  "gateway": {
+    "selectMethod": "Select Payment Method",
+    "selectMethodDescription": "Choose how you would like to pay",
+    "esewa": "eSewa",
+    "esewaDescription": "Pay using your eSewa digital wallet",
+    "khalti": "Khalti",
+    "khaltiDescription": "Pay using your Khalti digital wallet",
+    "fonepay": "Fonepay",
+    "fonepayDescription": "Pay via Fonepay QR or mobile banking",
+    "connectips": "ConnectIPS",
+    "connectipsDescription": "Pay directly from your bank account",
+    "stripe": "Card Payment",
+    "stripeDescription": "Pay with Visa, Mastercard, or other cards",
+    "cash": "Cash",
+    "cashDescription": "Pay at the school office",
+    "bankTransfer": "Bank Transfer",
+    "bankTransferDescription": "Transfer to school bank account",
+    "cheque": "Cheque",
+    "chequeDescription": "Pay by cheque at the school office",
+    "testMode": "Test Mode",
+    "productionMode": "Production",
+    "configured": "Configured",
+    "notConfigured": "Not Configured"
+  },
+
+  "flow": {
+    "confirmPayment": "Confirm Payment",
+    "confirmDescription": "You are about to pay {{amount}} via {{gateway}}",
+    "redirecting": "Redirecting to {{gateway}}...",
+    "redirectDescription": "You will be redirected to {{gateway}} to complete your payment",
+    "verifying": "Verifying payment...",
+    "verifyDescription": "Please wait while we verify your payment with {{gateway}}",
+    "processingPayment": "Processing payment...",
+    "paymentSuccessful": "Payment Successful!",
+    "paymentFailed": "Payment Failed",
+    "paymentCancelled": "Payment Cancelled",
+    "failedDescription": "Your payment could not be processed. No amount was charged.",
+    "cancelledDescription": "You cancelled the payment. No amount was charged.",
+    "tryAgain": "Try Again",
+    "returnToInvoices": "Return to Invoices",
+    "sessionExpired": "Payment session has expired. Please try again."
+  },
+
+  "receipt": {
+    "title": "Payment Receipt",
+    "receiptNumber": "Receipt #",
+    "transactionId": "Transaction ID",
+    "paymentDate": "Payment Date",
+    "paymentMethod": "Payment Method",
+    "paidBy": "Paid By",
+    "studentName": "Student",
+    "schoolName": "School",
+    "downloadPdf": "Download PDF",
+    "print": "Print Receipt",
+    "emailReceipt": "Email Receipt",
+    "taxInvoice": "Tax Invoice",
+    "panNumber": "PAN",
+    "vatNumber": "VAT Reg.",
+    "taxableAmount": "Taxable Amount",
+    "taxAmount": "Tax Amount",
+    "thankYou": "Thank you for your payment!"
+  },
+
+  "status": {
+    "draft": "Draft",
+    "issued": "Issued",
+    "partially_paid": "Partially Paid",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "cancelled": "Cancelled",
+    "written_off": "Written Off",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed",
+    "refunded": "Refunded",
+    "partially_refunded": "Partially Refunded"
+  },
+
+  "feeStructure": {
+    "title": "Fee Structures",
+    "description": "Configure fee types and amounts for your school",
+    "addFee": "Add Fee Structure",
+    "editFee": "Edit Fee Structure",
+    "deleteFee": "Delete Fee Structure",
+    "deleteConfirmation": "Are you sure you want to delete this fee structure? This cannot be undone.",
+    "name": "Fee Name",
+    "type": "Fee Type",
+    "amount": "Amount (NPR)",
+    "frequency": "Frequency",
+    "taxRate": "Tax Rate (%)",
+    "taxType": "Tax Type",
+    "gradeLevels": "Grade Levels",
+    "allGrades": "All Grades",
+    "effectiveFrom": "Effective From",
+    "effectiveTo": "Effective Until",
+    "academicYear": "Academic Year",
+    "noFeeStructures": "No fee structures configured",
+    "noFeeStructuresDescription": "Add your school's fee structures to start generating invoices.",
+    "created": "Fee structure created successfully",
+    "updated": "Fee structure updated successfully",
+    "deleted": "Fee structure deleted successfully",
+    "types": {
+      "tuition": "Tuition",
+      "admission": "Admission",
+      "exam": "Examination",
+      "transport": "Transport",
+      "library": "Library",
+      "lab": "Laboratory",
+      "hostel": "Hostel",
+      "uniform": "Uniform",
+      "miscellaneous": "Miscellaneous",
+      "custom": "Custom"
+    },
+    "frequencies": {
+      "one_time": "One-time",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "annual": "Annual"
+    }
+  },
+
+  "gatewayConfig": {
+    "title": "Payment Gateways",
+    "description": "Configure payment gateways for your school",
+    "enable": "Enable",
+    "disable": "Disable",
+    "merchantCode": "Merchant Code",
+    "apiKey": "API Key",
+    "secretKey": "Secret Key",
+    "publicKey": "Public Key",
+    "saveConfig": "Save Configuration",
+    "testPayment": "Test Payment",
+    "testPaymentDescription": "Make a NPR 1 test transaction to verify the configuration",
+    "saved": "Gateway configuration saved successfully",
+    "credentialsMasked": "Credentials are masked for security"
+  },
+
+  "studentAccount": {
+    "title": "Student Account",
+    "balance": "Outstanding Balance",
+    "totalPaid": "Total Paid",
+    "lastPayment": "Last Payment",
+    "ledger": "Account Ledger",
+    "noTransactions": "No transactions yet"
+  },
+
+  "currency": {
+    "npr": "NPR",
+    "symbol": "रू"
+  },
+
+  "actions": {
+    "payNow": "Pay Now",
+    "viewReceipt": "View Receipt",
+    "viewInvoice": "View Invoice",
+    "downloadPdf": "Download PDF",
+    "exportCsv": "Export CSV",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "saving": "Saving...",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "retry": "Retry"
+  },
+
+  "filters": {
+    "label": "Filters",
+    "allStatuses": "All Statuses",
+    "dateRange": "Date Range",
+    "academicYear": "Academic Year",
+    "clearAll": "Clear All"
+  },
+
+  "empty": {
+    "noPayments": "No payments found",
+    "noPaymentsDescription": "Payment records will appear here once payments are made."
+  },
+
+  "error": {
+    "failedToLoad": "Failed to load payment data",
+    "failedToInitiate": "Failed to initiate payment",
+    "failedToVerify": "Failed to verify payment",
+    "tryAgain": "Please try again",
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later."
+  },
+
+  "toast": {
+    "paymentSuccess": "Payment completed successfully",
+    "paymentFailed": "Payment failed. Please try again.",
+    "invoiceGenerated": "Invoice generated successfully",
+    "receiptDownloaded": "Receipt downloaded"
+  },
+
+  "widgets": {
+    "outstandingFees": "Outstanding Fees",
+    "recentPayments": "Recent Payments",
+    "paymentHistory": "Payment History"
+  }
+}

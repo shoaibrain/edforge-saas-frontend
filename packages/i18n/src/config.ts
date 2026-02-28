@@ -21,6 +21,7 @@ import enDashboard from './locales/en/dashboard.json'
 import enErrors from './locales/en/errors.json'
 import enAcademics from './locales/en/academics.json'
 import enPeople from './locales/en/people.json'
+import enPayments from './locales/en/payments.json'
 
 // Nepali translations
 import neCommon from './locales/ne/common.json'
@@ -31,6 +32,7 @@ import neDashboard from './locales/ne/dashboard.json'
 import neErrors from './locales/ne/errors.json'
 import neAcademics from './locales/ne/academics.json'
 import nePeople from './locales/ne/people.json'
+import nePayments from './locales/ne/payments.json'
 
 export const SUPPORTED_LANGUAGES = ['en', 'ne'] as const
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
@@ -49,6 +51,7 @@ export const NAMESPACES = [
   'errors',
   'academics',
   'people',
+  'payments',
 ] as const
 export type Namespace = (typeof NAMESPACES)[number]
 
@@ -62,6 +65,7 @@ const resources = {
     errors: enErrors,
     academics: enAcademics,
     people: enPeople,
+    payments: enPayments,
   },
   ne: {
     common: neCommon,
@@ -72,6 +76,7 @@ const resources = {
     errors: neErrors,
     academics: neAcademics,
     people: nePeople,
+    payments: nePayments,
   },
 } as const
 

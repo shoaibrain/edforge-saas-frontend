@@ -13,6 +13,7 @@ import {
   Outlet,
   redirect,
   useNavigate,
+  useParams,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
@@ -50,6 +51,11 @@ import ParentOverviewPage from './pages/parent-portal/ParentOverviewPage'
 import ParentGradesPage from './pages/parent-portal/ParentGradesPage'
 import ParentAttendancePage from './pages/parent-portal/ParentAttendancePage'
 import ParentSchedulePage from './pages/parent-portal/ParentSchedulePage'
+import FeePaymentPage from './pages/parent-portal/FeePaymentPage'
+import PaymentCallbackPage from './pages/payments/callback'
+import ReceiptPage from './pages/payments/receipt'
+import FeeStructuresPage from './pages/settings/fee-structures'
+import PaymentGatewaysPage from './pages/settings/payment-gateways'
 import {
   AccountPage,
   SecurityPage,
@@ -495,6 +501,20 @@ const settingsOrgSchoolCreateRoute = createRoute({
   }),
 })
 
+// Settings: Fee Structures
+const settingsFeeStructuresRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/fee-structures',
+  component: FeeStructuresPage,
+})
+
+// Settings: Payment Gateways
+const settingsPaymentGatewaysRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/payment-gateways',
+  component: PaymentGatewaysPage,
+})
+
 // [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
 // const settingsBillingRoute = createRoute({
 //   getParentRoute: () => settingsRoute,
@@ -743,7 +763,8 @@ const parentPortalScheduleRoute = createRoute({
 const parentPortalFeesRoute = createRoute({
   getParentRoute: () => parentPortalRoute,
   path: '/fees',
-  component: () => <ComingSoon moduleName="Fee Payments" />,
+  component: FeePaymentPage,
+  errorComponent: PortalPageError,
 })
 
 const parentPortalCalendarRoute = createRoute({
@@ -792,6 +813,27 @@ const specialProgramsComingSoonRoute = createRoute({
   component: () => <ComingSoon moduleName="Special Programs" />,
 })
 
+// ============================================================================
+// PAYMENT ROUTES (callback + receipt)
+// ============================================================================
+
+const paymentCallbackRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/payments/callback',
+  component: PaymentCallbackPage,
+})
+
+const paymentReceiptRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/payments/$paymentId/receipt',
+  component: PaymentReceiptRouteComponent,
+})
+
+function PaymentReceiptRouteComponent() {
+  const params = useParams({ strict: false }) as { paymentId?: string }
+  return <ReceiptPage paymentId={params.paymentId ?? ''} />
+}
+
 const financeComingSoonRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/finance/$',
@@ -832,6 +874,8 @@ const routeTree = rootRoute.addChildren([
       // [MVP-PARKED] settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
+      settingsFeeStructuresRoute,
+      settingsPaymentGatewaysRoute,
       // [MVP-PARKED] settingsBillingRoute,
       // [MVP-PARKED] settingsIntegrationsRoute,
       // [MVP-PARKED] settingsImportExportRoute,
@@ -852,6 +896,9 @@ const routeTree = rootRoute.addChildren([
     specialProgramsComingSoonRoute,
     financeComingSoonRoute,
     // [/MVP-PARKED]
+    // Payment routes
+    paymentCallbackRoute,
+    paymentReceiptRoute,
     studentPortalRoute.addChildren([
       studentPortalIndexRoute,
       studentPortalGradesRoute,

@@ -51,6 +51,8 @@
     "workspace-settings": "Workspace Settings",
     "organization": "Organization",
     "rbac-security": "RBAC Security",
+    "fee-structures": "Fee Structures",
+    "payment-gateways": "Payment Gateways",
 
     "academics-home": "Overview",
     "students": "Students",
@@ -128,6 +130,11 @@
     "myAttendance": "My Attendance",
     "myGrades": "My Grades",
     "mySchedule": "My Schedule",
-    "myAccount": "My Account"
+    "myAccount": "My Account",
+    "feePayments": "Fee Payments",
+    "feeStructures": "Fee Structures",
+    "paymentGateways": "Payment Gateways",
+    "paymentCallback": "Payment",
+    "paymentReceipt": "Receipt"
   }
 }

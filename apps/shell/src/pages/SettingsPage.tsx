@@ -11,7 +11,7 @@ import { motion } from 'framer-motion'
 import {
   Camera,
   Shield,
-  // [MVP-PARKED] CreditCard,
+  CreditCard,
   User,
   Bell,
   Building2,
@@ -80,6 +80,8 @@ function SettingsOverviewContent({
     { label: t('preferences.title'), icon: Bell, href: '/settings/preferences' },
     { label: t('organization.title'), icon: Building2, href: '/settings/organization' },
     { label: t('workspace.title'), icon: Settings, href: '/settings/workspace' },
+    { label: 'Fee Structures', icon: CreditCard, href: '/settings/fee-structures' },
+    { label: 'Payment Gateways', icon: CreditCard, href: '/settings/payment-gateways' },
     // [MVP-PARKED] { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
   ]
 

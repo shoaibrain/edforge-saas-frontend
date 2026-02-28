@@ -51,6 +51,8 @@
     "workspace-settings": "कार्यक्षेत्र सेटिङ्हरू",
     "organization": "संगठन",
     "rbac-security": "RBAC सुरक्षा",
+    "fee-structures": "शुल्क संरचनाहरू",
+    "payment-gateways": "भुक्तानी गेटवेहरू",
 
     "academics-home": "सिंहावलोकन",
     "students": "विद्यार्थीहरू",
@@ -128,6 +130,11 @@
     "myAttendance": "मेरो उपस्थिति",
     "myGrades": "मेरो ग्रेडहरू",
     "mySchedule": "मेरो तालिका",
-    "myAccount": "मेरो खाता"
+    "myAccount": "मेरो खाता",
+    "feePayments": "शुल्क भुक्तानी",
+    "feeStructures": "शुल्क संरचनाहरू",
+    "paymentGateways": "भुक्तानी गेटवेहरू",
+    "paymentCallback": "भुक्तानी",
+    "paymentReceipt": "रसिद"
   }
 }

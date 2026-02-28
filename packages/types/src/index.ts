@@ -13,3 +13,9 @@ export * from './tenant'
 // Person types
 export * from './person'
 
+// Billing types (fee structures, invoices, student accounts)
+export * from './billing'
+
+// Payment types (gateways, payments, receipts)
+export * from './payment'
+

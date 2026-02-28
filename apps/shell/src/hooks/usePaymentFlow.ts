@@ -1,0 +1,218 @@
+/**
+ * usePaymentFlow — Finite State Machine for payment lifecycle
+ *
+ * Manages the complete payment UI state with clean transitions:
+ *   idle → selecting_gateway → confirming → initiating → redirecting
+ *     → verifying → success | failed | cancelled
+ *
+ * Security:
+ * - Never stores gateway credentials
+ * - Redirect URL comes from backend only
+ * - Session ID validated on callback
+ */
+
+import { useCallback, useReducer } from 'react'
+import type { Invoice, PaymentGateway, Receipt } from '@edforge/types'
+import { initiatePayment } from '../services/payments.service'
+
+// ============================================================================
+// STATE TYPES
+// ============================================================================
+
+export type PaymentFlowStatus =
+  | 'idle'
+  | 'selecting_gateway'
+  | 'confirming'
+  | 'initiating'
+  | 'redirecting'
+  | 'verifying'
+  | 'success'
+  | 'failed'
+  | 'cancelled'
+
+export interface PaymentFlowState {
+  status: PaymentFlowStatus
+  gateway: PaymentGateway | null
+  sessionId: string | null
+  receipt: Receipt | null
+  error: string | null
+}
+
+const initialState: PaymentFlowState = {
+  status: 'idle',
+  gateway: null,
+  sessionId: null,
+  receipt: null,
+  error: null,
+}
+
+// ============================================================================
+// ACTIONS
+// ============================================================================
+
+type PaymentFlowAction =
+  | { type: 'START' }
+  | { type: 'SELECT_GATEWAY'; gateway: PaymentGateway }
+  | { type: 'CONFIRM' }
+  | { type: 'INITIATE_START' }
+  | { type: 'INITIATE_SUCCESS'; sessionId: string }
+  | { type: 'VERIFY_START'; sessionId: string }
+  | { type: 'VERIFY_SUCCESS'; receipt: Receipt }
+  | { type: 'VERIFY_FAILED'; error: string }
+  | { type: 'CANCELLED' }
+  | { type: 'ERROR'; error: string }
+  | { type: 'RESET' }
+
+// ============================================================================
+// REDUCER
+// ============================================================================
+
+function paymentFlowReducer(
+  state: PaymentFlowState,
+  action: PaymentFlowAction
+): PaymentFlowState {
+  switch (action.type) {
+    case 'START':
+      return { ...initialState, status: 'selecting_gateway' }
+
+    case 'SELECT_GATEWAY':
+      return { ...state, status: 'confirming', gateway: action.gateway }
+
+    case 'CONFIRM':
+      return { ...state, status: 'initiating' }
+
+    case 'INITIATE_START':
+      return { ...state, status: 'initiating', error: null }
+
+    case 'INITIATE_SUCCESS':
+      return { ...state, status: 'redirecting', sessionId: action.sessionId }
+
+    case 'VERIFY_START':
+      return { ...state, status: 'verifying', sessionId: action.sessionId }
+
+    case 'VERIFY_SUCCESS':
+      return { ...state, status: 'success', receipt: action.receipt }
+
+    case 'VERIFY_FAILED':
+      return { ...state, status: 'failed', error: action.error }
+
+    case 'CANCELLED':
+      return { ...state, status: 'cancelled' }
+
+    case 'ERROR':
+      return { ...state, status: 'failed', error: action.error }
+
+    case 'RESET':
+      return initialState
+
+    default:
+      return state
+  }
+}
+
+// ============================================================================
+// HOOK
+// ============================================================================
+
+export function usePaymentFlow(invoice: Invoice, schoolId: string) {
+  const [state, dispatch] = useReducer(paymentFlowReducer, initialState)
+
+  const start = useCallback(() => {
+    dispatch({ type: 'START' })
+  }, [])
+
+  const selectGateway = useCallback((gateway: PaymentGateway) => {
+    dispatch({ type: 'SELECT_GATEWAY', gateway })
+  }, [])
+
+  const goBackToGatewaySelection = useCallback(() => {
+    dispatch({ type: 'START' })
+  }, [])
+
+  /**
+   * Initiate payment and redirect to gateway.
+   * The backend returns a redirect URL — we set window.location.href.
+   */
+  const confirmAndPay = useCallback(async () => {
+    if (!state.gateway) return
+
+    dispatch({ type: 'INITIATE_START' })
+
+    try {
+      const response = await initiatePayment(schoolId, {
+        invoiceId: invoice.id,
+        gateway: state.gateway,
+        amount: invoice.amountDue,
+        currency: 'NPR',
+        returnUrl: `${window.location.origin}/payments/callback`,
+        cancelUrl: `${window.location.origin}/parent-portal/fees`,
+      })
+
+      dispatch({ type: 'INITIATE_SUCCESS', sessionId: response.paymentSessionId })
+
+      // Handle gateway redirect based on method
+      if (response.method === 'form_post' && response.formData) {
+        // eSewa requires hidden form POST — create and auto-submit
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = response.redirectUrl
+        form.style.display = 'none'
+
+        for (const [key, value] of Object.entries(response.formData as Record<string, string>)) {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = key
+          input.value = value
+          form.appendChild(input)
+        }
+
+        document.body.appendChild(form)
+        form.submit()
+      } else {
+        // Khalti and others — simple URL redirect
+        window.location.href = response.redirectUrl
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to initiate payment'
+      dispatch({ type: 'ERROR', error: message })
+    }
+  }, [state.gateway, schoolId, invoice.id, invoice.amountDue])
+
+  /**
+   * Verify payment on callback page.
+   * Called with session ID from URL params after gateway redirect.
+   */
+  const verifyOnReturn = useCallback((sessionId: string) => {
+    dispatch({ type: 'VERIFY_START', sessionId })
+  }, [])
+
+  const markVerified = useCallback((receipt: Receipt) => {
+    dispatch({ type: 'VERIFY_SUCCESS', receipt })
+  }, [])
+
+  const markFailed = useCallback((error: string) => {
+    dispatch({ type: 'VERIFY_FAILED', error })
+  }, [])
+
+  const markCancelled = useCallback(() => {
+    dispatch({ type: 'CANCELLED' })
+  }, [])
+
+  const reset = useCallback(() => {
+    dispatch({ type: 'RESET' })
+  }, [])
+
+  return {
+    state,
+    start,
+    selectGateway,
+    goBackToGatewaySelection,
+    confirmAndPay,
+    verifyOnReturn,
+    markVerified,
+    markFailed,
+    markCancelled,
+    reset,
+  }
+}

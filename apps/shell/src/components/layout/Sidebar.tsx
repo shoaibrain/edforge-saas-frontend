@@ -409,7 +409,6 @@ function HomeNavButton({
 // ============================================================================
 
 function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
-  const { t } = useTranslation('common')
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)

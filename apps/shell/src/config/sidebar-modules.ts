@@ -27,6 +27,7 @@ import {
   // [MVP-PARKED] HandCoins,
   UsersRound,
   CreditCard,
+  Wallet,
   // [MVP-PARKED] Zap,
   // [MVP-PARKED] Landmark,
   // [MVP-PARKED] Database,
@@ -441,6 +442,20 @@ const settingsModule: ModuleConfig = {
           icon: BrickWallShield,
           href: '/settings/security-policies',
           permission: { action: 'manage', resource: 'settings' },
+        },
+        {
+          id: 'fee-structures',
+          label: 'Fee Structures',
+          icon: CreditCard,
+          href: '/settings/fee-structures',
+          permission: { action: 'manage', resource: 'settings:tenant' },
+        },
+        {
+          id: 'payment-gateways',
+          label: 'Payment Gateways',
+          icon: Wallet,
+          href: '/settings/payment-gateways',
+          permission: { action: 'manage', resource: 'settings:tenant' },
         },
         // [MVP-PARKED] Billing, Integrations, Import/Export — not needed for MVP pilot schools
         // {

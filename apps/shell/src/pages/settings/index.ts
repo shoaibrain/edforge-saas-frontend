@@ -24,6 +24,10 @@ export { default as OrganizationSettingsPage } from './organization'
 export { default as EducationOrgDetailPage } from './education-org-detail'
 // [MVP-PARKED] export { default as EdFiExportPreviewPage } from './edfi-export-preview'
 
+// Payments (Nepal Fee Collection)
+export { default as FeeStructuresPage } from './fee-structures'
+export { default as PaymentGatewaysPage } from './payment-gateways'
+
 // Other
 // [MVP-PARKED] export { default as IntegrationsSettingsPage } from './integrations'
 // [MVP-PARKED] export { default as BillingSettingsPage } from './billing'
