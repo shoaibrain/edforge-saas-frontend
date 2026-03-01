@@ -82,6 +82,33 @@ export async function updateInvoice(
   )
 }
 
+/**
+ * Issue a draft invoice (transitions from draft → issued).
+ */
+export async function issueInvoice(
+  schoolId: string,
+  invoiceId: string
+): Promise<Invoice> {
+  return apiPost<Invoice, undefined>(
+    `/finance/schools/${schoolId}/invoices/${invoiceId}/issue`,
+    undefined as any
+  )
+}
+
+/**
+ * Cancel an invoice (sets status to cancelled).
+ */
+export async function cancelInvoice(
+  schoolId: string,
+  invoiceId: string,
+  reason?: string
+): Promise<Invoice> {
+  return apiPatch<Invoice, { status: string; notes?: string }>(
+    `/finance/schools/${schoolId}/invoices/${invoiceId}`,
+    { status: 'cancelled', ...(reason && { notes: reason }) }
+  )
+}
+
 // ============================================================================
 // STUDENT ACCOUNTS
 // ============================================================================
@@ -113,6 +140,66 @@ export async function getStudentLedger(
 }
 
 // ============================================================================
+// BULK OPERATIONS
+// ============================================================================
+
+/** Bulk-generate response from the backend */
+export interface BulkGenerateInvoiceResponse {
+  generated: number
+  skipped: number
+  invoiceIds: string[]
+  errors?: { studentAccountId: string; reason: string }[]
+}
+
+/** DTO for bulk generate — matches BulkGenerateInvoiceDto from shared-types */
+export interface BulkGenerateInvoiceDto {
+  studentAccountIds: string[]
+  academicYear: string
+  billingPeriod?: string
+  feeStructureIds: string[]
+  dueDate: string
+  notes?: string
+}
+
+/**
+ * Bulk-generate invoices for multiple students at once.
+ */
+export async function bulkGenerateInvoices(
+  schoolId: string,
+  data: BulkGenerateInvoiceDto
+): Promise<BulkGenerateInvoiceResponse> {
+  return apiPost<BulkGenerateInvoiceResponse, BulkGenerateInvoiceDto>(
+    `/finance/schools/${schoolId}/invoices/bulk-generate`,
+    data
+  )
+}
+
+/** DTO for bulk issue */
+export interface BulkIssueInvoicesDto {
+  invoiceIds: string[]
+}
+
+/** Bulk-issue response from the backend */
+export interface BulkIssueInvoicesResponse {
+  issued: number
+  skipped: number
+  errors?: { invoiceId: string; reason: string }[]
+}
+
+/**
+ * Bulk-issue multiple draft invoices at once.
+ */
+export async function bulkIssueInvoices(
+  schoolId: string,
+  data: BulkIssueInvoicesDto
+): Promise<BulkIssueInvoicesResponse> {
+  return apiPost<BulkIssueInvoicesResponse, BulkIssueInvoicesDto>(
+    `/finance/schools/${schoolId}/invoices/bulk-issue`,
+    data
+  )
+}
+
+// ============================================================================
 // CONVENIENCE EXPORT
 // ============================================================================
 
@@ -121,6 +208,10 @@ export const invoicesService = {
   getInvoice,
   generateInvoice,
   updateInvoice,
+  issueInvoice,
+  cancelInvoice,
   getStudentAccounts,
   getStudentLedger,
+  bulkGenerateInvoices,
+  bulkIssueInvoices,
 }

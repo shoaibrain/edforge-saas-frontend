@@ -56,6 +56,8 @@ import PaymentCallbackPage from './pages/payments/callback'
 import ReceiptPage from './pages/payments/receipt'
 import FeeStructuresPage from './pages/settings/fee-structures'
 import PaymentGatewaysPage from './pages/settings/payment-gateways'
+import InvoicesPage from './pages/settings/invoices'
+import InvoiceDetailPage from './pages/settings/invoice-detail'
 import {
   AccountPage,
   SecurityPage,
@@ -72,6 +74,11 @@ import {
   // [MVP-PARKED] BillingSettingsPage,
   PeopleSettingsPage,
   // [MVP-PARKED] DangerZonePage,
+  PaymentsPage,
+  RecordPaymentPage,
+  StudentAccountsPage,
+  FinancialDashboardPage,
+  BulkInvoicesPage,
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React from 'react'
@@ -517,6 +524,61 @@ const settingsPaymentGatewaysRoute = createRoute({
   errorComponent: PortalPageError,
 })
 
+// Settings: Invoices (Admin)
+const settingsInvoicesRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/invoices',
+  component: InvoicesPage,
+  errorComponent: PortalPageError,
+})
+
+const settingsInvoiceDetailRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/invoices/$invoiceId',
+  component: InvoiceDetailPage,
+  errorComponent: PortalPageError,
+})
+
+// Settings: Payments (Admin)
+const settingsPaymentsRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/payments',
+  component: PaymentsPage,
+  errorComponent: PortalPageError,
+})
+
+// Settings: Record Manual Payment
+const settingsRecordPaymentRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/record-payment',
+  component: RecordPaymentPage,
+  errorComponent: PortalPageError,
+})
+
+// Settings: Student Accounts & Ledger
+const settingsStudentAccountsRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/student-accounts',
+  component: StudentAccountsPage,
+  errorComponent: PortalPageError,
+})
+
+// Settings: Financial Dashboard
+const settingsFinancialDashboardRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/financial-dashboard',
+  component: FinancialDashboardPage,
+  errorComponent: PortalPageError,
+})
+
+// Settings: Bulk Invoice Generation
+const settingsBulkInvoicesRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/bulk-invoices',
+  component: BulkInvoicesPage,
+  errorComponent: PortalPageError,
+})
+
 // [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
 // const settingsBillingRoute = createRoute({
 //   getParentRoute: () => settingsRoute,
@@ -880,6 +942,13 @@ const routeTree = rootRoute.addChildren([
       settingsSecurityPoliciesRoute,
       settingsFeeStructuresRoute,
       settingsPaymentGatewaysRoute,
+      settingsInvoicesRoute,
+      settingsInvoiceDetailRoute,
+      settingsPaymentsRoute,
+      settingsRecordPaymentRoute,
+      settingsStudentAccountsRoute,
+      settingsFinancialDashboardRoute,
+      settingsBulkInvoicesRoute,
       // [MVP-PARKED] settingsBillingRoute,
       // [MVP-PARKED] settingsIntegrationsRoute,
       // [MVP-PARKED] settingsImportExportRoute,

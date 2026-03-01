@@ -150,6 +150,62 @@ export interface VerifyPaymentResponse {
 }
 
 // ============================================================================
+// RECORD MANUAL PAYMENT (cash, bank_transfer, cheque)
+// ============================================================================
+
+export interface RecordManualPaymentDto {
+  invoiceId: string
+  gateway: 'cash' | 'bank_transfer' | 'cheque'
+  amount: number // NPR
+  currency: 'NPR'
+  referenceNumber?: string // Bank ref / cheque number
+  notes?: string
+  paidDate?: string // ISO date, defaults to today on server
+  idempotencyKey?: string // UUID to prevent double-record
+}
+
+// ============================================================================
+// VOID / REFUND
+// ============================================================================
+
+export interface VoidPaymentDto {
+  reason: string
+}
+
+export interface CreateRefundDto {
+  amount: number
+  reason: string
+}
+
+// ============================================================================
+// PAYMENT FILTER
+// ============================================================================
+
+export interface PaymentFilterDto {
+  status?: PaymentStatus | PaymentStatus[]
+  gateway?: PaymentGateway
+  invoiceId?: string
+  studentId?: string
+  dateFrom?: string
+  dateTo?: string
+}
+
+// ============================================================================
+// DASHBOARD SUMMARY
+// ============================================================================
+
+export interface DashboardSummary {
+  totalInvoiced: number
+  totalCollected: number
+  outstanding: number
+  overdue: number
+  collectionRate: number // 0-100
+  invoicesByStatus: Record<string, number>
+  paymentsByGateway: Record<string, number>
+  recentPayments: Payment[]
+}
+
+// ============================================================================
 // RECEIPT
 // ============================================================================
 

@@ -5,11 +5,12 @@
  * PAN/VAT tax breakdown, and print-friendly layout.
  */
 
+import { useCallback, useRef, useState } from 'react'
 import type { Receipt } from '@edforge/types'
 import { formatNPR } from '@edforge/types'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
-import { CheckCircle2, Printer, ArrowLeft } from 'lucide-react'
+import { CheckCircle2, Printer, ArrowLeft, Download, Loader2 } from 'lucide-react'
 
 interface PaymentReceiptProps {
   receipt: Receipt
@@ -20,6 +21,34 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
   const { t, i18n } = useTranslation('payments')
   const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
   const fmt = (amount: number) => formatNPR(amount, { locale })
+  const receiptRef = useRef<HTMLDivElement>(null)
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (!receiptRef.current || downloading) return
+    setDownloading(true)
+    try {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      })
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight)
+      pdf.save(`Receipt-${receipt.receiptNumber}.pdf`)
+    } catch (err) {
+      console.error('PDF generation failed:', err)
+    } finally {
+      setDownloading(false)
+    }
+  }, [receipt.receiptNumber, downloading])
 
   return (
     <div className="max-w-lg mx-auto">
@@ -38,6 +67,21 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
         <div className="flex gap-2 ml-auto">
           <button
             type="button"
+            onClick={handleDownloadPdf}
+            disabled={downloading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+              border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))]
+              hover:bg-[rgb(var(--bg-tertiary))] transition-colors disabled:opacity-50"
+          >
+            {downloading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
+            {downloading ? t('receipt.generating') : t('receipt.download')}
+          </button>
+          <button
+            type="button"
             onClick={() => window.print()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
               border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))]
@@ -50,7 +94,7 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
       </div>
 
       {/* Receipt card */}
-      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-black">
+      <div ref={receiptRef} className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-black">
         {/* Success header */}
         <div className="text-center mb-6 pb-6 border-b border-[rgb(var(--border-primary))] border-dashed">
           <div className="inline-flex p-3 rounded-full bg-emerald-100 dark:bg-emerald-500/10 mb-3 print:hidden">

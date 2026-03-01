@@ -8,13 +8,18 @@
  * Security: No gateway credentials are handled client-side.
  */
 
-import { apiGet, apiPost } from '../lib/api'
+import { api, apiGet, apiPost } from '../lib/api'
 import type {
   Payment,
   InitiatePaymentRequest,
   InitiatePaymentResponse,
   VerifyPaymentResponse,
   Receipt,
+  RecordManualPaymentDto,
+  VoidPaymentDto,
+  CreateRefundDto,
+  Refund,
+  DashboardSummary,
 } from '@edforge/types'
 
 // ============================================================================
@@ -96,6 +101,89 @@ export async function getPaymentReceipt(paymentId: string): Promise<Receipt> {
 }
 
 // ============================================================================
+// RECORD MANUAL PAYMENT (cash, bank_transfer, cheque)
+// ============================================================================
+
+/**
+ * Record a manual (offline) payment — cash, bank transfer, or cheque.
+ * Admin-only action. Creates the payment and credits the student account.
+ */
+export async function recordManualPayment(
+  schoolId: string,
+  data: RecordManualPaymentDto
+): Promise<Payment> {
+  return apiPost<Payment, RecordManualPaymentDto>(
+    `/finance/schools/${schoolId}/payments/manual`,
+    data
+  )
+}
+
+// ============================================================================
+// VOID PAYMENT
+// ============================================================================
+
+/**
+ * Void a completed payment. Reverses the ledger entry.
+ */
+export async function voidPayment(
+  schoolId: string,
+  paymentId: string,
+  data: VoidPaymentDto
+): Promise<Payment> {
+  return apiPost<Payment, VoidPaymentDto>(
+    `/finance/schools/${schoolId}/payments/${paymentId}/void`,
+    data
+  )
+}
+
+// ============================================================================
+// REFUND
+// ============================================================================
+
+/**
+ * Create a refund for a completed payment (full or partial).
+ */
+export async function createRefund(
+  schoolId: string,
+  paymentId: string,
+  data: CreateRefundDto
+): Promise<Refund> {
+  return apiPost<Refund, CreateRefundDto>(
+    `/finance/schools/${schoolId}/payments/${paymentId}/refund`,
+    data
+  )
+}
+
+// ============================================================================
+// DASHBOARD SUMMARY
+// ============================================================================
+
+/**
+ * Get financial dashboard summary for a school.
+ */
+export async function getDashboardSummary(
+  schoolId: string
+): Promise<DashboardSummary> {
+  return apiGet<DashboardSummary>(`/finance/schools/${schoolId}/dashboard`)
+}
+
+// ============================================================================
+// EXPORT (CSV)
+// ============================================================================
+
+/**
+ * Export invoices as CSV for a school.
+ * Returns a Blob that can be downloaded by the client.
+ */
+export async function exportInvoicesCsv(schoolId: string): Promise<Blob> {
+  const response = await api.get(`/finance/schools/${schoolId}/invoices/export`, {
+    params: { format: 'csv' },
+    responseType: 'blob',
+  })
+  return response.data
+}
+
+// ============================================================================
 // CONVENIENCE EXPORT
 // ============================================================================
 
@@ -105,4 +193,9 @@ export const paymentsService = {
   getInvoicePayments,
   getSchoolPayments,
   getPaymentReceipt,
+  recordManualPayment,
+  voidPayment,
+  createRefund,
+  getDashboardSummary,
+  exportInvoicesCsv,
 }

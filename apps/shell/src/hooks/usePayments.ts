@@ -15,15 +15,34 @@ import {
   getInvoices,
   getInvoice,
   generateInvoice,
+  issueInvoice,
+  cancelInvoice,
   getStudentAccounts,
   getStudentLedger,
+  bulkGenerateInvoices,
+  bulkIssueInvoices,
+} from '../services/invoices.service'
+import type {
+  BulkGenerateInvoiceDto,
+  BulkIssueInvoicesDto,
 } from '../services/invoices.service'
 import {
   initiatePayment,
   verifyPayment,
   getInvoicePayments,
+  getSchoolPayments,
   getPaymentReceipt,
+  recordManualPayment,
+  voidPayment,
+  createRefund,
+  getDashboardSummary,
+  exportInvoicesCsv,
 } from '../services/payments.service'
+import type {
+  RecordManualPaymentDto,
+  VoidPaymentDto,
+  CreateRefundDto,
+} from '@edforge/types'
 
 // ============================================================================
 // QUERY KEY FACTORY
@@ -49,6 +68,10 @@ export const paymentKeys = {
   // Receipt
   receipt: (paymentId: string) => [...paymentKeys.all, 'receipt', paymentId] as const,
 
+  // School-wide payments
+  schoolPayments: (schoolId: string, filters?: Record<string, unknown>) =>
+    [...paymentKeys.all, 'school', schoolId, filters] as const,
+
   // Student accounts
   studentAccounts: (schoolId: string) =>
     [...paymentKeys.all, 'accounts', schoolId] as const,
@@ -56,6 +79,10 @@ export const paymentKeys = {
     [...paymentKeys.studentAccounts(schoolId), studentId] as const,
   ledger: (schoolId: string, accountId: string) =>
     [...paymentKeys.all, 'ledger', schoolId, accountId] as const,
+
+  // Dashboard
+  dashboard: (schoolId: string) =>
+    [...paymentKeys.all, 'dashboard', schoolId] as const,
 }
 
 // ============================================================================
@@ -89,6 +116,31 @@ export function useGenerateInvoice(schoolId: string) {
 
   return useMutation({
     mutationFn: (data: GenerateInvoiceDto) => generateInvoice(schoolId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+export function useIssueInvoice(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (invoiceId: string) => issueInvoice(schoolId, invoiceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+export function useCancelInvoice(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, reason }: { invoiceId: string; reason?: string }) =>
+      cancelInvoice(schoolId, invoiceId, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
@@ -176,5 +228,142 @@ export function useStudentLedger(schoolId: string, accountId: string) {
     queryFn: () => getStudentLedger(schoolId, accountId),
     enabled: !!schoolId && !!accountId,
     staleTime: 30 * 1000,
+  })
+}
+
+// ============================================================================
+// SCHOOL-WIDE PAYMENTS (admin list)
+// ============================================================================
+
+export function useSchoolPayments(
+  schoolId: string,
+  params?: { status?: string; gateway?: string; limit?: number }
+) {
+  return useQuery({
+    queryKey: paymentKeys.schoolPayments(schoolId, params),
+    queryFn: () => getSchoolPayments(schoolId, params),
+    enabled: !!schoolId,
+    staleTime: 30 * 1000,
+  })
+}
+
+// ============================================================================
+// RECORD MANUAL PAYMENT
+// ============================================================================
+
+export function useRecordManualPayment(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: RecordManualPaymentDto) =>
+      recordManualPayment(schoolId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+// ============================================================================
+// VOID PAYMENT
+// ============================================================================
+
+export function useVoidPayment(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ paymentId, data }: { paymentId: string; data: VoidPaymentDto }) =>
+      voidPayment(schoolId, paymentId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+// ============================================================================
+// REFUND
+// ============================================================================
+
+export function useCreateRefund(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ paymentId, data }: { paymentId: string; data: CreateRefundDto }) =>
+      createRefund(schoolId, paymentId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+// ============================================================================
+// BULK GENERATE INVOICES
+// ============================================================================
+
+export function useBulkGenerateInvoices(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: BulkGenerateInvoiceDto) =>
+      bulkGenerateInvoices(schoolId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+// ============================================================================
+// BULK ISSUE INVOICES
+// ============================================================================
+
+export function useBulkIssueInvoices(schoolId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: BulkIssueInvoicesDto) =>
+      bulkIssueInvoices(schoolId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+    },
+  })
+}
+
+// ============================================================================
+// DASHBOARD SUMMARY
+// ============================================================================
+
+export function useDashboardSummary(schoolId: string) {
+  return useQuery({
+    queryKey: paymentKeys.dashboard(schoolId),
+    queryFn: () => getDashboardSummary(schoolId),
+    enabled: !!schoolId,
+    staleTime: 60 * 1000, // 1 min — dashboard can be slightly stale
+  })
+}
+
+// ============================================================================
+// EXPORT INVOICES CSV
+// ============================================================================
+
+export function useExportInvoicesCsv() {
+  return useMutation({
+    mutationFn: (schoolId: string) => exportInvoicesCsv(schoolId),
+    onSuccess: (blob) => {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `invoices-export-${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    },
   })
 }
