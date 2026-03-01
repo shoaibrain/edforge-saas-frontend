@@ -138,7 +138,7 @@ export function useVerifyPayment(
     queryFn: () => verifyPayment(sessionId!, callbackParams),
     enabled: !!sessionId,
     retry: 2, // Retry verification on transient failures
-    staleTime: Infinity, // Verification result is immutable
+    staleTime: Infinity, // Verification result is immutable — no refetch needed
   })
 }
 

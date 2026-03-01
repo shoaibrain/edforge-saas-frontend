@@ -70,15 +70,18 @@ export async function getInvoicePayments(
 
 /**
  * Get all payments for a school (admin view).
+ * Backend returns { items, hasMore } — unwrap to flat array.
  */
 export async function getSchoolPayments(
   schoolId: string,
-  params?: { status?: string; page?: number; pageSize?: number }
+  params?: { status?: string; limit?: number; cursor?: string }
 ): Promise<Payment[]> {
-  return apiGet<Payment[]>(
+  const response = await apiGet<Payment[] | { items: Payment[]; hasMore: boolean }>(
     `/finance/schools/${schoolId}/payments`,
     params as Record<string, unknown>
   )
+  if (Array.isArray(response)) return response
+  return response?.items ?? []
 }
 
 // ============================================================================

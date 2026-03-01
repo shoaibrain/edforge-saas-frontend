@@ -11,7 +11,7 @@
  * - Session ID validated on callback
  */
 
-import { useCallback, useReducer } from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import type { Invoice, PaymentGateway, Receipt } from '@edforge/types'
 import { initiatePayment } from '../services/payments.service'
 
@@ -114,8 +114,30 @@ function paymentFlowReducer(
 // HOOK
 // ============================================================================
 
+/** Max time to wait for gateway redirect before timing out (default 30 min) */
+const PAYMENT_TIMEOUT_MS = 30 * 60 * 1000
+
 export function usePaymentFlow(invoice: Invoice, schoolId: string) {
   const [state, dispatch] = useReducer(paymentFlowReducer, initialState)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Auto-timeout when stuck in 'redirecting' state (user abandoned gateway page)
+  useEffect(() => {
+    if (state.status === 'redirecting') {
+      timeoutRef.current = setTimeout(() => {
+        dispatch({ type: 'ERROR', error: 'Payment session expired. Please try again.' })
+      }, PAYMENT_TIMEOUT_MS)
+    } else if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [state.status])
 
   const start = useCallback(() => {
     dispatch({ type: 'START' })
@@ -168,13 +190,16 @@ export function usePaymentFlow(invoice: Invoice, schoolId: string) {
 
         document.body.appendChild(form)
         form.submit()
+        // Clean up form element after submission to prevent DOM leak
+        setTimeout(() => { form.remove() }, 100)
       } else {
         // Khalti and others — simple URL redirect
         window.location.href = response.redirectUrl
       }
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to initiate payment'
+      const raw = err instanceof Error ? err.message : 'Failed to initiate payment'
+      // Sanitize: strip HTML tags and truncate to prevent XSS via error display
+      const message = raw.replace(/<[^>]*>/g, '').substring(0, 200)
       dispatch({ type: 'ERROR', error: message })
     }
   }, [state.gateway, schoolId, invoice.id, invoice.amountDue])

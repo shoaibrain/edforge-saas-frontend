@@ -14,9 +14,14 @@ import type {
 
 /**
  * Get all fee structures for a school.
+ * Backend returns { items, hasMore } — we unwrap to a flat array.
  */
 export async function getFeeStructures(schoolId: string): Promise<FeeStructure[]> {
-  return apiGet<FeeStructure[]>(`/finance/schools/${schoolId}/fee-structures`)
+  const response = await apiGet<FeeStructure[] | { items: FeeStructure[]; hasMore: boolean }>(
+    `/finance/schools/${schoolId}/fee-structures`
+  )
+  if (Array.isArray(response)) return response
+  return response?.items ?? []
 }
 
 /**

@@ -39,7 +39,7 @@ export default function FeePaymentPage() {
     data: gateways,
   } = useEnabledGateways(schoolId ?? '')
 
-  const invoices = invoiceData?.data ?? []
+  const invoices = Array.isArray(invoiceData) ? invoiceData : (invoiceData?.items ?? [])
 
   const handleSelectInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice)

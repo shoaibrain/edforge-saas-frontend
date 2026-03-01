@@ -4,7 +4,7 @@
  * API client for invoice operations (CRUD, generation, filtering).
  */
 
-import { apiGet, apiPost, apiPatch, type PaginatedResponse } from '../lib/api'
+import { apiGet, apiPost, apiPatch } from '../lib/api'
 import type {
   Invoice,
   InvoiceFilterDto,
@@ -14,21 +14,31 @@ import type {
   StudentLedgerEntry,
 } from '@edforge/types'
 
+/** Backend finance pagination shape: { items, hasMore, lastEvaluatedKey? } */
+export interface FinancePaginatedResponse<T> {
+  items: T[]
+  hasMore: boolean
+  lastEvaluatedKey?: string
+}
+
 // ============================================================================
 // INVOICE QUERIES
 // ============================================================================
 
 /**
  * Get paginated invoices for a school, with optional filters.
+ * Backend returns { items, hasMore } — we normalise consistently.
  */
 export async function getInvoices(
   schoolId: string,
   filters?: InvoiceFilterDto
-): Promise<PaginatedResponse<Invoice>> {
-  return apiGet<PaginatedResponse<Invoice>>(
+): Promise<FinancePaginatedResponse<Invoice>> {
+  const response = await apiGet<FinancePaginatedResponse<Invoice> | Invoice[]>(
     `/finance/schools/${schoolId}/invoices`,
     filters as Record<string, unknown>
   )
+  if (Array.isArray(response)) return { items: response, hasMore: false }
+  return { items: response?.items ?? [], hasMore: response?.hasMore ?? false }
 }
 
 /**

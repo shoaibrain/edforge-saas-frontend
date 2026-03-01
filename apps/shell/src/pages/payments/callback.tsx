@@ -9,15 +9,18 @@
  * - Direct navigation without session ID redirects to parent portal
  */
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
 import { Loader2, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
 import { useVerifyPayment } from '../../hooks/usePayments'
 
+const CALLBACK_CACHE_PREFIX = 'payment_verified_'
+
 export default function PaymentCallbackPage() {
   const { t } = useTranslation('payments')
   const navigate = useNavigate()
+  const verifiedOnce = useRef(false)
 
   // Parse URL params — capture ALL query params for gateway callback forwarding
   const { sessionId, callbackParams } = useMemo(() => {
@@ -39,6 +42,17 @@ export default function PaymentCallbackPage() {
     }
   }, [])
 
+  // Check if this session was already verified (page refresh handling)
+  const cachedResult = useMemo(() => {
+    if (!sessionId) return null
+    try {
+      const cached = sessionStorage.getItem(`${CALLBACK_CACHE_PREFIX}${sessionId}`)
+      return cached ? JSON.parse(cached) : null
+    } catch {
+      return null
+    }
+  }, [sessionId])
+
   // Redirect if no session ID (direct navigation)
   useEffect(() => {
     if (!sessionId) {
@@ -46,25 +60,47 @@ export default function PaymentCallbackPage() {
     }
   }, [sessionId, navigate])
 
+  // Only verify if not already verified (prevents duplicate calls on re-render/refresh)
+  const shouldVerify = !!sessionId && !cachedResult && !verifiedOnce.current
+
   // Verify payment with backend — forward all gateway callback params
-  const { data, isLoading, error } = useVerifyPayment(sessionId, callbackParams)
+  const { data, isLoading, error } = useVerifyPayment(
+    shouldVerify ? sessionId : null,
+    callbackParams,
+  )
+
+  // Use cached result if available, otherwise use live data
+  const resolvedData = cachedResult || data
+
+  // Cache successful verification result in sessionStorage
+  useEffect(() => {
+    if (data && !verifiedOnce.current && sessionId) {
+      verifiedOnce.current = true
+      try {
+        sessionStorage.setItem(
+          `${CALLBACK_CACHE_PREFIX}${sessionId}`,
+          JSON.stringify(data),
+        )
+      } catch { /* sessionStorage full or unavailable — safe to ignore */ }
+    }
+  }, [data, sessionId])
 
   // Redirect to receipt on success
   useEffect(() => {
-    if (data?.status === 'completed' && data.payment?.id) {
+    if (resolvedData?.status === 'completed' && resolvedData.payment?.id) {
       const timer = setTimeout(() => {
-        navigate({ to: `/payments/${data.payment.id}/receipt` as string })
+        navigate({ to: `/payments/${resolvedData.payment.id}/receipt` as string })
       }, 2000) // Brief delay to show success state
       return () => clearTimeout(timer)
     }
-  }, [data, navigate])
+  }, [resolvedData, navigate])
 
   if (!sessionId) {
     return null // Redirecting
   }
 
   // Loading state — verifying with backend
-  if (isLoading) {
+  if (isLoading && !resolvedData) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
@@ -73,7 +109,7 @@ export default function PaymentCallbackPage() {
             {t('flow.verifying')}
           </p>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-            {t('flow.verifyDescription', { gateway: '' })}
+            {t('flow.verifyDescription', { gateway: t('flow.gateway') })}
           </p>
         </div>
       </div>
@@ -118,7 +154,7 @@ export default function PaymentCallbackPage() {
   }
 
   // Payment completed successfully
-  if (data?.status === 'completed') {
+  if (resolvedData?.status === 'completed') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
@@ -138,7 +174,7 @@ export default function PaymentCallbackPage() {
   }
 
   // Payment failed
-  if (data?.status === 'failed') {
+  if (resolvedData?.status === 'failed') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-sm">
@@ -175,7 +211,7 @@ export default function PaymentCallbackPage() {
   }
 
   // Payment cancelled
-  if (data?.status === 'cancelled') {
+  if (resolvedData?.status === 'cancelled') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-sm">

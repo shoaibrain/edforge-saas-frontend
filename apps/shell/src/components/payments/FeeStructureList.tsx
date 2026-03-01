@@ -25,6 +25,8 @@ export function FeeStructureList({
   const { t, i18n } = useTranslation('payments')
   const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
 
+  const safeList = Array.isArray(feeStructures) ? feeStructures : []
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -35,7 +37,7 @@ export function FeeStructureList({
     )
   }
 
-  if (feeStructures.length === 0) {
+  if (safeList.length === 0) {
     return (
       <div className="text-center py-12">
         <DollarSign className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
@@ -73,7 +75,7 @@ export function FeeStructureList({
           </tr>
         </thead>
         <tbody>
-          {feeStructures.map((fee) => (
+          {safeList.map((fee) => (
             <tr
               key={fee.id}
               className="border-t border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
@@ -106,13 +108,13 @@ export function FeeStructureList({
                 {t(`feeStructure.frequencies.${fee.frequency}`, { defaultValue: fee.frequency })}
               </td>
               <td className="px-4 py-3">
-                {fee.gradeLevels.length === 0 ? (
+                {(fee.gradeLevels ?? []).length === 0 ? (
                   <span className="text-xs text-[rgb(var(--text-tertiary))]">
                     {t('feeStructure.allGrades')}
                   </span>
                 ) : (
                   <div className="flex flex-wrap gap-1">
-                    {fee.gradeLevels.map((grade) => (
+                    {(fee.gradeLevels ?? []).map((grade) => (
                       <span
                         key={grade}
                         className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"

@@ -506,6 +506,7 @@ const settingsFeeStructuresRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/fee-structures',
   component: FeeStructuresPage,
+  errorComponent: PortalPageError,
 })
 
 // Settings: Payment Gateways
@@ -513,6 +514,7 @@ const settingsPaymentGatewaysRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/payment-gateways',
   component: PaymentGatewaysPage,
+  errorComponent: PortalPageError,
 })
 
 // [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
@@ -821,12 +823,14 @@ const paymentCallbackRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/payments/callback',
   component: PaymentCallbackPage,
+  errorComponent: PortalPageError,
 })
 
 const paymentReceiptRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/payments/$paymentId/receipt',
   component: PaymentReceiptRouteComponent,
+  errorComponent: PortalPageError,
 })
 
 function PaymentReceiptRouteComponent() {

@@ -36,34 +36,36 @@ export function InvoiceList({
   const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('outstanding')
 
+  const safeInvoices = Array.isArray(invoices) ? invoices : []
+
   const filtered = useMemo(() => {
-    if (statusFilter === 'all') return invoices
+    if (statusFilter === 'all') return safeInvoices
     const targetStatuses =
       statusFilter === 'outstanding'
         ? OUTSTANDING_STATUSES
         : statusFilter === 'overdue'
           ? OVERDUE_STATUSES
           : PAID_STATUSES
-    return invoices.filter((inv) => targetStatuses.includes(inv.status))
-  }, [invoices, statusFilter])
+    return safeInvoices.filter((inv) => targetStatuses.includes(inv.status))
+  }, [safeInvoices, statusFilter])
 
   const tabs: { key: StatusFilter; label: string; count: number }[] = [
     {
       key: 'outstanding',
       label: t('invoices.outstanding'),
-      count: invoices.filter((i) => OUTSTANDING_STATUSES.includes(i.status)).length,
+      count: safeInvoices.filter((i) => OUTSTANDING_STATUSES.includes(i.status)).length,
     },
     {
       key: 'overdue',
       label: t('invoices.overdue'),
-      count: invoices.filter((i) => OVERDUE_STATUSES.includes(i.status)).length,
+      count: safeInvoices.filter((i) => OVERDUE_STATUSES.includes(i.status)).length,
     },
     {
       key: 'paid',
       label: t('invoices.paid'),
-      count: invoices.filter((i) => PAID_STATUSES.includes(i.status)).length,
+      count: safeInvoices.filter((i) => PAID_STATUSES.includes(i.status)).length,
     },
-    { key: 'all', label: t('invoices.all'), count: invoices.length },
+    { key: 'all', label: t('invoices.all'), count: safeInvoices.length },
   ]
 
   if (isLoading) {
