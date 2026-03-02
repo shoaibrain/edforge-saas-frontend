@@ -2,7 +2,7 @@
  * Financial Dashboard Page
  *
  * Overview of school finances with summary cards, breakdowns, and recent payments.
- * Route: /settings/financial-dashboard
+ * Route: /finance/dashboard
  */
 
 import { motion } from 'framer-motion'
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAppStore } from '../../stores/app.store'
-import { useDashboardSummary, useExportInvoicesCsv } from '../../hooks/usePayments'
+import { useDashboardSummary, useExportInvoicesCsv } from '@edforge/finance-services'
 import type { Payment } from '@edforge/types'
 
 function formatNPR(amount: number): string {

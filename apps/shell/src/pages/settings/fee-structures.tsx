@@ -18,7 +18,7 @@ import {
   useCreateFeeStructure,
   useUpdateFeeStructure,
   useDeleteFeeStructure,
-} from '../../hooks/useFeeStructures'
+} from '@edforge/finance-services'
 import { FeeStructureList } from '../../components/payments/FeeStructureList'
 import { FeeStructureForm } from '../../components/payments/FeeStructureForm'
 

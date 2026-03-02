@@ -15,7 +15,7 @@
 
 import {
   GraduationCap,
-  // [MVP-PARKED] DollarSign,
+  DollarSign,
   GalleryVerticalEnd,
   Users,
   Settings,
@@ -28,9 +28,7 @@ import {
   UsersRound,
   CreditCard,
   Wallet,
-  BarChart3,
   Receipt,
-  BookUser,
   // [MVP-PARKED] Zap,
   // [MVP-PARKED] Landmark,
   // [MVP-PARKED] Database,
@@ -108,7 +106,7 @@ export type SidebarModule =
   | 'home-parent'
   | 'settings'
   | 'academics'
-  // [MVP-PARKED] | 'finance'
+  | 'finance'
   | 'people'
   // [MVP-PARKED] | 'messages'
   // [MVP-PARKED] | 'analytics'
@@ -153,15 +151,13 @@ const homeModule: ModuleConfig = {
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
         },
-        // [MVP-PARKED] Finance
-        // {
-        //   id: 'finance',
-        //   label: 'Finance',
-        //   icon: HandCoins,
-        //   href: '/finance',
-        //   permission: { action: 'view', resource: 'billing' },
-        // },
-        // [/MVP-PARKED]
+        {
+          id: 'finance',
+          label: 'Finance',
+          icon: DollarSign,
+          href: '/finance',
+          permission: { action: 'view', resource: 'billing' },
+        },
         // [MVP-PARKED] Messages, Analytics, State Reporting
         // {
         //   id: 'messages',
@@ -459,41 +455,6 @@ const settingsModule: ModuleConfig = {
           href: '/settings/payment-gateways',
           permission: { action: 'manage', resource: 'settings:tenant' },
         },
-        {
-          id: 'invoices',
-          label: 'Invoices',
-          icon: FileText,
-          href: '/settings/invoices',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
-        {
-          id: 'payments',
-          label: 'Payments',
-          icon: Receipt,
-          href: '/settings/payments',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
-        {
-          id: 'record-payment',
-          label: 'Record Payment',
-          icon: CreditCard,
-          href: '/settings/record-payment',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
-        {
-          id: 'student-accounts',
-          label: 'Student Accounts',
-          icon: BookUser,
-          href: '/settings/student-accounts',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
-        {
-          id: 'financial-dashboard',
-          label: 'Financial Dashboard',
-          icon: BarChart3,
-          href: '/settings/financial-dashboard',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
         // [MVP-PARKED] Billing, Integrations, Import/Export — not needed for MVP pilot schools
         // {
         //   id: 'billing',
@@ -612,25 +573,38 @@ const academicsModule: ModuleConfig = {
   ],
 }
 
-// [MVP-PARKED] Finance module config
-// const financeModule: ModuleConfig = {
-//   id: 'finance',
-//   title: 'Finance',
-//   icon: HandCoins,
-//   backTo: { path: '/home', label: 'Back to Home' },
-//   groups: [
-//     {
-//       id: 'main',
-//       items: [
-//         { id: 'finance-home', label: 'Overview', icon: GalleryVerticalEnd, href: '/finance', permission: { action: 'view', resource: 'billing' } },
-//         { id: 'ledger', label: 'Ledger', icon: Landmark, href: '/finance/ledger', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
-//         { id: 'billing', label: 'Billing', icon: CreditCard, href: '/finance/billing', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
-//         { id: 'expenses', label: 'Expenses', icon: ClipboardList, href: '/finance/expenses', permission: { action: 'view', resource: 'expenses' }, requiresActiveSchool: true },
-//       ],
-//     },
-//   ],
-// }
-// [/MVP-PARKED]
+const financeModule: ModuleConfig = {
+  id: 'finance',
+  title: 'Finance',
+  icon: DollarSign,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'main',
+      items: [
+        { id: 'finance-home', label: 'Overview', icon: GalleryVerticalEnd, href: '/finance', permission: { action: 'view', resource: 'billing' } },
+      ],
+    },
+    {
+      id: 'billing',
+      label: 'BILLING',
+      items: [
+        { id: 'billing-overview', label: 'Billing', icon: CreditCard, href: '/finance/billing', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'invoices', label: 'Invoices', icon: FileText, href: '/finance/billing/invoices', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'payments', label: 'Payments', icon: Wallet, href: '/finance/billing/payments', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'student-accounts', label: 'Student Accounts', icon: UsersRound, href: '/finance/billing/accounts', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+      ],
+    },
+    {
+      id: 'accounting',
+      label: 'ACCOUNTING',
+      items: [
+        { id: 'ledger', label: 'Ledger', icon: Receipt, href: '/finance/ledger', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'dashboard', label: 'Dashboard', icon: Layers, href: '/finance/dashboard', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+      ],
+    },
+  ],
+}
 
 // ============================================================================
 // PEOPLE MODULE - Staff and user management (Consolidated: 10 → 2 items)
@@ -902,7 +876,7 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   'home-parent': parentHomeModule,
   settings: settingsModule,
   academics: academicsModule,
-  // [MVP-PARKED] finance: financeModule,
+  finance: financeModule,
   people: peopleModule,
   // [MVP-PARKED] messages: messagesModule,
   // [MVP-PARKED] analytics: analyticsModule,
@@ -969,7 +943,7 @@ export function getHomeModuleForSchoolRole(schoolRole: SchoolRole | null): Sideb
 export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/settings')) return 'settings'
   if (pathname.startsWith('/academics')) return 'academics'
-  // [MVP-PARKED] if (pathname.startsWith('/finance')) return 'finance'
+  if (pathname.startsWith('/finance')) return 'finance'
   if (pathname.startsWith('/people')) return 'people'
   // [MVP-PARKED] if (pathname.startsWith('/messages')) return 'messages'
   // [MVP-PARKED] if (pathname.startsWith('/analytics')) return 'analytics'

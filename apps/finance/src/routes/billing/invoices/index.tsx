@@ -3,13 +3,12 @@
  *
  * List, filter, generate, issue, and cancel invoices.
  * Supports bulk selection with bulk-issue action and overdue status display.
- * Route: /settings/invoices
+ * Route: /finance/billing/invoices
  */
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { useTranslation } from '@edforge/i18n'
 import { Button } from '@edforge/ui'
 import {
   Plus,
@@ -24,15 +23,15 @@ import {
   Clock,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { useAppStore } from '../../stores/app.store'
+import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoices,
   useGenerateInvoice,
   useIssueInvoice,
   useCancelInvoice,
   useBulkIssueInvoices,
-} from '../../hooks/usePayments'
-import { useFeeStructures } from '../../hooks/useFeeStructures'
+  useFeeStructures,
+} from '@edforge/finance-services'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 
@@ -66,7 +65,6 @@ function getOverdueDays(dueDate: string | undefined): number {
 }
 
 export default function InvoicesPage() {
-  useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
@@ -174,7 +172,7 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => navigate({ to: '/settings/bulk-invoices' as string })}
+            onClick={() => navigate({ to: '/finance/billing/invoices/bulk-generate' as string })}
           >
             <Users className="w-4 h-4 mr-1.5" />
             Bulk Generate
@@ -313,7 +311,7 @@ export default function InvoicesPage() {
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => navigate({ to: `/settings/invoices/${invoice.id}` as string })}
+                          onClick={() => navigate({ to: `/finance/billing/invoices/${invoice.id}` as string })}
                           className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                           title="View"
                         >
@@ -481,7 +479,7 @@ function GenerateInvoiceModal({
         academicYear,
         billingPeriod: billingPeriod || undefined,
         notes: notes || undefined,
-      } as any)
+      })
       toast.success('Invoice generated')
       onClose()
     } catch {

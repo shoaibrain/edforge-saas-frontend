@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@edforge/abac": "workspace:*",
+    "@edforge/api-client": "workspace:*",
+    "@edforge/finance-services": "workspace:*",
     "@edforge/theme": "workspace:*",
     "@edforge/types": "workspace:*",
     "@edforge/ui": "workspace:*",
@@ -23,6 +25,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.0",
+    "sonner": "^1.7.0",
     "zod": "^3.24.0",
     "zustand": "^5.0.0"
   },

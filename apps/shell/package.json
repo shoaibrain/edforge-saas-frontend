@@ -13,7 +13,9 @@
   "dependencies": {
     "@aibrains/shared-types": "^0.10.1",
     "@edforge/abac": "workspace:*",
+    "@edforge/api-client": "workspace:*",
     "@edforge/auth": "workspace:*",
+    "@edforge/finance-services": "workspace:*",
     "@edforge/date-utils": "workspace:*",
     "@edforge/forms": "workspace:*",
     "@edforge/i18n": "workspace:*",

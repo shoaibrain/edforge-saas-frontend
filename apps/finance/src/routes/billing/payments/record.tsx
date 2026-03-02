@@ -2,7 +2,7 @@
  * Record Manual Payment Page
  *
  * Admin page for recording cash, bank transfer, or cheque payments.
- * Route: /settings/record-payment
+ * Route: /finance/billing/payments/record
  */
 
 import { useState } from 'react'
@@ -16,8 +16,8 @@ import {
   RotateCcw,
 } from 'lucide-react'
 import { useSearch } from '@tanstack/react-router'
-import { useAppStore } from '../../stores/app.store'
-import { useRecordManualPayment } from '../../hooks/usePayments'
+import { useAppStore } from '../../../stores/app.store'
+import { useRecordManualPayment } from '@edforge/finance-services'
 
 type PaymentMethod = 'cash' | 'bank_transfer' | 'cheque'
 

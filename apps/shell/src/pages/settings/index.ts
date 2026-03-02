@@ -24,16 +24,10 @@ export { default as OrganizationSettingsPage } from './organization'
 export { default as EducationOrgDetailPage } from './education-org-detail'
 // [MVP-PARKED] export { default as EdFiExportPreviewPage } from './edfi-export-preview'
 
-// Payments (Nepal Fee Collection)
+// Finance Configuration (stays in settings)
 export { default as FeeStructuresPage } from './fee-structures'
 export { default as PaymentGatewaysPage } from './payment-gateways'
-export { default as InvoicesPage } from './invoices'
-export { default as InvoiceDetailPage } from './invoice-detail'
-export { default as PaymentsPage } from './payments'
-export { default as RecordPaymentPage } from './record-payment'
-export { default as StudentAccountsPage } from './student-accounts'
-export { default as FinancialDashboardPage } from './financial-dashboard'
-export { default as BulkInvoicesPage } from './bulk-invoices'
+// Finance operational pages moved to Finance MFE (/finance/billing/*)
 
 // Other
 // [MVP-PARKED] export { default as IntegrationsSettingsPage } from './integrations'

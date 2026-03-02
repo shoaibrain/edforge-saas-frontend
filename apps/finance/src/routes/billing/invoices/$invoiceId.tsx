@@ -2,20 +2,20 @@
  * Admin Invoice Detail Page
  *
  * Shows full invoice breakdown with actions (issue, cancel).
- * Route: /settings/invoices/:invoiceId
+ * Route: /finance/billing/invoices/:invoiceId
  */
 
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
-import { ArrowLeft, Check, X, Loader2, FileText } from 'lucide-react'
+import { ArrowLeft, Check, X, Loader2 } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { useAppStore } from '../../stores/app.store'
+import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoice,
   useIssueInvoice,
   useCancelInvoice,
   useInvoicePayments,
-} from '../../hooks/usePayments'
+} from '@edforge/finance-services'
 
 function formatNPR(amount: number): string {
   return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -81,7 +81,7 @@ export default function InvoiceDetailPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       {/* Back nav */}
       <button
-        onClick={() => navigate({ to: '/settings/invoices' as string })}
+        onClick={() => navigate({ to: '/finance/billing/invoices' as string })}
         className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -173,16 +173,16 @@ export default function InvoiceDetailPage() {
           <span>Subtotal</span>
           <span>{formatNPR(invoice.subtotal ?? 0)}</span>
         </div>
-        {(invoice.totalDiscount ?? 0) > 0 && (
+        {(invoice.discountTotal ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
             <span>Discount</span>
-            <span>-{formatNPR(invoice.totalDiscount)}</span>
+            <span>-{formatNPR(invoice.discountTotal)}</span>
           </div>
         )}
-        {(invoice.totalTax ?? 0) > 0 && (
+        {(invoice.taxTotal ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
             <span>Tax</span>
-            <span>{formatNPR(invoice.totalTax)}</span>
+            <span>{formatNPR(invoice.taxTotal)}</span>
           </div>
         )}
         <div className="flex justify-between text-base font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2">
@@ -228,7 +228,7 @@ export default function InvoiceDetailPage() {
       {/* Metadata */}
       <div className="text-xs text-[rgb(var(--text-tertiary))] space-y-0.5">
         {invoice.createdAt && <p>Created: {new Date(invoice.createdAt).toLocaleString()}</p>}
-        {invoice.issuedAt && <p>Issued: {new Date(invoice.issuedAt).toLocaleString()}</p>}
+        {invoice.issuedDate && <p>Issued: {new Date(invoice.issuedDate).toLocaleString()}</p>}
         {invoice.notes && <p>Notes: {invoice.notes}</p>}
       </div>
     </div>

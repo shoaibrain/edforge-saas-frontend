@@ -103,8 +103,8 @@ export default defineConfig({
           remotes: {
             academics:          remoteUrl('academics', 'academics', 3002),
             people:             remoteUrl('people', 'people', 3006),
+            finance:            remoteUrl('finance', 'finance', 3003),
             // [MVP-PARKED] Modules parked for post-MVP release
-            // finance:            remoteUrl('finance', 'finance', 3003),
             // edfi:               remoteUrl('edfi', 'edfi', 3001),
             // 'special-programs': remoteUrl('special-programs', 'special_programs', 3005),
             // messages:           remoteUrl('messages', 'messages', 3007),

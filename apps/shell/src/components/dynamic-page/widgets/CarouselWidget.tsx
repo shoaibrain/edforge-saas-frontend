@@ -491,15 +491,13 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
     module: 'academics',
     visitedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
-  // [MVP-PARKED] Finance mock entry
-  // {
-  //   path: '/finance',
-  //   title: 'Finance',
-  //   icon: 'DollarSign',
-  //   module: 'finance',
-  //   visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-  // },
-  // [/MVP-PARKED]
+  {
+    path: '/finance',
+    title: 'Finance',
+    icon: 'DollarSign',
+    module: 'finance',
+    visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+  },
   {
     path: '/people',
     title: 'People',

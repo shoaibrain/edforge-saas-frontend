@@ -163,7 +163,7 @@ export interface Invoice {
 }
 
 export interface GenerateInvoiceDto {
-  studentAccountId: string
+  studentId: string
   academicYear: string
   billingPeriod?: string
   feeStructureIds: string[] // Which fees to include

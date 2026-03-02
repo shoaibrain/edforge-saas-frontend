@@ -51,15 +51,13 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
     module: 'academics',
     visitedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
-  // [MVP-PARKED] Finance mock entry
-  // {
-  //   path: '/finance',
-  //   title: 'Finance',
-  //   icon: 'DollarSign',
-  //   module: 'finance',
-  //   visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-  // },
-  // [/MVP-PARKED]
+  {
+    path: '/finance',
+    title: 'Finance',
+    icon: 'DollarSign',
+    module: 'finance',
+    visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+  },
   {
     path: '/people',
     title: 'People',
@@ -105,13 +103,11 @@ function VisitedCard({ page, index }: VisitedCardProps) {
       icon: 'text-teal-600 dark:text-cyan-400',
       gradient: 'from-teal-500/20 to-teal-500/5 dark:from-cyan-500/20 dark:to-cyan-500/5',
     },
-    // [MVP-PARKED] Finance color scheme
-    // finance: {
-    //   bg: 'bg-golden-400/10',
-    //   icon: 'text-golden-600 dark:text-golden-400',
-    //   gradient: 'from-golden-400/20 to-golden-400/5',
-    // },
-    // [/MVP-PARKED]
+    finance: {
+      bg: 'bg-golden-400/10',
+      icon: 'text-golden-600 dark:text-golden-400',
+      gradient: 'from-golden-400/20 to-golden-400/5',
+    },
     people: {
       bg: 'bg-aqua-400/10',
       icon: 'text-aqua-700 dark:text-aqua-400',

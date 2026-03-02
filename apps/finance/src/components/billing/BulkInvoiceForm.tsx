@@ -30,8 +30,11 @@ import {
   ChevronLeft,
   X,
 } from 'lucide-react'
-import { useStudentAccounts, useBulkGenerateInvoices } from '../../hooks/usePayments'
-import { useFeeStructures } from '../../hooks/useFeeStructures'
+import {
+  useStudentAccounts,
+  useBulkGenerateInvoices,
+  useFeeStructures,
+} from '@edforge/finance-services'
 
 // ============================================================================
 // TYPES
@@ -49,7 +52,7 @@ interface BulkInvoiceFormProps {
 interface BulkResult {
   generated: number
   skipped: number
-  errors?: { studentAccountId: string; reason: string }[]
+  errors?: { studentId: string; reason: string }[]
 }
 
 // ============================================================================
@@ -190,7 +193,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
     setFormState('submitting')
     try {
       const response = await bulkGenerateMutation.mutateAsync({
-        studentAccountIds: selectedAccountIds,
+        studentIds: selectedAccountIds,
         feeStructureIds: selectedFeeIds,
         academicYear: academicYear.trim(),
         billingPeriod: billingPeriod.trim() || undefined,
@@ -274,7 +277,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
             <div className="max-h-32 overflow-y-auto space-y-1">
               {result.errors.map((err, i) => (
                 <p key={i} className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Account {err.studentAccountId.slice(0, 8)}...: {err.reason}
+                  Account {err.studentId.slice(0, 8)}...: {err.reason}
                 </p>
               ))}
             </div>

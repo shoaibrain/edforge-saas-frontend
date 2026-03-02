@@ -2,7 +2,7 @@
  * Admin Payments List Page
  *
  * View all payments for a school with filtering, void, and refund actions.
- * Route: /settings/payments
+ * Route: /finance/billing/payments
  */
 
 import { useState } from 'react'
@@ -18,12 +18,12 @@ import {
   RotateCcw,
   X,
 } from 'lucide-react'
-import { useAppStore } from '../../stores/app.store'
+import { useAppStore } from '../../../stores/app.store'
 import {
   useSchoolPayments,
   useVoidPayment,
   useCreateRefund,
-} from '../../hooks/usePayments'
+} from '@edforge/finance-services'
 import type { Payment } from '@edforge/types'
 
 function formatNPR(amount: number): string {

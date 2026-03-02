@@ -2,7 +2,7 @@
  * Bulk Invoices Page
  *
  * Admin page for bulk invoice generation.
- * Route: /settings/bulk-invoices
+ * Route: /finance/billing/invoices/bulk-generate
  *
  * Wraps the BulkInvoiceForm component with page layout,
  * header, and back navigation.
@@ -11,8 +11,8 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { useAppStore } from '../../stores/app.store'
-import { BulkInvoiceForm } from '../../components/payments/BulkInvoiceForm'
+import { useAppStore } from '../../../stores/app.store'
+import { BulkInvoiceForm } from '../../../components/billing/BulkInvoiceForm'
 
 export default function BulkInvoicesPage() {
   const navigate = useNavigate()
@@ -32,7 +32,7 @@ export default function BulkInvoicesPage() {
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
-          onClick={() => navigate({ to: '/settings/invoices' as string })}
+          onClick={() => navigate({ to: '/finance/billing/invoices' as string })}
           className="p-2"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -51,8 +51,8 @@ export default function BulkInvoicesPage() {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl p-6">
         <BulkInvoiceForm
           schoolId={schoolId}
-          onComplete={() => navigate({ to: '/settings/invoices' as string })}
-          onCancel={() => navigate({ to: '/settings/invoices' as string })}
+          onComplete={() => navigate({ to: '/finance/billing/invoices' as string })}
+          onCancel={() => navigate({ to: '/finance/billing/invoices' as string })}
         />
       </div>
     </div>

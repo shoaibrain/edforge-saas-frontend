@@ -5,7 +5,7 @@
  * Admin-only: configures what fees a school charges.
  */
 
-import { apiGet, apiPost, apiPut, apiDelete } from '../lib/api'
+import { apiGet, apiPost, apiPut, apiDelete } from '@edforge/api-client'
 import type {
   FeeStructure,
   CreateFeeStructureDto,

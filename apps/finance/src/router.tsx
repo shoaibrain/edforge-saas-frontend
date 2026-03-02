@@ -1,7 +1,8 @@
 /**
  * Finance Router Configuration
- * 
+ *
  * Defines the internal routing for the Finance micro-frontend.
+ * Includes billing sub-routes (invoices, payments, accounts) and dashboard.
  */
 
 import {
@@ -13,6 +14,14 @@ import {
 import { FinanceLayout } from './layouts/FinanceLayout'
 import { Overview } from './routes/overview'
 import { LedgerModule } from './routes/ledger'
+import { BillingModule } from './routes/billing'
+import InvoicesPage from './routes/billing/invoices/index'
+import InvoiceDetailPage from './routes/billing/invoices/$invoiceId'
+import BulkInvoicesPage from './routes/billing/invoices/bulk-generate'
+import PaymentsPage from './routes/billing/payments/index'
+import RecordPaymentPage from './routes/billing/payments/record'
+import StudentAccountsPage from './routes/billing/accounts/index'
+import FinancialDashboardPage from './routes/dashboard/index'
 
 // ============================================================================
 // ROOT ROUTE
@@ -37,32 +46,60 @@ const indexRoute = createRoute({
     component: Overview,
 })
 
-// Billing
+// Billing Overview
 const billingRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/billing',
-    component: () => <div className="p-8 text-center text-text-secondary">Billing Module</div>,
+    component: BillingModule,
 })
 
-// Payroll
-const payrollRoute = createRoute({
+// Billing > Invoices List
+const invoicesRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/payroll',
-    component: () => <div className="p-8 text-center text-text-secondary">Payroll Module</div>,
+    path: '/billing/invoices',
+    component: InvoicesPage,
 })
 
-// Tuition
-const tuitionRoute = createRoute({
+// Billing > Invoice Detail
+const invoiceDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/tuition',
-    component: () => <div className="p-8 text-center text-text-secondary">Tuition Module</div>,
+    path: '/billing/invoices/$invoiceId',
+    component: InvoiceDetailPage,
 })
 
-// Expenses
-const expensesRoute = createRoute({
+// Billing > Bulk Generate Invoices
+const bulkGenerateRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/expenses',
-    component: () => <div className="p-8 text-center text-text-secondary">Expenses Module</div>,
+    path: '/billing/invoices/bulk-generate',
+    component: BulkInvoicesPage,
+})
+
+// Billing > Payments List
+const paymentsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing/payments',
+    component: PaymentsPage,
+})
+
+// Billing > Record Payment
+const recordPaymentRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing/payments/record',
+    component: RecordPaymentPage,
+})
+
+// Billing > Student Accounts
+const accountsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing/accounts',
+    component: StudentAccountsPage,
+})
+
+// Financial Dashboard
+const dashboardRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/dashboard',
+    component: FinancialDashboardPage,
 })
 
 // Ledger - Consolidated GL/AP/AR view
@@ -79,9 +116,13 @@ const ledgerRoute = createRoute({
 const routeTree = rootRoute.addChildren([
     indexRoute,
     billingRoute,
-    payrollRoute,
-    tuitionRoute,
-    expensesRoute,
+    bulkGenerateRoute,  // Must be before invoiceDetailRoute so /bulk-generate matches before /$invoiceId
+    invoicesRoute,
+    invoiceDetailRoute,
+    paymentsRoute,
+    recordPaymentRoute,
+    accountsRoute,
+    dashboardRoute,
     ledgerRoute,
 ])
 

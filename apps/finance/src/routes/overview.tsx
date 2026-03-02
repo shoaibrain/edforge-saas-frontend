@@ -8,7 +8,6 @@
 import {
     DollarSign,
     CreditCard,
-    Users,
     Receipt,
     Landmark,
     TrendingUp,
@@ -39,11 +38,11 @@ export function Overview() {
             iconColor: 'text-rose-600 dark:text-rose-400',
         },
         {
-            label: 'Payroll (MTD)',
+            label: 'Collected',
             value: '$89,234',
             change: '+2.1%',
             changeType: 'positive',
-            icon: Users,
+            icon: TrendingUp,
             iconBg: 'bg-blue-400/20',
             iconColor: 'text-blue-600 dark:text-blue-400',
         },
@@ -61,58 +60,40 @@ export function Overview() {
     // Action cards linking to sub-routes
     const actionCards: ModuleActionCard[] = [
         {
+            id: 'billing',
+            title: 'Billing',
+            description: 'Manage student invoices and payments',
+            icon: CreditCard,
+            href: '/finance/billing',
+            iconBg: 'bg-emerald-400/20 group-hover:bg-emerald-400/30',
+            iconColor: 'text-emerald-600 dark:text-emerald-400',
+        },
+        {
             id: 'general-ledger',
             title: 'General Ledger',
             description: 'View and manage financial accounts',
             icon: Landmark,
-            href: '/finance/accounting/general-ledger',
+            href: '/finance/ledger',
             iconBg: 'bg-amber-500/15 group-hover:bg-amber-500/25',
             iconColor: 'text-amber-600 dark:text-amber-400',
         },
         {
-            id: 'tuition-fees',
-            title: 'Tuition & Fees',
-            description: 'Manage student billing and payments',
-            icon: TrendingUp,
-            href: '/finance/billing/tuition-fees',
-            iconBg: 'bg-emerald-400/20 group-hover:bg-emerald-400/30',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            id: 'dashboard',
+            title: 'Financial Dashboard',
+            description: 'Overview of school finances and metrics',
+            icon: BarChart3,
+            href: '/finance/dashboard',
+            iconBg: 'bg-cyan-400/20 group-hover:bg-cyan-400/30',
+            iconColor: 'text-cyan-600 dark:text-cyan-400',
         },
         {
             id: 'fee-structures',
             title: 'Fee Structures',
             description: 'Configure pricing and fee schedules',
             icon: Layers,
-            href: '/finance/billing/fee-structures',
+            href: '/settings/fee-structures',
             iconBg: 'bg-blue-400/20 group-hover:bg-blue-400/30',
             iconColor: 'text-blue-600 dark:text-blue-400',
-        },
-        {
-            id: 'payroll',
-            title: 'Payroll',
-            description: 'Process staff payroll and benefits',
-            icon: Users,
-            href: '/finance/payroll',
-            iconBg: 'bg-purple-400/20 group-hover:bg-purple-400/30',
-            iconColor: 'text-purple-600 dark:text-purple-400',
-        },
-        {
-            id: 'expenses',
-            title: 'Expenses',
-            description: 'Track and approve expenses',
-            icon: Receipt,
-            href: '/finance/expenses',
-            iconBg: 'bg-orange-400/20 group-hover:bg-orange-400/30',
-            iconColor: 'text-orange-600 dark:text-orange-400',
-        },
-        {
-            id: 'reports',
-            title: 'Financial Reports',
-            description: 'View financial analytics and reports',
-            icon: BarChart3,
-            href: '/finance/reports',
-            iconBg: 'bg-cyan-400/20 group-hover:bg-cyan-400/30',
-            iconColor: 'text-cyan-600 dark:text-cyan-400',
         },
     ]
 
@@ -120,7 +101,7 @@ export function Overview() {
         <ModuleOverviewPage
             moduleId="finance"
             title="Finance"
-            description="Manage billing, payroll, tuition, and expenses"
+            description="Manage billing, payments, and financial operations"
             icon={DollarSign}
             stats={stats}
             actionCards={actionCards}

@@ -56,8 +56,6 @@ import PaymentCallbackPage from './pages/payments/callback'
 import ReceiptPage from './pages/payments/receipt'
 import FeeStructuresPage from './pages/settings/fee-structures'
 import PaymentGatewaysPage from './pages/settings/payment-gateways'
-import InvoicesPage from './pages/settings/invoices'
-import InvoiceDetailPage from './pages/settings/invoice-detail'
 import {
   AccountPage,
   SecurityPage,
@@ -74,11 +72,6 @@ import {
   // [MVP-PARKED] BillingSettingsPage,
   PeopleSettingsPage,
   // [MVP-PARKED] DangerZonePage,
-  PaymentsPage,
-  RecordPaymentPage,
-  StudentAccountsPage,
-  FinancialDashboardPage,
-  BulkInvoicesPage,
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React from 'react'
@@ -88,13 +81,11 @@ const AcademicsModule = React.lazy(async () => {
   if (!module) throw new Error('Failed to load Academics remote')
   return module
 })
-// [MVP-PARKED] Finance module
-// const FinanceModule = React.lazy(async () => {
-//   const module = await loadRemote<{ default: React.ComponentType }>('finance/FinanceModule')
-//   if (!module) throw new Error('Failed to load Finance remote')
-//   return module
-// })
-// [/MVP-PARKED]
+const FinanceModule = React.lazy(async () => {
+  const module = await loadRemote<{ default: React.ComponentType }>('finance/FinanceModule')
+  if (!module) throw new Error('Failed to load Finance remote')
+  return module
+})
 // [MVP-PARKED] Special Programs module
 // const SpecialProgramsModule = React.lazy(async () => {
 //   const module = await loadRemote<{ default: React.ComponentType }>('special-programs/SpecialProgramsModule')
@@ -524,60 +515,8 @@ const settingsPaymentGatewaysRoute = createRoute({
   errorComponent: PortalPageError,
 })
 
-// Settings: Invoices (Admin)
-const settingsInvoicesRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/invoices',
-  component: InvoicesPage,
-  errorComponent: PortalPageError,
-})
-
-const settingsInvoiceDetailRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/invoices/$invoiceId',
-  component: InvoiceDetailPage,
-  errorComponent: PortalPageError,
-})
-
-// Settings: Payments (Admin)
-const settingsPaymentsRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/payments',
-  component: PaymentsPage,
-  errorComponent: PortalPageError,
-})
-
-// Settings: Record Manual Payment
-const settingsRecordPaymentRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/record-payment',
-  component: RecordPaymentPage,
-  errorComponent: PortalPageError,
-})
-
-// Settings: Student Accounts & Ledger
-const settingsStudentAccountsRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/student-accounts',
-  component: StudentAccountsPage,
-  errorComponent: PortalPageError,
-})
-
-// Settings: Financial Dashboard
-const settingsFinancialDashboardRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/financial-dashboard',
-  component: FinancialDashboardPage,
-  errorComponent: PortalPageError,
-})
-
-// Settings: Bulk Invoice Generation
-const settingsBulkInvoicesRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/bulk-invoices',
-  component: BulkInvoicesPage,
-  errorComponent: PortalPageError,
-})
+// Finance operational pages moved to Finance MFE (/finance/billing/*)
+// Fee Structures and Payment Gateways remain here as configuration pages
 
 // [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
 // const settingsBillingRoute = createRoute({
@@ -621,17 +560,15 @@ const academicsRoute = createRoute({
 
 
 
-// [MVP-PARKED] Finance route definition
-// const financeRoute = createRoute({
-//   getParentRoute: () => protectedRoute,
-//   path: '/finance/$',
-//   component: () => (
-//     <Suspense fallback={<LoadingScreen />}>
-//       <FinanceModule />
-//     </Suspense>
-//   ),
-// })
-// [/MVP-PARKED]
+const financeRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/finance/$',
+  component: () => (
+    <Suspense fallback={<LoadingScreen />}>
+      <FinanceModule />
+    </Suspense>
+  ),
+})
 
 
 
@@ -900,12 +837,6 @@ function PaymentReceiptRouteComponent() {
   return <ReceiptPage paymentId={params.paymentId ?? ''} />
 }
 
-const financeComingSoonRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/finance/$',
-  component: () => <ComingSoon moduleName="Finance" />,
-})
-
 // [/MVP-PARKED]
 
 // ============================================================================
@@ -942,20 +873,13 @@ const routeTree = rootRoute.addChildren([
       settingsSecurityPoliciesRoute,
       settingsFeeStructuresRoute,
       settingsPaymentGatewaysRoute,
-      settingsInvoicesRoute,
-      settingsInvoiceDetailRoute,
-      settingsPaymentsRoute,
-      settingsRecordPaymentRoute,
-      settingsStudentAccountsRoute,
-      settingsFinancialDashboardRoute,
-      settingsBulkInvoicesRoute,
       // [MVP-PARKED] settingsBillingRoute,
       // [MVP-PARKED] settingsIntegrationsRoute,
       // [MVP-PARKED] settingsImportExportRoute,
       // [MVP-PARKED] settingsDangerZoneRoute,
     ]),
     academicsRoute,
-    // [MVP-PARKED] financeRoute,
+    financeRoute,
     peopleRoute,
     // [MVP-PARKED] Original module routes removed from tree
     // messagesRoute,
@@ -967,7 +891,7 @@ const routeTree = rootRoute.addChildren([
     analyticsComingSoonRoute,
     edfiComingSoonRoute,
     specialProgramsComingSoonRoute,
-    financeComingSoonRoute,
+    // financeComingSoonRoute removed — finance is now live
     // [/MVP-PARKED]
     // Payment routes
     paymentCallbackRoute,

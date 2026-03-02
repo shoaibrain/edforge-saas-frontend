@@ -2,12 +2,11 @@
  * Admin Student Accounts Page
  *
  * View student billing accounts with balances and payment history.
- * Route: /settings/student-accounts
+ * Route: /finance/billing/accounts
  */
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Button } from '@edforge/ui'
 import {
   Loader2,
   Users,
@@ -15,11 +14,11 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react'
-import { useAppStore } from '../../stores/app.store'
+import { useAppStore } from '../../../stores/app.store'
 import {
   useStudentAccounts,
   useStudentLedger,
-} from '../../hooks/usePayments'
+} from '@edforge/finance-services'
 import type { StudentAccount, StudentLedgerEntry } from '@edforge/types'
 
 function formatNPR(amount: number): string {
