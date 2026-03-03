@@ -35,6 +35,7 @@ import {
   useBulkGenerateInvoices,
   useFeeStructures,
 } from '@edforge/finance-services'
+import { formatDate } from '../../utils/format-date'
 
 // ============================================================================
 // TYPES
@@ -269,17 +270,47 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
         </p>
 
         {result.errors && result.errors.length > 0 && (
-          <div className="max-w-md mx-auto mt-4 text-left">
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 mb-2">
-              <AlertTriangle className="w-3.5 h-3.5 inline mr-1" />
-              Some invoices could not be generated:
-            </p>
-            <div className="max-h-32 overflow-y-auto space-y-1">
-              {result.errors.map((err, i) => (
-                <p key={i} className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Account {err.studentId.slice(0, 8)}...: {err.reason}
-                </p>
-              ))}
+          <div className="max-w-lg mx-auto mt-4 text-left">
+            <div className="flex items-center gap-1.5 mb-3">
+              <div className="p-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                {result.errors.length} invoice{result.errors.length > 1 ? 's' : ''} could not be generated
+              </p>
+            </div>
+            <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
+                    <th className="text-left px-3 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+                      Student
+                    </th>
+                    <th className="text-left px-3 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+                      Error Reason
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+              <div className="max-h-48 overflow-y-auto">
+                <table className="w-full">
+                  <tbody className="divide-y divide-[rgb(var(--border-primary))]">
+                    {result.errors.map((err, i) => {
+                      const account = accounts.find((a) => a.id === err.studentId || a.studentId === err.studentId)
+                      return (
+                        <tr key={i} className="hover:bg-[rgb(var(--surface-secondary))]">
+                          <td className="px-3 py-2 text-sm text-[rgb(var(--text-primary))]">
+                            {account?.studentName || `Account ${err.studentId.slice(0, 8)}...`}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-red-600 dark:text-red-400">
+                            {err.reason}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -595,7 +626,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     <div className="flex justify-between">
                       <span className="text-[rgb(var(--text-tertiary))]">Due Date</span>
                       <span className="text-[rgb(var(--text-primary))]">
-                        {new Date(dueDate).toLocaleDateString()}
+                        {formatDate(dueDate)}
                       </span>
                     </div>
                   </div>

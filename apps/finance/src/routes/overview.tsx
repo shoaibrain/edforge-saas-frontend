@@ -1,63 +1,90 @@
 /**
  * Finance Overview Page
- * 
+ *
  * Main landing page for the Finance module.
  * Uses ModuleOverviewPage for consistent, customizable layout.
+ * Fetches real dashboard metrics from the Finance API.
  */
 
 import {
     DollarSign,
     CreditCard,
-    Receipt,
-    Landmark,
     TrendingUp,
-    Layers,
+    AlertTriangle,
+    Users,
     BarChart3,
+    Layers,
+    Loader2,
 } from 'lucide-react'
 import { ModuleOverviewPage, type ModuleStat, type ModuleActionCard } from '../components/ModuleOverviewPage'
+import { useAppStore } from '../stores/app.store'
+import { useDashboardSummary } from '@edforge/finance-services'
+import { formatNPRShort } from '@edforge/types'
 
 export function Overview() {
-    // Stats for the finance module
-    const stats: ModuleStat[] = [
-        {
-            label: 'Revenue (MTD)',
-            value: '$125,890',
-            change: '+12.3%',
-            changeType: 'positive',
-            icon: DollarSign,
-            iconBg: 'bg-amber-500/15 dark:bg-amber-500/20',
-            iconColor: 'text-amber-600 dark:text-amber-400',
-        },
-        {
-            label: 'Outstanding',
-            value: '$23,456',
-            change: '-5.2%',
-            changeType: 'negative',
-            icon: CreditCard,
-            iconBg: 'bg-rose-400/20',
-            iconColor: 'text-rose-600 dark:text-rose-400',
-        },
-        {
-            label: 'Collected',
-            value: '$89,234',
-            change: '+2.1%',
-            changeType: 'positive',
-            icon: TrendingUp,
-            iconBg: 'bg-blue-400/20',
-            iconColor: 'text-blue-600 dark:text-blue-400',
-        },
-        {
-            label: 'Expenses (MTD)',
-            value: '$34,567',
-            change: '+8.7%',
-            changeType: 'positive',
-            icon: Receipt,
-            iconBg: 'bg-purple-400/20',
-            iconColor: 'text-purple-600 dark:text-purple-400',
-        },
-    ]
+    const schoolId = useAppStore((s) => s.activeSchoolId)
+    const { data: summary, isLoading } = useDashboardSummary(schoolId ?? '')
 
-    // Action cards linking to sub-routes
+    if (!schoolId) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                    <DollarSign className="w-12 h-12 mx-auto text-[rgb(var(--text-tertiary))] mb-4" />
+                    <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-1">Select a School</h2>
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                        Choose a school from the top navigation to view financial data.
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+            </div>
+        )
+    }
+
+    const stats: ModuleStat[] = summary
+        ? [
+              {
+                  label: 'Total Collected',
+                  value: formatNPRShort(summary.totalCollected),
+                  change: `${summary.collectionRate}% collected`,
+                  changeType: summary.collectionRate >= 50 ? 'positive' : 'negative',
+                  icon: DollarSign,
+                  iconBg: 'bg-amber-500/15 dark:bg-amber-500/20',
+                  iconColor: 'text-amber-600 dark:text-amber-400',
+              },
+              {
+                  label: 'Outstanding',
+                  value: formatNPRShort(summary.outstanding),
+                  changeType: 'neutral',
+                  icon: CreditCard,
+                  iconBg: 'bg-rose-400/20',
+                  iconColor: 'text-rose-600 dark:text-rose-400',
+              },
+              {
+                  label: 'Total Invoiced',
+                  value: formatNPRShort(summary.totalInvoiced),
+                  changeType: 'neutral',
+                  icon: TrendingUp,
+                  iconBg: 'bg-blue-400/20',
+                  iconColor: 'text-blue-600 dark:text-blue-400',
+              },
+              {
+                  label: 'Overdue',
+                  value: formatNPRShort(summary.overdue),
+                  changeType: summary.overdue > 0 ? 'negative' : 'positive',
+                  icon: AlertTriangle,
+                  iconBg: 'bg-red-400/20',
+                  iconColor: 'text-red-600 dark:text-red-400',
+              },
+          ]
+        : []
+
     const actionCards: ModuleActionCard[] = [
         {
             id: 'billing',
@@ -69,18 +96,18 @@ export function Overview() {
             iconColor: 'text-emerald-600 dark:text-emerald-400',
         },
         {
-            id: 'general-ledger',
-            title: 'General Ledger',
-            description: 'View and manage financial accounts',
-            icon: Landmark,
-            href: '/finance/ledger',
+            id: 'student-accounts',
+            title: 'Student Accounts',
+            description: 'View student billing accounts and ledger',
+            icon: Users,
+            href: '/finance/billing/accounts',
             iconBg: 'bg-amber-500/15 group-hover:bg-amber-500/25',
             iconColor: 'text-amber-600 dark:text-amber-400',
         },
         {
-            id: 'dashboard',
-            title: 'Financial Dashboard',
-            description: 'Overview of school finances and metrics',
+            id: 'reports',
+            title: 'Financial Reports',
+            description: 'View financial metrics and breakdowns',
             icon: BarChart3,
             href: '/finance/dashboard',
             iconBg: 'bg-cyan-400/20 group-hover:bg-cyan-400/30',
@@ -91,7 +118,7 @@ export function Overview() {
             title: 'Fee Structures',
             description: 'Configure pricing and fee schedules',
             icon: Layers,
-            href: '/settings/fee-structures',
+            href: '/finance/configuration/fee-structures',
             iconBg: 'bg-blue-400/20 group-hover:bg-blue-400/30',
             iconColor: 'text-blue-600 dark:text-blue-400',
         },

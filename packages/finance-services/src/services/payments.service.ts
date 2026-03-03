@@ -139,11 +139,30 @@ export async function getDashboardSummary(
 // ============================================================================
 
 export async function exportInvoicesCsv(schoolId: string): Promise<Blob> {
-  const response = await api.get(`/finance/schools/${schoolId}/invoices/export`, {
-    params: { format: 'csv' },
-    responseType: 'blob',
-  })
-  return response.data
+  try {
+    const response = await api.get(`/finance/schools/${schoolId}/invoices/export`, {
+      params: { format: 'csv' },
+      responseType: 'blob',
+    })
+    if (!response.data || !(response.data instanceof Blob)) {
+      throw new Error('Server returned an invalid response for CSV export')
+    }
+    return response.data
+  } catch (error: any) {
+    // If the error response is a blob (e.g. JSON error wrapped in blob), parse it
+    if (error?.response?.data instanceof Blob) {
+      const text = await error.response.data.text()
+      try {
+        const parsed = JSON.parse(text)
+        throw new Error(parsed.message || 'Failed to export invoices')
+      } catch {
+        throw new Error(text || 'Failed to export invoices')
+      }
+    }
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to export invoices CSV')
+  }
 }
 
 // ============================================================================

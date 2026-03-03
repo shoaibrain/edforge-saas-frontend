@@ -5,9 +5,11 @@
  * Route: /finance/billing/invoices/:invoiceId
  */
 
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
-import { ArrowLeft, Check, X, Loader2 } from 'lucide-react'
+import { ArrowLeft, Check, X, Loader2, Printer, AlertTriangle } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -16,10 +18,8 @@ import {
   useCancelInvoice,
   useInvoicePayments,
 } from '@edforge/finance-services'
-
-function formatNPR(amount: number): string {
-  return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
+import { formatNPR } from '@edforge/types'
+import { formatDate, formatDateTime } from '../../../utils/format-date'
 
 function statusBadge(status: string) {
   const map: Record<string, string> = {
@@ -47,6 +47,8 @@ export default function InvoiceDetailPage() {
   const issueMutation = useIssueInvoice(schoolId ?? '')
   const cancelMutation = useCancelInvoice(schoolId ?? '')
 
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
+
   const handleIssue = async () => {
     try {
       await issueMutation.mutateAsync(invoiceId)
@@ -56,11 +58,11 @@ export default function InvoiceDetailPage() {
     }
   }
 
-  const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this invoice? This cannot be undone.')) return
+  const handleConfirmCancel = async (reason: string) => {
     try {
-      await cancelMutation.mutateAsync({ invoiceId })
+      await cancelMutation.mutateAsync({ invoiceId, reason })
       toast.success('Invoice cancelled')
+      setShowCancelDialog(false)
     } catch {
       toast.error('Failed to cancel invoice')
     }
@@ -82,7 +84,7 @@ export default function InvoiceDetailPage() {
       {/* Back nav */}
       <button
         onClick={() => navigate({ to: '/finance/billing/invoices' as string })}
-        className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+        className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors print:hidden"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Invoices
@@ -99,12 +101,16 @@ export default function InvoiceDetailPage() {
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
             {invoice.studentName && `Student: ${invoice.studentName}`}
-            {invoice.dueDate && ` · Due: ${new Date(invoice.dueDate).toLocaleDateString()}`}
+            {invoice.dueDate && ` · Due: ${formatDate(invoice.dueDate)}`}
           </p>
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 print:hidden">
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer className="w-4 h-4 mr-1.5" />
+            Print
+          </Button>
           {invoice.status === 'draft' && (
             <>
               <Button onClick={handleIssue} disabled={issueMutation.isPending}>
@@ -115,14 +121,14 @@ export default function InvoiceDetailPage() {
                 )}
                 Issue Invoice
               </Button>
-              <Button variant="outline" onClick={handleCancel} disabled={cancelMutation.isPending}>
+              <Button variant="outline" onClick={() => setShowCancelDialog(true)} disabled={cancelMutation.isPending}>
                 <X className="w-4 h-4 mr-1.5" />
                 Cancel
               </Button>
             </>
           )}
           {(invoice.status === 'issued' || invoice.status === 'overdue') && (
-            <Button variant="outline" onClick={handleCancel} disabled={cancelMutation.isPending}>
+            <Button variant="outline" onClick={() => setShowCancelDialog(true)} disabled={cancelMutation.isPending}>
               <X className="w-4 h-4 mr-1.5" />
               Cancel Invoice
             </Button>
@@ -213,7 +219,7 @@ export default function InvoiceDetailPage() {
                     {payment.gateway || payment.paymentMethod || 'Payment'}
                   </p>
                   <p className="text-xs text-[rgb(var(--text-secondary))]">
-                    {payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : ''}
+                    {payment.createdAt ? formatDate(payment.createdAt) : ''}
                   </p>
                 </div>
                 <span className="text-sm font-medium text-green-600 dark:text-green-400">
@@ -227,10 +233,175 @@ export default function InvoiceDetailPage() {
 
       {/* Metadata */}
       <div className="text-xs text-[rgb(var(--text-tertiary))] space-y-0.5">
-        {invoice.createdAt && <p>Created: {new Date(invoice.createdAt).toLocaleString()}</p>}
-        {invoice.issuedDate && <p>Issued: {new Date(invoice.issuedDate).toLocaleString()}</p>}
+        {invoice.createdAt && <p>Created: {formatDateTime(invoice.createdAt)}</p>}
+        {invoice.issuedDate && <p>Issued: {formatDateTime(invoice.issuedDate)}</p>}
         {invoice.notes && <p>Notes: {invoice.notes}</p>}
       </div>
+
+      {/* Cancel Invoice Dialog */}
+      <AnimatePresence>
+        {showCancelDialog && (
+          <CancelInvoiceDialog
+            invoiceNumber={invoice.invoiceNumber || `Invoice ${invoice.id.slice(0, 8)}`}
+            isPending={cancelMutation.isPending}
+            onConfirm={handleConfirmCancel}
+            onClose={() => setShowCancelDialog(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Print-friendly styles */}
+      <style>{`
+        @media print {
+          /* Hide shell chrome: sidebar, header, navigation */
+          nav, header, aside,
+          [data-sidebar], [data-topbar], [data-shell-header] {
+            display: none !important;
+          }
+
+          /* Hide interactive elements */
+          .print\\:hidden {
+            display: none !important;
+          }
+
+          /* Clean black-on-white layout */
+          body {
+            background: white !important;
+            color: black !important;
+            font-size: 12pt;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          /* Remove decorative styling */
+          * {
+            box-shadow: none !important;
+          }
+
+          /* Fill the page */
+          main, [data-content], .p-6 {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+          }
+
+          /* Table borders for line items */
+          table {
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid #d1d5db !important;
+            padding: 6px 10px !important;
+          }
+
+          /* Ensure all text is black */
+          h1, h2, h3, p, span, td, th {
+            color: black !important;
+          }
+
+          /* Light background for totals section */
+          .bg-\\[rgb\\(var\\(--surface-secondary\\)\\)\\] {
+            background: #f9fafb !important;
+          }
+
+          /* Status badge print readability */
+          .rounded-full {
+            border: 1px solid #9ca3af !important;
+          }
+
+          @page {
+            margin: 1.5cm;
+          }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ============================================================================
+// CANCEL INVOICE DIALOG
+// ============================================================================
+
+function CancelInvoiceDialog({
+  invoiceNumber,
+  isPending,
+  onConfirm,
+  onClose,
+}: {
+  invoiceNumber: string
+  isPending: boolean
+  onConfirm: (reason: string) => void
+  onClose: () => void
+}) {
+  const [reason, setReason] = useState('')
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isPending) onClose()
+    },
+    [isPending, onClose]
+  )
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 print:hidden">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+      >
+        <div className="flex items-start gap-3 mb-4">
+          <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
+            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+              Cancel Invoice {invoiceNumber}?
+            </h3>
+            <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
+              This action is <span className="font-semibold text-red-600 dark:text-red-400">irreversible</span>.
+              The invoice will be permanently cancelled and cannot be re-issued.
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+            Reason for cancellation *
+          </label>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Enter the reason for cancelling this invoice..."
+            rows={3}
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-red-500/30"
+            autoFocus
+          />
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose} disabled={isPending}>
+            Keep Invoice
+          </Button>
+          <Button
+            onClick={() => onConfirm(reason.trim())}
+            disabled={isPending || !reason.trim()}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+            ) : (
+              <X className="w-4 h-4 mr-1.5" />
+            )}
+            Cancel Invoice
+          </Button>
+        </div>
+      </motion.div>
     </div>
   )
 }

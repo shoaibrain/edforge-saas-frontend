@@ -202,7 +202,15 @@ export interface DashboardSummary {
   collectionRate: number // 0-100
   invoicesByStatus: Record<string, number>
   paymentsByGateway: Record<string, number>
-  recentPayments: Payment[]
+  recentPayments: Array<{
+    id: string
+    amount: number
+    gateway: string
+    status: string
+    receiptNumber?: string
+    paidAt?: string
+    createdAt: string
+  }>
 }
 
 // ============================================================================
@@ -301,4 +309,23 @@ export function formatNPR(
 
   const symbol = locale === 'ne' ? 'रू' : 'NPR'
   return showSymbol ? `${symbol} ${formatted}` : formatted
+}
+
+/**
+ * Abbreviated NPR format for dashboard KPI cards.
+ * Uses lakh/crore notation (Nepal convention).
+ *
+ * Examples:
+ *   formatNPRShort(12500)      → "NPR 12,500"
+ *   formatNPRShort(150000)     → "NPR 1.5 lakh"
+ *   formatNPRShort(10000000)   → "NPR 1.0 crore"
+ */
+export function formatNPRShort(amount: number): string {
+  if (amount >= 1_00_00_000) {
+    return `NPR ${(amount / 1_00_00_000).toFixed(1)} crore`
+  }
+  if (amount >= 1_00_000) {
+    return `NPR ${(amount / 1_00_000).toFixed(1)} lakh`
+  }
+  return formatNPR(amount, { decimals: 0 })
 }

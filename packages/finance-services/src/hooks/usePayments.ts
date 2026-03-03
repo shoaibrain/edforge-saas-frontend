@@ -348,15 +348,27 @@ export function useDashboardSummary(schoolId: string) {
 export function useExportInvoicesCsv() {
   return useMutation({
     mutationFn: (schoolId: string) => exportInvoicesCsv(schoolId),
-    onSuccess: (blob) => {
-      const url = URL.createObjectURL(blob)
+    onSuccess: (blob, schoolId) => {
+      const dateStr = new Date().toISOString().slice(0, 10)
+      const filename = `invoices-${schoolId}-${dateStr}.csv`
+      const csvBlob = new Blob([blob], { type: 'text/csv;charset=utf-8' })
+      const url = URL.createObjectURL(csvBlob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `invoices-export-${new Date().toISOString().slice(0, 10)}.csv`
+      a.download = filename
+      a.style.display = 'none'
       document.body.appendChild(a)
       a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      // Clean up after a short delay to ensure download starts
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 100)
+    },
+    onError: (error) => {
+      throw error instanceof Error
+        ? error
+        : new Error('Failed to export invoices CSV')
     },
   })
 }

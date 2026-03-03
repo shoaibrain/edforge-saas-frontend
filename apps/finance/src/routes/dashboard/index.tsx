@@ -19,21 +19,8 @@ import {
 import { toast } from 'sonner'
 import { useAppStore } from '../../stores/app.store'
 import { useDashboardSummary, useExportInvoicesCsv } from '@edforge/finance-services'
-import type { Payment } from '@edforge/types'
-
-function formatNPR(amount: number): string {
-  return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-function formatNPRShort(amount: number): string {
-  if (amount >= 10_00_000) {
-    return `NPR ${(amount / 10_00_000).toFixed(1)}M`
-  }
-  if (amount >= 1_00_000) {
-    return `NPR ${(amount / 1_00_000).toFixed(1)}L`
-  }
-  return formatNPR(amount)
-}
+import { formatNPR, formatNPRShort } from '@edforge/types'
+import { formatDate } from '../../utils/format-date'
 
 // ============================================================================
 // SUMMARY CARD
@@ -149,7 +136,7 @@ export default function FinancialDashboardPage() {
   const paymentGateways = summary.paymentsByGateway ?? {}
   const totalPaymentCount = Object.values(paymentGateways).reduce((a, b) => a + b, 0)
 
-  const recentPayments: Payment[] = summary.recentPayments ?? []
+  const recentPayments = summary.recentPayments ?? []
 
   const invoiceStatusColors: Record<string, string> = {
     draft: 'bg-gray-400',
@@ -328,9 +315,9 @@ export default function FinancialDashboardPage() {
                     </td>
                     <td className="px-4 py-2.5 text-sm text-[rgb(var(--text-secondary))]">
                       {payment.paidAt
-                        ? new Date(payment.paidAt).toLocaleDateString()
+                        ? formatDate(payment.paidAt)
                         : payment.createdAt
-                          ? new Date(payment.createdAt).toLocaleDateString()
+                          ? formatDate(payment.createdAt)
                           : '-'}
                     </td>
                   </tr>

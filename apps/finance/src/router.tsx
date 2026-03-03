@@ -13,7 +13,6 @@ import {
 } from '@tanstack/react-router'
 import { FinanceLayout } from './layouts/FinanceLayout'
 import { Overview } from './routes/overview'
-import { LedgerModule } from './routes/ledger'
 import { BillingModule } from './routes/billing'
 import InvoicesPage from './routes/billing/invoices/index'
 import InvoiceDetailPage from './routes/billing/invoices/$invoiceId'
@@ -104,13 +103,6 @@ const dashboardRoute = createRoute({
     component: FinancialDashboardPage,
 })
 
-// Ledger - Consolidated GL/AP/AR view
-const ledgerRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/ledger',
-    component: LedgerModule,
-})
-
 // Configuration > Fee Structures
 const feeStructuresRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -139,7 +131,6 @@ const routeTree = rootRoute.addChildren([
     recordPaymentRoute,
     accountsRoute,
     dashboardRoute,
-    ledgerRoute,
     feeStructuresRoute,
     paymentGatewaysRoute,
 ])

@@ -6,7 +6,7 @@
  * Route: /finance/billing/invoices
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
@@ -21,6 +21,7 @@ import {
   Users,
   Send,
   Clock,
+  AlertTriangle,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAppStore } from '../../../stores/app.store'
@@ -32,12 +33,10 @@ import {
   useBulkIssueInvoices,
   useFeeStructures,
 } from '@edforge/finance-services'
+import { formatNPR } from '@edforge/types'
+import { formatDate } from '../../../utils/format-date'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
-
-function formatNPR(amount: number): string {
-  return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
 
 function statusBadge(status: string) {
   const map: Record<string, string> = {
@@ -76,6 +75,9 @@ export default function InvoicesPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [showBulkIssueConfirm, setShowBulkIssueConfirm] = useState(false)
 
+  // Cancel dialog state
+  const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
+
   const { data: invoiceData, isLoading } = useInvoices(schoolId ?? '', {
     ...(statusFilter && { status: statusFilter as any }),
   })
@@ -109,11 +111,20 @@ export default function InvoicesPage() {
     }
   }
 
-  const handleCancel = async (invoiceId: string) => {
-    if (!confirm('Are you sure you want to cancel this invoice?')) return
+  const openCancelDialog = (invoiceId: string) => {
+    const inv = invoices.find((i) => i.id === invoiceId)
+    setCancelTarget({
+      id: invoiceId,
+      invoiceNumber: inv?.invoiceNumber || invoiceId.slice(0, 8),
+    })
+  }
+
+  const handleConfirmCancel = async (reason: string) => {
+    if (!cancelTarget) return
     try {
-      await cancelMutation.mutateAsync({ invoiceId })
+      await cancelMutation.mutateAsync({ invoiceId: cancelTarget.id, reason })
       toast.success('Invoice cancelled')
+      setCancelTarget(null)
     } catch {
       toast.error('Failed to cancel invoice')
     }
@@ -295,7 +306,7 @@ export default function InvoicesPage() {
                     <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
                       <div className="flex items-center gap-1.5">
                         <span>
-                          {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : '-'}
+                          {invoice.dueDate ? formatDate(invoice.dueDate) : '-'}
                         </span>
                         {invoice.status === 'overdue' && overdueDays > 0 && (
                           <span className="inline-flex items-center gap-0.5 text-xs text-red-600 dark:text-red-400">
@@ -328,7 +339,7 @@ export default function InvoicesPage() {
                               <Check className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleCancel(invoice.id)}
+                              onClick={() => openCancelDialog(invoice.id)}
                               disabled={cancelMutation.isPending}
                               className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
                               title="Cancel"
@@ -339,7 +350,7 @@ export default function InvoicesPage() {
                         )}
                         {(invoice.status === 'issued' || invoice.status === 'overdue') && (
                           <button
-                            onClick={() => handleCancel(invoice.id)}
+                            onClick={() => openCancelDialog(invoice.id)}
                             disabled={cancelMutation.isPending}
                             className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
                             title="Cancel"
@@ -376,6 +387,106 @@ export default function InvoicesPage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Cancel Invoice Dialog */}
+      <AnimatePresence>
+        {cancelTarget && (
+          <CancelInvoiceDialog
+            invoiceNumber={cancelTarget.invoiceNumber}
+            isPending={cancelMutation.isPending}
+            onConfirm={handleConfirmCancel}
+            onClose={() => setCancelTarget(null)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================================================
+// CANCEL INVOICE DIALOG
+// ============================================================================
+
+function CancelInvoiceDialog({
+  invoiceNumber,
+  isPending,
+  onConfirm,
+  onClose,
+}: {
+  invoiceNumber: string
+  isPending: boolean
+  onConfirm: (reason: string) => void
+  onClose: () => void
+}) {
+  const [reason, setReason] = useState('')
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isPending) onClose()
+    },
+    [isPending, onClose]
+  )
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+      >
+        <div className="flex items-start gap-3 mb-4">
+          <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
+            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+              Cancel Invoice {invoiceNumber}?
+            </h3>
+            <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
+              This action is <span className="font-semibold text-red-600 dark:text-red-400">irreversible</span>.
+              The invoice will be permanently cancelled and cannot be re-issued.
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+            Reason for cancellation *
+          </label>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Enter the reason for cancelling this invoice..."
+            rows={3}
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-red-500/30"
+            autoFocus
+          />
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose} disabled={isPending}>
+            Keep Invoice
+          </Button>
+          <Button
+            onClick={() => onConfirm(reason.trim())}
+            disabled={isPending || !reason.trim()}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+            ) : (
+              <X className="w-4 h-4 mr-1.5" />
+            )}
+            Cancel Invoice
+          </Button>
+        </div>
+      </motion.div>
     </div>
   )
 }

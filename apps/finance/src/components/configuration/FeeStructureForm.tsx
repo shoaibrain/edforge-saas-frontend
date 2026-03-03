@@ -2,14 +2,26 @@
  * FeeStructureForm
  *
  * Create/edit form for fee structures using react-hook-form + zod.
+ *
+ * Sprint 2 improvements:
+ *  - Fixed modal overlay (z-50, backdrop click, Escape key)
+ *  - Multi-select grade-level chips with "All Grades" toggle
+ *  - Bikram Sambat academic year default
+ *  - Inline validation errors, amount/tax bounds, date cross-validation
  */
 
-import { useForm } from 'react-hook-form'
+import { useEffect, useCallback } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { FeeStructure, FeeType, FeeFrequency, TaxType } from '@edforge/types'
 import { Button } from '@edforge/ui'
 import { X } from 'lucide-react'
+import { getCurrentBSYear } from '../../utils/bikram-sambat'
+
+/* ------------------------------------------------------------------ */
+/*  Constants                                                          */
+/* ------------------------------------------------------------------ */
 
 const FEE_TYPES: FeeType[] = [
   'tuition', 'admission', 'exam', 'transport', 'library',
@@ -40,25 +52,58 @@ const FREQUENCY_LABELS: Record<string, string> = {
 
 const TAX_TYPES: TaxType[] = ['none', 'PAN', 'VAT']
 
-const feeStructureSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
-  description: z.string().max(255).optional(),
-  feeType: z.enum(['tuition', 'admission', 'exam', 'transport', 'library', 'lab', 'hostel', 'uniform', 'miscellaneous', 'custom']),
-  amount: z.number().min(0, 'Amount must be positive').max(10_000_000),
-  frequency: z.enum(['one_time', 'monthly', 'quarterly', 'annual']),
-  taxRate: z.number().min(0).max(100).optional(),
-  taxType: z.enum(['none', 'PAN', 'VAT']).optional(),
-  gradeLevels: z.string().optional(),
-  effectiveFrom: z.string().min(1, 'Effective date is required'),
-  effectiveTo: z.string().optional(),
-  academicYear: z.string().min(1, 'Academic year is required'),
-})
+const GRADE_OPTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+
+/* ------------------------------------------------------------------ */
+/*  Zod schema                                                         */
+/* ------------------------------------------------------------------ */
+
+const feeStructureSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required').max(100, 'Name must be 100 characters or fewer'),
+    description: z.string().max(255, 'Description must be 255 characters or fewer').optional(),
+    feeType: z.enum([
+      'tuition', 'admission', 'exam', 'transport', 'library',
+      'lab', 'hostel', 'uniform', 'miscellaneous', 'custom',
+    ]),
+    amount: z
+      .number({ invalid_type_error: 'Amount is required' })
+      .min(0, 'Amount must be 0 or more')
+      .max(10_000_000, 'Amount cannot exceed 10,000,000'),
+    frequency: z.enum(['one_time', 'monthly', 'quarterly', 'annual']),
+    taxRate: z
+      .number()
+      .min(0, 'Tax rate must be 0 or more')
+      .max(100, 'Tax rate cannot exceed 100%')
+      .optional(),
+    taxType: z.enum(['none', 'PAN', 'VAT']).optional(),
+    gradeLevels: z.array(z.string()),
+    effectiveFrom: z.string().min(1, 'Effective date is required'),
+    effectiveTo: z.string().optional(),
+    academicYear: z.string().min(1, 'Academic year is required'),
+  })
+  .refine(
+    (data) => {
+      if (data.effectiveTo && data.effectiveFrom) {
+        return data.effectiveTo > data.effectiveFrom
+      }
+      return true
+    },
+    {
+      message: 'Effective To must be after Effective From',
+      path: ['effectiveTo'],
+    },
+  )
 
 type FormData = z.infer<typeof feeStructureSchema>
 
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
+
 interface FeeStructureFormProps {
   feeStructure?: FeeStructure | null
-  academicYear: string
+  academicYear?: string
   onSubmit: (data: FormData) => void
   onClose: () => void
   isSubmitting?: boolean
@@ -71,12 +116,16 @@ export function FeeStructureForm({
   onClose,
   isSubmitting,
 }: FeeStructureFormProps) {
+  const resolvedAcademicYear = academicYear ?? getCurrentBSYear()
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
+    formState: { errors, isValid },
   } = useForm<FormData>({
     resolver: zodResolver(feeStructureSchema),
+    mode: 'onChange',
     defaultValues: feeStructure
       ? {
           name: feeStructure.name,
@@ -86,25 +135,50 @@ export function FeeStructureForm({
           frequency: feeStructure.frequency,
           taxRate: feeStructure.taxRate,
           taxType: feeStructure.taxType,
-          gradeLevels: feeStructure.gradeLevels.join(', '),
+          gradeLevels: feeStructure.gradeLevels ?? [],
           effectiveFrom: feeStructure.effectiveFrom.split('T')[0],
           effectiveTo: feeStructure.effectiveTo?.split('T')[0] ?? '',
           academicYear: feeStructure.academicYear,
         }
       : {
+          name: '',
+          description: '',
           feeType: 'tuition',
           frequency: 'annual',
           taxRate: 0,
           taxType: 'none',
           amount: 0,
+          gradeLevels: [],
           effectiveFrom: new Date().toISOString().split('T')[0],
-          academicYear,
+          effectiveTo: '',
+          academicYear: resolvedAcademicYear,
         },
   })
 
+  /* --- Escape key handler --- */
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    },
+    [onClose],
+  )
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  /* --- Backdrop click --- */
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose()
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={handleBackdropClick}
+    >
+      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -120,7 +194,7 @@ export function FeeStructureForm({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-4">
           {/* Name */}
           <Field label="Name" error={errors.name?.message}>
             <input
@@ -168,6 +242,7 @@ export function FeeStructureForm({
                 {...register('amount', { valueAsNumber: true })}
                 type="number"
                 min="0"
+                max="10000000"
                 step="0.01"
                 className="input-field"
                 placeholder="0.00"
@@ -193,14 +268,18 @@ export function FeeStructureForm({
             </Field>
           </div>
 
-          {/* Grade Levels */}
-          <Field label="Grade Levels" error={errors.gradeLevels?.message}>
-            <input
-              {...register('gradeLevels')}
-              className="input-field"
-              placeholder="e.g. 1, 2, 3 (leave empty for all grades)"
-            />
-          </Field>
+          {/* Grade Levels — chip multi-select */}
+          <Controller
+            name="gradeLevels"
+            control={control}
+            render={({ field }) => (
+              <GradeLevelChips
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.gradeLevels?.message}
+              />
+            )}
+          />
 
           {/* Effective dates */}
           <div className="grid grid-cols-2 gap-4">
@@ -221,7 +300,10 @@ export function FeeStructureForm({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            disabled={isSubmitting || !isValid}
+          >
             {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         </div>
@@ -247,6 +329,84 @@ export function FeeStructureForm({
     </div>
   )
 }
+
+/* ------------------------------------------------------------------ */
+/*  GradeLevelChips                                                    */
+/* ------------------------------------------------------------------ */
+
+function GradeLevelChips({
+  value,
+  onChange,
+  error,
+}: {
+  value: string[]
+  onChange: (val: string[]) => void
+  error?: string
+}) {
+  const allSelected = value.length === 0
+
+  const toggleGrade = (grade: string) => {
+    if (value.includes(grade)) {
+      onChange(value.filter((g) => g !== grade))
+    } else {
+      onChange([...value, grade])
+    }
+  }
+
+  const toggleAll = () => {
+    // If already "All Grades" (empty array), do nothing special — clicking again stays empty.
+    // If specific grades are selected, clear to empty (= all).
+    onChange([])
+  }
+
+  return (
+    <Field label="Grade Levels" error={error}>
+      <div className="flex flex-wrap gap-2">
+        {/* All Grades toggle */}
+        <button
+          type="button"
+          onClick={toggleAll}
+          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+            allSelected
+              ? 'bg-teal-600 text-white border-teal-600'
+              : 'bg-transparent text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))] hover:border-teal-400'
+          }`}
+        >
+          All Grades
+        </button>
+
+        {GRADE_OPTIONS.map((grade) => {
+          const isSelected = !allSelected && value.includes(grade)
+          return (
+            <button
+              key={grade}
+              type="button"
+              onClick={() => {
+                if (allSelected) {
+                  // Switching from "All" to specific: select all EXCEPT this one
+                  onChange(GRADE_OPTIONS.filter((g) => g !== grade))
+                } else {
+                  toggleGrade(grade)
+                }
+              }}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                isSelected
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-transparent text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))] hover:border-blue-400'
+              }`}
+            >
+              {grade}
+            </button>
+          )
+        })}
+      </div>
+    </Field>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Field helper                                                       */
+/* ------------------------------------------------------------------ */
 
 function Field({
   label,

@@ -5,8 +5,8 @@
  * Route: /finance/billing/payments
  */
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
 import {
@@ -17,6 +17,7 @@ import {
   Ban,
   RotateCcw,
   X,
+  AlertTriangle,
 } from 'lucide-react'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -24,11 +25,369 @@ import {
   useVoidPayment,
   useCreateRefund,
 } from '@edforge/finance-services'
+import { formatNPR } from '@edforge/types'
 import type { Payment } from '@edforge/types'
+import { formatDate } from '../../../utils/format-date'
 
-function formatNPR(amount: number): string {
-  return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+// ============================================================================
+// STYLED DIALOG COMPONENTS
+// ============================================================================
+
+/**
+ * VoidPaymentDialog
+ *
+ * Confirms void action with payment details and required reason.
+ * Closes on Escape key or backdrop click.
+ */
+function VoidPaymentDialog({
+  payment,
+  isPending,
+  onConfirm,
+  onCancel,
+}: {
+  payment: Payment
+  isPending: boolean
+  onConfirm: (reason: string) => void
+  onCancel: () => void
+}) {
+  const [reason, setReason] = useState('')
+  const backdropRef = useRef<HTMLDivElement>(null)
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isPending) onCancel()
+    },
+    [onCancel, isPending],
+  )
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === backdropRef.current && !isPending) onCancel()
+  }
+
+  return (
+    <div
+      ref={backdropRef}
+      onClick={handleBackdropClick}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+              Void Payment
+            </h3>
+          </div>
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className="p-1 rounded-md hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Payment details */}
+        <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
+          <div className="flex justify-between text-sm">
+            <span className="text-[rgb(var(--text-secondary))]">Amount</span>
+            <span className="font-medium text-[rgb(var(--text-primary))]">
+              {formatNPR(payment.amount)}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-[rgb(var(--text-secondary))]">Gateway</span>
+            <span className="font-medium text-[rgb(var(--text-primary))] capitalize">
+              {payment.gateway.replace('_', ' ')}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-[rgb(var(--text-secondary))]">Date</span>
+            <span className="font-medium text-[rgb(var(--text-primary))]">
+              {payment.paidAt
+                ? formatDate(payment.paidAt)
+                : payment.createdAt
+                  ? formatDate(payment.createdAt)
+                  : '-'}
+            </span>
+          </div>
+          {payment.receiptNumber && (
+            <div className="flex justify-between text-sm">
+              <span className="text-[rgb(var(--text-secondary))]">Receipt #</span>
+              <span className="font-medium text-[rgb(var(--text-primary))]">
+                {payment.receiptNumber}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
+          This will reverse the ledger entry and restore the amount due on the invoice.
+          This action cannot be undone.
+        </p>
+
+        {/* Reason input */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+            Reason for voiding *
+          </label>
+          <input
+            type="text"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="e.g. Duplicate payment, data entry error"
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-red-500/30"
+            autoFocus
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={isPending}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <button
+            type="button"
+            onClick={() => onConfirm(reason.trim())}
+            disabled={isPending || !reason.trim()}
+            className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
+            ) : (
+              <Ban className="w-4 h-4 inline mr-1.5" />
+            )}
+            Void Payment
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
 }
+
+/**
+ * RefundPaymentDialog
+ *
+ * Supports full or partial refund with client-side amount validation
+ * and inline error display. Closes on Escape key or backdrop click.
+ */
+function RefundPaymentDialog({
+  payment,
+  isPending,
+  onConfirm,
+  onCancel,
+}: {
+  payment: Payment
+  isPending: boolean
+  onConfirm: (amount: number, reason: string) => void
+  onCancel: () => void
+}) {
+  const [amount, setAmount] = useState(String(payment.amount))
+  const [reason, setReason] = useState('')
+  const [amountError, setAmountError] = useState('')
+  const backdropRef = useRef<HTMLDivElement>(null)
+
+  // Compute the maximum refundable amount (original minus already refunded)
+  const totalRefunded = (payment.refunds ?? [])
+    .filter((r) => r.status === 'completed')
+    .reduce((sum, r) => sum + r.amount, 0)
+  const maxRefundable = payment.amount - totalRefunded
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isPending) onCancel()
+    },
+    [onCancel, isPending],
+  )
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === backdropRef.current && !isPending) onCancel()
+  }
+
+  // Validate amount on change
+  const handleAmountChange = (value: string) => {
+    setAmount(value)
+    const parsed = parseFloat(value)
+    if (!value.trim() || isNaN(parsed)) {
+      setAmountError('')
+      return
+    }
+    if (parsed <= 0) {
+      setAmountError('Amount must be greater than 0')
+    } else if (parsed > maxRefundable) {
+      setAmountError(
+        `Exceeds refundable amount (${formatNPR(maxRefundable)})`,
+      )
+    } else {
+      setAmountError('')
+    }
+  }
+
+  const parsedAmount = parseFloat(amount) || 0
+  const isValid =
+    parsedAmount > 0 &&
+    parsedAmount <= maxRefundable &&
+    reason.trim().length > 0
+
+  return (
+    <div
+      ref={backdropRef}
+      onClick={handleBackdropClick}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+            Refund Payment
+          </h3>
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className="p-1 rounded-md hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Payment details */}
+        <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
+          <div className="flex justify-between text-sm">
+            <span className="text-[rgb(var(--text-secondary))]">Original amount</span>
+            <span className="font-medium text-[rgb(var(--text-primary))]">
+              {formatNPR(payment.amount)}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-[rgb(var(--text-secondary))]">Gateway</span>
+            <span className="font-medium text-[rgb(var(--text-primary))] capitalize">
+              {payment.gateway.replace('_', ' ')}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-[rgb(var(--text-secondary))]">Date</span>
+            <span className="font-medium text-[rgb(var(--text-primary))]">
+              {payment.paidAt
+                ? formatDate(payment.paidAt)
+                : payment.createdAt
+                  ? formatDate(payment.createdAt)
+                  : '-'}
+            </span>
+          </div>
+          {totalRefunded > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-[rgb(var(--text-secondary))]">Already refunded</span>
+              <span className="font-medium text-orange-600 dark:text-orange-400">
+                {formatNPR(totalRefunded)}
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between text-sm border-t border-[rgb(var(--border-primary))] pt-1.5 mt-1.5">
+            <span className="text-[rgb(var(--text-secondary))]">Max refundable</span>
+            <span className="font-semibold text-[rgb(var(--text-primary))]">
+              {formatNPR(maxRefundable)}
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Amount input */}
+          <div>
+            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+              Refund Amount (NPR) *
+            </label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => handleAmountChange(e.target.value)}
+              max={maxRefundable}
+              min="0"
+              step="0.01"
+              className={`w-full px-3 py-2 text-sm border rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 ${
+                amountError
+                  ? 'border-red-400 focus:ring-red-500/30'
+                  : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/30'
+              }`}
+              autoFocus
+            />
+            {amountError && (
+              <p className="mt-1 text-xs text-red-500">{amountError}</p>
+            )}
+          </div>
+
+          {/* Reason input */}
+          <div>
+            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+              Reason *
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={3}
+              placeholder="Reason for refund..."
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 mt-6">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={isPending}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <button
+            type="button"
+            onClick={() => onConfirm(parsedAmount, reason.trim())}
+            disabled={isPending || !isValid}
+            className="flex-1 py-2 rounded-xl bg-orange-600 text-white text-sm font-semibold hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
+            ) : null}
+            Refund{parsedAmount > 0 && parsedAmount < payment.amount ? ' (Partial)' : ''}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// ============================================================================
+// STATUS BADGE
+// ============================================================================
 
 function paymentStatusBadge(status: string) {
   const map: Record<string, string> = {
@@ -47,15 +406,20 @@ function paymentStatusBadge(status: string) {
   )
 }
 
+// ============================================================================
+// MAIN PAGE
+// ============================================================================
+
 export default function PaymentsPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [refundModal, setRefundModal] = useState<Payment | null>(null)
-  const [refundAmount, setRefundAmount] = useState('')
-  const [refundReason, setRefundReason] = useState('')
+
+  // Dialog state: which payment is being voided or refunded
+  const [voidTarget, setVoidTarget] = useState<Payment | null>(null)
+  const [refundTarget, setRefundTarget] = useState<Payment | null>(null)
 
   const { data: payments, isLoading } = useSchoolPayments(schoolId ?? '', {
     ...(statusFilter && { status: statusFilter }),
@@ -74,48 +438,42 @@ export default function PaymentsPage() {
       )
     : paymentList
 
-  const handleVoid = async (payment: Payment) => {
-    if (!confirm('Are you sure you want to void this payment? This will reverse the ledger entry.')) return
+  // Void handler: opens dialog instead of window.confirm()
+  const handleVoidClick = (payment: Payment) => {
+    setVoidTarget(payment)
+  }
+
+  const handleVoidConfirm = async (reason: string) => {
+    if (!voidTarget) return
     try {
       await voidMutation.mutateAsync({
-        paymentId: payment.id,
-        data: { reason: 'Voided by admin' },
+        paymentId: voidTarget.id,
+        data: { reason },
       })
       toast.success('Payment voided successfully')
+      setVoidTarget(null)
     } catch {
       toast.error('Failed to void payment')
     }
   }
 
-  const handleRefundSubmit = async () => {
-    if (!refundModal) return
-    const amt = parseFloat(refundAmount)
-    if (!amt || amt <= 0) {
-      toast.error('Please enter a valid refund amount')
-      return
-    }
-    if (!refundReason.trim()) {
-      toast.error('Please enter a reason for the refund')
-      return
-    }
+  // Refund handler: opens dialog
+  const handleRefundClick = (payment: Payment) => {
+    setRefundTarget(payment)
+  }
+
+  const handleRefundConfirm = async (amount: number, reason: string) => {
+    if (!refundTarget) return
     try {
       await refundMutation.mutateAsync({
-        paymentId: refundModal.id,
-        data: { amount: amt, reason: refundReason.trim() },
+        paymentId: refundTarget.id,
+        data: { amount, reason },
       })
       toast.success('Refund initiated successfully')
-      setRefundModal(null)
-      setRefundAmount('')
-      setRefundReason('')
+      setRefundTarget(null)
     } catch {
       toast.error('Failed to create refund')
     }
-  }
-
-  const openRefundModal = (payment: Payment) => {
-    setRefundModal(payment)
-    setRefundAmount(String(payment.amount))
-    setRefundReason('')
   }
 
   if (!schoolId) {
@@ -228,9 +586,9 @@ export default function PaymentsPage() {
                     </td>
                     <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
                       {payment.paidAt
-                        ? new Date(payment.paidAt).toLocaleDateString()
+                        ? formatDate(payment.paidAt)
                         : payment.createdAt
-                          ? new Date(payment.createdAt).toLocaleDateString()
+                          ? formatDate(payment.createdAt)
                           : '-'}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -250,7 +608,7 @@ export default function PaymentsPage() {
                         {/* Void (for completed only) */}
                         {payment.status === 'completed' && (
                           <button
-                            onClick={() => handleVoid(payment)}
+                            onClick={() => handleVoidClick(payment)}
                             disabled={voidMutation.isPending}
                             className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
                             title="Void Payment"
@@ -258,10 +616,10 @@ export default function PaymentsPage() {
                             <Ban className="w-4 h-4" />
                           </button>
                         )}
-                        {/* Refund (for completed only) */}
-                        {payment.status === 'completed' && (
+                        {/* Refund (for completed or partially_refunded) */}
+                        {(payment.status === 'completed' || payment.status === 'partially_refunded') && (
                           <button
-                            onClick={() => openRefundModal(payment)}
+                            onClick={() => handleRefundClick(payment)}
                             className="p-1.5 rounded-md hover:bg-orange-50 text-orange-500 dark:hover:bg-orange-900/20 dark:text-orange-400"
                             title="Refund"
                           >
@@ -278,81 +636,29 @@ export default function PaymentsPage() {
         </motion.div>
       )}
 
-      {/* Refund Modal */}
-      {refundModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-                Refund Payment
-              </h3>
-              <button
-                onClick={() => setRefundModal(null)}
-                className="p-1 rounded-md hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))]"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      {/* Void Payment Dialog */}
+      <AnimatePresence>
+        {voidTarget && (
+          <VoidPaymentDialog
+            payment={voidTarget}
+            isPending={voidMutation.isPending}
+            onConfirm={handleVoidConfirm}
+            onCancel={() => setVoidTarget(null)}
+          />
+        )}
+      </AnimatePresence>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-[rgb(var(--text-secondary))]">
-                  Original amount: <span className="font-medium text-[rgb(var(--text-primary))]">{formatNPR(refundModal.amount)}</span>
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                  Refund Amount (NPR) *
-                </label>
-                <input
-                  type="number"
-                  value={refundAmount}
-                  onChange={(e) => setRefundAmount(e.target.value)}
-                  max={refundModal.amount}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                  Reason *
-                </label>
-                <textarea
-                  value={refundReason}
-                  onChange={(e) => setRefundReason(e.target.value)}
-                  rows={3}
-                  placeholder="Reason for refund..."
-                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <Button variant="outline" onClick={() => setRefundModal(null)} className="flex-1">
-                Cancel
-              </Button>
-              <button
-                type="button"
-                onClick={handleRefundSubmit}
-                disabled={refundMutation.isPending}
-                className="flex-1 py-2 rounded-xl bg-orange-600 text-white text-sm font-semibold hover:bg-orange-700 transition-colors disabled:opacity-50"
-              >
-                {refundMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
-                ) : null}
-                Refund
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      {/* Refund Payment Dialog */}
+      <AnimatePresence>
+        {refundTarget && (
+          <RefundPaymentDialog
+            payment={refundTarget}
+            isPending={refundMutation.isPending}
+            onConfirm={handleRefundConfirm}
+            onCancel={() => setRefundTarget(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

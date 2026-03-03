@@ -21,20 +21,7 @@ import {
 } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useDashboardSummary } from '@edforge/finance-services'
-
-function formatNPR(amount: number): string {
-  return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-function formatNPRShort(amount: number): string {
-  if (amount >= 10_00_000) {
-    return `NPR ${(amount / 10_00_000).toFixed(1)}M`
-  }
-  if (amount >= 1_00_000) {
-    return `NPR ${(amount / 1_00_000).toFixed(1)}L`
-  }
-  return formatNPR(amount)
-}
+import { formatNPRShort } from '@edforge/types'
 
 export function BillingModule() {
   const navigate = useNavigate()

@@ -19,11 +19,9 @@ import {
   useStudentAccounts,
   useStudentLedger,
 } from '@edforge/finance-services'
+import { formatNPR } from '@edforge/types'
 import type { StudentAccount, StudentLedgerEntry } from '@edforge/types'
-
-function formatNPR(amount: number): string {
-  return `NPR ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
+import { formatDate } from '../../../utils/format-date'
 
 // ============================================================================
 // INLINE LEDGER DETAIL (expanded row)
@@ -72,7 +70,7 @@ function AccountLedgerDetail({
           {entries.map((entry) => (
             <tr key={entry.id}>
               <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))]">
-                {new Date(entry.date).toLocaleDateString()}
+                {formatDate(entry.date)}
               </td>
               <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))] capitalize">
                 {entry.entryType.replace('_', ' ')}
@@ -238,7 +236,7 @@ function AccountRow({
         </td>
         <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
           {account.lastPaymentDate
-            ? new Date(account.lastPaymentDate).toLocaleDateString()
+            ? formatDate(account.lastPaymentDate)
             : 'Never'}
         </td>
       </tr>

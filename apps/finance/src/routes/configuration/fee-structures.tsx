@@ -3,14 +3,16 @@
  *
  * Admin page for configuring fee types and amounts.
  * Route: /finance/configuration/fee-structures
+ *
+ * Sprint 2: styled delete dialog, Bikram Sambat year, gradeLevels as array.
  */
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { FeeStructure } from '@edforge/types'
 import { Button } from '@edforge/ui'
-import { Plus } from 'lucide-react'
+import { Plus, AlertTriangle } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import {
   useFeeStructures,
@@ -20,6 +22,7 @@ import {
 } from '@edforge/finance-services'
 import { FeeStructureList } from '../../components/configuration/FeeStructureList'
 import { FeeStructureForm } from '../../components/configuration/FeeStructureForm'
+import { getCurrentBSYear } from '../../utils/bikram-sambat'
 
 export default function FeeStructuresPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
@@ -44,9 +47,7 @@ export default function FeeStructuresPage() {
         taxRate: (data.taxRate as number) || 0,
         taxType: (data.taxType as FeeStructure['taxType']) || 'none',
         frequency: data.frequency as FeeStructure['frequency'],
-        gradeLevels: (data.gradeLevels as string)
-          ? (data.gradeLevels as string).split(',').map((g: string) => g.trim()).filter(Boolean)
-          : [],
+        gradeLevels: (data.gradeLevels as string[]) ?? [],
         effectiveFrom: data.effectiveFrom as string,
         effectiveTo: (data.effectiveTo as string) || undefined,
         academicYear: data.academicYear as string,
@@ -70,9 +71,7 @@ export default function FeeStructuresPage() {
           taxRate: (data.taxRate as number) || 0,
           taxType: (data.taxType as FeeStructure['taxType']) || 'none',
           frequency: data.frequency as FeeStructure['frequency'],
-          gradeLevels: (data.gradeLevels as string)
-            ? (data.gradeLevels as string).split(',').map((g: string) => g.trim()).filter(Boolean)
-            : [],
+          gradeLevels: (data.gradeLevels as string[]) ?? [],
           effectiveFrom: data.effectiveFrom as string,
           effectiveTo: (data.effectiveTo as string) || undefined,
         },
@@ -139,7 +138,7 @@ export default function FeeStructuresPage() {
       {/* Create form modal */}
       {showForm && (
         <FeeStructureForm
-          academicYear={new Date().getFullYear().toString()}
+          academicYear={getCurrentBSYear()}
           onSubmit={handleCreate}
           onClose={() => setShowForm(false)}
           isSubmitting={createMutation.isPending}
@@ -157,35 +156,92 @@ export default function FeeStructuresPage() {
         />
       )}
 
-      {/* Delete confirmation */}
+      {/* Styled delete confirmation dialog */}
       {deletingFee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl">
-            <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              Delete Fee Structure
-            </h3>
-            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-2">
-              Are you sure you want to delete this fee structure? This action cannot be undone.
-            </p>
-            <p className="text-sm font-medium text-[rgb(var(--text-primary))] mt-2">
-              {deletingFee.name}
-            </p>
-            <div className="flex gap-3 mt-6">
-              <Button variant="outline" onClick={() => setDeletingFee(null)} className="flex-1">
-                Cancel
-              </Button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleteMutation.isPending}
-                className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
-                {deleteMutation.isPending ? '...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteConfirmDialog
+          feeName={deletingFee.name}
+          isPending={deleteMutation.isPending}
+          onConfirm={handleDelete}
+          onCancel={() => setDeletingFee(null)}
+        />
       )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Delete Confirm Dialog                                              */
+/* ------------------------------------------------------------------ */
+
+function DeleteConfirmDialog({
+  feeName,
+  isPending,
+  onConfirm,
+  onCancel,
+}: {
+  feeName: string
+  isPending: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isPending) onCancel()
+    },
+    [onCancel, isPending],
+  )
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget && !isPending) onCancel()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={handleBackdropClick}
+    >
+      <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl">
+        {/* Warning icon */}
+        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50 dark:bg-red-500/10">
+          <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+        </div>
+
+        <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))] text-center">
+          Delete Fee Structure
+        </h3>
+
+        <p className="text-sm text-[rgb(var(--text-tertiary))] mt-2 text-center">
+          Are you sure you want to delete{' '}
+          <span className="font-medium text-[rgb(var(--text-primary))]">
+            {feeName}
+          </span>
+          ? This action is irreversible and cannot be undone.
+        </p>
+
+        <div className="flex gap-3 mt-6">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={isPending}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isPending}
+            className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? 'Deleting...' : 'Confirm Delete'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
