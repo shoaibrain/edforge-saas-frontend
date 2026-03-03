@@ -9,21 +9,24 @@ import { useState } from 'react'
 import { MoreHorizontal, Pencil, ToggleLeft, ToggleRight, Users } from 'lucide-react'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import { getCapacityColor, getCapacityPercent } from '../../schemas/section.form'
-import { getColorForCourse } from '../../lib/classroom-colors'
-import { getCoverForCourse } from '../../lib/classroom-covers'
+import { getColorForSubjectArea } from '../../lib/classroom-colors'
+import { getCoverForSubjectArea } from '../../lib/classroom-covers'
 import { getStaffAvatar } from '../../lib/avatar'
 
 interface ClassroomCardProps {
   section: SectionResponseDto
+  /** Fallback subjectArea from parent course (for sections not yet backfilled) */
+  subjectAreaOverride?: string
   onNavigate: (sectionId: string) => void
   onEdit?: (sectionId: string) => void
   onToggleActive?: (section: SectionResponseDto) => void
 }
 
-export function ClassroomCard({ section, onNavigate, onEdit, onToggleActive }: ClassroomCardProps) {
+export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit, onToggleActive }: ClassroomCardProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const color = getColorForCourse(section.courseId)
-  const cover = getCoverForCourse(section.courseId)
+  const subjectArea = section.subjectArea ?? subjectAreaOverride
+  const color = getColorForSubjectArea(subjectArea)
+  const cover = getCoverForSubjectArea(subjectArea)
   const percent = getCapacityPercent(section.currentEnrollment, section.maxEnrollment)
   const barColor = getCapacityColor(section.currentEnrollment, section.maxEnrollment)
 

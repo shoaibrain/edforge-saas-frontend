@@ -12,6 +12,8 @@ interface ClassroomCardGridProps {
   isLoading: boolean
   hasMore?: boolean
   isFetchingMore?: boolean
+  /** courseId → subjectArea lookup for sections missing subjectArea */
+  subjectAreaMap?: Map<string, string>
   onLoadMore?: () => void
   onNavigate: (sectionId: string) => void
   onEdit?: (sectionId: string) => void
@@ -23,6 +25,7 @@ export function ClassroomCardGrid({
   isLoading,
   hasMore,
   isFetchingMore,
+  subjectAreaMap,
   onLoadMore,
   onNavigate,
   onEdit,
@@ -57,6 +60,7 @@ export function ClassroomCardGrid({
           <ClassroomCard
             key={section.sectionId}
             section={section}
+            subjectAreaOverride={subjectAreaMap?.get(section.courseId)}
             onNavigate={onNavigate}
             onEdit={onEdit}
             onToggleActive={onToggleActive}

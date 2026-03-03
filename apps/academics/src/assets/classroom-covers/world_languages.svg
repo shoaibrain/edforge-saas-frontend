@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#581c87"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="url(#bg)"/>
+  <!-- Speech bubble 1 - "Hola" -->
+  <g transform="translate(420, 55)">
+    <path d="M-30,-20 L30,-20 C35,-20 35,-15 35,-10 L35,10 C35,15 30,15 25,15 L5,15 L-5,25 L-2,15 L-30,15 C-35,15 -35,10 -35,5 L-35,-10 C-35,-15 -30,-20 -25,-20Z" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.15" stroke-width="1"/>
+    <text x="0" y="3" text-anchor="middle" font-family="sans-serif" font-size="14" fill="white" fill-opacity="0.2">Hola</text>
+  </g>
+  <!-- Speech bubble 2 - "Bonjour" -->
+  <g transform="translate(560, 100)">
+    <path d="M-35,-20 L35,-20 C40,-20 40,-15 40,-10 L40,10 C40,15 35,15 30,15 L10,15 L0,25 L3,15 L-35,15 C-40,15 -40,10 -40,5 L-40,-10 C-40,-15 -35,-20 -30,-20Z" fill="white" fill-opacity="0.08" stroke="white" stroke-opacity="0.12" stroke-width="1"/>
+    <text x="0" y="3" text-anchor="middle" font-family="sans-serif" font-size="13" fill="white" fill-opacity="0.18">Bonjour</text>
+  </g>
+  <!-- Speech bubble 3 - "こんにちは" -->
+  <g transform="translate(680, 50)">
+    <path d="M-30,-18 L30,-18 C34,-18 34,-14 34,-10 L34,10 C34,14 30,14 26,14 L8,14 L0,22 L2,14 L-30,14 C-34,14 -34,10 -34,6 L-34,-10 C-34,-14 -30,-18 -26,-18Z" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-family="sans-serif" font-size="11" fill="white" fill-opacity="0.15">こんにちは</text>
+  </g>
+  <!-- Speech bubble 4 - "مرحبا" -->
+  <g transform="translate(470, 145)">
+    <path d="M-25,-16 L25,-16 C29,-16 29,-12 29,-8 L29,8 C29,12 25,12 21,12 L5,12 L-2,20 L0,12 L-25,12 C-29,12 -29,8 -29,4 L-29,-8 C-29,-12 -25,-16 -21,-16Z" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-family="sans-serif" font-size="12" fill="white" fill-opacity="0.15">مرحبا</text>
+  </g>
+  <!-- Globe -->
+  <g transform="translate(720, 140)" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="1.5">
+    <circle r="25"/>
+    <ellipse rx="25" ry="10"/>
+    <ellipse rx="10" ry="25"/>
+  </g>
+  <!-- Pencil -->
+  <g transform="translate(380, 120) rotate(-20)" fill="white" fill-opacity="0.08" stroke="none">
+    <rect x="-2" y="-30" width="4" height="50" rx="1"/>
+    <polygon points="-2,20 2,20 0,28"/>
+    <rect x="-3" y="-30" width="6" height="5" rx="1" fill-opacity="0.06"/>
+  </g>
+  <!-- Scattered accent dots -->
+  <circle cx="350" cy="50" r="3" fill="white" fill-opacity="0.05"/>
+  <circle cx="620" cy="170" r="2" fill="white" fill-opacity="0.04"/>
+  <circle cx="760" cy="90" r="2" fill="white" fill-opacity="0.04"/>
+</svg>

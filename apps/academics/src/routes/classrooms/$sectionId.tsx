@@ -32,9 +32,10 @@ import {
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
 import { useSection, useUpdateSection, useSectionRoster } from '../../hooks/useSections'
+import { useCourse } from '../../hooks/useCourses'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { getCapacityPercent } from '../../schemas/section.form'
-import { getCoverForCourse } from '../../lib/classroom-covers'
+import { getCoverForSubjectArea } from '../../lib/classroom-covers'
 import { SectionRoster } from '../../components/scheduling/SectionRoster'
 
 // --- Grades imports ---
@@ -358,6 +359,13 @@ export function ClassroomDetailPage() {
     enabled: isValidId && !!schoolId,
   })
 
+  // Course fetch for subjectArea fallback (sections created before backfill)
+  const { data: course } = useCourse({
+    courseId: section?.courseId || '',
+    schoolId,
+    enabled: !!section && !section.subjectArea && !!schoolId,
+  })
+
   const updateMutation = useUpdateSection()
 
   const handleToggleActive = async () => {
@@ -398,11 +406,11 @@ export function ClassroomDetailPage() {
   }
 
   const percent = getCapacityPercent(section.currentEnrollment, section.maxEnrollment)
-  const courseCover = getCoverForCourse(section.courseId)
+  const courseCover = getCoverForSubjectArea(section.subjectArea ?? course?.subjectArea)
 
   return (
     <div className="min-h-full">
-      {/* Cover Image Banner Header */}
+      {/* Cover Image Banner Header — full bleed (parent padding negated on wrapper) */}
       <div className="relative">
         {/* Cover image */}
         <img
@@ -414,17 +422,9 @@ export function ClassroomDetailPage() {
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Content (positioned above overlay) */}
-        <div className="relative px-6 py-6">
-          {/* Top bar: back + actions */}
-          <div className="flex items-center justify-between mb-4">
-            <button
-              type="button"
-              onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
-              className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-              aria-label="Back to classrooms"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+        <div className="relative px-8 pt-8 pb-6">
+          {/* Top bar: status + actions */}
+          <div className="flex items-center justify-end mb-6">
             <div className="flex items-center gap-2">
               <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
                 section.isActive
@@ -480,7 +480,7 @@ export function ClassroomDetailPage() {
 
       {/* Tab Navigation */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6">
+        <div className="px-8">
           <nav className="flex gap-1 overflow-x-auto" aria-label="Classroom tabs" role="tablist">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id
@@ -516,7 +516,7 @@ export function ClassroomDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="p-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="px-8 py-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

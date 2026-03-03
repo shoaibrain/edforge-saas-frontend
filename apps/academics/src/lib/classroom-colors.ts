@@ -1,9 +1,12 @@
 /**
  * Classroom Colors
  *
- * Deterministic color palette for classroom cards.
- * Maps courseId to a consistent color via simple hash.
+ * Subject-area-based color palette for classroom cards.
+ * Colors are coordinated with the subject-area banner images
+ * for visual harmony.
  */
+
+import type { CourseSubjectArea } from '@aibrains/shared-types'
 
 export const CLASSROOM_COLORS = [
   { gradient: 'from-blue-500 to-blue-600', accent: 'bg-blue-500', text: 'text-white', bg: 'bg-blue-500/10' },
@@ -18,6 +21,38 @@ export const CLASSROOM_COLORS = [
 
 export type ClassroomColor = (typeof CLASSROOM_COLORS)[number]
 
+/**
+ * Subject-area to color mapping.
+ * Each subject area gets a color that complements its banner image.
+ */
+const SUBJECT_AREA_COLORS: Record<CourseSubjectArea, ClassroomColor> = {
+  mathematics: CLASSROOM_COLORS[0],       // blue — matches blue-toned math banner
+  english_language_arts: CLASSROOM_COLORS[3], // amber — matches warm amber ELA banner
+  science: CLASSROOM_COLORS[1],           // emerald — matches green-teal science banner
+  social_studies: CLASSROOM_COLORS[7],    // teal — complements earth-toned social studies banner
+  world_languages: CLASSROOM_COLORS[2],   // purple — matches purple languages banner
+  arts: CLASSROOM_COLORS[4],              // rose — matches rose arts banner
+  physical_education: CLASSROOM_COLORS[3], // amber — complements orange PE banner
+  technology: CLASSROOM_COLORS[5],        // cyan — matches cyan tech banner
+  business: CLASSROOM_COLORS[6],          // indigo — matches indigo business banner
+  vocational: CLASSROOM_COLORS[3],        // amber — complements orange vocational banner
+  other: CLASSROOM_COLORS[7],             // teal — neutral for generic banner
+}
+
+/**
+ * Get the color for a subject area.
+ * Falls back to teal (neutral) if subjectArea is undefined or unrecognized.
+ */
+export function getColorForSubjectArea(subjectArea?: string): ClassroomColor {
+  if (subjectArea && subjectArea in SUBJECT_AREA_COLORS) {
+    return SUBJECT_AREA_COLORS[subjectArea as CourseSubjectArea]
+  }
+  return CLASSROOM_COLORS[7] // teal fallback
+}
+
+/**
+ * @deprecated Use getColorForSubjectArea() instead.
+ */
 export function getColorForCourse(courseId: string): ClassroomColor {
   let hash = 0
   for (let i = 0; i < courseId.length; i++) {

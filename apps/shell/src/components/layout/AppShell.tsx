@@ -57,7 +57,7 @@ export function AppShell({ children }: AppShellProps) {
         <main 
           id="main-content"
           tabIndex={-1}
-          className="flex-1 p-6 overflow-x-clip outline-none"
+          className="flex-1 overflow-x-clip outline-none"
           aria-label="Main content"
         >
           {children}

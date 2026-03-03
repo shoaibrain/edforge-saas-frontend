@@ -520,7 +520,7 @@ export function ModuleOverviewPage({
     const accentClasses = accentColorClasses[accentColor]
 
     return (
-        <div className="space-y-10 max-w-6xl mx-auto pb-12 relative">
+        <div className="p-6 space-y-10 max-w-6xl mx-auto pb-12 relative">
             {/* Three-dot menu in top right corner */}
             <motion.div
                 initial={{ opacity: 0 }}

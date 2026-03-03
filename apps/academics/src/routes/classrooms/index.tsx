@@ -49,6 +49,7 @@ import {
   useUpdateSection,
   useSectionRoster,
 } from '../../hooks/useSections'
+import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
 import { SectionTable } from '../../components/scheduling/SectionTable'
 import { SectionFilters } from '../../components/scheduling/SectionFilters'
 import type { SectionResponseDto } from '@aibrains/shared-types'
@@ -153,6 +154,13 @@ function OverviewTab() {
   const total = getSectionTotalFromPages(sectionsData)
   const updateMutation = useUpdateSection()
 
+  // Courses lookup for subjectArea fallback (sections created before backfill)
+  const { data: coursesData } = useCourses({ schoolId, filters: { isActive: true }, limit: 100, enabled: !!schoolId })
+  const subjectAreaMap = useMemo(() => {
+    const courses = flattenCoursePages(coursesData)
+    return new Map(courses.map((c) => [c.courseId, c.subjectArea]))
+  }, [coursesData])
+
   // Stats
   const stats = useMemo(() => {
     const totalSections = sections.length
@@ -221,6 +229,7 @@ function OverviewTab() {
           isLoading={isLoading}
           hasMore={hasNextPage}
           isFetchingMore={isFetchingNextPage}
+          subjectAreaMap={subjectAreaMap}
           onLoadMore={() => fetchNextPage()}
           onNavigate={(id) => navigate({ to: `/classrooms/${id}` })}
           onEdit={schedPerms.edit ? (id) => navigate({ to: `/classrooms/${id}/edit` }) : undefined}
