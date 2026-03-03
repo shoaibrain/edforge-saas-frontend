@@ -148,7 +148,7 @@ export function GradesModule() {
   const handleViewReportCard = useCallback(
     (studentId: string, studentName: string) => {
       navigate({
-        to: '/grades/report-card',
+        to: '/classrooms/report-card',
         search: { studentId, studentName },
       })
     },

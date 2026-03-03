@@ -558,7 +558,8 @@ export function OverviewTab({ student }: OverviewTabProps) {
             {tAcad('sections.attendanceTrend')}
           </h3>
           <Link
-            to="/attendance"
+            to="/classrooms"
+            search={{ tab: 'attendance' }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />

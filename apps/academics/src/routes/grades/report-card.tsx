@@ -117,7 +117,7 @@ export function ReportCardPage() {
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => navigate({ to: '/grades' })}
+              onClick={() => navigate({ to: '/classrooms', search: { tab: 'gradebook' } })}
               className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

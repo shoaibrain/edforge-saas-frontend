@@ -16,7 +16,6 @@ import {
   Download,
   Lock,
 } from 'lucide-react'
-import { toast } from 'sonner'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
   useEnrollmentStore,

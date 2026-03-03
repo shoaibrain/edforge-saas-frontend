@@ -223,7 +223,8 @@ export function AttendanceTrendWidget({
       {/* Footer link */}
       <div className="pt-3 mt-auto border-t border-border-secondary">
         <Link
-          to="/attendance"
+          to="/classrooms"
+          search={{ tab: 'attendance' }}
           className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:text-teal-700 dark:hover:text-cyan-300 transition-colors"
         >
           View Attendance

@@ -81,7 +81,7 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
     labelKey: 'quickAction.attendance',
     descriptionKey: 'quickAction.markDailyAttendance',
     icon: Calendar,
-    href: '/academics/attendance',
+    href: '/academics/classrooms?tab=attendance',
     color: {
       bg: 'bg-orange-50 dark:bg-orange-900/10',
       text: 'text-orange-600 dark:text-orange-400',
@@ -118,9 +118,9 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
 
 const TEACHER_QUICK_ACTIONS: QuickAction[] = [
   {
-    id: 'my-classes',
-    label: 'My Classes',
-    description: 'View your classes',
+    id: 'my-classrooms',
+    label: 'My Classrooms',
+    description: 'View your classrooms',
     labelKey: 'quickAction.myClasses',
     descriptionKey: 'quickAction.viewYourClasses',
     icon: BookOpen,
@@ -138,7 +138,7 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     labelKey: 'quickAction.attendance',
     descriptionKey: 'quickAction.markClassAttendance',
     icon: ClipboardCheck,
-    href: '/academics/attendance',
+    href: '/academics/classrooms?tab=attendance',
     color: {
       bg: 'bg-orange-50 dark:bg-orange-900/10',
       text: 'text-orange-600 dark:text-orange-400',

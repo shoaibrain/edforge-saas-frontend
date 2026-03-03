@@ -360,7 +360,7 @@ function useAttendanceAlertItems(
         title: `${criticalCount} student${criticalCount !== 1 ? 's' : ''} below 80% attendance`,
         description: 'Immediate intervention may be needed',
         count: criticalCount,
-        href: '/attendance',
+        href: '/classrooms?tab=attendance',
         severityIcon: AlertTriangle,
         typeIcon: ClipboardCheck,
       })
@@ -374,7 +374,7 @@ function useAttendanceAlertItems(
         title: `${warningCount} student${warningCount !== 1 ? 's' : ''} below 90% attendance`,
         description: 'Attendance rate below school threshold',
         count: warningCount,
-        href: '/attendance',
+        href: '/classrooms?tab=attendance',
         severityIcon: AlertCircle,
         typeIcon: ClipboardCheck,
       })
@@ -415,7 +415,7 @@ function useGradingDeadlineAlerts(
           severity: 'critical',
           title: `Grades overdue for ${period.name}`,
           description: `Due date was ${Math.abs(daysUntil)} day${Math.abs(daysUntil) !== 1 ? 's' : ''} ago`,
-          href: '/grades',
+          href: '/classrooms?tab=gradebook',
           severityIcon: AlertTriangle,
           typeIcon: GraduationCap,
         })
@@ -426,7 +426,7 @@ function useGradingDeadlineAlerts(
           severity: 'warning',
           title: `Grades due for ${period.name} in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`,
           description: `Due ${new Date(dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-          href: '/grades',
+          href: '/classrooms?tab=gradebook',
           severityIcon: AlertCircle,
           typeIcon: GraduationCap,
         })
@@ -437,7 +437,7 @@ function useGradingDeadlineAlerts(
           severity: 'info',
           title: `Grades due for ${period.name} in ${daysUntil} days`,
           description: `Due ${new Date(dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-          href: '/grades',
+          href: '/classrooms?tab=gradebook',
           severityIcon: Info,
           typeIcon: GraduationCap,
         })

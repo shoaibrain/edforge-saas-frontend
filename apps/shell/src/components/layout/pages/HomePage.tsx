@@ -91,7 +91,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     label: 'Take Attendance', 
     description: 'Mark class attendance',
     icon: Clock, 
-    href: '/academics/attendance' 
+    href: '/academics/classrooms?tab=attendance'
   },
   { 
     label: 'Create Invoice', 

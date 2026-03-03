@@ -86,7 +86,6 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/academics/students': { title: 'Students', icon: 'Users', module: 'academics' },
   '/academics/teachers': { title: 'Teachers', icon: 'UserCog', module: 'academics' },
   '/academics/classrooms': { title: 'Classrooms', icon: 'BookOpen', module: 'academics' },
-  '/academics/attendance': { title: 'Attendance', icon: 'ClipboardList', module: 'academics' },
   '/academics/gradebooks': { title: 'Gradebooks', icon: 'GraduationCap', module: 'academics' },
   '/finance': { title: 'Finance', icon: 'DollarSign', module: 'finance' },
   '/finance/billing': { title: 'Billing', icon: 'DollarSign', module: 'finance' },

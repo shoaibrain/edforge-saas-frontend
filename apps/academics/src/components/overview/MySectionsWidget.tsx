@@ -81,7 +81,8 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
           )}
         </div>
         <Link
-          to="/scheduling"
+          to="/classrooms"
+          search={{ tab: undefined }}
           className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 hover:underline"
         >
           View all
@@ -139,14 +140,16 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
                 {/* Quick actions */}
                 <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
                   <Link
-                    to="/attendance"
+                    to="/classrooms"
+                    search={{ tab: 'attendance' }}
                     className="p-1.5 rounded-md text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
                     title="Take Attendance"
                   >
                     <ClipboardCheck className="w-3.5 h-3.5" />
                   </Link>
                   <Link
-                    to="/grades"
+                    to="/classrooms"
+                    search={{ tab: 'gradebook' }}
                     className="p-1.5 rounded-md text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
                     title="Enter Grades"
                   >

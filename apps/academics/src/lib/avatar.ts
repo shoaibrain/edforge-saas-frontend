@@ -68,3 +68,18 @@ export function getStudentAvatar(
     ...options,
   })
 }
+
+/**
+ * Get avatar URL for a staff member / instructor.
+ * Uses 'lorelei' DiceBear style, seeded by staff name or ID.
+ */
+export function getStaffAvatar(
+  identifier: string,
+  options?: Partial<Omit<AvatarOptions, 'seed'>>
+): string {
+  return getAvatarUrl({
+    seed: identifier,
+    style: 'lorelei',
+    ...options,
+  })
+}

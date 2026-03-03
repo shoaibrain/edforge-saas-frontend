@@ -535,7 +535,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               Grading scales, category weights, and calculation rules are configured through Grading Policies in the Grades & Assessments module.
             </p>
             <a
-              href="/academics/grades"
+              href="/academics/classrooms?tab=gradebook"
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-500/10 hover:bg-teal-100 dark:hover:bg-teal-500/20 rounded-lg transition-colors"
             >
               <GraduationCap className="w-4 h-4" />

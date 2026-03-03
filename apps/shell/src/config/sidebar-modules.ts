@@ -28,7 +28,7 @@ import {
   UsersRound,
   CreditCard,
   Wallet,
-  Receipt,
+  // [MVP-PARKED] Receipt,
   // [MVP-PARKED] Zap,
   // [MVP-PARKED] Landmark,
   // [MVP-PARKED] Database,
@@ -520,29 +520,11 @@ const academicsModule: ModuleConfig = {
           requiresActiveSchool: true,
         },
         {
-          // Attendance: Elevated to top-level (high-frequency daily task)
-          id: 'attendance',
-          label: 'Attendance',
-          icon: ClipboardPlus,
-          href: '/academics/attendance',
-          permission: { action: 'view', resource: 'attendance' },
-          requiresActiveSchool: true,
-        },
-        {
-          // Grades & Assessments: Gradebook main view; Assessments/Exams as tabs
-          id: 'grades',
-          label: 'Grades & Assessments',
-          icon: GraduationCap,
-          href: '/academics/grades',
-          permission: { action: 'view', resource: 'grades' },
-          requiresActiveSchool: true,
-        },
-        {
-          // Scheduling: Combined Classrooms + Schedules + Timetables
-          id: 'scheduling',
-          label: 'Scheduling',
-          icon: Calendars,
-          href: '/academics/scheduling',
+          // Classrooms: Consolidated Scheduling + Grades + Attendance
+          id: 'classrooms',
+          label: 'Classrooms',
+          icon: School,
+          href: '/academics/classrooms',
           permission: { action: 'view', resource: 'classes' },
           requiresActiveSchool: true,
         },
