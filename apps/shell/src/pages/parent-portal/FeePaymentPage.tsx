@@ -19,7 +19,7 @@ import { CreditCard, Loader2, AlertTriangle, ShieldX, CheckCircle2 } from 'lucid
 import { useAppStore } from '../../stores/app.store'
 import { useParentPortal } from './ParentPortalLayout'
 import { useInvoices } from '../../hooks/usePayments'
-import { useEnabledGateways } from '../../hooks/usePaymentGateways'
+import { useEnabledGateways } from '@edforge/finance-services'
 import { InvoiceList } from '../../components/payments/InvoiceList'
 import { InvoiceDetail } from '../../components/payments/InvoiceDetail'
 import { PaymentForm } from '../../components/payments/PaymentForm'

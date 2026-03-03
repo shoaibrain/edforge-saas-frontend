@@ -54,8 +54,7 @@ import ParentSchedulePage from './pages/parent-portal/ParentSchedulePage'
 import FeePaymentPage from './pages/parent-portal/FeePaymentPage'
 import PaymentCallbackPage from './pages/payments/callback'
 import ReceiptPage from './pages/payments/receipt'
-import FeeStructuresPage from './pages/settings/fee-structures'
-import PaymentGatewaysPage from './pages/settings/payment-gateways'
+// Fee Structures and Payment Gateways moved to Finance MFE (/finance/configuration/*)
 import {
   AccountPage,
   SecurityPage,
@@ -499,24 +498,7 @@ const settingsOrgSchoolCreateRoute = createRoute({
   }),
 })
 
-// Settings: Fee Structures
-const settingsFeeStructuresRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/fee-structures',
-  component: FeeStructuresPage,
-  errorComponent: PortalPageError,
-})
-
-// Settings: Payment Gateways
-const settingsPaymentGatewaysRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/payment-gateways',
-  component: PaymentGatewaysPage,
-  errorComponent: PortalPageError,
-})
-
-// Finance operational pages moved to Finance MFE (/finance/billing/*)
-// Fee Structures and Payment Gateways remain here as configuration pages
+// Fee Structures and Payment Gateways moved to Finance MFE (/finance/configuration/*)
 
 // [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
 // const settingsBillingRoute = createRoute({
@@ -871,8 +853,7 @@ const routeTree = rootRoute.addChildren([
       // [MVP-PARKED] settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
-      settingsFeeStructuresRoute,
-      settingsPaymentGatewaysRoute,
+      // Fee Structures and Payment Gateways moved to Finance MFE
       // [MVP-PARKED] settingsBillingRoute,
       // [MVP-PARKED] settingsIntegrationsRoute,
       // [MVP-PARKED] settingsImportExportRoute,

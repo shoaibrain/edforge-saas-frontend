@@ -1,8 +1,8 @@
 /**
- * Payment Gateways Settings Page
+ * Payment Gateways Configuration Page
  *
  * Admin page for configuring payment gateways (eSewa, Khalti, etc).
- * Route: /settings/payment-gateways
+ * Route: /finance/configuration/payment-gateways
  *
  * Security: Credentials are stored server-side only.
  * The API returns masked values for credential fields.
@@ -11,11 +11,10 @@
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { PaymentGateway } from '@edforge/types'
-import { useTranslation } from '@edforge/i18n'
+import { Loader2 } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useGatewayConfigs, useSaveGatewayConfig } from '@edforge/finance-services'
-import { GatewayConfigCard } from '../../components/payments/GatewayConfigCard'
-import { Loader2 } from 'lucide-react'
+import { GatewayConfigCard } from '../../components/configuration/GatewayConfigCard'
 
 // Gateways to show in the admin UI (in display order)
 const GATEWAYS: PaymentGateway[] = [
@@ -27,7 +26,6 @@ const GATEWAYS: PaymentGateway[] = [
 ]
 
 export default function PaymentGatewaysPage() {
-  const { t } = useTranslation('payments')
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
   const { data: configs, isLoading } = useGatewayConfigs(schoolId ?? '')
@@ -46,9 +44,9 @@ export default function PaymentGatewaysPage() {
           credentials: data.credentials,
         },
       })
-      toast.success(t('gatewayConfig.saved'))
+      toast.success('Gateway configuration saved')
     } catch {
-      toast.error(t('error.failedToLoad'))
+      toast.error('Failed to save gateway configuration')
     }
   }
 
@@ -70,10 +68,10 @@ export default function PaymentGatewaysPage() {
       >
         <div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            {t('gatewayConfig.title')}
+            Payment Gateways
           </h1>
           <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-            {t('gatewayConfig.description')}
+            Configure which payment gateways are available for your school.
           </p>
         </div>
 

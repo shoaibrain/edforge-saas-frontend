@@ -441,20 +441,7 @@ const settingsModule: ModuleConfig = {
           href: '/settings/security-policies',
           permission: { action: 'manage', resource: 'settings' },
         },
-        {
-          id: 'fee-structures',
-          label: 'Fee Structures',
-          icon: CreditCard,
-          href: '/settings/fee-structures',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
-        {
-          id: 'payment-gateways',
-          label: 'Payment Gateways',
-          icon: Wallet,
-          href: '/settings/payment-gateways',
-          permission: { action: 'manage', resource: 'settings:tenant' },
-        },
+        // Fee Structures and Payment Gateways moved to Finance module (/finance/configuration/*)
         // [MVP-PARKED] Billing, Integrations, Import/Export — not needed for MVP pilot schools
         // {
         //   id: 'billing',
@@ -601,6 +588,14 @@ const financeModule: ModuleConfig = {
       items: [
         { id: 'ledger', label: 'Ledger', icon: Receipt, href: '/finance/ledger', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
         { id: 'dashboard', label: 'Dashboard', icon: Layers, href: '/finance/dashboard', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+      ],
+    },
+    {
+      id: 'configuration',
+      label: 'CONFIGURATION',
+      items: [
+        { id: 'fee-structures', label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures', permission: { action: 'manage', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'payment-gateways', label: 'Payment Gateways', icon: Wallet, href: '/finance/configuration/payment-gateways', permission: { action: 'manage', resource: 'billing' }, requiresActiveSchool: true },
       ],
     },
   ],

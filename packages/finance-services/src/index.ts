@@ -50,6 +50,13 @@ export {
   feeStructuresService,
 } from './services/fee-structures.service'
 
+export {
+  getEnabledGateways,
+  getGatewayConfigs,
+  saveGatewayConfig,
+  paymentGatewaysService,
+} from './services/payment-gateways.service'
+
 // Hooks
 export {
   feeStructureKeys,
@@ -81,3 +88,10 @@ export {
   useDashboardSummary,
   useExportInvoicesCsv,
 } from './hooks/usePayments'
+
+export {
+  gatewayKeys,
+  useEnabledGateways,
+  useGatewayConfigs,
+  useSaveGatewayConfig,
+} from './hooks/usePaymentGateways'

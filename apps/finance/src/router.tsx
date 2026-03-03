@@ -22,6 +22,8 @@ import PaymentsPage from './routes/billing/payments/index'
 import RecordPaymentPage from './routes/billing/payments/record'
 import StudentAccountsPage from './routes/billing/accounts/index'
 import FinancialDashboardPage from './routes/dashboard/index'
+import FeeStructuresPage from './routes/configuration/fee-structures'
+import PaymentGatewaysPage from './routes/configuration/payment-gateways'
 
 // ============================================================================
 // ROOT ROUTE
@@ -109,6 +111,20 @@ const ledgerRoute = createRoute({
     component: LedgerModule,
 })
 
+// Configuration > Fee Structures
+const feeStructuresRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/configuration/fee-structures',
+    component: FeeStructuresPage,
+})
+
+// Configuration > Payment Gateways
+const paymentGatewaysRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/configuration/payment-gateways',
+    component: PaymentGatewaysPage,
+})
+
 // ============================================================================
 // ROUTE TREE
 // ============================================================================
@@ -124,6 +140,8 @@ const routeTree = rootRoute.addChildren([
     accountsRoute,
     dashboardRoute,
     ledgerRoute,
+    feeStructuresRoute,
+    paymentGatewaysRoute,
 ])
 
 /**

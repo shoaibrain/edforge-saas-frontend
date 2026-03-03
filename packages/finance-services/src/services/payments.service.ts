@@ -131,7 +131,7 @@ export async function createRefund(
 export async function getDashboardSummary(
   schoolId: string
 ): Promise<DashboardSummary> {
-  return apiGet<DashboardSummary>(`/finance/schools/${schoolId}/dashboard`)
+  return apiGet<DashboardSummary>(`/finance/schools/${schoolId}/dashboard/summary`)
 }
 
 // ============================================================================

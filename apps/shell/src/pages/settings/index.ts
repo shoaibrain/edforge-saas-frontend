@@ -24,10 +24,7 @@ export { default as OrganizationSettingsPage } from './organization'
 export { default as EducationOrgDetailPage } from './education-org-detail'
 // [MVP-PARKED] export { default as EdFiExportPreviewPage } from './edfi-export-preview'
 
-// Finance Configuration (stays in settings)
-export { default as FeeStructuresPage } from './fee-structures'
-export { default as PaymentGatewaysPage } from './payment-gateways'
-// Finance operational pages moved to Finance MFE (/finance/billing/*)
+// Finance Configuration moved to Finance MFE (/finance/configuration/*)
 
 // Other
 // [MVP-PARKED] export { default as IntegrationsSettingsPage } from './integrations'

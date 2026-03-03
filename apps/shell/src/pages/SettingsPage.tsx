@@ -80,8 +80,8 @@ function SettingsOverviewContent({
     { label: t('preferences.title'), icon: Bell, href: '/settings/preferences' },
     { label: t('organization.title'), icon: Building2, href: '/settings/organization' },
     { label: t('workspace.title'), icon: Settings, href: '/settings/workspace' },
-    { label: 'Fee Structures', icon: CreditCard, href: '/settings/fee-structures' },
-    { label: 'Payment Gateways', icon: CreditCard, href: '/settings/payment-gateways' },
+    { label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures' },
+    { label: 'Payment Gateways', icon: CreditCard, href: '/finance/configuration/payment-gateways' },
     // [MVP-PARKED] { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
   ]
 
