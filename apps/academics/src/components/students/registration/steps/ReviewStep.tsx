@@ -42,7 +42,7 @@ function display(val: unknown, fallback = '—'): string {
 /** Lookup label from options */
 function labelFor(
   value: string | undefined,
-  options: { value: string; label: string }[]
+  options: readonly { value: string; label: string }[]
 ): string {
   if (!value) return '—'
   return options.find((o) => o.value === value)?.label ?? value

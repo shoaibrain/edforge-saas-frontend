@@ -681,12 +681,19 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
                       />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
-                      <p className={cn(
-                        'text-sm font-medium truncate',
-                        isSelected ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
-                      )}>
-                        {school.name}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className={cn(
+                          'text-sm font-medium truncate',
+                          isSelected ? 'text-teal-700 dark:text-cyan-300' : 'text-[rgb(var(--text-primary))]'
+                        )}>
+                          {school.name}
+                        </p>
+                        {school.status === 'setup' && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 flex-shrink-0">
+                            Setup
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-[rgb(var(--text-tertiary))]">
                         {userRole || school.code}
                       </p>

@@ -96,7 +96,8 @@ function mapApiSchool(apiSchool: any, tenantId?: string): School {
     name: apiSchool.name,
     code: apiSchool.schoolCode || apiSchool.code,
     type: apiSchool.schoolType || apiSchool.type,
-    isActive: apiSchool.status === 'active' || apiSchool.status === 'setup',
+    status: apiSchool.status || 'setup',
+    isActive: apiSchool.status === 'active',
     address: apiSchool.address ? {
       street1: apiSchool.address.street1,
       street2: apiSchool.address.street2,
@@ -181,7 +182,18 @@ export async function updateSchool(schoolId: string, data: UpdateSchoolDto): Pro
 }
 
 /**
- * Delete a school (soft delete - sets isActive to false)
+ * Transition school status via the state machine endpoint
+ * PATCH /schools/{schoolId}/status
+ */
+export async function transitionSchoolStatus(schoolId: string, status: string): Promise<School> {
+  const data = await apiPatch<any>(`/schools/${schoolId}/status`, { status })
+  return mapApiSchool(data)
+}
+
+/**
+ * Delete a school
+ * - Setup schools: permanently removed (hard-delete)
+ * - Active/suspended schools: transitioned to inactive (soft-delete)
  */
 export async function deleteSchool(schoolId: string): Promise<void> {
   return apiDelete<void>(`/schools/${schoolId}`)
@@ -669,6 +681,7 @@ export const tenantService = {
   getSchool,
   createSchool,
   updateSchool,
+  transitionSchoolStatus,
   deleteSchool,
 
   // School Configuration

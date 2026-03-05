@@ -6,9 +6,8 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react'
 import {
   ChevronRight,
   Building2,
@@ -81,8 +80,12 @@ const ORG_TYPE_CONFIG: Record<
 const STATUS_CONFIG: Record<string, { dot: string; label: string }> = {
   Active: { dot: 'bg-emerald-500', label: 'Active' },
   active: { dot: 'bg-emerald-500', label: 'Active' },
+  Setup: { dot: 'bg-amber-500', label: 'Setup' },
+  setup: { dot: 'bg-amber-500', label: 'Setup' },
   Inactive: { dot: 'bg-slate-400', label: 'Inactive' },
   inactive: { dot: 'bg-slate-400', label: 'Inactive' },
+  Suspended: { dot: 'bg-orange-500', label: 'Suspended' },
+  suspended: { dot: 'bg-orange-500', label: 'Suspended' },
   Closed: { dot: 'bg-red-500', label: 'Closed' },
   closed: { dot: 'bg-red-500', label: 'Closed' },
   Added: { dot: 'bg-blue-500', label: 'Added' },
@@ -200,42 +203,36 @@ function TreeNodeActionMenu({
         <MoreHorizontal className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
       </MenuButton>
 
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
+      <MenuItems
+        anchor="bottom end"
+        transition
+        className="z-50 w-52 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] shadow-lg focus:outline-none overflow-hidden origin-top-right transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
       >
-        <MenuItems className="absolute right-0 z-50 mt-1 w-44 origin-top-right rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] shadow-lg focus:outline-none overflow-hidden">
-          <div className="py-1">
-            {actions.map(({ action, label, icon: Icon, destructive }) => (
-              <MenuItem key={action}>
-                {({ focus }) => (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onAction(action, node)
-                    }}
-                    className={cn(
-                      'flex items-center gap-2 w-full px-3 py-2 text-sm',
-                      focus && 'bg-[rgb(var(--surface-tertiary))]',
-                      destructive
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-[rgb(var(--text-secondary))]'
-                    )}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {label}
-                  </button>
-                )}
-              </MenuItem>
-            ))}
-          </div>
-        </MenuItems>
-      </Transition>
+        <div className="py-1">
+          {actions.map(({ action, label, icon: Icon, destructive }) => (
+            <MenuItem key={action}>
+              {({ focus }) => (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAction(action, node)
+                  }}
+                  className={cn(
+                    'flex items-center gap-2 w-full px-3 py-2 text-sm',
+                    focus && 'bg-[rgb(var(--surface-tertiary))]',
+                    destructive
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-[rgb(var(--text-secondary))]'
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </button>
+              )}
+            </MenuItem>
+          ))}
+        </div>
+      </MenuItems>
     </Menu>
   )
 }
@@ -447,6 +444,22 @@ export function OrganizationHierarchyTree({
     return count
   }, [sea, educationServiceCenters, unassigned])
 
+  const allExpandableIds = useMemo(() => {
+    const ids = new Set<string>()
+    const collect = (node: HierarchyNode) => {
+      if (node.children?.length) { ids.add(node.id); node.children.forEach(collect) }
+    }
+    if (sea) collect(sea)
+    educationServiceCenters.forEach(collect)
+    return ids
+  }, [sea, educationServiceCenters])
+
+  const isAllExpanded = useMemo(() => {
+    if (allExpandableIds.size === 0) return false
+    for (const id of allExpandableIds) { if (!expandedIds.has(id)) return false }
+    return true
+  }, [allExpandableIds, expandedIds])
+
   if (isLoading) {
     return <SettingsSkeleton rows={5} showHeader={false} />
   }
@@ -484,12 +497,16 @@ export function OrganizationHierarchyTree({
           />
         </div>
 
-        {/* Expand/Collapse */}
-        <Button variant="ghost" size="sm" onClick={expandAll} title="Expand All">
-          <ChevronsUpDown className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" onClick={collapseAll} title="Collapse All">
-          <ChevronsDownUp className="w-4 h-4" />
+        {/* Expand/Collapse Toggle */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={isAllExpanded ? collapseAll : expandAll}
+          title={isAllExpanded ? 'Collapse All' : 'Expand All'}
+        >
+          {isAllExpanded
+            ? <ChevronsDownUp className="w-4 h-4" />
+            : <ChevronsUpDown className="w-4 h-4" />}
         </Button>
 
         {/* Count */}
@@ -502,7 +519,7 @@ export function OrganizationHierarchyTree({
       <div
         role="tree"
         aria-label="Organization hierarchy"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-2 overflow-hidden"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-2"
       >
         {/* SEA + Children */}
         {sea && (

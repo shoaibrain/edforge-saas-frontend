@@ -95,7 +95,7 @@ export function PersonalInfoStep({
             <SelectField
               name="currentGradeLevel"
               label="Grade Level"
-              options={GRADE_LEVEL_OPTIONS}
+              options={[...GRADE_LEVEL_OPTIONS]}
               placeholder="Select grade level"
               required
             />

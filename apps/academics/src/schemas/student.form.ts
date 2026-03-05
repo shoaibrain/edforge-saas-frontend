@@ -12,22 +12,8 @@ import { z } from 'zod'
 // CONSTANTS
 // ============================================================================
 
-export const GRADE_LEVEL_OPTIONS = [
-  { value: 'PK', label: 'Pre-Kindergarten' },
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1', label: 'Grade 1' },
-  { value: '2', label: 'Grade 2' },
-  { value: '3', label: 'Grade 3' },
-  { value: '4', label: 'Grade 4' },
-  { value: '5', label: 'Grade 5' },
-  { value: '6', label: 'Grade 6' },
-  { value: '7', label: 'Grade 7' },
-  { value: '8', label: 'Grade 8' },
-  { value: '9', label: 'Grade 9' },
-  { value: '10', label: 'Grade 10' },
-  { value: '11', label: 'Grade 11' },
-  { value: '12', label: 'Grade 12' },
-]
+// Re-exported from shared-types (canonical source of truth)
+export { GRADE_LEVEL_OPTIONS } from '@aibrains/shared-types'
 
 export const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },

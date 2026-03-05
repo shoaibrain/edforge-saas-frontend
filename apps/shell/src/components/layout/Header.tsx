@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
+import { motion } from 'framer-motion'
 import {
   Bell,
   User,
@@ -14,10 +15,64 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
-import { Avatar, LanguageSwitcher } from '@edforge/ui'
+import { Avatar } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 
 import { Breadcrumbs } from './Breadcrumbs'
+
+// ============================================================================
+// LANGUAGE SLIDING TOGGLE
+// ============================================================================
+
+const LANG_OPTIONS = [
+  { code: 'en', label: 'EN' },
+  { code: 'ne', label: 'NP' },
+] as const
+
+function LanguageToggle() {
+  const { i18n } = useTranslation()
+  const currentLang = i18n.language || 'en'
+
+  const handleSwitch = (code: string) => (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    i18n.changeLanguage(code)
+  }
+
+  return (
+    <div
+      className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
+      role="radiogroup"
+      aria-label="Language"
+    >
+      {LANG_OPTIONS.map(({ code, label }) => {
+        const isActive = currentLang === code
+        return (
+          <button
+            key={code}
+            role="radio"
+            aria-checked={isActive}
+            onClick={handleSwitch(code)}
+            className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
+              isActive
+                ? 'text-white'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="lang-toggle-pill"
+                className="absolute inset-0 bg-teal-500 dark:bg-cyan-500 rounded-md shadow-sm"
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{label}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 // ============================================================================
 // USER MENU WITH THEME PICKER
@@ -29,7 +84,6 @@ function UserMenu() {
   const navigate = useNavigate()
   const { theme, setTheme } = useThemeStore()
   const { t: tNav } = useTranslation('nav')
-  const { t: tCommon } = useTranslation('common')
   const { t: tSettings } = useTranslation('settings')
 
   if (!user) return null
@@ -76,10 +130,9 @@ function UserMenu() {
             </div>
           </div>
 
-          {/* Theme Picker */}
+          {/* Quick Preferences: Theme + Language */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{tCommon('theme')}</span>
               <div className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]">
                 {themes.map(({ value, icon: Icon, label }) => (
                   <button
@@ -99,6 +152,7 @@ function UserMenu() {
                   </button>
                 ))}
               </div>
+              <LanguageToggle />
             </div>
           </div>
 
@@ -191,9 +245,6 @@ export function Header() {
 
         {/* Right Section - All header actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Language Switcher */}
-          <LanguageSwitcher variant="default" />
-
           {/* Documentation */}
           <button
             className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"

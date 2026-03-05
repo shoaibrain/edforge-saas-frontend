@@ -59,6 +59,11 @@ export function useCurrentAcademicYear(schoolId: string, enabled = true) {
     enabled: enabled && !!schoolId,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
+    // Don't retry on 404 — new schools won't have a current academic year yet
+    retry: (failureCount, error) => {
+      if (error?.message?.includes('404') || error?.message?.includes('not found')) return false
+      return failureCount < 2
+    },
   })
 }
 

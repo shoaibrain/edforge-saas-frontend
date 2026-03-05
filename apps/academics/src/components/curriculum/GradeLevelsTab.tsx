@@ -31,6 +31,8 @@ interface GradeLevelsTabProps {
   isLoading?: boolean
   /** Callback when a course is clicked inside the drawer */
   onViewCourse?: (course: CourseResponseDto) => void
+  /** Optional school grade range to filter displayed grades (e.g., { start: '9', end: '12' }) */
+  schoolGradeRange?: { start: string; end: string }
 }
 
 // ============================================================================
@@ -120,17 +122,28 @@ export function GradeLevelsTab({
   courses,
   isLoading,
   onViewCourse,
+  schoolGradeRange,
 }: GradeLevelsTabProps) {
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedGrade, setSelectedGrade] = useState<GradeLevelData | null>(null)
 
+  // Filter grade options to the school's grade range if provided
+  const filteredGradeOptions = useMemo(() => {
+    if (!schoolGradeRange) return GRADE_LEVEL_OPTIONS
+    const allValues: string[] = GRADE_LEVEL_OPTIONS.map((o) => o.value)
+    const startIdx = allValues.indexOf(schoolGradeRange.start)
+    const endIdx = allValues.indexOf(schoolGradeRange.end)
+    if (startIdx === -1 || endIdx === -1 || startIdx > endIdx) return GRADE_LEVEL_OPTIONS
+    return GRADE_LEVEL_OPTIONS.slice(startIdx, endIdx + 1)
+  }, [schoolGradeRange])
+
   // Derive enriched grade level data with associated courses
   const gradeData: GradeLevelData[] = useMemo(() => {
     const courseMap = new Map<string, CourseResponseDto[]>()
 
-    // Initialize all known grades
-    for (const opt of GRADE_LEVEL_OPTIONS) {
+    // Initialize only the relevant grades
+    for (const opt of filteredGradeOptions) {
       courseMap.set(opt.value, [])
     }
 
@@ -138,14 +151,15 @@ export function GradeLevelsTab({
     for (const course of courses) {
       if (course.gradeLevels) {
         for (const grade of course.gradeLevels) {
-          const existing = courseMap.get(grade) ?? []
-          existing.push(course)
-          courseMap.set(grade, existing)
+          const existing = courseMap.get(grade)
+          if (existing !== undefined) {
+            existing.push(course)
+          }
         }
       }
     }
 
-    return GRADE_LEVEL_OPTIONS.map((opt) => {
+    return filteredGradeOptions.map((opt) => {
       const gradeCourses = courseMap.get(opt.value) ?? []
       return {
         value: opt.value,
@@ -154,11 +168,11 @@ export function GradeLevelsTab({
         courses: gradeCourses,
       }
     })
-  }, [courses])
+  }, [courses, filteredGradeOptions])
 
   // Summary stats
   const stats = useMemo(() => {
-    const totalGrades = GRADE_LEVEL_OPTIONS.length
+    const totalGrades = filteredGradeOptions.length
     const totalAssignments = gradeData.reduce((sum, g) => sum + g.courseCount, 0)
     const avgPerGrade =
       totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
@@ -194,7 +208,7 @@ export function GradeLevelsTab({
         header: 'Grade Level',
         sortable: true,
         width: '200px',
-        render: (grade) => (
+        render: (grade: GradeLevelData) => (
           <GradeBadge value={grade.value} label={grade.label} />
         ),
       },
@@ -203,7 +217,7 @@ export function GradeLevelsTab({
         header: 'Course Count',
         sortable: true,
         width: '130px',
-        render: (grade) => (
+        render: (grade: GradeLevelData) => (
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-text-primary">
               {grade.courseCount}
@@ -217,13 +231,13 @@ export function GradeLevelsTab({
         ),
       },
       {
-        key: 'courses' as any,
+        key: 'courses',
         header: 'Courses',
         width: '320px',
-        render: (grade) => <CourseChips courses={grade.courses} />,
+        render: (grade: GradeLevelData) => <CourseChips courses={grade.courses} />,
       },
       {
-        key: 'students' as any,
+        key: 'students',
         header: 'Students',
         width: '120px',
         render: () => (
@@ -272,7 +286,7 @@ export function GradeLevelsTab({
       <DataTable
         columns={columns}
         data={gradeData}
-        keyExtractor={(grade) => grade.value}
+        keyExtractor={(grade: GradeLevelData) => grade.value}
         isLoading={isLoading}
         skeletonRows={8}
         emptyState={{

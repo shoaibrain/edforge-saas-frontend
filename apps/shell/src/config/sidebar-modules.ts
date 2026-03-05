@@ -184,7 +184,7 @@ const homeModule: ModuleConfig = {
         // [/MVP-PARKED]
         {
           id: 'settings',
-          label: 'System Admin',
+          label: 'Settings',
           icon: Settings,
           href: '/settings',
           permission: { action: 'view', resource: 'settings' },

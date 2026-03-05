@@ -96,7 +96,7 @@ function NoAcademicYearGuard() {
 export function Overview() {
   const schoolId = useActiveSchoolId()
 
-  // Guard: No school selected
+  // Guard: No school selected (setup guard is handled at AcademicsLayout level)
   if (!schoolId) return <NoSchoolGuard />
 
   return <OverviewContent schoolId={schoolId} />

@@ -81,6 +81,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const {
     activeSchoolId,
     setActiveSchoolId,
+    setActiveSchoolStatus,
     sidebarCollapsed,
     toggleSidebar,
   } = useAppStore()
@@ -199,6 +200,11 @@ export function ShellProvider({ children }: ShellProviderProps) {
       setActiveSchoolId(availableSchools[0].id)
     }
   }, [user, activeSchoolId, availableSchools, setActiveSchoolId])
+
+  // Sync activeSchoolStatus to cookie store so MFEs can read it
+  useEffect(() => {
+    setActiveSchoolStatus(activeSchool?.status ?? null)
+  }, [activeSchool?.status, setActiveSchoolStatus])
 
   // ============================================================================
   // NAVIGATION

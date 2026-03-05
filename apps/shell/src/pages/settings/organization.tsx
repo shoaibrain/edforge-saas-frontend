@@ -13,12 +13,9 @@ import {
   Landmark,
   School,
   Plus,
-  GraduationCap,
-  Briefcase,
   Network,
   // [MVP-PARKED] FileJson2,
   AlertTriangle,
-  type LucideIcon,
 } from 'lucide-react'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
@@ -54,40 +51,6 @@ import { useModalState } from '@/hooks/useModalState'
 import type { HierarchyNode } from '@aibrains/shared-types'
 
 // ============================================================================
-// STAT CARD
-// ============================================================================
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  color,
-  delay = 0,
-}: {
-  icon: LucideIcon
-  label: string
-  value: number | string
-  color: string
-  delay?: number
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: delay * 0.08, type: 'spring', stiffness: 300, damping: 25 }}
-      className="flex items-center gap-3 p-4 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
-    >
-      <div className={`p-2.5 rounded-lg ${color}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-      <div>
-        <p className="text-2xl font-bold text-[rgb(var(--text-primary))]">{value}</p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">{label}</p>
-      </div>
-    </motion.div>
-  )
-}
-
 // ============================================================================
 // TAB BUTTON
 // ============================================================================
@@ -469,29 +432,17 @@ export default function OrganizationSettingsPage() {
   }, [hierarchy])
 
   // Compute stats from hierarchy
-  const stats = {
-    totalOrgs: 0,
-    activeSchools: 0,
-    students: 0,
-    staff: 0,
-  }
+  const stats = { totalOrgs: 0, activeSchools: 0 }
 
   if (hierarchy) {
     const countOrgs = (node: HierarchyNode) => {
       stats.totalOrgs++
       if (node.type === 'school') stats.activeSchools++
-      if (node.studentCount) stats.students += node.studentCount
-      if (node.staffCount) stats.staff += node.staffCount
       node.children?.forEach(countOrgs)
     }
     if (hierarchy.sea) countOrgs(hierarchy.sea)
     hierarchy.educationServiceCenters?.forEach(countOrgs)
-    hierarchy.unassigned?.forEach((s) => {
-      stats.totalOrgs++
-      stats.activeSchools++
-      if (s.studentCount) stats.students += s.studentCount
-      if (s.staffCount) stats.staff += s.staffCount
-    })
+    hierarchy.unassigned?.forEach(() => { stats.totalOrgs++; stats.activeSchools++ })
   }
 
   const hasNoData =
@@ -541,66 +492,48 @@ export default function OrganizationSettingsPage() {
         {/* Header */}
         <SettingsPageHeader
           title="Organization Structure"
-          description="Manage your education organization hierarchy — SEA, Districts, Service Centers, and Schools"
+          description={
+            !hierarchyLoading && !hasNoData
+              ? `${stats.totalOrgs} organizations · ${stats.activeSchools} schools`
+              : 'Manage your education organization hierarchy'
+          }
           icon={Building2}
           action={
             canManage ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
                 {!sea ? (
-                  <Button size="sm" variant="ghost" className="gap-1.5" onClick={seaModal.openCreate}>
-                    <Landmark className="w-4 h-4" />
+                  <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={seaModal.openCreate}>
+                    <Landmark className="w-3.5 h-3.5" />
                     Set Up SEA
                   </Button>
                 ) : (
-                  <Button size="sm" variant="ghost" className="gap-1.5" onClick={() => seaModal.openEdit(null)}>
-                    <Landmark className="w-4 h-4" />
+                  <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={() => seaModal.openEdit(null)}>
+                    <Landmark className="w-3.5 h-3.5" />
                     Edit SEA
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" className="gap-1.5" onClick={leaModal.openCreate}>
-                  <Plus className="w-4 h-4" />
-                  Add District
+                <div className="w-px h-5 bg-[rgb(var(--border-primary))]" />
+                <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={leaModal.openCreate}>
+                  <Plus className="w-3.5 h-3.5" />
+                  District
                 </Button>
-                <Button size="sm" variant="ghost" className="gap-1.5" onClick={escModal.openCreate}>
-                  <Plus className="w-4 h-4" />
-                  Add Service Center
+                <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={escModal.openCreate}>
+                  <Plus className="w-3.5 h-3.5" />
+                  Service Center
                 </Button>
-                {/* [MVP-PARKED] Ed-Fi Preview button
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="gap-1.5"
-                  onClick={() => navigate({ to: '/settings/organization/edfi-preview' as string })}
-                >
-                  <FileJson2 className="w-4 h-4" />
-                  Ed-Fi Preview
-                </Button>
-                [/MVP-PARKED] */}
                 {stats.activeSchools > 0 && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="gap-1.5"
-                    onClick={() => setShowAllSchoolsManager(true)}
-                  >
-                    <Network className="w-4 h-4" />
-                    Manage Assignments
-                  </Button>
+                  <>
+                    <div className="w-px h-5 bg-[rgb(var(--border-primary))]" />
+                    <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={() => setShowAllSchoolsManager(true)}>
+                      <Network className="w-3.5 h-3.5" />
+                      Assignments
+                    </Button>
+                  </>
                 )}
               </div>
             ) : undefined
           }
         />
-
-        {/* Stats Bar */}
-        {!hierarchyLoading && !hasNoData && (
-          <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon={Building2} label="Total Orgs" value={stats.totalOrgs} color="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" delay={0} />
-            <StatCard icon={School} label="Active Schools" value={stats.activeSchools} color="bg-teal-500/10 text-teal-600 dark:text-teal-400" delay={1} />
-            <StatCard icon={GraduationCap} label="Students" value={stats.students.toLocaleString()} color="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" delay={2} />
-            <StatCard icon={Briefcase} label="Staff" value={stats.staff.toLocaleString()} color="bg-amber-500/10 text-amber-600 dark:text-amber-400" delay={3} />
-          </motion.div>
-        )}
 
         {/* Orphaned Schools Banner */}
         {hierarchy && hierarchy.unassigned && hierarchy.unassigned.length > 0 && (

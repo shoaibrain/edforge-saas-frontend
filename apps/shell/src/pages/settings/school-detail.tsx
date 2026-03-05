@@ -24,12 +24,20 @@ import {
   AlertTriangle,
   X,
   MoreHorizontal,
+  CheckCircle2,
+  XCircle,
+  PauseCircle,
+  Lock,
+  Power,
+  ArrowRight,
 } from 'lucide-react'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
+import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
-import type { School as SchoolType } from '@edforge/types'
+import { edOrgKeys } from '@/hooks/useEducationOrgs'
+import type { School as SchoolType, SchoolStatus } from '@edforge/types'
 import { Button } from '@edforge/ui'
 
 // Sub-page components
@@ -53,6 +61,36 @@ const SCHOOL_TYPE_LABELS: Record<string, string> = {
   private: 'Private',
   vocational: 'Vocational',
   special_education: 'Special Ed',
+}
+
+// ============================================================================
+// SCHOOL STATUS CONFIG
+// ============================================================================
+
+const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
+  icon: typeof Settings
+  color: string
+  bg: string
+  dot: string
+  label: string
+}> = {
+  setup:     { icon: Settings,     color: 'text-amber-700 dark:text-amber-400',  bg: 'bg-amber-500/10',  dot: 'bg-amber-500',  label: 'Setup' },
+  active:    { icon: CheckCircle2, color: 'text-teal-700 dark:text-teal-400',    bg: 'bg-teal-500/10',   dot: 'bg-teal-500',   label: 'Active' },
+  inactive:  { icon: XCircle,      color: 'text-slate-600 dark:text-slate-400',  bg: 'bg-slate-500/10',  dot: 'bg-slate-400',  label: 'Inactive' },
+  suspended: { icon: PauseCircle,  color: 'text-orange-700 dark:text-orange-400', bg: 'bg-orange-500/10', dot: 'bg-orange-500', label: 'Suspended' },
+  closed:    { icon: Lock,         color: 'text-red-700 dark:text-red-400',      bg: 'bg-red-500/10',    dot: 'bg-red-500',    label: 'Closed' },
+}
+
+/** Status transitions allowed from each state (mirrors server state machine) */
+const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: SchoolStatus; color: string }[]> = {
+  setup:     [{ label: 'Activate School', targetStatus: 'active', color: 'text-teal-600' }],
+  active:    [
+    { label: 'Suspend School', targetStatus: 'suspended', color: 'text-orange-600' },
+    { label: 'Deactivate School', targetStatus: 'inactive', color: 'text-red-600' },
+  ],
+  suspended: [{ label: 'Reactivate School', targetStatus: 'active', color: 'text-teal-600' }],
+  inactive:  [{ label: 'Reactivate School', targetStatus: 'active', color: 'text-teal-600' }],
+  closed:    [],
 }
 
 // ============================================================================
@@ -116,24 +154,39 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
         
         {/* Content */}
         <div className="p-6 space-y-4">
-          <p className="text-sm text-[rgb(var(--text-secondary))]">
-            This action <strong className="text-[rgb(var(--text-primary))]">cannot be undone</strong>. This will permanently delete:
-          </p>
-          
-          <ul className="space-y-2 text-sm text-[rgb(var(--text-secondary))]">
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-rust-500" />
-              All departments associated with this school
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-rust-500" />
-              All academic years and grading periods
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-rust-500" />
-              All staff and user assignments to this school
-            </li>
-          </ul>
+          {school.status === 'setup' ? (
+            <>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">
+                This will <strong className="text-[rgb(var(--text-primary))]">permanently remove</strong> the school and all associated data. This cannot be undone.
+              </p>
+              <ul className="space-y-2 text-sm text-[rgb(var(--text-secondary))]">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rust-500" />
+                  School entity and configuration will be permanently deleted
+                </li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">
+                This will <strong className="text-[rgb(var(--text-primary))]">deactivate</strong> the school. It can be reactivated later by an administrator.
+              </p>
+              <ul className="space-y-2 text-sm text-[rgb(var(--text-secondary))]">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  School will be set to Inactive status
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Academic operations will be suspended
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                  Can be reactivated from the school detail page
+                </li>
+              </ul>
+            </>
+          )}
           
           <div className="pt-2">
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
@@ -213,7 +266,32 @@ export default function SchoolDetailPage() {
     mutationFn: () => tenantService.deleteSchool(schoolId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['schools'] })
+      queryClient.removeQueries({ queryKey: ['school', schoolId] })
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
+      toast.success('School deleted successfully')
       navigate({ to: '/settings/organization' })
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || 'Failed to delete school'
+      toast.error(message)
+    },
+  })
+
+  // Status transition mutation
+  const statusMutation = useMutation({
+    mutationFn: (newStatus: SchoolStatus) => tenantService.transitionSchoolStatus(schoolId, newStatus),
+    onSuccess: (updatedSchool) => {
+      queryClient.invalidateQueries({ queryKey: ['school', schoolId] })
+      queryClient.invalidateQueries({ queryKey: ['schools'] })
+      queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
+      toast.success(
+        updatedSchool.status === 'active'
+          ? 'School activated successfully'
+          : `School status updated to ${updatedSchool.status}`
+      )
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to update school status')
     },
   })
 
@@ -278,13 +356,15 @@ export default function SchoolDetailPage() {
                 </span>
                 
                 {/* Status Badge */}
-                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${displaySchool.isActive
-                  ? 'bg-teal-500/10 text-teal-700 dark:text-teal-400'
-                  : 'bg-rust-500/10 text-rust-700 dark:text-rust-400'
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${displaySchool.isActive ? 'bg-teal-500' : 'bg-rust-500'}`} />
-                  {displaySchool.isActive ? 'Active' : 'Inactive'}
-                </span>
+                {(() => {
+                  const statusCfg = SCHOOL_STATUS_CONFIG[displaySchool.status] || SCHOOL_STATUS_CONFIG.setup
+                  return (
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${statusCfg.bg} ${statusCfg.color}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
+                      {statusCfg.label}
+                    </span>
+                  )
+                })()}
               </div>
             </div>
           </div>
@@ -303,25 +383,83 @@ export default function SchoolDetailPage() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <MenuItems className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+                <MenuItems className="absolute right-0 z-50 mt-1 w-56 origin-top-right rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
                   <div className="py-1">
-                    <MenuItem>
-                      {({ active }) => (
-                        <button
-                          onClick={() => setShowDeleteModal(true)}
-                          className={`flex items-center w-full px-3 py-2.5 text-sm text-red-600 ${active ? 'bg-red-50 dark:bg-red-500/10' : ''}`}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2.5" />
-                          Delete School
-                        </button>
-                      )}
-                    </MenuItem>
+                    {/* Status transition actions */}
+                    {displaySchool && STATUS_ACTIONS[displaySchool.status]?.map((action) => (
+                      <MenuItem key={action.targetStatus}>
+                        {({ active }) => (
+                          <button
+                            onClick={() => statusMutation.mutate(action.targetStatus)}
+                            disabled={statusMutation.isPending}
+                            className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--surface-secondary))]' : ''} disabled:opacity-50`}
+                          >
+                            <Power className="w-4 h-4 mr-2.5" />
+                            {action.label}
+                          </button>
+                        )}
+                      </MenuItem>
+                    ))}
+
+                    {/* Separator if there are status actions */}
+                    {displaySchool && (STATUS_ACTIONS[displaySchool.status]?.length ?? 0) > 0 && (
+                      <div className="border-t border-[rgb(var(--border-primary))] my-1" />
+                    )}
+
+                    {/* Delete action — only for non-closed schools */}
+                    {displaySchool?.status !== 'closed' && (
+                      <MenuItem>
+                        {({ active }) => (
+                          <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className={`flex items-center w-full px-3 py-2.5 text-sm text-red-600 ${active ? 'bg-red-50 dark:bg-red-500/10' : ''}`}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2.5" />
+                            {displaySchool?.status === 'setup' ? 'Delete School' : 'Deactivate School'}
+                          </button>
+                        )}
+                      </MenuItem>
+                    )}
                   </div>
                 </MenuItems>
               </Transition>
             </Menu>
           )}
         </div>
+
+        {/* Setup Mode Banner */}
+        {displaySchool.status === 'setup' && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-lg bg-amber-500/10 flex-shrink-0">
+                <Settings className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                  This school is in setup mode
+                </h3>
+                <p className="mt-1 text-sm text-amber-700/80 dark:text-amber-400/80">
+                  Complete the school configuration (departments, academic years, calendar), then activate it to enable academic operations.
+                </p>
+              </div>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => statusMutation.mutate('active')}
+                disabled={statusMutation.isPending}
+                isLoading={statusMutation.isPending}
+                className="flex-shrink-0"
+              >
+                Activate School
+                <ArrowRight className="w-4 h-4 ml-1.5" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Tabs Navigation */}
         <div className="border-b border-[rgb(var(--border-primary))]">

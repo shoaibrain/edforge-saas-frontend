@@ -64,6 +64,8 @@ export interface TenantIntegrations {
 /**
  * Represents a school within a tenant
  */
+export type SchoolStatus = 'active' | 'inactive' | 'setup' | 'suspended' | 'closed'
+
 export interface School {
   id: string
   tenantId: string
@@ -72,8 +74,9 @@ export interface School {
   address?: SchoolAddress
   phone?: string
   email?: string
-  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-  /** Active status */
+  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'charter' | 'private' | 'vocational' | 'special_education' | 'other'
+  status: SchoolStatus
+  /** @deprecated Use `status === 'active'` instead */
   isActive: boolean
 }
 
