@@ -36,7 +36,7 @@ export function StreamFeed({ sectionId, onSwitchTab }: StreamFeedProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => onSwitchTab('attendance')}
+            onClick={() => onSwitchTab('progress:attendance')}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-secondary bg-surface-secondary rounded-lg hover:bg-surface-tertiary transition-colors"
           >
             <ClipboardCheck className="w-3.5 h-3.5" />
@@ -44,11 +44,19 @@ export function StreamFeed({ sectionId, onSwitchTab }: StreamFeedProps) {
           </button>
           <button
             type="button"
-            onClick={() => onSwitchTab('grades')}
+            onClick={() => onSwitchTab('progress:gradebook')}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-secondary bg-surface-secondary rounded-lg hover:bg-surface-tertiary transition-colors"
           >
             <BookCheck className="w-3.5 h-3.5" />
             Open Gradebook
+          </button>
+          <button
+            type="button"
+            onClick={() => onSwitchTab('classwork')}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-secondary bg-surface-secondary rounded-lg hover:bg-surface-tertiary transition-colors"
+          >
+            <BookCheck className="w-3.5 h-3.5" />
+            Classwork
           </button>
           <button
             type="button"

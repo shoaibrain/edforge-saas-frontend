@@ -26,12 +26,8 @@ import {
   BookCheck,
   Settings,
   ClipboardCheck,
-  CalendarDays,
-  Users,
-  Clock,
   Plus,
   GraduationCap,
-  Calendar,
   Lock,
   AlertTriangle,
   LayoutGrid,
@@ -80,39 +76,42 @@ const TABS: { id: ClassroomTabId; label: string; icon: typeof School }[] = [
   { id: 'overview', label: 'Overview', icon: School },
   { id: 'gradebook', label: 'Gradebook', icon: BookCheck },
   { id: 'policies', label: 'Grading Policies', icon: Settings },
-  { id: 'attendance', label: 'Attendance Board', icon: ClipboardCheck },
+  { id: 'attendance', label: 'Attendance', icon: ClipboardCheck },
 ]
 
 const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
 
 // ============================================================================
-// STAT CARD (shared)
+// STATS SUMMARY STRIP (compact single-row)
 // ============================================================================
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
+function StatsSummaryStrip({
+  stats,
+  total,
 }: {
-  icon: typeof Calendar
-  label: string
-  value: string | number
-  accent: string
-  bg: string
+  stats: { totalSections: number; totalEnrolled: number; utilization: number; uniqueTeachers: number }
+  total: number | undefined
 }) {
+  const items = [
+    { label: 'Total Classes', value: total ?? stats.totalSections, primary: true },
+    { label: 'Students', value: stats.totalEnrolled },
+    { label: 'Utilization', value: `${stats.utilization}%` },
+    { label: 'Teachers', value: stats.uniqueTeachers },
+  ]
+
   return (
-    <div className="bg-surface-primary rounded-xl border border-border-primary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
+    <div className="flex items-center gap-0 bg-surface-primary rounded-xl border border-border-primary overflow-x-auto">
+      {items.map((item, i) => (
+        <div key={item.label} className="flex items-center">
+          {i > 0 && <div className="w-px h-8 bg-border-secondary" />}
+          <div className={`px-5 py-3 ${i === 0 ? 'pl-5' : ''}`}>
+            <p className="text-xs text-text-tertiary">{item.label}</p>
+            <p className={`font-semibold text-text-primary ${item.primary ? 'text-lg' : 'text-base'}`}>
+              {item.value}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
-        </div>
-      </div>
+      ))}
     </div>
   )
 }
@@ -189,13 +188,11 @@ function OverviewTab() {
 
   return (
     <div className="space-y-6">
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard icon={CalendarDays} label="Total Classes" value={total ?? stats.totalSections} accent="text-blue-600 dark:text-blue-400" bg="bg-blue-500/10" />
-        <StatCard icon={Users} label="Total Students" value={stats.totalEnrolled} accent="text-emerald-600 dark:text-emerald-400" bg="bg-emerald-500/10" />
-        <StatCard icon={Clock} label="Capacity Utilization" value={`${stats.utilization}%`} accent="text-purple-600 dark:text-purple-400" bg="bg-purple-500/10" />
-        <StatCard icon={Users} label="Teachers" value={stats.uniqueTeachers} accent="text-amber-600 dark:text-amber-400" bg="bg-amber-500/10" />
-      </div>
+      {/* Stats Summary Strip */}
+      <StatsSummaryStrip
+        stats={stats}
+        total={total}
+      />
 
       {/* Filters + View Toggle */}
       <div className="flex items-start justify-between gap-4">
@@ -558,20 +555,15 @@ export function ClassroomsModule() {
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
+        <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
-                <School className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">
-                  Classrooms
-                </h1>
-                <p className="text-text-secondary mt-1">
-                  Manage your classes, grades, and attendance in one place
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-text-primary">
+                Classrooms
+              </h1>
+              <p className="text-sm text-text-secondary mt-0.5">
+                Manage your classes, grades, and attendance in one place
+              </p>
             </div>
             {schedPerms.create && (
               <CreateMenu onCreateSection={() => navigate({ to: '/classrooms/create' })} />

@@ -5,7 +5,7 @@
  * This file should be imported by all EdForge applications.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Font loaded via <link> in index.html for faster LCP (no render-blocking @import) */
 
 /* Custom theme configuration with Coolors palette */
 @theme {

@@ -61,7 +61,7 @@ export default function LandingPage() {
 
       <Navbar />
 
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <HeroSection />
         <SocialProofSection />
 

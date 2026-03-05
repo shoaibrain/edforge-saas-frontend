@@ -17,8 +17,8 @@
   --surface-tertiary: 22 46 59;      /* #162e3b — interactive surfaces */
   --surface-elevated: 22 46 59;      /* #162e3b */
   --text-primary: 232 237 240;       /* #e8edf0 — primary text */
-  --text-secondary: 138 175 191;     /* #8aafbf — secondary text */
-  --text-tertiary: 77 127 143;       /* #4d7f8f — muted text */
+  --text-secondary: 160 195 210;     /* #a0c3d2 — secondary text (WCAG AA ≥5.5:1 on #0a1a24) */
+  --text-tertiary: 100 155 175;      /* #649baf — muted text (WCAG AA ≥4.6:1 on #0a1a24) */
   --text-inverted: 10 26 36;         /* #0a1a24 */
   --border-primary: 42 157 143;      /* #2a9d8f at full, use with alpha */
   --border-secondary: 42 157 143;    /* #2a9d8f */
@@ -65,7 +65,22 @@
   --lp-chart-success: #34d399;
   --lp-chart-warning: #f4a261;
   --lp-chart-danger: #e76f51;
-  --lp-chart-neutral: #8aafbf;
+  --lp-chart-neutral: #a0c3d2;
+
+  /* ── 8px Baseline Grid Spacing Scale ── */
+  /* All section gaps MUST be multiples of 8px */
+  --lp-space-1: 0.5rem;   /* 8px */
+  --lp-space-2: 1rem;     /* 16px */
+  --lp-space-3: 1.5rem;   /* 24px */
+  --lp-space-4: 2rem;     /* 32px */
+  --lp-space-5: 2.5rem;   /* 40px */
+  --lp-space-6: 3rem;     /* 48px */
+  --lp-space-8: 4rem;     /* 64px */
+  --lp-space-10: 5rem;    /* 80px */
+  --lp-space-12: 6rem;    /* 96px */
+
+  /* ── Touch ── */
+  touch-action: manipulation;
 }
 
 /* Mesh gradient & grid overlays — limited to hero viewport only */

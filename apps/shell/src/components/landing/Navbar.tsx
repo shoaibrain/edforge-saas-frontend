@@ -60,7 +60,7 @@ const NAV_ITEMS: NavItem[] = [
           icon: Activity, iconColor: '#e76f51', title: 'EdForge Core',
           description: 'Central nervous system for school ops.', href: '/about',
           visual: (
-            <div className="w-full h-24 mt-3 rounded-md bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/10 flex items-center justify-center overflow-hidden relative">
+            <div aria-hidden="true" className="w-full h-24 mt-3 rounded-md bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/10 flex items-center justify-center overflow-hidden relative">
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:14px_24px]" />
               <div className="w-3/4 h-3/4 bg-[#0f172a] rounded border border-white/5 flex flex-col p-2 gap-2 shadow-2xl">
                 <div className="w-full h-1.5 bg-orange-500/40 rounded-full" />
@@ -74,7 +74,7 @@ const NAV_ITEMS: NavItem[] = [
           icon: BarChart3, iconColor: '#2a9d8f', title: 'Analytics',
           description: 'Real-time student performance insights.', href: '/about',
           visual: (
-            <div className="w-full h-24 mt-3 rounded-md bg-gradient-to-br from-teal-500/10 to-teal-500/5 border border-teal-500/10 flex items-center justify-center overflow-hidden relative">
+            <div aria-hidden="true" className="w-full h-24 mt-3 rounded-md bg-gradient-to-br from-teal-500/10 to-teal-500/5 border border-teal-500/10 flex items-center justify-center overflow-hidden relative">
               <div className="absolute bottom-0 left-0 right-0 h-12 flex items-end justify-around px-4 pb-2 gap-1">
                 <div className="w-3 h-6 bg-teal-500/40 rounded-t-[2px]" />
                 <div className="w-3 h-10 bg-teal-500/60 rounded-t-[2px]" />
@@ -88,7 +88,7 @@ const NAV_ITEMS: NavItem[] = [
           icon: Wallet, iconColor: '#e9c46a', title: 'Finance',
           description: 'Automated payroll and fee management.', href: '/about',
           visual: (
-            <div className="w-full h-24 mt-3 rounded-md bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/10 flex items-center justify-center overflow-hidden relative">
+            <div aria-hidden="true" className="w-full h-24 mt-3 rounded-md bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/10 flex items-center justify-center overflow-hidden relative">
               <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
                 <span className="text-yellow-500 font-bold">$</span>
               </div>
@@ -156,7 +156,7 @@ function isInternalRoute(href: string): boolean {
 
 function NavLink({ href, className, children, onClick }: { href: string; className?: string; children: React.ReactNode; onClick?: () => void }) {
   if (isInternalRoute(href)) {
-    return <Link to={href} className={className} onClick={onClick}>{children}</Link>
+    return <Link to={href} className={className} onClick={onClick} activeProps={{ 'aria-current': 'page' } as Record<string, string>}>{children}</Link>
   }
   return <a href={href} className={className} onClick={onClick}>{children}</a>
 }
@@ -226,9 +226,13 @@ export function Navbar() {
       aria-label="Main navigation"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? 'h-20 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10 shadow-lg'
+          ? 'h-20 backdrop-blur-xl border-b shadow-lg'
           : 'h-24 bg-transparent border-b border-transparent'
       }`}
+      style={isScrolled ? {
+        backgroundColor: 'rgb(var(--surface-primary) / 0.85)',
+        borderColor: 'rgba(var(--border-primary), 0.1)',
+      } : undefined}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 h-full flex items-center justify-between">
         {/* Logo */}
@@ -277,11 +281,12 @@ export function Navbar() {
                       setHoveredItem(null)
                     }
                   }}
-                  className={`px-4 py-2 flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 rounded-full ${
-                    activeDropdown === item.label || hoveredItem === item.label
-                      ? 'text-white'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
+                  className="px-4 py-2 flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 rounded-full"
+                  style={{
+                    color: activeDropdown === item.label || hoveredItem === item.label
+                      ? 'rgb(var(--text-primary))'
+                      : 'rgb(var(--text-secondary))',
+                  }}
                 >
                   {item.label}
                   {item.type === 'mega_menu' && (
@@ -386,13 +391,15 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             to="/login"
-            className="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/20 text-sm font-medium text-white hover:bg-white/10 transition-colors"
+            className="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-full border text-sm font-medium transition-all hover:border-white/40 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            style={{ borderColor: 'rgba(var(--text-primary), 0.2)', color: 'rgb(var(--text-primary))' }}
           >
             Sign In
           </Link>
-          {/* Mobile Toggle */}
+          {/* Mobile Toggle — 44x44px min touch target */}
           <button
-            className="md:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+            className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+            style={{ color: 'rgb(var(--text-primary))' }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
@@ -403,17 +410,17 @@ export function Navbar() {
 
       {/* Mobile Menu — two-column categorized layout */}
       <div
-        className={`md:hidden fixed inset-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl transition-all duration-300 ${
+        className={`md:hidden fixed inset-0 z-40 backdrop-blur-xl transition-all duration-300 ${
           mobileMenuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-4 invisible pointer-events-none'
         }`}
-        style={{ top: '80px' }}
+        style={{ top: '80px', backgroundColor: 'rgb(var(--surface-primary) / 0.95)' }}
       >
-        <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto p-4 pt-4">
+        <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto overscroll-contain p-4 pt-4" style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
           {/* Sign In CTA — immediately visible at top */}
           <div className="pb-4 mb-4 border-b border-white/10">
             <Link
               to="/login"
-              className="flex items-center justify-center w-full min-h-[44px] py-3 rounded-full bg-gradient-to-r from-[#e76f51] to-[#f4a261] text-white font-semibold transition-all hover:shadow-lg"
+              className="flex items-center justify-center w-full min-h-[48px] py-3 rounded-full bg-gradient-to-r from-[#e76f51] to-[#f4a261] text-white font-semibold transition-all hover:shadow-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Sign In
@@ -432,7 +439,7 @@ export function Navbar() {
                     <NavLink
                       key={idx}
                       href={subItem.href}
-                      className="flex items-center gap-3 rounded-lg px-2 py-2 min-h-[44px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-3 rounded-lg px-2 py-2.5 min-h-[44px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors touch-manipulation"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <subItem.icon className="w-4 h-4 shrink-0" style={{ color: subItem.iconColor }} />

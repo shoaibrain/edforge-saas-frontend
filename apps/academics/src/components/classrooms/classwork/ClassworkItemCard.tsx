@@ -3,7 +3,7 @@
  */
 
 import { ClipboardList, HelpCircle, FileText, MessageCircle, Paperclip, Calendar } from 'lucide-react'
-import type { ClassworkItem } from './types'
+import type { ClassworkItemResponseDto } from '@aibrains/shared-types'
 
 const typeConfig = {
   assignment: { icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -13,10 +13,11 @@ const typeConfig = {
 }
 
 interface ClassworkItemCardProps {
-  item: ClassworkItem
+  item: ClassworkItemResponseDto
+  onClick?: (item: ClassworkItemResponseDto) => void
 }
 
-export function ClassworkItemCard({ item }: ClassworkItemCardProps) {
+export function ClassworkItemCard({ item, onClick }: ClassworkItemCardProps) {
   const config = typeConfig[item.type]
   const TypeIcon = config.icon
 
@@ -25,8 +26,13 @@ export function ClassworkItemCard({ item }: ClassworkItemCardProps) {
     : null
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 bg-surface-primary rounded-lg border border-border-primary hover:border-border-secondary hover:shadow-sm transition-all cursor-pointer">
-      <div className={`p-2 rounded-full ${config.bg} flex-shrink-0`}>
+    <button
+      type="button"
+      onClick={() => onClick?.(item)}
+      className="flex items-center gap-3 px-4 py-3 w-full text-left bg-surface-primary rounded-lg border border-border-primary hover:border-border-secondary hover:shadow-sm transition-all cursor-pointer"
+      aria-label={`Open ${item.title}`}
+    >
+      <div className={`p-2 rounded-full ${config.bg} flex-shrink-0`} aria-hidden="true">
         <TypeIcon className={`w-4 h-4 ${config.color}`} />
       </div>
       <div className="flex-1 min-w-0">
@@ -34,7 +40,7 @@ export function ClassworkItemCard({ item }: ClassworkItemCardProps) {
         <div className="flex items-center gap-3 mt-0.5">
           {dueLabel && (
             <span className="flex items-center gap-1 text-xs text-text-tertiary">
-              <Calendar className="w-3 h-3" />
+              <Calendar className="w-3 h-3" aria-hidden="true" />
               Due {dueLabel}
             </span>
           )}
@@ -43,7 +49,8 @@ export function ClassworkItemCard({ item }: ClassworkItemCardProps) {
           )}
           {item.attachments && item.attachments.length > 0 && (
             <span className="flex items-center gap-1 text-xs text-text-tertiary">
-              <Paperclip className="w-3 h-3" />
+              <Paperclip className="w-3 h-3" aria-hidden="true" />
+              <span className="sr-only">Attachments:</span>
               {item.attachments.length}
             </span>
           )}
@@ -54,6 +61,6 @@ export function ClassworkItemCard({ item }: ClassworkItemCardProps) {
           Draft
         </span>
       )}
-    </div>
+    </button>
   )
 }

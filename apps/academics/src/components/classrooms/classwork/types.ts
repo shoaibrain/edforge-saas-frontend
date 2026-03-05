@@ -1,35 +1,22 @@
 /**
  * Classwork Types
+ *
+ * Local aliases that match @aibrains/shared-types classwork DTOs.
+ * We re-export from shared-types for canonical usage, and keep
+ * lightweight aliases here for component-level convenience.
  */
 
-export type ClassworkItemType = 'assignment' | 'quiz' | 'material' | 'question'
-
-export interface ClassworkItem {
-  itemId: string
-  sectionId: string
-  type: ClassworkItemType
-  title: string
-  description?: string
-  topicId?: string
-  topicName?: string
-  dueDate?: string
-  possiblePoints?: number
-  status: 'draft' | 'published' | 'scheduled'
-  createdAt: string
-  updatedAt?: string
-  attachments?: ClassworkAttachment[]
-}
-
-export interface ClassworkTopic {
-  topicId: string
-  sectionId: string
-  name: string
-  sortOrder: number
-}
-
-export interface ClassworkAttachment {
-  attachmentId: string
-  fileName: string
-  fileType: string
-  url?: string
-}
+export type {
+  ClassworkItemType,
+  ClassworkItemStatus,
+  ClassworkAssessmentCategory,
+  ClassworkAttachmentDto as ClassworkAttachment,
+  ClassworkItemResponseDto as ClassworkItem,
+  ClassworkTopicResponseDto as ClassworkTopic,
+  SectionClassworkResponseDto,
+  CreateClassworkItemDto,
+  UpdateClassworkItemDto,
+  CreateClassworkTopicDto,
+  UpdateClassworkTopicDto,
+  ReorderClassworkItemsDto,
+} from '@aibrains/shared-types'

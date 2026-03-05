@@ -11,6 +11,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
     return (
       <Link
         to={href}
+        activeProps={{ 'aria-current': 'page' } as Record<string, string>}
         className="text-sm font-medium transition-colors hover:opacity-80"
         style={{ color: 'rgb(var(--text-secondary))' }}
       >
@@ -61,7 +62,7 @@ export function Footer() {
     >
       <div className="mx-auto max-w-7xl px-6 md:px-12">
         {/* Links Grid */}
-        <nav aria-label="Footer navigation" className="mb-16 grid grid-cols-2 gap-8 md:grid-cols-3 lg:gap-16">
+        <nav aria-label="Footer navigation" className="mb-16 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:gap-16">
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category} className="flex flex-col gap-5">
               <h3

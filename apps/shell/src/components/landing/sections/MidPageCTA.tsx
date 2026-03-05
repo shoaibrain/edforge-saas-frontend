@@ -24,7 +24,7 @@ export function MidPageCTA() {
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             to="/login"
-            className="group inline-flex items-center gap-2 px-8 py-3.5 font-semibold transition-all duration-200 hover:scale-[1.03]"
+            className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 min-h-[48px] py-3.5 font-semibold transition-all duration-200 hover:scale-[1.03]"
             style={{ backgroundColor: 'var(--lp-chart-primary)', color: 'rgb(var(--text-inverted))', borderRadius: 'var(--lp-radius-sm)', fontSize: 'var(--lp-font-body)', fontWeight: 'var(--lp-weight-subheading)' }}
           >
             Get Started
@@ -32,7 +32,7 @@ export function MidPageCTA() {
           </Link>
           <a
             href="mailto:shoaibrain@edforge.net?subject=EdForge%20Demo%20Request"
-            className="inline-flex items-center gap-2 px-8 py-3.5 font-medium transition-all duration-200 hover:bg-white/5"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 min-h-[48px] py-3.5 font-medium transition-all duration-200 hover:bg-white/5"
             style={{ border: '1px solid rgba(var(--brand-primary),0.3)', color: 'var(--lp-chart-secondary)', borderRadius: 'var(--lp-radius-sm)', fontSize: 'var(--lp-font-body)' }}
           >
             Schedule a Demo

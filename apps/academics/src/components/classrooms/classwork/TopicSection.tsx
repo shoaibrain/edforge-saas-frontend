@@ -5,16 +5,17 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import type { ClassworkItem } from './types'
+import type { ClassworkItemResponseDto } from '@aibrains/shared-types'
 import { ClassworkItemCard } from './ClassworkItemCard'
 
 interface TopicSectionProps {
   name: string
-  items: ClassworkItem[]
+  items: ClassworkItemResponseDto[]
   defaultOpen?: boolean
+  onItemClick?: (item: ClassworkItemResponseDto) => void
 }
 
-export function TopicSection({ name, items, defaultOpen = true }: TopicSectionProps) {
+export function TopicSection({ name, items, defaultOpen = true, onItemClick }: TopicSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
   return (
@@ -47,7 +48,11 @@ export function TopicSection({ name, items, defaultOpen = true }: TopicSectionPr
           >
             <div className="space-y-2 pl-6">
               {items.map((item) => (
-                <ClassworkItemCard key={item.itemId} item={item} />
+                <ClassworkItemCard
+                  key={item.itemId}
+                  item={item}
+                  onClick={onItemClick}
+                />
               ))}
             </div>
           </motion.div>

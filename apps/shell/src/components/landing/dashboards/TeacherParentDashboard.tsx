@@ -71,7 +71,7 @@ export function TeacherParentDashboard({ activeState }: TeacherParentDashboardPr
             className="flex h-16 items-center justify-between px-6"
             style={{ backgroundColor: 'rgb(var(--surface-secondary))', borderBottom: '1px solid rgba(var(--brand-primary),0.1)' }}
           >
-            <h1 style={{ fontSize: 'var(--lp-font-dashboard-title)', fontWeight: 'var(--lp-weight-subheading)', color: 'rgb(var(--text-primary))', paddingTop: '0.75rem' }}>Classroom Hub</h1>
+            <div style={{ fontSize: 'var(--lp-font-dashboard-title)', fontWeight: 'var(--lp-weight-subheading)', color: 'rgb(var(--text-primary))', paddingTop: '0.75rem' }}>Classroom Hub</div>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Bell className="h-5 w-5" style={{ color: 'rgb(var(--text-tertiary))' }} />

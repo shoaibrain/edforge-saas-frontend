@@ -247,8 +247,8 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(42,157,143,0.1)" opacity={0.4} />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dy={10} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dx={-10} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#8aafbf' }} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#8aafbf' }} dx={-10} />
                         <Tooltip
                           contentStyle={{ backgroundColor: '#102630', borderColor: 'rgba(42,157,143,0.1)', borderRadius: '8px', fontSize: '12px' }}
                           itemStyle={{ color: '#e8edf0' }}
@@ -506,7 +506,7 @@ export function AdminDashboard({ activeState }: AdminDashboardProps) {
                             <stop offset="95%" stopColor="#2a9d8f" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8aafbf' }} dy={10} interval={Math.ceil(overviewData.length / 3)} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#8aafbf' }} dy={10} interval={Math.ceil(overviewData.length / 3)} />
                         <YAxis axisLine={false} tickLine={false} tick={false} width={0} />
                         <Tooltip
                           contentStyle={{ backgroundColor: '#102630', borderColor: 'rgba(42,157,143,0.1)', borderRadius: '8px', fontSize: '12px' }}

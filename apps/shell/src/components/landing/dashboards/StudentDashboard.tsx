@@ -83,7 +83,7 @@ export function StudentDashboard({ activeState }: StudentDashboardProps) {
             className="flex h-16 items-center justify-between px-6"
             style={{ borderBottom: '1px solid rgba(var(--brand-primary),0.1)', backgroundColor: 'rgb(var(--surface-secondary))' }}
           >
-            <h1 style={{ fontSize: 'var(--lp-font-dashboard-title)', fontWeight: 'var(--lp-weight-subheading)', color: 'rgb(var(--text-primary))', paddingTop: '0.75rem' }}>My Learning Dashboard</h1>
+            <div style={{ fontSize: 'var(--lp-font-dashboard-title)', fontWeight: 'var(--lp-weight-subheading)', color: 'rgb(var(--text-primary))', paddingTop: '0.75rem' }}>My Learning Dashboard</div>
             <div className="flex items-center gap-3">
               <div
                 className="flex items-center gap-2 rounded-full px-3 py-1"

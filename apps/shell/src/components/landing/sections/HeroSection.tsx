@@ -15,7 +15,7 @@ export function HeroSection() {
     >
       {/* Layer 1 — base gradient */}
       <div
-        className="absolute inset-0 z-0"
+        className="landing-hero-bg absolute inset-0 z-0"
         aria-hidden="true"
         style={{
           background:
@@ -25,7 +25,7 @@ export function HeroSection() {
 
       {/* Layer 2 — dot grid with radial mask */}
       <div
-        className="pointer-events-none absolute inset-0 z-0"
+        className="landing-hero-dots pointer-events-none absolute inset-0 z-0"
         aria-hidden="true"
         style={{
           backgroundImage:
@@ -63,13 +63,19 @@ export function HeroSection() {
       {/* Content */}
       <div className="relative z-10 max-w-[56rem] mx-auto px-6 sm:px-8 pt-28 pb-20 text-center">
         {/* Badge pill */}
-        <div className="hero-fade-in hero-stagger-1 mb-6 inline-flex items-center gap-2 rounded-full border border-[#2a9d8f]/20 bg-[#2a9d8f]/[0.06] px-4 py-2 text-[0.8125rem] font-medium text-[#5ec4b6]/80 backdrop-blur-sm">
+        <div
+          className="hero-fade-in hero-stagger-1 mb-6 inline-flex items-center gap-2 rounded-full border border-[#2a9d8f]/20 bg-[#2a9d8f]/[0.06] px-4 py-2 text-[0.8125rem] font-medium backdrop-blur-sm"
+          style={{ color: '#7dd8c4' }}
+        >
           <span className="h-1.5 w-1.5 rounded-full bg-[#2a9d8f]/60" />
           Purpose-built for K-12 education
         </div>
 
         {/* Headline */}
-        <h1 className="hero-fade-in hero-stagger-2 text-[2.5rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.25rem] font-bold text-white tracking-[-0.025em] mb-6">
+        <h1
+          className="hero-fade-in hero-stagger-2 text-[2.5rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.25rem] font-bold tracking-[-0.025em] mb-6"
+          style={{ color: 'rgb(var(--text-primary))' }}
+        >
           One platform to power
           <br />
           <span className="hero-gradient-text">
@@ -78,17 +84,24 @@ export function HeroSection() {
         </h1>
 
         {/* Subtitle */}
-        <p className="hero-fade-in hero-stagger-3 text-base leading-relaxed sm:text-lg md:text-xl lg:text-[1.35rem] lg:leading-[1.6] text-[#8aafbf] max-w-[38rem] mx-auto mb-10">
+        <p
+          className="hero-fade-in hero-stagger-3 text-base leading-relaxed sm:text-lg md:text-xl lg:text-[1.35rem] lg:leading-[1.6] max-w-[38rem] mx-auto mb-10"
+          style={{ color: 'rgb(var(--text-secondary))' }}
+        >
           Unify student data, school operations, and district analytics on one
           modern, FERPA-compliant platform — designed to replace legacy systems,
           not add to them.
         </p>
 
         {/* CTA */}
-        <div className="hero-fade-in hero-stagger-4 mb-14 sm:mb-16">
+        <div className="hero-fade-in hero-stagger-4 mb-16 sm:mb-20">
           <Link
             to="/login"
-            className="group relative z-10 inline-flex items-center justify-center gap-2 cursor-pointer rounded-full bg-white text-[#0a1a24] px-7 py-2.5 text-[0.875rem] font-semibold transition-colors duration-200 hover:bg-[#e8ebed]"
+            className="group relative z-10 inline-flex items-center justify-center gap-2 cursor-pointer rounded-full px-7 py-3 sm:py-2.5 text-[0.9375rem] sm:text-[0.875rem] font-semibold transition-colors duration-200"
+            style={{
+              backgroundColor: 'rgb(var(--text-primary))',
+              color: 'rgb(var(--text-inverted))',
+            }}
           >
             Get Started
             <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -96,16 +109,19 @@ export function HeroSection() {
         </div>
 
         {/* Platform pillars — above the fold */}
-        <div className="hero-fade-in hero-stagger-5 flex flex-col sm:flex-row items-center justify-center sm:divide-x sm:divide-white/[0.08]">
+        <div className="hero-fade-in hero-stagger-5 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0 divide-y divide-white/[0.06] sm:divide-y-0 sm:divide-x sm:divide-white/[0.08]">
           {pillars.map((pillar) => (
             <div
               key={pillar.title}
-              className="flex flex-col items-center px-7 sm:px-9 py-2 sm:py-0"
+              className="flex flex-col items-center px-7 sm:px-9 pt-4 sm:pt-0 pb-0 sm:py-0"
             >
-              <span className="text-[0.8125rem] font-semibold text-white/60 tracking-wide">
+              <span className="text-[0.8125rem] font-semibold text-white/70 tracking-wide">
                 {pillar.title}
               </span>
-              <span className="text-[0.6875rem] text-[#4d7f8f] mt-0.5">
+              <span
+                className="text-[0.6875rem] mt-0.5"
+                style={{ color: 'rgb(var(--text-tertiary))' }}
+              >
                 {pillar.detail}
               </span>
             </div>
@@ -115,7 +131,7 @@ export function HeroSection() {
 
       {/* Bottom gradient fade for seamless transition */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-32 z-[5] pointer-events-none"
+        className="landing-hero-fade absolute bottom-0 left-0 right-0 h-32 z-[5] pointer-events-none"
         aria-hidden="true"
         style={{ background: 'linear-gradient(to bottom, transparent, #0d1e27)' }}
       />

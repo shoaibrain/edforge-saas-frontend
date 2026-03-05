@@ -157,10 +157,15 @@ const classroomDetailRoute = createRoute({
     component: ClassroomDetailPage,
     validateSearch: (search: Record<string, unknown>) => ({
         tab: z
-            .enum(['stream', 'classwork', 'people', 'grades', 'attendance'])
+            .enum(['stream', 'classwork', 'people', 'progress', 'grades', 'attendance'])
             .optional()
             .catch(undefined)
             .parse(search.tab),
+        view: z
+            .enum(['overview', 'gradebook', 'attendance'])
+            .optional()
+            .catch(undefined)
+            .parse(search.view),
     }),
 })
 
@@ -188,7 +193,7 @@ const schedulingDetailRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/scheduling/$sectionId',
     beforeLoad: ({ params }) => {
-        throw redirect({ to: '/classrooms/$sectionId', params: { sectionId: params.sectionId }, search: { tab: undefined } })
+        throw redirect({ to: '/classrooms/$sectionId', params: { sectionId: params.sectionId }, search: { tab: undefined, view: undefined } })
     },
     component: () => null,
 })

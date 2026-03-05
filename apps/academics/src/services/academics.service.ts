@@ -54,6 +54,10 @@ export type {
   ClassPeriodListResponseDto,
   LocationResponseDto,
   LocationListResponseDto,
+  ClassworkItemResponseDto,
+  ClassworkTopicResponseDto,
+  SectionClassworkResponseDto,
+  CreateClassworkItemDto,
 } from '@aibrains/shared-types'
 
 // Import for internal use
@@ -84,6 +88,10 @@ import type {
   UpdateCourseOfferingDto,
   ClassPeriodListResponseDto,
   LocationListResponseDto,
+  ClassworkItemResponseDto,
+  ClassworkTopicResponseDto,
+  SectionClassworkResponseDto,
+  CreateClassworkItemDto,
 } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -1507,6 +1515,117 @@ export async function linkGuardianToUser(
 }
 
 // ============================================================================
+// CLASSWORK
+// ============================================================================
+
+/**
+ * Get all classwork items and topics for a section
+ * GET /academics/classwork?sectionId=&schoolId=
+ */
+export async function getClassworkItems(
+  sectionId: string,
+  schoolId: string
+): Promise<SectionClassworkResponseDto> {
+  return apiGet<SectionClassworkResponseDto>(
+    `/academics/classwork?sectionId=${sectionId}&schoolId=${schoolId}`
+  )
+}
+
+/**
+ * Create a classwork item
+ * POST /academics/classwork
+ */
+export async function createClassworkItem(
+  data: CreateClassworkItemDto
+): Promise<ClassworkItemResponseDto> {
+  return apiPost<ClassworkItemResponseDto>('/academics/classwork', data)
+}
+
+/**
+ * Update a classwork item
+ * PATCH /academics/classwork/:itemId?schoolId=&sectionId=
+ */
+export async function updateClassworkItem(
+  itemId: string,
+  schoolId: string,
+  sectionId: string,
+  data: Record<string, unknown>
+): Promise<ClassworkItemResponseDto> {
+  return apiPatch<ClassworkItemResponseDto>(
+    `/academics/classwork/${itemId}?schoolId=${schoolId}&sectionId=${sectionId}`,
+    data
+  )
+}
+
+/**
+ * Delete a classwork item
+ * DELETE /academics/classwork/:itemId?schoolId=&sectionId=
+ */
+export async function deleteClassworkItem(
+  itemId: string,
+  schoolId: string,
+  sectionId: string
+): Promise<void> {
+  return apiDelete(
+    `/academics/classwork/${itemId}?schoolId=${schoolId}&sectionId=${sectionId}`
+  )
+}
+
+/**
+ * Create a classwork topic
+ * POST /academics/classwork/topics
+ */
+export async function createClassworkTopic(
+  data: { sectionId: string; schoolId: string; name: string }
+): Promise<ClassworkTopicResponseDto> {
+  return apiPost<ClassworkTopicResponseDto>('/academics/classwork/topics', data)
+}
+
+/**
+ * Update a classwork topic
+ * PATCH /academics/classwork/topics/:topicId?schoolId=&sectionId=
+ */
+export async function updateClassworkTopic(
+  topicId: string,
+  schoolId: string,
+  sectionId: string,
+  data: { name?: string; sortOrder?: number }
+): Promise<ClassworkTopicResponseDto> {
+  return apiPatch<ClassworkTopicResponseDto>(
+    `/academics/classwork/topics/${topicId}?schoolId=${schoolId}&sectionId=${sectionId}`,
+    data
+  )
+}
+
+/**
+ * Delete a classwork topic
+ * DELETE /academics/classwork/topics/:topicId?schoolId=&sectionId=
+ */
+export async function deleteClassworkTopic(
+  topicId: string,
+  schoolId: string,
+  sectionId: string
+): Promise<void> {
+  return apiDelete(
+    `/academics/classwork/topics/${topicId}?schoolId=${schoolId}&sectionId=${sectionId}`
+  )
+}
+
+/**
+ * Reorder classwork items and topics within a section
+ * PATCH /academics/classwork/reorder
+ */
+export async function reorderClassworkItems(
+  data: {
+    schoolId: string
+    sectionId: string
+    items: Array<{ id: string; type: 'item' | 'topic'; sortOrder: number; topicId?: string | null }>
+  }
+): Promise<void> {
+  return apiPatch('/academics/classwork/reorder', data)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -1584,4 +1703,13 @@ export const academicsService = {
   createParentAccount,
   createStudentAccount,
   linkGuardianToUser,
+  // Classwork (Sprint 3B)
+  getClassworkItems,
+  createClassworkItem,
+  updateClassworkItem,
+  deleteClassworkItem,
+  createClassworkTopic,
+  updateClassworkTopic,
+  deleteClassworkTopic,
+  reorderClassworkItems,
 }

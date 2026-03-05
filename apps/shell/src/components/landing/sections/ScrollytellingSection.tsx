@@ -146,13 +146,13 @@ export function ScrollytellingSection<T extends string>({
 
   // ─── Mobile section header (static, non-sticky) ───
   const sectionHeader = (
-    <div className="px-6 pt-12 pb-10 text-center lg:pb-14">
+    <div className="px-6 pt-12 pb-12 text-center lg:pb-14">
       <div
         className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium backdrop-blur-sm"
         style={{
           border: '1px solid rgba(var(--brand-primary),0.2)',
           backgroundColor: 'rgba(var(--brand-primary),0.06)',
-          color: 'rgba(94,196,182,0.8)',
+          color: 'rgb(125, 216, 196)',
         }}
       >
         {sectionTag}
@@ -202,7 +202,7 @@ export function ScrollytellingSection<T extends string>({
           style={{
             border: '1px solid rgba(var(--brand-primary),0.2)',
             backgroundColor: 'rgba(var(--brand-primary),0.06)',
-            color: 'rgba(94,196,182,0.8)',
+            color: 'rgb(125, 216, 196)',
           }}
         >
           {sectionTag}
@@ -267,8 +267,9 @@ export function ScrollytellingSection<T extends string>({
       <section className="relative" aria-label={typeof sectionTag === 'string' ? sectionTag : undefined}>
         {sectionHeader}
 
-        {/* Pill Tab Bar */}
-        <div className="flex gap-2 overflow-x-auto px-4 pb-6 scrollbar-hide" role="tablist" aria-label={`${sectionTag} features`}>
+        {/* Pill Tab Bar — scroll-snap with overflow hint */}
+        <div className="relative">
+        <div className="flex gap-2 overflow-x-auto px-4 pb-6 scrollbar-hide snap-x snap-mandatory scroll-pl-4" role="tablist" aria-label={`${sectionTag} features`}>
           {sections.map((section, index) => (
             <button
               key={section.id}
@@ -277,7 +278,7 @@ export function ScrollytellingSection<T extends string>({
               aria-selected={isActive(index)}
               aria-controls={`tabpanel-${section.state}`}
               id={`tab-${section.state}`}
-              className="shrink-0 rounded-full px-4 py-2 font-medium transition-all duration-300"
+              className="shrink-0 snap-start rounded-full px-4 py-2 font-medium transition-all duration-300"
               style={{
                 fontSize: 'var(--lp-font-label)',
                 backgroundColor: isActive(index) ? 'var(--lp-chart-primary)' : 'rgba(var(--brand-primary),0.08)',
@@ -289,6 +290,9 @@ export function ScrollytellingSection<T extends string>({
               {section.badge}
             </button>
           ))}
+        </div>
+        {/* Right-edge fade hint for scroll overflow */}
+        <div className="pointer-events-none absolute right-0 top-0 bottom-6 w-12" style={{ background: 'linear-gradient(to right, transparent, rgb(var(--surface-primary)))' }} />
         </div>
 
         {/* Active Content */}
@@ -325,7 +329,9 @@ export function ScrollytellingSection<T extends string>({
 
         {/* Mobile Dashboard Preview */}
         <div className="px-4 pb-12 sm:px-6">
-          <div className="mx-auto max-w-[500px] overflow-hidden" style={{ border: '1px solid rgba(var(--brand-primary),0.1)', borderRadius: 'var(--lp-radius-lg)' }}>
+          <div className="relative mx-auto max-w-[500px] overflow-hidden" style={{ border: '1px solid rgba(var(--brand-primary),0.1)', borderRadius: 'var(--lp-radius-lg)' }}>
+            {/* Top gradient overlay for visual blending */}
+            <div className="pointer-events-none absolute top-0 left-0 right-0 z-10 h-5" style={{ background: 'linear-gradient(to bottom, rgb(var(--surface-primary)), transparent)' }} />
             <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', marginBottom: '-15%' }}>
               <Dashboard activeState={dashboardState} />
             </div>

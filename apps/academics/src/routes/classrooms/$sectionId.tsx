@@ -2,10 +2,9 @@
  * Classroom Detail Page
  *
  * Google Classroom-inspired detail view for a single class section.
- * Tabs: Stream (stub), Classwork (stub), People, Grades, Attendance
+ * Tabs: Stream, Classwork, People, Progress (Grades + Attendance merged)
  *
- * People, Grades, and Attendance are fully functional using existing components.
- * Stream and Classwork are placeholders until Sprint 4/5.
+ * People, Progress (Grades & Attendance), Stream, and Classwork are fully functional.
  */
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
@@ -28,6 +27,7 @@ import {
   FileText,
   Plus,
   Lock,
+  TrendingUp,
 } from 'lucide-react'
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
@@ -62,14 +62,13 @@ import { ClassworkFeed } from '../../components/classrooms/classwork'
 // TYPES
 // ============================================================================
 
-type ClassroomDetailTab = 'stream' | 'classwork' | 'people' | 'grades' | 'attendance'
+type ClassroomDetailTab = 'stream' | 'classwork' | 'people' | 'progress'
 
 const TABS: { id: ClassroomDetailTab; label: string; icon: typeof BookOpen }[] = [
   { id: 'stream', label: 'Stream', icon: MessageSquare },
   { id: 'classwork', label: 'Classwork', icon: FileText },
   { id: 'people', label: 'People', icon: Users },
-  { id: 'grades', label: 'Grades', icon: GraduationCap },
-  { id: 'attendance', label: 'Attendance', icon: ClipboardCheck },
+  { id: 'progress', label: 'Progress', icon: TrendingUp },
 ]
 
 const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
@@ -118,38 +117,42 @@ function ActionsDropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Actions"
+        aria-label="Section actions"
         aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
-        <MoreHorizontal className="w-5 h-5" />
+        <MoreHorizontal className="w-5 h-5" aria-hidden="true" />
       </button>
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1">
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label="Section actions">
             <button
               type="button"
+              role="menuitem"
               onClick={() => { setIsOpen(false); onEdit() }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              <Pencil className="w-4 h-4" />
+              <Pencil className="w-4 h-4" aria-hidden="true" />
               Edit Section
             </button>
             <button
               type="button"
+              role="menuitem"
               onClick={() => { setIsOpen(false); window.print() }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              <Printer className="w-4 h-4" />
+              <Printer className="w-4 h-4" aria-hidden="true" />
               Print Roster
             </button>
-            <div className="border-t border-border-secondary my-1" />
+            <div className="border-t border-border-secondary my-1" role="separator" />
             <button
               type="button"
+              role="menuitem"
               onClick={() => { setIsOpen(false); onToggleActive() }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              {isActive ? <><ToggleLeft className="w-4 h-4" />Deactivate</> : <><ToggleRight className="w-4 h-4" />Activate</>}
+              {isActive ? <><ToggleLeft className="w-4 h-4" aria-hidden="true" />Deactivate</> : <><ToggleRight className="w-4 h-4" aria-hidden="true" />Activate</>}
             </button>
           </div>
         </>
@@ -324,6 +327,211 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
 }
 
 // ============================================================================
+// PROGRESS SUB-VIEWS
+// ============================================================================
+
+type ProgressView = 'overview' | 'gradebook' | 'attendance'
+
+function ProgressOverview({
+  sectionId,
+  onNavigate,
+}: {
+  sectionId: string
+  onNavigate: (view: ProgressView) => void
+}) {
+  const schoolId = useActiveSchoolId() || ''
+  const { data: roster } = useSectionRoster({ sectionId, schoolId, enabled: !!schoolId })
+  const { data: gradebook } = useSectionGrades(sectionId, { schoolId }, !!schoolId)
+
+  const gradeStats = useMemo(() => {
+    const grades = gradebook?.grades ?? []
+    if (grades.length === 0) return null
+    const scored = grades.filter((g) => g.numericGrade != null)
+    const avg =
+      scored.length > 0 ? scored.reduce((s, g) => s + (g.numericGrade || 0), 0) / scored.length : 0
+    const distribution = { A: 0, B: 0, C: 0, D: 0, F: 0 }
+    scored.forEach((g) => {
+      const n = g.numericGrade || 0
+      if (n >= 90) distribution.A++
+      else if (n >= 80) distribution.B++
+      else if (n >= 70) distribution.C++
+      else if (n >= 60) distribution.D++
+      else distribution.F++
+    })
+    return { avg: Math.round(avg * 10) / 10, total: scored.length, distribution }
+  }, [gradebook])
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Grade Summary Card */}
+      <div className="bg-surface-primary rounded-xl border border-border-primary p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wide">
+            Grades
+          </h3>
+          <button
+            type="button"
+            onClick={() => onNavigate('gradebook')}
+            className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+          >
+            Open Gradebook →
+          </button>
+        </div>
+        {gradeStats ? (
+          <div className="space-y-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-text-primary">{gradeStats.avg}%</span>
+              <span className="text-sm text-text-secondary">class average</span>
+            </div>
+            <div className="flex gap-1 h-2 rounded-full overflow-hidden bg-surface-secondary">
+              {Object.entries(gradeStats.distribution).map(([letter, count]) => {
+                const pct =
+                  gradeStats.total > 0 ? (count / gradeStats.total) * 100 : 0
+                const colors: Record<string, string> = {
+                  A: 'bg-emerald-500',
+                  B: 'bg-blue-500',
+                  C: 'bg-amber-500',
+                  D: 'bg-orange-500',
+                  F: 'bg-red-500',
+                }
+                return pct > 0 ? (
+                  <div
+                    key={letter}
+                    className={`${colors[letter]} transition-all`}
+                    style={{ width: `${pct}%` }}
+                    title={`${letter}: ${count}`}
+                  />
+                ) : null
+              })}
+            </div>
+            <div className="flex gap-3 text-xs text-text-tertiary">
+              {Object.entries(gradeStats.distribution).map(([letter, count]) => (
+                <span key={letter}>
+                  {letter}: {count}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <GraduationCap className="w-8 h-8 mx-auto text-text-tertiary mb-2" aria-hidden="true" />
+            <p className="text-sm text-text-secondary">No grades recorded yet</p>
+          </div>
+        )}
+      </div>
+
+      {/* Attendance Summary Card */}
+      <div className="bg-surface-primary rounded-xl border border-border-primary p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wide">
+            Attendance
+          </h3>
+          <button
+            type="button"
+            onClick={() => onNavigate('attendance')}
+            className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+          >
+            Open Attendance →
+          </button>
+        </div>
+        <div className="text-center py-8">
+          <ClipboardCheck className="w-8 h-8 mx-auto text-text-tertiary mb-2" aria-hidden="true" />
+          {(roster?.students?.length ?? 0) > 0 ? (
+            <>
+              <p className="text-sm text-text-secondary">
+                {roster?.students?.length} students enrolled
+              </p>
+              <p className="text-xs text-text-tertiary mt-1">
+                Open attendance to record today's attendance
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-text-secondary">No students enrolled yet</p>
+              <p className="text-xs text-text-tertiary mt-1">
+                Enroll students in this section before recording attendance
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// PROGRESS TAB (merged Grades + Attendance)
+// ============================================================================
+
+function ProgressTab({
+  sectionId,
+  section,
+  activeView,
+  onViewChange,
+}: {
+  sectionId: string
+  section: any
+  activeView: ProgressView
+  onViewChange: (view: ProgressView) => void
+}) {
+  const views: { id: ProgressView; label: string }[] = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'gradebook', label: 'Gradebook' },
+    { id: 'attendance', label: 'Attendance' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      {/* Segmented control */}
+      <div className="flex items-center gap-1 p-1 bg-surface-secondary rounded-lg w-fit" role="tablist" aria-label="Progress views">
+        {views.map((v) => (
+          <button
+            key={v.id}
+            type="button"
+            role="tab"
+            id={`progress-tab-${v.id}`}
+            aria-selected={activeView === v.id}
+            aria-controls={`progress-panel-${v.id}`}
+            onClick={() => onViewChange(v.id)}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              activeView === v.id
+                ? 'bg-surface-primary text-text-primary shadow-sm'
+                : 'text-text-tertiary hover:text-text-secondary'
+            }`}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Sub-view content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeView}
+          role="tabpanel"
+          id={`progress-panel-${activeView}`}
+          aria-labelledby={`progress-tab-${activeView}`}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.12 }}
+        >
+          {activeView === 'overview' && (
+            <ProgressOverview sectionId={sectionId} onNavigate={onViewChange} />
+          )}
+          {activeView === 'gradebook' && (
+            <SectionGradesTab sectionId={sectionId} section={section} />
+          )}
+          {activeView === 'attendance' && (
+            <SectionAttendanceWrapper sectionId={sectionId} />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================================================
 // SECTION DETAIL PAGE (main export)
 // ============================================================================
 
@@ -333,10 +541,16 @@ export function ClassroomDetailPage() {
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
 
-  // Tab state from URL
-  const search = useSearch({ strict: false }) as { tab?: string }
+  // Tab state from URL (with redirects for old tab names)
+  const search = useSearch({ strict: false }) as { tab?: string; view?: string }
   const rawTab = search?.tab || 'stream'
-  const activeTab: ClassroomDetailTab = VALID_TABS.has(rawTab) ? (rawTab as ClassroomDetailTab) : 'stream'
+  let resolvedTab = rawTab
+  if (resolvedTab === 'grades') resolvedTab = 'progress'
+  if (resolvedTab === 'attendance') resolvedTab = 'progress'
+  const activeTab: ClassroomDetailTab = VALID_TABS.has(resolvedTab) ? (resolvedTab as ClassroomDetailTab) : 'stream'
+
+  // Progress sub-view from URL
+  const progressView = search?.view || 'overview'
 
   const setActiveTab = useCallback(
     (tab: ClassroomDetailTab) => {
@@ -410,7 +624,7 @@ export function ClassroomDetailPage() {
 
   return (
     <div className="min-h-full">
-      {/* Cover Image Banner Header — full bleed (parent padding negated on wrapper) */}
+      {/* Cover Image Banner Header — compact full bleed */}
       <div className="relative">
         {/* Cover image */}
         <img
@@ -418,15 +632,15 @@ export function ClassroomDetailPage() {
           alt={courseCover.alt}
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/40" />
+        {/* Enhanced gradient overlay for better text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
 
         {/* Content (positioned above overlay) */}
-        <div className="relative px-8 pt-8 pb-6">
+        <div className="relative px-4 sm:px-8 pt-5 pb-4">
           {/* Top bar: status + actions */}
-          <div className="flex items-center justify-end mb-6">
+          <div className="flex items-center justify-end mb-3">
             <div className="flex items-center gap-2">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
+              <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                 section.isActive
                   ? 'bg-white/20 text-white'
                   : 'bg-black/20 text-white/80'
@@ -444,35 +658,28 @@ export function ClassroomDetailPage() {
             </div>
           </div>
 
-          {/* Title on banner */}
-          <div>
-            <h1 className="text-2xl font-bold text-white drop-shadow-sm">
-              {section.sectionName || `Section ${section.sectionNumber}`}
-            </h1>
-            <p className="text-white/80 text-sm mt-1 drop-shadow-sm">
-              {section.courseName}
-              {section.courseCode && ` (${section.courseCode})`}
-              {' · '}
-              {section.primaryTeacherName || 'No teacher assigned'}
-            </p>
-          </div>
+          {/* Title + meta on banner — tighter layout */}
+          <h1 className="text-2xl font-bold text-white drop-shadow-sm">
+            {section.sectionName || `Section ${section.sectionNumber}`}
+          </h1>
+          <p className="text-white/80 text-sm mt-0.5 drop-shadow-sm">
+            {section.courseName}
+            {section.courseCode && ` (${section.courseCode})`}
+            {' · '}
+            {section.primaryTeacherName || 'No teacher assigned'}
+          </p>
 
-          {/* Enrollment bar */}
-          <div className="mt-4 flex items-center gap-4">
-            <div className="flex-1 max-w-xs">
-              <div className="flex items-center justify-between text-xs text-white/70 mb-1">
-                <span>{section.currentEnrollment} / {section.maxEnrollment} students</span>
-                <span>{percent}%</span>
-              </div>
-              <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                <div className="h-full rounded-full bg-white/80 transition-all" style={{ width: `${percent}%` }} />
-              </div>
-            </div>
+          {/* Compact inline badges: enrollment + room */}
+          <div className="mt-2 flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-white/90">
+              <Users className="w-3 h-3" />
+              {section.currentEnrollment}/{section.maxEnrollment} students ({percent}%)
+            </span>
             {(section.locationRoomNumber || section.roomNumber) && (
-              <div className="flex items-center gap-1.5 text-xs text-white/70">
-                <MapPin className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-white/90">
+                <MapPin className="w-3 h-3" />
                 {section.locationRoomNumber || section.roomNumber}
-              </div>
+              </span>
             )}
           </div>
         </div>
@@ -480,7 +687,7 @@ export function ClassroomDetailPage() {
 
       {/* Tab Navigation */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-8">
+        <div className="px-4 sm:px-8">
           <nav className="flex gap-1 overflow-x-auto" aria-label="Classroom tabs" role="tablist">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id
@@ -516,7 +723,7 @@ export function ClassroomDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="px-8 py-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="px-4 sm:px-8 py-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -527,7 +734,15 @@ export function ClassroomDetailPage() {
           >
             {activeTab === 'stream' && (
               <TabErrorBoundary tabName="Stream">
-                <StreamFeed sectionId={sectionId} onSwitchTab={(tab) => setActiveTab(tab as ClassroomDetailTab)} />
+                <StreamFeed sectionId={sectionId} onSwitchTab={(tab) => {
+                  // Handle "progress:view" format from StreamFeed quick actions
+                  if (tab.startsWith('progress:')) {
+                    const view = tab.split(':')[1]
+                    navigate({ search: { tab: 'progress', view } as any, replace: true })
+                  } else {
+                    setActiveTab(tab as ClassroomDetailTab)
+                  }
+                }} />
               </TabErrorBoundary>
             )}
 
@@ -543,15 +758,14 @@ export function ClassroomDetailPage() {
               </TabErrorBoundary>
             )}
 
-            {activeTab === 'grades' && (
-              <TabErrorBoundary tabName="Grades">
-                <SectionGradesTab sectionId={sectionId} section={section} />
-              </TabErrorBoundary>
-            )}
-
-            {activeTab === 'attendance' && (
-              <TabErrorBoundary tabName="Attendance">
-                <SectionAttendanceWrapper sectionId={sectionId} />
+            {activeTab === 'progress' && (
+              <TabErrorBoundary tabName="Progress">
+                <ProgressTab
+                  sectionId={sectionId}
+                  section={section}
+                  activeView={progressView as ProgressView}
+                  onViewChange={(view) => navigate({ search: { tab: 'progress', view } as any, replace: true })}
+                />
               </TabErrorBoundary>
             )}
           </motion.div>

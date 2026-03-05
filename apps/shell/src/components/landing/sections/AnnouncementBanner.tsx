@@ -33,7 +33,7 @@ export function AnnouncementBanner() {
       <button
         onClick={dismiss}
         aria-label="Dismiss announcement"
-        className="ml-2 shrink-0 rounded-full p-1 hover:bg-white/10 transition-colors"
+        className="ml-2 shrink-0 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-white/10 transition-colors"
       >
         <X className="h-3.5 w-3.5" />
       </button>
