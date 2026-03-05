@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
+import { SchoolTransitionOverlay } from './SchoolTransitionOverlay'
 import { useAppStore } from '../../stores/app.store'
 import { useRouteFocus, useRouteAnnouncement } from '../../hooks/useFocusManagement'
 
@@ -18,11 +19,6 @@ export function AppShell({ children }: AppShellProps) {
   // Accessibility: Focus management on route changes
   useRouteFocus()
   useRouteAnnouncement()
-
-  // NOTE: School auto-selection is handled by the SidebarSchoolSelector
-  // which fetches real schools from the API. Do NOT auto-select from
-  // user.assignments keys here — those are role-mapping keys that may
-  // not match actual school UUIDs from the Identity service.
 
   // Keyboard shortcut: Cmd+B / Ctrl+B to toggle sidebar
   useEffect(() => {
@@ -54,13 +50,14 @@ export function AppShell({ children }: AppShellProps) {
         <Header />
 
         {/* Page content */}
-        <main 
+        <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 overflow-x-clip outline-none"
+          className="relative flex-1 overflow-x-clip outline-none"
           aria-label="Main content"
         >
           {children}
+          <SchoolTransitionOverlay />
         </main>
       </motion.div>
     </div>

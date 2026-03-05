@@ -37,6 +37,7 @@ import { getRoleI18nKey } from '../components/staff/StaffRoleBadge'
 import { getStatusI18nKey } from '../components/staff/StaffStatusBadge'
 
 import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'
+import { useActiveSchoolId } from '../stores/app.store'
 import { Button } from '../components/ui'
 import {
   CreateUserModal,
@@ -131,6 +132,7 @@ export default function StaffPage() {
   const { t } = useTranslation('people')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const schoolId = useActiveSchoolId()
 
   // ABAC permission checks for staff management
   const canCreate = usePermission('create', 'staff')
@@ -191,19 +193,20 @@ export default function StaffPage() {
     refetch,
     totalLoaded,
   } = usePaginatedQuery<StaffResponseDto>({
-    queryKey: ['staff', debouncedSearch, filters],
+    queryKey: ['staff', schoolId, debouncedSearch, filters],
     queryFn: ({ limit, cursor }) =>
       staffService.listStaff({
         limit,
         cursor,
         search: debouncedSearch || undefined,
+        schoolId: schoolId || undefined,
         ...filters,
       }),
     limit: 20,
   })
 
   // Query key for cache operations
-  const staffQueryKey = ['staff', debouncedSearch, filters]
+  const staffQueryKey = ['staff', schoolId, debouncedSearch, filters]
 
   // Optimistic delete mutation
   const deleteMutation = useMutation({

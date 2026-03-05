@@ -11,7 +11,7 @@
  */
 
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
 import type { UserIdentity, Tenant, School, SchoolYear } from '@edforge/types'
 import { useAuthStore, type AuthStore } from '../stores/auth.store'
@@ -82,9 +82,12 @@ export function ShellProvider({ children }: ShellProviderProps) {
     activeSchoolId,
     setActiveSchoolId,
     setActiveSchoolStatus,
+    setSchoolTransitioning,
     sidebarCollapsed,
     toggleSidebar,
   } = useAppStore()
+
+  const queryClient = useQueryClient()
 
   // Theme (using 'system' as default for now)
   const theme: 'light' | 'dark' | 'system' = 'system'
@@ -194,17 +197,81 @@ export function ShellProvider({ children }: ShellProviderProps) {
     return availableSchools.find((s) => s.id === activeSchoolId) ?? null
   }, [activeSchoolId, availableSchools])
 
-  // Auto-select first school if none selected
+  // Consolidated auto-select: restore from localStorage or pick first available
   useEffect(() => {
-    if (user && !activeSchoolId && availableSchools.length > 0) {
+    if (!user || availableSchools.length === 0) return
+    if (activeSchoolId && availableSchools.some((s) => s.id === activeSchoolId)) return
+
+    // Try to restore user's last-used school
+    const savedId = localStorage.getItem(`edforge-active-school-${user.id}`)
+    if (savedId && availableSchools.some((s) => s.id === savedId)) {
+      setActiveSchoolId(savedId)
+    } else {
       setActiveSchoolId(availableSchools[0].id)
     }
   }, [user, activeSchoolId, availableSchools, setActiveSchoolId])
+
+  // Persist school selection to localStorage for restore on next login
+  useEffect(() => {
+    if (activeSchoolId && user?.id) {
+      localStorage.setItem(`edforge-active-school-${user.id}`, activeSchoolId)
+    }
+  }, [activeSchoolId, user?.id])
 
   // Sync activeSchoolStatus to cookie store so MFEs can read it
   useEffect(() => {
     setActiveSchoolStatus(activeSchool?.status ?? null)
   }, [activeSchool?.status, setActiveSchoolStatus])
+
+  // ============================================================================
+  // CACHE INVALIDATION ON SCHOOL CHANGE
+  // Cancels in-flight queries for old school, removes their cache, and
+  // invalidates any existing cache for the new school to force refetch.
+  // ============================================================================
+
+  const prevSchoolIdRef = useRef<string | null>(activeSchoolId)
+
+  useEffect(() => {
+    const prevId = prevSchoolIdRef.current
+    prevSchoolIdRef.current = activeSchoolId
+
+    // Skip on initial mount or when school hasn't actually changed
+    if (prevId === activeSchoolId) return
+
+    // Deep-search predicate: finds schoolId at any position in the query key
+    // array, or inside a filter/params object.
+    const matchesSchool = (schoolId: string) => (query: { queryKey: readonly unknown[] }) => {
+      return query.queryKey.some((segment) => {
+        if (typeof segment === 'string' && segment === schoolId) return true
+        if (typeof segment === 'object' && segment !== null) {
+          const obj = segment as Record<string, unknown>
+          if (obj.schoolId === schoolId) return true
+        }
+        return false
+      })
+    }
+
+    // 1. Cancel any in-flight requests for the old school
+    if (prevId) {
+      queryClient.cancelQueries({ predicate: matchesSchool(prevId) })
+      // 2. Remove stale cache for the old school
+      queryClient.removeQueries({ predicate: matchesSchool(prevId) })
+    }
+
+    // 3. If switching to a real school, invalidate existing cache (force refetch)
+    if (activeSchoolId) {
+      queryClient.invalidateQueries({ predicate: matchesSchool(activeSchoolId) })
+    }
+  }, [activeSchoolId, queryClient])
+
+  // Clear the transition flag once all queries have settled
+  const fetchingCount = useIsFetching()
+
+  useEffect(() => {
+    if (fetchingCount === 0) {
+      setSchoolTransitioning(false)
+    }
+  }, [fetchingCount, setSchoolTransitioning])
 
   // ============================================================================
   // NAVIGATION

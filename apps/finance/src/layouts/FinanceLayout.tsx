@@ -9,9 +9,12 @@
  * MFE modules should only render their content.
  */
 
-import { Component } from 'react'
+import { Component, useEffect, useRef } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle, RotateCw, Home } from 'lucide-react'
+import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
+import { useAppStore } from '../stores/app.store'
 
 // ============================================================================
 // ERROR BOUNDARY (must be a class component)
@@ -103,6 +106,32 @@ class FinanceErrorBoundary extends Component<
 // ============================================================================
 
 export function FinanceLayout({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
+  const prevSchoolRef = useRef<string | null>(null)
+
+  // Sync school context from Shell broadcasts.
+  // On mount, grab the current context synchronously in case the Shell
+  // already broadcast before this MFE mounted.
+  useEffect(() => {
+    const { setActiveSchoolId } = useAppStore.getState()
+    const initial = getSchoolContext()
+    if (initial.schoolId) {
+      setActiveSchoolId(initial.schoolId)
+      prevSchoolRef.current = initial.schoolId
+    }
+    return onSchoolChange(({ schoolId }) => {
+      const prevId = prevSchoolRef.current
+      prevSchoolRef.current = schoolId
+
+      setActiveSchoolId(schoolId)
+
+      // On school switch (not initial mount), redirect to module root
+      if (prevId && prevId !== schoolId) {
+        navigate({ to: '/' })
+      }
+    })
+  }, [navigate])
+
   // Shell's AppShell provides the layout (Header + Sidebar)
   // This module just renders its content, wrapped in an error boundary
   return (

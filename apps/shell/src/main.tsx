@@ -7,12 +7,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { configureAmplify } from '@edforge/auth'
 import { initI18n } from '@edforge/i18n'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { router } from './router'
+import { queryClient } from './lib/query-client'
 import '@edforge/theme'
 import './index.css'
 
@@ -27,16 +28,6 @@ if (amplifyConfigured) {
 } else {
   console.warn('[EdForge] Amplify not configured — authentication will not work')
 }
-
-// Query client for data fetching
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-})
 
 // Bootstrap the application
 createRoot(document.getElementById('root')!).render(

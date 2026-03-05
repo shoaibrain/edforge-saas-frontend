@@ -146,18 +146,16 @@ export function EnrollmentModule() {
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
-                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">Student Enrollment</h1>
-                <p className="text-text-secondary mt-0.5">
-                  Manage enrollment, withdrawals, and transfers
-                </p>
-              </div>
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Users className="w-5 h-5 text-text-tertiary" />
+              <h1 className="text-xl font-semibold text-text-primary tracking-tight">Student Enrollment</h1>
+              {!summaryLoading && summary && (
+                <span className="hidden sm:inline text-sm text-text-tertiary">
+                  {summary.totalEnrolled ?? 0} enrolled
+                </span>
+              )}
             </div>
 
             {/* Academic Year Selector + Actions */}

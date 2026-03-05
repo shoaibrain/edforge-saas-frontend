@@ -769,7 +769,7 @@ function OverviewTab({
         queries: sectionIds.map(sectionId => {
             const section = sections!.find(s => s.sectionId === sectionId)!
             return {
-                queryKey: ['grades', 'section', sectionId],
+                queryKey: ['grades', 'section', sectionId, section.schoolId],
                 queryFn: async () => {
                     try {
                         return await apiGet<GradeRecord[]>(

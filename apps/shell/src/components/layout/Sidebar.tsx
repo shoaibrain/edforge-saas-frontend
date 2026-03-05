@@ -413,6 +413,7 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const setActiveSchoolId = useAppStore((s) => s.setActiveSchoolId)
+  const isTransitioning = useAppStore((s) => s.isSchoolTransitioning)
   const [query, setQuery] = useState('')
 
   // Fetch real schools from API
@@ -447,31 +448,9 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
   // Get active school data
   const activeSchool = schoolsArray.find(s => s.id === activeSchoolId)
 
-  // Auto-select a valid school if none selected or current one doesn't exist
-  useEffect(() => {
-    if (visibleSchools.length === 0) return
-
-    // Check if current activeSchoolId matches a real school
-    const isValid = activeSchoolId && visibleSchools.some(s => s.id === activeSchoolId)
-
-    if (!isValid) {
-      // Try to restore from localStorage first
-      const savedSchoolId = localStorage.getItem(`edforge-active-school-${user.id}`)
-      if (savedSchoolId && visibleSchools.some(s => s.id === savedSchoolId)) {
-        setActiveSchoolId(savedSchoolId)
-      } else {
-        // Default to first visible school
-        setActiveSchoolId(visibleSchools[0].id)
-      }
-    }
-  }, [activeSchoolId, visibleSchools, user.id, setActiveSchoolId])
-
-  // Persist school selection
-  useEffect(() => {
-    if (activeSchoolId && user.id) {
-      localStorage.setItem(`edforge-active-school-${user.id}`, activeSchoolId)
-    }
-  }, [activeSchoolId, user.id])
+  // NOTE: Auto-select and localStorage persistence are handled by
+  // ShellProvider (shell-context.tsx). The Sidebar is display-only
+  // for school context — it can switch schools but never auto-selects.
 
   // Filter by search query
   const filteredSchools = query === ''
@@ -660,12 +639,15 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
               <MenuItem key={school.id}>
                 {({ active }) => (
                   <button
+                    disabled={isTransitioning}
                     onClick={() => {
+                      if (isTransitioning) return
                       setActiveSchoolId(school.id)
                       setQuery('')
                     }}
                     className={cn(
                       'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150',
+                      isTransitioning && 'opacity-60 pointer-events-none',
                       active && 'bg-[rgb(var(--interactive-hover))]',
                       isSelected && 'bg-teal-500/10 dark:bg-cyan-500/15'
                     )}
@@ -752,7 +734,12 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
         </Tooltip>
       ) : (
         <MenuButton className="flex items-center gap-3 w-full h-12 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200 group px-2">
-          <div className="w-10 h-10 rounded-xl overflow-hidden border border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50 transition-colors flex-shrink-0">
+          <div className={cn(
+            'w-10 h-10 rounded-xl overflow-hidden border transition-colors flex-shrink-0',
+            isTransitioning
+              ? 'border-teal-500 animate-pulse'
+              : 'border-[rgb(var(--border-primary))] group-hover:border-teal-500/50 dark:group-hover:border-cyan-500/50'
+          )}>
             <img
               src={getSchoolAvatar(activeSchool?.name || 'school', { size: 40 })}
               alt={activeSchool?.name}
@@ -764,7 +751,9 @@ function SidebarSchoolSelector({ collapsed }: { collapsed: boolean }) {
               {activeSchool?.name || 'Select School'}
             </p>
             <p className="text-[11px] text-[rgb(var(--text-tertiary))] truncate leading-tight">
-              {activeSchool ? (user.assignments[activeSchool.id] || activeSchool.code) : 'Choose school'}
+              {isTransitioning
+                ? 'Switching...'
+                : activeSchool ? (user.assignments[activeSchool.id] || activeSchool.code) : 'Choose school'}
             </p>
           </div>
           <ChevronsUpDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] transition-colors flex-shrink-0 mr-1" />

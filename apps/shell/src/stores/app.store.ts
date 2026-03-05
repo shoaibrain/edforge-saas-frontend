@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { broadcastSchoolChange } from '@edforge/config/school-context-channel'
 
 // ============================================================================
 // APP STORE - UI preferences, active school context
@@ -11,6 +12,9 @@ interface AppStore {
   activeSchoolId: string | null
   activeSchoolStatus: string | null
 
+  // School transition state
+  isSchoolTransitioning: boolean
+
   // Sidebar state
   sidebarCollapsed: boolean
 
@@ -20,6 +24,7 @@ interface AppStore {
   // Actions
   setActiveSchoolId: (schoolId: string | null) => void
   setActiveSchoolStatus: (status: string | null) => void
+  setSchoolTransitioning: (transitioning: boolean) => void
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
   setTheme: (theme: 'light' | 'dark' | 'system') => void
@@ -27,18 +32,30 @@ interface AppStore {
 
 export const useAppStore = create<AppStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       activeSchoolId: null,
       activeSchoolStatus: null,
+      isSchoolTransitioning: false,
       sidebarCollapsed: false,
       theme: 'light',
 
       setActiveSchoolId: (schoolId) => {
-        set({ activeSchoolId: schoolId })
+        const prev = get().activeSchoolId
+        if (prev === schoolId) return
+        // Only show transition overlay on real school switches (prev non-null),
+        // not on initial auto-select where components have their own loading states
+        set({ activeSchoolId: schoolId, isSchoolTransitioning: prev !== null })
+        broadcastSchoolChange(schoolId, get().activeSchoolStatus)
       },
 
       setActiveSchoolStatus: (status) => {
         set({ activeSchoolStatus: status })
+        // Re-broadcast so MFE stores with activeSchoolStatus stay in sync
+        broadcastSchoolChange(get().activeSchoolId, status)
+      },
+
+      setSchoolTransitioning: (transitioning) => {
+        set({ isSchoolTransitioning: transitioning })
       },
 
       toggleSidebar: () => {
@@ -78,4 +95,5 @@ export const useAppStore = create<AppStore>()(
 // Selector hooks for common patterns
 export const useActiveSchoolId = () => useAppStore((s) => s.activeSchoolId)
 export const useActiveSchoolStatus = () => useAppStore((s) => s.activeSchoolStatus)
+export const useIsSchoolTransitioning = () => useAppStore((s) => s.isSchoolTransitioning)
 export const useSidebarCollapsed = () => useAppStore((s) => s.sidebarCollapsed)

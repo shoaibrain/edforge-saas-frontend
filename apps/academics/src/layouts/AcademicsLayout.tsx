@@ -5,14 +5,18 @@
  * The Shell's AppShell handles all layout concerns (Header, Sidebar).
  * MFE modules should only render their content.
  *
- * Includes a global guard that blocks ALL academic routes when the
- * active school is in setup mode.
+ * Includes:
+ * - School context sync (listens for Shell broadcast events)
+ * - Global guard that blocks ALL academic routes when the active school
+ *   is in setup mode.
  */
 
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { Settings } from 'lucide-react'
 import { Card } from '@edforge/ui'
-import { useActiveSchoolStatus } from '../stores/app.store'
+import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
+import { useAppStore, useActiveSchoolStatus } from '../stores/app.store'
 
 function SchoolSetupGate() {
   return (
@@ -35,6 +39,34 @@ function SchoolSetupGate() {
 
 export function AcademicsLayout({ children }: { children: ReactNode }) {
     const schoolStatus = useActiveSchoolStatus()
+    const navigate = useNavigate()
+    const prevSchoolRef = useRef<string | null>(null)
+
+    // Sync school context from Shell broadcasts.
+    // On mount, grab the current context synchronously (covers the case where
+    // the Shell already broadcast before this MFE mounted).
+    useEffect(() => {
+      const { setActiveSchoolId, setActiveSchoolStatus } = useAppStore.getState()
+      const initial = getSchoolContext()
+      if (initial.schoolId) {
+        setActiveSchoolId(initial.schoolId)
+        setActiveSchoolStatus(initial.schoolStatus)
+        prevSchoolRef.current = initial.schoolId
+      }
+      return onSchoolChange(({ schoolId, schoolStatus: status }) => {
+        const prevId = prevSchoolRef.current
+        prevSchoolRef.current = schoolId
+
+        setActiveSchoolId(schoolId)
+        setActiveSchoolStatus(status)
+
+        // On school switch (not initial mount), redirect to module root
+        // to prevent viewing stale entity data from the previous school
+        if (prevId && prevId !== schoolId) {
+          navigate({ to: '/' })
+        }
+      })
+    }, [navigate])
 
     // Hard-gate: block all academic routes for schools in setup mode
     if (schoolStatus === 'setup') {

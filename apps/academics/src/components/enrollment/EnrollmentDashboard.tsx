@@ -9,7 +9,7 @@
  */
 
 import { useMemo } from 'react'
-import { Users, TrendingUp, BookOpen, AlertCircle, Calendar, AlertTriangle } from 'lucide-react'
+import { Calendar, AlertTriangle } from 'lucide-react'
 import type { EnrollmentSummaryResponse } from '../../services/academics.service'
 import type { AcademicYearResponseDto } from '../../services/school.service'
 
@@ -17,34 +17,6 @@ interface EnrollmentDashboardProps {
   summary: EnrollmentSummaryResponse | undefined
   isLoading: boolean
   activeYear?: AcademicYearResponseDto | null
-}
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
-}: {
-  icon: typeof Users
-  label: string
-  value: string | number
-  accent: string
-  bg: string
-}) {
-  return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
-        </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -72,18 +44,14 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
   }, [startDate, endDate])
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between text-xs text-text-tertiary mb-1">
-        <span>{startDate}</span>
-        <span>{progress}% complete</span>
-        <span>{endDate}</span>
-      </div>
-      <div className="h-1.5 bg-surface-tertiary rounded-full overflow-hidden">
+    <div className="flex items-center gap-2 text-xs text-text-tertiary">
+      <div className="w-20 h-1.5 bg-surface-tertiary rounded-full overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full transition-all"
+          className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
           style={{ width: `${progress}%` }}
         />
       </div>
+      <span>{progress}%</span>
     </div>
   )
 }
@@ -125,79 +93,34 @@ export function EnrollmentDashboard({ summary, isLoading, activeYear }: Enrollme
 
   return (
     <div className="space-y-4">
-      {/* Academic Year Context Banner */}
-      {activeYear && (
-        <div className="rounded-xl bg-surface-secondary border border-border-secondary p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-teal-500" />
-              <div>
-                <span className="text-sm font-semibold text-text-primary">
-                  {activeYear.name}
-                </span>
-                <span className="ml-2">
-                  <StatusBadge status={activeYear.status} />
-                </span>
-              </div>
-            </div>
+      {/* Year + Stats Compact Bar */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl bg-surface-secondary border border-border-secondary px-4 py-3">
+        {activeYear && (
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="w-4 h-4 text-teal-500" />
+            <span className="font-medium text-text-primary">{activeYear.name}</span>
+            <StatusBadge status={activeYear.status} />
+            <YearProgressBar startDate={activeYear.startDate} endDate={activeYear.endDate} />
           </div>
-          <YearProgressBar startDate={activeYear.startDate} endDate={activeYear.endDate} />
+        )}
+        <div className="flex items-center gap-4 text-sm">
+          <span className="text-text-secondary">
+            <span className="font-semibold text-text-primary">{summary?.totalEnrolled ?? '--'}</span> enrolled
+          </span>
+          <span className="text-text-secondary">
+            <span className="font-semibold text-text-primary">{activeCount}</span> active
+          </span>
+          <span className="text-text-secondary">
+            <span className="font-semibold text-text-primary">{gradeLevelCount}</span> grade levels
+          </span>
+          {pendingCount > 0 && (
+            <span className="text-amber-600 dark:text-amber-400">
+              <span className="font-semibold">{pendingCount}</span> pending
+            </span>
+          )}
         </div>
-      )}
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={Users}
-          label="Total Enrolled"
-          value={summary?.totalEnrolled ?? '--'}
-          accent="text-blue-600 dark:text-blue-400"
-          bg="bg-blue-500/10"
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Active"
-          value={activeCount}
-          accent="text-emerald-600 dark:text-emerald-400"
-          bg="bg-emerald-500/10"
-        />
-        <StatCard
-          icon={BookOpen}
-          label="Grade Levels"
-          value={gradeLevelCount}
-          accent="text-purple-600 dark:text-purple-400"
-          bg="bg-purple-500/10"
-        />
-        <StatCard
-          icon={AlertCircle}
-          label="Pending"
-          value={pendingCount}
-          accent="text-amber-600 dark:text-amber-400"
-          bg="bg-amber-500/10"
-        />
       </div>
 
-      {/* Grade Level Breakdown */}
-      {summary?.byGradeLevel && Object.keys(summary.byGradeLevel).length > 0 && (
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
-          <h4 className="text-sm font-semibold text-text-primary mb-3">
-            Enrollment by Grade Level
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {Object.entries(summary.byGradeLevel)
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(([grade, count]) => (
-                <div
-                  key={grade}
-                  className="text-center p-3 bg-surface-primary rounded-lg border border-border-secondary"
-                >
-                  <div className="text-xs text-text-tertiary mb-1">{grade}</div>
-                  <div className="text-lg font-semibold text-text-primary">{count}</div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

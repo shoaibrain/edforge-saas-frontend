@@ -15,12 +15,11 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   Users,
   Plus,
-  GraduationCap,
-  UserCheck,
   AlertCircle,
   RefreshCw,
   UserMinus,
   Upload,
+  MoreVertical,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { useResourcePermissions } from '@edforge/abac'
@@ -37,39 +36,47 @@ import { useStudentFilters } from '../../stores/students.store'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
-// STAT CARD COMPONENT
+// STUDENT ACTIONS MENU (3-DOT)
 // ============================================================================
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
-  isLoading = false,
+function StudentActionsMenu({
+  onImport,
+  onAddStudent,
 }: {
-  icon: typeof Users
-  label: string
-  value: string | number
-  accent: string
-  bg: string
-  isLoading?: boolean
+  onImport: () => void
+  onAddStudent: () => void
 }) {
+  const [open, setOpen] = useState(false)
+
   return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
-        </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          {isLoading ? (
-            <div className="h-7 w-16 bg-surface-tertiary rounded animate-pulse mt-0.5" />
-          ) : (
-            <p className="text-xl font-semibold text-text-primary">{value}</p>
-          )}
-        </div>
-      </div>
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-interactive-hover transition-colors"
+      >
+        <MoreVertical className="w-5 h-5" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-xl bg-surface-primary border border-border-secondary shadow-lg overflow-hidden">
+            <button
+              onClick={() => { onAddStudent(); setOpen(false) }}
+              className="flex items-center gap-2.5 w-full px-3 py-2.5 text-sm text-text-secondary hover:bg-interactive-hover transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Student
+            </button>
+            <button
+              onClick={() => { onImport(); setOpen(false) }}
+              className="flex items-center gap-2.5 w-full px-3 py-2.5 text-sm text-text-secondary hover:bg-interactive-hover transition-colors"
+            >
+              <Upload className="w-4 h-4" />
+              Import CSV
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -244,43 +251,23 @@ export function StudentsModule() {
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20">
-                <Users className="w-6 h-6 text-teal-600 dark:text-cyan-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">
-                  Student Directory
-                </h1>
-                <p className="text-text-secondary mt-1">
-                  Comprehensive student roster with enrollment status, demographics, and academic standing
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {studentPerms.create && (
-                <Button
-                  variant="outline"
-                  onClick={() => setShowImport(true)}
-                  disabled={!activeSchoolId}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Import CSV
-                </Button>
-              )}
-              {studentPerms.create && (
-                <Button
-                  variant="outline"
-                  onClick={handleAddStudent}
-                  disabled={!activeSchoolId}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Student
-                </Button>
+            <div className="flex items-center gap-2.5">
+              <Users className="w-5 h-5 text-text-tertiary" />
+              <h1 className="text-xl font-semibold text-text-primary tracking-tight">Students</h1>
+              {!isLoading && activeSchoolId && (
+                <span className="hidden sm:inline text-sm text-text-tertiary">
+                  {stats.total} enrolled · {stats.active} active
+                </span>
               )}
             </div>
+            {studentPerms.create && activeSchoolId && (
+              <StudentActionsMenu
+                onImport={() => setShowImport(true)}
+                onAddStudent={handleAddStudent}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -294,42 +281,6 @@ export function StudentsModule() {
           <ErrorState onRetry={() => refetch()} />
         ) : (
           <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <StatCard
-                icon={Users}
-                label="Total Enrolled"
-                value={stats.total.toLocaleString()}
-                accent="text-teal-600 dark:text-cyan-400"
-                bg="bg-teal-500/10"
-                isLoading={isLoading}
-              />
-              <StatCard
-                icon={GraduationCap}
-                label="Active Students"
-                value={stats.active.toLocaleString()}
-                accent="text-blue-600 dark:text-blue-400"
-                bg="bg-blue-500/10"
-                isLoading={isLoading}
-              />
-              <StatCard
-                icon={UserCheck}
-                label="New Enrollments"
-                value={stats.newEnrollments.toLocaleString()}
-                accent="text-emerald-600 dark:text-emerald-400"
-                bg="bg-emerald-500/10"
-                isLoading={isLoading}
-              />
-              <StatCard
-                icon={AlertCircle}
-                label="Pending Review"
-                value={stats.pendingReview.toLocaleString()}
-                accent="text-amber-600 dark:text-amber-400"
-                bg="bg-amber-500/10"
-                isLoading={isLoading}
-              />
-            </div>
-
             {/* Filters */}
             <StudentFilters />
 

@@ -210,8 +210,6 @@ function MessageBubble({ message }: { message: typeof MOCK_MESSAGES[0] }) {
 export default function MessagesInboxPage() {
     const { activeSchoolId } = useAppStore()
 
-    // NOTE: Auth/ABAC checks removed - Shell's protected routes handle authentication
-    console.log('[Messages:Inbox] Rendering inbox page, activeSchoolId:', activeSchoolId)
     const [selectedConversation, setSelectedConversation] = useState<string | null>('conv-001')
     const [searchQuery, setSearchQuery] = useState('')
     const [messageInput, setMessageInput] = useState('')
@@ -222,6 +220,22 @@ export default function MessagesInboxPage() {
     )
 
     const currentConversation = MOCK_CONVERSATIONS.find(c => c.id === selectedConversation)
+
+    if (!activeSchoolId) {
+        return (
+            <div className="h-full flex items-center justify-center p-6">
+                <div className="text-center">
+                    <Mail className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
+                    <p className="text-lg font-medium text-[rgb(var(--text-secondary))] mb-2">
+                        Select a school
+                    </p>
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                        Choose a school from the sidebar to view messages.
+                    </p>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="h-[calc(100vh-180px)] flex flex-col">
