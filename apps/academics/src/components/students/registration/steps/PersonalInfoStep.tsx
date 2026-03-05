@@ -9,10 +9,10 @@ import { FormProvider } from 'react-hook-form'
 import { TextField, SelectField, DateField } from '@edforge/forms'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
-import {
-  GENDER_OPTIONS,
-  GRADE_LEVEL_OPTIONS,
-} from '../../../../schemas/student.form'
+import { GENDER_OPTIONS } from '../../../../schemas/student.form'
+import { useActiveSchoolId } from '../../../../stores/app.store'
+import { useSchoolGradeRange } from '../../../../hooks/useSchool'
+import { useFilteredGradeOptions } from '../../../../hooks/useGradeOptions'
 
 // Age bounds for date field (3–22 years)
 const today = new Date()
@@ -30,6 +30,9 @@ export function PersonalInfoStep({
   clearError,
 }: WizardStepProps) {
   const form = useWizardForm({ data, updateData, errors, clearError })
+  const schoolId = useActiveSchoolId()
+  const { gradeRange } = useSchoolGradeRange(schoolId)
+  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
 
   return (
     <FormProvider {...form}>
@@ -95,7 +98,7 @@ export function PersonalInfoStep({
             <SelectField
               name="currentGradeLevel"
               label="Grade Level"
-              options={[...GRADE_LEVEL_OPTIONS]}
+              options={[...filteredGradeOptions]}
               placeholder="Select grade level"
               required
             />

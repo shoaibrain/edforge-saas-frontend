@@ -305,21 +305,18 @@ export function CurriculumModule() {
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20">
-                <BookOpen className="w-6 h-6 text-rose-600 dark:text-rose-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">
-                  Curriculum Management
-                </h1>
-                <p className="text-text-secondary mt-0.5 text-sm">
-                  Define courses, map learning standards, and organize curriculum
-                  by grade level
-                </p>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <BookOpen className="w-5 h-5 text-text-tertiary" />
+              <h1 className="text-xl font-semibold text-text-primary tracking-tight">
+                Curriculum Management
+              </h1>
+              {!isLoading && (
+                <span className="hidden sm:inline text-sm text-text-tertiary">
+                  {totalCount ?? stats.total} courses
+                </span>
+              )}
             </div>
 
             {activeTab === 'courses' && coursePerms.create && (
