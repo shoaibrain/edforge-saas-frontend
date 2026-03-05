@@ -23,6 +23,7 @@ import {
   Download,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolGradeRange } from '../../hooks/useSchool'
 import { useCourseFilters } from '../../stores/courses.store'
 import {
   useCourses,
@@ -211,6 +212,7 @@ export function CurriculumModule() {
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+  const { gradeRange } = useSchoolGradeRange(schoolId)
 
   // ABAC: check course/curriculum permissions
   const coursePerms = useResourcePermissions('courses')
@@ -441,6 +443,7 @@ export function CurriculumModule() {
                 courses={courses}
                 isLoading={isLoading}
                 onViewCourse={openViewDrawer}
+                schoolGradeRange={gradeRange ?? undefined}
               />
             )}
 
@@ -456,6 +459,7 @@ export function CurriculumModule() {
         mode={drawerMode}
         course={selectedCourse}
         onModeChange={setDrawerMode}
+        schoolGradeRange={gradeRange}
       />
     </div>
   )

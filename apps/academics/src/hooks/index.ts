@@ -50,6 +50,8 @@ export {
   staffKeys,
 } from './useStaff'
 export {
+  useSchoolProfile,
+  useSchoolGradeRange,
   useAcademicYears,
   useCurrentAcademicYear,
   useGradingPeriods,
@@ -57,6 +59,7 @@ export {
   useUpdateAcademicYearStatus,
   schoolKeys,
 } from './useSchool'
+export { useFilteredGradeOptions } from './useGradeOptions'
 export {
   useAttendanceSummary,
   useStudentAttendance,

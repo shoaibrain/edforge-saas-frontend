@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
 import { useDebounce } from '../../hooks'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -35,11 +36,9 @@ interface EnrollmentTableProps {
   onWithdraw?: (enrollment: EnrollmentResponseDto) => void
   onTransfer?: (enrollment: EnrollmentResponseDto) => void
   onMarkNoShow?: (enrollment: EnrollmentResponseDto) => void
+  /** School's configured grade range for filtering the grade dropdown */
+  schoolGradeRange?: { start: string; end: string } | null
 }
-
-const gradeLevels = [
-  'Pre-K', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-]
 
 const statusOptions = [
   { value: 'enrolled', label: 'Enrolled' },
@@ -145,7 +144,9 @@ export function EnrollmentTable({
   onWithdraw,
   onTransfer,
   onMarkNoShow,
+  schoolGradeRange,
 }: EnrollmentTableProps) {
+  const gradeLevelOptions = useFilteredGradeOptions(schoolGradeRange)
   // Client-side search filter
   const debouncedSearch = useDebounce(searchTerm, 300)
   const filtered = enrollments.filter((e) => {
@@ -177,8 +178,8 @@ export function EnrollmentTable({
           className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
         >
           <option value="">All Grades</option>
-          {gradeLevels.map((g) => (
-            <option key={g} value={g}>Grade {g}</option>
+          {gradeLevelOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
         <select
