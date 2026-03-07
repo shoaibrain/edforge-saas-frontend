@@ -107,28 +107,28 @@ export function BillingModule() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <ActionCard
+            icon={Users}
+            title="Student Accounts"
+            description="View accounts, invoices, payments, and ledger per student"
+            onClick={() => navigate({ to: '/billing/accounts' as string })}
+          />
+          <ActionCard
             icon={FileText}
-            title="Invoices"
-            description="Generate, issue, and manage student invoices"
-            onClick={() => navigate({ to: '/finance/billing/invoices' as string })}
+            title="All Invoices"
+            description="View and manage all invoices across students"
+            onClick={() => navigate({ to: '/billing/invoices' as string })}
           />
           <ActionCard
             icon={CreditCard}
             title="Payments"
             description="View and manage all payment transactions"
-            onClick={() => navigate({ to: '/finance/billing/payments' as string })}
-          />
-          <ActionCard
-            icon={Users}
-            title="Student Accounts"
-            description="View student billing accounts and ledger"
-            onClick={() => navigate({ to: '/finance/billing/accounts' as string })}
+            onClick={() => navigate({ to: '/billing/payments' as string })}
           />
           <ActionCard
             icon={Banknote}
             title="Record Payment"
             description="Manually record cash, bank, or cheque payments"
-            onClick={() => navigate({ to: '/finance/billing/payments/record' as string })}
+            onClick={() => navigate({ to: '/billing/payments/record' as string })}
           />
         </div>
       </div>

@@ -38,6 +38,7 @@ export {
   createRefund,
   getDashboardSummary,
   exportInvoicesCsv,
+  exportPaymentsCsv,
   paymentsService,
 } from './services/payments.service'
 
@@ -49,6 +50,11 @@ export {
   deleteFeeStructure,
   feeStructuresService,
 } from './services/fee-structures.service'
+
+export {
+  searchStudents,
+} from './services/students.service'
+export type { StudentSearchResult } from './services/students.service'
 
 export {
   getEnabledGateways,
@@ -87,6 +93,9 @@ export {
   useBulkIssueInvoices,
   useDashboardSummary,
   useExportInvoicesCsv,
+  useExportPaymentsCsv,
+  studentKeys,
+  useSearchStudents,
 } from './hooks/usePayments'
 
 export {

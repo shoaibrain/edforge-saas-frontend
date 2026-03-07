@@ -5,11 +5,13 @@
  * Uses the usePaymentFlow state machine for clean transitions.
  */
 
+import { useEffect, useState } from 'react'
 import type { Invoice, PaymentGatewayPublicConfig } from '@edforge/types'
 import { formatNPR } from '@edforge/types'
 import { useTranslation } from '@edforge/i18n'
-import { ArrowLeft, Loader2, ExternalLink, AlertTriangle, XCircle } from 'lucide-react'
+import { ArrowLeft, Loader2, ExternalLink, AlertTriangle, XCircle, CheckCircle2 } from 'lucide-react'
 import { usePaymentFlow } from '../../hooks/usePaymentFlow'
+import { useVerifyPayment } from '../../hooks/usePayments'
 import { PaymentMethodSelector } from './PaymentMethodSelector'
 import { PaymentSummary } from './PaymentSummary'
 
@@ -39,6 +41,17 @@ export function PaymentForm({
     confirmAndPay,
     reset,
   } = usePaymentFlow(invoice, schoolId)
+
+  // Verification state — enabled when user clicks "Check Status"
+  const [verifySessionId, setVerifySessionId] = useState<string | null>(null)
+  const { data: verifyResult, isLoading: isVerifying, error: verifyError } = useVerifyPayment(verifySessionId)
+
+  // Handle verification result
+  useEffect(() => {
+    if (verifyResult?.status === 'completed' && verifyResult.payment?.id) {
+      onComplete(verifyResult.payment.id)
+    }
+  }, [verifyResult, onComplete])
 
   // Auto-start if idle
   if (state.status === 'idle') {
@@ -109,20 +122,104 @@ export function PaymentForm({
     )
   }
 
-  // Initiating / redirecting
-  if (state.status === 'initiating' || state.status === 'redirecting') {
-    const gatewayLabel = t(`gateway.${state.gateway}`)
+  // Initiating — spinner while API call is in progress
+  if (state.status === 'initiating') {
     return (
       <div className="text-center py-16">
         <Loader2 className="w-10 h-10 mx-auto mb-4 text-teal-500 animate-spin" />
         <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-          {state.status === 'initiating'
-            ? t('flow.processingPayment')
-            : t('flow.redirecting', { gateway: gatewayLabel })}
+          {t('flow.processingPayment')}
         </p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          {t('flow.redirectDescription', { gateway: gatewayLabel })}
+      </div>
+    )
+  }
+
+  // Redirecting — payment in progress in another tab
+  if (state.status === 'redirecting') {
+    const gatewayLabel = t(`gateway.${state.gateway}`)
+
+    // Verification completed with a failed/cancelled result
+    if (verifyResult && verifyResult.status !== 'completed') {
+      return (
+        <div className="text-center py-16">
+          <div className="p-4 rounded-full bg-red-100 dark:bg-red-500/10 inline-flex mb-4">
+            <XCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+            {t('flow.paymentFailed')}
+          </p>
+          <p className="text-sm text-[rgb(var(--text-tertiary))] mt-2">
+            {t('flow.failedDescription')}
+          </p>
+          <div className="flex gap-3 justify-center mt-6">
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-6 py-2 rounded-xl border border-[rgb(var(--border-primary))] text-sm font-medium
+                text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
+            >
+              {t('flow.returnToInvoices')}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setVerifySessionId(null); reset(); start() }}
+              className="px-6 py-2 rounded-xl bg-teal-600 text-white text-sm font-semibold
+                hover:bg-teal-700 transition-colors"
+            >
+              {t('flow.tryAgain')}
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="text-center py-16">
+        <div className="p-4 rounded-full bg-teal-100 dark:bg-teal-500/10 inline-flex mb-4">
+          <ExternalLink className="w-8 h-8 text-teal-600 dark:text-teal-400" />
+        </div>
+        <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+          {t('flow.paymentInProgress')}
         </p>
+        <p className="text-sm text-[rgb(var(--text-tertiary))] mt-2 max-w-sm mx-auto">
+          {t('flow.paymentInProgressDescription', { gateway: gatewayLabel })}
+        </p>
+
+        {verifyError && (
+          <p className="text-sm text-red-500 mt-3">
+            {t('error.failedToVerify')}
+          </p>
+        )}
+
+        <div className="flex gap-3 justify-center mt-6">
+          <button
+            type="button"
+            onClick={() => { setVerifySessionId(null); reset(); onBack() }}
+            className="px-6 py-2 rounded-xl border border-[rgb(var(--border-primary))] text-sm font-medium
+              text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
+          >
+            {t('actions.cancel')}
+          </button>
+          <button
+            type="button"
+            disabled={isVerifying}
+            onClick={() => setVerifySessionId(state.sessionId)}
+            className="px-6 py-2 rounded-xl bg-teal-600 text-white text-sm font-semibold
+              hover:bg-teal-700 transition-colors disabled:opacity-60 flex items-center gap-2"
+          >
+            {isVerifying ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {t('flow.verifying')}
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                {t('flow.checkStatus')}
+              </>
+            )}
+          </button>
+        </div>
       </div>
     )
   }

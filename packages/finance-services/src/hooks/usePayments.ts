@@ -40,7 +40,9 @@ import {
   createRefund,
   getDashboardSummary,
   exportInvoicesCsv,
+  exportPaymentsCsv,
 } from '../services/payments.service'
+import { searchStudents } from '../services/students.service'
 
 // ============================================================================
 // QUERY KEY FACTORY
@@ -79,8 +81,8 @@ export const paymentKeys = {
     [...paymentKeys.all, 'ledger', schoolId, accountId] as const,
 
   // Dashboard
-  dashboard: (schoolId: string) =>
-    [...paymentKeys.all, 'dashboard', schoolId] as const,
+  dashboard: (schoolId: string, filters?: Record<string, unknown>) =>
+    [...paymentKeys.all, 'dashboard', schoolId, filters] as const,
 }
 
 // ============================================================================
@@ -88,10 +90,16 @@ export const paymentKeys = {
 // ============================================================================
 
 export function useInvoices(schoolId: string, filters?: InvoiceFilterDto) {
+  // If a studentId filter is provided but falsy (e.g. undefined during parent portal
+  // first render before activeChild resolves), disable the query to prevent fetching
+  // without the required student scope.
+  const studentIdGate = 'studentId' in (filters ?? {})
+    ? !!filters?.studentId
+    : true
   return useQuery({
     queryKey: paymentKeys.invoiceList(schoolId, filters),
     queryFn: () => getInvoices(schoolId, filters),
-    enabled: !!schoolId,
+    enabled: !!schoolId && studentIdGate,
     staleTime: 30 * 1000,
   })
 }
@@ -332,11 +340,33 @@ export function useBulkIssueInvoices(schoolId: string) {
 // DASHBOARD SUMMARY
 // ============================================================================
 
-export function useDashboardSummary(schoolId: string) {
+export function useDashboardSummary(
+  schoolId: string,
+  filters?: { from?: string; to?: string; academicYear?: string },
+) {
   return useQuery({
-    queryKey: paymentKeys.dashboard(schoolId),
-    queryFn: () => getDashboardSummary(schoolId),
+    queryKey: paymentKeys.dashboard(schoolId, filters),
+    queryFn: () => getDashboardSummary(schoolId, filters),
     enabled: !!schoolId,
+    staleTime: 60 * 1000,
+  })
+}
+
+// ============================================================================
+// STUDENT SEARCH
+// ============================================================================
+
+export const studentKeys = {
+  all: ['students'] as const,
+  search: (schoolId: string, search: string) =>
+    [...studentKeys.all, 'search', schoolId, search] as const,
+}
+
+export function useSearchStudents(schoolId: string, search: string) {
+  return useQuery({
+    queryKey: studentKeys.search(schoolId, search),
+    queryFn: () => searchStudents(schoolId, search),
+    enabled: !!schoolId && search.length >= 2,
     staleTime: 60 * 1000,
   })
 }
@@ -369,6 +399,37 @@ export function useExportInvoicesCsv() {
       throw error instanceof Error
         ? error
         : new Error('Failed to export invoices CSV')
+    },
+  })
+}
+
+// ============================================================================
+// EXPORT PAYMENTS CSV
+// ============================================================================
+
+export function useExportPaymentsCsv() {
+  return useMutation({
+    mutationFn: (schoolId: string) => exportPaymentsCsv(schoolId),
+    onSuccess: (blob, schoolId) => {
+      const dateStr = new Date().toISOString().slice(0, 10)
+      const filename = `payments-${schoolId}-${dateStr}.csv`
+      const csvBlob = new Blob([blob], { type: 'text/csv;charset=utf-8' })
+      const url = URL.createObjectURL(csvBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 100)
+    },
+    onError: (error) => {
+      throw error instanceof Error
+        ? error
+        : new Error('Failed to export payments CSV')
     },
   })
 }

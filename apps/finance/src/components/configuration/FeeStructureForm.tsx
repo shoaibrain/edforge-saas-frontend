@@ -178,9 +178,9 @@ export function FeeStructureForm({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl overflow-y-auto max-h-[90vh]">
+      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))] flex-shrink-0">
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             {feeStructure ? 'Edit Fee Structure' : 'Add Fee Structure'}
           </h2>
@@ -194,7 +194,7 @@ export function FeeStructureForm({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-4 overflow-y-auto flex-1">
           {/* Name */}
           <Field label="Name" error={errors.name?.message}>
             <input
@@ -296,7 +296,7 @@ export function FeeStructureForm({
         </form>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-[rgb(var(--border-primary))]">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-[rgb(var(--border-primary))] flex-shrink-0">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>

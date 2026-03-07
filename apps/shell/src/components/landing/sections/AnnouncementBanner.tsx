@@ -20,7 +20,7 @@ export function AnnouncementBanner() {
   }
 
   return (
-    <div className="relative z-[60] flex items-center justify-center gap-3 bg-gradient-to-r from-[#2a9d8f] to-[#1a4a5e] px-4 py-2.5 text-[0.8125rem] sm:text-sm text-white/95">
+    <div className="relative z-[60] flex items-center justify-center gap-3 bg-gradient-to-r from-[#F97316] to-[#F59E0B] px-4 py-2.5 text-[0.8125rem] sm:text-sm text-white/95">
       <span className="text-center">
         EdForge is now available for K-12 districts.{' '}
         <a

@@ -62,7 +62,7 @@ function InvoiceSearchInput({
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Fetch all payable invoices (issued, partially_paid, overdue)
-  const { data: invoiceData, isLoading } = useInvoices(schoolId, {
+  const { data: invoiceData, isLoading, isError } = useInvoices(schoolId, {
     status: ['issued', 'partially_paid', 'overdue'],
   })
 
@@ -187,6 +187,10 @@ function InvoiceSearchInput({
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
               <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading invoices...</span>
+            </div>
+          ) : isError ? (
+            <div className="py-4 text-center text-sm text-red-500">
+              Failed to load invoices. Please try again.
             </div>
           ) : filteredInvoices.length === 0 ? (
             <div className="py-4 text-center text-sm text-[rgb(var(--text-tertiary))]">

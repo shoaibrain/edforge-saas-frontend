@@ -54,13 +54,13 @@ export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
         <div>
           <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('invoices.issuedDate')}</p>
           <p className="text-sm font-medium text-[rgb(var(--text-primary))] mt-0.5">
-            <DateDisplay date={invoice.issuedDate} format="long" />
+            <DateDisplay date={invoice.issuedDate} format="long" showDual />
           </p>
         </div>
         <div>
           <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('invoices.dueDate')}</p>
           <p className="text-sm font-medium text-[rgb(var(--text-primary))] mt-0.5">
-            <DateDisplay date={invoice.dueDate} format="long" />
+            <DateDisplay date={invoice.dueDate} format="long" showDual />
           </p>
         </div>
       </div>

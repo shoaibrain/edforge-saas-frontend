@@ -129,9 +129,13 @@ export async function createRefund(
 // ============================================================================
 
 export async function getDashboardSummary(
-  schoolId: string
+  schoolId: string,
+  filters?: { from?: string; to?: string; academicYear?: string }
 ): Promise<DashboardSummary> {
-  return apiGet<DashboardSummary>(`/finance/schools/${schoolId}/dashboard/summary`)
+  return apiGet<DashboardSummary>(
+    `/finance/schools/${schoolId}/dashboard/summary`,
+    filters as Record<string, unknown>,
+  )
 }
 
 // ============================================================================
@@ -165,6 +169,32 @@ export async function exportInvoicesCsv(schoolId: string): Promise<Blob> {
   }
 }
 
+export async function exportPaymentsCsv(schoolId: string): Promise<Blob> {
+  try {
+    const response = await api.get(`/finance/schools/${schoolId}/payments/export`, {
+      params: { format: 'csv' },
+      responseType: 'blob',
+    })
+    if (!response.data || !(response.data instanceof Blob)) {
+      throw new Error('Server returned an invalid response for CSV export')
+    }
+    return response.data
+  } catch (error: any) {
+    if (error?.response?.data instanceof Blob) {
+      const text = await error.response.data.text()
+      try {
+        const parsed = JSON.parse(text)
+        throw new Error(parsed.message || 'Failed to export payments')
+      } catch {
+        throw new Error(text || 'Failed to export payments')
+      }
+    }
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to export payments CSV')
+  }
+}
+
 // ============================================================================
 // CONVENIENCE EXPORT
 // ============================================================================
@@ -180,4 +210,5 @@ export const paymentsService = {
   createRefund,
   getDashboardSummary,
   exportInvoicesCsv,
+  exportPaymentsCsv,
 }

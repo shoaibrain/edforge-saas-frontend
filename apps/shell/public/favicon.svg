@@ -1,11 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>EdForge</title>
   <defs>
-    <linearGradient id="edforge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#005f73"/>
-      <stop offset="100%" style="stop-color:#0a9396"/>
+    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#005f73"/>
+      <stop offset="100%" stop-color="#0a9396"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="16" fill="url(#edforge-gradient)"/>
-  <text x="32" y="44" font-family="system-ui, sans-serif" font-size="32" font-weight="700" fill="white" text-anchor="middle">E</text>
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+  <path d="M 7.5 24 L 13 10.5 Q 14.2 7.5 16.5 7.5 L 24.5 7.5
+           M 15.5 16 L 24.5 16
+           M 15.5 24 L 24.5 24"
+        fill="none" stroke="white" stroke-width="3"
+        stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-

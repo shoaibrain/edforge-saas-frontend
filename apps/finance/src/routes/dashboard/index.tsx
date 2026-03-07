@@ -5,7 +5,9 @@
  * Route: /finance/dashboard
  */
 
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@edforge/ui'
 import {
   Loader2,
@@ -15,10 +17,12 @@ import {
   AlertTriangle,
   DollarSign,
   Receipt,
+  FileText,
+  CreditCard,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAppStore } from '../../stores/app.store'
-import { useDashboardSummary, useExportInvoicesCsv } from '@edforge/finance-services'
+import { useDashboardSummary, useExportInvoicesCsv, useFeeStructures } from '@edforge/finance-services'
 import { formatNPR, formatNPRShort } from '@edforge/types'
 import { formatDate } from '../../utils/format-date'
 
@@ -88,11 +92,43 @@ function PercentageBar({
 // MAIN PAGE
 // ============================================================================
 
+/** Get first day of current month as YYYY-MM-DD */
+function firstOfMonth(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+}
+
+/** Get today as YYYY-MM-DD */
+function todayISO(): string {
+  return new Date().toISOString().split('T')[0]
+}
+
 export default function FinancialDashboardPage() {
+  const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
-  const { data: summary, isLoading } = useDashboardSummary(schoolId ?? '')
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [academicYear, setAcademicYear] = useState('')
+
+  const filters = useMemo(() => {
+    const f: { from?: string; to?: string; academicYear?: string } = {}
+    if (fromDate) f.from = fromDate
+    if (toDate) f.to = toDate
+    if (academicYear) f.academicYear = academicYear
+    return Object.keys(f).length > 0 ? f : undefined
+  }, [fromDate, toDate, academicYear])
+
+  const { data: summary, isLoading, isError } = useDashboardSummary(schoolId ?? '', filters)
+  const { data: feeStructures } = useFeeStructures(schoolId ?? '')
   const exportCsvMutation = useExportInvoicesCsv()
+
+  // Extract unique academic years from fee structures
+  const academicYears = useMemo(() => {
+    if (!feeStructures) return []
+    const years = new Set(feeStructures.map((f) => f.academicYear).filter(Boolean))
+    return [...years].sort().reverse()
+  }, [feeStructures])
 
   const handleExportCSV = () => {
     if (!schoolId) return
@@ -114,6 +150,18 @@ export default function FinancialDashboardPage() {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-16">
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
+        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load dashboard</p>
+        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+          Please check your connection and try again.
+        </p>
       </div>
     )
   }
@@ -185,6 +233,51 @@ export default function FinancialDashboardPage() {
             )}
             Export CSV
           </Button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-end gap-3 flex-wrap">
+          <div>
+            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">From</label>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">To</label>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+            />
+          </div>
+          {academicYears.length > 0 && (
+            <div>
+              <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">Academic Year</label>
+              <select
+                value={academicYear}
+                onChange={(e) => setAcademicYear(e.target.value)}
+                className="px-3 py-1.5 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              >
+                <option value="">All Years</option>
+                {academicYears.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {(fromDate || toDate || academicYear) && (
+            <button
+              onClick={() => { setFromDate(''); setToDate(''); setAcademicYear('') }}
+              className="px-3 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
 
         {/* Summary Cards */}
@@ -268,65 +361,158 @@ export default function FinancialDashboardPage() {
           </div>
         </div>
 
-        {/* Recent Payments */}
-        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-          <div className="bg-[rgb(var(--surface-secondary))] px-4 py-3 border-b border-[rgb(var(--border-primary))]">
-            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-              Recent Payments
-            </h2>
-          </div>
-          {recentPayments.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-xs text-[rgb(var(--text-tertiary))]">No recent payments.</p>
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[rgb(var(--border-primary))]">
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Receipt #</th>
-                  <th className="text-right px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Amount</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Gateway</th>
-                  <th className="text-center px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgb(var(--border-primary))]">
-                {recentPayments.slice(0, 10).map((payment) => (
-                  <tr key={payment.id} className="hover:bg-[rgb(var(--surface-secondary))] transition-colors">
-                    <td className="px-4 py-2.5 text-sm font-medium text-[rgb(var(--text-primary))]">
-                      {payment.receiptNumber || payment.id.slice(0, 8)}
-                    </td>
-                    <td className="px-4 py-2.5 text-sm text-right font-medium text-[rgb(var(--text-primary))]">
-                      {formatNPR(payment.amount)}
-                    </td>
-                    <td className="px-4 py-2.5 text-sm text-[rgb(var(--text-secondary))] capitalize">
-                      {payment.gateway.replace('_', ' ')}
-                    </td>
-                    <td className="px-4 py-2.5 text-center">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                        payment.status === 'completed'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : payment.status === 'failed'
-                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                      }`}>
-                        {payment.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5 text-sm text-[rgb(var(--text-secondary))]">
-                      {payment.paidAt
-                        ? formatDate(payment.paidAt)
-                        : payment.createdAt
-                          ? formatDate(payment.createdAt)
-                          : '-'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        {/* Recent Activity Feed */}
+        <RecentActivityFeed
+          recentPayments={recentPayments}
+          recentInvoices={summary.recentInvoices ?? []}
+          onNavigate={(path) => navigate({ to: path as string })}
+        />
       </motion.div>
+    </div>
+  )
+}
+
+// ============================================================================
+// RECENT ACTIVITY FEED
+// ============================================================================
+
+interface ActivityItem {
+  type: 'invoice' | 'payment'
+  id: string
+  description: string
+  amount: string
+  status: string
+  date: string
+  navigateTo: string
+}
+
+const invoiceStatusBadge: Record<string, string> = {
+  draft: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+  issued: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  partially_paid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
+}
+
+const paymentStatusBadge: Record<string, string> = {
+  completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+}
+
+function RecentActivityFeed({
+  recentPayments,
+  recentInvoices,
+  onNavigate,
+}: {
+  recentPayments: Array<{
+    id: string
+    amount: number
+    gateway: string
+    status: string
+    receiptNumber?: string
+    paidAt?: string
+    createdAt: string
+  }>
+  recentInvoices: Array<{
+    id: string
+    invoiceNumber: string
+    studentName: string
+    grandTotal: number
+    amountDue: number
+    status: string
+    issuedDate: string
+    createdAt: string
+  }>
+  onNavigate: (path: string) => void
+}) {
+  const activities = useMemo<ActivityItem[]>(() => {
+    const items: ActivityItem[] = []
+
+    for (const inv of recentInvoices) {
+      items.push({
+        type: 'invoice',
+        id: `inv-${inv.id}`,
+        description: `${inv.invoiceNumber} — ${inv.studentName || 'Unknown'}`,
+        amount: formatNPR(inv.grandTotal),
+        status: inv.status,
+        date: inv.createdAt,
+        navigateTo: `/billing/invoices/${inv.id}`,
+      })
+    }
+
+    for (const pay of recentPayments) {
+      items.push({
+        type: 'payment',
+        id: `pay-${pay.id}`,
+        description: `${pay.receiptNumber || pay.id.slice(0, 8)} via ${pay.gateway.replace('_', ' ')}`,
+        amount: formatNPR(pay.amount),
+        status: pay.status,
+        date: pay.paidAt || pay.createdAt,
+        navigateTo: '/billing/payments',
+      })
+    }
+
+    return items
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 20)
+  }, [recentPayments, recentInvoices])
+
+  return (
+    <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
+      <div className="bg-[rgb(var(--surface-secondary))] px-4 py-3 border-b border-[rgb(var(--border-primary))]">
+        <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+          Recent Activity
+        </h2>
+      </div>
+      {activities.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">No recent activity.</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-[rgb(var(--border-primary))]">
+          {activities.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.navigateTo)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+            >
+              <div className={`p-1.5 rounded-md flex-shrink-0 ${
+                item.type === 'invoice'
+                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                  : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+              }`}>
+                {item.type === 'invoice'
+                  ? <FileText className="w-3.5 h-3.5" />
+                  : <CreditCard className="w-3.5 h-3.5" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm text-[rgb(var(--text-primary))] truncate">
+                    {item.description}
+                  </span>
+                  <span className="text-sm font-medium text-[rgb(var(--text-primary))] flex-shrink-0">
+                    {item.amount}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2 mt-0.5">
+                  <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
+                    item.type === 'invoice'
+                      ? invoiceStatusBadge[item.status] || invoiceStatusBadge.draft
+                      : paymentStatusBadge[item.status] || paymentStatusBadge.pending
+                  }`}>
+                    {item.status.replace('_', ' ')}
+                  </span>
+                  <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                    {formatDate(item.date)}
+                  </span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

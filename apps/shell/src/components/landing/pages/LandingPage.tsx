@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, Component, type ReactNode } from 'react'
 import { Navbar } from '../Navbar'
 import { HeroSection } from '../sections/HeroSection'
-import { SocialProofSection } from '../sections/SocialProofSection'
 import { Footer } from '../Footer'
 import { useInView } from '../hooks/useInView'
 import '../landing.css'
@@ -12,9 +11,25 @@ function BelowFoldFallback() {
   return (
     <div className="min-h-[200vh]">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="px-6 py-24 text-center">
-          <div className="mx-auto h-6 w-48 rounded-full landing-skeleton" style={{ backgroundColor: 'rgba(42,157,143,0.1)' }} />
-          <div className="mx-auto mt-4 h-10 w-96 max-w-full rounded-lg landing-skeleton" style={{ backgroundColor: 'rgba(42,157,143,0.06)' }} />
+        <div key={i} className="px-6 py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mx-auto mb-8 text-center">
+              <div className="mx-auto h-6 w-48 rounded-full landing-skeleton" style={{ backgroundColor: 'rgba(249,115,22,0.1)' }} />
+              <div className="mx-auto mt-4 h-10 w-96 max-w-full rounded-lg landing-skeleton" style={{ backgroundColor: 'rgba(249,115,22,0.06)' }} />
+            </div>
+            <div className="grid gap-8 lg:grid-cols-[38%_1fr]">
+              <div className="grid grid-cols-2 gap-3 auto-rows-min">
+                {[1, 2, 3, 4].map((j) => (
+                  <div
+                    key={j}
+                    className={`rounded-xl landing-skeleton ${j === 1 ? 'col-span-2 h-28' : 'h-24'}`}
+                    style={{ backgroundColor: 'rgba(226,232,240,0.3)' }}
+                  />
+                ))}
+              </div>
+              <div className="hidden lg:block h-[400px] rounded-2xl landing-skeleton" style={{ backgroundColor: 'rgba(226,232,240,0.2)' }} />
+            </div>
+          </div>
         </div>
       ))}
     </div>
@@ -63,7 +78,6 @@ export default function LandingPage() {
 
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
-        <SocialProofSection />
 
         {/* Sentinel triggers lazy load 200px before scrolling into view */}
         <div ref={sentinelRef} />

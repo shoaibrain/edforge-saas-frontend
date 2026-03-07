@@ -31,7 +31,7 @@ export default function FeeStructuresPage() {
   const [editingFee, setEditingFee] = useState<FeeStructure | null>(null)
   const [deletingFee, setDeletingFee] = useState<FeeStructure | null>(null)
 
-  const { data: feeStructures, isLoading } = useFeeStructures(schoolId ?? '')
+  const { data: feeStructures, isLoading, isError } = useFeeStructures(schoolId ?? '')
   const createMutation = useCreateFeeStructure(schoolId ?? '')
   const updateMutation = useUpdateFeeStructure(schoolId ?? '')
   const deleteMutation = useDeleteFeeStructure(schoolId ?? '')
@@ -98,6 +98,20 @@ export default function FeeStructuresPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8 text-center text-[rgb(var(--text-tertiary))]">
         Select a school to manage fee structures.
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="text-center py-16">
+          <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
+          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load fee structures</p>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+            Please check your connection and try again.
+          </p>
+        </div>
       </div>
     )
   }

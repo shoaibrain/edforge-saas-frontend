@@ -1,37 +1,66 @@
 /**
- * Landing Page Scoped Styles
+ * Landing Page Scoped Styles — Light, Vibrant, Human-Centric Theme
+ * Inspired by Google for Education (Clean, Accessible, Fast)
  *
  * All styles are scoped under .landing-page to prevent bleeding
  * into the authenticated MFE application routes.
  */
 
 .landing-page {
-  scroll-behavior: smooth;
-  contain: paint;
-  background-color: #0a1a24;
-  color: #e8edf0;
+  /* scroll-behavior intentionally omitted — Framer Motion useScroll needs instant position updates */
+  background-color: #FAF9F6;
+  color: #1E293B;
 
   /* ── Theme Palette (RGB channels for alpha composition) ── */
-  --surface-primary: 10 26 36;       /* #0a1a24 — base background */
-  --surface-secondary: 16 38 48;     /* #102630 — elevated surfaces */
-  --surface-tertiary: 22 46 59;      /* #162e3b — interactive surfaces */
-  --surface-elevated: 22 46 59;      /* #162e3b */
-  --text-primary: 232 237 240;       /* #e8edf0 — primary text */
-  --text-secondary: 160 195 210;     /* #a0c3d2 — secondary text (WCAG AA ≥5.5:1 on #0a1a24) */
-  --text-tertiary: 100 155 175;      /* #649baf — muted text (WCAG AA ≥4.6:1 on #0a1a24) */
-  --text-inverted: 10 26 36;         /* #0a1a24 */
-  --border-primary: 42 157 143;      /* #2a9d8f at full, use with alpha */
-  --border-secondary: 42 157 143;    /* #2a9d8f */
-  --brand-primary: 42 157 143;       /* #2a9d8f — teal accent */
-  --brand-secondary: 94 196 182;     /* #5ec4b6 */
-  --brand-accent: 233 196 106;       /* #e9c46a — warm accent */
-  --interactive-hover: 22 46 59;     /* #162e3b */
-  --interactive-active: 42 157 143;  /* #2a9d8f */
+  --surface-primary: 250 249 246;
+  /* #FAF9F6 — warm off-white base */
+  --surface-secondary: 255 255 255;
+  /* #FFFFFF — cards, elevated surfaces */
+  --surface-tertiary: 245 243 238;
+  /* #F5F3EE — subtle depth */
+  --surface-elevated: 255 255 255;
+  /* #FFFFFF */
+  --text-primary: 30 41 59;
+  /* #1E293B — deep charcoal */
+  --text-secondary: 71 85 105;
+  /* #475569 — warm gray */
+  --text-tertiary: 148 163 184;
+  /* #94A3B8 — muted */
+  --text-inverted: 255 255 255;
+  /* #FFFFFF */
+  --border-primary: 226 232 240;
+  /* #E2E8F0 — soft border */
+  --border-secondary: 241 245 249;
+  /* #F1F5F9 — whisper border */
+  --brand-primary: 249 115 22;
+  /* #F97316 — warm orange */
+  --brand-secondary: 42 157 143;
+  /* #2A9D8F — teal accent */
+  --brand-accent: 245 158 11;
+  /* #F59E0B — amber/mustard */
+  --interactive-hover: 241 245 249;
+  /* #F1F5F9 */
+  --interactive-active: 249 115 22;
+  /* Additional landing page specific typography if needed beyond globals */
 
-  /* ── Typography Scale ── */
-  --lp-font-section-title: clamp(1.75rem, 3vw, 2.75rem);
-  --lp-font-feature-title: clamp(1.25rem, 2vw, 1.5rem);
+  /* Google-inspired Accents */
+  --lp-accent-green: #188038;
+  --lp-accent-orange: #E37400;
+  --lp-accent-blue: #1A73E8;
+  --lp-accent-green-light: #e6f4ea;
+  --lp-accent-orange-light: #feefe3;
+  --lp-accent-blue-light: #e8f0fe;
+
+  /* Spacing */
+  --lp-section-padding-y: 6rem;
+  --lp-section-padding-x: 2rem;
+
+  /* ── Typography ── */
+  --lp-font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
+  --lp-font-section-title: clamp(2rem, 4vw, 3.5rem);
+  --lp-font-feature-title: clamp(1.375rem, 2.5vw, 1.75rem);
   --lp-font-body: clamp(0.9375rem, 1.5vw, 1.125rem);
+  --lp-font-summary: clamp(0.8125rem, 1.2vw, 0.9375rem);
   --lp-font-label: 0.75rem;
   --lp-font-dashboard-title: clamp(1rem, 1.5vw, 1.25rem);
   --lp-font-dashboard-value: clamp(1.125rem, 2vw, 1.5rem);
@@ -42,99 +71,102 @@
   --lp-weight-body: 400;
   --lp-weight-label: 500;
 
-  /* ── Spacing ── */
-  --lp-section-gap: clamp(4rem, 8vw, 8rem);
-  --lp-card-padding: clamp(1rem, 2vw, 1.5rem);
-  --lp-card-padding-lg: clamp(1.25rem, 2.5vw, 2rem);
+  /* ── Line Heights ── */
+  --lp-line-height-body: 1.7;
+  --lp-line-height-heading: 1.15;
 
-  /* ── Border Radius ── */
-  --lp-radius-sm: 8px;
-  --lp-radius-md: 12px;
-  --lp-radius-lg: 16px;
-  --lp-radius-xl: 20px;
+  /* ── Sub-feature heading ── */
+  --lp-font-subheading: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
 
-  /* ── Shadows ── */
-  --lp-shadow-card: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
-  --lp-shadow-elevated: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
-  --lp-shadow-dashboard: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3);
+  /* ── Spacing (generous whitespace for breathing room) ── */
+  --lp-section-gap: clamp(5rem, 10vw, 10rem);
+  --lp-card-padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  --lp-card-padding-lg: clamp(1.5rem, 3vw, 2.25rem);
 
-  /* ── Data Visualization Palette (brand-aligned) ── */
-  --lp-chart-primary: #2a9d8f;
-  --lp-chart-secondary: #5ec4b6;
-  --lp-chart-accent: #e9c46a;
-  --lp-chart-success: #34d399;
-  --lp-chart-warning: #f4a261;
-  --lp-chart-danger: #e76f51;
-  --lp-chart-neutral: #a0c3d2;
+  /* ── Border Radius (large = friendly, approachable) ── */
+  --lp-radius-sm: 12px;
+  --lp-radius-md: 20px;
+  --lp-radius-lg: 28px;
+  --lp-radius-xl: 32px;
+  --lp-radius-pill: 9999px;
+
+  /* ── Shadows (soft, warm, diffuse — no dark glows) ── */
+  --lp-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --lp-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.06), 0 12px 28px rgba(0, 0, 0, 0.04);
+  --lp-shadow-dashboard: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
+  --lp-shadow-bento: 0 2px 20px rgba(0, 0, 0, 0.03), 0 0 1px rgba(0, 0, 0, 0.04);
+
+  /* ── Bento Containment Wrapper ── */
+  --lp-bento-container-bg: rgba(245, 243, 238, 0.5);
+  --lp-bento-container-border: rgba(226, 232, 240, 0.5);
+
+  /* ── Alternating Section Background ── */
+  --lp-surface-alt: rgba(245, 243, 238, 0.6);
+
+  /* ── Persona Accent Themes ── */
+  --lp-persona-district-accent: #F97316;
+  --lp-persona-district-accent-dark: #EA580C;
+  --lp-persona-district-bg: var(--lp-bento-peach);
+  --lp-persona-teacher-accent: #2A9D8F;
+  --lp-persona-teacher-accent-dark: #1E7A6E;
+  --lp-persona-teacher-bg: var(--lp-bento-mint);
+  --lp-persona-student-accent: #8B5CF6;
+  --lp-persona-student-accent-dark: #7C3AED;
+  --lp-persona-student-bg: var(--lp-bento-lavender);
+
+  /* ── Data Visualization Palette (vibrant, warm, student-friendly) ── */
+  --lp-chart-primary: #F97316;
+  --lp-chart-secondary: #2A9D8F;
+  --lp-chart-accent: #8B5CF6;
+  --lp-chart-success: #22C55E;
+  --lp-chart-warning: #F59E0B;
+  --lp-chart-danger: #EF4444;
+  --lp-chart-neutral: #94A3B8;
+
+  /* ── Bento Card Background Palette ── */
+  --lp-bento-peach: #FFF7ED;
+  --lp-bento-peach-accent: #FB923C;
+  --lp-bento-blue: #EFF6FF;
+  --lp-bento-blue-accent: #60A5FA;
+  --lp-bento-mint: #ECFDF5;
+  --lp-bento-mint-accent: #34D399;
+  --lp-bento-mustard: #FFFBEB;
+  --lp-bento-mustard-accent: #FBBF24;
+  --lp-bento-lavender: #F5F3FF;
+  --lp-bento-lavender-accent: #A78BFA;
 
   /* ── 8px Baseline Grid Spacing Scale ── */
-  /* All section gaps MUST be multiples of 8px */
-  --lp-space-1: 0.5rem;   /* 8px */
-  --lp-space-2: 1rem;     /* 16px */
-  --lp-space-3: 1.5rem;   /* 24px */
-  --lp-space-4: 2rem;     /* 32px */
-  --lp-space-5: 2.5rem;   /* 40px */
-  --lp-space-6: 3rem;     /* 48px */
-  --lp-space-8: 4rem;     /* 64px */
-  --lp-space-10: 5rem;    /* 80px */
-  --lp-space-12: 6rem;    /* 96px */
+  --lp-space-1: 0.5rem;
+  /* 8px */
+  --lp-space-2: 1rem;
+  /* 16px */
+  --lp-space-3: 1.5rem;
+  /* 24px */
+  --lp-space-4: 2rem;
+  /* 32px */
+  --lp-space-5: 2.5rem;
+  /* 40px */
+  --lp-space-6: 3rem;
+  /* 48px */
+  --lp-space-8: 4rem;
+  /* 64px */
+  --lp-space-10: 5rem;
+  /* 80px */
+  --lp-space-12: 6rem;
+  /* 96px */
 
   /* ── Touch ── */
   touch-action: manipulation;
 }
 
-/* Mesh gradient & grid overlays — limited to hero viewport only */
-.landing-page::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  max-height: 100vh;
-  pointer-events: none;
-  z-index: -2;
-  background:
-    radial-gradient(circle 600px at 15% 50%, oklch(0.35 0.06 230 / 0.6), transparent),
-    radial-gradient(circle 500px at 85% 30%, oklch(0.65 0.18 35 / 0.12), transparent),
-    radial-gradient(circle 700px at 50% 80%, oklch(0.60 0.14 175 / 0.12), transparent);
-}
-
-.landing-page::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  max-height: 100vh;
-  pointer-events: none;
-  z-index: -1;
-  background-image:
-    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e"),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-}
-
 /* ── Hero section animations ─────────────────────────────── */
 
-/* Hero ambient glow rotation — GPU composited via transform */
-@keyframes heroGlowRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.hero-glow-rotate {
-  animation: heroGlowRotate 60s linear infinite;
-}
-
-/* Staggered fade-in for hero content */
 @keyframes heroFadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -143,54 +175,232 @@
 
 .hero-fade-in {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(24px);
   animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.hero-stagger-1 { animation-delay: 0.15s; }
-.hero-stagger-2 { animation-delay: 0.3s; }
-.hero-stagger-3 { animation-delay: 0.45s; }
-.hero-stagger-4 { animation-delay: 0.6s; }
-.hero-stagger-5 { animation-delay: 0.75s; }
+.hero-stagger-1 {
+  animation-delay: 0.1s;
+}
 
-/* Hero gradient accent text with slow shimmer */
+.hero-stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.hero-stagger-3 {
+  animation-delay: 0.35s;
+}
+
+.hero-stagger-4 {
+  animation-delay: 0.5s;
+}
+
+.hero-stagger-5 {
+  animation-delay: 0.65s;
+}
+
+.hero-stagger-6 {
+  animation-delay: 0.8s;
+}
+
+/* Hero gradient text — static warm orange/amber */
 .hero-gradient-text {
-  background: linear-gradient(
-    135deg,
-    #3bc4b4 0%,
-    #7dd8c4 25%,
-    #e9c46a 50%,
-    #7dd8c4 75%,
-    #3bc4b4 100%
-  );
-  background-size: 250% auto;
+  background: linear-gradient(135deg, #EA580C 0%, #B45309 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: heroGradientShift 10s ease-in-out infinite;
 }
 
-@keyframes heroGradientShift {
-  0%, 100% { background-position: 0% center; }
-  50% { background-position: 100% center; }
+/* ── CTA Button Interaction States ──────────────────────── */
+
+/* Primary CTA (orange pill) — snappy physics */
+.landing-page .lp-btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Legacy fadeIn (used by below-fold sections) */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.landing-page .lp-btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: inherit;
 }
 
-/* ── Utility animations ──────────────────────────────────── */
-
-/* Skeleton pulse animation for scrollytelling cards */
-@keyframes landing-skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+.landing-page .lp-btn-primary:hover::before {
+  opacity: 1;
 }
 
-.landing-page .landing-skeleton {
-  animation: landing-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.landing-page .lp-btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4), 0 2px 6px rgba(249, 115, 22, 0.2) !important;
+}
+
+.landing-page .lp-btn-primary:active {
+  transform: scale(0.98) !important;
+  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3) !important;
+}
+
+/* Secondary CTA (outlined pill) */
+.landing-page .lp-btn-secondary {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.landing-page .lp-btn-secondary:hover {
+  background-color: rgba(30, 41, 59, 0.04) !important;
+  border-color: rgba(30, 41, 59, 0.6) !important;
+  transform: translateY(-1px);
+}
+
+.landing-page .lp-btn-secondary:active {
+  transform: translateY(0);
+  background-color: rgba(30, 41, 59, 0.08) !important;
+}
+
+/* Dashboard internal buttons (View Dashboard, Filter, Execute) */
+.landing-page .lp-btn-dashboard {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.landing-page .lp-btn-dashboard:hover {
+  background-color: rgba(249, 115, 22, 0.06) !important;
+  border-color: rgba(249, 115, 22, 0.3) !important;
+  color: #F97316 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
+}
+
+.landing-page .lp-btn-dashboard:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Mobile scroll tab pills */
+.landing-page .lp-tab-pill:active {
+  transform: scale(0.96);
+}
+
+/* ── Dashboard Card Micro-Interactions ──────────────────── */
+
+.landing-page .lp-dashboard-card {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.landing-page .lp-dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lp-shadow-elevated);
+}
+
+.landing-page .lp-dashboard-card:active {
+  transform: translateY(0);
+}
+
+/* ── Feature Title Enhancement ─────────────────────────── */
+
+.landing-page .lp-feature-title {
+  letter-spacing: -0.01em;
+}
+
+
+
+/* ── Animated Progress Bar ─────────────────────────────── */
+
+.landing-page .lp-progress-bar {
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Text Enhancement ──────────────────────────────────── */
+
+/* Highlighted keyword with animated underline */
+.landing-page .text-highlight-word {
+  position: relative;
+  display: inline;
+}
+
+.landing-page .text-highlight-word::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #F97316, #F59E0B);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-text-active="true"] .text-highlight-word::after {
+  transform: scaleX(1);
+}
+
+/* ── Text Enhancement ──────────────────────────────────── */
+
+/* ── Ambient Data / Social Proof ───────────────────────── */
+
+.landing-page .ambient-stat {
+  font-family: var(--lp-font-heading);
+  font-weight: 800;
+  color: rgb(var(--text-primary));
+  opacity: 0.06;
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  text-align: center;
+}
+
+/* ── SVG Decoration Utility ────────────────────────────── */
+
+.landing-page .svg-decoration {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Persona Breadcrumb ────────────────────────────────── */
+
+.landing-page .persona-breadcrumb {
+  position: fixed;
+  top: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--lp-radius-pill);
+  background: rgba(250, 249, 246, 0.8);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.landing-page .persona-breadcrumb.visible {
+  opacity: 1;
+}
+
+@keyframes breadcrumbPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0);
+  }
+}
+
+.landing-page .persona-dot-active {
+  animation: breadcrumbPulse 2s ease-in-out infinite;
 }
 
 /* ── GPU compositing hints ──────────────────────────────── */
@@ -205,21 +415,28 @@
   will-change: auto;
 }
 
+/* ── Performance ────────────────────────────────────────── */
+
+.landing-page .lp-bento-grid-container {
+  contain: layout style paint;
+}
+
+.landing-page .lp-dashboard-state {
+  contain: layout style;
+}
+
 /* ── Accessibility ───────────────────────────────────────── */
 
 /* Focus visible rings for interactive elements */
 .landing-page a:focus-visible,
 .landing-page button:focus-visible {
-  outline: 2px solid oklch(0.60 0.14 175);
+  outline: 2px solid #F97316;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .landing-page {
-    scroll-behavior: auto;
-  }
 
   .landing-page *,
   .landing-page *::before,
@@ -229,13 +446,36 @@
     transition-duration: 0.01ms !important;
   }
 
-  .hero-glow-rotate {
-    animation: none;
-  }
-
   /* Ensure hero content is visible when motion is reduced */
   .hero-fade-in {
     opacity: 1;
     transform: none;
+  }
+
+  /* Text highlight underlines show immediately */
+  .landing-page .text-highlight-word::after {
+    transform: scaleX(1);
+    transition: none;
+  }
+
+  /* Disable button lift/scale transitions */
+  .landing-page .lp-btn-primary:active,
+  .landing-page .lp-btn-secondary:hover,
+  .landing-page .lp-btn-secondary:active,
+  .landing-page .lp-btn-dashboard:hover,
+  .landing-page .lp-btn-dashboard:active,
+  .landing-page .lp-dashboard-card:hover {
+    transform: none;
+  }
+
+  /* Disable shimmer */
+  .landing-page .lp-card-shimmer::before {
+    animation: none;
+    display: none;
+  }
+
+  /* Disable progress bar animation */
+  .landing-page .lp-progress-bar {
+    transition: none;
   }
 }

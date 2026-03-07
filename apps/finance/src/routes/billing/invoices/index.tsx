@@ -34,7 +34,8 @@ import {
   useFeeStructures,
 } from '@edforge/finance-services'
 import { formatNPR } from '@edforge/types'
-import { formatDate } from '../../../utils/format-date'
+import { formatDateDual } from '../../../utils/format-date'
+import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 
@@ -183,7 +184,7 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => navigate({ to: '/finance/billing/invoices/bulk-generate' as string })}
+            onClick={() => navigate({ to: '/billing/invoices/bulk-generate' as string })}
           >
             <Users className="w-4 h-4 mr-1.5" />
             Bulk Generate
@@ -298,7 +299,14 @@ export default function InvoicesPage() {
                       {invoice.invoiceNumber || invoice.id.slice(0, 8)}
                     </td>
                     <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-                      {invoice.studentName || '-'}
+                      {invoice.studentName || (
+                        <span
+                          className="text-[rgb(var(--text-tertiary))] font-mono text-xs"
+                          title={invoice.studentId}
+                        >
+                          {invoice.studentId?.slice(0, 8) || '-'}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-medium text-[rgb(var(--text-primary))]">
                       {formatNPR(invoice.grandTotal)}
@@ -306,7 +314,7 @@ export default function InvoicesPage() {
                     <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
                       <div className="flex items-center gap-1.5">
                         <span>
-                          {invoice.dueDate ? formatDate(invoice.dueDate) : '-'}
+                          {invoice.dueDate ? formatDateDual(invoice.dueDate) : '-'}
                         </span>
                         {invoice.status === 'overdue' && overdueDays > 0 && (
                           <span className="inline-flex items-center gap-0.5 text-xs text-red-600 dark:text-red-400">
@@ -322,7 +330,7 @@ export default function InvoicesPage() {
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => navigate({ to: `/finance/billing/invoices/${invoice.id}` as string })}
+                          onClick={() => navigate({ to: `/billing/invoices/${invoice.id}` as string })}
                           className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                           title="View"
                         >
@@ -562,7 +570,7 @@ function GenerateInvoiceModal({
   const { data: feeStructureData } = useFeeStructures(schoolId)
   const feeStructures = Array.isArray(feeStructureData) ? feeStructureData : []
 
-  const [studentId, setStudentId] = useState('')
+  const [selectedStudent, setSelectedStudent] = useState<{ studentId: string; studentName: string } | null>(null)
   const [selectedFees, setSelectedFees] = useState<string[]>([])
   const [dueDate, setDueDate] = useState('')
   const [academicYear, setAcademicYear] = useState('')
@@ -578,13 +586,13 @@ function GenerateInvoiceModal({
   const grandTotal = subtotal + taxTotal
 
   const handleSubmit = async () => {
-    if (!studentId || selectedFees.length === 0 || !dueDate || !academicYear) {
+    if (!selectedStudent || selectedFees.length === 0 || !dueDate || !academicYear) {
       toast.error('Please fill all required fields')
       return
     }
     try {
       await generateMutation.mutateAsync({
-        studentId,
+        studentId: selectedStudent.studentId,
         feeStructureIds: selectedFees,
         dueDate,
         academicYear,
@@ -616,17 +624,15 @@ function GenerateInvoiceModal({
         </h2>
 
         <div className="space-y-4">
-          {/* Student ID */}
+          {/* Student */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Student ID *
+              Student *
             </label>
-            <input
-              type="text"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              placeholder="Enter student ID"
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+            <StudentSearchInput
+              schoolId={schoolId}
+              value={selectedStudent}
+              onChange={setSelectedStudent}
             />
           </div>
 

@@ -1,80 +1,43 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 
-const pillars = [
-  { title: 'Compliance-First', detail: 'FERPA · COPPA · SOC 2' },
-  { title: 'Ed-Fi Aligned', detail: 'Open data interoperability' },
-  { title: 'Event-Driven Core', detail: 'Real-time across every school' },
-]
-
 export function HeroSection() {
   return (
     <section
       aria-label="Introduction"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative flex items-center justify-center overflow-hidden"
+      style={{ backgroundColor: 'rgb(var(--surface-primary))', minHeight: '85vh' }}
     >
-      {/* Layer 1 — base gradient */}
-      <div
-        className="landing-hero-bg absolute inset-0 z-0"
-        aria-hidden="true"
-        style={{
-          background:
-            'linear-gradient(180deg, #050b0f 0%, #0a1a24 35%, #102630 65%, #162e3b 100%)',
-        }}
-      />
-
-      {/* Layer 2 — dot grid with radial mask */}
-      <div
-        className="landing-hero-dots pointer-events-none absolute inset-0 z-0"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3e%3ccircle cx='1' cy='1' r='0.6' fill='rgba(255,255,255,0.045)'/%3e%3c/svg%3e\")",
-          maskImage:
-            'radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 70%)',
-          WebkitMaskImage:
-            'radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 70%)',
-        }}
-      />
-
-      {/* Layer 3 — soft ambient mesh */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(ellipse 50% 40% at 50% 45%, rgba(42,157,143,0.07), transparent),' +
-            'radial-gradient(ellipse 40% 30% at 25% 35%, rgba(42,157,143,0.04), transparent),' +
-            'radial-gradient(ellipse 35% 25% at 75% 55%, rgba(233,196,106,0.03), transparent)',
-        }}
-      />
-
-      {/* Layer 4 — slow-rotating glow (GPU-composited via transform) */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-25 hero-glow-rotate"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(circle 450px at 30% 40%, oklch(0.42 0.09 175 / 0.2), transparent),' +
-            'radial-gradient(circle 350px at 70% 55%, oklch(0.50 0.06 80 / 0.12), transparent)',
-        }}
-      />
-
       {/* Content */}
-      <div className="relative z-10 max-w-[56rem] mx-auto px-6 sm:px-8 pt-28 pb-20 text-center">
+      <div className="relative z-10 max-w-[60rem] mx-auto px-6 sm:px-8 pt-32 pb-24 text-center">
         {/* Badge pill */}
         <div
-          className="hero-fade-in hero-stagger-1 mb-6 inline-flex items-center gap-2 rounded-full border border-[#2a9d8f]/20 bg-[#2a9d8f]/[0.06] px-4 py-2 text-[0.8125rem] font-medium backdrop-blur-sm"
-          style={{ color: '#7dd8c4' }}
+          className="hero-fade-in hero-stagger-1 mb-8 inline-flex items-center gap-2 px-5 py-2.5 text-[0.8125rem] font-semibold"
+          style={{
+            borderRadius: 'var(--lp-radius-pill)',
+            backgroundColor: 'var(--lp-bento-peach)',
+            color: '#EA580C',
+            border: '1px solid #FDBA74',
+          }}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-[#2a9d8f]/60" />
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: '#F97316', boxShadow: '0 0 6px #F97316' }}
+          />
           Purpose-built for K-12 education
         </div>
 
-        {/* Headline */}
+        {/* Headline — serif display font */}
         <h1
-          className="hero-fade-in hero-stagger-2 text-[2.5rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.25rem] font-bold tracking-[-0.025em] mb-6"
-          style={{ color: 'rgb(var(--text-primary))' }}
+          className="hero-fade-in hero-stagger-2 mb-8"
+          style={{
+            fontFamily: 'var(--lp-font-heading)',
+            fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+            lineHeight: 1.1,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: 'rgb(var(--text-primary))',
+          }}
         >
           One platform to power
           <br />
@@ -85,7 +48,7 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <p
-          className="hero-fade-in hero-stagger-3 text-base leading-relaxed sm:text-lg md:text-xl lg:text-[1.35rem] lg:leading-[1.6] max-w-[38rem] mx-auto mb-10"
+          className="hero-fade-in hero-stagger-3 text-base leading-relaxed sm:text-lg md:text-xl lg:text-[1.35rem] lg:leading-[1.7] max-w-[40rem] mx-auto mb-12"
           style={{ color: 'rgb(var(--text-secondary))' }}
         >
           Unify student data, school operations, and district analytics on one
@@ -93,48 +56,36 @@ export function HeroSection() {
           not add to them.
         </p>
 
-        {/* CTA */}
-        <div className="hero-fade-in hero-stagger-4 mb-16 sm:mb-20">
+        {/* CTA row */}
+        <div className="hero-fade-in hero-stagger-4 mb-10 sm:mb-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             to="/login"
-            className="group relative z-10 inline-flex items-center justify-center gap-2 cursor-pointer rounded-full px-7 py-3 sm:py-2.5 text-[0.9375rem] sm:text-[0.875rem] font-semibold transition-colors duration-200"
+            className="lp-btn-primary group relative z-10 inline-flex items-center justify-center gap-2 cursor-pointer px-8 py-3.5 text-base font-semibold transition-all duration-200 hover:scale-[1.03] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
             style={{
-              backgroundColor: 'rgb(var(--text-primary))',
-              color: 'rgb(var(--text-inverted))',
+              borderRadius: 'var(--lp-radius-pill)',
+              backgroundColor: '#F97316',
+              color: '#FFFFFF',
+              boxShadow: '0 4px 14px rgba(249,115,22,0.3)',
             }}
           >
             Get Started
-            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
+          <a
+            href="mailto:shoaibrain@edforge.net?subject=EdForge%20Demo%20Request"
+            className="lp-btn-secondary inline-flex items-center justify-center gap-2 px-8 py-3.5 text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1E293B]"
+            style={{
+              borderRadius: 'var(--lp-radius-pill)',
+              border: '2px solid rgb(var(--text-primary))',
+              color: 'rgb(var(--text-primary))',
+            }}
+          >
+            Schedule a Demo
+          </a>
         </div>
 
-        {/* Platform pillars — above the fold */}
-        <div className="hero-fade-in hero-stagger-5 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0 divide-y divide-white/[0.06] sm:divide-y-0 sm:divide-x sm:divide-white/[0.08]">
-          {pillars.map((pillar) => (
-            <div
-              key={pillar.title}
-              className="flex flex-col items-center px-7 sm:px-9 pt-4 sm:pt-0 pb-0 sm:py-0"
-            >
-              <span className="text-[0.8125rem] font-semibold text-white/70 tracking-wide">
-                {pillar.title}
-              </span>
-              <span
-                className="text-[0.6875rem] mt-0.5"
-                style={{ color: 'rgb(var(--text-tertiary))' }}
-              >
-                {pillar.detail}
-              </span>
-            </div>
-          ))}
-        </div>
+
       </div>
-
-      {/* Bottom gradient fade for seamless transition */}
-      <div
-        className="landing-hero-fade absolute bottom-0 left-0 right-0 h-32 z-[5] pointer-events-none"
-        aria-hidden="true"
-        style={{ background: 'linear-gradient(to bottom, transparent, #0d1e27)' }}
-      />
     </section>
   )
 }

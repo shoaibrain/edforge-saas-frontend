@@ -19,7 +19,7 @@ import {
   useInvoicePayments,
 } from '@edforge/finance-services'
 import { formatNPR } from '@edforge/types'
-import { formatDate, formatDateTime } from '../../../utils/format-date'
+import { formatDate, formatDateTime, formatDateDual } from '../../../utils/format-date'
 
 function statusBadge(status: string) {
   const map: Record<string, string> = {
@@ -83,7 +83,7 @@ export default function InvoiceDetailPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       {/* Back nav */}
       <button
-        onClick={() => navigate({ to: '/finance/billing/invoices' as string })}
+        onClick={() => navigate({ to: '/billing/invoices' as string })}
         className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors print:hidden"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -101,7 +101,7 @@ export default function InvoiceDetailPage() {
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
             {invoice.studentName && `Student: ${invoice.studentName}`}
-            {invoice.dueDate && ` · Due: ${formatDate(invoice.dueDate)}`}
+            {invoice.dueDate && ` · Due: ${formatDateDual(invoice.dueDate)}`}
           </p>
         </div>
 
@@ -216,10 +216,15 @@ export default function InvoiceDetailPage() {
               <div key={payment.paymentId || payment.id} className="px-4 py-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {payment.gateway || payment.paymentMethod || 'Payment'}
+                    {payment.receiptNumber || payment.gateway || 'Payment'}
+                    {payment.receiptNumber && payment.gateway && (
+                      <span className="text-[rgb(var(--text-tertiary))] font-normal ml-1.5 text-xs capitalize">
+                        via {payment.gateway.replace('_', ' ')}
+                      </span>
+                    )}
                   </p>
                   <p className="text-xs text-[rgb(var(--text-secondary))]">
-                    {payment.createdAt ? formatDate(payment.createdAt) : ''}
+                    {payment.paidAt ? formatDate(payment.paidAt) : payment.createdAt ? formatDate(payment.createdAt) : ''}
                   </p>
                 </div>
                 <span className="text-sm font-medium text-green-600 dark:text-green-400">
@@ -234,7 +239,7 @@ export default function InvoiceDetailPage() {
       {/* Metadata */}
       <div className="text-xs text-[rgb(var(--text-tertiary))] space-y-0.5">
         {invoice.createdAt && <p>Created: {formatDateTime(invoice.createdAt)}</p>}
-        {invoice.issuedDate && <p>Issued: {formatDateTime(invoice.issuedDate)}</p>}
+        {invoice.issuedDate && <p>Issued: {formatDateDual(invoice.issuedDate)}</p>}
         {invoice.notes && <p>Notes: {invoice.notes}</p>}
       </div>
 

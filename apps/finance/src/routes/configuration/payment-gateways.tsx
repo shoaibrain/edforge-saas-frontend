@@ -11,7 +11,7 @@
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { PaymentGateway } from '@edforge/types'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertTriangle } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useGatewayConfigs, useSaveGatewayConfig } from '@edforge/finance-services'
 import { GatewayConfigCard } from '../../components/configuration/GatewayConfigCard'
@@ -28,7 +28,7 @@ const GATEWAYS: PaymentGateway[] = [
 export default function PaymentGatewaysPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
-  const { data: configs, isLoading } = useGatewayConfigs(schoolId ?? '')
+  const { data: configs, isLoading, isError } = useGatewayConfigs(schoolId ?? '')
   const saveMutation = useSaveGatewayConfig(schoolId ?? '')
 
   const handleSave = async (
@@ -78,6 +78,14 @@ export default function PaymentGatewaysPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12">
+            <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
+            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load gateway configurations</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+              Please check your connection and try again.
+            </p>
           </div>
         ) : (
           <div className="space-y-3">

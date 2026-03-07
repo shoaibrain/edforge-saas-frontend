@@ -95,6 +95,8 @@ export interface Payment {
   receiptNumber: string | null
   metadata: Record<string, unknown> // Gateway-specific response data
   refunds: Refund[]
+  studentName?: string // Denormalized from invoice for display
+  invoiceNumber?: string // Denormalized from invoice for display
   createdAt: string
   updatedAt: string
 }
@@ -209,6 +211,16 @@ export interface DashboardSummary {
     status: string
     receiptNumber?: string
     paidAt?: string
+    createdAt: string
+  }>
+  recentInvoices?: Array<{
+    id: string
+    invoiceNumber: string
+    studentName: string
+    grandTotal: number
+    amountDue: number
+    status: string
+    issuedDate: string
     createdAt: string
   }>
 }

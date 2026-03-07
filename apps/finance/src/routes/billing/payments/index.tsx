@@ -18,12 +18,14 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
+  Download,
 } from 'lucide-react'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useSchoolPayments,
   useVoidPayment,
   useCreateRefund,
+  useExportPaymentsCsv,
 } from '@edforge/finance-services'
 import { formatNPR } from '@edforge/types'
 import type { Payment } from '@edforge/types'
@@ -427,6 +429,7 @@ export default function PaymentsPage() {
   })
   const voidMutation = useVoidPayment(schoolId ?? '')
   const refundMutation = useCreateRefund(schoolId ?? '')
+  const exportCsvMutation = useExportPaymentsCsv()
 
   const paymentList = Array.isArray(payments) ? payments : []
   const filtered = searchTerm
@@ -487,11 +490,31 @@ export default function PaymentsPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Payments</h1>
-        <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-          View and manage all payment transactions.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Payments</h1>
+          <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
+            View and manage all payment transactions.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (!schoolId) return
+            exportCsvMutation.mutate(schoolId, {
+              onSuccess: () => toast.success('Payments CSV exported'),
+              onError: () => toast.error('Failed to export payments CSV'),
+            })
+          }}
+          disabled={exportCsvMutation.isPending}
+        >
+          {exportCsvMutation.isPending ? (
+            <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4 mr-1.5" />
+          )}
+          Export CSV
+        </Button>
       </div>
 
       {/* Filters */}
@@ -558,6 +581,7 @@ export default function PaymentsPage() {
               <thead>
                 <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
                   <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Receipt #</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Student</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Invoice #</th>
                   <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Amount</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Gateway</th>
@@ -572,8 +596,11 @@ export default function PaymentsPage() {
                     <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">
                       {payment.receiptNumber || payment.id.slice(0, 8)}
                     </td>
+                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-primary))]">
+                      {payment.studentName || '-'}
+                    </td>
                     <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-                      {payment.invoiceId ? payment.invoiceId.slice(0, 8) : '-'}
+                      {payment.invoiceNumber || (payment.invoiceId ? payment.invoiceId.slice(0, 8) : '-')}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-medium text-[rgb(var(--text-primary))]">
                       {formatNPR(payment.amount)}

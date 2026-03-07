@@ -133,7 +133,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
   const [result, setResult] = useState<BulkResult | null>(null)
 
   // Step 1 — Student selection
-  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([])
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([])
   const [studentSearch, setStudentSearch] = useState('')
 
   // Step 2 — Fee structures
@@ -163,13 +163,13 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
     0
   )
   const perStudentTotal = perStudentSubtotal + perStudentTax
-  const grandTotal = perStudentTotal * selectedAccountIds.length
+  const grandTotal = perStudentTotal * selectedStudentIds.length
 
   // Validation per step
   const canProceed = (s: Step): boolean => {
     switch (s) {
       case 1:
-        return selectedAccountIds.length > 0
+        return selectedStudentIds.length > 0
       case 2:
         return selectedFeeIds.length > 0
       case 3:
@@ -194,7 +194,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
     setFormState('submitting')
     try {
       const response = await bulkGenerateMutation.mutateAsync({
-        studentIds: selectedAccountIds,
+        studentIds: selectedStudentIds,
         feeStructureIds: selectedFeeIds,
         academicYear: academicYear.trim(),
         billingPeriod: billingPeriod.trim() || undefined,
@@ -216,16 +216,16 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
 
   // Toggle helpers
   const toggleAccount = (id: string) => {
-    setSelectedAccountIds((prev) =>
+    setSelectedStudentIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
   }
 
   const toggleAllAccounts = () => {
-    if (selectedAccountIds.length === filteredAccounts.length) {
-      setSelectedAccountIds([])
+    if (selectedStudentIds.length === filteredAccounts.length) {
+      setSelectedStudentIds([])
     } else {
-      setSelectedAccountIds(filteredAccounts.map((a) => a.id))
+      setSelectedStudentIds(filteredAccounts.map((a) => a.studentId))
     }
   }
 
@@ -243,7 +243,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
       <div className="flex flex-col items-center justify-center py-16 space-y-4">
         <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
         <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-          Generating invoices for {selectedAccountIds.length} students...
+          Generating invoices for {selectedStudentIds.length} students...
         </p>
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
           This may take a moment.
@@ -366,13 +366,13 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
 
               {/* Selection summary */}
               <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-secondary))]">
-                <span>{selectedAccountIds.length} selected</span>
+                <span>{selectedStudentIds.length} selected</span>
                 <button
                   type="button"
                   onClick={toggleAllAccounts}
                   className="text-teal-600 dark:text-teal-400 hover:underline"
                 >
-                  {selectedAccountIds.length === filteredAccounts.length
+                  {selectedStudentIds.length === filteredAccounts.length
                     ? 'Deselect All'
                     : 'Select All'}
                 </button>
@@ -399,8 +399,8 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     >
                       <input
                         type="checkbox"
-                        checked={selectedAccountIds.includes(account.id)}
-                        onChange={() => toggleAccount(account.id)}
+                        checked={selectedStudentIds.includes(account.studentId)}
+                        onChange={() => toggleAccount(account.studentId)}
                         className="rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
                       />
                       <span className="flex-1 text-sm text-[rgb(var(--text-primary))]">
@@ -584,7 +584,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     <span className="text-sm text-[rgb(var(--text-secondary))]">Students</span>
                   </div>
                   <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {selectedAccountIds.length}
+                    {selectedStudentIds.length}
                   </span>
                 </div>
 
@@ -640,7 +640,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   </div>
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Number of students</span>
-                    <span>&times; {selectedAccountIds.length}</span>
+                    <span>&times; {selectedStudentIds.length}</span>
                   </div>
                   <div className="flex justify-between text-base font-bold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2 mt-2">
                     <span>Grand Total</span>
@@ -683,7 +683,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
           ) : (
             <Button onClick={handleSubmit} disabled={!canProceed(step)}>
               <Eye className="w-4 h-4 mr-1.5" />
-              Generate {selectedAccountIds.length} Invoices
+              Generate {selectedStudentIds.length} Invoices
             </Button>
           )}
         </div>

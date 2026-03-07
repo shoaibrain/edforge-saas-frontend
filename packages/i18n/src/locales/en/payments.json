@@ -84,7 +84,10 @@
     "cancelledDescription": "You cancelled the payment. No amount was charged.",
     "tryAgain": "Try Again",
     "returnToInvoices": "Return to Invoices",
-    "sessionExpired": "Payment session has expired. Please try again."
+    "sessionExpired": "Payment session has expired. Please try again.",
+    "paymentInProgress": "Payment in Progress",
+    "paymentInProgressDescription": "Complete your payment in the {{gateway}} tab that just opened. Click 'Check Status' once you're done.",
+    "checkStatus": "Check Status"
   },
 
   "receipt": {

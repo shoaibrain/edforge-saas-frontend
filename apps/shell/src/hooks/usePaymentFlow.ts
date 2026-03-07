@@ -172,12 +172,13 @@ export function usePaymentFlow(invoice: Invoice, schoolId: string) {
 
       dispatch({ type: 'INITIATE_SUCCESS', sessionId: response.paymentSessionId })
 
-      // Handle gateway redirect based on method
+      // Handle gateway redirect — open in new tab to keep app on current page
       if (response.method === 'form_post' && response.formData) {
-        // eSewa requires hidden form POST — create and auto-submit
+        // eSewa requires hidden form POST — create and auto-submit in new tab
         const form = document.createElement('form')
         form.method = 'POST'
         form.action = response.redirectUrl
+        form.target = '_blank'
         form.style.display = 'none'
 
         for (const [key, value] of Object.entries(response.formData as Record<string, string>)) {
@@ -190,11 +191,10 @@ export function usePaymentFlow(invoice: Invoice, schoolId: string) {
 
         document.body.appendChild(form)
         form.submit()
-        // Clean up form element after submission to prevent DOM leak
         setTimeout(() => { form.remove() }, 100)
       } else {
-        // Khalti and others — simple URL redirect
-        window.location.href = response.redirectUrl
+        // Khalti and others — open in new tab
+        window.open(response.redirectUrl, '_blank', 'noopener,noreferrer')
       }
     } catch (err) {
       const raw = err instanceof Error ? err.message : 'Failed to initiate payment'
