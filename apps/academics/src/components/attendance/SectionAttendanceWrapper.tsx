@@ -2,8 +2,8 @@
  * SectionAttendanceWrapper
  *
  * Section-scoped attendance component for the classroom detail page.
- * Unlike the full AttendanceModule which is school-wide, this wrapper
- * filters attendance to only students in the given section's roster.
+ * Uses section-level attendance APIs (SEC_ATTEND#) to ensure records
+ * are properly isolated per section — no cross-section data leaks.
  */
 
 import { useMemo, useCallback } from 'react'
@@ -23,14 +23,14 @@ import {
   useAttendanceDateActions,
 } from '../../stores/attendance.store'
 import {
-  useAttendanceSummary,
-  useAttendanceRecords,
-  useRecordBulkAttendance,
-  useUpdateAttendance,
   useCalendarDate,
 } from '../../hooks/useAttendance'
+import {
+  useSectionAttendanceRecords,
+  useRecordBulkSectionAttendance,
+  useUpdateSectionAttendance,
+} from '../../hooks/useSectionAttendance'
 import { useSectionRoster } from '../../hooks/useSections'
-import { useCurrentAcademicYear } from '../../hooks'
 import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
 import { DateSelector } from './DateSelector'
 import { AttendanceGrid } from './AttendanceGrid'
@@ -101,38 +101,30 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
   const dateActions = useAttendanceDateActions()
   const canCreateAttendance = usePermission('create', 'attendance')
 
-  const { data: currentYear } = useCurrentAcademicYear(schoolId)
-
-  // Fetch section roster — this is the key difference from the school-wide module
+  // Fetch section roster
   const { data: roster, isLoading: rosterLoading } = useSectionRoster({
     sectionId,
     schoolId,
     enabled: !!sectionId && !!schoolId,
   })
 
-  // Fetch daily summary
-  const { data: summary, isLoading: summaryLoading } = useAttendanceSummary({
-    schoolId,
-    date: selectedDate,
-    academicYearId: currentYear?.yearId,
-    enabled: !!schoolId,
-  })
-
-  // Fetch existing attendance records
-  const { data: attendanceRecords } = useAttendanceRecords({
+  // Fetch section-specific attendance records (no client-side filtering needed)
+  const { data: sectionRecords } = useSectionAttendanceRecords({
+    sectionId,
     schoolId,
     date: selectedDate,
     enabled: !!schoolId && !!sectionId,
   })
 
-  // Filter records to only students in this section's roster
+  // Map section records to the format AttendanceGrid expects
   const existingRecords = useMemo(() => {
-    if (!attendanceRecords || !roster?.students) return []
-    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
-    return attendanceRecords
-      .filter((r) => rosterStudentIds.has(r.studentId))
-      .map((r) => ({ studentId: r.studentId, status: r.status, notes: r.notes }))
-  }, [attendanceRecords, roster?.students])
+    if (!sectionRecords) return []
+    return sectionRecords.map((r) => ({
+      studentId: r.studentId,
+      status: r.status as AttendanceStatus,
+      notes: r.notes,
+    }))
+  }, [sectionRecords])
 
   // Calendar date check
   const { data: calendarDate } = useCalendarDate({
@@ -143,30 +135,34 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
 
   const isNonInstructional = calendarDate != null && !calendarDate.isInstructionalDay
 
-  // Mutations
-  const bulkMutation = useRecordBulkAttendance()
-  const updateMutation = useUpdateAttendance()
+  // Mutations — section-level
+  const bulkMutation = useRecordBulkSectionAttendance()
+  const updateMutation = useUpdateSectionAttendance()
 
-  // Previous day records
-  const previousDate = useMemo(() => {
-    const d = new Date(selectedDate)
-    d.setDate(d.getDate() - 1)
-    return d.toISOString().split('T')[0]
-  }, [selectedDate])
-
-  const { data: previousDayAttendanceRecords } = useAttendanceRecords({
-    schoolId,
-    date: previousDate,
-    enabled: !!schoolId && !!sectionId,
-  })
-
-  const previousDayRecords = useMemo(() => {
-    if (!previousDayAttendanceRecords || !roster?.students) return undefined
-    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
-    return previousDayAttendanceRecords
-      .filter((r) => rosterStudentIds.has(r.studentId))
-      .map((r) => ({ studentId: r.studentId, status: r.status as AttendanceStatus }))
-  }, [previousDayAttendanceRecords, roster?.students])
+  // Section-level summary computed from roster + records (no extra API call)
+  const sectionSummary = useMemo(() => {
+    if (!roster?.students?.length) return undefined
+    const total = roster.students.length
+    const present = sectionRecords?.filter((r) => r.status === 'present').length ?? 0
+    const absent = sectionRecords?.filter((r) => r.status === 'absent').length ?? 0
+    const late = sectionRecords?.filter((r) => r.status === 'late').length ?? 0
+    const excused = sectionRecords?.filter((r) => r.status === 'excused').length ?? 0
+    const halfDay = sectionRecords?.filter((r) => r.status === 'half_day').length ?? 0
+    const remote = sectionRecords?.filter((r) => r.status === 'remote').length ?? 0
+    const rate = total > 0 ? ((present + late + remote) / total) * 100 : 0
+    return {
+      date: selectedDate,
+      schoolId,
+      totalStudents: total,
+      present,
+      absent,
+      late,
+      excused,
+      halfDay,
+      remote,
+      attendanceRate: rate,
+    }
+  }, [roster, sectionRecords, selectedDate, schoolId])
 
   // Offline resilience
   const offlineState = useOfflineAttendance({
@@ -197,17 +193,31 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
 
   const handleCorrection = useCallback(
     (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => {
-      if (!schoolId) return
-      updateMutation.mutate({
-        date: selectedDate,
-        studentId: record.studentId,
-        status: record.status,
-        notes: record.notes,
-        excuseType: record.excuseType,
-        schoolId,
-      })
+      if (!schoolId || !sectionId) return
+      // Check if this student already has a record for this date
+      const hasExisting = sectionRecords?.some((r) => r.studentId === record.studentId)
+      if (hasExisting) {
+        // PATCH existing record
+        updateMutation.mutate({
+          date: selectedDate,
+          sectionId,
+          studentId: record.studentId,
+          status: record.status,
+          notes: record.notes,
+          excuseReason: record.excuseType,
+          schoolId,
+        })
+      } else {
+        // POST new record via bulk endpoint (single-record array)
+        bulkMutation.mutate({
+          date: selectedDate,
+          schoolId,
+          sectionId,
+          records: [{ studentId: record.studentId, status: record.status, notes: record.notes }],
+        })
+      }
     },
-    [schoolId, selectedDate, updateMutation]
+    [schoolId, sectionId, selectedDate, sectionRecords, updateMutation, bulkMutation]
   )
 
   return (
@@ -233,7 +243,7 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
       )}
 
       {/* Daily Summary */}
-      <DailySummary summary={summary} isLoading={summaryLoading} />
+      <DailySummary summary={sectionSummary} isLoading={rosterLoading} />
 
       {/* Attendance Grid */}
       {rosterLoading ? (
@@ -261,7 +271,6 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
           disabled={isNonInstructional || !canCreateAttendance}
           saveStatus={offlineState.saveStatus}
           onCorrection={handleCorrection}
-          previousDayRecords={previousDayRecords}
         />
       )}
     </div>

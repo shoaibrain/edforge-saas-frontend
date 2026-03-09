@@ -1,26 +1,21 @@
 /**
  * OverviewTab Component — Academic Dashboard
  *
- * Clean, chart-driven student overview. No redundancy — each metric once.
- * - Stat cards: attendance rate, classes, term GPA, cumulative GPA (live data)
- * - Attendance trend: minimal area chart with 90% reference line
- * - Course performance: horizontal bar chart, color-coded by grade band
- * - Current classes: read-only table
- *
- * No destructive actions. No redundant data.
+ * Student overview with:
+ * - Stat cards: attendance rate, classes, term GPA, cumulative GPA
+ * - Attendance trend chart + daily status strip
+ * - Expandable course grade cards with category breakdown + assignments
+ * - Current classes table
  */
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   Tooltip,
-  Cell,
   ReferenceLine,
 } from 'recharts'
 import {
@@ -34,6 +29,9 @@ import {
   BarChart3,
   Target,
   Lock,
+  ChevronDown,
+  ChevronRight,
+  FileText,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
@@ -90,12 +88,41 @@ function getGpaTheme(gpa: number) {
   return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10' }
 }
 
-function getGradeBarColor(numericGrade: number): string {
-  if (numericGrade >= 90) return '#10b981'
-  if (numericGrade >= 80) return '#3b82f6'
-  if (numericGrade >= 70) return '#f59e0b'
-  if (numericGrade >= 60) return '#f97316'
-  return '#ef4444'
+function getGradeColor(numericGrade: number): string {
+  if (numericGrade >= 90) return 'text-emerald-600 dark:text-emerald-400'
+  if (numericGrade >= 80) return 'text-blue-600 dark:text-blue-400'
+  if (numericGrade >= 70) return 'text-amber-600 dark:text-amber-400'
+  if (numericGrade >= 60) return 'text-orange-600 dark:text-orange-400'
+  return 'text-red-600 dark:text-red-400'
+}
+
+function getGradeBg(numericGrade: number): string {
+  if (numericGrade >= 90) return 'bg-emerald-500'
+  if (numericGrade >= 80) return 'bg-blue-500'
+  if (numericGrade >= 70) return 'bg-amber-500'
+  if (numericGrade >= 60) return 'bg-orange-500'
+  return 'bg-red-500'
+}
+
+function getLetterBadgeClasses(letter: string): string {
+  switch (letter) {
+    case 'A': return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+    case 'B': return 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
+    case 'C': return 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+    case 'D': return 'bg-orange-500/15 text-orange-600 dark:text-orange-400'
+    default: return 'bg-red-500/15 text-red-600 dark:text-red-400'
+  }
+}
+
+function getAttendanceDotColor(status: string): string {
+  switch (status) {
+    case 'present': return 'bg-emerald-500'
+    case 'absent': return 'bg-red-500'
+    case 'late': case 'tardy': return 'bg-amber-500'
+    case 'excused': return 'bg-blue-500'
+    case 'remote': return 'bg-indigo-500'
+    default: return 'bg-slate-300 dark:bg-slate-600'
+  }
 }
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
@@ -171,24 +198,8 @@ function TrendTooltip({ active, payload }: any) {
   )
 }
 
-function GradeTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const point = payload[0].payload
-  return (
-    <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
-      <p className="text-xs text-text-tertiary">{point.name}</p>
-      <p className="text-sm font-semibold text-text-primary">
-        {point.grade != null ? `${point.grade.toFixed(1)}%` : '—'}
-      </p>
-      {point.letterGrade && (
-        <p className="text-xs text-text-tertiary mt-0.5">Grade: {point.letterGrade}</p>
-      )}
-    </div>
-  )
-}
-
 // ============================================================================
-// ATTENDANCE TREND CHART (minimal, no grid)
+// ATTENDANCE TREND CHART
 // ============================================================================
 
 function AttendanceTrendChart({ studentId }: { studentId: string }) {
@@ -293,26 +304,244 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
 }
 
 // ============================================================================
-// COURSE PERFORMANCE CHART
+// ATTENDANCE DAILY STATUS STRIP
 // ============================================================================
 
-function CoursePerformanceChart({
-  grades,
+function AttendanceDailyStrip({ studentId }: { studentId: string }) {
+  const thirtyDaysAgo = useMemo(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 30)
+    return d.toISOString().split('T')[0]
+  }, [])
+  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+
+  const { data: records } = useStudentAttendance({
+    studentId,
+    startDate: thirtyDaysAgo,
+    endDate: today,
+    enabled: !!studentId,
+  })
+
+  const days = useMemo(() => {
+    const statusMap = new Map<string, string>()
+    if (records) {
+      for (const r of records) {
+        statusMap.set(r.date, r.status)
+      }
+    }
+    const result: Array<{ date: string; label: string; status: string | null; isWeekend: boolean }> = []
+    const start = new Date(thirtyDaysAgo)
+    const end = new Date(today)
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const iso = d.toISOString().split('T')[0]
+      const dow = d.getDay()
+      result.push({
+        date: iso,
+        label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        status: statusMap.get(iso) || null,
+        isWeekend: dow === 0 || dow === 6,
+      })
+    }
+    return result
+  }, [records, thirtyDaysAgo, today])
+
+  if (!records || records.length === 0) return null
+
+  return (
+    <div className="mt-3">
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {days.map((day) => (
+          <div
+            key={day.date}
+            title={`${day.label}: ${day.status || (day.isWeekend ? 'Weekend' : 'No record')}`}
+            className={`w-3 h-3 rounded-sm ${
+              day.isWeekend
+                ? 'bg-surface-secondary'
+                : day.status
+                  ? getAttendanceDotColor(day.status)
+                  : 'bg-slate-200 dark:bg-slate-700'
+            }`}
+          />
+        ))}
+      </div>
+      <div className="flex items-center gap-3 mt-2">
+        {[
+          { status: 'present', label: 'Present' },
+          { status: 'absent', label: 'Absent' },
+          { status: 'late', label: 'Late' },
+          { status: 'excused', label: 'Excused' },
+        ].map((item) => (
+          <span key={item.status} className="flex items-center gap-1 text-[10px] text-text-tertiary">
+            <span className={`w-2 h-2 rounded-sm ${getAttendanceDotColor(item.status)}`} />
+            {item.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// EXPANDABLE COURSE GRADE CARD
+// ============================================================================
+
+function CourseGradeCard({
+  grade,
+  courseName,
 }: {
-  grades: Array<{ gradeId: string; courseName?: string; courseId: string; numericGrade: number; letterGrade: string; isFinal: boolean }>;
+  grade: any
+  courseName: string
+}) {
+  const [expanded, setExpanded] = useState(false)
+
+  const numericGrade = grade.numericGrade
+  const letterGrade = grade.letterGrade || '—'
+  const categoryGrades: any[] = grade.categoryGrades || []
+  const assignments: any[] = grade.assignments || []
+
+  const gradedAssignments = useMemo(() => {
+    return [...assignments]
+      .sort((a, b) => new Date(b.gradedAt).getTime() - new Date(a.gradedAt).getTime())
+  }, [assignments])
+
+  const totalWeight = categoryGrades.reduce((sum: number, c: any) => sum + (c.weight || 0), 0)
+
+  return (
+    <div className="rounded-xl border border-border-secondary bg-surface-secondary/30 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-secondary/50 transition-colors"
+      >
+        {expanded
+          ? <ChevronDown className="w-4 h-4 text-text-tertiary shrink-0" />
+          : <ChevronRight className="w-4 h-4 text-text-tertiary shrink-0" />
+        }
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-text-primary truncate">{courseName}</span>
+            <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${getLetterBadgeClasses(letterGrade)}`}>
+              {letterGrade}
+            </span>
+            {grade.isFinal && (
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-teal-500/15 text-teal-600 dark:text-teal-400">
+                Final
+              </span>
+            )}
+          </div>
+          {/* Grade bar */}
+          {numericGrade != null && (
+            <div className="flex items-center gap-2 mt-1.5">
+              <div className="flex-1 h-2 bg-surface-secondary rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${getGradeBg(numericGrade)} transition-all`}
+                  style={{ width: `${Math.min(numericGrade, 100)}%` }}
+                />
+              </div>
+              <span className={`text-xs font-semibold ${getGradeColor(numericGrade)} tabular-nums`}>
+                {numericGrade.toFixed(1)}%
+              </span>
+            </div>
+          )}
+          {/* Category weights bar */}
+          {categoryGrades.length > 0 && totalWeight > 0 && (
+            <div className="flex gap-0.5 mt-1.5 h-1.5 rounded-full overflow-hidden bg-surface-secondary">
+              {categoryGrades.map((cat: any, i: number) => {
+                const pct = (cat.weight / totalWeight) * 100
+                const catPct = cat.percentage ?? 0
+                return (
+                  <div
+                    key={cat.categoryId || i}
+                    title={`${cat.categoryName}: ${catPct.toFixed(0)}% (${cat.weight}% weight)`}
+                    className="h-full transition-all"
+                    style={{
+                      width: `${pct}%`,
+                      backgroundColor: catPct >= 90 ? '#10b981' : catPct >= 80 ? '#3b82f6' : catPct >= 70 ? '#f59e0b' : catPct >= 60 ? '#f97316' : catPct > 0 ? '#ef4444' : '#94a3b8',
+                      opacity: catPct > 0 ? 1 : 0.3,
+                    }}
+                  />
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </button>
+
+      {/* Expanded: Category breakdown + Assignments */}
+      {expanded && (
+        <div className="border-t border-border-secondary">
+          {/* Category breakdown */}
+          {categoryGrades.length > 0 && (
+            <div className="px-4 pt-3 pb-2">
+              <p className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2">Category Breakdown</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {categoryGrades.map((cat: any, i: number) => (
+                  <div key={cat.categoryId || i} className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-surface-secondary">
+                    <div className="min-w-0">
+                      <p className="text-xs text-text-secondary truncate">{cat.categoryName}</p>
+                      <p className="text-[10px] text-text-tertiary">{cat.weight}% weight</p>
+                    </div>
+                    <span className={`text-xs font-bold tabular-nums ${cat.percentage > 0 ? getGradeColor(cat.percentage) : 'text-text-tertiary'}`}>
+                      {cat.percentage > 0 ? `${cat.percentage.toFixed(0)}%` : '—'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Assignments list */}
+          {gradedAssignments.length > 0 && (
+            <div className="px-4 pt-2 pb-3">
+              <p className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+                Assignments ({gradedAssignments.length})
+              </p>
+              <div className="space-y-1">
+                {gradedAssignments.map((a: any) => (
+                  <div key={a.assignmentId} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors">
+                    <FileText className="w-3.5 h-3.5 text-text-tertiary shrink-0" />
+                    <span className="text-xs text-text-primary truncate flex-1">{a.assignmentName}</span>
+                    <span className="text-[10px] text-text-tertiary shrink-0">{a.assignmentType}</span>
+                    {a.earnedPoints != null ? (
+                      <span className={`text-xs font-medium tabular-nums shrink-0 ${getGradeColor(a.percentage ?? (a.earnedPoints / a.possiblePoints) * 100)}`}>
+                        {a.earnedPoints}/{a.possiblePoints}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-text-tertiary shrink-0">—/{a.possiblePoints}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {gradedAssignments.length === 0 && categoryGrades.length === 0 && (
+            <div className="px-4 py-4 text-center text-xs text-text-tertiary">
+              No detailed grade data available
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// COURSE GRADES SECTION
+// ============================================================================
+
+function CourseGradeCards({
+  grades,
+  courseNameMap,
+}: {
+  grades: any[]
+  courseNameMap: Map<string, string>
 }) {
   const { t: tAcad } = useTranslation('academics')
-  const chartData = useMemo(() => {
-    return grades
-      .filter((g) => g.numericGrade != null)
-      .map((g) => ({
-        name: g.courseName || g.courseId.slice(0, 12),
-        grade: g.numericGrade,
-        letterGrade: g.letterGrade,
-      }))
-  }, [grades])
 
-  if (chartData.length === 0) {
+  const validGrades = grades.filter((g) => g.numericGrade != null)
+
+  if (validGrades.length === 0) {
     return (
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
@@ -330,55 +559,21 @@ function CoursePerformanceChart({
     )
   }
 
-  const chartHeight = Math.max(120, chartData.length * 40 + 20)
-
   return (
     <section>
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <BarChart3 className="w-4 h-4 text-blue-500" />
         {tAcad('sections.coursePerformance')}
+        <span className="text-xs text-text-tertiary font-normal ml-1">({validGrades.length})</span>
       </h3>
-      <div className="rounded-xl border border-border-secondary bg-surface-secondary/30 p-4">
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
-            <XAxis
-              type="number"
-              domain={[0, 100]}
-              tick={{ fontSize: 10, fill: 'var(--color-text-tertiary, #9ca3af)' }}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v: number) => `${v}%`}
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              tick={{ fontSize: 11, fill: 'var(--color-text-tertiary, #9ca3af)' }}
-              tickLine={false}
-              axisLine={false}
-              width={100}
-            />
-            <Tooltip content={<GradeTooltip />} />
-            <Bar dataKey="grade" radius={[0, 4, 4, 0]} barSize={18}>
-              {chartData.map((entry, index) => (
-                <Cell key={index} fill={getGradeBarColor(entry.grade)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-        <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-border-secondary">
-          {[
-            { key: 'gradeLegend.a', color: '#10b981' },
-            { key: 'gradeLegend.b', color: '#3b82f6' },
-            { key: 'gradeLegend.c', color: '#f59e0b' },
-            { key: 'gradeLegend.d', color: '#f97316' },
-            { key: 'gradeLegend.f', color: '#ef4444' },
-          ].map((item) => (
-            <span key={item.key} className="flex items-center gap-1.5 text-[10px] text-text-tertiary">
-              <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color }} />
-              {tAcad(item.key)}
-            </span>
-          ))}
-        </div>
+      <div className="space-y-2">
+        {validGrades.map((g) => (
+          <CourseGradeCard
+            key={g.gradeId}
+            grade={g}
+            courseName={g.courseName || courseNameMap.get(g.courseId) || g.courseId.slice(0, 12)}
+          />
+        ))}
       </div>
     </section>
   )
@@ -498,8 +693,26 @@ export function OverviewTab({ student }: OverviewTabProps) {
   const gpa = gradesData?.gpa
   const grades = gradesData?.grades ?? []
 
-  const termGpaTheme = gpa?.termGpa != null ? getGpaTheme(gpa.termGpa) : null
-  const cumGpaTheme = gpa?.cumulativeGpa != null ? getGpaTheme(gpa.cumulativeGpa) : null
+  // Client-side GPA computation when backend returns null (same pattern as report-card.tsx:81-83)
+  const computedGpa = useMemo(() => {
+    if (gpa?.cumulativeGpa != null) return gpa
+    const withGpa = grades.filter((g: any) => g.gpaPoints != null && g.numericGrade != null)
+    if (withGpa.length === 0) return null
+    const avg = withGpa.reduce((sum: number, g: any) => sum + g.gpaPoints, 0) / withGpa.length
+    return { termGpa: avg, cumulativeGpa: avg, weightedGpa: avg }
+  }, [gpa, grades])
+
+  // Course name lookup from classrooms when grade record is missing courseName
+  const courseNameMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const c of classrooms) {
+      if ((c as any).courseId) map.set((c as any).courseId, c.subject || c.name)
+    }
+    return map
+  }, [classrooms])
+
+  const termGpaTheme = computedGpa?.termGpa != null ? getGpaTheme(computedGpa.termGpa) : null
+  const cumGpaTheme = computedGpa?.cumulativeGpa != null ? getGpaTheme(computedGpa.cumulativeGpa) : null
 
   if (hasNoData) {
     return (
@@ -537,20 +750,20 @@ export function OverviewTab({ student }: OverviewTabProps) {
         <StatCard
           icon={GraduationCap}
           label={tAcad('stats.termGpa')}
-          value={gpa?.termGpa != null ? gpa.termGpa.toFixed(2) : gradesLoading ? '...' : '—'}
+          value={computedGpa?.termGpa != null ? computedGpa.termGpa.toFixed(2) : gradesLoading ? '...' : '—'}
           accent={termGpaTheme?.accent || 'text-text-tertiary'}
           bg={termGpaTheme?.bg || 'bg-surface-tertiary'}
         />
         <StatCard
           icon={GraduationCap}
           label={tAcad('stats.cumGpa')}
-          value={gpa?.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : gradesLoading ? '...' : '—'}
+          value={computedGpa?.cumulativeGpa != null ? computedGpa.cumulativeGpa.toFixed(2) : gradesLoading ? '...' : '—'}
           accent={cumGpaTheme?.accent || 'text-text-tertiary'}
           bg={cumGpaTheme?.bg || 'bg-surface-tertiary'}
         />
       </div>
 
-      {/* Attendance Trend */}
+      {/* Attendance Trend + Daily Strip */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
@@ -568,6 +781,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
           </Link>
         </div>
         <AttendanceTrendChart studentId={student.studentId} />
+        <AttendanceDailyStrip studentId={student.studentId} />
         {effectiveSummary && effectiveSummary.attendanceRate < 90 && (
           <div className="mt-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">
             <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
@@ -597,7 +811,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
             <AccessRestricted label="grade data" />
           </section>
         ) : (
-          <CoursePerformanceChart grades={grades} />
+          <CourseGradeCards grades={grades} courseNameMap={courseNameMap} />
         )}
         <ClassesList classrooms={classrooms} />
       </div>

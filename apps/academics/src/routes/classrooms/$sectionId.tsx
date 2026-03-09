@@ -51,6 +51,7 @@ import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 
 // --- Section-scoped attendance ---
 import { SectionAttendanceWrapper } from '../../components/attendance/SectionAttendanceWrapper'
+import { useSectionAttendanceRecords } from '../../hooks/useSectionAttendance'
 
 // --- Stream ---
 import { StreamFeed } from '../../components/classrooms/stream'
@@ -340,8 +341,15 @@ function ProgressOverview({
   onNavigate: (view: ProgressView) => void
 }) {
   const schoolId = useActiveSchoolId() || ''
+  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
   const { data: roster } = useSectionRoster({ sectionId, schoolId, enabled: !!schoolId })
   const { data: gradebook } = useSectionGrades(sectionId, { schoolId }, !!schoolId)
+  const { data: todayRecords } = useSectionAttendanceRecords({
+    sectionId,
+    schoolId,
+    date: today,
+    enabled: !!schoolId && !!sectionId,
+  })
 
   const gradeStats = useMemo(() => {
     const grades = gradebook?.grades ?? []
@@ -361,6 +369,26 @@ function ProgressOverview({
     return { avg: Math.round(avg * 10) / 10, total: scored.length, distribution }
   }, [gradebook])
 
+  const attendanceStats = useMemo(() => {
+    const total = roster?.students?.length ?? 0
+    if (total === 0) return null
+    const recorded = todayRecords?.length ?? 0
+    const present = todayRecords?.filter((r) => r.status === 'present').length ?? 0
+    const absent = todayRecords?.filter((r) => r.status === 'absent').length ?? 0
+    const late = todayRecords?.filter((r) => r.status === 'late').length ?? 0
+    const remote = todayRecords?.filter((r) => r.status === 'remote').length ?? 0
+    const rate = total > 0 ? ((present + late + remote) / total) * 100 : 0
+    return { total, recorded, present, absent, late, remote, rate }
+  }, [roster, todayRecords])
+
+  const distColors: Record<string, string> = {
+    A: 'bg-emerald-500',
+    B: 'bg-blue-500',
+    C: 'bg-amber-500',
+    D: 'bg-orange-500',
+    F: 'bg-red-500',
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Grade Summary Card */}
@@ -374,7 +402,7 @@ function ProgressOverview({
             onClick={() => onNavigate('gradebook')}
             className="text-xs text-teal-500 hover:text-teal-600 font-medium"
           >
-            Open Gradebook →
+            Open Gradebook &rarr;
           </button>
         </div>
         {gradeStats ? (
@@ -383,32 +411,27 @@ function ProgressOverview({
               <span className="text-3xl font-bold text-text-primary">{gradeStats.avg}%</span>
               <span className="text-sm text-text-secondary">class average</span>
             </div>
-            <div className="flex gap-1 h-2 rounded-full overflow-hidden bg-surface-secondary">
+            <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
               {Object.entries(gradeStats.distribution).map(([letter, count]) => {
                 const pct =
                   gradeStats.total > 0 ? (count / gradeStats.total) * 100 : 0
-                const colors: Record<string, string> = {
-                  A: 'bg-emerald-500',
-                  B: 'bg-blue-500',
-                  C: 'bg-amber-500',
-                  D: 'bg-orange-500',
-                  F: 'bg-red-500',
-                }
                 return pct > 0 ? (
                   <div
                     key={letter}
-                    className={`${colors[letter]} transition-all`}
+                    className={`${distColors[letter]} transition-all`}
                     style={{ width: `${pct}%` }}
                     title={`${letter}: ${count}`}
                   />
                 ) : null
               })}
             </div>
-            <div className="flex gap-3 text-xs text-text-tertiary">
+            <div className="flex gap-4 text-xs">
               {Object.entries(gradeStats.distribution).map(([letter, count]) => (
-                <span key={letter}>
-                  {letter}: {count}
-                </span>
+                <div key={letter} className="flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${distColors[letter]}`} />
+                  <span className="text-text-secondary font-medium">{letter}</span>
+                  <span className="text-text-tertiary">{count}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -431,29 +454,73 @@ function ProgressOverview({
             onClick={() => onNavigate('attendance')}
             className="text-xs text-teal-500 hover:text-teal-600 font-medium"
           >
-            Open Attendance →
+            Open Attendance &rarr;
           </button>
         </div>
-        <div className="text-center py-8">
-          <ClipboardCheck className="w-8 h-8 mx-auto text-text-tertiary mb-2" aria-hidden="true" />
-          {(roster?.students?.length ?? 0) > 0 ? (
-            <>
-              <p className="text-sm text-text-secondary">
-                {roster?.students?.length} students enrolled
-              </p>
-              <p className="text-xs text-text-tertiary mt-1">
-                Open attendance to record today's attendance
-              </p>
-            </>
-          ) : (
-            <>
+        {attendanceStats && attendanceStats.recorded > 0 ? (
+          <div className="space-y-3">
+            <div className="flex items-baseline gap-2">
+              <span className={`text-3xl font-bold ${
+                attendanceStats.rate >= 95 ? 'text-emerald-600 dark:text-emerald-400' :
+                attendanceStats.rate >= 90 ? 'text-amber-600 dark:text-amber-400' :
+                'text-red-600 dark:text-red-400'
+              }`}>
+                {attendanceStats.rate.toFixed(1)}%
+              </span>
+              <span className="text-sm text-text-secondary">today&apos;s rate</span>
+            </div>
+
+            <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
+              {attendanceStats.present > 0 && (
+                <div className="bg-emerald-500 transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
+              )}
+              {attendanceStats.late > 0 && (
+                <div className="bg-amber-500 transition-all" style={{ width: `${(attendanceStats.late / attendanceStats.total) * 100}%` }} title={`Late: ${attendanceStats.late}`} />
+              )}
+              {attendanceStats.remote > 0 && (
+                <div className="bg-indigo-500 transition-all" style={{ width: `${(attendanceStats.remote / attendanceStats.total) * 100}%` }} title={`Remote: ${attendanceStats.remote}`} />
+              )}
+              {attendanceStats.absent > 0 && (
+                <div className="bg-red-500 transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-4 text-xs">
+              {[
+                { label: 'Present', value: attendanceStats.present, dot: 'bg-emerald-500' },
+                { label: 'Late', value: attendanceStats.late, dot: 'bg-amber-500' },
+                { label: 'Remote', value: attendanceStats.remote, dot: 'bg-indigo-500' },
+                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-red-500' },
+              ].filter(s => s.value > 0).map((s) => (
+                <div key={s.label} className="flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+                  <span className="text-text-secondary font-medium">{s.label}</span>
+                  <span className="text-text-tertiary">{s.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-text-tertiary">
+              {attendanceStats.recorded} of {attendanceStats.total} students recorded today
+            </p>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <ClipboardCheck className="w-8 h-8 mx-auto text-text-tertiary mb-2" aria-hidden="true" />
+            {(roster?.students?.length ?? 0) > 0 ? (
+              <>
+                <p className="text-sm text-text-secondary">
+                  {roster?.students?.length} students enrolled
+                </p>
+                <p className="text-xs text-text-tertiary mt-1">
+                  No attendance recorded for today yet
+                </p>
+              </>
+            ) : (
               <p className="text-sm text-text-secondary">No students enrolled yet</p>
-              <p className="text-xs text-text-tertiary mt-1">
-                Enroll students in this section before recording attendance
-              </p>
-            </>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

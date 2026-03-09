@@ -833,6 +833,145 @@ export async function updateAttendance(
 }
 
 // ============================================================================
+// SECTION ATTENDANCE (Ed-Fi: StudentSectionAttendanceEvent)
+// ============================================================================
+
+export interface CreateSectionAttendanceParams {
+  studentId: string
+  sectionId: string
+  schoolId: string
+  date: string
+  status: AttendanceStatus
+  academicYearId?: string
+  checkInTime?: string
+  notes?: string
+  excuseReason?: string
+}
+
+export interface BulkSectionAttendanceRecord {
+  studentId: string
+  studentName?: string
+  status: AttendanceStatus
+  checkInTime?: string
+  notes?: string
+}
+
+export interface BulkSectionAttendanceParams {
+  sectionId: string
+  date: string
+  schoolId: string
+  academicYearId?: string
+  records: BulkSectionAttendanceRecord[]
+}
+
+export interface SectionAttendanceRecord {
+  sectionAttendanceId: string
+  studentId: string
+  studentName?: string
+  schoolId: string
+  sectionId: string
+  courseName?: string
+  courseCode?: string
+  date: string
+  status: AttendanceStatus
+  checkInTime?: string
+  checkOutTime?: string
+  durationMinutes?: number
+  excuseType?: string
+  excuseReason?: string
+  notes?: string
+  parentNotified: boolean
+  parentNotifiedAt?: string
+  createdAt: string
+  updatedAt: string
+  createdBy?: string
+  updatedBy?: string
+  version?: number
+}
+
+export interface BulkSectionAttendanceResponse {
+  success: boolean
+  date: string
+  schoolId: string
+  sectionId: string
+  totalProcessed: number
+  recordsCreated: number
+  recordsUpdated: number
+  errors: Array<{ studentId: string; error: string }>
+}
+
+/**
+ * Record single section attendance
+ * POST /academics/section-attendance
+ */
+export async function recordSectionAttendance(
+  data: CreateSectionAttendanceParams
+): Promise<SectionAttendanceRecord> {
+  return apiPost<SectionAttendanceRecord>('/academics/section-attendance', data)
+}
+
+/**
+ * Record bulk section attendance
+ * POST /academics/section-attendance/bulk
+ */
+export async function recordBulkSectionAttendance(
+  data: BulkSectionAttendanceParams
+): Promise<BulkSectionAttendanceResponse> {
+  return apiPost<BulkSectionAttendanceResponse>('/academics/section-attendance/bulk', data)
+}
+
+/**
+ * Get section attendance by date
+ * GET /academics/section-attendance?sectionId=&schoolId=&date=
+ */
+export async function getSectionAttendanceByDate(
+  sectionId: string,
+  schoolId: string,
+  date: string,
+): Promise<{ items: SectionAttendanceRecord[]; hasMore: boolean }> {
+  return apiGet<{ items: SectionAttendanceRecord[]; hasMore: boolean }>(
+    '/academics/section-attendance',
+    { sectionId, schoolId, date },
+  )
+}
+
+/**
+ * Get student section attendance history
+ * GET /academics/section-attendance/student/:studentId?sectionId=&schoolId=&startDate=&endDate=
+ */
+export async function getStudentSectionAttendance(
+  studentId: string,
+  params?: { sectionId?: string; schoolId?: string; startDate?: string; endDate?: string }
+): Promise<SectionAttendanceRecord[]> {
+  const queryParams: Record<string, string> = {}
+  if (params?.sectionId) queryParams.sectionId = params.sectionId
+  if (params?.schoolId) queryParams.schoolId = params.schoolId
+  if (params?.startDate) queryParams.startDate = params.startDate
+  if (params?.endDate) queryParams.endDate = params.endDate
+  return apiGet<SectionAttendanceRecord[]>(
+    `/academics/section-attendance/student/${studentId}`,
+    queryParams,
+  )
+}
+
+/**
+ * Update section attendance (correction)
+ * PATCH /academics/section-attendance/:date/:sectionId/:studentId?schoolId=
+ */
+export async function updateSectionAttendance(
+  date: string,
+  sectionId: string,
+  studentId: string,
+  data: { status?: AttendanceStatus; notes?: string; excuseReason?: string; expectedVersion?: number },
+  schoolId?: string,
+): Promise<SectionAttendanceRecord> {
+  const url = schoolId
+    ? `/academics/section-attendance/${date}/${sectionId}/${studentId}?schoolId=${schoolId}`
+    : `/academics/section-attendance/${date}/${sectionId}/${studentId}`
+  return apiPatch<SectionAttendanceRecord>(url, data)
+}
+
+// ============================================================================
 // ENROLLMENT MANAGEMENT OPERATIONS
 // ============================================================================
 

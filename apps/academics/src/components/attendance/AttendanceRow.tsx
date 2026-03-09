@@ -36,8 +36,6 @@ export interface AttendanceRowProps {
   /** Task 4.6: Callback for correction save (PATCH) */
   onCorrectionSave?: () => void
   onCorrectionCancel?: () => void
-  /** Task 4.8: Previous day's status */
-  previousDayStatus?: AttendanceStatus | null
   /** Task 4.4: Arrow key navigation */
   onArrowUp?: () => void
   onArrowDown?: () => void
@@ -94,7 +92,6 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
     isPastDate = false,
     onCorrectionSave,
     onCorrectionCancel,
-    previousDayStatus,
     onArrowUp,
     onArrowDown,
   },
@@ -176,12 +173,6 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
             <span className="text-sm font-medium text-text-primary truncate">
               {studentName}
             </span>
-            {/* Task 4.8: Previous day status indicator */}
-            {previousDayStatus && (
-              <span title={`Yesterday: ${previousDayStatus}`}>
-                <StatusBadge status={previousDayStatus} variant="compact" />
-              </span>
-            )}
           </div>
           {studentNumber && (
             <div className="text-xs text-text-tertiary">{studentNumber}</div>

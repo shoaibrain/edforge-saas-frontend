@@ -524,12 +524,10 @@ function GradebookTab() {
 }
 
 // ============================================================================
-// ATTENDANCE BOARD TAB — lazy loaded
+// ATTENDANCE BOARD TAB — direct import (React.lazy conflicts with Module Federation)
 // ============================================================================
 
-const AttendanceBoardTab = React.lazy(() =>
-  import('../attendance/index').then((m) => ({ default: m.AttendanceModule }))
-)
+import { AttendanceModule } from '../attendance/index'
 
 // ============================================================================
 // CLASSROOMS MODULE (main export)
@@ -637,9 +635,7 @@ export function ClassroomsModule() {
 
             {activeTab === 'attendance' && (
               <TabErrorBoundary tabName="Attendance Board">
-                <React.Suspense fallback={<div className="animate-pulse bg-surface-secondary rounded-xl h-96" />}>
-                  <AttendanceBoardTab />
-                </React.Suspense>
+                <AttendanceModule />
               </TabErrorBoundary>
             )}
           </motion.div>

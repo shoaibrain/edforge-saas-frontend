@@ -60,8 +60,6 @@ interface AttendanceGridProps {
   saveStatus?: SaveStatus
   /** Task 4.6: Correction callback for past-date updates */
   onCorrection?: (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => void
-  /** Task 4.8: Previous day records for status indicators */
-  previousDayRecords?: Array<{ studentId: string; status: AttendanceStatus }>
 }
 
 type SortKey = 'name' | 'number' | 'status'
@@ -179,7 +177,6 @@ export function AttendanceGrid({
   disabled = false,
   saveStatus,
   onCorrection,
-  previousDayRecords,
 }: AttendanceGridProps) {
   // Task 4.6: Determine if this is a past date
   const isPastDate = useMemo(() => {
@@ -229,10 +226,6 @@ export function AttendanceGrid({
   const [announcement, setAnnouncement] = useState('')
 
   // Task 4.8: Previous day status map
-  const previousDayMap = useMemo(() => {
-    if (!previousDayRecords) return new Map<string, AttendanceStatus>()
-    return new Map(previousDayRecords.map((r) => [r.studentId, r.status]))
-  }, [previousDayRecords])
 
   // Track if anything has changed
   const hasChanges = useMemo(() => {
@@ -558,7 +551,6 @@ export function AttendanceGrid({
               onNotesChange={(notes) => handleNotesChange(entry.studentId, notes)}
               onExcuseTypeChange={(excuseType) => handleExcuseTypeChange(entry.studentId, excuseType)}
               isPastDate={isPastDate}
-              previousDayStatus={previousDayMap.get(entry.studentId) ?? null}
               onCorrectionSave={() => handleCorrectionSave(entry.studentId)}
               onCorrectionCancel={() => handleCorrectionCancel(entry.studentId)}
               onArrowUp={() => focusRow(index - 1)}

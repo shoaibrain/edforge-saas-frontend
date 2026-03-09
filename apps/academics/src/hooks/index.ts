@@ -72,6 +72,14 @@ export {
   useAttendanceAlerts,
   attendanceKeys,
 } from './useAttendance'
+export {
+  useSectionAttendanceRecords,
+  useRecordSectionAttendance,
+  useRecordBulkSectionAttendance,
+  useUpdateSectionAttendance,
+  useStudentSectionAttendance,
+  sectionAttendanceKeys,
+} from './useSectionAttendance'
 export { useOfflineAttendance } from './useOfflineAttendance'
 export type { SaveStatus } from './useOfflineAttendance'
 export {

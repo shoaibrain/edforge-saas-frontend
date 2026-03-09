@@ -30,12 +30,14 @@ import {
 } from '../../stores/attendance.store'
 import {
   useAttendanceSummary,
-  useAttendanceRecords,
-  useRecordBulkAttendance,
-  useUpdateAttendance,
   useCalendarDate,
   useAttendanceOverview,
 } from '../../hooks/useAttendance'
+import {
+  useSectionAttendanceRecords,
+  useRecordBulkSectionAttendance,
+  useUpdateSectionAttendance,
+} from '../../hooks/useSectionAttendance'
 import { useSections, flattenSectionPages, useSectionRoster } from '../../hooks'
 import { useCurrentAcademicYear } from '../../hooks'
 import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
@@ -284,25 +286,22 @@ export function AttendanceModule() {
     enabled: !!schoolId,
   })
 
-  // Fetch existing attendance records for the selected date
-  const { data: attendanceRecords } = useAttendanceRecords({
+  // Fetch section-specific attendance records (no client-side filtering needed)
+  const { data: sectionRecords } = useSectionAttendanceRecords({
+    sectionId: selectedSectionId || '',
     schoolId,
     date: selectedDate,
     enabled: !!schoolId && !!selectedSectionId && activeTab === 'daily-entry',
   })
 
-  // Filter records to only students in the selected section's roster
   const existingRecords = useMemo(() => {
-    if (!attendanceRecords || !roster?.students) return []
-    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
-    return attendanceRecords
-      .filter((r) => rosterStudentIds.has(r.studentId))
-      .map((r) => ({
-        studentId: r.studentId,
-        status: r.status,
-        notes: r.notes,
-      }))
-  }, [attendanceRecords, roster?.students])
+    if (!sectionRecords) return []
+    return sectionRecords.map((r) => ({
+      studentId: r.studentId,
+      status: r.status as AttendanceStatus,
+      notes: r.notes,
+    }))
+  }, [sectionRecords])
 
   // Calendar date check (Sprint 5)
   const { data: calendarDate } = useCalendarDate({
@@ -314,11 +313,9 @@ export function AttendanceModule() {
   const isNonInstructional = calendarDate != null &&
     !calendarDate.isInstructionalDay
 
-  // Bulk attendance mutation
-  const bulkMutation = useRecordBulkAttendance()
-
-  // Task 4.6: Update attendance mutation for corrections
-  const updateMutation = useUpdateAttendance()
+  // Section-level mutations
+  const bulkMutation = useRecordBulkSectionAttendance()
+  const updateMutation = useUpdateSectionAttendance()
 
   // Task 4.1: Fetch overview for section completion indicators
   const { data: overviewData } = useAttendanceOverview({
@@ -338,29 +335,6 @@ export function AttendanceModule() {
     }
     return ids
   }, [overviewData])
-
-  // Task 4.8: Compute previous day's date
-  const previousDate = useMemo(() => {
-    const d = new Date(selectedDate)
-    d.setDate(d.getDate() - 1)
-    return d.toISOString().split('T')[0]
-  }, [selectedDate])
-
-  // Task 4.8: Fetch previous day's attendance records (lazy — delay 2s)
-  const { data: previousDayAttendanceRecords } = useAttendanceRecords({
-    schoolId,
-    date: previousDate,
-    enabled: !!schoolId && !!selectedSectionId && activeTab === 'daily-entry',
-  })
-
-  // Task 4.8: Filter previous day records to section roster
-  const previousDayRecords = useMemo(() => {
-    if (!previousDayAttendanceRecords || !roster?.students) return undefined
-    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
-    return previousDayAttendanceRecords
-      .filter((r) => rosterStudentIds.has(r.studentId))
-      .map((r) => ({ studentId: r.studentId, status: r.status as AttendanceStatus }))
-  }, [previousDayAttendanceRecords, roster?.students])
 
   // Offline resilience (Sprint 5)
   const offlineState = useOfflineAttendance({
@@ -391,20 +365,33 @@ export function AttendanceModule() {
     [schoolId, selectedSectionId, offlineState]
   )
 
-  // Task 4.6: Correction handler for past-date individual updates
   const handleCorrection = useCallback(
     (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => {
-      if (!schoolId) return
-      updateMutation.mutate({
-        date: selectedDate,
-        studentId: record.studentId,
-        status: record.status,
-        notes: record.notes,
-        excuseType: record.excuseType,
-        schoolId,
-      })
+      if (!schoolId || !selectedSectionId) return
+      // Check if this student already has a record for this date
+      const hasExisting = sectionRecords?.some((r) => r.studentId === record.studentId)
+      if (hasExisting) {
+        // PATCH existing record
+        updateMutation.mutate({
+          date: selectedDate,
+          sectionId: selectedSectionId,
+          studentId: record.studentId,
+          status: record.status,
+          notes: record.notes,
+          excuseReason: record.excuseType,
+          schoolId,
+        })
+      } else {
+        // POST new record via bulk endpoint (single-record array)
+        bulkMutation.mutate({
+          date: selectedDate,
+          schoolId,
+          sectionId: selectedSectionId,
+          records: [{ studentId: record.studentId, status: record.status, notes: record.notes }],
+        })
+      }
     },
-    [schoolId, selectedDate, updateMutation]
+    [schoolId, selectedSectionId, selectedDate, sectionRecords, updateMutation, bulkMutation]
   )
 
   return (
@@ -536,7 +523,6 @@ export function AttendanceModule() {
                     disabled={isNonInstructional || !canCreateAttendance}
                     saveStatus={offlineState.saveStatus}
                     onCorrection={handleCorrection}
-                    previousDayRecords={previousDayRecords}
                   />
                 )}
               </div>

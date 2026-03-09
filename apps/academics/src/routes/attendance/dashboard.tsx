@@ -941,16 +941,19 @@ export function AttendanceDashboard({
   const isSchoolWide = usePermission('manage', 'attendance')
 
   // Single aggregate data source (Task 2.2)
+  // Guard: if academicYearId not yet loaded, treat as loading
+  const queryEnabled = !!schoolId && !!academicYearId
   const {
     data,
-    isLoading,
+    isLoading: queryLoading,
     error,
   } = useAttendanceOverview({
     schoolId,
     academicYearId,
     date: currentDate,
-    enabled: !!schoolId && !!academicYearId,
+    enabled: queryEnabled,
   })
+  const isLoading = queryLoading || !queryEnabled
 
   // Chart data formatting — Task 5.6: include BS date
   const chartData = useMemo(() => {
