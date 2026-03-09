@@ -44,6 +44,8 @@ export interface ModuleStat {
     iconBg: string
     iconColor: string
     loading?: boolean
+    error?: boolean
+    onRetry?: () => void
 }
 
 export interface ModuleOverviewPageProps {
@@ -207,6 +209,20 @@ function StatCard({ stat, index }: StatCardProps) {
                         <div className="space-y-1.5">
                             <div className="h-6 w-16 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
                             <div className="h-3.5 w-12 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
+                        </div>
+                    ) : stat.error ? (
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xl font-bold text-[rgb(var(--text-tertiary))]">—</span>
+                            {stat.onRetry && (
+                                <button
+                                    onClick={stat.onRetry}
+                                    className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+                                    title="Retry loading"
+                                >
+                                    <RotateCcw className="w-2.5 h-2.5" />
+                                    Retry
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div className="flex items-baseline gap-2">

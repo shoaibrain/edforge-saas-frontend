@@ -306,6 +306,55 @@ export interface PaginationQuery {
 }
 
 // ============================================================================
+// DASHBOARD OVERVIEW (Unified endpoint)
+// ============================================================================
+
+export interface DashboardEnrollmentSummary {
+  totalEnrolled: number
+  byGradeLevel: Record<string, number>
+  byStatus: Record<string, number>
+  recentEnrollments: number
+  recentWithdrawals: number
+}
+
+export interface DashboardAttendanceSummary {
+  date: string
+  totalStudents: number
+  totalRecorded: number
+  present: number
+  absent: number
+  late: number
+  excused: number
+  halfDay: number
+  remote: number
+  attendanceRate: number
+}
+
+export interface DashboardOverviewResponse {
+  schoolId: string
+  academicYearId: string
+  date: string
+  enrollment: DashboardEnrollmentSummary
+  activeSectionsCount: number
+  attendance: DashboardAttendanceSummary | null
+  _cached: boolean
+}
+
+/**
+ * Get unified dashboard overview (enrollment + sections + attendance)
+ * GET /academics/dashboard/overview
+ */
+export async function getDashboardOverview(
+  schoolId: string,
+  academicYearId: string,
+  date: string,
+): Promise<DashboardOverviewResponse> {
+  return apiGet<DashboardOverviewResponse>('/academics/dashboard/overview', {
+    params: { schoolId, academicYearId, date },
+  })
+}
+
+// ============================================================================
 // STUDENT CRUD OPERATIONS
 // ============================================================================
 

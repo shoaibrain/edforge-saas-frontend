@@ -34,6 +34,7 @@ import {
   overviewKeys,
 } from '../hooks/useAcademicsOverview'
 import { useWidgetVisible } from '../stores/overview-widgets.store'
+import { usePerformanceMetrics } from '../hooks/usePerformanceMetrics'
 
 // Widgets
 import { WidgetErrorBoundary } from '../components/overview/WidgetErrorBoundary'
@@ -131,14 +132,19 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
     overviewData.enrollmentByGradeLevel
   )
 
-  // ---- Alerts ----
-  const alertsData = useCombinedAlerts(schoolId, academicYearId)
+  // ---- Alerts (deferred: waits for core KPIs to load) ----
+  const coreLoaded = !overviewData.isLoading
+  const alertsData = useCombinedAlerts(schoolId, academicYearId, coreLoaded)
 
   // ---- Calendar context ----
   const calendarContext = useAcademicCalendarContext(schoolId, academicYearId)
 
   // ---- Widget visibility ----
   const showActivityAlerts = useWidgetVisible('activity-alerts')
+
+  // ---- Performance metrics (dev mode logging) ----
+  const allLoaded = coreLoaded && !alertsData.isLoading
+  usePerformanceMetrics(coreLoaded, allLoaded)
 
   // ---- Last updated ----
   const lastUpdated = useMemo(() => {
@@ -148,6 +154,12 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
   // ---- Refresh handler ----
   const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: overviewKeys.all })
+  }, [queryClient])
+
+  // ---- Per-stat error detection ----
+  const hasOverviewError = overviewData.errors.length > 0
+  const retryOverview = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: overviewKeys.all })
   }, [queryClient])
 
@@ -176,6 +188,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
             iconColor: 'text-teal-600 dark:text-cyan-400',
             loading: overviewData.isLoading,
+            error: hasOverviewError,
+            onRetry: retryOverview,
           },
         ]
       : []),
@@ -191,6 +205,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       iconBg: 'bg-aqua-400/20',
       iconColor: 'text-aqua-700 dark:text-aqua-400',
       loading: overviewData.isLoading,
+      error: hasOverviewError,
+      onRetry: retryOverview,
     },
     {
       label: 'Active Teachers',
@@ -207,6 +223,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       iconBg: 'bg-blue-400/20',
       iconColor: 'text-blue-700 dark:text-blue-400',
       loading: teacherData.isLoading,
+      error: teacherData.isError,
+      onRetry: retryOverview,
     },
     {
       label: "Today's Attendance",
@@ -220,6 +238,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       iconBg: 'bg-amber-400/20',
       iconColor: 'text-amber-600 dark:text-amber-400',
       loading: overviewData.isLoading,
+      error: hasOverviewError,
+      onRetry: retryOverview,
     },
   ]
 
@@ -255,11 +275,13 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {canViewEnrollment ? (
           <WidgetErrorBoundary name="Enrollment Chart">
-            <EnrollmentDistributionChart
-              data={enrollmentDistribution.data}
-              total={enrollmentDistribution.total}
-              loading={overviewData.isLoading}
-            />
+            <div data-testid="widget-enrollment-chart">
+              <EnrollmentDistributionChart
+                data={enrollmentDistribution.data}
+                total={enrollmentDistribution.total}
+                loading={overviewData.isLoading}
+              />
+            </div>
           </WidgetErrorBoundary>
         ) : (
           <WidgetErrorBoundary name="My Sections">
@@ -269,18 +291,22 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
         <div className="flex flex-col gap-6">
           <WidgetErrorBoundary name="Attendance Trend">
-            <AttendanceTrendWidget
-              schoolId={schoolId}
-              enabled={!!schoolId}
-            />
+            <div data-testid="widget-attendance-trend">
+              <AttendanceTrendWidget
+                schoolId={schoolId}
+                enabled={!!schoolId && coreLoaded}
+              />
+            </div>
           </WidgetErrorBoundary>
           {showActivityAlerts && (
             <WidgetErrorBoundary name="Activity Feed">
-              <ActivityFeedWidget
-                alerts={alertsData.alerts}
-                totalCount={alertsData.totalCount}
-                loading={alertsData.isLoading}
-              />
+              <div data-testid="widget-activity-feed">
+                <ActivityFeedWidget
+                  alerts={alertsData.alerts}
+                  totalCount={alertsData.totalCount}
+                  loading={alertsData.isLoading}
+                />
+              </div>
             </WidgetErrorBoundary>
           )}
         </div>

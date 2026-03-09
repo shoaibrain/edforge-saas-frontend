@@ -9,11 +9,13 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { usePermission } from '@edforge/abac'
 import {
+  getDashboardOverview,
   getEnrollmentSummary,
   getSections,
   getAttendanceSummary,
   getAttendanceAlerts,
   getAttendanceTrend,
+  type DashboardOverviewResponse,
   type EnrollmentSummaryResponse,
   type DailyAttendanceSummary,
   type AttendanceAlert,
@@ -37,6 +39,8 @@ import {
 
 export const overviewKeys = {
   all: ['academics-overview'] as const,
+  dashboardOverview: (schoolId: string, yearId: string, date: string) =>
+    [...overviewKeys.all, 'dashboard', schoolId, yearId, date] as const,
   enrollment: (schoolId: string, yearId: string) =>
     [...overviewKeys.all, 'enrollment', schoolId, yearId] as const,
   sections: (schoolId: string) =>
@@ -102,15 +106,31 @@ export function useAcademicsOverview(
   // ABAC: skip enrollment API if user lacks enrollment:view permission
   const canViewEnrollment = usePermission('view', 'enrollment', schoolId ?? undefined)
 
-  // 1. Enrollment summary — only fetch if user has enrollment:view permission
+  // Primary: unified dashboard overview endpoint (1 call instead of 3)
+  const dashboard = useQuery<DashboardOverviewResponse, Error>({
+    queryKey: overviewKeys.dashboardOverview(schoolId!, academicYearId!, today),
+    queryFn: () => getDashboardOverview(schoolId!, academicYearId!, today),
+    enabled,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
+  })
+
+  // Fallback: individual queries if unified endpoint fails (e.g., 404 before backend deploy)
+  const unifiedFailed = dashboard.isError
+  const fallbackEnabled = enabled && unifiedFailed
+
   const enrollment = useQuery<EnrollmentSummaryResponse, Error>({
     queryKey: overviewKeys.enrollment(schoolId!, academicYearId!),
     queryFn: () => getEnrollmentSummary(schoolId!, academicYearId!),
-    enabled: enabled && canViewEnrollment,
+    enabled: fallbackEnabled && canViewEnrollment,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 
-  // 2. Active sections
   const sections = useQuery<SectionListResponseDto, Error>({
     queryKey: overviewKeys.sections(schoolId!),
     queryFn: () =>
@@ -120,26 +140,63 @@ export function useAcademicsOverview(
         academicYearId,
         limit: 200,
       }),
-    enabled: !!schoolId,
+    enabled: fallbackEnabled,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 
-  // 3. Today's attendance
   const attendance = useQuery<DailyAttendanceSummary, Error>({
     queryKey: overviewKeys.attendance(schoolId!, today),
     queryFn: () => getAttendanceSummary(schoolId!, today),
-    enabled: !!schoolId,
+    enabled: fallbackEnabled,
     staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 
-  // Aggregate loading / error states
-  const isLoading = enrollment.isLoading || sections.isLoading || attendance.isLoading
+  // Aggregate: prefer unified, fall back to individual
+  if (dashboard.isSuccess && dashboard.data) {
+    const d = dashboard.data
+    return {
+      totalEnrolled: canViewEnrollment ? d.enrollment.totalEnrolled : null,
+      enrollmentByGradeLevel: canViewEnrollment ? d.enrollment.byGradeLevel : null,
+      enrollmentByStatus: canViewEnrollment ? d.enrollment.byStatus : null,
+      activeSections: d.activeSectionsCount,
+      sectionsList: null, // Unified endpoint doesn't return full sections list
+      todayAttendanceRate: d.attendance?.attendanceRate ?? null,
+      todayAttendanceSummary: d.attendance
+        ? {
+            date: d.attendance.date,
+            totalStudents: d.attendance.totalStudents,
+            totalRecorded: d.attendance.totalRecorded,
+            present: d.attendance.present,
+            absent: d.attendance.absent,
+            late: d.attendance.late,
+            excused: d.attendance.excused,
+            attendanceRate: d.attendance.attendanceRate,
+          } as DailyAttendanceSummary
+        : null,
+      isLoading: false,
+      isPartiallyLoaded: true,
+      errors: [],
+    }
+  }
+
+  // Fallback aggregation
+  const isLoading = unifiedFailed
+    ? enrollment.isLoading || sections.isLoading || attendance.isLoading
+    : dashboard.isLoading
   const isPartiallyLoaded =
     !isLoading && (enrollment.isSuccess || sections.isSuccess || attendance.isSuccess)
   const errors: Array<{ source: string; error: Error }> = []
-  if (enrollment.error) errors.push({ source: 'enrollment', error: enrollment.error })
-  if (sections.error) errors.push({ source: 'sections', error: sections.error })
-  if (attendance.error) errors.push({ source: 'attendance', error: attendance.error })
+  if (fallbackEnabled) {
+    if (enrollment.error) errors.push({ source: 'enrollment', error: enrollment.error })
+    if (sections.error) errors.push({ source: 'sections', error: sections.error })
+    if (attendance.error) errors.push({ source: 'attendance', error: attendance.error })
+  }
 
   return {
     totalEnrolled: enrollment.data?.totalEnrolled ?? null,
@@ -279,7 +336,8 @@ export function useAttendanceTrendData(
     queryKey: [...overviewKeys.all, 'trend', schoolId, startDate, today],
     queryFn: () => getAttendanceTrend(schoolId!, startDate, today),
     enabled: enabled && !!schoolId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
   const chartData = useMemo<AttendanceTrendPoint[]>(() => {
@@ -339,7 +397,8 @@ function useAttendanceAlertItems(
     queryFn: () =>
       getAttendanceAlerts(schoolId!, academicYearId!, 90, startDate, today),
     enabled: enabled && !!schoolId && !!academicYearId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
   const alerts = useMemo<AcademicAlert[]>(() => {
@@ -454,13 +513,14 @@ const SEVERITY_ORDER = { critical: 0, warning: 1, info: 2 }
 
 export function useCombinedAlerts(
   schoolId: string | null,
-  academicYearId: string | undefined
+  academicYearId: string | undefined,
+  deferEnabled: boolean = true,
 ): {
   alerts: AcademicAlert[]
   totalCount: number
   isLoading: boolean
 } {
-  const enabled = !!schoolId && !!academicYearId
+  const enabled = !!schoolId && !!academicYearId && deferEnabled
 
   const attendance = useAttendanceAlertItems(schoolId, academicYearId, enabled)
   const grading = useGradingDeadlineAlerts(schoolId, academicYearId, enabled)
