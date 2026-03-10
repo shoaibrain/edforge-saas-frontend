@@ -26,11 +26,14 @@ import {
   Bell,
   Layers,
   AlertTriangle,
+  Lock,
+  AlertCircle,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
 import type { School } from '@edforge/types'
 import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
+import { isFieldLocked, FIELD_MUTABILITY } from '@aibrains/shared-types'
 import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
 import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
 // GradingScaleEditor removed — grading scales are now managed exclusively via Grading Policies
@@ -147,6 +150,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
     enabled: !!schoolId,
     staleTime: 5 * 60 * 1000,
   })
+
+  // Field governance: determine if school has an active academic year
+  const hasActiveAcademicYear = !!school?.currentAcademicYearId
 
   // Form state
   const [formState, setFormState] = useState<{
@@ -373,6 +379,22 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
   return (
     <div className="max-w-3xl space-y-8 pb-24">
+      {/* Active Academic Year Banner */}
+      {hasActiveAcademicYear && (
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+              Active Academic Year
+            </p>
+            <p className="text-sm text-amber-600 dark:text-amber-400/80 mt-0.5">
+              Some settings are locked while an academic year is active. Schedule, term structure, and grading fields
+              cannot be changed until the current academic year is completed or archived.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Identity Section */}
       <Section
         title="School Identity"
@@ -478,14 +500,33 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="School days and operating hours"
         icon={Clock}
       >
-        <SettingsFieldRow label="School Days" description="Days when school is in session">
+        <SettingsFieldRow label={
+          <span className="flex items-center gap-1.5">
+            School Days
+            {isFieldLocked('schoolDays', hasActiveAcademicYear) && (
+              <span title="Locked during active academic year">
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+              </span>
+            )}
+          </span>
+        } description="Days when school is in session">
           <SchoolDaysSelector
             selected={formState.schoolDays}
             onChange={(days) => updateField('schoolDays', days)}
+            disabled={isFieldLocked('schoolDays', hasActiveAcademicYear)}
           />
         </SettingsFieldRow>
 
-        <SettingsFieldRow label="School Hours" description="Daily start and end times">
+        <SettingsFieldRow label={
+          <span className="flex items-center gap-1.5">
+            School Hours
+            {isFieldLocked('startTime', hasActiveAcademicYear) && (
+              <span title="Locked during active academic year">
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+              </span>
+            )}
+          </span>
+        } description="Daily start and end times">
           <TimeRangePicker
             startTime={formState.startTime}
             endTime={formState.endTime}
@@ -493,10 +534,20 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               updateField('startTime', start)
               updateField('endTime', end)
             }}
+            disabled={isFieldLocked('startTime', hasActiveAcademicYear)}
           />
         </SettingsFieldRow>
 
-        <SettingsFieldRow label="Period Duration" description="Length of each class period" inline>
+        <SettingsFieldRow label={
+          <span className="flex items-center gap-1.5">
+            Period Duration
+            {isFieldLocked('periodDuration', hasActiveAcademicYear) && (
+              <span title="Locked during active academic year">
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+              </span>
+            )}
+          </span>
+        } description="Length of each class period" inline>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -504,7 +555,8 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               onChange={(e) => updateField('periodDuration', Number(e.target.value))}
               min={15}
               max={120}
-              className="w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+              disabled={isFieldLocked('periodDuration', hasActiveAcademicYear)}
+              className={`w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all ${isFieldLocked('periodDuration', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
             <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
           </div>
@@ -517,11 +569,21 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="Grading and term structure"
         icon={GraduationCap}
       >
-        <SettingsFieldRow label="Term Structure" description="How the academic year is divided" inline>
+        <SettingsFieldRow label={
+          <span className="flex items-center gap-1.5">
+            Term Structure
+            {isFieldLocked('academicCalendarType', hasActiveAcademicYear) && (
+              <span title="Locked during active academic year">
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+              </span>
+            )}
+          </span>
+        } description="How the academic year is divided" inline>
           <select
             value={formState.termStructure}
             onChange={(e) => updateField('termStructure', e.target.value)}
-            className="min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            disabled={isFieldLocked('academicCalendarType', hasActiveAcademicYear)}
+            className={`min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all ${isFieldLocked('academicCalendarType', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {TERM_STRUCTURE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>

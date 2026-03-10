@@ -74,4 +74,6 @@ export { LanguageSwitcher } from './components/LanguageSwitcher'
 
 // Date
 export { DateDisplay } from './components/DateDisplay'
+export { BsDatePicker, DateInput } from './components/BsDatePicker'
+export { SchoolDate } from './components/SchoolDate'
 

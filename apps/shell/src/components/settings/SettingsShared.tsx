@@ -720,7 +720,7 @@ export function UnsavedChangesBar({
 // ============================================================================
 
 export interface SettingsFieldRowProps {
-  label: string
+  label: ReactNode
   description?: string
   children: ReactNode
   inline?: boolean

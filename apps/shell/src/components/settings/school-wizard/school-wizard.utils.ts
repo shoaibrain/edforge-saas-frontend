@@ -6,6 +6,11 @@
  */
 
 import type { CreateSchoolDto } from '@aibrains/shared-types'
+import {
+  getCountryConfig,
+  getDefaultsForCountry,
+  getTimezoneOptionsForCountry,
+} from '@aibrains/shared-types'
 
 // Re-export canonical constants from shared-types for use by wizard steps
 export {
@@ -26,53 +31,18 @@ export {
   getSuggestedCategory,
   getSuggestedDescriptor,
   validateSchoolTypeGradeRange,
+  // Country configuration — from shared-types registry
+  COUNTRY_OPTIONS,
+  COUNTRY_REGISTRY,
+  getCountryConfig,
+  getTimezoneOptionsForCountry,
+  getLocaleOptionsForCountry,
+  getDefaultsForCountry,
+  STATE_TIMEZONE_MAP,
 } from '@aibrains/shared-types'
 
-export const COUNTRY_OPTIONS = [
-  { value: 'USA', label: 'United States' },
-  { value: 'CAN', label: 'Canada' },
-  { value: 'GBR', label: 'United Kingdom' },
-  { value: 'AUS', label: 'Australia' },
-  { value: 'OTHER', label: 'Other' },
-]
-
-// ============================================================================
-// TIMEZONE CONSTANTS
-// ============================================================================
-
-export const US_TIMEZONE_OPTIONS = [
-  { value: 'America/New_York', label: 'Eastern (ET)' },
-  { value: 'America/Chicago', label: 'Central (CT)' },
-  { value: 'America/Denver', label: 'Mountain (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific (PT)' },
-  { value: 'America/Anchorage', label: 'Alaska (AKT)' },
-  { value: 'Pacific/Honolulu', label: 'Hawaii (HT)' },
-]
-
-/** Map US state abbreviations to their primary timezone */
-export const STATE_TIMEZONE_MAP: Record<string, string> = {
-  CT: 'America/New_York', DE: 'America/New_York', FL: 'America/New_York',
-  GA: 'America/New_York', ME: 'America/New_York', MD: 'America/New_York',
-  MA: 'America/New_York', NH: 'America/New_York', NJ: 'America/New_York',
-  NY: 'America/New_York', NC: 'America/New_York', OH: 'America/New_York',
-  PA: 'America/New_York', RI: 'America/New_York', SC: 'America/New_York',
-  VT: 'America/New_York', VA: 'America/New_York', WV: 'America/New_York',
-  DC: 'America/New_York',
-  AL: 'America/Chicago', AR: 'America/Chicago', IL: 'America/Chicago',
-  IA: 'America/Chicago', KS: 'America/Chicago', KY: 'America/Chicago',
-  LA: 'America/Chicago', MN: 'America/Chicago', MS: 'America/Chicago',
-  MO: 'America/Chicago', NE: 'America/Chicago', ND: 'America/Chicago',
-  OK: 'America/Chicago', SD: 'America/Chicago', TN: 'America/Chicago',
-  TX: 'America/Chicago', WI: 'America/Chicago', IN: 'America/New_York',
-  MI: 'America/New_York',
-  AZ: 'America/Denver', CO: 'America/Denver', ID: 'America/Denver',
-  MT: 'America/Denver', NM: 'America/Denver', UT: 'America/Denver',
-  WY: 'America/Denver',
-  CA: 'America/Los_Angeles', NV: 'America/Los_Angeles',
-  OR: 'America/Los_Angeles', WA: 'America/Los_Angeles',
-  AK: 'America/Anchorage',
-  HI: 'Pacific/Honolulu',
-}
+// Backward-compatible aliases
+export const US_TIMEZONE_OPTIONS = getTimezoneOptionsForCountry('USA')
 
 // ============================================================================
 // AUTO-GENERATION HELPERS
@@ -141,6 +111,40 @@ export function transformWizardDataToDto(
   data: Record<string, unknown>,
 ): CreateSchoolDto {
   const hasAddress = data['address.street1']
+  const country = (data['address.country'] as string) || 'USA'
+  const defaults = getDefaultsForCountry(country)
+
+  // Build address based on country
+  let address: CreateSchoolDto['address'] | undefined
+  if (hasAddress) {
+    const baseAddress: any = {
+      street1: data['address.street1'] as string,
+      street2: (data['address.street2'] as string) || undefined,
+      country,
+    }
+
+    if (country === 'NPL') {
+      // Nepal: ward, municipality, district, province
+      baseAddress.wardNumber = (data['address.wardNumber'] as string) || undefined
+      baseAddress.municipality = (data['address.municipality'] as string) || undefined
+      baseAddress.district = (data['address.district'] as string) || undefined
+      baseAddress.province = (data['address.province'] as string) || undefined
+      baseAddress.city = (data['address.city'] as string) || undefined
+    } else if (country === 'USA') {
+      // US: city, state (2-char), zipCode
+      baseAddress.city = data['address.city'] as string
+      baseAddress.state = data['address.state'] as string
+      baseAddress.zipCode = data['address.zipCode'] as string
+    } else {
+      // Generic: city, state/region, zipCode
+      baseAddress.city = (data['address.city'] as string) || undefined
+      baseAddress.state = (data['address.state'] as string) || undefined
+      baseAddress.zipCode = (data['address.zipCode'] as string) || undefined
+      baseAddress.region = (data['address.region'] as string) || undefined
+    }
+
+    address = baseAddress
+  }
 
   return {
     name: data.name as string,
@@ -154,21 +158,11 @@ export function transformWizardDataToDto(
     phone: (data.phone as string) || undefined,
     email: (data.email as string) || undefined,
     website: (data.website as string) || undefined,
-    address: hasAddress
-      ? {
-          street1: data['address.street1'] as string,
-          street2: (data['address.street2'] as string) || undefined,
-          city: data['address.city'] as string,
-          state: data['address.state'] as string,
-          zipCode: data['address.zipCode'] as string,
-          country: (data['address.country'] as string) || 'USA',
-        }
-      : undefined,
-    principalName: (data.principalName as string) || undefined,
-    principalEmail: (data.principalEmail as string) || undefined,
-    timezone: (data.timezone as string) || 'America/Chicago',
-    locale: 'en-US',
-    academicCalendarType: (data.academicCalendarType as any) || 'semester',
+    address,
+    timezone: (data.timezone as string) || defaults.timezone,
+    locale: (data.locale as string) || defaults.locale,
+    academicCalendarType: (data.academicCalendarType as any) || defaults.calendarSystem === 'bikram_sambat' ? 'annual' : 'semester',
+    calendarSystem: (data.calendarSystem as any) || defaults.calendarSystem,
     localEducationAgencyId:
       (data.localEducationAgencyId as string) || undefined,
     schoolCategories: (data.schoolCategories as string[])?.length
