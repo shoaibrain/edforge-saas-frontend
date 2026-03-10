@@ -418,10 +418,10 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Hire Date</span>
                             <p className="text-sm text-[rgb(var(--text-secondary))]">{formatDate(staff.hireDate)}</p>
                         </div>
-                        {staff.department && (
+                        {staff.departmentName && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Department</span>
-                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.department}</p>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.departmentName}</p>
                             </div>
                         )}
                         {staff.title && (
@@ -1137,10 +1137,10 @@ function AssignmentsTab({
                                         </div>
                                         <div className="flex items-center gap-1.5 mt-0.5 flex-wrap text-xs text-[rgb(var(--text-tertiary))]">
                                             <span className="font-medium text-[rgb(var(--text-secondary))]">{getRoleLabel(assignment.role)}</span>
-                                            {assignment.department && (
+                                            {assignment.departmentName && (
                                                 <>
                                                     <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
-                                                    <span>{assignment.department}</span>
+                                                    <span>{assignment.departmentName}</span>
                                                 </>
                                             )}
                                             {typeof assignment.fullTimeEquivalency === 'number' && (

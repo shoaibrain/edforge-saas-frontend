@@ -30,6 +30,7 @@ import {
   Lock,
   Power,
   ArrowRight,
+  Shield,
 } from 'lucide-react'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { toast } from 'sonner'
@@ -47,6 +48,7 @@ import SchoolAcademicYearsPage from './school-academic-years'
 import SchoolCalendarPage from './school-calendar'
 import SchoolBellSchedulePage from './school-bell-schedule'
 import SchoolRoomsPage from './school-rooms'
+import { AuditLogViewer } from '@/components/settings/AuditLogViewer'
 
 // ============================================================================
 // CONSTANTS
@@ -97,7 +99,7 @@ const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: School
 // TYPES
 // ============================================================================
 
-type SchoolTab = 'configuration' | 'departments' | 'academic-years' | 'calendar' | 'bell-schedule' | 'rooms'
+type SchoolTab = 'configuration' | 'departments' | 'academic-years' | 'calendar' | 'bell-schedule' | 'rooms' | 'audit-log'
 
 const TABS: { id: SchoolTab; label: string; icon: typeof Settings }[] = [
   { id: 'configuration', label: 'Configuration', icon: Settings },
@@ -106,6 +108,7 @@ const TABS: { id: SchoolTab; label: string; icon: typeof Settings }[] = [
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
   { id: 'bell-schedule', label: 'Bell Schedule', icon: Clock },
   { id: 'rooms', label: 'Rooms', icon: MapPin },
+  { id: 'audit-log', label: 'Audit Log', icon: Shield },
 ]
 
 // ============================================================================
@@ -520,6 +523,7 @@ export default function SchoolDetailPage() {
               {activeTab === 'calendar' && <SchoolCalendarPage schoolId={schoolId} />}
               {activeTab === 'bell-schedule' && <SchoolBellSchedulePage schoolId={schoolId} />}
               {activeTab === 'rooms' && <SchoolRoomsPage schoolId={schoolId} />}
+              {activeTab === 'audit-log' && <AuditLogViewer schoolId={schoolId} />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -78,6 +78,8 @@ export interface School {
   status: SchoolStatus
   /** @deprecated Use `status === 'active'` instead */
   isActive: boolean
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
+  currentAcademicYearId?: string
 }
 
 /**
@@ -90,6 +92,13 @@ export interface SchoolAddress {
   state: string
   postalCode: string
   country: string
+  wardNumber?: string
+  municipality?: string
+  district?: string
+  province?: string
+  region?: string
+  zipCode?: string
+  [key: string]: string | undefined
 }
 
 /**

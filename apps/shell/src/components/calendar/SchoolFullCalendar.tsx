@@ -1,0 +1,304 @@
+/**
+ * SchoolFullCalendar Component
+ *
+ * Production-ready school calendar using FullCalendar.
+ * - Month and list views with built-in navigation
+ * - Drag-to-select for bulk editing
+ * - Custom event rendering with instructional indicators & bell schedules
+ * - Bikram Sambat dual-calendar support for Nepal schools
+ * - Dark mode via CSS class-based event coloring
+ * - Loading overlay during month navigation
+ */
+
+import { useState, useMemo, useCallback, useRef } from 'react'
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import listPlugin from '@fullcalendar/list'
+import interactionPlugin from '@fullcalendar/interaction'
+import type {
+  DatesSetArg,
+  DateSelectArg,
+  EventContentArg,
+  DayCellContentArg,
+  LocaleInput,
+} from '@fullcalendar/core'
+import neLocale from '@fullcalendar/core/locales/ne'
+import { Loader2, Wand2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { adToBS, BS_MONTH_NAMES_EN, BS_MONTH_NAMES_NE } from '@edforge/date-utils'
+import { useFullCalendarEvents } from '@/hooks/useFullCalendarEvents'
+import { getPrimaryEventType } from './fullcalendar-utils'
+import type { CalendarDateResponseDto } from '@aibrains/shared-types'
+
+import '../../styles/fullcalendar-theme.css'
+
+// ============================================================================
+// PROPS
+// ============================================================================
+
+interface SchoolFullCalendarProps {
+  schoolId: string
+  academicYearId: string
+  onDateClick: (date: string, calendarDate?: CalendarDateResponseDto) => void
+  onDateRangeSelect?: (dates: string[]) => void
+  selectedDates?: string[]
+  isEditable?: boolean
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
+  locale?: string         // e.g. 'ne' for Nepali, 'en' default
+  timeZone?: string       // e.g. 'Asia/Kathmandu'
+  firstDay?: number       // 0=Sunday, 1=Monday, 6=Saturday
+  activeTypes?: Set<string>  // filter visible event types
+  onGenerate?: () => void
+}
+
+const LOCALE_MAP: Record<string, LocaleInput> = {
+  ne: neLocale,
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function formatDateStr(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+function getAllDatesInRange(start: Date, end: Date): string[] {
+  const dates: string[] = []
+  const current = new Date(start)
+  while (current < end) {
+    dates.push(formatDateStr(current))
+    current.setDate(current.getDate() + 1)
+  }
+  return dates
+}
+
+function getBSTitle(date: Date, locale: string): string {
+  try {
+    const bs = adToBS(date)
+    const monthNames = locale === 'ne' ? BS_MONTH_NAMES_NE : BS_MONTH_NAMES_EN
+    const monthName = monthNames[bs.month - 1] || ''
+    return `${monthName} ${bs.year}`
+  } catch {
+    return ''
+  }
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+export function SchoolFullCalendar({
+  schoolId,
+  academicYearId,
+  onDateClick,
+  onDateRangeSelect,
+  selectedDates = [],
+  isEditable = false,
+  calendarSystem = 'gregorian',
+  locale,
+  timeZone,
+  firstDay = 0,
+  activeTypes,
+  onGenerate,
+}: SchoolFullCalendarProps) {
+  const { i18n } = useTranslation()
+  const fcLocale = locale ? LOCALE_MAP[locale] : undefined
+  const calendarRef = useRef<FullCalendar>(null)
+  const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null)
+  const [bsTitle, setBsTitle] = useState('')
+
+  const { events, bgEvents, rawDates, isLoading, isEmpty } = useFullCalendarEvents(
+    schoolId,
+    academicYearId,
+    dateRange,
+    activeTypes,
+  )
+
+  const allEvents = useMemo(() => [...events, ...bgEvents], [events, bgEvents])
+
+  // Build a lookup map from raw API data for edit drawer access
+  const dateMap = useMemo(() => {
+    const map = new Map<string, CalendarDateResponseDto>()
+    for (const cd of rawDates) {
+      map.set(cd.date, cd)
+    }
+    return map
+  }, [rawDates])
+
+  // Selected dates set for O(1) lookup
+  const selectedSet = useMemo(() => new Set(selectedDates), [selectedDates])
+
+  // Track whether we've had data before (to distinguish initial load vs refetch)
+  const hasHadData = useRef(false)
+  if (rawDates.length > 0) hasHadData.current = true
+
+  // ── Callbacks ──
+
+  const handleDatesSet = useCallback((arg: DatesSetArg) => {
+    setDateRange({
+      start: formatDateStr(arg.start),
+      end: formatDateStr(arg.end),
+    })
+
+    if (calendarSystem === 'bikram_sambat') {
+      const mid = new Date(arg.start)
+      mid.setDate(mid.getDate() + 15)
+      setBsTitle(getBSTitle(mid, i18n.language))
+    }
+  }, [calendarSystem, i18n.language])
+
+  const handleDateClick = useCallback((arg: { dateStr: string }) => {
+    const calDate = dateMap.get(arg.dateStr)
+    onDateClick(arg.dateStr, calDate)
+  }, [onDateClick, dateMap])
+
+  const handleSelect = useCallback((arg: DateSelectArg) => {
+    if (!onDateRangeSelect) return
+    const dates = getAllDatesInRange(arg.start, arg.end)
+    if (dates.length > 0) {
+      onDateRangeSelect(dates)
+    }
+  }, [onDateRangeSelect])
+
+  // ── Custom rendering ──
+
+  const renderEventContent = useCallback((arg: EventContentArg) => {
+    const { extendedProps } = arg.event
+    if (!extendedProps) return null
+
+    return (
+      <div className="flex items-center gap-0.5 overflow-hidden w-full">
+        {extendedProps.isInstructional && !extendedProps.isWeekend && (
+          <span className="fc-event-instructional-dot" />
+        )}
+        <span className="truncate text-[11px] leading-tight font-medium">
+          {arg.event.title}
+        </span>
+        {extendedProps.bellScheduleName && (
+          <span className="fc-event-bell-schedule ml-auto hidden sm:inline">
+            {extendedProps.bellScheduleName}
+          </span>
+        )}
+      </div>
+    )
+  }, [])
+
+  const renderDayCellContent = useCallback((arg: DayCellContentArg) => {
+    if (calendarSystem !== 'bikram_sambat') {
+      return (
+        <span className="fc-daygrid-day-number">{arg.dayNumberText}</span>
+      )
+    }
+
+    try {
+      const bs = adToBS(arg.date)
+      return (
+        <div className="relative w-full">
+          <span className="fc-daygrid-day-number">{arg.dayNumberText}</span>
+          <span className="fc-bs-day-number">{bs.day}</span>
+        </div>
+      )
+    } catch {
+      return <span className="fc-daygrid-day-number">{arg.dayNumberText}</span>
+    }
+  }, [calendarSystem])
+
+  const dayCellClassNames = useCallback((arg: DayCellContentArg) => {
+    const dateStr = formatDateStr(arg.date)
+    const classes: string[] = []
+    if (selectedSet.has(dateStr)) {
+      classes.push('fc-day--selected')
+    }
+    const calDate = dateMap.get(dateStr)
+    if (calDate) {
+      const eventType = getPrimaryEventType(calDate)
+      classes.push(`fc-event-type-${eventType}`)
+    }
+    return classes
+  }, [selectedSet, dateMap])
+
+  // ── Initial loading state ──
+
+  if (isLoading && !hasHadData.current) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+        <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading calendar...</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative">
+      {/* BS dual title for Nepal schools */}
+      {calendarSystem === 'bikram_sambat' && bsTitle && (
+        <div className="text-center mb-1">
+          <span className="text-xs font-medium text-teal-600 bg-teal-500/10 px-2.5 py-1 rounded-full">
+            {bsTitle} BS
+          </span>
+        </div>
+      )}
+
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[dayGridPlugin, listPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,listMonth',
+        }}
+        events={allEvents}
+        height="auto"
+        fixedWeekCount={false}
+        dayMaxEvents={3}
+        moreLinkText={(n) => `+${n} more`}
+        selectable={isEditable}
+        selectMirror={true}
+        editable={false}
+        datesSet={handleDatesSet}
+        dateClick={isEditable ? handleDateClick : undefined}
+        select={isEditable ? handleSelect : undefined}
+        eventContent={renderEventContent}
+        dayCellContent={renderDayCellContent}
+        dayCellClassNames={dayCellClassNames}
+        noEventsContent="No calendar dates for this period"
+        locale={fcLocale}
+        timeZone={timeZone || 'local'}
+        firstDay={firstDay}
+        titleFormat={{ year: 'numeric', month: 'long' }}
+      />
+
+      {/* Refetch loading overlay (shows during month navigation) */}
+      {isLoading && hasHadData.current && (
+        <div className="fc-loading-overlay">
+          <Loader2 className="w-5 h-5 text-teal-500 animate-spin" />
+        </div>
+      )}
+
+      {/* Empty state overlay */}
+      {isEmpty && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--surface-primary))]/80 rounded-xl z-10 pointer-events-auto">
+          <div className="text-center">
+            <p className="text-sm text-[rgb(var(--text-tertiary))] mb-3">
+              No calendar dates generated for this academic year.
+            </p>
+            {onGenerate && (
+              <button
+                onClick={onGenerate}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors"
+              >
+                <Wand2 className="w-4 h-4" />
+                Generate Calendar
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

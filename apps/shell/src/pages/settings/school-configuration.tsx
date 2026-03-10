@@ -33,7 +33,8 @@ import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
 import type { School } from '@edforge/types'
 import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
-import { isFieldLocked, FIELD_MUTABILITY } from '@aibrains/shared-types'
+import { isFieldLocked, FIELD_MUTABILITY, getCountryConfig } from '@aibrains/shared-types'
+import type { AddressFieldConfig } from '@aibrains/shared-types'
 import { SchoolDaysSelector } from '@/components/settings/SchoolDaysSelector'
 import { TimeRangePicker } from '@/components/settings/TimeRangePicker'
 // GradingScaleEditor removed — grading scales are now managed exclusively via Grading Policies
@@ -168,6 +169,13 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
       state: string
       postalCode: string
       country: string
+      wardNumber?: string
+      municipality?: string
+      district?: string
+      province?: string
+      region?: string
+      zipCode?: string
+      [key: string]: string | undefined
     }
     phone: string
     email: string
@@ -210,6 +218,12 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           state: school.address?.state || '',
           postalCode: school.address?.postalCode || '',
           country: school.address?.country || 'USA',
+          wardNumber: school.address?.wardNumber || '',
+          municipality: school.address?.municipality || '',
+          district: school.address?.district || '',
+          province: school.address?.province || '',
+          region: school.address?.region || '',
+          zipCode: school.address?.zipCode || '',
         },
         phone: school.phone || '',
         email: school.email || '',
@@ -306,8 +320,12 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             street2: formState.address.street2,
             city: formState.address.city,
             state: formState.address.state,
-            zipCode: formState.address.postalCode,
+            zipCode: formState.address.postalCode || formState.address.zipCode,
             country: formState.address.country,
+            wardNumber: formState.address.wardNumber || undefined,
+            municipality: formState.address.municipality || undefined,
+            district: formState.address.district || undefined,
+            province: formState.address.province || undefined,
           },
         })
       }
@@ -439,40 +457,40 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         description="Physical address and contact information"
         icon={MapPin}
       >
-        <SettingsFieldRow label="Street Address">
-          <input
-            type="text"
-            value={formState.address.street1}
-            onChange={(e) => updateField('address', { ...formState.address, street1: e.target.value })}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
-          />
-        </SettingsFieldRow>
+        {/* Render country-adaptive address fields from country config */}
+        {(() => {
+          const countryConfig = getCountryConfig(formState.address.country || 'USA');
+          const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all";
 
-        <SettingsFieldRow label="City, State, ZIP">
-          <div className="grid grid-cols-3 gap-3">
-            <input
-              type="text"
-              value={formState.address.city}
-              onChange={(e) => updateField('address', { ...formState.address, city: e.target.value })}
-              placeholder="City"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
-            />
-            <input
-              type="text"
-              value={formState.address.state}
-              onChange={(e) => updateField('address', { ...formState.address, state: e.target.value })}
-              placeholder="State"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
-            />
-            <input
-              type="text"
-              value={formState.address.postalCode}
-              onChange={(e) => updateField('address', { ...formState.address, postalCode: e.target.value })}
-              placeholder="ZIP"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
-            />
-          </div>
-        </SettingsFieldRow>
+          // Group address fields into rows (street1 alone, then remaining in pairs)
+          const fields = countryConfig.addressFields.filter(f => f.key !== 'country');
+
+          return fields.map((field: AddressFieldConfig) => (
+            <SettingsFieldRow key={field.key} label={field.label}>
+              {field.type === 'select' && field.options ? (
+                <select
+                  value={formState.address[field.key] || ''}
+                  onChange={(e) => updateField('address', { ...formState.address, [field.key]: e.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">{field.placeholder || `Select ${field.label}`}</option>
+                  {field.options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={formState.address[field.key] || ''}
+                  onChange={(e) => updateField('address', { ...formState.address, [field.key]: e.target.value })}
+                  placeholder={field.placeholder}
+                  maxLength={field.maxLength}
+                  className={inputClass}
+                />
+              )}
+            </SettingsFieldRow>
+          ));
+        })()}
 
         <SettingsFieldRow label="Phone & Email">
           <div className="grid grid-cols-2 gap-3">

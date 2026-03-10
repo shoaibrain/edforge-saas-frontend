@@ -5,7 +5,9 @@
  * Accepts Gregorian ISO as value, displays in BS.
  */
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import {
   gregorianToBs,
   bsToGregorian,
@@ -24,6 +26,9 @@ interface BsDatePickerProps {
 }
 
 export function BsDatePicker({ value, onChange, disabled, className }: BsDatePickerProps) {
+  const { i18n } = useTranslation()
+  const bsLocale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
+
   // Convert current value to BS
   const currentBs = useMemo(() => {
     if (value) {
@@ -68,45 +73,92 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
     }
   }
 
+  const navigateYear = (delta: number) => {
+    const newYear = viewYear + delta
+    if (isBsYearSupported(newYear)) {
+      setViewYear(newYear)
+    }
+  }
+
   const isSelected = (day: number) =>
     currentBs.year === viewYear && currentBs.month === viewMonth && currentBs.day === day
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const dayNames = bsLocale === 'ne'
+    ? ['आ', 'सो', 'मं', 'बु', 'बि', 'शु', 'श']
+    : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
   return (
-    <div className={`bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl p-4 w-80 ${className || ''}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <button type="button" onClick={() => navigateMonth(-1)} className="p-1 rounded hover:bg-[rgb(var(--interactive-hover))]">
-          &larr;
+    <div
+      className={`bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-lg p-3 w-[280px] ${className || ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Bikram Sambat calendar: ${getBsMonthName(viewMonth, bsLocale)} ${viewYear}`}
+    >
+      {/* Year navigation */}
+      <div className="flex items-center justify-between mb-1">
+        <button
+          type="button"
+          onClick={() => navigateYear(-1)}
+          className="p-1 rounded text-xs text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))] transition-colors"
+          aria-label={`Previous year: ${viewYear - 1}`}
+        >
+          &laquo;
+        </button>
+        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
+          {viewYear} BS
+        </span>
+        <button
+          type="button"
+          onClick={() => navigateYear(1)}
+          className="p-1 rounded text-xs text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))] transition-colors"
+          aria-label={`Next year: ${viewYear + 1}`}
+        >
+          &raquo;
+        </button>
+      </div>
+
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-2">
+        <button
+          type="button"
+          onClick={() => navigateMonth(-1)}
+          className="p-1.5 rounded-lg hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-secondary))] transition-colors"
+          aria-label="Previous month"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </button>
         <div className="text-center">
           <div className="font-semibold text-sm text-[rgb(var(--text-primary))]">
-            {getBsMonthName(viewMonth)} {viewYear}
+            {getBsMonthName(viewMonth, bsLocale)}
           </div>
-          <div className="text-xs text-[rgb(var(--text-tertiary))]">
-            BS ({viewYear - 57} AD approx.)
+          <div className="text-[10px] text-[rgb(var(--text-tertiary))]">
+            ~{viewYear - 57} AD
           </div>
         </div>
-        <button type="button" onClick={() => navigateMonth(1)} className="p-1 rounded hover:bg-[rgb(var(--interactive-hover))]">
-          &rarr;
+        <button
+          type="button"
+          onClick={() => navigateMonth(1)}
+          className="p-1.5 rounded-lg hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-secondary))] transition-colors"
+          aria-label="Next month"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </button>
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
+      <div className="grid grid-cols-7 mb-1">
         {dayNames.map(d => (
-          <div key={d} className="text-center text-xs font-medium text-[rgb(var(--text-tertiary))] py-1">
+          <div key={d} className="text-center text-[10px] font-semibold text-[rgb(var(--text-tertiary))] py-1 uppercase tracking-wide">
             {d}
           </div>
         ))}
       </div>
 
       {/* Day grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7">
         {/* Empty cells for offset */}
         {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-          <div key={`empty-${i}`} />
+          <div key={`empty-${i}`} className="aspect-square" />
         ))}
         {/* Day cells */}
         {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -118,10 +170,12 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
               type="button"
               disabled={disabled}
               onClick={() => handleDayClick(day)}
+              aria-label={`${day} ${getBsMonthName(viewMonth, bsLocale)} ${viewYear}`}
+              aria-pressed={selected}
               className={`
-                text-center text-sm py-1.5 rounded-lg transition-colors
+                aspect-square flex items-center justify-center text-xs rounded-lg transition-colors
                 ${selected
-                  ? 'bg-teal-500 text-white font-semibold'
+                  ? 'bg-teal-500 text-white font-semibold shadow-sm'
                   : 'hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))]'
                 }
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -135,7 +189,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
 
       {/* Selected date display */}
       {value && (
-        <div className="mt-3 pt-2 border-t border-[rgb(var(--border-secondary))] text-xs text-[rgb(var(--text-secondary))] flex justify-between">
+        <div className="mt-2 pt-2 border-t border-[rgb(var(--border-secondary))] text-[10px] text-[rgb(var(--text-tertiary))] flex justify-between">
           <span>BS: {currentBs.year}/{String(currentBs.month).padStart(2, '0')}/{String(currentBs.day).padStart(2, '0')}</span>
           <span>AD: {value}</span>
         </div>
@@ -146,7 +200,8 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
 
 /**
  * DateInput wrapper — renders BS picker or standard date input
- * based on school's calendar system.
+ * based on school's calendar system. Uses portal for popup to avoid
+ * clipping in modals and overflow containers.
  */
 interface DateInputProps {
   value?: string
@@ -159,32 +214,101 @@ interface DateInputProps {
 }
 
 export function DateInput({ value, onChange, calendarSystem = 'gregorian', label, error, disabled, className }: DateInputProps) {
+  const { i18n } = useTranslation()
+  const bsLocale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
   const [showPicker, setShowPicker] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const popupRef = useRef<HTMLDivElement>(null)
+
+  // Click-outside-to-close
+  useEffect(() => {
+    if (!showPicker) return
+    const handleMouseDown = (e: MouseEvent) => {
+      if (
+        popupRef.current && !popupRef.current.contains(e.target as Node) &&
+        triggerRef.current && !triggerRef.current.contains(e.target as Node)
+      ) {
+        setShowPicker(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [showPicker])
+
+  // Escape to close
+  useEffect(() => {
+    if (!showPicker) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowPicker(false)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showPicker])
+
+  // Calculate popup position
+  const getPopupStyle = (): React.CSSProperties => {
+    if (!triggerRef.current) return { position: 'fixed', top: 0, left: 0 }
+    const rect = triggerRef.current.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - rect.bottom
+    const openAbove = spaceBelow < 320
+
+    return {
+      position: 'fixed',
+      left: Math.min(rect.left, window.innerWidth - 296), // 280px picker + 16px margin
+      top: openAbove ? undefined : rect.bottom + 4,
+      bottom: openAbove ? window.innerHeight - rect.top + 4 : undefined,
+      zIndex: 9999,
+    }
+  }
 
   if (calendarSystem === 'bikram_sambat') {
     const displayValue = value
-      ? (() => { try { const bs = gregorianToBs(value); return `${bs.year}/${String(bs.month).padStart(2, '0')}/${String(bs.day).padStart(2, '0')}` } catch { return value } })()
+      ? (() => { try { const bs = gregorianToBs(value); return `${getBsMonthName(bs.month, bsLocale)} ${bs.day}, ${bs.year}` } catch { return value } })()
       : ''
 
     return (
-      <div className={`relative ${className || ''}`}>
-        {label && <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">{label}</label>}
-        <input
-          type="text"
-          readOnly
-          value={displayValue}
-          placeholder="YYYY/MM/DD (BS)"
+      <div className={className}>
+        {label && <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{label}</label>}
+        <button
+          ref={triggerRef}
+          type="button"
+          disabled={disabled}
           onClick={() => !disabled && setShowPicker(!showPicker)}
-          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-sm cursor-pointer"
-        />
-        {showPicker && (
-          <div className="absolute z-50 mt-1">
+          className={`
+            w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-left transition-all
+            ${showPicker
+              ? 'border-teal-500 ring-2 ring-teal-500/20'
+              : 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
+            }
+            bg-[rgb(var(--surface-secondary))]
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+          `}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[rgb(var(--text-tertiary))] flex-shrink-0"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          <span className={displayValue ? 'text-[rgb(var(--text-primary))]' : 'text-[rgb(var(--text-tertiary))]'}>
+            {displayValue || 'Select date (BS)'}
+          </span>
+          {value && !disabled && (
+            <span
+              role="button"
+              tabIndex={-1}
+              onClick={(e) => { e.stopPropagation(); onChange(''); setShowPicker(false) }}
+              className="ml-auto text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+              aria-label="Clear date"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+            </span>
+          )}
+        </button>
+        {showPicker && createPortal(
+          <div ref={popupRef} style={getPopupStyle()}>
             <BsDatePicker
               value={value}
               onChange={(iso) => { onChange(iso); setShowPicker(false) }}
               disabled={disabled}
             />
-          </div>
+          </div>,
+          document.body,
         )}
         {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
       </div>
@@ -194,13 +318,13 @@ export function DateInput({ value, onChange, calendarSystem = 'gregorian', label
   // Standard Gregorian date input
   return (
     <div className={className}>
-      {label && <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">{label}</label>}
+      {label && <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{label}</label>}
       <input
         type="date"
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-sm"
+        className="w-full px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
       />
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>

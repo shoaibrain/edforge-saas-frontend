@@ -45,6 +45,7 @@ export function WizardProvider({
   initialData = {},
   onSubmit,
   autoSaveKey,
+  onValidationError,
   children,
 }: WizardProviderProps) {
   // Restore from auto-save on initial mount
@@ -101,6 +102,7 @@ export function WizardProvider({
           newErrors[path] = issue.message
         })
         setErrors(newErrors)
+        onValidationError?.(newErrors)
       }
       return false
     }

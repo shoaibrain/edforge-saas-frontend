@@ -339,7 +339,7 @@ export function StaffDrawer({
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <BookOpen className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
-                          {staff.department || '—'}
+                          {staff.departmentName || '—'}
                         </p>
                         <p className="text-[11px] text-text-tertiary">{t('tableHeaders.department')}</p>
                       </div>
@@ -427,9 +427,9 @@ export function StaffDrawer({
                                   {t(`roles.${getRoleI18nKey(assignment.role)}`, { defaultValue: assignment.role })}
                                 </p>
                                 <div className="flex items-center gap-2">
-                                  {assignment.department && (
+                                  {assignment.departmentName && (
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-surface-tertiary text-text-secondary">
-                                      {assignment.department}
+                                      {assignment.departmentName}
                                     </span>
                                   )}
                                   {assignment.isPrimary && (

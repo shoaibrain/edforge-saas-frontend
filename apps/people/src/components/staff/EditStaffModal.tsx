@@ -14,6 +14,7 @@ import { Loader2, Save } from 'lucide-react'
 import { updateStaffSchema, type UpdateStaffDto, type StaffResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 import { staffService } from '../../services/staff.service'
+import { useDepartments } from './wizard/steps/AssignmentStep'
 import { parseApiError } from '../../services/people.service'
 
 export interface EditStaffModalProps {
@@ -48,6 +49,7 @@ const EMPLOYMENT_STATUS_OPTIONS = [
 export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
   const queryClient = useQueryClient()
   const firstInputRef = useRef<HTMLInputElement>(null)
+  const { data: departments = [], isLoading: loadingDepts } = useDepartments(staff?.primarySchoolId || undefined)
 
   const {
     register,
@@ -67,7 +69,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
         lastSurname: staff.lastSurname,
         phone: staff.phone || '',
         role: staff.role,
-        department: staff.department || '',
+        departmentId: staff.departmentId || '',
         title: staff.title || '',
         employmentStatus: staff.employmentStatus,
       })
@@ -249,19 +251,22 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
         {/* Department & Title */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="department" className="block text-sm font-medium text-text-primary mb-1.5">
+            <label htmlFor="departmentId" className="block text-sm font-medium text-text-primary mb-1.5">
               Department
             </label>
-            <input
-              id="department"
-              type="text"
-              {...register('department')}
-              className={inputClass(!!errors.department)}
-              placeholder="Mathematics"
-              disabled={isSubmitting}
-            />
-            {errors.department && (
-              <p className="mt-1 text-sm text-red-500">{errors.department.message}</p>
+            <select
+              id="departmentId"
+              {...register('departmentId')}
+              className={inputClass(!!errors.departmentId)}
+              disabled={isSubmitting || loadingDepts}
+            >
+              <option value="">{loadingDepts ? 'Loading...' : 'Select department...'}</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+              ))}
+            </select>
+            {errors.departmentId && (
+              <p className="mt-1 text-sm text-red-500">{errors.departmentId.message}</p>
             )}
           </div>
           <div>

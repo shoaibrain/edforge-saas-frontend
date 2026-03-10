@@ -81,6 +81,8 @@ const feeStructureSchema = z
     effectiveFrom: z.string().min(1, 'Effective date is required'),
     effectiveTo: z.string().optional(),
     academicYear: z.string().min(1, 'Academic year is required'),
+    autoApplyOnEnrollment: z.boolean().optional(),
+    proRateOnMidTermEntry: z.boolean().optional(),
   })
   .refine(
     (data) => {
@@ -139,6 +141,8 @@ export function FeeStructureForm({
           effectiveFrom: feeStructure.effectiveFrom.split('T')[0],
           effectiveTo: feeStructure.effectiveTo?.split('T')[0] ?? '',
           academicYear: feeStructure.academicYear,
+          autoApplyOnEnrollment: (feeStructure as any).autoApplyOnEnrollment ?? false,
+          proRateOnMidTermEntry: (feeStructure as any).proRateOnMidTermEntry ?? false,
         }
       : {
           name: '',
@@ -152,6 +156,8 @@ export function FeeStructureForm({
           effectiveFrom: new Date().toISOString().split('T')[0],
           effectiveTo: '',
           academicYear: resolvedAcademicYear,
+          autoApplyOnEnrollment: false,
+          proRateOnMidTermEntry: true,
         },
   })
 
@@ -280,6 +286,30 @@ export function FeeStructureForm({
               />
             )}
           />
+
+          {/* Enrollment & Pro-Rate Settings */}
+          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--bg-tertiary))]">
+            <p className="text-xs font-medium text-[rgb(var(--text-secondary))]">Enrollment Settings</p>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                {...register('autoApplyOnEnrollment')}
+                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+              />
+              <span className="text-sm text-[rgb(var(--text-primary))]">Auto-apply on enrollment</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                {...register('proRateOnMidTermEntry')}
+                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+              />
+              <span className="text-sm text-[rgb(var(--text-primary))]">Pro-rate on mid-term entry</span>
+            </label>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
+              When enabled, fees are automatically calculated proportionally for students enrolling mid-term.
+            </p>
+          </div>
 
           {/* Effective dates */}
           <div className="grid grid-cols-2 gap-4">

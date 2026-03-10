@@ -100,7 +100,7 @@ export function StaffTable({
         width: '140px',
         render: (s) => (
           <span className="text-text-secondary text-sm">
-            {s.department || '—'}
+            {s.departmentName || '—'}
           </span>
         ),
       },

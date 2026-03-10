@@ -121,7 +121,6 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 interface StaffFilters {
   role?: StaffRole
   employmentStatus?: EmploymentStatus
-  department?: string
 }
 
 // ============================================================================
@@ -479,16 +478,6 @@ export default function StaffPage() {
                     ))}
                   </select>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">{t('filters.department')}</label>
-                  <input
-                    type="text"
-                    value={filters.department || ''}
-                    onChange={(e) => updateFilter('department', e.target.value || undefined)}
-                    placeholder={t('filters.filterByDepartment')}
-                    className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -506,12 +495,6 @@ export default function StaffPage() {
                 <FilterChip
                   label={`${t('tableHeaders.status')}: ${t(`employmentStatus.${getStatusI18nKey(filters.employmentStatus)}`, { defaultValue: filters.employmentStatus })}`}
                   onRemove={() => updateFilter('employmentStatus', undefined)}
-                />
-              )}
-              {filters.department && (
-                <FilterChip
-                  label={`${t('tableHeaders.department')}: ${filters.department}`}
-                  onRemove={() => updateFilter('department', undefined)}
                 />
               )}
               <button

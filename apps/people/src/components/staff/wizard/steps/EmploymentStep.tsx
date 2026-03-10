@@ -61,7 +61,7 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatedInput
             label="Hire Date"
             required
@@ -69,12 +69,6 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
             value={(data.hireDate as string) || ''}
             onChange={handleChange('hireDate')}
             error={errors.hireDate}
-          />
-          <AnimatedInput
-            label="Department"
-            placeholder="e.g., Mathematics"
-            value={(data.department as string) || ''}
-            onChange={handleChange('department')}
           />
           <AnimatedInput
             label="Position Title"

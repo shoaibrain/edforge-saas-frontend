@@ -1,30 +1,30 @@
 /**
- * School Calendar Page (Task 2.9c)
+ * School Calendar Page
  *
- * Full calendar management page assembling:
- * - Month navigation + academic year selector
- * - MonthlyCalendarGrid (read + click-to-edit)
- * - Calendar date editing panel
- * - Bulk date actions
+ * Full calendar management page using FullCalendar:
+ * - Month + list views with built-in navigation
+ * - Drag-to-select for bulk editing
+ * - Click-to-edit with auto-populated form fields
  * - Calendar generation
  * - SessionManager (academic sessions/terms)
+ * - Bikram Sambat dual-calendar for Nepal schools
  */
 
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import {
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   Wand2,
-  CheckSquare,
   Save,
   Layers,
+  X,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button, Drawer, DrawerFooter, Dropdown } from '@edforge/ui'
 import type { DropdownOption } from '@edforge/ui'
+import type { CalendarDateResponseDto } from '@aibrains/shared-types'
 import { tenantService } from '@/services/tenant.service'
 import {
   useCalendarStats,
@@ -33,8 +33,10 @@ import {
   useGenerateCalendar,
 } from '@/hooks/useCalendar'
 import { useBellSchedules } from '@/hooks/useBellSchedules'
-import { MonthlyCalendarGrid } from '@/components/calendar/MonthlyCalendarGrid'
+import { SchoolFullCalendar } from '@/components/calendar/SchoolFullCalendar'
 import { SessionManager } from '@/components/calendar/SessionManager'
+import { LEGEND_ITEMS, ALL_EVENT_TYPES } from '@/components/calendar/fullcalendar-utils'
+import { adToBS, BS_MONTH_NAMES_EN, BS_MONTH_NAMES_NE, DAY_NAMES_NE } from '@edforge/date-utils'
 import {
   SettingsAlert,
 } from '@/components/settings/SettingsShared'
@@ -53,21 +55,39 @@ const EVENT_TYPE_OPTIONS = [
   { value: 'early_release', label: 'Early Release' },
   { value: 'late_start', label: 'Late Start' },
   { value: 'make_up_day', label: 'Make-up Day' },
+  { value: 'weather_day', label: 'Weather Day' },
+  { value: 'testing_day', label: 'Testing Day' },
+  { value: 'conference_day', label: 'Conference Day' },
+  { value: 'graduation', label: 'Graduation' },
+  { value: 'in_service', label: 'In-Service' },
 ]
 
-const LEGEND_ITEMS = [
-  { label: 'Instructional',     color: 'bg-emerald-500' },
-  { label: 'Holiday',           color: 'bg-red-500' },
-  { label: 'Teacher Only',      color: 'bg-amber-500' },
-  { label: 'Break',             color: 'bg-purple-500' },
-  { label: 'Non-Instructional', color: 'bg-slate-400' },
-  { label: 'Student Holiday',   color: 'bg-orange-500' },
-]
+// ============================================================================
+// HELPERS
+// ============================================================================
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-]
+const DAY_NAMES_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+function formatDrawerDate(dateStr: string, calendarSystem: string, locale: string): string {
+  const date = new Date(dateStr + 'T00:00:00')
+  const isNepali = locale === 'ne'
+  const dayNames = isNepali ? DAY_NAMES_NE : DAY_NAMES_EN
+  const dayOfWeek = dayNames[date.getDay()]
+  const bsMonthNames = isNepali ? BS_MONTH_NAMES_NE : BS_MONTH_NAMES_EN
+
+  if (calendarSystem === 'bikram_sambat') {
+    try {
+      const bs = adToBS(date)
+      const bsMonth = bsMonthNames[bs.month - 1] || ''
+      const bsPrimary = `${dayOfWeek}, ${bsMonth} ${bs.day}, ${bs.year} BS`
+      const adSecondary = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      return `${bsPrimary} — ${adSecondary}`
+    } catch { /* ignore conversion errors */ }
+  }
+
+  const formatted = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  return `${dayOfWeek}, ${formatted}`
+}
 
 // ============================================================================
 // PROPS
@@ -82,18 +102,53 @@ interface SchoolCalendarPageProps {
 // ============================================================================
 
 export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps) {
-  const now = new Date()
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1)
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear())
+  const { i18n } = useTranslation()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedDates, setSelectedDates] = useState<string[]>([])
-  const [isBulkMode, setIsBulkMode] = useState(false)
   const [showGenerator, setShowGenerator] = useState(false)
   const [showSessions, setShowSessions] = useState(false)
   const [editEventType, setEditEventType] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [editIsInstructional, setEditIsInstructional] = useState(true)
   const [editBellScheduleId, setEditBellScheduleId] = useState<string | null>(null)
+  const [editCalendarDate, setEditCalendarDate] = useState<CalendarDateResponseDto | null>(null)
+
+  // Filter state — all types active by default (including weekend pseudo-type)
+  const [activeTypes, setActiveTypes] = useState<Set<string>>(
+    () => new Set([...ALL_EVENT_TYPES, '__weekend__'])
+  )
+  const allTypesActive = activeTypes.size === ALL_EVENT_TYPES.length + 1
+
+  const toggleType = (type: string) => {
+    setActiveTypes(prev => {
+      const next = new Set(prev)
+      if (next.has(type)) next.delete(type)
+      else next.add(type)
+      return next
+    })
+  }
+
+  const toggleAllTypes = () => {
+    if (allTypesActive) {
+      setActiveTypes(new Set())
+    } else {
+      setActiveTypes(new Set([...ALL_EVENT_TYPES, '__weekend__']))
+    }
+  }
+
+  // ── Fetch school (for calendarSystem) ──
+  const { data: school } = useQuery({
+    queryKey: ['school', schoolId],
+    queryFn: () => tenantService.getSchool(schoolId),
+    enabled: !!schoolId,
+    staleTime: 10 * 60 * 1000,
+  })
+  const calendarSystem = (school as any)?.calendarSystem || 'gregorian'
+  const schoolTimezone = (school as any)?.timezone || undefined
+  const schoolFirstDay = (school as any)?.defaultWeekStartsOn ?? 0
+
+  // Map user's language preference (not school locale) to FullCalendar locale code
+  const fcLocaleCode = i18n.language === 'ne' ? 'ne' : undefined
 
   // ── Fetch academic years ──
   const { data: academicYears } = useQuery({
@@ -139,26 +194,53 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   // ── Stats ──
   const { data: stats } = useCalendarStats(schoolId, academicYearId, !!academicYearId)
 
-  // ── Month navigation ──
-  const prevMonth = () => {
-    if (selectedMonth === 1) { setSelectedMonth(12); setSelectedYear(y => y - 1) }
-    else setSelectedMonth(m => m - 1)
-  }
-  const nextMonth = () => {
-    if (selectedMonth === 12) { setSelectedMonth(1); setSelectedYear(y => y + 1) }
-    else setSelectedMonth(m => m + 1)
+  // ── Date click → open single edit drawer with pre-populated data ──
+  const handleDateClick = (date: string, calendarDate?: CalendarDateResponseDto) => {
+    if (date === selectedDate) {
+      setSelectedDate(null)
+      return
+    }
+    setSelectedDate(date)
+    setEditCalendarDate(calendarDate || null)
+
+    // Pre-populate edit form from existing calendar date data
+    if (calendarDate) {
+      const evt = calendarDate.calendarEvents?.[0]
+      if (evt) {
+        setEditEventType(evt.eventType)
+        setEditDescription(evt.description || '')
+      } else if (calendarDate.isInstructionalDay) {
+        setEditEventType('instructional_day')
+        setEditDescription('')
+      } else {
+        setEditEventType('non_instructional_day')
+        setEditDescription('')
+      }
+      setEditIsInstructional(calendarDate.isInstructionalDay)
+      setEditBellScheduleId(calendarDate.bellScheduleId || null)
+    } else {
+      // No data for this date — reset form
+      setEditEventType('')
+      setEditDescription('')
+      setEditIsInstructional(true)
+      setEditBellScheduleId(null)
+    }
   }
 
-  // ── Date click handler ──
-  const handleDateClick = (date: string) => {
-    if (isBulkMode) {
-      setSelectedDates(prev =>
-        prev.includes(date) ? prev.filter(d => d !== date) : [...prev, date]
-      )
-    } else {
-      setSelectedDate(date === selectedDate ? null : date)
-      setSelectedDates([])
-    }
+  // ── Drag-select → populate bulk selection ──
+  const handleDateRangeSelect = (dates: string[]) => {
+    setSelectedDates(dates)
+    // Reset bulk edit form
+    setEditEventType('')
+    setEditDescription('')
+    setEditBellScheduleId(null)
+  }
+
+  // ── Clear selection ──
+  const handleClearSelection = () => {
+    setSelectedDates([])
+    setEditEventType('')
+    setEditBellScheduleId(null)
   }
 
   // ── Save single date edit ──
@@ -204,9 +286,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
       {
         onSuccess: () => {
           toast.success(`Updated ${selectedDates.length} dates`)
-          setSelectedDates([])
-          setIsBulkMode(false)
-          setEditBellScheduleId(null)
+          handleClearSelection()
         },
       }
     )
@@ -269,15 +349,6 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setIsBulkMode(!isBulkMode)}
-            className={isBulkMode ? 'bg-teal-500/10 border-teal-500/30 text-teal-600' : ''}
-          >
-            <CheckSquare className="w-4 h-4 mr-1.5" />
-            {isBulkMode ? 'Exit Bulk' : 'Bulk Edit'}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
             onClick={() => setShowGenerator(true)}
           >
             <Wand2 className="w-4 h-4 mr-1.5" />
@@ -295,8 +366,8 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
         >
           {[
             { label: 'Total Days', value: stats.totalDays ?? 0, color: 'text-[rgb(var(--text-primary))]' },
-            { label: 'Instructional', value: stats.instructionalDays ?? 0, color: 'text-emerald-600' },
-            { label: 'Holidays', value: stats.holidays ?? 0, color: 'text-red-500' },
+            { label: 'Instructional', value: stats.instructionalDays ?? 0, color: 'text-emerald-600 dark:text-emerald-400' },
+            { label: 'Holidays', value: stats.holidays ?? 0, color: 'text-red-500 dark:text-red-400' },
             { label: 'Non-Instructional', value: stats.nonInstructionalDays ?? 0, color: 'text-gray-400' },
           ].map((stat) => (
             <div key={stat.label} className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3">
@@ -307,34 +378,24 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
         </motion.div>
       )}
 
-      {/* Month Navigation */}
-      <div className="flex items-center justify-between">
-        <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] transition-colors">
-          <ChevronLeft className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
-        </button>
-        <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-          {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
-        </h3>
-        <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] transition-colors">
-          <ChevronRight className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
-        </button>
-      </div>
-
-      {/* Bulk selection info */}
-      {isBulkMode && selectedDates.length > 0 && (
+      {/* Bulk selection bar */}
+      {selectedDates.length > 0 && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4 flex items-center justify-between"
+          className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         >
-          <span className="text-sm font-medium text-teal-700">
+          <span className="text-sm font-medium text-teal-700 dark:text-teal-300">
             {selectedDates.length} date{selectedDates.length > 1 ? 's' : ''} selected
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <select
               value={editEventType}
-              onChange={(e) => setEditEventType(e.target.value)}
-              className="text-sm rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] px-3 py-1.5"
+              onChange={(e) => {
+                setEditEventType(e.target.value)
+                setEditIsInstructional(e.target.value === 'instructional_day')
+              }}
+              className="text-sm rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] px-3 py-1.5"
             >
               <option value="">Select type...</option>
               {EVENT_TYPE_OPTIONS.map(o => (
@@ -353,33 +414,54 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             <Button size="sm" variant="primary" onClick={handleBulkUpdate} disabled={!editEventType || bulkUpdate.isPending}>
               Apply
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => { setSelectedDates([]); setIsBulkMode(false) }}>
-              Cancel
+            <Button size="sm" variant="ghost" onClick={handleClearSelection}>
+              <X className="w-3.5 h-3.5 mr-1" />
+              Clear
             </Button>
           </div>
         </motion.div>
       )}
 
-      {/* Calendar Grid */}
-      <MonthlyCalendarGrid
+      {/* FullCalendar Grid */}
+      <SchoolFullCalendar
         schoolId={schoolId}
         academicYearId={academicYearId}
-        selectedMonth={selectedMonth}
-        selectedYear={selectedYear}
         onDateClick={handleDateClick}
-        selectedDates={isBulkMode ? selectedDates : selectedDate ? [selectedDate] : []}
+        onDateRangeSelect={handleDateRangeSelect}
+        selectedDates={[...selectedDates, ...(selectedDate ? [selectedDate] : [])]}
         isEditable
+        calendarSystem={calendarSystem}
+        locale={fcLocaleCode}
+        timeZone={schoolTimezone}
+        firstDay={schoolFirstDay}
+        activeTypes={allTypesActive ? undefined : activeTypes}
+        onGenerate={() => setShowGenerator(true)}
       />
 
       {/* Single Date Edit Drawer */}
       <Drawer
-        open={!!selectedDate && !isBulkMode}
+        open={!!selectedDate}
         onClose={() => setSelectedDate(null)}
-        title={`Edit: ${selectedDate || ''}`}
-        description="Update this calendar date's event type and properties"
+        title="Edit Calendar Date"
+        description={selectedDate ? formatDrawerDate(selectedDate, calendarSystem, i18n.language) : ''}
         size="sm"
       >
         <div className="space-y-5">
+          {/* Date context info */}
+          {selectedDate && editCalendarDate && (
+            <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-secondary))] rounded-xl px-3 py-2.5">
+              {editCalendarDate.dayNumber && (
+                <span>Day {editCalendarDate.dayNumber}</span>
+              )}
+              {editCalendarDate.instructionalDayNumber && (
+                <span>Instructional Day #{editCalendarDate.instructionalDayNumber}</span>
+              )}
+              {editCalendarDate.bellScheduleName && (
+                <span>Bell: {editCalendarDate.bellScheduleName}</span>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Event Type</label>
             <select
@@ -388,7 +470,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                 setEditEventType(e.target.value)
                 setEditIsInstructional(e.target.value === 'instructional_day')
               }}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
             >
               <option value="">Select...</option>
               {EVENT_TYPE_OPTIONS.map(o => (
@@ -402,20 +484,29 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               type="text"
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Optional description"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5"
+              placeholder="Optional description (e.g., Dashain Holiday)"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
             />
           </div>
-          <div>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={editIsInstructional}
-                onChange={(e) => setEditIsInstructional(e.target.checked)}
-                className="rounded border-[rgb(var(--border-primary))]"
+
+          {/* Instructional toggle */}
+          <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5">
+            <span className="text-sm text-[rgb(var(--text-secondary))]">Instructional Day</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={editIsInstructional}
+              onClick={() => setEditIsInstructional(!editIsInstructional)}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                editIsInstructional ? 'bg-teal-500' : 'bg-[rgb(var(--border-primary))]'
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                  editIsInstructional ? 'translate-x-4.5' : 'translate-x-0.5'
+                }`}
               />
-              <span className="text-[rgb(var(--text-secondary))]">Instructional Day</span>
-            </label>
+            </button>
           </div>
 
           {/* Bell Schedule */}
@@ -479,7 +570,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               <div className="text-sm text-[rgb(var(--text-secondary))] space-y-2">
                 <p>This will generate calendar dates from <strong>{activeYear?.startDate}</strong> to <strong>{activeYear?.endDate}</strong>.</p>
                 <p>Weekdays will be marked as instructional days. Weekends will be marked automatically.</p>
-                <p className="text-amber-600">Existing dates for this year will be replaced.</p>
+                <p className="text-amber-600 dark:text-amber-400">Existing dates for this year will be replaced.</p>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
@@ -517,14 +608,35 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
         )}
       </Drawer>
 
-      {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 px-1 py-3 text-xs">
-        {LEGEND_ITEMS.map(item => (
-          <span key={item.label} className="flex items-center gap-1.5">
-            <span className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
-            <span className="text-[rgb(var(--text-secondary))] font-medium">{item.label}</span>
-          </span>
-        ))}
+      {/* Interactive Legend / Filter */}
+      <div className="flex flex-wrap items-center gap-2 px-1 py-3">
+        <button
+          onClick={toggleAllTypes}
+          className={`text-[11px] font-medium px-2 py-1 rounded-full border transition-colors ${
+            allTypesActive
+              ? 'border-teal-500/30 bg-teal-500/10 text-teal-700 dark:text-teal-300'
+              : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
+          }`}
+        >
+          {allTypesActive ? 'All' : 'None'}
+        </button>
+        {LEGEND_ITEMS.map(item => {
+          const isActive = activeTypes.has(item.type)
+          return (
+            <button
+              key={item.type}
+              onClick={() => toggleType(item.type)}
+              className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border transition-all ${
+                isActive
+                  ? 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-secondary))]'
+                  : 'border-transparent bg-transparent text-[rgb(var(--text-tertiary))] opacity-40 hover:opacity-70'
+              }`}
+            >
+              <span className={`fc-legend-dot fc-legend-dot--${item.type}`} />
+              {item.label}
+            </button>
+          )
+        })}
       </div>
     </div>
   )

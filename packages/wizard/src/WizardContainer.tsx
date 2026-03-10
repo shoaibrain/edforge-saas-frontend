@@ -130,6 +130,7 @@ export function WizardContainer({
   initialData,
   onSubmit,
   onCancel,
+  onValidationError,
   header,
   footerVariant = 'inline',
   contentClassName,
@@ -142,6 +143,7 @@ export function WizardContainer({
       initialData={initialData}
       onSubmit={onSubmit}
       onCancel={onCancel}
+      onValidationError={onValidationError}
     >
       <WizardContent
         header={header}

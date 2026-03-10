@@ -104,10 +104,16 @@ function mapApiSchool(apiSchool: any, tenantId?: string): School {
       city: apiSchool.address.city,
       state: apiSchool.address.state,
       postalCode: apiSchool.address.zipCode || apiSchool.address.postalCode,
-      country: apiSchool.address.country
+      country: apiSchool.address.country,
+      wardNumber: apiSchool.address.wardNumber,
+      municipality: apiSchool.address.municipality,
+      district: apiSchool.address.district,
+      province: apiSchool.address.province,
     } : undefined,
     phone: apiSchool.phone,
-    email: apiSchool.email
+    email: apiSchool.email,
+    calendarSystem: apiSchool.calendarSystem,
+    currentAcademicYearId: apiSchool.currentAcademicYearId,
   }
 }
 
@@ -659,6 +665,43 @@ export async function deleteHoliday(
 }
 
 // ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+export interface AuditLogEntry {
+  auditId: string
+  schoolId: string
+  targetEntity: string
+  targetEntityId: string
+  action: string
+  changes: { field: string; oldValue: any; newValue: any }[]
+  changedBy: string
+  changedByName?: string
+  changedAt: string
+  reason?: string
+  severity?: 'normal' | 'high'
+}
+
+/**
+ * Get audit log for a school
+ * GET /schools/{schoolId}/audit-log
+ */
+export async function getAuditLog(
+  schoolId: string,
+  options: { limit?: number; startDate?: string; endDate?: string; action?: string } = {}
+): Promise<{ items: AuditLogEntry[]; hasMore: boolean }> {
+  const params: Record<string, string> = {}
+  if (options.limit) params.limit = String(options.limit)
+  if (options.startDate) params.startDate = options.startDate
+  if (options.endDate) params.endDate = options.endDate
+  if (options.action) params.action = options.action
+  const query = new URLSearchParams(params).toString()
+  return apiGet<{ items: AuditLogEntry[]; hasMore: boolean }>(
+    `/schools/${schoolId}/audit-log${query ? `?${query}` : ''}`
+  )
+}
+
+// ============================================================================
 // CONVENIENCE EXPORTS
 // ============================================================================
 
@@ -717,6 +760,9 @@ export const tenantService = {
   // School Years (Legacy)
   getSchoolYears,
   getCurrentSchoolYear,
+
+  // Audit Log
+  getAuditLog,
 }
 
 // Export types for use in components

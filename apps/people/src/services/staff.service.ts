@@ -117,7 +117,7 @@ export async function listStaff(
   if (filters?.schoolId) params.schoolId = filters.schoolId
   if (filters?.role) params.role = filters.role
   if (filters?.employmentStatus) params.employmentStatus = filters.employmentStatus
-  if (filters?.department) params.department = filters.department
+  if (filters?.departmentId) params.departmentId = filters.departmentId
 
   return apiGet<StaffListResponseDto>('/staff', params)
 }

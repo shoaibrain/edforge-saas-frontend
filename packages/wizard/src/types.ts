@@ -125,6 +125,8 @@ export interface WizardProviderProps {
   onCancel?: () => void
   /** localStorage key for auto-save. If set, wizard state is saved/restored automatically. */
   autoSaveKey?: string
+  /** Called when step validation fails. Use to show toast/alert. */
+  onValidationError?: (errors: Record<string, string>) => void
   /** Children */
   children: ReactNode
 }
