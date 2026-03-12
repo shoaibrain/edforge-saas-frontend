@@ -408,7 +408,7 @@ function SecurityOverviewCard({
 
       <div className="space-y-2">
         <StatusItem label="Password" value={passwordText} tone={passwordTone} />
-        <StatusItem label="Two-Factor" value={overview.mfaEnabled ? 'Enabled' : 'Not enabled'} tone={overview.mfaEnabled ? 'good' : 'warn'} />
+        <StatusItem label="Two-Factor" value="Coming soon" tone="neutral" />
         <StatusItem
           label="Sessions"
           value={`${overview.activeSessions} active session${overview.activeSessions === 1 ? '' : 's'}`}
@@ -416,22 +416,28 @@ function SecurityOverviewCard({
         />
       </div>
 
-      {overview.recommendations?.length > 0 && (
-        <div className="pt-2 border-t border-[rgb(var(--border-secondary))]">
-          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span className="text-xs font-semibold">Recommendations</span>
+      {/* Filter out recommendations for unreleased features (2FA/MFA) */}
+      {(() => {
+        const filteredRecs = overview.recommendations?.filter(
+          (rec) => !/two.?factor|2fa|mfa/i.test(rec)
+        ) ?? []
+        return filteredRecs.length > 0 ? (
+          <div className="pt-2 border-t border-[rgb(var(--border-secondary))]">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-xs font-semibold">Recommendations</span>
+            </div>
+            <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
+              {filteredRecs.map((rec, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-amber-500">&bull;</span>
+                  <span>{rec}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
-            {overview.recommendations.map((rec, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="text-amber-500">&bull;</span>
-                <span>{rec}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        ) : null
+      })()}
     </motion.div>
   )
 }
@@ -479,7 +485,7 @@ function ComingSoonPanel({
         </div>
 
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          Coming in a future update
+          Planned for a future release
         </p>
       </div>
     </motion.div>
@@ -632,9 +638,9 @@ export default function SecurityPage() {
                 <ComingSoonPanel
                   icon={Shield}
                   title="Two-Factor Authentication"
-                  description="Add an extra layer of security to your account. When enabled, you'll need your password plus a verification code from your authenticator app each time you sign in."
+                  description="Two-factor authentication will add an extra layer of protection to your account. This feature is being built for a future release."
                   features={[
-                    'Supports Google Authenticator, Authy, and more',
+                    'Support for Google Authenticator, Authy, and more',
                     'Backup codes for account recovery',
                     'Required for sensitive operations',
                   ]}
@@ -653,7 +659,7 @@ export default function SecurityPage() {
                 <ComingSoonPanel
                   icon={Monitor}
                   title="Session Management"
-                  description="View and manage all devices where you're currently signed in. Revoke access to any session you don't recognize."
+                  description="Session management will let you see where you're signed in and control access to your account. This feature is being built for a future release."
                   features={[
                     'See all active sessions and devices',
                     'Revoke individual or all sessions',

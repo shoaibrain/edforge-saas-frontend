@@ -3,15 +3,12 @@ import { useNavigate } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { motion } from 'framer-motion'
 import {
-  Bell,
   User,
   Settings,
-  FileText,
   Moon,
   Sun,
   Monitor,
   LogOut,
-  HelpCircle,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
@@ -189,19 +186,7 @@ function UserMenu() {
                 </button>
               )}
             </MenuItem>
-            <MenuItem>
-              {({ active }) => (
-                <button className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}>
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] flex items-center justify-center">
-                    <HelpCircle className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('helpSupport')}</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('getHelp')}</p>
-                  </div>
-                </button>
-              )}
-            </MenuItem>
+            {/* COMING SOON — Help & Support menu item (re-enable when support page/URL is available) */}
           </div>
 
           <div className="border-t border-[rgb(var(--border-secondary))] py-2">
@@ -230,8 +215,6 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
-  const { t: tNav } = useTranslation('nav')
-
   return (
     <>
       <header
@@ -245,22 +228,8 @@ export function Header() {
 
         {/* Right Section - All header actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Documentation */}
-          <button
-            className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label={tNav('documentation')}
-          >
-            <FileText className="w-5 h-5" />
-          </button>
-
-          {/* Notifications */}
-          <button
-            className="relative p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label={tNav('notifications')}
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-rust-500 rounded-full ring-2 ring-[rgb(var(--surface-secondary))]" />
-          </button>
+          {/* COMING SOON — Documentation button (re-enable when docs are available) */}
+          {/* COMING SOON — Notifications button (re-enable when notification system ships) */}
 
           {/* User Menu */}
           <UserMenu />

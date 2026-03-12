@@ -17,7 +17,6 @@ import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Globe,
-  Palette,
   Shield,
   Lock,
   AlertTriangle,
@@ -110,13 +109,15 @@ const WEEK_START_OPTIONS = [
   { value: 'monday', label: 'Monday' },
 ]
 
-const ATTENDANCE_POLICY_OPTIONS = [
-  { value: 'daily', label: 'Daily Attendance' },
-  { value: 'period', label: 'Period-by-Period' },
-  { value: 'both', label: 'Both Daily & Period' },
-]
+// COMING SOON — re-enable when Attendance Defaults section ships
+// const ATTENDANCE_POLICY_OPTIONS = [
+//   { value: 'daily', label: 'Daily Attendance' },
+//   { value: 'period', label: 'Period-by-Period' },
+//   { value: 'both', label: 'Both Daily & Period' },
+// ]
 
-const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+// COMING SOON — re-enable when Organization Branding section ships
+// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
 const SELECT_CLASS = 'min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
@@ -259,6 +260,8 @@ export default function WorkspaceSettingsPage() {
   }
 
   // Save all pending changes
+  // Note: branding and policies are still sent (round-tripping server data)
+  // even though their UI sections are currently hidden for pilot release.
   const handleSave = () => {
     if (!formState) return
     updateMutation.mutate({
@@ -434,84 +437,9 @@ export default function WorkspaceSettingsPage() {
           </SettingsFieldRow>
         </SettingsSection>
 
-        {/* Branding */}
-        <SettingsSection
-          title="Organization Branding"
-          icon={Palette}
-          description="Visual identity across the platform"
-          collapsible
-          defaultOpen={false}
-        >
-          <SettingsFieldRow label="Organization Name" description="Display name for your organization">
-            <input
-              type="text"
-              value={displaySettings.branding.organizationName}
-              onChange={(e) => updateField('branding', 'organizationName', e.target.value)}
-              disabled={isLocked}
-              className={INPUT_CLASS}
-            />
-          </SettingsFieldRow>
+        {/* COMING SOON — Organization Branding section (re-enable when branding customization ships) */}
 
-          <SettingsFieldRow label="Primary Color" description="Main brand color" inline>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={displaySettings.branding.primaryColor || '#0D9488'}
-                onChange={(e) => updateField('branding', 'primaryColor', e.target.value)}
-                disabled={isLocked}
-                className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))] disabled:opacity-50"
-              />
-              <input
-                type="text"
-                value={displaySettings.branding.primaryColor || '#0D9488'}
-                onChange={(e) => updateField('branding', 'primaryColor', e.target.value)}
-                disabled={isLocked}
-                className={INPUT_CLASS + ' max-w-[140px]'}
-              />
-            </div>
-          </SettingsFieldRow>
-
-          <SettingsFieldRow label="Accent Color" description="Secondary highlight color" inline>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={displaySettings.branding.accentColor || '#F59E0B'}
-                onChange={(e) => updateField('branding', 'accentColor', e.target.value)}
-                disabled={isLocked}
-                className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))] disabled:opacity-50"
-              />
-              <input
-                type="text"
-                value={displaySettings.branding.accentColor || '#F59E0B'}
-                onChange={(e) => updateField('branding', 'accentColor', e.target.value)}
-                disabled={isLocked}
-                className={INPUT_CLASS + ' max-w-[140px]'}
-              />
-            </div>
-          </SettingsFieldRow>
-        </SettingsSection>
-
-        {/* Attendance Defaults */}
-        <SettingsSection
-          title="Attendance Defaults"
-          icon={Shield}
-          description="Default attendance tracking policy for new schools"
-          collapsible
-          defaultOpen={false}
-        >
-          <SettingsFieldRow label="Default Attendance Policy" description="How attendance is tracked by default" inline>
-            <select
-              value={displaySettings.policies.defaultAttendancePolicy}
-              onChange={(e) => updateField('policies', 'defaultAttendancePolicy', e.target.value)}
-              disabled={isLocked}
-              className={SELECT_CLASS}
-            >
-              {ATTENDANCE_POLICY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </SettingsFieldRow>
-        </SettingsSection>
+        {/* COMING SOON — Attendance Defaults section (re-enable when attendance policy config ships) */}
 
         {/* Info Note */}
         <motion.div variants={fadeInUp}>

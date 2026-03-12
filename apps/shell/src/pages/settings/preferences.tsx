@@ -11,7 +11,6 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import {
@@ -21,9 +20,6 @@ import {
   Monitor,
   School,
   Check,
-  ArrowRight,
-  Building2,
-  Info,
   Bell,
   Megaphone,
   ClipboardCheck,
@@ -42,7 +38,6 @@ import {
   SettingsSkeleton,
   UnsavedChangesBar,
   staggerChildren,
-  fadeInUp,
 } from '@/components/settings/SettingsShared'
 import {
   usersService,
@@ -187,35 +182,6 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
   )
 }
 
-// ============================================================================
-// WORKSPACE SETTINGS LINK
-// ============================================================================
-
-function WorkspaceSettingsLink() {
-  return (
-    <motion.div variants={fadeInUp}>
-      <Link
-        to="/settings/workspace"
-        className="flex items-center justify-between p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500/30 hover:shadow-md transition-all group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-teal-500/10">
-            <Building2 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-          </div>
-          <div>
-            <p className="font-medium text-[rgb(var(--text-primary))] group-hover:text-teal-700 dark:group-hover:text-teal-400">
-              Workspace Settings
-            </p>
-            <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              Manage organization-wide settings like timezone, language, and date formats
-            </p>
-          </div>
-        </div>
-        <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
-      </Link>
-    </motion.div>
-  )
-}
 
 // ============================================================================
 // MAIN COMPONENT
@@ -387,8 +353,8 @@ export default function PreferencesPage() {
       >
         {/* Header */}
         <SettingsPageHeader
-          title="Preferences & Notifications"
-          description="Personal display and notification settings"
+          title="Preferences"
+          description="Personal display and appearance settings"
           icon={Palette}
         />
 
@@ -420,12 +386,18 @@ export default function PreferencesPage() {
           </SettingsSection>
         )}
 
-        {/* Notification Preferences */}
+        {/* Notification Preferences — disabled for pilot release */}
         <SettingsSection
           title="Notification Preferences"
           icon={Bell}
           description="Choose which notifications you'd like to receive"
         >
+          <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-teal-500/5 border border-teal-500/10">
+            <Bell className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+            <p className="text-sm text-[rgb(var(--text-secondary))]">
+              Notification preferences are coming soon. We'll let you know when this is ready!
+            </p>
+          </div>
           <div className="space-y-1">
             {MVP_NOTIFICATION_CATEGORIES.map((cat) => (
               <SettingsToggleRow
@@ -435,24 +407,12 @@ export default function PreferencesPage() {
                 description={cat.description}
                 checked={categories[cat.key]}
                 onChange={(checked) => handleCategoryToggle(cat.key, checked)}
+                disabled
               />
             ))}
           </div>
         </SettingsSection>
 
-        {/* Link to Workspace Settings */}
-        <motion.div variants={fadeInUp}>
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] mb-4">
-            <Info className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-[rgb(var(--text-secondary))]">
-                <strong>Looking for regional settings?</strong> Organization-wide settings like
-                timezone, language, date format, and week start day are now managed in Workspace Settings.
-              </p>
-            </div>
-          </div>
-          <WorkspaceSettingsLink />
-        </motion.div>
       </motion.div>
 
       <UnsavedChangesBar
