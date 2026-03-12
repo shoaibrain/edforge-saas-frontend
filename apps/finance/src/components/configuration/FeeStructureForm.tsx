@@ -6,8 +6,12 @@
  * Sprint 2 improvements:
  *  - Fixed modal overlay (z-50, backdrop click, Escape key)
  *  - Multi-select grade-level chips with "All Grades" toggle
- *  - Bikram Sambat academic year default
  *  - Inline validation errors, amount/tax bounds, date cross-validation
+ *
+ * Production fixes:
+ *  - Academic year selector (dropdown fetched from identity service)
+ *  - Dynamic grade levels from school's gradeRange configuration
+ *  - academicYearId (UUID) sent alongside academicYear display name
  */
 
 import { useEffect, useCallback } from 'react'
@@ -17,7 +21,6 @@ import { z } from 'zod'
 import type { FeeStructure, FeeType, FeeFrequency, TaxType } from '@edforge/types'
 import { Button } from '@edforge/ui'
 import { X } from 'lucide-react'
-import { getCurrentBSYear } from '../../utils/bikram-sambat'
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -52,7 +55,16 @@ const FREQUENCY_LABELS: Record<string, string> = {
 
 const TAX_TYPES: TaxType[] = ['none', 'PAN', 'VAT']
 
-const GRADE_OPTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+export interface AcademicYearOption {
+  id: string
+  name: string
+  status: string
+  isCurrent?: boolean
+}
 
 /* ------------------------------------------------------------------ */
 /*  Zod schema                                                         */
@@ -80,7 +92,7 @@ const feeStructureSchema = z
     gradeLevels: z.array(z.string()),
     effectiveFrom: z.string().min(1, 'Effective date is required'),
     effectiveTo: z.string().optional(),
-    academicYear: z.string().min(1, 'Academic year is required'),
+    academicYearId: z.string().min(1, 'Academic year is required'),
     autoApplyOnEnrollment: z.boolean().optional(),
     proRateOnMidTermEntry: z.boolean().optional(),
   })
@@ -97,7 +109,7 @@ const feeStructureSchema = z
     },
   )
 
-type FormData = z.infer<typeof feeStructureSchema>
+export type FeeStructureFormData = z.infer<typeof feeStructureSchema>
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -105,27 +117,33 @@ type FormData = z.infer<typeof feeStructureSchema>
 
 interface FeeStructureFormProps {
   feeStructure?: FeeStructure | null
-  academicYear?: string
-  onSubmit: (data: FormData) => void
+  academicYears: AcademicYearOption[]
+  gradeOptions: string[]
+  onSubmit: (data: FeeStructureFormData) => void
   onClose: () => void
   isSubmitting?: boolean
 }
 
 export function FeeStructureForm({
   feeStructure,
-  academicYear,
+  academicYears,
+  gradeOptions,
   onSubmit,
   onClose,
   isSubmitting,
 }: FeeStructureFormProps) {
-  const resolvedAcademicYear = academicYear ?? getCurrentBSYear()
+  const defaultAcademicYearId = feeStructure?.academicYearId
+    ?? academicYears.find((y) => y.isCurrent)?.id
+    ?? academicYears.find((y) => y.status === 'active')?.id
+    ?? academicYears[0]?.id
+    ?? ''
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isValid },
-  } = useForm<FormData>({
+  } = useForm<FeeStructureFormData>({
     resolver: zodResolver(feeStructureSchema),
     mode: 'onChange',
     defaultValues: feeStructure
@@ -140,9 +158,9 @@ export function FeeStructureForm({
           gradeLevels: feeStructure.gradeLevels ?? [],
           effectiveFrom: feeStructure.effectiveFrom.split('T')[0],
           effectiveTo: feeStructure.effectiveTo?.split('T')[0] ?? '',
-          academicYear: feeStructure.academicYear,
-          autoApplyOnEnrollment: (feeStructure as any).autoApplyOnEnrollment ?? false,
-          proRateOnMidTermEntry: (feeStructure as any).proRateOnMidTermEntry ?? false,
+          academicYearId: defaultAcademicYearId,
+          autoApplyOnEnrollment: feeStructure.autoApplyOnEnrollment ?? false,
+          proRateOnMidTermEntry: feeStructure.proRateOnMidTermEntry ?? false,
         }
       : {
           name: '',
@@ -155,7 +173,7 @@ export function FeeStructureForm({
           gradeLevels: [],
           effectiveFrom: new Date().toISOString().split('T')[0],
           effectiveTo: '',
-          academicYear: resolvedAcademicYear,
+          academicYearId: defaultAcademicYearId,
           autoApplyOnEnrollment: false,
           proRateOnMidTermEntry: true,
         },
@@ -217,6 +235,23 @@ export function FeeStructureForm({
               className="input-field"
               placeholder="Optional description"
             />
+          </Field>
+
+          {/* Academic Year */}
+          <Field label="Academic Year" error={errors.academicYearId?.message}>
+            {academicYears.length > 0 ? (
+              <select {...register('academicYearId')} className="input-field">
+                {academicYears.map((ay) => (
+                  <option key={ay.id} value={ay.id}>
+                    {ay.name}{ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-xs text-[rgb(var(--text-tertiary))] py-2">
+                No academic years configured. Please create one in School Settings first.
+              </p>
+            )}
           </Field>
 
           {/* Type + Frequency */}
@@ -282,6 +317,7 @@ export function FeeStructureForm({
               <GradeLevelChips
                 value={field.value}
                 onChange={field.onChange}
+                gradeOptions={gradeOptions}
                 error={errors.gradeLevels?.message}
               />
             )}
@@ -320,9 +356,6 @@ export function FeeStructureForm({
               <input {...register('effectiveTo')} type="date" className="input-field" />
             </Field>
           </div>
-
-          {/* Academic year (hidden but submitted) */}
-          <input {...register('academicYear')} type="hidden" />
         </form>
 
         {/* Footer */}
@@ -367,10 +400,12 @@ export function FeeStructureForm({
 function GradeLevelChips({
   value,
   onChange,
+  gradeOptions,
   error,
 }: {
   value: string[]
   onChange: (val: string[]) => void
+  gradeOptions: string[]
   error?: string
 }) {
   const allSelected = value.length === 0
@@ -384,8 +419,6 @@ function GradeLevelChips({
   }
 
   const toggleAll = () => {
-    // If already "All Grades" (empty array), do nothing special — clicking again stays empty.
-    // If specific grades are selected, clear to empty (= all).
     onChange([])
   }
 
@@ -405,7 +438,7 @@ function GradeLevelChips({
           All Grades
         </button>
 
-        {GRADE_OPTIONS.map((grade) => {
+        {gradeOptions.map((grade) => {
           const isSelected = !allSelected && value.includes(grade)
           return (
             <button
@@ -414,7 +447,7 @@ function GradeLevelChips({
               onClick={() => {
                 if (allSelected) {
                   // Switching from "All" to specific: select all EXCEPT this one
-                  onChange(GRADE_OPTIONS.filter((g) => g !== grade))
+                  onChange(gradeOptions.filter((g) => g !== grade))
                 } else {
                   toggleGrade(grade)
                 }

@@ -44,6 +44,7 @@ export interface FeeStructure {
   name: string
   description?: string
   academicYear: string
+  academicYearId: string
   feeType: FeeType
   amount: number // NPR, 2 decimal precision
   currency: 'NPR'
@@ -52,8 +53,11 @@ export interface FeeStructure {
   frequency: FeeFrequency
   gradeLevels: string[] // Which grades this applies to (empty = all)
   isActive: boolean
+  autoApplyOnEnrollment?: boolean
+  proRateOnMidTermEntry?: boolean
   effectiveFrom: string // ISO date
   effectiveTo?: string // ISO date, null = indefinite
+  version?: number
   createdAt: string
   updatedAt: string
 }
@@ -62,6 +66,7 @@ export interface CreateFeeStructureDto {
   name: string
   description?: string
   academicYear: string
+  academicYearId: string
   feeType: FeeType
   amount: number
   currency: 'NPR'
@@ -69,6 +74,8 @@ export interface CreateFeeStructureDto {
   taxType?: TaxType
   frequency: FeeFrequency
   gradeLevels?: string[]
+  autoApplyOnEnrollment?: boolean
+  proRateOnMidTermEntry?: boolean
   effectiveFrom: string
   effectiveTo?: string
 }

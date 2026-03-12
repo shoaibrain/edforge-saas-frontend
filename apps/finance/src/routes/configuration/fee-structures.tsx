@@ -4,13 +4,19 @@
  * Admin page for configuring fee types and amounts.
  * Route: /finance/configuration/fee-structures
  *
- * Sprint 2: styled delete dialog, Bikram Sambat year, gradeLevels as array.
+ * Production fixes:
+ *  - Fetches academic years from identity service for academicYearId
+ *  - Fetches school gradeRange for dynamic grade level chips
+ *  - Improved error handling with specific error messages in toasts
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { FeeStructure } from '@edforge/types'
+import { apiGet } from '@edforge/api-client'
+import type { AxiosError } from '@edforge/api-client'
 import { Button } from '@edforge/ui'
 import { Plus, AlertTriangle } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
@@ -22,7 +28,56 @@ import {
 } from '@edforge/finance-services'
 import { FeeStructureList } from '../../components/configuration/FeeStructureList'
 import { FeeStructureForm } from '../../components/configuration/FeeStructureForm'
-import { getCurrentBSYear } from '../../utils/bikram-sambat'
+import type { FeeStructureFormData, AcademicYearOption } from '../../components/configuration/FeeStructureForm'
+
+/* ------------------------------------------------------------------ */
+/*  API response types                                                 */
+/* ------------------------------------------------------------------ */
+
+interface AcademicYearApiItem {
+  yearId?: string
+  academicYearId?: string
+  id?: string
+  name: string
+  status: string
+  isCurrent?: boolean
+}
+
+interface SchoolApiResponse {
+  gradeRange?: { start: string; end: string }
+  [key: string]: unknown
+}
+
+/* ------------------------------------------------------------------ */
+/*  Constants & Helpers                                                */
+/* ------------------------------------------------------------------ */
+
+/** Canonical grade ordering (mirrors @aibrains/shared-types ORDERED_GRADES) */
+const ORDERED_GRADES = [
+  'PK', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+] as const
+
+function extractApiErrorMessage(error: unknown): string | null {
+  const axiosErr = error as AxiosError<{ message?: string; errors?: Array<{ message?: string }> }>
+  const data = axiosErr?.response?.data
+  if (!data) return null
+  if (data.message) return data.message
+  if (data.errors?.length) {
+    return data.errors.map((e) => e.message).filter(Boolean).join('; ')
+  }
+  return null
+}
+
+function gradeRangeToOptions(start: string, end: string): string[] {
+  const startIdx = ORDERED_GRADES.indexOf(start as typeof ORDERED_GRADES[number])
+  const endIdx = ORDERED_GRADES.indexOf(end as typeof ORDERED_GRADES[number])
+  if (startIdx === -1 || endIdx === -1 || startIdx > endIdx) return [...ORDERED_GRADES]
+  return ORDERED_GRADES.slice(startIdx, endIdx + 1) as unknown as string[]
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page Component                                                     */
+/* ------------------------------------------------------------------ */
 
 export default function FeeStructuresPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
@@ -36,50 +91,98 @@ export default function FeeStructuresPage() {
   const updateMutation = useUpdateFeeStructure(schoolId ?? '')
   const deleteMutation = useDeleteFeeStructure(schoolId ?? '')
 
-  const handleCreate = async (data: Record<string, unknown>) => {
+  // Fetch academic years for the school
+  const { data: academicYearsRaw } = useQuery({
+    queryKey: ['academicYears', schoolId],
+    queryFn: () => apiGet<{ items: AcademicYearApiItem[] } | AcademicYearApiItem[]>(
+      `/schools/${schoolId}/academic-years`,
+    ),
+    enabled: !!schoolId,
+    staleTime: 10 * 60 * 1000,
+  })
+
+  const academicYears: AcademicYearOption[] = useMemo(() => {
+    const items = Array.isArray(academicYearsRaw)
+      ? academicYearsRaw
+      : academicYearsRaw?.items ?? []
+    return items.map((ay) => ({
+      id: ay.yearId || ay.academicYearId || ay.id || '',
+      name: ay.name,
+      status: ay.status,
+      isCurrent: ay.isCurrent,
+    }))
+  }, [academicYearsRaw])
+
+  // Fetch school details for grade range
+  const { data: schoolData } = useQuery({
+    queryKey: ['school', schoolId],
+    queryFn: () => apiGet<SchoolApiResponse>(`/schools/${schoolId}`),
+    enabled: !!schoolId,
+    staleTime: 10 * 60 * 1000,
+  })
+
+  const gradeOptions = useMemo(() => {
+    if (schoolData?.gradeRange) {
+      return gradeRangeToOptions(schoolData.gradeRange.start, schoolData.gradeRange.end)
+    }
+    return [...ORDERED_GRADES] as string[]
+  }, [schoolData])
+
+  // Resolve academic year name from ID
+  const getAcademicYearName = (yearId: string): string => {
+    const year = academicYears.find((y) => y.id === yearId)
+    return year?.name ?? ''
+  }
+
+  const handleCreate = async (data: FeeStructureFormData) => {
     try {
       await createMutation.mutateAsync({
-        name: data.name as string,
-        description: data.description as string,
-        feeType: data.feeType as FeeStructure['feeType'],
-        amount: data.amount as number,
+        name: data.name,
+        description: data.description,
+        feeType: data.feeType,
+        amount: data.amount,
         currency: 'NPR',
-        taxRate: (data.taxRate as number) || 0,
-        taxType: (data.taxType as FeeStructure['taxType']) || 'none',
-        frequency: data.frequency as FeeStructure['frequency'],
-        gradeLevels: (data.gradeLevels as string[]) ?? [],
-        effectiveFrom: data.effectiveFrom as string,
-        effectiveTo: (data.effectiveTo as string) || undefined,
-        academicYear: data.academicYear as string,
+        taxRate: data.taxRate || 0,
+        taxType: data.taxType || 'none',
+        frequency: data.frequency,
+        gradeLevels: data.gradeLevels ?? [],
+        autoApplyOnEnrollment: data.autoApplyOnEnrollment,
+        proRateOnMidTermEntry: data.proRateOnMidTermEntry,
+        effectiveFrom: data.effectiveFrom,
+        effectiveTo: data.effectiveTo || undefined,
+        academicYear: getAcademicYearName(data.academicYearId),
+        academicYearId: data.academicYearId,
       })
       toast.success('Fee structure created')
       setShowForm(false)
-    } catch {
-      toast.error('Failed to create fee structure')
+    } catch (error) {
+      const msg = extractApiErrorMessage(error)
+      toast.error(msg || 'Failed to create fee structure')
     }
   }
 
-  const handleUpdate = async (data: Record<string, unknown>) => {
+  const handleUpdate = async (data: FeeStructureFormData) => {
     if (!editingFee) return
     try {
       await updateMutation.mutateAsync({
         id: editingFee.id,
         data: {
-          name: data.name as string,
-          description: data.description as string,
-          amount: data.amount as number,
-          taxRate: (data.taxRate as number) || 0,
-          taxType: (data.taxType as FeeStructure['taxType']) || 'none',
-          frequency: data.frequency as FeeStructure['frequency'],
-          gradeLevels: (data.gradeLevels as string[]) ?? [],
-          effectiveFrom: data.effectiveFrom as string,
-          effectiveTo: (data.effectiveTo as string) || undefined,
+          name: data.name,
+          description: data.description,
+          amount: data.amount,
+          taxRate: data.taxRate || 0,
+          taxType: data.taxType || 'none',
+          frequency: data.frequency,
+          gradeLevels: data.gradeLevels ?? [],
+          effectiveFrom: data.effectiveFrom,
+          effectiveTo: data.effectiveTo || undefined,
         },
       })
       toast.success('Fee structure updated')
       setEditingFee(null)
-    } catch {
-      toast.error('Failed to update fee structure')
+    } catch (error) {
+      const msg = extractApiErrorMessage(error)
+      toast.error(msg || 'Failed to update fee structure')
     }
   }
 
@@ -89,8 +192,9 @@ export default function FeeStructuresPage() {
       await deleteMutation.mutateAsync(deletingFee.id)
       toast.success('Fee structure deleted')
       setDeletingFee(null)
-    } catch {
-      toast.error('Failed to delete fee structure')
+    } catch (error) {
+      const msg = extractApiErrorMessage(error)
+      toast.error(msg || 'Failed to delete fee structure')
     }
   }
 
@@ -152,7 +256,8 @@ export default function FeeStructuresPage() {
       {/* Create form modal */}
       {showForm && (
         <FeeStructureForm
-          academicYear={getCurrentBSYear()}
+          academicYears={academicYears}
+          gradeOptions={gradeOptions}
           onSubmit={handleCreate}
           onClose={() => setShowForm(false)}
           isSubmitting={createMutation.isPending}
@@ -163,7 +268,8 @@ export default function FeeStructuresPage() {
       {editingFee && (
         <FeeStructureForm
           feeStructure={editingFee}
-          academicYear={editingFee.academicYear}
+          academicYears={academicYears}
+          gradeOptions={gradeOptions}
           onSubmit={handleUpdate}
           onClose={() => setEditingFee(null)}
           isSubmitting={updateMutation.isPending}
