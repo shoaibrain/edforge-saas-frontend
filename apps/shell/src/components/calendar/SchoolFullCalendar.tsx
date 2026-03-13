@@ -3,9 +3,9 @@
  *
  * Production-ready school calendar using FullCalendar.
  * - Month and list views with built-in navigation
- * - Drag-to-select for bulk editing
+ * - Click-to-edit via drawer (single date editing)
  * - Custom event rendering with instructional indicators & bell schedules
- * - Bikram Sambat dual-calendar support for Nepal schools
+ * - Bikram Sambat dual-calendar support with labeled BS/AD dates
  * - Dark mode via CSS class-based event coloring
  * - Loading overlay during month navigation
  */
@@ -17,7 +17,6 @@ import listPlugin from '@fullcalendar/list'
 import interactionPlugin from '@fullcalendar/interaction'
 import type {
   DatesSetArg,
-  DateSelectArg,
   EventContentArg,
   DayCellContentArg,
   LocaleInput,
@@ -40,8 +39,7 @@ interface SchoolFullCalendarProps {
   schoolId: string
   academicYearId: string
   onDateClick: (date: string, calendarDate?: CalendarDateResponseDto) => void
-  onDateRangeSelect?: (dates: string[]) => void
-  selectedDates?: string[]
+  focusedDate?: string | null  // drawer-active date (distinct visual highlight)
   isEditable?: boolean
   calendarSystem?: 'gregorian' | 'bikram_sambat'
   locale?: string         // e.g. 'ne' for Nepali, 'en' default
@@ -66,16 +64,6 @@ function formatDateStr(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-function getAllDatesInRange(start: Date, end: Date): string[] {
-  const dates: string[] = []
-  const current = new Date(start)
-  while (current < end) {
-    dates.push(formatDateStr(current))
-    current.setDate(current.getDate() + 1)
-  }
-  return dates
-}
-
 function getBSTitle(date: Date, locale: string): string {
   try {
     const bs = adToBS(date)
@@ -95,8 +83,7 @@ export function SchoolFullCalendar({
   schoolId,
   academicYearId,
   onDateClick,
-  onDateRangeSelect,
-  selectedDates = [],
+  focusedDate,
   isEditable = false,
   calendarSystem = 'gregorian',
   locale,
@@ -129,9 +116,6 @@ export function SchoolFullCalendar({
     return map
   }, [rawDates])
 
-  // Selected dates set for O(1) lookup
-  const selectedSet = useMemo(() => new Set(selectedDates), [selectedDates])
-
   // Track whether we've had data before (to distinguish initial load vs refetch)
   const hasHadData = useRef(false)
   if (rawDates.length > 0) hasHadData.current = true
@@ -156,14 +140,6 @@ export function SchoolFullCalendar({
     onDateClick(arg.dateStr, calDate)
   }, [onDateClick, dateMap])
 
-  const handleSelect = useCallback((arg: DateSelectArg) => {
-    if (!onDateRangeSelect) return
-    const dates = getAllDatesInRange(arg.start, arg.end)
-    if (dates.length > 0) {
-      onDateRangeSelect(dates)
-    }
-  }, [onDateRangeSelect])
-
   // ── Custom rendering ──
 
   const renderEventContent = useCallback((arg: EventContentArg) => {
@@ -171,15 +147,15 @@ export function SchoolFullCalendar({
     if (!extendedProps) return null
 
     return (
-      <div className="flex items-center gap-0.5 overflow-hidden w-full">
+      <div className="fc-event-content-row">
         {extendedProps.isInstructional && !extendedProps.isWeekend && (
           <span className="fc-event-instructional-dot" />
         )}
-        <span className="truncate text-[11px] leading-tight font-medium">
+        <span className="fc-event-title-text">
           {arg.event.title}
         </span>
         {extendedProps.bellScheduleName && (
-          <span className="fc-event-bell-schedule ml-auto hidden sm:inline">
+          <span className="fc-event-bell-schedule">
             {extendedProps.bellScheduleName}
           </span>
         )}
@@ -196,10 +172,17 @@ export function SchoolFullCalendar({
 
     try {
       const bs = adToBS(arg.date)
+      const adDay = arg.dayNumberText.replace(/\D/g, '')
       return (
-        <div className="relative w-full">
-          <span className="fc-daygrid-day-number">{arg.dayNumberText}</span>
-          <span className="fc-bs-day-number">{bs.day}</span>
+        <div className="fc-day-header-row">
+          <span className="fc-bs-date">
+            <span className="fc-daygrid-day-number">{bs.day}</span>
+            <span className="fc-date-label">BS</span>
+          </span>
+          <span className="fc-ad-date">
+            <span className="fc-ad-day-number">{adDay}</span>
+            <span className="fc-date-label">AD</span>
+          </span>
         </div>
       )
     } catch {
@@ -210,8 +193,8 @@ export function SchoolFullCalendar({
   const dayCellClassNames = useCallback((arg: DayCellContentArg) => {
     const dateStr = formatDateStr(arg.date)
     const classes: string[] = []
-    if (selectedSet.has(dateStr)) {
-      classes.push('fc-day--selected')
+    if (focusedDate === dateStr) {
+      classes.push('fc-day--focused')
     }
     const calDate = dateMap.get(dateStr)
     if (calDate) {
@@ -219,7 +202,7 @@ export function SchoolFullCalendar({
       classes.push(`fc-event-type-${eventType}`)
     }
     return classes
-  }, [selectedSet, dateMap])
+  }, [focusedDate, dateMap])
 
   // ── Initial loading state ──
 
@@ -257,12 +240,9 @@ export function SchoolFullCalendar({
         fixedWeekCount={false}
         dayMaxEvents={3}
         moreLinkText={(n) => `+${n} more`}
-        selectable={isEditable}
-        selectMirror={true}
         editable={false}
         datesSet={handleDatesSet}
         dateClick={isEditable ? handleDateClick : undefined}
-        select={isEditable ? handleSelect : undefined}
         eventContent={renderEventContent}
         dayCellContent={renderDayCellContent}
         dayCellClassNames={dayCellClassNames}

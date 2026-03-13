@@ -3,8 +3,8 @@
  *
  * Full calendar management page using FullCalendar:
  * - Month + list views with built-in navigation
- * - Drag-to-select for bulk editing
- * - Click-to-edit with auto-populated form fields
+ * - Click-to-edit via drawer with auto-populated form fields
+ * - Stats cards with academic year progress, instructional days, holidays
  * - Calendar generation
  * - SessionManager (academic sessions/terms)
  * - Bikram Sambat dual-calendar for Nepal schools
@@ -19,7 +19,6 @@ import {
   Wand2,
   Save,
   Layers,
-  X,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button, Drawer, DrawerFooter, Dropdown } from '@edforge/ui'
@@ -29,7 +28,6 @@ import { tenantService } from '@/services/tenant.service'
 import {
   useCalendarStats,
   useUpdateCalendarDate,
-  useBulkUpdateCalendarDates,
   useGenerateCalendar,
 } from '@/hooks/useCalendar'
 import { useBellSchedules } from '@/hooks/useBellSchedules'
@@ -104,7 +102,6 @@ interface SchoolCalendarPageProps {
 export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps) {
   const { i18n } = useTranslation()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [showGenerator, setShowGenerator] = useState(false)
   const [showSessions, setShowSessions] = useState(false)
   const [editEventType, setEditEventType] = useState('')
@@ -166,7 +163,6 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
 
   // ── Mutations ──
   const updateDate = useUpdateCalendarDate(schoolId)
-  const bulkUpdate = useBulkUpdateCalendarDates(schoolId)
   const generateCalendar = useGenerateCalendar(schoolId)
 
   // ── Bell Schedules ──
@@ -227,22 +223,6 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
     }
   }
 
-  // ── Drag-select → populate bulk selection ──
-  const handleDateRangeSelect = (dates: string[]) => {
-    setSelectedDates(dates)
-    // Reset bulk edit form
-    setEditEventType('')
-    setEditDescription('')
-    setEditBellScheduleId(null)
-  }
-
-  // ── Clear selection ──
-  const handleClearSelection = () => {
-    setSelectedDates([])
-    setEditEventType('')
-    setEditBellScheduleId(null)
-  }
-
   // ── Save single date edit ──
   const handleSaveDate = () => {
     if (!selectedDate || !editEventType) return
@@ -263,30 +243,6 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           toast.success(`Updated ${selectedDate}`)
           setSelectedDate(null)
           setEditBellScheduleId(null)
-        },
-      }
-    )
-  }
-
-  // ── Bulk update ──
-  const handleBulkUpdate = () => {
-    if (!selectedDates.length || !editEventType) return
-    const bellScheduleId = editBellScheduleId && editBellScheduleId !== '__none__' ? editBellScheduleId : undefined
-    const bellScheduleName = getScheduleName(editBellScheduleId)
-    bulkUpdate.mutate(
-      {
-        dates: selectedDates,
-        updates: {
-          calendarEvents: [{ eventType: editEventType as any, isAllDay: true, description: editDescription || undefined }],
-          isInstructionalDay: editIsInstructional,
-          bellScheduleId,
-          bellScheduleName,
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success(`Updated ${selectedDates.length} dates`)
-          handleClearSelection()
         },
       }
     )
@@ -364,60 +320,54 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3"
         >
-          {[
-            { label: 'Total Days', value: stats.totalDays ?? 0, color: 'text-[rgb(var(--text-primary))]' },
-            { label: 'Instructional', value: stats.instructionalDays ?? 0, color: 'text-emerald-600 dark:text-emerald-400' },
-            { label: 'Holidays', value: stats.holidays ?? 0, color: 'text-red-500 dark:text-red-400' },
-            { label: 'Non-Instructional', value: stats.nonInstructionalDays ?? 0, color: 'text-gray-400' },
-          ].map((stat) => (
-            <div key={stat.label} className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3">
-              <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
-              <div className="text-xs text-[rgb(var(--text-tertiary))]">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Bulk selection bar */}
-      {selectedDates.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-        >
-          <span className="text-sm font-medium text-teal-700 dark:text-teal-300">
-            {selectedDates.length} date{selectedDates.length > 1 ? 's' : ''} selected
-          </span>
-          <div className="flex items-center gap-2 flex-wrap">
-            <select
-              value={editEventType}
-              onChange={(e) => {
-                setEditEventType(e.target.value)
-                setEditIsInstructional(e.target.value === 'instructional_day')
-              }}
-              className="text-sm rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] px-3 py-1.5"
-            >
-              <option value="">Select type...</option>
-              {EVENT_TYPE_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {bellScheduleOptions.length > 1 && (
-              <Dropdown
-                options={bellScheduleOptions}
-                value={editBellScheduleId}
-                onChange={(id) => setEditBellScheduleId(id)}
-                placeholder="Bell schedule..."
-                buttonClassName="text-sm rounded-lg py-1.5"
-              />
+          {/* Academic Year Progress */}
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-teal-500">
+            <div className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">{activeYear?.name || 'Academic Year'}</div>
+            {stats.progressPercentage != null ? (
+              <>
+                <div className="mt-1.5 w-full h-1.5 rounded-full bg-[rgb(var(--border-primary))]">
+                  <div className="h-full rounded-full bg-teal-500 transition-all" style={{ width: `${Math.min(stats.progressPercentage, 100)}%` }} />
+                </div>
+                <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+                  {stats.daysPassed ?? 0} of {stats.totalDays ?? 0} days elapsed
+                </div>
+              </>
+            ) : (
+              <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+                {stats.totalDays ?? 0} total days
+              </div>
             )}
-            <Button size="sm" variant="primary" onClick={handleBulkUpdate} disabled={!editEventType || bulkUpdate.isPending}>
-              Apply
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleClearSelection}>
-              <X className="w-3.5 h-3.5 mr-1" />
-              Clear
-            </Button>
+          </div>
+
+          {/* Instructional Days */}
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-emerald-500">
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.instructionalDays ?? 0}</div>
+            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Instructional Days</div>
+            {stats.instructionalDaysRemaining != null && (
+              <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+                {stats.instructionalDaysPassed ?? 0} completed, {stats.instructionalDaysRemaining} remaining
+              </div>
+            )}
+          </div>
+
+          {/* Holidays */}
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-red-500">
+            <div className="text-2xl font-bold text-red-500 dark:text-red-400">{stats.holidays ?? 0}</div>
+            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Holidays</div>
+            <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+              {(stats.holidays ?? 0) === 0 ? 'No holidays scheduled' : 'Scheduled holidays'}
+            </div>
+          </div>
+
+          {/* Non-Instructional */}
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-slate-400">
+            <div className="text-2xl font-bold text-[rgb(var(--text-secondary))]">{stats.nonInstructionalDays ?? 0}</div>
+            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Non-Instructional</div>
+            {(stats.teacherOnlyDays ?? 0) > 0 && (
+              <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+                Includes {stats.teacherOnlyDays} teacher-only days
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -427,8 +377,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
         schoolId={schoolId}
         academicYearId={academicYearId}
         onDateClick={handleDateClick}
-        onDateRangeSelect={handleDateRangeSelect}
-        selectedDates={[...selectedDates, ...(selectedDate ? [selectedDate] : [])]}
+        focusedDate={selectedDate}
         isEditable
         calendarSystem={calendarSystem}
         locale={fcLocaleCode}
