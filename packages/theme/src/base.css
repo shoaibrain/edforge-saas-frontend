@@ -207,6 +207,18 @@ body {
     color 0.3s ease;
 }
 
+/* Pointer cursor for all interactive elements */
+a,
+button,
+[role="button"],
+[role="menuitem"],
+[role="option"],
+[role="tab"],
+[role="radio"],
+summary {
+  cursor: pointer;
+}
+
 /* Typography defaults */
 h1 {
   font-size: 1.875rem;
