@@ -13,7 +13,6 @@ import {
   Eye,
   Edit,
   UserPlus,
-  Activity,
   ChevronRight,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
@@ -22,6 +21,7 @@ import { can } from '@edforge/abac'
 import { ROLE_PERMISSIONS } from '@edforge/abac'
 import type { SchoolRole } from '@edforge/types'
 import { usersService } from '@/services/users.service'
+import { ComingSoonBanner } from '@edforge/ui'
 import AssignUserModal from '@/components/modals/AssignUserModal'
 import {
   SettingsPageHeader,
@@ -450,47 +450,19 @@ export default function RBACSecurityPage() {
                 </SettingsSection>
               )}
 
-              {/* Audit Tab */}
+              {/* COMING_SOON: audit-log — Replace ComingSoonBanner with AuditLogViewer when it ships */}
               {selectedTab === 'audit' && (
-                <SettingsSection
-                  title="Access Audit Trail"
-                  icon={Eye}
-                  description="Security events are automatically logged for compliance"
-                >
-                  <div className="space-y-3">
-                    {[
-                      { icon: Shield, label: 'Permission Denials', desc: 'Blocked access attempts with user, resource, and endpoint details', severity: 'HIGH' },
-                      { icon: UserPlus, label: 'Role Assignments', desc: 'When a user is assigned or removed from a school role', severity: 'HIGH' },
-                      { icon: Users, label: 'User Lifecycle', desc: 'User creation, updates, disabling, and deletion events', severity: 'MEDIUM' },
-                      { icon: Activity, label: 'Authentication Events', desc: 'Login successes, failures, password changes, and MFA changes', severity: 'HIGH' },
-                    ].map((item) => {
-                      const Icon = item.icon
-                      return (
-                        <div
-                          key={item.label}
-                          className="flex items-start gap-3 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]"
-                        >
-                          <div className="p-1.5 rounded-md bg-teal-500/10">
-                            <Icon className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{item.label}</p>
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                                item.severity === 'HIGH'
-                                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
-                                  : 'bg-blue-500/10 text-blue-700 dark:text-blue-400'
-                              }`}>
-                                {item.severity}
-                              </span>
-                            </div>
-                            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{item.desc}</p>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </SettingsSection>
+                <ComingSoonBanner
+                  variant="security"
+                  title="Audit Log"
+                  description="Track security events across your organization including permission changes, role assignments, and authentication activity."
+                  features={[
+                    'Permission denial tracking with endpoint details',
+                    'Role assignment and removal history',
+                    'User lifecycle events (create, update, disable)',
+                    'Authentication events and login history',
+                  ]}
+                />
               )}
             </motion.div>
           </AnimatePresence>

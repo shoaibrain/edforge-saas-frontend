@@ -16,16 +16,13 @@ import {
   Eye,
   EyeOff,
   Key,
-  Monitor,
   RotateCcw,
-  Shield,
   X,
-  type LucideIcon,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import axios from 'axios'
-import { Button, Modal, ModalFooter } from '@edforge/ui'
+import { Button, Modal, ModalFooter, ComingSoonBanner } from '@edforge/ui'
 import { TextField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
 import {
@@ -443,56 +440,6 @@ function SecurityOverviewCard({
 }
 
 // ============================================================================
-// COMING SOON PANEL
-// ============================================================================
-
-interface ComingSoonPanelProps {
-  icon: LucideIcon
-  title: string
-  description: string
-  features: string[]
-}
-
-function ComingSoonPanel({
-  icon: Icon,
-  title,
-  description,
-  features,
-}: ComingSoonPanelProps) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
-    >
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="w-14 h-14 rounded-full bg-teal-500/10 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
-          <p className="text-sm text-[rgb(var(--text-secondary))] max-w-xl">
-            {description}
-          </p>
-        </div>
-
-        <div className="w-full max-w-xl space-y-2">
-          {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-2 text-sm text-[rgb(var(--text-secondary))]">
-              <Check className="w-4 h-4 text-teal-600 dark:text-cyan-400 mt-0.5" />
-              <span>{feature}</span>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          Planned for a future release
-        </p>
-      </div>
-    </motion.div>
-  )
-}
-
-// ============================================================================
 // SECURITY TABS
 // ============================================================================
 
@@ -627,6 +574,7 @@ export default function SecurityPage() {
               </motion.div>
             )}
 
+            {/* COMING_SOON: mfa — Replace ComingSoonBanner with MFA settings when 2FA ships */}
             {activeTab === 'mfa' && (
               <motion.div
                 key="mfa"
@@ -635,12 +583,12 @@ export default function SecurityPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <ComingSoonPanel
-                  icon={Shield}
+                <ComingSoonBanner
+                  variant="security"
                   title="Two-Factor Authentication"
-                  description="Two-factor authentication will add an extra layer of protection to your account. This feature is being built for a future release."
+                  description="Add an extra layer of security to your account with authenticator apps and backup codes."
                   features={[
-                    'Support for Google Authenticator, Authy, and more',
+                    'Google Authenticator, Authy, and other TOTP apps',
                     'Backup codes for account recovery',
                     'Required for sensitive operations',
                   ]}
@@ -648,6 +596,7 @@ export default function SecurityPage() {
               </motion.div>
             )}
 
+            {/* COMING_SOON: sessions — Replace ComingSoonBanner with session management when it ships */}
             {activeTab === 'sessions' && (
               <motion.div
                 key="sessions"
@@ -656,14 +605,14 @@ export default function SecurityPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <ComingSoonPanel
-                  icon={Monitor}
+                <ComingSoonBanner
+                  variant="security"
                   title="Session Management"
-                  description="Session management will let you see where you're signed in and control access to your account. This feature is being built for a future release."
+                  description="See where you're signed in and manage active sessions across your devices."
                   features={[
-                    'See all active sessions and devices',
+                    'View all active sessions and devices',
                     'Revoke individual or all sessions',
-                    'View recent login history',
+                    'Recent login history',
                   ]}
                 />
               </motion.div>

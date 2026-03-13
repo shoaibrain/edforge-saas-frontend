@@ -1,11 +1,12 @@
 /**
  * StreamFeed — Main container for the Stream tab
+ *
+ * Currently annotated as "Coming Soon" for the initial production release.
+ * Quick action buttons remain functional for navigation to other tabs.
  */
 
-import { ClipboardCheck, BookCheck, Users, MessageSquare } from 'lucide-react'
-import { useStreamPosts } from '../../../hooks/useStreamPosts'
-import { PostComposer } from './PostComposer'
-import { StreamPostCard } from './StreamPostCard'
+import { ClipboardCheck, BookCheck, Users } from 'lucide-react'
+import { ComingSoonBanner } from '@edforge/ui'
 
 interface StreamFeedProps {
   sectionId: string
@@ -13,25 +14,9 @@ interface StreamFeedProps {
 }
 
 export function StreamFeed({ sectionId, onSwitchTab }: StreamFeedProps) {
-  const { posts, createPost, addComment } = useStreamPosts(sectionId)
-
-  const handleSubmit = (content: string, type: 'announcement' | 'post' | 'material') => {
-    createPost(content, content, type)
-  }
-
-  // Sort: pinned first, then by date
-  const sortedPosts = [...posts].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1
-    if (!a.isPinned && b.isPinned) return 1
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  })
-
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
-      {/* Composer */}
-      <PostComposer onSubmit={handleSubmit} />
-
-      {/* Quick Actions */}
+      {/* Quick Actions — still functional for navigation */}
       {onSwitchTab && (
         <div className="flex items-center gap-2">
           <button
@@ -69,24 +54,17 @@ export function StreamFeed({ sectionId, onSwitchTab }: StreamFeedProps) {
         </div>
       )}
 
-      {/* Feed */}
-      {sortedPosts.length === 0 ? (
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
-          <MessageSquare className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">No posts yet</h4>
-          <p className="text-text-secondary max-w-md mx-auto">
-            Share something with your class to get the conversation started.
-          </p>
-        </div>
-      ) : (
-        sortedPosts.map((post) => (
-          <StreamPostCard
-            key={post.postId}
-            post={post}
-            onAddComment={addComment}
-          />
-        ))
-      )}
+      {/* Stream Coming Soon */}
+      <ComingSoonBanner
+        variant="communication"
+        title="Class Stream"
+        description="Post announcements, share materials, and engage with your class — all in one feed."
+        features={[
+          'Announcements and class updates',
+          'Share materials and resources',
+          'Comments and class discussions',
+        ]}
+      />
     </div>
   )
 }

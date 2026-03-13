@@ -72,6 +72,16 @@ export {
 // i18n
 export { LanguageSwitcher } from './components/LanguageSwitcher'
 
+// Coming Soon
+export {
+  ComingSoonBadge,
+  ComingSoonBanner,
+  ComingSoonOverlay,
+  type ComingSoonBadgeProps,
+  type ComingSoonBannerProps,
+  type ComingSoonOverlayProps,
+} from './components/ComingSoon'
+
 // Date
 export { DateDisplay } from './components/DateDisplay'
 export { BsDatePicker, DateInput } from './components/BsDatePicker'
