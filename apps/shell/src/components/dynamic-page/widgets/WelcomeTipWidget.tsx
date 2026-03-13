@@ -48,7 +48,7 @@ export interface WelcomeTip {
 export const WELCOME_TIPS: Record<RoleCategory, WelcomeTip> = {
   administrator: {
     title: 'Welcome to EdForge',
-    description: 'Your all-in-one education management platform. Connect your video conferencing tools, manage students, track attendance, and streamline your school operations.',
+    description: 'Your all-in-one education management platform. Manage students, track attendance, enter grades, and streamline your school operations.',
     actionLabel: 'Manage your students',
     actionHref: '/academics/students',
     icon: Sparkles,

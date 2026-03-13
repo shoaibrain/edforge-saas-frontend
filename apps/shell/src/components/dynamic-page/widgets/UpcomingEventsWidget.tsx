@@ -1,12 +1,17 @@
 /**
  * UpcomingEventsWidget
- * 
+ *
  * A Notion-inspired calendar widget with customization menu.
  * Features:
  * - Notion-style vertical list view grouped by day
  * - Timeline aesthetic
  * - Role-specific mock events
  * - Options menu
+ *
+ * COMING_SOON: Calendar integration, meeting/conferencing tools, and collaboration
+ * features are not yet available. This widget displays mock data behind a
+ * ComingSoonOverlay. Remove the overlay and connect to real calendar APIs
+ * when these features ship.
  */
 
 import { useState, useRef, useEffect } from 'react'
@@ -25,6 +30,7 @@ import {
   MapPin,
   Calendar,
 } from 'lucide-react'
+import { ComingSoonOverlay, ComingSoonBadge } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { formatRelativeDate } from '../../../lib/greeting'
 import { WidgetSection } from '../WidgetSection'
@@ -537,14 +543,16 @@ function EventItem({ event }: { event: UpcomingEvent }) {
 export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { events?: UpcomingEvent[]; maxDays?: number }) {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  const { toggleWidget } = useDynamicPage()
+  // COMING_SOON: Re-enable toggleWidget and setFilters when calendar features ship
+  const _dynPage = useDynamicPage()
+  void _dynPage
   const { t, i18n } = useTranslation('dashboard')
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const events = propEvents || getEventsForRole(roleCategory ?? undefined)
   const calendars = Array.from(new Set(events.map(e => e.calendar).filter(Boolean) as string[]))
   const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
 
-  const [filters, setFilters] = useState<EventFilters>({
+  const [filters] = useState<EventFilters>({
     calendars: new Set(calendars),
     includeDays: 3,
     showAllDay: true,
@@ -562,51 +570,44 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
       label={t('upcomingEvents')}
       overflowVisible={true}
       icon={Calendar}
-      headerActions={
-        <div className="flex items-center gap-1">
-          <EventsHeaderActions
-            calendars={calendars}
-            filters={filters}
-            onUpdateFilters={(u) => setFilters(p => ({ ...p, ...u }))}
-            onHideWidget={() => toggleWidget('upcoming-events')}
-            onAddEvent={() => console.log('add')}
-            onExpand={() => console.log('expand')}
-          />
-        </div>
-      }
+      // COMING_SOON: Replace header actions with badge until calendar features ship
+      headerActions={<ComingSoonBadge size="sm" />}
     >
-      {dayGroups.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="space-y-6 pl-2">
-          {dayGroups.map(([dateKey, dayEvents]) => {
-            const date = new Date(dateKey)
-            const isToday = new Date().toDateString() === date.toDateString()
-            const relativeDate = formatRelativeDate(date, t)
+      {/* COMING_SOON: Wrap mock events in overlay — remove when real calendar API is connected */}
+      <ComingSoonOverlay>
+        {dayGroups.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="space-y-6 pl-2">
+            {dayGroups.map(([dateKey, dayEvents]) => {
+              const date = new Date(dateKey)
+              const isToday = new Date().toDateString() === date.toDateString()
+              const relativeDate = formatRelativeDate(date, t)
 
-            return (
-              <div key={dateKey} className="flex gap-4">
-                {/* Left Column: Date */}
-                <div className="w-24 flex-shrink-0 pt-2">
-                  <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
-                    {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
+              return (
+                <div key={dateKey} className="flex gap-4">
+                  {/* Left Column: Date */}
+                  <div className="w-24 flex-shrink-0 pt-2">
+                    <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
+                      {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
+                    </div>
+                    <div className="text-xs text-[rgb(var(--text-tertiary))]">
+                      {date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                    </div>
                   </div>
-                  <div className="text-xs text-[rgb(var(--text-tertiary))]">
-                    {date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+
+                  {/* Right Column: Events */}
+                  <div className="flex-1 space-y-2 border-l border-[rgb(var(--border-secondary))] pl-4 py-1">
+                    {dayEvents.map(event => (
+                      <EventItem key={event.id} event={event} />
+                    ))}
                   </div>
                 </div>
-
-                {/* Right Column: Events */}
-                <div className="flex-1 space-y-2 border-l border-[rgb(var(--border-secondary))] pl-4 py-1">
-                  {dayEvents.map(event => (
-                    <EventItem key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+              )
+            })}
+          </div>
+        )}
+      </ComingSoonOverlay>
     </WidgetSection>
   )
 }
