@@ -179,6 +179,8 @@ export const useAuthStore = create<AuthStore>()(
             tenantTier: null,
             error: null,
           })
+          // Full page reload to clear all in-memory state and navigate to root
+          window.location.href = '/'
         }
       },
 

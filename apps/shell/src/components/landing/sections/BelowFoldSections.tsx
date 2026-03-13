@@ -1,6 +1,5 @@
 import { DistrictLeadersSection } from './DistrictLeadersSection'
 import { TeacherParentSection } from './TeacherParentSection'
-import { MidPageCTA } from './MidPageCTA'
 import { StudentSection } from './StudentSection'
 
 export default function BelowFoldSections() {
@@ -16,10 +15,6 @@ export default function BelowFoldSections() {
 
       <div id="student" className="bg-[#FAF9F6] pt-12">
         <StudentSection />
-      </div>
-
-      <div className="bg-white pt-24">
-        <MidPageCTA />
       </div>
     </div>
   )

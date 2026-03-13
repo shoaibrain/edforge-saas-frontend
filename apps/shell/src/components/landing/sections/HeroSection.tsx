@@ -71,8 +71,8 @@ export function HeroSection() {
             Get Started
             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
-          <a
-            href="mailto:shoaibrain@edforge.net?subject=EdForge%20Demo%20Request"
+          <Link
+            to="/about"
             className="lp-btn-secondary inline-flex items-center justify-center gap-2 px-8 py-3.5 text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1E293B]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
@@ -80,8 +80,8 @@ export function HeroSection() {
               color: 'rgb(var(--text-primary))',
             }}
           >
-            Schedule a Demo
-          </a>
+            Explore Use Cases
+          </Link>
         </div>
 
 

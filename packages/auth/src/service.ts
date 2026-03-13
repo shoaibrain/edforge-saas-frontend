@@ -6,6 +6,7 @@
  */
 
 import {
+  signIn,
   signInWithRedirect,
   signOut,
   fetchAuthSession,
@@ -20,6 +21,14 @@ import { getAuthConfig } from './config'
  */
 export async function login(): Promise<void> {
   await signInWithRedirect()
+}
+
+/**
+ * Signs in directly with username/password via Cognito's InitiateAuth API.
+ * No redirect — tokens are returned inline.
+ */
+export async function signInDirect(username: string, password: string) {
+  return await signIn({ username, password })
 }
 
 /**
