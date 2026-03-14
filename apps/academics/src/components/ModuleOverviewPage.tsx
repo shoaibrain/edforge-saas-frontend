@@ -198,21 +198,21 @@ function StatCard({ stat, index }: StatCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+            <div className="group relative flex flex-col w-[200px] h-[148px] p-5 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm transition-all duration-200 overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
-                    <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.iconBg}`}>
+                    <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
                 </div>
                 <div className="mt-auto relative z-10">
-                    <p className="text-xs text-[rgb(var(--text-tertiary))] mb-0.5 truncate">{stat.label}</p>
+                    <p className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide mb-1 truncate">{stat.label}</p>
                     {stat.loading ? (
                         <div className="space-y-1.5">
-                            <div className="h-6 w-16 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
+                            <div className="h-8 w-16 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
                             <div className="h-3.5 w-12 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
                         </div>
                     ) : stat.error ? (
                         <div className="flex items-center gap-1.5">
-                            <span className="text-xl font-bold text-[rgb(var(--text-tertiary))]">—</span>
+                            <span className="text-3xl font-semibold text-[rgb(var(--text-tertiary))]">—</span>
                             {stat.onRetry && (
                                 <button
                                     onClick={stat.onRetry}
@@ -226,7 +226,7 @@ function StatCard({ stat, index }: StatCardProps) {
                         </div>
                     ) : (
                         <div className="flex items-baseline gap-2">
-                            <span className="text-xl font-bold text-[rgb(var(--text-primary))]">{stat.value}</span>
+                            <span className="text-3xl font-semibold text-[rgb(var(--text-primary))]">{stat.value}</span>
                             {stat.change && (
                                 <div className={`flex items-center gap-0.5 text-xs ${
                                     stat.changeType === 'positive' ? 'text-emerald-600' :

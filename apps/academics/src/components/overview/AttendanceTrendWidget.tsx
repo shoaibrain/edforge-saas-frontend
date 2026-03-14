@@ -152,7 +152,8 @@ export function AttendanceTrendWidget({
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="var(--color-border-secondary, #e5e7eb)"
+                  stroke="#e2e8f0"
+                  strokeOpacity={0.5}
                   vertical={false}
                 />
                 <XAxis

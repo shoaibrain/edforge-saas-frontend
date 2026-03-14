@@ -132,7 +132,8 @@ export function EnrollmentDistributionChart({
                 <CartesianGrid
                   strokeDasharray="3 3"
                   horizontal={false}
-                  stroke="var(--color-border-secondary, #e5e7eb)"
+                  stroke="#e2e8f0"
+                  strokeOpacity={0.5}
                 />
                 <XAxis
                   type="number"
@@ -149,7 +150,7 @@ export function EnrollmentDistributionChart({
                   width={100}
                 />
                 <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--color-interactive-hover, rgba(0,0,0,0.04))' }} />
-                <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={24}>
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={24}>
                   {data.map((_, index) => (
                     <Cell
                       key={index}

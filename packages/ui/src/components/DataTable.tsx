@@ -139,7 +139,7 @@ export function DataTable<T>({
     return (
       <div
         className={cn(
-          'overflow-x-auto rounded-xl border border-border-primary bg-surface-primary',
+          'overflow-x-auto rounded-xl border border-[rgb(var(--border-primary)/0.6)] shadow-sm bg-surface-primary',
           className
         )}
       >
@@ -149,14 +149,14 @@ export function DataTable<T>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-4 py-3 text-left text-sm font-medium text-text-secondary"
+                  className="px-6 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider bg-[rgb(var(--surface-tertiary)/0.5)]"
                   style={{ width: col.width }}
                 >
                   {col.header}
                 </th>
               ))}
               {showActionsColumn && (
-                <th className="px-4 py-3 text-right text-sm font-medium text-text-secondary w-24">
+                <th className="px-6 py-3 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider bg-[rgb(var(--surface-tertiary)/0.5)] w-24">
                   Actions
                 </th>
               )}
@@ -166,10 +166,10 @@ export function DataTable<T>({
             {Array.from({ length: skeletonRows }).map((_, rowIndex) => (
               <tr
                 key={rowIndex}
-                className="border-b border-border-tertiary last:border-b-0"
+                className="border-b border-border-secondary last:border-b-0"
               >
                 {columns.map((col, colIndex) => (
-                  <td key={col.key} className="px-4 py-3">
+                  <td key={col.key} className="px-6 py-4">
                     <div
                       className="h-4 bg-surface-tertiary rounded animate-pulse"
                       style={{
@@ -184,7 +184,7 @@ export function DataTable<T>({
                   </td>
                 ))}
                 {showActionsColumn && (
-                  <td className="px-4 py-3">
+                  <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
                       <div className="w-8 h-8 bg-surface-tertiary rounded animate-pulse" />
                     </div>
@@ -203,7 +203,7 @@ export function DataTable<T>({
     return (
       <div
         className={cn(
-          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-border-primary bg-surface-primary',
+          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.6)] shadow-sm bg-surface-primary',
           className
         )}
       >
@@ -234,7 +234,7 @@ export function DataTable<T>({
   return (
     <div
       className={cn(
-        'rounded-xl border border-border-primary bg-surface-primary overflow-hidden',
+        'rounded-xl border border-[rgb(var(--border-primary)/0.6)] shadow-sm bg-surface-primary overflow-hidden',
         className
       )}
     >
@@ -242,12 +242,12 @@ export function DataTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border-secondary bg-surface-secondary">
+            <tr className="border-b border-border-secondary bg-[rgb(var(--surface-tertiary)/0.5)]">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={cn(
-                    'px-4 py-3 text-left text-sm font-medium text-text-secondary',
+                    'px-6 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider',
                     col.sortable &&
                       'cursor-pointer select-none hover:text-text-primary transition-colors'
                   )}
@@ -261,7 +261,7 @@ export function DataTable<T>({
                 </th>
               ))}
               {showActionsColumn && (
-                <th className="px-4 py-3 text-right text-sm font-medium text-text-secondary w-24">
+                <th className="px-6 py-3 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider w-24">
                   Actions
                 </th>
               )}
@@ -272,23 +272,24 @@ export function DataTable<T>({
               <tr
                 key={keyExtractor(item)}
                 className={cn(
-                  'border-b border-border-tertiary last:border-b-0',
-                  onRowClick &&
-                    'cursor-pointer hover:bg-surface-secondary/50 transition-colors'
+                  'border-b border-border-secondary last:border-b-0',
+                  onRowClick
+                    ? 'cursor-pointer hover:bg-[rgb(var(--surface-tertiary)/0.5)] transition-colors'
+                    : 'hover:bg-[rgb(var(--surface-tertiary)/0.3)] transition-colors'
                 )}
                 onClick={onRowClick ? () => onRowClick(item) : undefined}
               >
                 {columns.map((col) => (
                   <td
                     key={col.key}
-                    className="px-4 py-3 text-sm text-text-primary"
+                    className="px-6 py-4 text-sm text-text-primary"
                   >
                     {col.render(item)}
                   </td>
                 ))}
                 {showActionsColumn && (
                   <td
-                    className="px-4 py-3"
+                    className="px-6 py-4"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-end gap-1">

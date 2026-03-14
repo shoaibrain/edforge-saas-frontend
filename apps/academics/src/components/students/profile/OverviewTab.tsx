@@ -165,14 +165,14 @@ function StatCard({
   bg: string
 }) {
   return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
+    <div className="bg-surface-secondary rounded-xl border border-[rgb(var(--border-primary)/0.6)] shadow-sm p-4">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg ${bg}`}>
           <Icon className={`w-4 h-4 ${accent}`} />
         </div>
         <div className="min-w-0">
-          <p className="text-xs text-text-tertiary uppercase tracking-wide">{label}</p>
-          <p className="text-xl font-bold text-text-primary">{value}</p>
+          <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide">{label}</p>
+          <p className="text-2xl font-semibold text-text-primary">{value}</p>
           {subLabel && <p className={`text-xs ${accent}`}>{subLabel}</p>}
         </div>
       </div>
@@ -610,29 +610,29 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
         {tAcad('sections.currentClasses')}
         <span className="text-xs text-text-tertiary font-normal ml-1">({classrooms.length})</span>
       </h3>
-      <div className="overflow-x-auto rounded-xl border border-border-secondary">
+      <div className="overflow-x-auto rounded-xl shadow-sm border border-[rgb(var(--border-primary)/0.6)] bg-surface-secondary">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-surface-secondary">
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">{tAcad('tableHeaders.number')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{tAcad('tableHeaders.class')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{tAcad('tableHeaders.subject')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{tAcad('tableHeaders.teacher')}</th>
+            <tr className="bg-[rgb(var(--surface-tertiary)/0.5)]">
+              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider w-12">{tAcad('tableHeaders.number')}</th>
+              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.class')}</th>
+              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.subject')}</th>
+              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.teacher')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-secondary">
             {classrooms.map((classroom, index) => {
               const subjectColor = getSubjectColor(classroom.subject)
               return (
-                <tr key={classroom.classroomId} className="hover:bg-surface-secondary/50 transition-colors">
-                  <td className="py-3 px-3">
+                <tr key={classroom.classroomId} className="hover:bg-[rgb(var(--surface-tertiary)/0.5)] transition-colors">
+                  <td className="py-4 px-6">
                     <div className={`w-7 h-7 rounded-lg ${subjectColor.bg} flex items-center justify-center`}>
                       <span className={`text-xs font-semibold ${subjectColor.text}`}>{index + 1}</span>
                     </div>
                   </td>
-                  <td className="py-3 px-3 font-medium text-text-primary">{classroom.name}</td>
-                  <td className="py-3 px-3 text-text-secondary">{classroom.subject || '—'}</td>
-                  <td className="py-3 px-3 text-text-secondary">
+                  <td className="py-4 px-6 font-medium text-text-primary">{classroom.name}</td>
+                  <td className="py-4 px-6 text-text-secondary">{classroom.subject || '—'}</td>
+                  <td className="py-4 px-6 text-text-secondary">
                     {classroom.teacherName ? (
                       <span className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-text-tertiary" />
@@ -783,16 +783,16 @@ export function OverviewTab({ student }: OverviewTabProps) {
         <AttendanceTrendChart studentId={student.studentId} />
         <AttendanceDailyStrip studentId={student.studentId} />
         {effectiveSummary && effectiveSummary.attendanceRate < 90 && (
-          <div className="mt-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">
-            <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
+          <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200/50 dark:border-amber-500/20">
+            <p className="text-sm text-amber-800 dark:text-amber-400 flex items-center gap-2">
               <TrendingDown className="w-4 h-4 flex-shrink-0" />
               {tAcad('alerts.lowAttendance')}
             </p>
           </div>
         )}
         {effectiveSummary && effectiveSummary.attendanceRate >= 98 && (
-          <div className="mt-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
-            <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+          <div className="mt-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/50 dark:border-emerald-500/20">
+            <p className="text-sm text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 flex-shrink-0" />
               {tAcad('alerts.highAttendance')}
             </p>

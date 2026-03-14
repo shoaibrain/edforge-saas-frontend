@@ -218,15 +218,15 @@ export function StudentProfilePage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
+                  relative px-4 py-3 pb-3.5 text-sm transition-colors whitespace-nowrap outline-none
                   ${isActive
-                    ? 'text-[rgb(var(--text-primary))]'
-                    : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
+                    ? 'text-teal-600 dark:text-teal-400 font-medium'
+                    : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-primary))]'
                   }
                 `}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-600 dark:text-teal-400' : 'opacity-70'}`} />
                   {t(`tabs.${tab.id}`)}
                 </span>
 
