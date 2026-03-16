@@ -5,7 +5,7 @@
  * Orchestrates parallel data fetching for KPIs, charts, and alerts.
  */
 
-import { useMemo } from 'react'
+import { useMemo, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { usePermission } from '@edforge/abac'
 import {
@@ -32,6 +32,12 @@ import {
   ClipboardCheck,
   GraduationCap,
 } from 'lucide-react'
+
+// ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
 
 // ============================================================================
 // QUERY KEYS
@@ -157,9 +163,46 @@ export function useAcademicsOverview(
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   })
 
+  // Debug: log which query strategy is active
+  const prevStrategy = useRef<string | null>(null)
+  useEffect(() => {
+    if (!DEBUG) return
+    const strategy = unifiedFailed ? 'fallback' : 'unified'
+    if (prevStrategy.current !== strategy) {
+      console.debug('[Academics Overview] Query strategy:', strategy, {
+        dashboardStatus: dashboard.status,
+        dashboardError: dashboard.error?.message,
+      })
+      prevStrategy.current = strategy
+    }
+  }, [unifiedFailed, dashboard.status, dashboard.error])
+
+  // Debug: log individual query success/failure
+  useEffect(() => {
+    if (!DEBUG || !fallbackEnabled) return
+    console.debug('[Academics Overview] Fallback query states:', {
+      enrollment: enrollment.status + (enrollment.error ? ` (${enrollment.error.message})` : ''),
+      sections: sections.status + (sections.error ? ` (${sections.error.message})` : ''),
+      attendance: attendance.status + (attendance.error ? ` (${attendance.error.message})` : ''),
+    })
+  }, [fallbackEnabled, enrollment.status, sections.status, attendance.status, enrollment.error, sections.error, attendance.error])
+
   // Aggregate: prefer unified, fall back to individual
   if (dashboard.isSuccess && dashboard.data) {
     const d = dashboard.data
+
+    // Debug: data consistency check on unified response
+    if (DEBUG) {
+      const hasEnrollment = d.enrollment != null
+      const hasAttendance = d.attendance != null
+      const hasSections = d.activeSectionsCount != null
+      if (!hasEnrollment || !hasAttendance || !hasSections) {
+        console.debug('[Academics Overview] Unified response missing data:', {
+          hasEnrollment, hasAttendance, hasSections,
+        })
+      }
+    }
+
     return {
       totalEnrolled: canViewEnrollment ? d.enrollment.totalEnrolled : null,
       enrollmentByGradeLevel: canViewEnrollment ? d.enrollment.byGradeLevel : null,
@@ -196,6 +239,16 @@ export function useAcademicsOverview(
     if (enrollment.error) errors.push({ source: 'enrollment', error: enrollment.error })
     if (sections.error) errors.push({ source: 'sections', error: sections.error })
     if (attendance.error) errors.push({ source: 'attendance', error: attendance.error })
+  }
+
+  // Debug: data consistency check on fallback
+  if (DEBUG && isPartiallyLoaded) {
+    console.debug('[Academics Overview] Fallback partial data:', {
+      hasEnrollment: enrollment.isSuccess,
+      hasSections: sections.isSuccess,
+      hasAttendance: attendance.isSuccess,
+      errorCount: errors.length,
+    })
   }
 
   return {

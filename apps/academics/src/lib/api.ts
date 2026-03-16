@@ -112,6 +112,25 @@ api.interceptors.response.use(
 )
 
 // ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
+
+/** Fields that must never have their values logged */
+const PII_FIELDS = new Set(['dateOfBirth', 'dob', 'ssn', 'socialSecurityNumber', 'medicalInfo', 'medicalNotes', 'healthInfo']);
+
+/** Return an object with PII field values replaced by '[redacted]' */
+function safeBodyKeys(body: unknown): Record<string, string> | null {
+  if (!body || typeof body !== 'object') return null
+  const result: Record<string, string> = {}
+  for (const key of Object.keys(body as Record<string, unknown>)) {
+    result[key] = PII_FIELDS.has(key) ? '[redacted]' : typeof (body as Record<string, unknown>)[key]
+  }
+  return result
+}
+
+// ============================================================================
 // TYPED API HELPERS
 // ============================================================================
 
@@ -123,26 +142,100 @@ function unwrapResponse<T>(response: unknown): T {
 }
 
 export async function apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
-  const response = await api.get<T>(url, { params })
-  return unwrapResponse<T>(response.data)
+  const start = performance.now()
+  try {
+    const response = await api.get<T>(url, { params })
+    if (DEBUG) {
+      console.debug('[Academics API] GET', url, {
+        params: params ? Object.keys(params) : [],
+        status: response.status,
+        latency: `${Math.round(performance.now() - start)}ms`,
+      })
+    }
+    return unwrapResponse<T>(response.data)
+  } catch (error: any) {
+    const status = error?.response?.status
+    const message = error?.response?.data?.message || error?.message || 'Unknown error'
+    console.error('[Academics API] GET FAILED', url, { status, message })
+    throw error
+  }
 }
 
 export async function apiPost<T, B = unknown>(url: string, body?: B): Promise<T> {
-  const response = await api.post<T>(url, body)
-  return unwrapResponse<T>(response.data)
+  const start = performance.now()
+  try {
+    const response = await api.post<T>(url, body)
+    if (DEBUG) {
+      console.debug('[Academics API] POST', url, {
+        bodyKeys: safeBodyKeys(body),
+        status: response.status,
+        latency: `${Math.round(performance.now() - start)}ms`,
+      })
+    }
+    return unwrapResponse<T>(response.data)
+  } catch (error: any) {
+    const status = error?.response?.status
+    const message = error?.response?.data?.message || error?.message || 'Unknown error'
+    console.error('[Academics API] POST FAILED', url, { status, message })
+    throw error
+  }
 }
 
 export async function apiPut<T, B = unknown>(url: string, body?: B): Promise<T> {
-  const response = await api.put<T>(url, body)
-  return unwrapResponse<T>(response.data)
+  const start = performance.now()
+  try {
+    const response = await api.put<T>(url, body)
+    if (DEBUG) {
+      console.debug('[Academics API] PUT', url, {
+        bodyKeys: safeBodyKeys(body),
+        status: response.status,
+        latency: `${Math.round(performance.now() - start)}ms`,
+      })
+    }
+    return unwrapResponse<T>(response.data)
+  } catch (error: any) {
+    const status = error?.response?.status
+    const message = error?.response?.data?.message || error?.message || 'Unknown error'
+    console.error('[Academics API] PUT FAILED', url, { status, message })
+    throw error
+  }
 }
 
 export async function apiPatch<T, B = unknown>(url: string, body?: B): Promise<T> {
-  const response = await api.patch<T>(url, body)
-  return unwrapResponse<T>(response.data)
+  const start = performance.now()
+  try {
+    const response = await api.patch<T>(url, body)
+    if (DEBUG) {
+      console.debug('[Academics API] PATCH', url, {
+        bodyKeys: safeBodyKeys(body),
+        status: response.status,
+        latency: `${Math.round(performance.now() - start)}ms`,
+      })
+    }
+    return unwrapResponse<T>(response.data)
+  } catch (error: any) {
+    const status = error?.response?.status
+    const message = error?.response?.data?.message || error?.message || 'Unknown error'
+    console.error('[Academics API] PATCH FAILED', url, { status, message })
+    throw error
+  }
 }
 
 export async function apiDelete<T>(url: string): Promise<T> {
-  const response = await api.delete<T>(url)
-  return unwrapResponse<T>(response.data)
+  const start = performance.now()
+  try {
+    const response = await api.delete<T>(url)
+    if (DEBUG) {
+      console.debug('[Academics API] DELETE', url, {
+        status: response.status,
+        latency: `${Math.round(performance.now() - start)}ms`,
+      })
+    }
+    return unwrapResponse<T>(response.data)
+  } catch (error: any) {
+    const status = error?.response?.status
+    const message = error?.response?.data?.message || error?.message || 'Unknown error'
+    console.error('[Academics API] DELETE FAILED', url, { status, message })
+    throw error
+  }
 }

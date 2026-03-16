@@ -164,12 +164,22 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   }, [queryClient])
 
   // ---- Empty state check ----
+  // Also consider attendance data — if students have attendance records,
+  // the system is active even if enrollment/sections queries return 0
   const isEmpty =
     !overviewData.isLoading &&
     !teacherData.isLoading &&
     (overviewData.totalEnrolled ?? 0) === 0 &&
     (overviewData.activeSections ?? 0) === 0 &&
-    (teacherData.teacherCount ?? 0) === 0
+    (teacherData.teacherCount ?? 0) === 0 &&
+    (overviewData.todayAttendanceRate === null || overviewData.todayAttendanceRate === 0)
+
+  // ---- Data inconsistency detection ----
+  // If attendance data exists but enrollment/sections return 0, the system
+  // is active but enrollment queries are failing — show "—" instead of "0"
+  const hasAttendanceButNoEnrollment =
+    (overviewData.todayAttendanceRate != null && overviewData.todayAttendanceRate > 0) &&
+    (overviewData.totalEnrolled ?? 0) === 0
 
   // ---- Build stats array ----
   const stats: ModuleStat[] = [
@@ -179,16 +189,22 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           {
             label: 'Total Enrolled',
             value:
-              overviewData.totalEnrolled != null
+              overviewData.totalEnrolled != null && overviewData.totalEnrolled > 0
                 ? overviewData.totalEnrolled.toLocaleString()
-                : '—',
-            change: 'this academic year',
-            changeType: 'neutral' as const,
+                : hasAttendanceButNoEnrollment
+                  ? '—'
+                  : overviewData.totalEnrolled != null
+                    ? overviewData.totalEnrolled.toLocaleString()
+                    : '—',
+            change: hasAttendanceButNoEnrollment
+              ? 'enrollment data unavailable'
+              : 'this academic year',
+            changeType: hasAttendanceButNoEnrollment ? 'negative' as const : 'neutral' as const,
             icon: Users,
             iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
             iconColor: 'text-teal-600 dark:text-cyan-400',
             loading: overviewData.isLoading,
-            error: hasOverviewError,
+            error: hasOverviewError || hasAttendanceButNoEnrollment,
             onRetry: retryOverview,
           },
         ]
@@ -196,16 +212,24 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
     {
       label: 'Active Sections',
       value:
-        overviewData.activeSections != null
+        overviewData.activeSections != null && overviewData.activeSections > 0
           ? overviewData.activeSections.toString()
-          : '—',
-      change: 'active classes',
-      changeType: 'neutral',
+          : hasAttendanceButNoEnrollment
+            ? '—'
+            : overviewData.activeSections != null
+              ? overviewData.activeSections.toString()
+              : '—',
+      change: hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0
+        ? 'section data unavailable'
+        : 'active classes',
+      changeType: hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0
+        ? 'negative'
+        : 'neutral',
       icon: LayoutGrid,
       iconBg: 'bg-aqua-400/20',
       iconColor: 'text-aqua-700 dark:text-aqua-400',
       loading: overviewData.isLoading,
-      error: hasOverviewError,
+      error: hasOverviewError || (hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0),
       onRetry: retryOverview,
     },
     {
@@ -271,7 +295,20 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       onRefresh={handleRefresh}
       calendarLabel={<AcademicYearLabel context={calendarContext} />}
     >
-      {/* Charts grid — left: enrollment or My Sections (role-based), right: attendance + alerts stacked */}
+      {/* Alerts — full width, above charts for immediate visibility */}
+      {showActivityAlerts && (
+        <WidgetErrorBoundary name="Activity Feed">
+          <div data-testid="widget-activity-feed">
+            <ActivityFeedWidget
+              alerts={alertsData.alerts}
+              totalCount={alertsData.totalCount}
+              loading={alertsData.isLoading}
+            />
+          </div>
+        </WidgetErrorBoundary>
+      )}
+
+      {/* Charts grid — left: enrollment or My Sections (role-based), right: attendance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {canViewEnrollment ? (
           <WidgetErrorBoundary name="Enrollment Chart">
@@ -289,27 +326,14 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           </WidgetErrorBoundary>
         )}
 
-        <div className="flex flex-col gap-6">
-          <WidgetErrorBoundary name="Attendance Trend">
-            <div data-testid="widget-attendance-trend">
-              <AttendanceTrendWidget
-                schoolId={schoolId}
-                enabled={!!schoolId && coreLoaded}
-              />
-            </div>
-          </WidgetErrorBoundary>
-          {showActivityAlerts && (
-            <WidgetErrorBoundary name="Activity Feed">
-              <div data-testid="widget-activity-feed">
-                <ActivityFeedWidget
-                  alerts={alertsData.alerts}
-                  totalCount={alertsData.totalCount}
-                  loading={alertsData.isLoading}
-                />
-              </div>
-            </WidgetErrorBoundary>
-          )}
-        </div>
+        <WidgetErrorBoundary name="Attendance Trend">
+          <div data-testid="widget-attendance-trend">
+            <AttendanceTrendWidget
+              schoolId={schoolId}
+              enabled={!!schoolId && coreLoaded}
+            />
+          </div>
+        </WidgetErrorBoundary>
       </div>
     </ModuleOverviewPage>
   )

@@ -9,6 +9,12 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 // ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
+
+// ============================================================================
 // APP STORE
 // ============================================================================
 
@@ -40,6 +46,10 @@ export const useAppStore = create<AppStore>()(
       theme: 'light',
 
       setActiveSchoolId: (schoolId) => {
+        if (DEBUG) {
+          const prev = useAppStore.getState().activeSchoolId
+          console.debug('[App Store] activeSchoolId change', { from: prev, to: schoolId })
+        }
         set({ activeSchoolId: schoolId })
       },
 

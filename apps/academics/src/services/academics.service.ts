@@ -9,6 +9,12 @@ import axios from 'axios'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
 
 // ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
+
+// ============================================================================
 // TYPES - Import from @aibrains/shared-types
 // ============================================================================
 
@@ -349,8 +355,9 @@ export async function getDashboardOverview(
   academicYearId: string,
   date: string,
 ): Promise<DashboardOverviewResponse> {
+  if (DEBUG) console.debug('[Academics Service] getDashboardOverview', { schoolId, academicYearId, date })
   return apiGet<DashboardOverviewResponse>('/academics/dashboard/overview', {
-    params: { schoolId, academicYearId, date },
+    schoolId, academicYearId, date,
   })
 }
 
@@ -365,6 +372,11 @@ export async function getDashboardOverview(
 export async function getStudents(
   params: StudentFilterDto & PaginationQuery
 ): Promise<StudentListResponseDto> {
+  if (DEBUG) console.debug('[Academics Service] getStudents', {
+    schoolId: params.schoolId,
+    gradeLevel: params.gradeLevel,
+    hasSearch: !!params.searchTerm,
+  })
   // Build query params, filtering out undefined values
   const queryParams: Record<string, unknown> = {}
 
@@ -506,6 +518,10 @@ export async function importStudentsCsv(
 export async function createEnrollment(
   data: CreateEnrollmentDto
 ): Promise<EnrollmentResponseDto> {
+  if (DEBUG) console.debug('[Academics Service] createEnrollment', {
+    schoolId: (data as any).schoolId,
+    yearId: (data as any).academicYearId,
+  })
   return apiPost<EnrollmentResponseDto>('/academics/enrollments', data)
 }
 
@@ -806,6 +822,11 @@ export async function recordAttendance(
 export async function recordBulkAttendance(
   data: BulkAttendanceParams
 ): Promise<BulkAttendanceResponse> {
+  if (DEBUG) console.debug('[Academics Service] recordBulkAttendance', {
+    batchSize: data.records.length,
+    schoolId: data.schoolId,
+    date: data.date,
+  })
   return apiPost<BulkAttendanceResponse>('/academics/attendance/bulk', data)
 }
 
@@ -966,6 +987,11 @@ export async function recordSectionAttendance(
 export async function recordBulkSectionAttendance(
   data: BulkSectionAttendanceParams
 ): Promise<BulkSectionAttendanceResponse> {
+  if (DEBUG) console.debug('[Academics Service] recordBulkSectionAttendance', {
+    batchSize: data.records.length,
+    sectionId: data.sectionId,
+    date: data.date,
+  })
   return apiPost<BulkSectionAttendanceResponse>('/academics/section-attendance/bulk', data)
 }
 
@@ -1077,6 +1103,12 @@ export async function getEnrollments(
   yearId: string,
   params?: EnrollmentFilterParams
 ): Promise<EnrollmentListResponse> {
+  if (DEBUG) console.debug('[Academics Service] getEnrollments', {
+    schoolId,
+    yearId,
+    gradeLevel: params?.gradeLevel,
+    status: params?.status,
+  })
   const queryParams: Record<string, unknown> = {}
   if (params?.gradeLevel) queryParams.gradeLevel = params.gradeLevel
   if (params?.status) queryParams.status = params.status
@@ -1339,6 +1371,7 @@ export interface StudentGradesResponse {
 export async function recordGrade(
   data: RecordGradeParams
 ): Promise<void> {
+  if (DEBUG) console.debug('[Academics Service] recordGrade', { studentId: data.studentId, sectionId: data.sectionId })
   return apiPost('/academics/grades/record', data)
 }
 
@@ -1363,6 +1396,7 @@ export async function getSectionGrades(
   sectionId: string,
   params: { schoolId: string; termId?: string }
 ): Promise<SectionGradebookResponse> {
+  if (DEBUG) console.debug('[Academics Service] getSectionGrades', { sectionId, termId: params.termId })
   const response = await apiGet<GradeRecord[] | SectionGradebookResponse>(
     `/academics/grades/section/${sectionId}`,
     params
@@ -1572,6 +1606,7 @@ export async function getAttendanceTrend(
   startDate: string,
   endDate: string,
 ): Promise<DailyAttendanceSummary[]> {
+  if (DEBUG) console.debug('[Academics Service] getAttendanceTrend', { schoolId, startDate, endDate })
   return apiGet<DailyAttendanceSummary[]>('/academics/attendance/trend', {
     schoolId,
     startDate,
@@ -1636,6 +1671,7 @@ export async function getAttendanceAlerts(
   startDate: string,
   endDate: string,
 ): Promise<AttendanceAlert[]> {
+  if (DEBUG) console.debug('[Academics Service] getAttendanceAlerts', { threshold, academicYearId })
   const res = await apiGet<{ alerts: AttendanceAlert[]; totalAtRiskCount: number } | AttendanceAlert[]>(
     '/academics/attendance/alerts',
     { schoolId, academicYearId, threshold, startDate, endDate },

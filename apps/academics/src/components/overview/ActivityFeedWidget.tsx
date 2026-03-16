@@ -143,7 +143,7 @@ export function ActivityFeedWidget({
   const hasMore = totalCount > 5
 
   return (
-    <Card className="p-5 border-border-secondary flex-1 flex flex-col">
+    <Card className="p-5 border-border-secondary flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <div className="p-1.5 rounded-lg bg-amber-500/10">

@@ -9,9 +9,27 @@
  * is configured as singleton: true in the Module Federation shared config.
  */
 
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      console.error('[React Query] Query error', {
+        queryKey: query.queryKey,
+        message: error.message,
+        status: (error as any)?.response?.status,
+      })
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error, variables, _context, mutation) => {
+      console.error('[React Query] Mutation error', {
+        mutationKey: mutation.options.mutationKey,
+        message: error.message,
+        status: (error as any)?.response?.status,
+      })
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
