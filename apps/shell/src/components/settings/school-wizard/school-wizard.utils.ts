@@ -7,7 +7,6 @@
 
 import type { CreateSchoolDto } from '@aibrains/shared-types'
 import {
-  getCountryConfig,
   getDefaultsForCountry,
   getTimezoneOptionsForCountry,
 } from '@aibrains/shared-types'

@@ -15,7 +15,7 @@ import {
   BarChart3,
   GraduationCap,
 } from 'lucide-react'
-import { DataTable, type Column } from '@edforge/ui'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
@@ -200,47 +200,45 @@ export function GradeLevelsTab({
     [handleCloseDrawer, onViewCourse]
   )
 
-  // DataTable columns
-  const columns: Column<GradeLevelData>[] = useMemo(
+  // TanstackDataTable columns
+  const columns: ColumnDef<GradeLevelData, unknown>[] = useMemo(
     () => [
       {
-        key: 'value',
+        accessorKey: 'value',
         header: 'Grade Level',
-        sortable: true,
-        width: '200px',
-        render: (grade: GradeLevelData) => (
-          <GradeBadge value={grade.value} label={grade.label} />
+        size: 200,
+        cell: ({ row }) => (
+          <GradeBadge value={row.original.value} label={row.original.label} />
         ),
       },
       {
-        key: 'courseCount',
+        accessorKey: 'courseCount',
         header: 'Course Count',
-        sortable: true,
-        width: '130px',
-        render: (grade: GradeLevelData) => (
+        size: 130,
+        cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-text-primary">
-              {grade.courseCount}
+              {row.original.courseCount}
             </span>
-            {grade.courseCount > 0 && (
+            {row.original.courseCount > 0 && (
               <span className="text-xs text-text-tertiary">
-                course{grade.courseCount !== 1 ? 's' : ''}
+                course{row.original.courseCount !== 1 ? 's' : ''}
               </span>
             )}
           </div>
         ),
       },
       {
-        key: 'courses',
+        accessorKey: 'courses',
         header: 'Courses',
-        width: '320px',
-        render: (grade: GradeLevelData) => <CourseChips courses={grade.courses} />,
+        size: 320,
+        cell: ({ row }) => <CourseChips courses={row.original.courses} />,
       },
       {
-        key: 'students',
+        accessorKey: 'students',
         header: 'Students',
-        width: '120px',
-        render: () => (
+        size: 120,
+        cell: () => (
           <span className="text-sm text-text-tertiary">&mdash;</span>
         ),
       },
@@ -283,12 +281,13 @@ export function GradeLevelsTab({
       </div>
 
       {/* Grade Levels DataTable */}
-      <DataTable
+      <TanstackDataTable
         columns={columns}
         data={gradeData}
-        keyExtractor={(grade: GradeLevelData) => grade.value}
+        getRowId={(grade) => grade.value}
         isLoading={isLoading}
-        skeletonRows={8}
+        enableSorting={true}
+        pagination={{ pageSize: 20 }}
         emptyState={{
           icon: <Layers className="w-12 h-12" />,
           title: 'No grade levels found',

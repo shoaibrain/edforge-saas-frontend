@@ -14,18 +14,12 @@
  * when these features ship.
  */
 
-import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 
 import {
   Video,
   Users,
-
-  Plus,
-  MoreHorizontal,
-  ArrowUpRight,
-  ChevronRight,
-  Check,
   Calendar as CalendarIcon,
   MapPin,
   Calendar,
@@ -323,22 +317,6 @@ function filterEvents(events: UpcomingEvent[], filters: EventFilters): UpcomingE
 // COMPONENTS
 // ============================================================================
 
-// --- Toggle Switch ---
-function ToggleSwitch({ checked, onChange, disabled }: { checked: boolean; onChange: () => void; disabled?: boolean }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={onChange}
-      className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${checked ? 'bg-[rgb(var(--brand-primary))]' : 'bg-[rgb(var(--border-primary))]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-    >
-      <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-4' : 'translate-x-0.5'}`} style={{ marginTop: '2px' }} />
-    </button>
-  )
-}
-
 // --- Empty State ---
 function EmptyState() {
   const { t } = useTranslation('dashboard')
@@ -350,134 +328,6 @@ function EmptyState() {
         <p className="text-xs">{t('enjoyFreeTime')}</p>
       </div>
     </motion.div>
-  )
-}
-
-// --- Options Menu ---
-function EventsOptionsMenu({
-  calendars,
-  filters,
-  onUpdateFilters,
-  onHideWidget,
-}: {
-  calendars: string[]
-  filters: EventFilters
-  onUpdateFilters: (updates: Partial<EventFilters>) => void
-  onHideWidget?: () => void
-}) {
-  const { t } = useTranslation('dashboard')
-  const [isOpen, setIsOpen] = useState(false)
-  const [activeSubmenu, setActiveSubmenu] = useState<'calendars' | 'days' | null>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        setActiveSubmenu(null)
-      }
-    }
-    if (isOpen) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen])
-
-  return (
-    <div className="relative" ref={menuRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors ${isOpen ? 'bg-[rgb(var(--surface-tertiary))]' : ''}`}
-      >
-        <MoreHorizontal className="w-4 h-4" />
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -8 }}
-            className="absolute right-0 top-full mt-2 z-50 w-64 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-xl overflow-hidden"
-          >
-            {activeSubmenu === null ? (
-              <>
-                <button onClick={() => setActiveSubmenu('calendars')} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                  <span>{t('events.calendars')}</span>
-                  <ChevronRight className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                </button>
-                <button onClick={() => setActiveSubmenu('days')} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                  <span>{t('events.includeEvents')}</span>
-                  <div className="flex items-center gap-1 text-[rgb(var(--text-tertiary))]">
-                    <span>{t('events.days', { count: filters.includeDays })}</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </button>
-                <div className="border-t border-[rgb(var(--border-secondary))] my-1" />
-                <div className="px-3 py-2 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">{t('events.allDayEvents')}</span>
-                    <ToggleSwitch checked={filters.showAllDay} onChange={() => onUpdateFilters({ showAllDay: !filters.showAllDay })} />
-                  </div>
-                </div>
-                <div className="border-t border-[rgb(var(--border-secondary))] my-1" />
-                <button onClick={() => { onHideWidget?.(); setIsOpen(false) }} className="w-full text-left px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">{t('events.hideFromHome')}</button>
-              </>
-            ) : (
-              <div>
-                <button onClick={() => setActiveSubmenu(null)} className="flex items-center px-3 py-2 text-sm font-medium border-b border-[rgb(var(--border-secondary))] w-full hover:bg-[rgb(var(--surface-hover))]">
-                  <ChevronRight className="w-4 h-4 rotate-180 mr-2" />
-                  {t('events.back')}
-                </button>
-                {activeSubmenu === 'calendars' && calendars.map(cal => (
-                  <button key={cal} onClick={() => {
-                    const newSet = new Set(filters.calendars)
-                    if (newSet.has(cal)) newSet.delete(cal)
-                    else newSet.add(cal)
-                    onUpdateFilters({ calendars: newSet })
-                  }} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                    <span>{cal}</span>
-                    {filters.calendars.has(cal) && <Check className="w-4 h-4 text-[rgb(var(--brand-primary))]" />}
-                  </button>
-                ))}
-                {activeSubmenu === 'days' && [3, 7, 14].map(d => (
-                  <button key={d} onClick={() => { onUpdateFilters({ includeDays: d as IncludeDays }); setIsOpen(false) }} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                    <span>{d} days</span>
-                    {filters.includeDays === d && <Check className="w-4 h-4 text-[rgb(var(--brand-primary))]" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-function EventsHeaderActions({
-  calendars,
-  filters,
-  onUpdateFilters,
-  onAddEvent,
-  onExpand,
-  onHideWidget,
-}: {
-  calendars: string[]
-  filters: EventFilters
-  onUpdateFilters: (updates: Partial<EventFilters>) => void
-  onAddEvent?: () => void
-  onExpand?: () => void
-  onHideWidget?: () => void
-}) {
-  return (
-    <div className="flex items-center gap-1">
-      <button onClick={onExpand} className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
-        <ArrowUpRight className="w-4 h-4" />
-      </button>
-      <EventsOptionsMenu calendars={calendars} filters={filters} onUpdateFilters={onUpdateFilters} onHideWidget={onHideWidget} />
-      <button onClick={onAddEvent} className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
-        <Plus className="w-4 h-4" />
-      </button>
-    </div>
   )
 }
 

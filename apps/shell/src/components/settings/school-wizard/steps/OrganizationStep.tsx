@@ -7,10 +7,10 @@
 
 import { motion } from 'framer-motion'
 import type { WizardStepProps } from '@edforge/wizard'
-import { AnimatedInput, AnimatedSelect } from './BasicInfoStep'
+import { AnimatedSelect } from './BasicInfoStep'
 import { useLocalEducationAgencies } from '@/hooks/useEducationOrgs'
 
-export function OrganizationStep({ data, updateData, errors, clearError }: WizardStepProps) {
+export function OrganizationStep({ data, updateData, clearError }: WizardStepProps) {
   const { data: leaList } = useLocalEducationAgencies()
   const leas = leaList?.items || []
 

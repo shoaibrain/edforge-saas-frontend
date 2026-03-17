@@ -26,11 +26,10 @@ import {
   Clock,
   ShieldAlert,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
-import { DataTable, type Column } from '@/components/ui/DataTable'
 import { useUsers, useChangeGlobalRole, useUpdateUserStatus, useDeleteUser } from '@/hooks/useUsers'
 import type { UserResponseDto, ListUsersParams } from '@/services/users.service'
 import type { GlobalRole } from '@edforge/types'
@@ -435,30 +434,36 @@ export default function PeopleSettingsPage() {
     }
   }, [data])
 
+  const handleChangeRole = useCallback((u: UserResponseDto) => setRoleModalUser(u), [])
+  const handleAction = useCallback((u: UserResponseDto, action: ConfirmAction) => setConfirmModal({ user: u, action }), [])
+
   // Table columns
-  const columns: Column<UserResponseDto>[] = useMemo(() => [
+  const columns: ColumnDef<UserResponseDto, unknown>[] = useMemo(() => [
     {
-      key: 'name',
+      id: 'name',
+      accessorFn: (u) => `${u.firstName} ${u.lastName}`,
       header: 'Name',
-      sortable: true,
-      render: (u) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 text-xs font-semibold shrink-0">
-            {u.firstName?.[0] || ''}{u.lastName?.[0] || ''}
+      cell: ({ row }) => {
+        const u = row.original
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 text-xs font-semibold shrink-0">
+              {u.firstName?.[0] || ''}{u.lastName?.[0] || ''}
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium text-[rgb(var(--text-primary))] truncate">{u.firstName} {u.lastName}</p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{u.email}</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="font-medium text-[rgb(var(--text-primary))] truncate">{u.firstName} {u.lastName}</p>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{u.email}</p>
-          </div>
-        </div>
-      ),
+        )
+      },
     },
     {
-      key: 'globalRole',
+      accessorKey: 'globalRole',
       header: 'Role',
-      sortable: true,
-      width: '140px',
-      render: (u) => {
+      size: 140,
+      cell: ({ row }) => {
+        const u = row.original
         const badge = getRoleBadge(u.globalRole)
         return (
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
@@ -469,11 +474,11 @@ export default function PeopleSettingsPage() {
       },
     },
     {
-      key: 'status',
+      accessorKey: 'status',
       header: 'Status',
-      sortable: true,
-      width: '120px',
-      render: (u) => {
+      size: 120,
+      cell: ({ row }) => {
+        const u = row.original
         const badge = getStatusBadge(u.status)
         const StatusIcon = badge.icon
         return (
@@ -485,32 +490,44 @@ export default function PeopleSettingsPage() {
       },
     },
     {
-      key: 'lastLoginAt',
+      accessorKey: 'lastLoginAt',
       header: 'Last Login',
-      sortable: true,
-      width: '140px',
-      render: (u) => (
-        <span className="text-xs text-[rgb(var(--text-secondary))]">
-          {u.lastLoginAt
-            ? new Date(u.lastLoginAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-            : 'Never'}
-        </span>
-      ),
+      size: 140,
+      cell: ({ row }) => {
+        const u = row.original
+        return (
+          <span className="text-xs text-[rgb(var(--text-secondary))]">
+            {u.lastLoginAt
+              ? new Date(u.lastLoginAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : 'Never'}
+          </span>
+        )
+      },
     },
     {
-      key: 'mfaEnabled',
+      accessorKey: 'mfaEnabled',
       header: 'MFA',
-      width: '60px',
-      render: (u) => (
-        <span className={`text-xs font-medium ${u.mfaEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-[rgb(var(--text-tertiary))]'}`}>
-          {u.mfaEnabled ? 'On' : 'Off'}
-        </span>
-      ),
+      size: 60,
+      cell: ({ row }) => {
+        const u = row.original
+        return (
+          <span className={`text-xs font-medium ${u.mfaEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-[rgb(var(--text-tertiary))]'}`}>
+            {u.mfaEnabled ? 'On' : 'Off'}
+          </span>
+        )
+      },
     },
-  ], [])
-
-  const handleChangeRole = useCallback((u: UserResponseDto) => setRoleModalUser(u), [])
-  const handleAction = useCallback((u: UserResponseDto, action: ConfirmAction) => setConfirmModal({ user: u, action }), [])
+    createActionsColumn<UserResponseDto>({
+      cell: ({ row }) => (
+        <UserActionsDropdown
+          user={row.original}
+          currentUserId={user.id}
+          onChangeRole={handleChangeRole}
+          onAction={handleAction}
+        />
+      ),
+    }),
+  ], [user.id, handleChangeRole, handleAction])
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
@@ -572,12 +589,13 @@ export default function PeopleSettingsPage() {
 
         {/* Data Table */}
         <motion.div variants={fadeInUp}>
-          <DataTable
+          <TanstackDataTable
             columns={columns}
             data={users}
-            keyExtractor={(u) => u.userId}
+            getRowId={(u) => u.userId}
             isLoading={isLoading}
-            skeletonRows={6}
+            enableSorting={true}
+            pagination={{ pageSize: 20 }}
             emptyState={{
               icon: <Users className="w-10 h-10" />,
               title: 'No users found',
@@ -585,14 +603,6 @@ export default function PeopleSettingsPage() {
                 ? 'Try adjusting your search or filters.'
                 : 'Users will appear here once they are added to this workspace.',
             }}
-            rowActions={(u) => (
-              <UserActionsDropdown
-                user={u}
-                currentUserId={user.id}
-                onChangeRole={handleChangeRole}
-                onAction={handleAction}
-              />
-            )}
           />
         </motion.div>
       </motion.div>

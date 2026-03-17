@@ -8,11 +8,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
 import type { FeeStructure } from '@edforge/types'
 import { useTranslation } from '@edforge/i18n'
 import { Button } from '@edforge/ui'
 import { Plus } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
+import { tenantService } from '../../services/tenant.service'
 import {
   useFeeStructures,
   useCreateFeeStructure,
@@ -31,6 +33,13 @@ export default function FeeStructuresPage() {
   const [deletingFee, setDeletingFee] = useState<FeeStructure | null>(null)
 
   const { data: feeStructures, isLoading } = useFeeStructures(schoolId ?? '')
+  const { data: academicYears } = useQuery({
+    queryKey: ['academicYears', schoolId],
+    queryFn: () => tenantService.getAcademicYears(schoolId!),
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
+  })
+  const activeAcademicYear = academicYears?.find((y) => y.status === 'active') ?? academicYears?.[0]
   const createMutation = useCreateFeeStructure(schoolId ?? '')
   const updateMutation = useUpdateFeeStructure(schoolId ?? '')
   const deleteMutation = useDeleteFeeStructure(schoolId ?? '')
@@ -52,6 +61,7 @@ export default function FeeStructuresPage() {
         effectiveFrom: data.effectiveFrom as string,
         effectiveTo: (data.effectiveTo as string) || undefined,
         academicYear: data.academicYear as string,
+        academicYearId: activeAcademicYear?.id ?? '',
       })
       toast.success(t('feeStructure.created'))
       setShowForm(false)

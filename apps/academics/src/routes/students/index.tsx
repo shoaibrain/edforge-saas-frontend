@@ -150,9 +150,6 @@ export function StudentsModule() {
     data,
     isLoading,
     isError,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
     refetch,
   } = useStudents({
     schoolId: activeSchoolId ?? '',
@@ -290,9 +287,6 @@ export function StudentsModule() {
             <StudentTable
               students={students}
               isLoading={isLoading}
-              hasMore={hasNextPage ?? false}
-              isFetchingMore={isFetchingNextPage}
-              onLoadMore={() => fetchNextPage()}
               onAddStudent={handleAddStudent}
               onViewStudent={handleViewStudent}
             />

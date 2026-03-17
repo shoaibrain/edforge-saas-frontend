@@ -241,9 +241,6 @@ export function CurriculumModule() {
   const {
     data: coursesData,
     isLoading,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
   } = useCourses({
     schoolId: schoolId || '',
     filters: queryFilters,
@@ -423,9 +420,6 @@ export function CurriculumModule() {
                 <CourseTable
                   courses={courses}
                   isLoading={isLoading}
-                  hasMore={!!hasNextPage}
-                  isFetchingMore={isFetchingNextPage}
-                  onLoadMore={() => fetchNextPage()}
                   onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
                   onViewCourse={openViewDrawer}
                   onEditCourse={coursePerms.edit ? openEditDrawer : undefined}

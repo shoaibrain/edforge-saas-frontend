@@ -1,7 +1,7 @@
 /**
  * SectionRoster Component
  *
- * Displays and manages enrolled students for a section as a sortable data table.
+ * Displays and manages enrolled students for a section using the TanstackDataTable.
  * Supports add (via StudentSelector modal) and remove operations.
  */
 
@@ -9,14 +9,12 @@ import { useState, useMemo } from 'react'
 import {
   Users,
   UserPlus,
-  Search,
-  ChevronUp,
-  ChevronDown,
   MoreHorizontal,
   Loader2,
   UserMinus,
 } from 'lucide-react'
 import type { SectionResponseDto, StudentSectionResponseDto } from '@aibrains/shared-types'
+import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { useSectionRoster, useRemoveStudent } from '../../hooks/useSections'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -35,9 +33,6 @@ interface SectionRosterProps {
   section: SectionResponseDto
 }
 
-type SortField = 'name' | 'studentNumber' | 'gradeLevel' | 'enrolledAt'
-type SortDir = 'asc' | 'desc'
-
 // ============================================================================
 // DATE FORMATTING
 // ============================================================================
@@ -52,47 +47,6 @@ function formatEnrolledDate(iso: string): string {
   } catch {
     return iso
   }
-}
-
-// ============================================================================
-// SORT HEADER
-// ============================================================================
-
-function SortHeader({
-  label,
-  field,
-  currentField,
-  currentDir,
-  onSort,
-  className = '',
-}: {
-  label: string
-  field: SortField
-  currentField: SortField
-  currentDir: SortDir
-  onSort: (field: SortField) => void
-  className?: string
-}) {
-  const isActive = currentField === field
-  return (
-    <button
-      type="button"
-      onClick={() => onSort(field)}
-      className={`group inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-tertiary hover:text-text-primary transition-colors ${className}`}
-      aria-label={`Sort by ${label}`}
-    >
-      {label}
-      <span className={`inline-flex flex-col ${isActive ? 'text-text-primary' : 'text-text-tertiary opacity-0 group-hover:opacity-50'}`}>
-        {isActive && currentDir === 'asc' ? (
-          <ChevronUp className="w-3.5 h-3.5" />
-        ) : isActive && currentDir === 'desc' ? (
-          <ChevronDown className="w-3.5 h-3.5" />
-        ) : (
-          <ChevronUp className="w-3.5 h-3.5" />
-        )}
-      </span>
-    </button>
-  )
 }
 
 // ============================================================================
@@ -208,9 +162,6 @@ export function SectionRoster({ section }: SectionRosterProps) {
   const schoolId = useActiveSchoolId() || ''
   const [showSelector, setShowSelector] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<StudentSectionResponseDto | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortField, setSortField] = useState<SortField>('name')
-  const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const { data: roster, isLoading } = useSectionRoster({
     sectionId: section.sectionId,
@@ -221,51 +172,6 @@ export function SectionRoster({ section }: SectionRosterProps) {
 
   const students = roster?.students ?? []
   const enrolledStudentIds = students.map((s) => s.studentId)
-
-  // ---- Search filter ----
-  const filteredStudents = useMemo(() => {
-    if (!searchQuery.trim()) return students
-    const q = searchQuery.toLowerCase()
-    return students.filter(
-      (s) =>
-        (s.studentName || '').toLowerCase().includes(q) ||
-        (s.studentNumber || '').toLowerCase().includes(q) ||
-        s.studentId.toLowerCase().includes(q)
-    )
-  }, [students, searchQuery])
-
-  // ---- Sort ----
-  const sortedStudents = useMemo(() => {
-    const sorted = [...filteredStudents]
-    sorted.sort((a, b) => {
-      let cmp = 0
-      switch (sortField) {
-        case 'name':
-          cmp = (a.studentName || a.studentId).localeCompare(b.studentName || b.studentId)
-          break
-        case 'studentNumber':
-          cmp = (a.studentNumber || '').localeCompare(b.studentNumber || '')
-          break
-        case 'gradeLevel':
-          cmp = (a.currentGradeLevel || '').localeCompare(b.currentGradeLevel || '')
-          break
-        case 'enrolledAt':
-          cmp = a.enrolledAt.localeCompare(b.enrolledAt)
-          break
-      }
-      return sortDir === 'asc' ? cmp : -cmp
-    })
-    return sorted
-  }, [filteredStudents, sortField, sortDir])
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortField(field)
-      setSortDir('asc')
-    }
-  }
 
   const handleRemove = async () => {
     if (!removeTarget) return
@@ -279,18 +185,90 @@ export function SectionRoster({ section }: SectionRosterProps) {
 
   const isFull = section.currentEnrollment >= section.maxEnrollment
 
-  // ---- Loading skeleton ----
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-8 bg-surface-secondary rounded-lg animate-pulse" />
-        <div className="h-10 bg-surface-secondary rounded-lg animate-pulse" />
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-12 bg-surface-secondary rounded-lg animate-pulse" />
-        ))}
-      </div>
-    )
-  }
+  // ---- Column Definitions ----
+  const columns: ColumnDef<StudentSectionResponseDto, unknown>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'studentName',
+        header: 'Name',
+        size: 240,
+        cell: ({ row }) => {
+          const student = row.original
+          const displayName = student.studentName || student.studentId
+          return (
+            <div className="flex items-center gap-3">
+              <UserAvatar
+                userId={student.studentId}
+                userName={displayName}
+                role="student"
+                size="md"
+              />
+              <span className="text-sm font-medium text-text-primary truncate">
+                {displayName}
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'studentNumber',
+        header: 'Student ID',
+        size: 140,
+        cell: ({ row }) => {
+          const studentNumber = row.original.studentNumber
+          return studentNumber ? (
+            <span className="text-sm font-mono text-text-secondary">
+              {studentNumber}
+            </span>
+          ) : (
+            <span className="text-sm text-text-tertiary">&mdash;</span>
+          )
+        },
+      },
+      {
+        accessorKey: 'currentGradeLevel',
+        header: 'Grade',
+        size: 100,
+        cell: ({ row }) => {
+          const gradeLevel = row.original.currentGradeLevel
+          return gradeLevel ? (
+            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-secondary">
+              {gradeLevel}
+            </span>
+          ) : (
+            <span className="text-sm text-text-tertiary">&mdash;</span>
+          )
+        },
+      },
+      {
+        accessorKey: 'enrolledAt',
+        header: 'Enrolled',
+        size: 130,
+        cell: ({ row }) => (
+          <span className="text-sm text-text-secondary">
+            {formatEnrolledDate(row.original.enrolledAt)}
+          </span>
+        ),
+      },
+      createActionsColumn<StudentSectionResponseDto>({
+        cell: ({ row }) => {
+          const student = row.original
+          const displayName = student.studentName || student.studentId
+          const isCurrentlyRemoving =
+            removeMutation.isPending &&
+            removeMutation.variables?.studentId === student.studentId
+          return (
+            <RowActions
+              onRemove={() => setRemoveTarget(student)}
+              isRemoving={isCurrentlyRemoving}
+              studentName={displayName}
+            />
+          )
+        },
+      }),
+    ],
+    [removeMutation.isPending, removeMutation.variables?.studentId]
+  )
 
   return (
     <div className="space-y-4">
@@ -323,167 +301,28 @@ export function SectionRoster({ section }: SectionRosterProps) {
         onAddStudents={() => setShowSelector(true)}
       />
 
-      {/* Search */}
-      {students.length > 0 && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name or student ID..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
-            aria-label="Search roster"
-          />
-        </div>
-      )}
-
-      {/* Data Table or Empty State */}
-      {students.length === 0 ? (
-        <div className="py-12 text-center">
-          <Users className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-          <h4 className="text-sm font-medium text-text-primary mb-1">
-            No students enrolled yet
-          </h4>
-          <p className="text-xs text-text-tertiary max-w-xs mx-auto mb-4">
-            Add students to this section to build your class roster.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowSelector(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add Students
-          </button>
-        </div>
-      ) : sortedStudents.length === 0 ? (
-        /* No search results */
-        <div className="py-8 text-center">
-          <Search className="w-8 h-8 mx-auto text-text-tertiary mb-2" />
-          <p className="text-sm text-text-secondary">
-            No students match "{searchQuery}"
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-border-secondary overflow-hidden">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-surface-secondary/60 border-b border-border-secondary">
-                <th className="px-4 py-2.5">
-                  <SortHeader
-                    label="Name"
-                    field="name"
-                    currentField={sortField}
-                    currentDir={sortDir}
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className="px-4 py-2.5 hidden sm:table-cell">
-                  <SortHeader
-                    label="Student ID"
-                    field="studentNumber"
-                    currentField={sortField}
-                    currentDir={sortDir}
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className="px-4 py-2.5 hidden md:table-cell">
-                  <SortHeader
-                    label="Grade"
-                    field="gradeLevel"
-                    currentField={sortField}
-                    currentDir={sortDir}
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className="px-4 py-2.5 hidden lg:table-cell">
-                  <SortHeader
-                    label="Enrolled"
-                    field="enrolledAt"
-                    currentField={sortField}
-                    currentDir={sortDir}
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className="px-4 py-2.5 text-right">
-                  <span className="text-xs font-medium uppercase tracking-wider text-text-tertiary">
-                    Actions
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-secondary">
-              {sortedStudents.map((student) => {
-                const isCurrentlyRemoving =
-                  removeMutation.isPending &&
-                  removeMutation.variables?.studentId === student.studentId
-                const displayName = student.studentName || student.studentId
-
-                return (
-                  <tr
-                    key={student.studentId}
-                    className="hover:bg-surface-secondary/50 transition-colors"
-                  >
-                    {/* Avatar + Name */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <UserAvatar
-                          userId={student.studentId}
-                          userName={displayName}
-                          role="student"
-                          size="md"
-                        />
-                        <span className="text-sm font-medium text-text-primary truncate">
-                          {displayName}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Student Number */}
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      {student.studentNumber ? (
-                        <span className="text-sm font-mono text-text-secondary">
-                          {student.studentNumber}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-text-tertiary">&mdash;</span>
-                      )}
-                    </td>
-
-                    {/* Grade Level */}
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      {student.currentGradeLevel ? (
-                        <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-secondary">
-                          {student.currentGradeLevel}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-text-tertiary">&mdash;</span>
-                      )}
-                    </td>
-
-                    {/* Enrolled Date */}
-                    <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className="text-sm text-text-secondary">
-                        {formatEnrolledDate(student.enrolledAt)}
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-4 py-3 text-right">
-                      <RowActions
-                        onRemove={() => setRemoveTarget(student)}
-                        isRemoving={isCurrentlyRemoving}
-                        studentName={displayName}
-                      />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Data Table */}
+      <TanstackDataTable
+        columns={columns}
+        data={students}
+        getRowId={(student) => student.studentId}
+        isLoading={isLoading}
+        enableSorting={true}
+        searchPlaceholder="Search by name or student ID..."
+        pagination={{ pageSize: 20 }}
+        emptyState={{
+          icon: <Users className="w-10 h-10" />,
+          title: 'No students enrolled yet',
+          description: 'Add students to this section to build your class roster.',
+          action: {
+            label: 'Add Students',
+            onClick: () => setShowSelector(true),
+          },
+        }}
+        onRowClick={(_student) => {
+          // Row click preserved for future navigation
+        }}
+      />
 
       {/* Student Selector Modal */}
       <StudentSelector

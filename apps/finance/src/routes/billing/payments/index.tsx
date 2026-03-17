@@ -5,15 +5,15 @@
  * Route: /finance/billing/payments
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { Button } from '@edforge/ui'
+import { Button, TanstackDataTable, createActionsColumn } from '@edforge/ui'
+import type { ColumnDef } from '@edforge/ui'
 import {
   Loader2,
   CreditCard,
-  Search,
   Eye,
   Ban,
   RotateCcw,
@@ -34,7 +34,6 @@ import { formatNPR } from '@edforge/types'
 import type { Payment } from '@edforge/types'
 import { formatDate } from '../../../utils/format-date'
 import { StatusBadge } from '../../../components/StatusBadge'
-import { TableSkeleton } from '../../../components/TableSkeleton'
 
 // ============================================================================
 // STYLED DIALOG COMPONENTS
@@ -393,6 +392,141 @@ function RefundPaymentDialog({
 }
 
 // ============================================================================
+// COLUMN DEFINITIONS
+// ============================================================================
+
+function usePaymentColumns(
+  handleVoidClick: (payment: Payment) => void,
+  handleRefundClick: (payment: Payment) => void,
+  voidIsPending: boolean,
+): ColumnDef<Payment, unknown>[] {
+  return useMemo(
+    () => [
+      {
+        accessorKey: 'receiptNumber',
+        header: 'Receipt #',
+        cell: ({ row }) => (
+          <span className="font-medium text-[rgb(var(--text-primary))]">
+            {row.original.receiptNumber || row.original.id.slice(0, 8)}
+          </span>
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'studentName',
+        header: 'Student',
+        cell: ({ row }) => (
+          <span className="text-[rgb(var(--text-primary))]">
+            {row.original.studentName || '-'}
+          </span>
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'invoiceNumber',
+        header: 'Invoice #',
+        cell: ({ row }) => (
+          <span className="text-[rgb(var(--text-secondary))]">
+            {row.original.invoiceNumber ||
+              (row.original.invoiceId
+                ? row.original.invoiceId.slice(0, 8)
+                : '-')}
+          </span>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: 'amount',
+        header: 'Amount',
+        cell: ({ row }) => (
+          <span className="font-medium text-[rgb(var(--text-primary))]">
+            {formatNPR(row.original.amount)}
+          </span>
+        ),
+        meta: { align: 'right' as const },
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'gateway',
+        header: 'Gateway',
+        cell: ({ row }) => (
+          <span className="text-[rgb(var(--text-secondary))] capitalize">
+            {row.original.gateway.replace('_', ' ')}
+          </span>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        meta: { align: 'center' as const },
+        enableSorting: false,
+      },
+      {
+        id: 'date',
+        header: 'Date',
+        accessorFn: (row) => row.paidAt ?? row.createdAt,
+        cell: ({ row }) => (
+          <span className="text-[rgb(var(--text-secondary))]">
+            {row.original.paidAt
+              ? formatDate(row.original.paidAt)
+              : row.original.createdAt
+                ? formatDate(row.original.createdAt)
+                : '-'}
+          </span>
+        ),
+        enableSorting: true,
+      },
+      createActionsColumn<Payment>({
+        cell: ({ row }) => {
+          const payment = row.original
+          return (
+            <div className="flex items-center justify-end gap-1">
+              {/* View receipt */}
+              {payment.receiptNumber && (
+                <a
+                  href={`/api/finance/payments/${payment.id}/receipt`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                  title="View Receipt"
+                >
+                  <Eye className="w-4 h-4" />
+                </a>
+              )}
+              {/* Void (for completed only) */}
+              {payment.status === 'completed' && (
+                <button
+                  onClick={() => handleVoidClick(payment)}
+                  disabled={voidIsPending}
+                  className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
+                  title="Void Payment"
+                >
+                  <Ban className="w-4 h-4" />
+                </button>
+              )}
+              {/* Refund (for completed or partially_refunded) */}
+              {(payment.status === 'completed' ||
+                payment.status === 'partially_refunded') && (
+                <button
+                  onClick={() => handleRefundClick(payment)}
+                  className="p-1.5 rounded-md hover:bg-orange-50 text-orange-500 dark:hover:bg-orange-900/20 dark:text-orange-400"
+                  title="Refund"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          )
+        },
+      }),
+    ],
+    [handleVoidClick, handleRefundClick, voidIsPending],
+  )
+}
+
+// ============================================================================
 // MAIN PAGE
 // ============================================================================
 
@@ -402,7 +536,6 @@ export default function PaymentsPage() {
 
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
   const [actionsOpen, setActionsOpen] = useState(false)
 
   // Dialog state: which payment is being voided or refunded
@@ -418,19 +551,11 @@ export default function PaymentsPage() {
   const exportCsvMutation = useExportPaymentsCsv()
 
   const paymentList = Array.isArray(payments) ? payments : []
-  const filtered = searchTerm
-    ? paymentList.filter(
-        (p) =>
-          p.receiptNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : paymentList
 
   // Void handler: opens dialog instead of window.confirm()
-  const handleVoidClick = (payment: Payment) => {
+  const handleVoidClick = useCallback((payment: Payment) => {
     setVoidTarget(payment)
-  }
+  }, [])
 
   const handleVoidConfirm = async (reason: string) => {
     if (!voidTarget) return
@@ -447,9 +572,9 @@ export default function PaymentsPage() {
   }
 
   // Refund handler: opens dialog
-  const handleRefundClick = (payment: Payment) => {
+  const handleRefundClick = useCallback((payment: Payment) => {
     setRefundTarget(payment)
-  }
+  }, [])
 
   const handleRefundConfirm = async (amount: number, reason: string) => {
     if (!refundTarget) return
@@ -464,6 +589,12 @@ export default function PaymentsPage() {
       toast.error('Failed to create refund')
     }
   }
+
+  const columns = usePaymentColumns(
+    handleVoidClick,
+    handleRefundClick,
+    voidMutation.isPending,
+  )
 
   if (!schoolId) {
     return (
@@ -537,152 +668,55 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          <input
-            type="text"
-            placeholder="Search by receipt #, invoice #, or student..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-        >
-          <option value="">All Statuses</option>
-          <option value="completed">Completed</option>
-          <option value="failed">Failed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="refunded">Refunded</option>
-          <option value="pending">Pending</option>
-        </select>
-        <select
-          value={gatewayFilter}
-          onChange={(e) => setGatewayFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-        >
-          <option value="">All Gateways</option>
-          <option value="esewa">eSewa</option>
-          <option value="khalti">Khalti</option>
-          <option value="fonepay">FonePay</option>
-          <option value="connectips">ConnectIPS</option>
-          <option value="cash">Cash</option>
-          <option value="bank_transfer">Bank Transfer</option>
-          <option value="cheque">Cheque</option>
-        </select>
-      </div>
-
-      {/* Table */}
-      {isLoading ? (
-        <TableSkeleton rows={6} cols={8} />
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <CreditCard className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No payments found</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1 mb-4">
-            Payments will appear here once students start paying invoices.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate({ to: '/payments/record' as string })}
-          >
-            Record Manual Payment
-          </Button>
-        </div>
-      ) : (
-        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Receipt #</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Student</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Invoice #</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Amount</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Gateway</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Date</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgb(var(--border-primary))]">
-                {filtered.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-[rgb(var(--surface-secondary))] transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">
-                      {payment.receiptNumber || payment.id.slice(0, 8)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-primary))]">
-                      {payment.studentName || '-'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-                      {payment.invoiceNumber || (payment.invoiceId ? payment.invoiceId.slice(0, 8) : '-')}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right font-medium text-[rgb(var(--text-primary))]">
-                      {formatNPR(payment.amount)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))] capitalize">
-                      {payment.gateway.replace('_', ' ')}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <StatusBadge status={payment.status} />
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-                      {payment.paidAt
-                        ? formatDate(payment.paidAt)
-                        : payment.createdAt
-                          ? formatDate(payment.createdAt)
-                          : '-'}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {/* View receipt */}
-                        {payment.receiptNumber && (
-                          <a
-                            href={`/api/finance/payments/${payment.id}/receipt`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
-                            title="View Receipt"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </a>
-                        )}
-                        {/* Void (for completed only) */}
-                        {payment.status === 'completed' && (
-                          <button
-                            onClick={() => handleVoidClick(payment)}
-                            disabled={voidMutation.isPending}
-                            className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
-                            title="Void Payment"
-                          >
-                            <Ban className="w-4 h-4" />
-                          </button>
-                        )}
-                        {/* Refund (for completed or partially_refunded) */}
-                        {(payment.status === 'completed' || payment.status === 'partially_refunded') && (
-                          <button
-                            onClick={() => handleRefundClick(payment)}
-                            className="p-1.5 rounded-md hover:bg-orange-50 text-orange-500 dark:hover:bg-orange-900/20 dark:text-orange-400"
-                            title="Refund"
-                          >
-                            <RotateCcw className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Data Table */}
+      <TanstackDataTable<Payment>
+        columns={columns}
+        data={paymentList}
+        getRowId={(row) => row.id}
+        isLoading={isLoading}
+        enableSorting
+        pagination={{ pageSize: 20 }}
+        searchPlaceholder="Search by receipt #, invoice #, or student..."
+        toolbarExtra={
+          <div className="flex items-center gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+            >
+              <option value="">All Statuses</option>
+              <option value="completed">Completed</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="refunded">Refunded</option>
+              <option value="pending">Pending</option>
+            </select>
+            <select
+              value={gatewayFilter}
+              onChange={(e) => setGatewayFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+            >
+              <option value="">All Gateways</option>
+              <option value="esewa">eSewa</option>
+              <option value="khalti">Khalti</option>
+              <option value="fonepay">FonePay</option>
+              <option value="connectips">ConnectIPS</option>
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="cheque">Cheque</option>
+            </select>
           </div>
-        </div>
-      )}
+        }
+        emptyState={{
+          icon: <CreditCard className="w-10 h-10" />,
+          title: 'No payments found',
+          description: 'Payments will appear here once students start paying invoices.',
+          action: {
+            label: 'Record Manual Payment',
+            onClick: () => navigate({ to: '/payments/record' as string }),
+          },
+        }}
+      />
 
       {/* Void Payment Dialog */}
       <AnimatePresence>

@@ -22,8 +22,7 @@ import {
 } from 'lucide-react'
 import { tenantService } from '@/services/tenant.service'
 import type { Department, CreateDepartmentDto } from '@edforge/types'
-import { DataTable, type Column } from '@/components/ui/DataTable'
-import { Button } from '@edforge/ui'
+import { Button, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 
 // ============================================================================
 // DEPARTMENT FORM MODAL
@@ -307,50 +306,73 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
   }, [departments, searchQuery, filterScope])
 
   // Table columns
-  const columns: Column<Department>[] = useMemo(() => [
+  const columns: ColumnDef<Department, unknown>[] = useMemo(() => [
     {
-      key: 'code',
+      accessorKey: 'code',
       header: 'Code',
-      sortable: true,
-      width: '100px',
-      render: (dept) => (
-        <span className="font-mono text-sm text-[rgb(var(--text-secondary))]">{dept.code}</span>
+      size: 100,
+      cell: ({ row }) => (
+        <span className="font-mono text-sm text-[rgb(var(--text-secondary))]">{row.original.code}</span>
       ),
     },
     {
-      key: 'name',
+      accessorKey: 'name',
       header: 'Name',
-      sortable: true,
-      render: (dept) => (
-        <div>
-          <div className="font-medium text-[rgb(var(--text-primary))]">{dept.name}</div>
-          {dept.description && (
-            <div className="text-xs text-[rgb(var(--text-tertiary))] truncate max-w-xs">
-              {dept.description}
-            </div>
-          )}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const dept = row.original
+        return (
+          <div>
+            <div className="font-medium text-[rgb(var(--text-primary))]">{dept.name}</div>
+            {dept.description && (
+              <div className="text-xs text-[rgb(var(--text-tertiary))] truncate max-w-xs">
+                {dept.description}
+              </div>
+            )}
+          </div>
+        )
+      },
     },
     {
-      key: 'scope',
+      accessorKey: 'scope',
       header: 'Scope',
-      render: (dept) => <ScopeBadge scope={dept.scope} />,
+      cell: ({ row }) => <ScopeBadge scope={row.original.scope} />,
     },
     {
-      key: 'headName',
+      id: 'headName',
+      accessorFn: (dept) => dept.headName ?? '',
       header: 'Department Head',
-      render: (dept) => (
-        dept.headName ? (
+      cell: ({ row }) => {
+        const dept = row.original
+        return dept.headName ? (
           <span className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))]">
             <UserCircle className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             {dept.headName}
           </span>
         ) : (
-          <span className="text-sm text-[rgb(var(--text-tertiary))]">—</span>
+          <span className="text-sm text-[rgb(var(--text-tertiary))]">--</span>
         )
-      ),
+      },
     },
+    createActionsColumn<Department>({
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setModalState({ mode: 'edit', department: row.original })}
+            className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            title="Edit department"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setModalState({ mode: 'delete', department: row.original })}
+            className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-rust-500 hover:bg-rust-500/10 transition-colors"
+            title="Delete department"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    }),
   ], [])
 
   return (
@@ -394,29 +416,13 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
       </div>
 
       {/* DataTable */}
-      <DataTable
+      <TanstackDataTable
         columns={columns}
         data={filteredDepartments}
-        keyExtractor={(dept) => dept.id}
+        getRowId={(dept) => dept.id}
         isLoading={isLoading}
-        rowActions={(dept) => (
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setModalState({ mode: 'edit', department: dept })}
-              className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
-              title="Edit department"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setModalState({ mode: 'delete', department: dept })}
-              className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-rust-500 hover:bg-rust-500/10 transition-colors"
-              title="Delete department"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        enableSorting={true}
+        pagination={{ pageSize: 20 }}
         emptyState={{
           icon: <Users className="w-10 h-10" />,
           title: searchQuery ? `No departments match "${searchQuery}"` : 'No departments found',

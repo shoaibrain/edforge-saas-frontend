@@ -15,7 +15,7 @@ import {
   ToggleRight,
   Users,
 } from 'lucide-react'
-import { DataTable, type Column } from '@edforge/ui'
+import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import {
   getCapacityColor,
@@ -31,9 +31,6 @@ import {
 interface SectionTableProps {
   sections: SectionResponseDto[]
   isLoading?: boolean
-  hasMore?: boolean
-  isFetchingMore?: boolean
-  onLoadMore?: () => void
   onViewSection?: (section: SectionResponseDto) => void
   onEditSection?: (section: SectionResponseDto) => void
   onToggleActive?: (section: SectionResponseDto) => void
@@ -175,140 +172,142 @@ function CapacityBar({ current, max }: { current: number; max: number }) {
 export function SectionTable({
   sections,
   isLoading,
-  hasMore,
-  isFetchingMore,
-  onLoadMore,
   onViewSection,
   onEditSection,
   onToggleActive,
   onViewRoster,
 }: SectionTableProps) {
-  const columns = useMemo<Column<SectionResponseDto>[]>(
+  const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
     () => [
       {
-        key: 'sectionNumber',
+        accessorKey: 'sectionNumber',
         header: 'Section',
-        sortable: true,
-        width: '180px',
-        render: (section) => (
+        size: 180,
+        cell: ({ row }) => (
           <div>
             <div className="font-medium text-text-primary">
-              {section.sectionName || `Section ${section.sectionNumber}`}
+              {row.original.sectionName || `Section ${row.original.sectionNumber}`}
             </div>
             <div className="text-xs text-text-tertiary mt-0.5">
-              #{section.sectionNumber}
+              #{row.original.sectionNumber}
             </div>
           </div>
         ),
       },
       {
-        key: 'course',
+        id: 'course',
+        accessorFn: (row) => row.courseName,
         header: 'Course',
-        sortable: true,
-        width: '200px',
-        render: (section) => (
+        size: 200,
+        cell: ({ row }) => (
           <div>
             <div className="text-sm text-text-primary">
-              {section.courseName || '—'}
+              {row.original.courseName || '\u2014'}
             </div>
-            {section.courseCode && (
+            {row.original.courseCode && (
               <div className="text-xs text-text-tertiary mt-0.5">
-                {section.courseCode}
+                {row.original.courseCode}
               </div>
             )}
           </div>
         ),
       },
       {
-        key: 'teacher',
+        id: 'teacher',
+        accessorFn: (row) => row.primaryTeacherName,
         header: 'Teacher',
-        sortable: true,
-        width: '180px',
-        render: (section) => (
+        size: 180,
+        cell: ({ row }) => (
           <span className="text-sm text-text-primary">
-            {section.primaryTeacherName || '—'}
+            {row.original.primaryTeacherName || '\u2014'}
           </span>
         ),
       },
       {
-        key: 'period',
+        id: 'period',
+        accessorFn: (row) => row.periodName,
         header: 'Period',
-        width: '120px',
-        render: (section) => (
+        size: 120,
+        enableSorting: false,
+        cell: ({ row }) => (
           <span className="text-sm text-text-secondary">
-            {section.periodName || '—'}
+            {row.original.periodName || '\u2014'}
           </span>
         ),
       },
       {
-        key: 'room',
+        id: 'room',
+        accessorFn: (row) => row.locationRoomNumber ?? row.roomNumber,
         header: 'Room',
-        width: '100px',
-        render: (section) => (
+        size: 100,
+        enableSorting: false,
+        cell: ({ row }) => (
           <span className="text-sm text-text-secondary">
-            {section.locationRoomNumber || section.roomNumber || '—'}
+            {row.original.locationRoomNumber || row.original.roomNumber || '\u2014'}
           </span>
         ),
       },
       {
-        key: 'enrollment',
+        id: 'enrollment',
+        accessorFn: (row) => row.currentEnrollment,
         header: 'Enrollment',
-        sortable: true,
-        width: '180px',
-        render: (section) => (
+        size: 180,
+        enableSorting: false,
+        cell: ({ row }) => (
           <CapacityBar
-            current={section.currentEnrollment}
-            max={section.maxEnrollment}
+            current={row.original.currentEnrollment}
+            max={row.original.maxEnrollment}
           />
         ),
       },
       {
-        key: 'status',
+        accessorKey: 'isActive',
         header: 'Status',
-        width: '80px',
-        render: (section) => (
+        size: 80,
+        enableSorting: false,
+        cell: ({ row }) => (
           <div className="flex items-center gap-1.5">
             <div
               className={`w-2 h-2 rounded-full ${
-                section.isActive ? 'bg-emerald-500' : 'bg-gray-400'
+                row.original.isActive ? 'bg-emerald-500' : 'bg-gray-400'
               }`}
             />
             <span className="text-xs text-text-secondary">
-              {section.isActive ? 'Active' : 'Inactive'}
+              {row.original.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
         ),
       },
+      createActionsColumn<SectionResponseDto>({
+        cell: ({ row }) => (
+          <RowActions
+            section={row.original}
+            onView={() => onViewSection?.(row.original)}
+            onEdit={() => onEditSection?.(row.original)}
+            onToggleActive={() => onToggleActive?.(row.original)}
+            onViewRoster={() => onViewRoster?.(row.original)}
+          />
+        ),
+      }),
     ],
-    []
+    [onViewSection, onEditSection, onToggleActive, onViewRoster]
   )
 
   return (
-    <DataTable
+    <TanstackDataTable
       columns={columns}
       data={sections}
-      keyExtractor={(s) => s.sectionId}
+      getRowId={(section) => section.sectionId}
       isLoading={isLoading}
-      skeletonRows={8}
-      hasMore={hasMore}
-      isFetchingMore={isFetchingMore}
-      onLoadMore={onLoadMore}
-      onRowClick={onViewSection}
-      rowActions={(section) => (
-        <RowActions
-          section={section}
-          onView={() => onViewSection?.(section)}
-          onEdit={() => onEditSection?.(section)}
-          onToggleActive={() => onToggleActive?.(section)}
-          onViewRoster={() => onViewRoster?.(section)}
-        />
-      )}
       emptyState={{
         icon: <CalendarDays className="w-12 h-12 text-text-tertiary" />,
         title: 'No sections found',
         description:
           'Create your first class section to start building your schedule.',
       }}
+      pagination={{ pageSize: 20 }}
+      enableSorting={true}
+      onRowClick={onViewSection}
     />
   )
 }

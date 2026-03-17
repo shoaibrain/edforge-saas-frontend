@@ -185,9 +185,6 @@ export default function StaffPage() {
   const {
     items: staffMembers,
     isLoading,
-    hasMore,
-    loadMore,
-    isFetchingNextPage,
     error,
     refetch,
     totalLoaded,
@@ -512,9 +509,6 @@ export default function StaffPage() {
         <StaffTable
           staff={staffMembers}
           isLoading={isLoading}
-          hasMore={hasMore}
-          isFetchingMore={isFetchingNextPage}
-          onLoadMore={loadMore}
           onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
           onViewStaff={handleViewStaff}
         />

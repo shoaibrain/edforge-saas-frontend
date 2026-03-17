@@ -1,12 +1,13 @@
 /**
  * EnrollmentTable Component
  *
- * DataTable for enrollment records with search, filters, and actions.
+ * DataTable for enrollment records using TanstackDataTable from @edforge/ui.
+ * Search, pagination, sorting, and skeleton are handled by the DataTable.
+ * Grade-level and status filters are parent-controlled via toolbarExtra.
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
-  Search,
   MoreHorizontal,
   UserMinus,
   ArrowRightLeft,
@@ -14,8 +15,12 @@ import {
   X,
   UserX,
 } from 'lucide-react'
+import {
+  TanstackDataTable,
+  createActionsColumn,
+  type ColumnDef,
+} from '@edforge/ui'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
-import { useDebounce } from '../../hooks'
 import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
@@ -47,6 +52,10 @@ const statusOptions = [
   { value: 'transferred', label: 'Transferred' },
   { value: 'graduated', label: 'Graduated' },
 ]
+
+// ============================================================================
+// BADGE HELPERS
+// ============================================================================
 
 function getStatusBadge(status: string) {
   const styles: Record<string, string> = {
@@ -127,16 +136,33 @@ function ActionMenu({
 }
 
 // ============================================================================
+// DATE HELPER
+// ============================================================================
+
+function formatDate(dateStr: string | undefined | null): string {
+  if (!dateStr) return '\u2014'
+  try {
+    return new Date(dateStr).toLocaleDateString()
+  } catch {
+    return '\u2014'
+  }
+}
+
+// ============================================================================
 // COMPONENT
 // ============================================================================
 
 export function EnrollmentTable({
   enrollments,
   isLoading,
-  hasMore,
-  onLoadMore,
-  searchTerm,
-  onSearchChange,
+  // hasMore and onLoadMore are kept in the interface for backwards compat
+  // but pagination is now handled by the DataTable
+  hasMore: _hasMore,
+  onLoadMore: _onLoadMore,
+  // searchTerm and onSearchChange are kept in the interface for backwards compat
+  // but globalFilter search is now handled internally by the DataTable
+  searchTerm: _searchTerm,
+  onSearchChange: _onSearchChange,
   gradeLevel,
   onGradeLevelChange,
   statusFilter,
@@ -147,140 +173,172 @@ export function EnrollmentTable({
   schoolGradeRange,
 }: EnrollmentTableProps) {
   const gradeLevelOptions = useFilteredGradeOptions(schoolGradeRange)
-  // Client-side search filter
-  const debouncedSearch = useDebounce(searchTerm, 300)
-  const filtered = enrollments.filter((e) => {
-    if (debouncedSearch) {
-      const term = debouncedSearch.toLowerCase()
-      const name = `${(e as Record<string, unknown>).studentName || ''}`.toLowerCase()
-      if (!name.includes(term) && !e.studentId.toLowerCase().includes(term)) return false
+
+  const hasActions = !!(onWithdraw || onTransfer || onMarkNoShow)
+
+  // ------------------------------------------------------------------
+  // Column definitions
+  // ------------------------------------------------------------------
+  const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(() => {
+    const cols: ColumnDef<EnrollmentResponseDto, unknown>[] = [
+      {
+        accessorFn: (row) =>
+          (row as Record<string, unknown>).studentName as string ||
+          row.studentId.slice(0, 8),
+        id: 'studentName',
+        header: 'Student',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span className="font-medium text-text-primary">
+            {getValue<string>()}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'gradeLevel',
+        header: 'Grade Level',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span className="text-text-secondary">{getValue<string>()}</span>
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const status = getValue<string>()
+          return (
+            <span
+              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(status)}`}
+            >
+              {status}
+            </span>
+          )
+        },
+      },
+      {
+        accessorFn: (row) => row.entryDate || row.enrollmentDate || null,
+        id: 'entryDate',
+        header: 'Entry Date',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span className="text-text-secondary">
+            {formatDate(getValue<string | null>())}
+          </span>
+        ),
+      },
+      {
+        accessorFn: (row) => row.exitWithdrawDate || row.withdrawalDate || null,
+        id: 'exitDate',
+        header: 'Exit Date',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span className="text-text-secondary">
+            {formatDate(getValue<string | null>())}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'enrollmentType',
+        header: 'Type',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span className="text-text-secondary capitalize">
+            {getValue<string>() || '\u2014'}
+          </span>
+        ),
+      },
+    ]
+
+    // Actions column (only if action callbacks are provided)
+    if (hasActions) {
+      cols.push(
+        createActionsColumn<EnrollmentResponseDto>({
+          cell: ({ row }) => (
+            <ActionMenu
+              enrollment={row.original}
+              onWithdraw={() => onWithdraw?.(row.original)}
+              onTransfer={() => onTransfer?.(row.original)}
+              onMarkNoShow={
+                onMarkNoShow ? () => onMarkNoShow(row.original) : undefined
+              }
+            />
+          ),
+          size: 48,
+        })
+      )
     }
-    return true
-  })
 
+    return cols
+  }, [hasActions, onWithdraw, onTransfer, onMarkNoShow])
+
+  // ------------------------------------------------------------------
+  // Pre-filter data by grade-level and status (parent-controlled)
+  // Search / globalFilter is handled internally by TanstackDataTable
+  // ------------------------------------------------------------------
+  const filteredData = useMemo(() => {
+    let result = enrollments
+    if (gradeLevel) {
+      result = result.filter((e) => e.gradeLevel === gradeLevel)
+    }
+    if (statusFilter) {
+      result = result.filter((e) => e.status === statusFilter)
+    }
+    return result
+  }, [enrollments, gradeLevel, statusFilter])
+
+  // ------------------------------------------------------------------
+  // Render
+  // ------------------------------------------------------------------
   return (
-    <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search students..."
-            className="w-full pl-10 pr-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-          />
-        </div>
-        <select
-          value={gradeLevel ?? ''}
-          onChange={(e) => onGradeLevelChange(e.target.value || null)}
-          className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        >
-          <option value="">All Grades</option>
-          {gradeLevelOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        <select
-          value={statusFilter ?? ''}
-          onChange={(e) => onStatusChange(e.target.value || null)}
-          className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        >
-          <option value="">All Status</option>
-          {statusOptions.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
-        {(gradeLevel || statusFilter) && (
-          <button
-            type="button"
-            onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
-            className="flex items-center gap-1 px-3 py-2.5 text-sm text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+    <TanstackDataTable<EnrollmentResponseDto>
+      columns={columns}
+      data={filteredData}
+      getRowId={(row) => `${row.studentId}-${row.schoolId}`}
+      isLoading={isLoading}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
+      searchPlaceholder="Search students..."
+      emptyState={{
+        icon: <Users className="w-10 h-10 text-text-tertiary opacity-40" />,
+        title: 'No enrollments found',
+        description: 'Try adjusting your filters or search term.',
+      }}
+      toolbarExtra={
+        <div className="flex items-center gap-2">
+          <select
+            value={gradeLevel ?? ''}
+            onChange={(e) => onGradeLevelChange(e.target.value || null)}
+            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
           >
-            <X className="w-3.5 h-3.5" />
-            Clear
-          </button>
-        )}
-      </div>
-
-      {/* Table */}
-      {isLoading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-12 bg-surface-secondary rounded-lg animate-pulse" />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="py-12 text-center">
-          <Users className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-          <h4 className="text-sm font-medium text-text-primary mb-1">
-            No enrollments found
-          </h4>
-          <p className="text-xs text-text-tertiary">
-            Try adjusting your filters or search term.
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-border-secondary overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-surface-secondary">
-                <th className="px-4 py-3 text-left font-semibold text-text-primary">Student</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Grade Level</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Entry Date</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Exit Date</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Type</th>
-                <th className="px-4 py-3 w-12" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-secondary">
-              {filtered.map((enrollment) => (
-                <tr key={`${enrollment.studentId}-${enrollment.schoolId}`} className="hover:bg-surface-secondary/50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-text-primary">
-                    {(enrollment as Record<string, unknown>).studentName as string || enrollment.studentId.slice(0, 8)}
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary">{enrollment.gradeLevel}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(enrollment.status)}`}>
-                      {enrollment.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary">
-                    {(enrollment.entryDate || enrollment.enrollmentDate) ? new Date(enrollment.entryDate || enrollment.enrollmentDate!).toLocaleDateString() : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary">
-                    {(enrollment.exitWithdrawDate || enrollment.withdrawalDate) ? new Date(enrollment.exitWithdrawDate || enrollment.withdrawalDate!).toLocaleDateString() : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary capitalize">
-                    {enrollment.enrollmentType || '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    {(onWithdraw || onTransfer || onMarkNoShow) && <ActionMenu
-                      enrollment={enrollment}
-                      onWithdraw={() => onWithdraw?.(enrollment)}
-                      onTransfer={() => onTransfer?.(enrollment)}
-                      onMarkNoShow={onMarkNoShow ? () => onMarkNoShow(enrollment) : undefined}
-                    />}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {hasMore && onLoadMore && (
-            <div className="px-4 py-3 text-center border-t border-border-secondary">
-              <button
-                type="button"
-                onClick={onLoadMore}
-                className="text-sm text-teal-600 hover:text-teal-700 font-medium"
-              >
-                Load more
-              </button>
-            </div>
+            <option value="">All Grades</option>
+            {gradeLevelOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <select
+            value={statusFilter ?? ''}
+            onChange={(e) => onStatusChange(e.target.value || null)}
+            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+          >
+            <option value="">All Status</option>
+            {statusOptions.map((s) => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+          {(gradeLevel || statusFilter) && (
+            <button
+              type="button"
+              onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
+              className="flex items-center gap-1 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] rounded-lg transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear
+            </button>
           )}
         </div>
-      )}
-    </div>
+      }
+    />
   )
 }

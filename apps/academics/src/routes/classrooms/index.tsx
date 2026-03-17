@@ -16,7 +16,6 @@
  */
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import React from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useResourcePermissions } from '@edforge/abac'
@@ -236,9 +235,6 @@ function OverviewTab() {
         <SectionTable
           sections={sections}
           isLoading={isLoading}
-          hasMore={hasNextPage}
-          isFetchingMore={isFetchingNextPage}
-          onLoadMore={() => fetchNextPage()}
           onViewSection={handleNavigateToDetail}
           onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
           onToggleActive={schedPerms.edit ? handleToggleActive : undefined}

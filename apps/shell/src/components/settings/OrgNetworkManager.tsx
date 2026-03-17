@@ -19,7 +19,7 @@ import {
   X,
   AlertTriangle,
 } from 'lucide-react'
-import { Button, Modal, ModalFooter, DataTable, type Column } from '@edforge/ui'
+import { Button, Modal, ModalFooter, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
 import type {
   NetworkResponseDto,
@@ -342,110 +342,82 @@ export function OrgNetworkManager() {
     setExpandedId((prev) => (prev === id ? null : id))
   }
 
-  const columns: Column<NetworkResponseDto>[] = [
+  const columns: ColumnDef<NetworkResponseDto, unknown>[] = [
     {
-      key: 'expand',
+      id: 'expand',
       header: '',
-      width: '40px',
-      render: (item) => (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            toggleExpanded(item.id)
-          }}
-          aria-label={expandedId === item.id ? 'Collapse members' : 'Expand members'}
-          aria-expanded={expandedId === item.id}
-          className="p-1 rounded hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
-        >
-          {expandedId === item.id ? (
-            <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          ) : (
-            <ChevronRight className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          )}
-        </button>
-      ),
+      size: 40,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const item = row.original
+        return (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleExpanded(item.id)
+            }}
+            aria-label={expandedId === item.id ? 'Collapse members' : 'Expand members'}
+            aria-expanded={expandedId === item.id}
+            className="p-1 rounded hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+          >
+            {expandedId === item.id ? (
+              <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+            )}
+          </button>
+        )
+      },
     },
     {
-      key: 'name',
+      accessorKey: 'nameOfInstitution',
       header: 'Network Name',
-      sortable: true,
-      render: (item) => (
-        <div>
-          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            {item.nameOfInstitution}
-          </p>
-          {item.shortNameOfInstitution && (
-            <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              {item.shortNameOfInstitution}
+      enableSorting: true,
+      cell: ({ row }) => {
+        const item = row.original
+        return (
+          <div>
+            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+              {item.nameOfInstitution}
             </p>
-          )}
-        </div>
-      ),
+            {item.shortNameOfInstitution && (
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                {item.shortNameOfInstitution}
+              </p>
+            )}
+          </div>
+        )
+      },
     },
     {
-      key: 'purpose',
+      accessorKey: 'networkPurposeDescriptor',
       header: 'Purpose',
-      sortable: true,
-      render: (item) => <PurposeBadge purpose={item.networkPurposeDescriptor} />,
+      enableSorting: true,
+      cell: ({ row }) => <PurposeBadge purpose={row.original.networkPurposeDescriptor} />,
     },
     {
-      key: 'status',
+      accessorKey: 'operationalStatusDescriptor',
       header: 'Status',
-      sortable: true,
-      render: (item) => <StatusBadge status={item.operationalStatusDescriptor} />,
+      enableSorting: true,
+      cell: ({ row }) => <StatusBadge status={row.original.operationalStatusDescriptor} />,
     },
     {
-      key: 'edfiId',
+      accessorKey: 'educationOrganizationNetworkId',
       header: 'Ed-Fi ID',
-      render: (item) => (
+      enableSorting: false,
+      cell: ({ row }) => (
         <span className="text-sm font-mono text-[rgb(var(--text-secondary))]">
-          {item.educationOrganizationNetworkId}
+          {row.original.educationOrganizationNetworkId}
         </span>
       ),
     },
-  ]
-
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Network className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-            Organization Networks
-          </h3>
-          <span className="text-xs text-[rgb(var(--text-tertiary))]">
-            ({networks.length})
-          </span>
-        </div>
-        {canManage && (
-          <Button size="sm" className="gap-1.5" onClick={formModal.openCreate}>
-            <Plus className="w-4 h-4" />
-            Create Network
-          </Button>
-        )}
-      </div>
-
-      {/* DataTable */}
-      <DataTable<NetworkResponseDto>
-        columns={columns}
-        data={networks}
-        keyExtractor={(item) => item.id}
-        isLoading={isLoading}
-        skeletonRows={3}
-        emptyState={{
-          icon: <Network className="w-10 h-10 text-[rgb(var(--text-tertiary))]" />,
-          title: 'No networks yet',
-          description: 'Create a network to group organizations for reporting or collaboration.',
-          action: canManage
-            ? { label: 'Create Network', onClick: formModal.openCreate }
-            : undefined,
-        }}
-        onRowClick={(item) => toggleExpanded(item.id)}
-        rowActions={
-          canManage
-            ? (item) => (
+    ...(canManage
+      ? [
+          createActionsColumn<NetworkResponseDto>({
+            cell: ({ row }) => {
+              const item = row.original
+              return (
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
@@ -471,8 +443,50 @@ export function OrgNetworkManager() {
                   </button>
                 </div>
               )
-            : undefined
-        }
+            },
+          }),
+        ]
+      : []),
+  ]
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Network className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
+          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+            Organization Networks
+          </h3>
+          <span className="text-xs text-[rgb(var(--text-tertiary))]">
+            ({networks.length})
+          </span>
+        </div>
+        {canManage && (
+          <Button size="sm" className="gap-1.5" onClick={formModal.openCreate}>
+            <Plus className="w-4 h-4" />
+            Create Network
+          </Button>
+        )}
+      </div>
+
+      {/* DataTable */}
+      <TanstackDataTable<NetworkResponseDto>
+        columns={columns}
+        data={networks}
+        getRowId={(row) => row.id}
+        isLoading={isLoading}
+        enableSorting={true}
+        pagination={{ pageSize: 20 }}
+        emptyState={{
+          icon: <Network className="w-10 h-10 text-[rgb(var(--text-tertiary))]" />,
+          title: 'No networks yet',
+          description: 'Create a network to group organizations for reporting or collaboration.',
+          action: canManage
+            ? { label: 'Create Network', onClick: formModal.openCreate }
+            : undefined,
+        }}
+        onRowClick={(item) => toggleExpanded(item.id)}
       />
 
       {/* Expanded Member Panel */}

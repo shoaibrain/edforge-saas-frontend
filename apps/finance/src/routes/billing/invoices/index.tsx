@@ -9,12 +9,17 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { Button } from '@edforge/ui'
+import {
+  Button,
+  TanstackDataTable,
+  createSelectColumn,
+  createActionsColumn,
+  type ColumnDef,
+} from '@edforge/ui'
 import {
   Plus,
   FileText,
   Loader2,
-  Search,
   Check,
   X,
   Eye,
@@ -23,6 +28,7 @@ import {
   Clock,
   AlertTriangle,
 } from 'lucide-react'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -34,11 +40,10 @@ import {
   useFeeStructures,
   useAcademicYears,
 } from '@edforge/finance-services'
-import { formatNPR } from '@edforge/types'
+import { formatNPR, type Invoice } from '@edforge/types'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { StatusBadge } from '../../../components/StatusBadge'
-import { TableSkeleton } from '../../../components/TableSkeleton'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 
@@ -56,11 +61,10 @@ export default function InvoicesPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('')
-  const [searchTerm, setSearchTerm] = useState('')
   const [showGenerateForm, setShowGenerateForm] = useState(false)
 
-  // Bulk selection state
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  // Row selection state (controlled by DataTable)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [showBulkIssueConfirm, setShowBulkIssueConfirm] = useState(false)
 
   // Cancel dialog state
@@ -74,21 +78,16 @@ export default function InvoicesPage() {
   const bulkIssueMutation = useBulkIssueInvoices(schoolId ?? '')
 
   const invoices = invoiceData?.items ?? []
-  const filtered = searchTerm
-    ? invoices.filter(
-        (inv) =>
-          inv.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          inv.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : invoices
 
-  // Selected draft invoices for bulk issue
+  // Selected draft invoice IDs for bulk issue
   const selectedDraftIds = useMemo(() => {
-    return [...selectedIds].filter((id) => {
-      const inv = invoices.find((i) => i.id === id)
-      return inv?.status === 'draft'
-    })
-  }, [selectedIds, invoices])
+    return Object.keys(rowSelection)
+      .filter((id) => rowSelection[id])
+      .filter((id) => {
+        const inv = invoices.find((i) => i.id === id)
+        return inv?.status === 'draft'
+      })
+  }, [rowSelection, invoices])
 
   const handleIssue = async (invoiceId: string) => {
     try {
@@ -124,7 +123,7 @@ export default function InvoicesPage() {
       const issued = result.issued ?? selectedDraftIds.length
       const skipped = result.skipped ?? 0
       toast.success(`Issued ${issued} invoices.${skipped > 0 ? ` ${skipped} skipped.` : ''}`)
-      setSelectedIds(new Set())
+      setRowSelection({})
       setShowBulkIssueConfirm(false)
     } catch {
       toast.error('Failed to issue invoices')
@@ -132,23 +131,126 @@ export default function InvoicesPage() {
     }
   }
 
-  // Toggle selection helpers
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === filtered.length) {
-      setSelectedIds(new Set())
-    } else {
-      setSelectedIds(new Set(filtered.map((inv) => inv.id)))
-    }
-  }
+  // -- Column definitions --
+  const columns = useMemo<ColumnDef<Invoice, unknown>[]>(
+    () => [
+      createSelectColumn<Invoice>(),
+      {
+        accessorKey: 'invoiceNumber',
+        header: 'Invoice #',
+        cell: ({ row }) => (
+          <span className="font-medium text-[rgb(var(--text-primary))]">
+            {row.original.invoiceNumber || row.original.id.slice(0, 8)}
+          </span>
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'studentName',
+        header: 'Student',
+        cell: ({ row }) => {
+          const invoice = row.original
+          return invoice.studentName ? (
+            <span className="text-[rgb(var(--text-secondary))]">{invoice.studentName}</span>
+          ) : (
+            <span
+              className="text-[rgb(var(--text-tertiary))] font-mono text-xs"
+              title={invoice.studentId}
+            >
+              {invoice.studentId?.slice(0, 8) || '-'}
+            </span>
+          )
+        },
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'grandTotal',
+        header: 'Amount',
+        cell: ({ row }) => (
+          <span className="font-medium text-[rgb(var(--text-primary))]">
+            {formatNPR(row.original.grandTotal)}
+          </span>
+        ),
+        meta: { align: 'right' as const },
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'dueDate',
+        header: 'Due Date',
+        cell: ({ row }) => {
+          const invoice = row.original
+          const overdueDays = invoice.status === 'overdue' ? getOverdueDays(invoice.dueDate) : 0
+          return (
+            <div className="flex items-center gap-1.5 text-[rgb(var(--text-secondary))]">
+              <span>{invoice.dueDate ? formatDateDual(invoice.dueDate) : '-'}</span>
+              {invoice.status === 'overdue' && overdueDays > 0 && (
+                <span className="inline-flex items-center gap-0.5 text-xs text-red-600 dark:text-red-400">
+                  <Clock className="w-3 h-3" />
+                  Overdue by {overdueDays}d
+                </span>
+              )}
+            </div>
+          )
+        },
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        meta: { align: 'center' as const },
+        enableSorting: true,
+      },
+      createActionsColumn<Invoice>({
+        size: 120,
+        cell: ({ row }) => {
+          const invoice = row.original
+          return (
+            <div className="flex items-center justify-end gap-1">
+              <button
+                onClick={() => navigate({ to: `/invoices/${invoice.id}` as string })}
+                className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                title="View"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+              {invoice.status === 'draft' && (
+                <>
+                  <button
+                    onClick={() => handleIssue(invoice.id)}
+                    disabled={issueMutation.isPending}
+                    className="p-1.5 rounded-md hover:bg-green-50 text-green-600 dark:hover:bg-green-900/20 dark:text-green-400"
+                    title="Issue"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openCancelDialog(invoice.id)}
+                    disabled={cancelMutation.isPending}
+                    className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
+                    title="Cancel"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+              {(invoice.status === 'issued' || invoice.status === 'overdue') && (
+                <button
+                  onClick={() => openCancelDialog(invoice.id)}
+                  disabled={cancelMutation.isPending}
+                  className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
+                  title="Cancel"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          )
+        },
+      }),
+    ],
+    [navigate, issueMutation.isPending, cancelMutation.isPending]
+  )
 
   if (!schoolId) {
     return (
@@ -183,183 +285,52 @@ export default function InvoicesPage() {
         </div>
       </div>
 
-      {/* Filters + Bulk actions bar */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          <input
-            type="text"
-            placeholder="Search by invoice # or student..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as InvoiceStatusFilter)}
-          className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-        >
-          <option value="">All Statuses</option>
-          <option value="draft">Draft</option>
-          <option value="issued">Issued</option>
-          <option value="partially_paid">Partially Paid</option>
-          <option value="paid">Paid</option>
-          <option value="overdue">Overdue</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-
-        {/* Bulk issue button — visible when draft invoices are selected */}
-        {selectedDraftIds.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+      {/* DataTable */}
+      <TanstackDataTable<Invoice>
+        columns={columns}
+        data={invoices}
+        getRowId={(row) => row.id}
+        isLoading={isLoading}
+        enableRowSelection={true}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        enableSorting={true}
+        pagination={{ pageSize: 20 }}
+        searchPlaceholder="Search by invoice # or student..."
+        toolbarExtra={
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as InvoiceStatusFilter)}
+            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
           >
-            <Button
-              onClick={() => setShowBulkIssueConfirm(true)}
-              disabled={bulkIssueMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {bulkIssueMutation.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
-              ) : (
-                <Send className="w-4 h-4 mr-1.5" />
-              )}
-              Bulk Issue ({selectedDraftIds.length})
-            </Button>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Table */}
-      {isLoading ? (
-        <TableSkeleton rows={6} cols={6} />
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <FileText className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No invoices found</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1 mb-4">
-            Generate your first invoice to get started.
-          </p>
-          <Button onClick={() => setShowGenerateForm(true)} size="sm">
-            <Plus className="w-4 h-4 mr-1.5" />
-            Generate Invoice
-          </Button>
-        </div>
-      ) : (
-        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
-                <th className="w-10 px-3 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.size === filtered.length && filtered.length > 0}
-                    onChange={toggleSelectAll}
-                    className="rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
-                  />
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Invoice #</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Student</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Amount</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Due Date</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Status</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[rgb(var(--border-primary))]">
-              {filtered.map((invoice) => {
-                const overdueDays = invoice.status === 'overdue' ? getOverdueDays(invoice.dueDate) : 0
-                return (
-                  <tr key={invoice.id} className="hover:bg-[rgb(var(--surface-secondary))] transition-colors">
-                    <td className="px-3 py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(invoice.id)}
-                        onChange={() => toggleSelect(invoice.id)}
-                        className="rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">
-                      {invoice.invoiceNumber || invoice.id.slice(0, 8)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-                      {invoice.studentName || (
-                        <span
-                          className="text-[rgb(var(--text-tertiary))] font-mono text-xs"
-                          title={invoice.studentId}
-                        >
-                          {invoice.studentId?.slice(0, 8) || '-'}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right font-medium text-[rgb(var(--text-primary))]">
-                      {formatNPR(invoice.grandTotal)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-                      <div className="flex items-center gap-1.5">
-                        <span>
-                          {invoice.dueDate ? formatDateDual(invoice.dueDate) : '-'}
-                        </span>
-                        {invoice.status === 'overdue' && overdueDays > 0 && (
-                          <span className="inline-flex items-center gap-0.5 text-xs text-red-600 dark:text-red-400">
-                            <Clock className="w-3 h-3" />
-                            Overdue by {overdueDays}d
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <StatusBadge status={invoice.status} />
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => navigate({ to: `/invoices/${invoice.id}` as string })}
-                          className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
-                          title="View"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {invoice.status === 'draft' && (
-                          <>
-                            <button
-                              onClick={() => handleIssue(invoice.id)}
-                              disabled={issueMutation.isPending}
-                              className="p-1.5 rounded-md hover:bg-green-50 text-green-600 dark:hover:bg-green-900/20 dark:text-green-400"
-                              title="Issue"
-                            >
-                              <Check className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => openCancelDialog(invoice.id)}
-                              disabled={cancelMutation.isPending}
-                              className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
-                              title="Cancel"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                        {(invoice.status === 'issued' || invoice.status === 'overdue') && (
-                          <button
-                            onClick={() => openCancelDialog(invoice.id)}
-                            disabled={cancelMutation.isPending}
-                            className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
-                            title="Cancel"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+            <option value="">All Statuses</option>
+            <option value="draft">Draft</option>
+            <option value="issued">Issued</option>
+            <option value="partially_paid">Partially Paid</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        }
+        bulkActions={[
+          {
+            label: `Issue Selected (${selectedDraftIds.length})`,
+            onClick: () => setShowBulkIssueConfirm(true),
+            icon: <Send className="w-4 h-4" />,
+            variant: 'primary',
+            disabled: selectedDraftIds.length === 0 || bulkIssueMutation.isPending,
+          },
+        ]}
+        emptyState={{
+          icon: <FileText className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
+          title: 'No invoices found',
+          description: 'Generate your first invoice to get started.',
+          action: {
+            label: 'Generate Invoice',
+            onClick: () => setShowGenerateForm(true),
+          },
+        }}
+      />
 
       {/* Generate Invoice Modal */}
       {showGenerateForm && (

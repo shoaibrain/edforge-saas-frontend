@@ -13,7 +13,7 @@ interface StreamFeedProps {
   onSwitchTab?: (tab: string) => void
 }
 
-export function StreamFeed({ sectionId, onSwitchTab }: StreamFeedProps) {
+export function StreamFeed({ sectionId: _sectionId, onSwitchTab }: StreamFeedProps) {
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
       {/* Quick Actions — still functional for navigation */}

@@ -11,14 +11,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2,
   Users,
-  Search,
-  ChevronDown,
-  ChevronUp,
   FileText,
   CreditCard,
   BookOpen,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import {
+  TanstackDataTable,
+  createExpandColumn,
+  type ColumnDef,
+} from '@edforge/ui'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useStudentAccounts,
@@ -28,7 +30,6 @@ import {
 import { formatNPR } from '@edforge/types'
 import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
 import { StatusBadge } from '../../../components/StatusBadge'
-import { TableSkeleton } from '../../../components/TableSkeleton'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
@@ -352,86 +353,71 @@ function AccountDetail({
 }
 
 // ============================================================================
-// ACCOUNT ROW
+// COLUMN DEFINITIONS
 // ============================================================================
 
-function AccountRow({
-  account,
-  isExpanded,
-  onToggle,
-  schoolId,
-}: {
-  account: StudentAccount
-  isExpanded: boolean
-  onToggle: () => void
-  schoolId: string
-}) {
-  return (
-    <>
-      <tr
-        className="hover:bg-[rgb(var(--surface-secondary))] transition-colors cursor-pointer"
-        onClick={onToggle}
-      >
-        <td className="px-4 py-3 text-center">
-          {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          )}
-        </td>
-        <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">
+const columns: ColumnDef<StudentAccount, unknown>[] = [
+  createExpandColumn<StudentAccount>(),
+  {
+    accessorKey: 'studentName',
+    header: 'Student Name',
+    cell: ({ row }) => {
+      const account = row.original
+      return (
+        <span className="font-medium text-[rgb(var(--text-primary))]">
           {account.studentName || (
             <span className="text-[rgb(var(--text-tertiary))] font-mono text-xs" title={account.studentId}>
               {account.studentId?.slice(0, 8) || '-'}
             </span>
           )}
-        </td>
-        <td className="px-4 py-3 text-sm text-right font-medium">
-          <span className={account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
-            {formatNPR(account.balance)}
-          </span>
-        </td>
-        <td className="px-4 py-3 text-sm text-right text-[rgb(var(--text-secondary))]">
-          {formatNPR(account.totalPaid)}
-        </td>
-        <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
-          {account.lastPaymentDate ? formatDate(account.lastPaymentDate) : 'Never'}
-        </td>
-      </tr>
-      {isExpanded && (
-        <tr>
-          <td colSpan={5} className="bg-[rgb(var(--surface-secondary))]">
-            <AccountDetail account={account} schoolId={schoolId} />
-          </td>
-        </tr>
-      )}
-    </>
-  )
-}
+        </span>
+      )
+    },
+  },
+  {
+    accessorKey: 'balance',
+    header: 'Balance',
+    meta: { align: 'right' as const },
+    cell: ({ row }) => {
+      const account = row.original
+      return (
+        <span className={account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+          {formatNPR(account.balance)}
+        </span>
+      )
+    },
+  },
+  {
+    accessorKey: 'totalPaid',
+    header: 'Total Paid',
+    meta: { align: 'right' as const },
+    cell: ({ row }) => (
+      <span className="text-[rgb(var(--text-secondary))]">
+        {formatNPR(row.original.totalPaid)}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'lastPaymentDate',
+    header: 'Last Payment',
+    cell: ({ row }) => (
+      <span className="text-[rgb(var(--text-secondary))]">
+        {row.original.lastPaymentDate ? formatDate(row.original.lastPaymentDate) : 'Never'}
+      </span>
+    ),
+  },
+]
 
 // ============================================================================
 // MAIN PAGE
 // ============================================================================
 
 export default function StudentAccountsPage() {
-  const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
-
-  const [searchTerm, setSearchTerm] = useState('')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 
   const accountList: StudentAccount[] = accounts ?? []
-  const filtered = searchTerm
-    ? accountList.filter((a) =>
-        a.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : accountList
-
-  const toggleExpand = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id))
-  }
 
   if (!schoolId) {
     return (
@@ -451,61 +437,24 @@ export default function StudentAccountsPage() {
         </p>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-        <input
-          type="text"
-          placeholder="Search by student name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-        />
-      </div>
-
-      {/* Table */}
-      {isLoading ? (
-        <TableSkeleton rows={5} cols={5} />
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <Users className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No student accounts found</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1 mb-4">
-            Student accounts are created automatically when invoices are generated.
-          </p>
-          <button
-            onClick={() => navigate({ to: '/invoices' as string })}
-            className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:underline"
-          >
-            Go to Invoices →
-          </button>
-        </div>
-      ) : (
-        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
-                <th className="w-10 px-4 py-3" />
-                <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Student Name</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Balance</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Total Paid</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Last Payment</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[rgb(var(--border-primary))]">
-              {filtered.map((account) => (
-                <AccountRow
-                  key={account.id}
-                  account={account}
-                  isExpanded={expandedId === account.id}
-                  onToggle={() => toggleExpand(account.id)}
-                  schoolId={schoolId}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Data Table */}
+      <TanstackDataTable<StudentAccount>
+        columns={columns}
+        data={accountList}
+        getRowId={(row) => row.id}
+        isLoading={isLoading}
+        searchPlaceholder="Search by student name..."
+        enableExpanding={true}
+        pagination={{ pageSize: 20 }}
+        renderSubComponent={({ row }) => (
+          <AccountDetail account={row.original} schoolId={schoolId} />
+        )}
+        emptyState={{
+          icon: <Users className="w-10 h-10" />,
+          title: 'No student accounts found',
+          description: 'Student accounts are created automatically when invoices are generated.',
+        }}
+      />
     </div>
   )
 }

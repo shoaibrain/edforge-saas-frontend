@@ -22,7 +22,7 @@ export const queryClient = new QueryClient({
     },
   }),
   mutationCache: new MutationCache({
-    onError: (error, variables, _context, mutation) => {
+    onError: (error, _variables, _context, mutation) => {
       console.error('[React Query] Mutation error', {
         mutationKey: mutation.options.mutationKey,
         message: error.message,
