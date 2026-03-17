@@ -156,4 +156,7 @@ export interface DataTableProps<TData> {
 
   // -- Styling --
   className?: string
+  /** Maximum height for the table container. Enables internal vertical scrolling with sticky headers.
+   *  Accepts any CSS height value, e.g. "calc(100vh - 14rem)" or "600px". */
+  maxHeight?: string
 }

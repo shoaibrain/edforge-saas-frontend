@@ -596,6 +596,7 @@ export default function PeopleSettingsPage() {
             isLoading={isLoading}
             enableSorting={true}
             pagination={{ pageSize: 20 }}
+            maxHeight="calc(100vh - 18rem)"
             emptyState={{
               icon: <Users className="w-10 h-10" />,
               title: 'No users found',

@@ -192,6 +192,7 @@ export function StudentTable({
           : undefined,
       }}
       onRowClick={onViewStudent}
+      maxHeight="calc(100vh - 13rem)"
     />
   )
 }

@@ -716,6 +716,7 @@ export default function PaymentsPage() {
             onClick: () => navigate({ to: '/payments/record' as string }),
           },
         }}
+        maxHeight="calc(100vh - 15rem)"
       />
 
       {/* Void Payment Dialog */}

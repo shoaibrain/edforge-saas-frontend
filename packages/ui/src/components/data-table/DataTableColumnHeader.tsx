@@ -21,7 +21,7 @@ export function DataTableColumnHeader<TData, TValue>({
     return (
       <div
         className={cn(
-          'text-xs font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider',
+          'text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider',
           align === 'right' && 'text-right',
           align === 'center' && 'text-center',
           className
@@ -39,7 +39,7 @@ export function DataTableColumnHeader<TData, TValue>({
       type="button"
       onClick={() => column.toggleSorting()}
       className={cn(
-        'inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider',
+        'inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider',
         'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
         'transition-colors select-none cursor-pointer',
         align === 'right' && 'ml-auto flex-row-reverse',

@@ -20,7 +20,7 @@ export function DataTablePagination<TData>({
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   return (
-    <div className="flex items-center justify-between px-6 py-3 border-t border-[rgb(var(--border-secondary))]">
+    <div className="flex items-center justify-between px-4 py-2.5 border-t border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--surface-tertiary)/0.25)]">
       <span className="text-xs text-[rgb(var(--text-secondary))]">
         Showing {start}-{end} of {totalRows} results
       </span>
@@ -32,7 +32,7 @@ export function DataTablePagination<TData>({
             table.setPageSize(Number(e.target.value))
             table.setPageIndex(0)
           }}
-          className="mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary))] rounded bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]"
+          className="mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-1 focus:ring-teal-500/30"
         >
           {pageSizeOptions.map((size) => (
             <option key={size} value={size}>
@@ -46,7 +46,7 @@ export function DataTablePagination<TData>({
           type="button"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Prev
         </button>
@@ -68,8 +68,8 @@ export function DataTablePagination<TData>({
               className={cn(
                 'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
                 pageIndex === page
-                  ? 'bg-teal-600 text-white'
-                  : 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
+                  ? 'bg-teal-600 text-white shadow-sm'
+                  : 'border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))]'
               )}
             >
               {(page as number) + 1}
@@ -82,7 +82,7 @@ export function DataTablePagination<TData>({
           type="button"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Next
         </button>

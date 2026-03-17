@@ -159,6 +159,7 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
         title: 'No staff found',
         description: 'Try adjusting your search or filters.',
       }}
+      maxHeight="calc(100vh - 13rem)"
       toolbarExtra={
         <div className="flex items-center gap-2">
           <select

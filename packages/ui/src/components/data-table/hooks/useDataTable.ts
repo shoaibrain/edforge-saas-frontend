@@ -79,6 +79,7 @@ export function useDataTable<TData>(
     data,
     columns,
     getRowId,
+    defaultColumn: { size: 200, minSize: 80 },
     state: {
       sorting,
       columnFilters,
@@ -106,6 +107,8 @@ export function useDataTable<TData>(
     enableColumnFilters,
     enableRowSelection,
     enableExpanding,
+    // When using renderSubComponent (no subRows), always allow expand
+    ...(enableExpanding && { getRowCanExpand: () => true }),
     enableMultiRowSelection: true,
 
     // Pagination defaults

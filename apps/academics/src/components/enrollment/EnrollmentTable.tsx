@@ -305,6 +305,7 @@ export function EnrollmentTable({
         title: 'No enrollments found',
         description: 'Try adjusting your filters or search term.',
       }}
+      maxHeight="calc(100vh - 13rem)"
       toolbarExtra={
         <div className="flex items-center gap-2">
           <select

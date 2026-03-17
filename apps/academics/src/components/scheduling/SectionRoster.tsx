@@ -322,6 +322,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
         onRowClick={(_student) => {
           // Row click preserved for future navigation
         }}
+        maxHeight="calc(100vh - 13rem)"
       />
 
       {/* Student Selector Modal */}

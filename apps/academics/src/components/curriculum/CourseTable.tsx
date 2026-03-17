@@ -342,6 +342,7 @@ export function CourseTable({
       pagination={{ pageSize: 20 }}
       enableSorting={true}
       onRowClick={onViewCourse}
+      maxHeight="calc(100vh - 13rem)"
     />
   )
 }

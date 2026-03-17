@@ -308,6 +308,7 @@ export function SectionTable({
       pagination={{ pageSize: 20 }}
       enableSorting={true}
       onRowClick={onViewSection}
+      maxHeight="calc(100vh - 13rem)"
     />
   )
 }

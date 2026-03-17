@@ -16,15 +16,5 @@ export {
   SkeletonModuleOverview,
 } from '@edforge/ui'
 export { Tooltip } from '@edforge/ui'
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@edforge/ui'
-
 // Local UI components
 export { Modal, ModalFooter, type ModalProps, type ModalFooterProps } from './Modal'

@@ -454,6 +454,7 @@ export default function StudentAccountsPage() {
           title: 'No student accounts found',
           description: 'Student accounts are created automatically when invoices are generated.',
         }}
+        maxHeight="calc(100vh - 13rem)"
       />
     </div>
   )

@@ -330,6 +330,7 @@ export default function InvoicesPage() {
             onClick: () => setShowGenerateForm(true),
           },
         }}
+        maxHeight="calc(100vh - 15rem)"
       />
 
       {/* Generate Invoice Modal */}

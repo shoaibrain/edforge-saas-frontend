@@ -423,6 +423,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
         isLoading={isLoading}
         enableSorting={true}
         pagination={{ pageSize: 20 }}
+        maxHeight="calc(100vh - 15rem)"
         emptyState={{
           icon: <Users className="w-10 h-10" />,
           title: searchQuery ? `No departments match "${searchQuery}"` : 'No departments found',

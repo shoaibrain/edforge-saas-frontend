@@ -39,6 +39,7 @@ export function DataTable<TData>({
   toolbarExtra,
   bulkActions,
   className,
+  maxHeight,
 }: DataTableProps<TData>) {
   const table = useDataTable<TData>({
     data,
@@ -71,7 +72,7 @@ export function DataTable<TData>({
     return (
       <div
         className={cn(
-          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.6)] shadow-sm bg-[rgb(var(--surface-primary))]',
+          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-primary))]',
           className
         )}
       >
@@ -105,27 +106,38 @@ export function DataTable<TData>({
     table.getState().rowSelection
   ).length
 
+  const hasToolbar = searchPlaceholder || facetedFilters?.length || enableColumnVisibility || toolbarExtra
+  const hasBulkActions = bulkActions && selectedRowCount > 0
+
   return (
-    <div className={cn('space-y-4', className)}>
-      {/* Toolbar */}
-      {(searchPlaceholder || facetedFilters?.length || enableColumnVisibility || toolbarExtra) && (
-        <DataTableToolbar
-          table={table}
-          searchPlaceholder={searchPlaceholder}
-          facetedFilters={facetedFilters}
-          enableColumnVisibility={enableColumnVisibility}
-          toolbarExtra={toolbarExtra}
-        />
+    <div
+      className={cn(
+        'flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        className
+      )}
+      style={maxHeight ? { maxHeight, height: maxHeight } : undefined}
+    >
+      {/* Toolbar — outside scroll area */}
+      {hasToolbar && (
+        <div className="flex-shrink-0 px-4 py-3 border-b border-[rgb(var(--border-primary)/0.3)]">
+          <DataTableToolbar
+            table={table}
+            searchPlaceholder={searchPlaceholder}
+            facetedFilters={facetedFilters}
+            enableColumnVisibility={enableColumnVisibility}
+            toolbarExtra={toolbarExtra}
+          />
+        </div>
       )}
 
-      {/* Bulk Actions Bar */}
-      {bulkActions && selectedRowCount > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-teal-500/10 border border-teal-500/20">
+      {/* Bulk Actions Bar — outside scroll area */}
+      {hasBulkActions && (
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-teal-500/10 border-b border-teal-500/20">
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {selectedRowCount} selected
           </span>
           <div className="flex items-center gap-2">
-            {bulkActions.map((action, i) => (
+            {bulkActions!.map((action, i) => (
               <button
                 key={i}
                 type="button"
@@ -161,94 +173,91 @@ export function DataTable<TData>({
         </div>
       )}
 
-      {/* Table Container */}
-      <div className="rounded-xl border border-[rgb(var(--border-primary)/0.6)] shadow-sm bg-[rgb(var(--surface-primary))] overflow-hidden relative">
-        {/* Fetching overlay */}
+      {/* Scrollable table area — flex-1 fills remaining height */}
+      <div className="flex-1 min-h-0 overflow-auto scrollbar-thin">
+        {/* Fetching progress bar — sticky at top of scroll area */}
         {isFetching && data.length > 0 && (
-          <div className="absolute inset-x-0 top-0 z-10">
+          <div className="sticky top-0 z-20">
             <div className="h-0.5 w-full bg-[rgb(var(--surface-tertiary))] overflow-hidden">
-              <div className="h-full w-1/3 bg-teal-500 animate-[shimmer_1.5s_infinite]" style={{
-                animation: 'shimmer 1.5s infinite',
-              }} />
+              <div className="h-full w-1/3 bg-teal-500 animate-shimmer" />
             </div>
           </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full" role="grid">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-tertiary)/0.5)]"
-                >
-                  {headerGroup.headers.map((header) => {
-                    const meta = header.column.columnDef
-                      .meta as DataTableColumnMeta | undefined
-                    return (
-                      <th
-                        key={header.id}
-                        className={cn(
-                          'px-6 py-3',
-                          meta?.align === 'right'
-                            ? 'text-right'
-                            : meta?.align === 'center'
-                              ? 'text-center'
-                              : 'text-left'
-                        )}
-                        style={{
-                          width: header.getSize() !== 150 ? header.getSize() : undefined,
-                        }}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : header.column.getCanSort()
-                            ? (
-                                <DataTableColumnHeader
-                                  column={header.column}
-                                  title={
-                                    typeof header.column.columnDef.header === 'string'
-                                      ? header.column.columnDef.header
-                                      : header.id
-                                  }
-                                />
+        <table className="w-full" role="grid" style={{ tableLayout: 'fixed' }}>
+          <thead className="sticky top-0 z-10">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr
+                key={headerGroup.id}
+                className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--surface-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
+              >
+                {headerGroup.headers.map((header) => {
+                  const meta = header.column.columnDef
+                    .meta as DataTableColumnMeta | undefined
+                  return (
+                    <th
+                      key={header.id}
+                      className={cn(
+                        'px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
+                        meta?.align === 'right'
+                          ? 'text-right'
+                          : meta?.align === 'center'
+                            ? 'text-center'
+                            : 'text-left'
+                      )}
+                      style={{ width: header.getSize() }}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : header.column.getCanSort()
+                          ? (
+                              <DataTableColumnHeader
+                                column={header.column}
+                                title={
+                                  typeof header.column.columnDef.header === 'string'
+                                    ? header.column.columnDef.header
+                                    : header.id
+                                }
+                              />
+                            )
+                          : (
+                              flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
                               )
-                            : (
-                                flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )
-                              )}
-                      </th>
-                    )
-                  })}
-                </tr>
-              ))}
-            </thead>
-            <tbody className={cn(isFetching && 'opacity-60 transition-opacity')}>
-              {table.getRowModel().rows.map((row) => (
-                <TableRowWithExpansion
-                  key={row.id}
-                  row={row}
-                  onRowClick={onRowClick}
-                  enableExpanding={enableExpanding}
-                  renderSubComponent={renderSubComponent}
-                  visibleCellCount={table.getVisibleFlatColumns().length}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+                            )}
+                    </th>
+                  )
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody className={cn(isFetching && 'opacity-60 transition-opacity')}>
+            {table.getRowModel().rows.map((row, rowIndex) => (
+              <TableRowWithExpansion
+                key={row.id}
+                row={row}
+                rowIndex={rowIndex}
+                onRowClick={onRowClick}
+                enableExpanding={enableExpanding}
+                renderSubComponent={renderSubComponent}
+                visibleCellCount={table.getVisibleFlatColumns().length}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        {/* Pagination */}
-        {pagination && table.getPageCount() > 1 && (
+      {/* Pagination — always visible at bottom */}
+      {pagination && (
+        <div className="flex-shrink-0">
           <DataTablePagination
             table={table}
             totalCount={totalCount}
             pageSizeOptions={pagination.pageSizeOptions}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -259,29 +268,36 @@ export function DataTable<TData>({
 
 function TableRowWithExpansion<TData>({
   row,
+  rowIndex,
   onRowClick,
   enableExpanding,
   renderSubComponent,
   visibleCellCount,
 }: {
   row: Row<TData>
+  rowIndex: number
   onRowClick?: (row: TData) => void
   enableExpanding: boolean
   renderSubComponent?: (props: { row: Row<TData> }) => ReactNode
   visibleCellCount: number
 }) {
   const isSelected = row.getIsSelected()
+  const isExpanded = enableExpanding && row.getIsExpanded()
+  const isEvenRow = rowIndex % 2 === 0
 
   return (
     <>
       <tr
         className={cn(
-          'border-b border-[rgb(var(--border-secondary))] last:border-b-0 transition-colors',
+          'border-b border-[rgb(var(--border-secondary)/0.7)] last:border-b-0 transition-colors duration-150',
           isSelected
-            ? 'bg-teal-500/5'
-            : onRowClick
-              ? 'cursor-pointer hover:bg-[rgb(var(--surface-tertiary)/0.5)]'
-              : 'hover:bg-[rgb(var(--surface-tertiary)/0.3)]'
+            ? 'bg-teal-500/10 border-l-2 border-l-teal-500'
+            : isEvenRow
+              ? 'bg-[rgb(var(--surface-tertiary)/0.35)]'
+              : '',
+          !isSelected && onRowClick && 'cursor-pointer',
+          !isSelected && 'hover:bg-[rgb(var(--brand-primary)/0.06)]',
+          isExpanded && 'border-b-0'
         )}
         onClick={onRowClick ? () => onRowClick(row.original) : undefined}
         data-state={isSelected ? 'selected' : undefined}
@@ -294,20 +310,24 @@ function TableRowWithExpansion<TData>({
             <td
               key={cell.id}
               className={cn(
-                'px-6 py-4 text-sm text-[rgb(var(--text-primary))]',
+                'px-4 py-2.5 text-sm text-[rgb(var(--text-primary))]',
                 meta?.align === 'right' && 'text-right',
                 meta?.align === 'center' && 'text-center'
               )}
+              style={{ width: cell.column.getSize() }}
             >
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </td>
           )
         })}
       </tr>
-      {/* Expanded row */}
-      {enableExpanding && row.getIsExpanded() && renderSubComponent && (
-        <tr>
-          <td colSpan={visibleCellCount} className="p-0">
+      {/* Expanded sub-component */}
+      {isExpanded && renderSubComponent && (
+        <tr className="border-b border-[rgb(var(--border-secondary)/0.7)]">
+          <td
+            colSpan={visibleCellCount}
+            className="bg-[rgb(var(--surface-tertiary)/0.2)] border-l-2 border-l-teal-500/30 px-4 py-3"
+          >
             {renderSubComponent({ row })}
           </td>
         </tr>
@@ -315,4 +335,3 @@ function TableRowWithExpansion<TData>({
     </>
   )
 }
-
