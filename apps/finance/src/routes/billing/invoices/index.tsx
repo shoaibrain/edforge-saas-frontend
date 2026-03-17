@@ -32,6 +32,7 @@ import {
   useCancelInvoice,
   useBulkIssueInvoices,
   useFeeStructures,
+  useAcademicYears,
 } from '@edforge/finance-services'
 import { formatNPR } from '@edforge/types'
 import { formatDateDual } from '../../../utils/format-date'
@@ -552,12 +553,29 @@ function GenerateInvoiceModal({
 }) {
   const generateMutation = useGenerateInvoice(schoolId)
   const { data: feeStructureData } = useFeeStructures(schoolId)
+  const { data: academicYearsData } = useAcademicYears(schoolId)
   const feeStructures = Array.isArray(feeStructureData) ? feeStructureData : []
+
+  // Filter to active/planning years, sorted most recent first
+  const academicYears = useMemo(() => {
+    const raw = Array.isArray(academicYearsData) ? academicYearsData : []
+    return raw
+      .filter((y) => y.status === 'active' || y.status === 'planning')
+      .sort((a, b) => b.startDate.localeCompare(a.startDate))
+  }, [academicYearsData])
 
   const [selectedStudent, setSelectedStudent] = useState<{ studentId: string; studentName: string } | null>(null)
   const [selectedFees, setSelectedFees] = useState<string[]>([])
   const [dueDate, setDueDate] = useState('')
   const [academicYear, setAcademicYear] = useState('')
+
+  // Auto-select current academic year
+  useEffect(() => {
+    if (!academicYear && academicYears.length > 0) {
+      const current = academicYears.find((y) => y.isCurrent)
+      setAcademicYear(current?.name ?? academicYears[0].name)
+    }
+  }, [academicYears, academicYear])
   const [billingPeriod, setBillingPeriod] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -656,13 +674,18 @@ function GenerateInvoiceModal({
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
                 Academic Year *
               </label>
-              <input
-                type="text"
+              <select
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
-                placeholder="2081/82"
                 className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-              />
+              >
+                <option value="">Select academic year</option>
+                {academicYears.map((y) => (
+                  <option key={y.yearId} value={y.name}>
+                    {y.name}{y.isCurrent ? ' (Current)' : ''}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">

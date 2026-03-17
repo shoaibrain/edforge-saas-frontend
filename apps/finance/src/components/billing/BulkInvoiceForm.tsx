@@ -11,11 +11,11 @@
  * Uses the bulk-generate endpoint: POST /finance/schools/{schoolId}/invoices/bulk-generate
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { formatNPR } from '@edforge/types'
-import type { FeeStructure, StudentAccount } from '@edforge/types'
+import type { FeeStructure } from '@edforge/types'
 import { Button } from '@edforge/ui'
 import {
   Search,
@@ -31,10 +31,12 @@ import {
   X,
 } from 'lucide-react'
 import {
-  useStudentAccounts,
+  useEnrolledStudents,
   useBulkGenerateInvoices,
   useFeeStructures,
+  useAcademicYears,
 } from '@edforge/finance-services'
+import type { StudentSearchResult } from '@edforge/finance-services'
 import { formatDate } from '../../utils/format-date'
 
 // ============================================================================
@@ -117,15 +119,24 @@ function StepIndicator({ current }: { current: Step }) {
 
 export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceFormProps) {
   // Data fetching
-  const { data: accountsData, isLoading: accountsLoading } = useStudentAccounts(schoolId)
+  const { data: studentsData, isLoading: studentsLoading } = useEnrolledStudents(schoolId)
   const { data: feeStructureData, isLoading: feesLoading } = useFeeStructures(schoolId)
+  const { data: academicYearsData } = useAcademicYears(schoolId)
   const bulkGenerateMutation = useBulkGenerateInvoices(schoolId)
 
-  const accounts: StudentAccount[] = Array.isArray(accountsData) ? accountsData : []
+  const students: StudentSearchResult[] = Array.isArray(studentsData) ? studentsData : []
   const feeStructures: FeeStructure[] = useMemo(() => {
     const raw: FeeStructure[] = Array.isArray(feeStructureData) ? feeStructureData : []
     return raw.filter((f) => f.isActive !== false)
   }, [feeStructureData])
+
+  // Filter to active/planning years, sorted most recent first
+  const academicYears = useMemo(() => {
+    const raw = Array.isArray(academicYearsData) ? academicYearsData : []
+    return raw
+      .filter((y) => y.status === 'active' || y.status === 'planning')
+      .sort((a, b) => b.startDate.localeCompare(a.startDate))
+  }, [academicYearsData])
 
   // Form state
   const [step, setStep] = useState<Step>(1)
@@ -145,12 +156,26 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
   const [dueDate, setDueDate] = useState('')
   const [notes, setNotes] = useState('')
 
+  // Auto-select current academic year
+  useEffect(() => {
+    if (!academicYear && academicYears.length > 0) {
+      const current = academicYears.find((y) => y.isCurrent)
+      setAcademicYear(current?.name ?? academicYears[0].name)
+    }
+  }, [academicYears, academicYear])
+
   // Derived values
-  const filteredAccounts = useMemo(() => {
-    if (!studentSearch) return accounts
+  const filteredStudents = useMemo(() => {
+    if (!studentSearch) return students
     const term = studentSearch.toLowerCase()
-    return accounts.filter((a) => a.studentName?.toLowerCase().includes(term))
-  }, [accounts, studentSearch])
+    return students.filter(
+      (s) =>
+        s.fullName?.toLowerCase().includes(term) ||
+        s.firstName?.toLowerCase().includes(term) ||
+        s.lastName?.toLowerCase().includes(term) ||
+        s.studentNumber?.toLowerCase().includes(term)
+    )
+  }, [students, studentSearch])
 
   const selectedFeeStructures = useMemo(
     () => feeStructures.filter((f) => selectedFeeIds.includes(f.id)),
@@ -221,11 +246,11 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
     )
   }
 
-  const toggleAllAccounts = () => {
-    if (selectedStudentIds.length === filteredAccounts.length) {
+  const toggleAllStudents = () => {
+    if (selectedStudentIds.length === filteredStudents.length) {
       setSelectedStudentIds([])
     } else {
-      setSelectedStudentIds(filteredAccounts.map((a) => a.studentId))
+      setSelectedStudentIds(filteredStudents.map((s) => s.studentId))
     }
   }
 
@@ -296,11 +321,11 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 <table className="w-full">
                   <tbody className="divide-y divide-[rgb(var(--border-primary))]">
                     {result.errors.map((err, i) => {
-                      const account = accounts.find((a) => a.id === err.studentId || a.studentId === err.studentId)
+                      const student = students.find((s) => s.studentId === err.studentId)
                       return (
                         <tr key={i} className="hover:bg-[rgb(var(--surface-secondary))]">
                           <td className="px-3 py-2 text-sm text-[rgb(var(--text-primary))]">
-                            {account?.studentName || `Account ${err.studentId.slice(0, 8)}...`}
+                            {student?.fullName || `Student ${err.studentId.slice(0, 8)}...`}
                           </td>
                           <td className="px-3 py-2 text-sm text-red-600 dark:text-red-400">
                             {err.reason}
@@ -357,7 +382,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                 <input
                   type="text"
-                  placeholder="Search by student name..."
+                  placeholder="Search by name or student number..."
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
@@ -369,46 +394,55 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 <span>{selectedStudentIds.length} selected</span>
                 <button
                   type="button"
-                  onClick={toggleAllAccounts}
+                  onClick={toggleAllStudents}
                   className="text-teal-600 dark:text-teal-400 hover:underline"
                 >
-                  {selectedStudentIds.length === filteredAccounts.length
+                  {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                     ? 'Deselect All'
                     : 'Select All'}
                 </button>
               </div>
 
               {/* Student list */}
-              {accountsLoading ? (
+              {studentsLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-5 h-5 text-teal-500 animate-spin" />
                 </div>
-              ) : filteredAccounts.length === 0 ? (
+              ) : filteredStudents.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="w-8 h-8 mx-auto mb-2 text-[rgb(var(--text-tertiary))] opacity-40" />
                   <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                    {studentSearch ? 'No students match your search.' : 'No student accounts found.'}
+                    {studentSearch ? 'No students match your search.' : 'No enrolled students found.'}
                   </p>
                 </div>
               ) : (
                 <div className="border border-[rgb(var(--border-primary))] rounded-lg max-h-72 overflow-y-auto divide-y divide-[rgb(var(--border-primary))]">
-                  {filteredAccounts.map((account) => (
+                  {filteredStudents.map((student) => (
                     <label
-                      key={account.id}
+                      key={student.studentId}
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
-                        checked={selectedStudentIds.includes(account.studentId)}
-                        onChange={() => toggleAccount(account.studentId)}
+                        checked={selectedStudentIds.includes(student.studentId)}
+                        onChange={() => toggleAccount(student.studentId)}
                         className="rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
                       />
-                      <span className="flex-1 text-sm text-[rgb(var(--text-primary))]">
-                        {account.studentName}
-                      </span>
-                      <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                        Balance: {formatNPR(account.balance)}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm text-[rgb(var(--text-primary))]">
+                          {student.fullName}
+                        </span>
+                        {student.currentGradeLevel && (
+                          <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">
+                            Grade {student.currentGradeLevel}
+                          </span>
+                        )}
+                      </div>
+                      {student.studentNumber && (
+                        <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">
+                          {student.studentNumber}
+                        </span>
+                      )}
                     </label>
                   ))}
                 </div>
@@ -515,13 +549,18 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
                     Academic Year *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={academicYear}
                     onChange={(e) => setAcademicYear(e.target.value)}
-                    placeholder="2081/82"
                     className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-                  />
+                  >
+                    <option value="">Select academic year</option>
+                    {academicYears.map((y) => (
+                      <option key={y.yearId} value={y.name}>
+                        {y.name}{y.isCurrent ? ' (Current)' : ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">

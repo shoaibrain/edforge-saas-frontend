@@ -360,6 +360,8 @@ export const studentKeys = {
   all: ['students'] as const,
   search: (schoolId: string, search: string) =>
     [...studentKeys.all, 'search', schoolId, search] as const,
+  enrolled: (schoolId: string) =>
+    [...studentKeys.all, 'enrolled', schoolId] as const,
 }
 
 export function useSearchStudents(schoolId: string, search: string) {
@@ -368,6 +370,20 @@ export function useSearchStudents(schoolId: string, search: string) {
     queryFn: () => searchStudents(schoolId, search),
     enabled: !!schoolId && search.length >= 2,
     staleTime: 60 * 1000,
+  })
+}
+
+/**
+ * Fetch all enrolled (active) students for the school.
+ * Used by Bulk Generate to show the complete student list.
+ * Fetches up to 500 students — covers typical Nepal school sizes.
+ */
+export function useEnrolledStudents(schoolId: string) {
+  return useQuery({
+    queryKey: studentKeys.enrolled(schoolId),
+    queryFn: () => searchStudents(schoolId, undefined, 500),
+    enabled: !!schoolId,
+    staleTime: 2 * 60 * 1000,
   })
 }
 

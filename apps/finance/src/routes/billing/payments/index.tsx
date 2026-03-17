@@ -20,6 +20,8 @@ import {
   X,
   AlertTriangle,
   Download,
+  MoreVertical,
+  Banknote,
 } from 'lucide-react'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -401,6 +403,7 @@ export default function PaymentsPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [actionsOpen, setActionsOpen] = useState(false)
 
   // Dialog state: which payment is being voided or refunded
   const [voidTarget, setVoidTarget] = useState<Payment | null>(null)
@@ -419,8 +422,8 @@ export default function PaymentsPage() {
     ? paymentList.filter(
         (p) =>
           p.receiptNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.invoiceId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.id?.toLowerCase().includes(searchTerm.toLowerCase())
+          p.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : paymentList
 
@@ -480,24 +483,58 @@ export default function PaymentsPage() {
             View and manage all payment transactions.
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => {
-            if (!schoolId) return
-            exportCsvMutation.mutate(schoolId, {
-              onSuccess: () => toast.success('Payments CSV exported'),
-              onError: () => toast.error('Failed to export payments CSV'),
-            })
-          }}
-          disabled={exportCsvMutation.isPending}
-        >
-          {exportCsvMutation.isPending ? (
-            <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-          ) : (
-            <Download className="w-4 h-4 mr-1.5" />
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setActionsOpen(!actionsOpen)}
+            className="p-2 rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+            aria-label="Actions"
+          >
+            <MoreVertical className="w-5 h-5" />
+          </button>
+
+          {actionsOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setActionsOpen(false)}
+              />
+              <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActionsOpen(false)
+                    navigate({ to: '/payments/record' as string })
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                >
+                  <Banknote className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                  Record Payment
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActionsOpen(false)
+                    if (!schoolId) return
+                    exportCsvMutation.mutate(schoolId, {
+                      onSuccess: () => toast.success('Payments CSV exported'),
+                      onError: () => toast.error('Failed to export payments CSV'),
+                    })
+                  }}
+                  disabled={exportCsvMutation.isPending}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors disabled:opacity-50"
+                >
+                  {exportCsvMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 text-[rgb(var(--text-tertiary))] animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                  )}
+                  Export Data
+                </button>
+              </div>
+            </>
           )}
-          Export CSV
-        </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -506,7 +543,7 @@ export default function PaymentsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
-            placeholder="Search by receipt # or invoice ID..."
+            placeholder="Search by receipt #, invoice #, or student..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"

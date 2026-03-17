@@ -57,6 +57,12 @@ export {
 export type { StudentSearchResult } from './services/students.service'
 
 export {
+  getAcademicYears,
+  getCurrentAcademicYear,
+} from './services/academic-years.service'
+export type { AcademicYearOption } from './services/academic-years.service'
+
+export {
   getEnabledGateways,
   getGatewayConfigs,
   saveGatewayConfig,
@@ -96,6 +102,7 @@ export {
   useExportPaymentsCsv,
   studentKeys,
   useSearchStudents,
+  useEnrolledStudents,
 } from './hooks/usePayments'
 
 export {
@@ -104,3 +111,9 @@ export {
   useGatewayConfigs,
   useSaveGatewayConfig,
 } from './hooks/usePaymentGateways'
+
+export {
+  academicYearKeys,
+  useAcademicYears,
+  useCurrentAcademicYear,
+} from './hooks/useAcademicYears'
