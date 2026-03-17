@@ -353,6 +353,14 @@ function AccountDetail({
 }
 
 // ============================================================================
+// AVATAR HELPER
+// ============================================================================
+
+function getAvatarUrl(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+}
+
+// ============================================================================
 // COLUMN DEFINITIONS
 // ============================================================================
 
@@ -361,16 +369,27 @@ const columns: ColumnDef<StudentAccount, unknown>[] = [
   {
     accessorKey: 'studentName',
     header: 'Student Name',
+    size: 280,
     cell: ({ row }) => {
       const account = row.original
       return (
-        <span className="font-medium text-[rgb(var(--text-primary))]">
-          {account.studentName || (
-            <span className="text-[rgb(var(--text-tertiary))] font-mono text-xs" title={account.studentId}>
-              {account.studentId?.slice(0, 8) || '-'}
-            </span>
-          )}
-        </span>
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--surface-tertiary))]">
+            <img
+              src={getAvatarUrl(account.studentId)}
+              alt={account.studentName || 'Student'}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <span className="font-medium text-[rgb(var(--text-primary))]">
+            {account.studentName || (
+              <span className="text-[rgb(var(--text-tertiary))] font-mono text-xs" title={account.studentId}>
+                {account.studentId?.slice(0, 8) || '-'}
+              </span>
+            )}
+          </span>
+        </div>
       )
     },
   },
@@ -444,6 +463,7 @@ export default function StudentAccountsPage() {
         getRowId={(row) => row.id}
         isLoading={isLoading}
         searchPlaceholder="Search by student name..."
+        enableSorting={true}
         enableExpanding={true}
         pagination={{ pageSize: 20 }}
         renderSubComponent={({ row }) => (

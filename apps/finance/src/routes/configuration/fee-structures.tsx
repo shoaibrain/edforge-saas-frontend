@@ -207,7 +207,7 @@ export default function FeeStructuresPage() {
 
   if (isError) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="p-6 space-y-6">
         <div className="text-center py-16">
           <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load fee structures</p>
@@ -220,32 +220,30 @@ export default function FeeStructuresPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-              Fee Structures
-            </h1>
-            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-              Configure the fee types and amounts for your school.
-            </p>
-          </div>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-4 h-4 mr-1.5" />
-            Add Fee Structure
-          </Button>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
+            Fee Structures
+          </h1>
+          <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
+            Configure the fee types and amounts for your school.
+          </p>
         </div>
-
-        {/* List */}
-        <FeeStructureList
-          feeStructures={feeStructures ?? []}
-          isLoading={isLoading}
-          onEdit={(fee) => setEditingFee(fee)}
-          onDelete={(fee) => setDeletingFee(fee)}
-        />
+        <Button onClick={() => setShowForm(true)}>
+          <Plus className="w-4 h-4 mr-1.5" />
+          Add Fee Structure
+        </Button>
       </div>
+
+      {/* List */}
+      <FeeStructureList
+        feeStructures={feeStructures ?? []}
+        isLoading={isLoading}
+        onEdit={(fee) => setEditingFee(fee)}
+        onDelete={(fee) => setDeletingFee(fee)}
+      />
 
       {/* Create form modal */}
       {showForm && (

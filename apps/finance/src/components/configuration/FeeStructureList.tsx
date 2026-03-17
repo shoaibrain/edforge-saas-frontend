@@ -165,6 +165,7 @@ export function FeeStructureList({
       isLoading={isLoading}
       enableSorting={true}
       pagination={{ pageSize: 10 }}
+      maxHeight="calc(100vh - 15rem)"
       emptyState={{
         icon: <DollarSign className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
         title: 'No fee structures configured',
