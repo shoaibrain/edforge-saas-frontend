@@ -20,22 +20,7 @@ import {
 } from '@edforge/finance-services'
 import { formatNPR } from '@edforge/types'
 import { formatDate, formatDateTime, formatDateDual } from '../../../utils/format-date'
-
-function statusBadge(status: string) {
-  const map: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-    issued: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    partially_paid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
-  }
-  return (
-    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${map[status] || map.draft}`}>
-      {status.replace('_', ' ')}
-    </span>
-  )
-}
+import { StatusBadge } from '../../../components/StatusBadge'
 
 export default function InvoiceDetailPage() {
   const navigate = useNavigate()
@@ -83,7 +68,7 @@ export default function InvoiceDetailPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       {/* Back nav */}
       <button
-        onClick={() => navigate({ to: '/billing/invoices' as string })}
+        onClick={() => navigate({ to: '/invoices' as string })}
         className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors print:hidden"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -97,7 +82,7 @@ export default function InvoiceDetailPage() {
             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
               {invoice.invoiceNumber || `Invoice ${invoice.id.slice(0, 8)}`}
             </h1>
-            {statusBadge(invoice.status)}
+            <StatusBadge status={invoice.status} />
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
             {invoice.studentName && `Student: ${invoice.studentName}`}

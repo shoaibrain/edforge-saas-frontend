@@ -12,7 +12,6 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { FeeStructure } from '@edforge/types'
 import { apiGet } from '@edforge/api-client'
@@ -222,12 +221,7 @@ export default function FeeStructuresPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -251,7 +245,7 @@ export default function FeeStructuresPage() {
           onEdit={(fee) => setEditingFee(fee)}
           onDelete={(fee) => setDeletingFee(fee)}
         />
-      </motion.div>
+      </div>
 
       {/* Create form modal */}
       {showForm && (

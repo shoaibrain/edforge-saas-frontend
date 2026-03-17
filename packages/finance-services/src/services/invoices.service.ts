@@ -98,10 +98,12 @@ export async function getStudentAccounts(
   schoolId: string,
   params?: { studentId?: string }
 ): Promise<StudentAccount[]> {
-  return apiGet<StudentAccount[]>(
+  const response = await apiGet<{ items: StudentAccount[]; hasMore: boolean } | StudentAccount[]>(
     `/finance/schools/${schoolId}/student-accounts`,
     params as Record<string, unknown>
   )
+  if (Array.isArray(response)) return response
+  return response?.items ?? []
 }
 
 export async function getStudentLedger(

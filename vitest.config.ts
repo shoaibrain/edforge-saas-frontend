@@ -30,6 +30,8 @@ export default defineConfig({
       '@edforge/i18n': resolve(__dirname, 'packages/i18n/src'),
       '@edforge/date-utils': resolve(__dirname, 'packages/date-utils/src'),
       '@edforge/config': resolve(__dirname, 'packages/config'),
+      '@edforge/api-client': resolve(__dirname, 'packages/api-client/src'),
+      '@edforge/finance-services': resolve(__dirname, 'packages/finance-services/src'),
     },
   },
 })

@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
@@ -30,6 +31,8 @@ import {
 import { formatNPR } from '@edforge/types'
 import type { Payment } from '@edforge/types'
 import { formatDate } from '../../../utils/format-date'
+import { StatusBadge } from '../../../components/StatusBadge'
+import { TableSkeleton } from '../../../components/TableSkeleton'
 
 // ============================================================================
 // STYLED DIALOG COMPONENTS
@@ -388,31 +391,11 @@ function RefundPaymentDialog({
 }
 
 // ============================================================================
-// STATUS BADGE
-// ============================================================================
-
-function paymentStatusBadge(status: string) {
-  const map: Record<string, string> = {
-    completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
-    refunded: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-    partially_refunded: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-    processing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  }
-  return (
-    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${map[status] || map.pending}`}>
-      {status.replace('_', ' ')}
-    </span>
-  )
-}
-
-// ============================================================================
 // MAIN PAGE
 // ============================================================================
 
 export default function PaymentsPage() {
+  const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
   const [statusFilter, setStatusFilter] = useState('')
@@ -559,23 +542,24 @@ export default function PaymentsPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
-        </div>
+        <TableSkeleton rows={6} cols={8} />
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
           <CreditCard className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No payments found</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1 mb-4">
             Payments will appear here once students start paying invoices.
           </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate({ to: '/payments/record' as string })}
+          >
+            Record Manual Payment
+          </Button>
         </div>
       ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden"
-        >
+        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -609,7 +593,7 @@ export default function PaymentsPage() {
                       {payment.gateway.replace('_', ' ')}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {paymentStatusBadge(payment.status)}
+                      <StatusBadge status={payment.status} />
                     </td>
                     <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">
                       {payment.paidAt
@@ -660,7 +644,7 @@ export default function PaymentsPage() {
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Void Payment Dialog */}

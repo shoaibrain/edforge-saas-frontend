@@ -8,7 +8,6 @@
  * The API returns masked values for credential fields.
  */
 
-import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import type { PaymentGateway } from '@edforge/types'
 import { Loader2, AlertTriangle } from 'lucide-react'
@@ -60,12 +59,7 @@ export default function PaymentGatewaysPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
             Payment Gateways
@@ -100,7 +94,7 @@ export default function PaymentGatewaysPage() {
             ))}
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   )
 }

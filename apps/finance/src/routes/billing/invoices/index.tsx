@@ -36,24 +36,10 @@ import {
 import { formatNPR } from '@edforge/types'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
+import { StatusBadge } from '../../../components/StatusBadge'
+import { TableSkeleton } from '../../../components/TableSkeleton'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
-
-function statusBadge(status: string) {
-  const map: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-    issued: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    partially_paid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
-  }
-  return (
-    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${map[status] || map.draft}`}>
-      {status.replace('_', ' ')}
-    </span>
-  )
-}
 
 /** Calculate how many days overdue an invoice is */
 function getOverdueDays(dueDate: string | undefined): number {
@@ -184,7 +170,7 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => navigate({ to: '/billing/invoices/bulk-generate' as string })}
+            onClick={() => navigate({ to: '/invoices/bulk-generate' as string })}
           >
             <Users className="w-4 h-4 mr-1.5" />
             Bulk Generate
@@ -246,23 +232,21 @@ export default function InvoicesPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
-        </div>
+        <TableSkeleton rows={6} cols={6} />
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
           <FileText className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No invoices found</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1 mb-4">
             Generate your first invoice to get started.
           </p>
+          <Button onClick={() => setShowGenerateForm(true)} size="sm">
+            <Plus className="w-4 h-4 mr-1.5" />
+            Generate Invoice
+          </Button>
         </div>
       ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden"
-        >
+        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
@@ -325,12 +309,12 @@ export default function InvoicesPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {statusBadge(invoice.status)}
+                      <StatusBadge status={invoice.status} />
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => navigate({ to: `/billing/invoices/${invoice.id}` as string })}
+                          onClick={() => navigate({ to: `/invoices/${invoice.id}` as string })}
                           className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                           title="View"
                         >
@@ -373,7 +357,7 @@ export default function InvoicesPage() {
               })}
             </tbody>
           </table>
-        </motion.div>
+        </div>
       )}
 
       {/* Generate Invoice Modal */}

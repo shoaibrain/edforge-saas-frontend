@@ -24,10 +24,11 @@ import {
   useStudentAccounts,
   useStudentLedger,
   useInvoices,
-  useSchoolPayments,
 } from '@edforge/finance-services'
 import { formatNPR } from '@edforge/types'
-import type { StudentAccount, StudentLedgerEntry, Invoice, Payment } from '@edforge/types'
+import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
+import { StatusBadge } from '../../../components/StatusBadge'
+import { TableSkeleton } from '../../../components/TableSkeleton'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
@@ -114,8 +115,8 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))]">
               {formatDate(entry.date)}
             </td>
-            <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))] capitalize">
-              {entry.entryType.replace('_', ' ')}
+            <td className="px-2 py-1.5">
+              <StatusBadge status={entry.entryType} size="xs" />
             </td>
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-primary))]">
               {entry.description}
@@ -139,22 +140,6 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
 // ============================================================================
 // INVOICES TAB
 // ============================================================================
-
-function statusBadge(status: string) {
-  const map: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-    issued: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    partially_paid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400',
-  }
-  return (
-    <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${map[status] || map.draft}`}>
-      {status.replace('_', ' ')}
-    </span>
-  )
-}
 
 function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: string }) {
   const navigate = useNavigate()
@@ -193,12 +178,12 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
           <tr
             key={invoice.id}
             className="hover:bg-[rgb(var(--surface-primary))] cursor-pointer transition-colors"
-            onClick={() => navigate({ to: `/billing/invoices/${invoice.id}` as string })}
+            onClick={() => navigate({ to: `/invoices/${invoice.id}` as string })}
           >
             <td className="px-2 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400">
               {invoice.invoiceNumber}
             </td>
-            <td className="px-2 py-1.5">{statusBadge(invoice.status)}</td>
+            <td className="px-2 py-1.5"><StatusBadge status={invoice.status} size="xs" /></td>
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-primary))]">
               {formatNPR(invoice.grandTotal)}
             </td>
@@ -221,41 +206,9 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
 // PAYMENTS TAB
 // ============================================================================
 
-function paymentStatusBadge(status: string) {
-  const map: Record<string, string> = {
-    pending: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    refunded: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  }
-  return (
-    <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${map[status] || map.pending}`}>
-      {status}
-    </span>
-  )
-}
-
+// Sprint 5, Ticket 5.3 will replace this with actual per-student payment records
+// using useSchoolPayments filtered by studentAccountId.
 function PaymentsTab({ schoolId, studentId }: { schoolId: string; studentId: string }) {
-  const { data: allPayments, isLoading } = useSchoolPayments(schoolId)
-  const payments: Payment[] = (Array.isArray(allPayments) ? allPayments : []).filter(
-    (p) => p.studentName || p.invoiceNumber // Only show payments we can associate
-  )
-  // Filter payments for this student by matching studentName from enriched data
-  // Note: Once GSI2-based student payment query is available, replace this client-side filter
-  const studentPayments = payments.filter((p) => {
-    // Match via invoiceId linkage — fall back to checking all
-    return true
-  })
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
-      </div>
-    )
-  }
-
-  // For now, use ledger-based payment view since we don't have a student-scoped payment API
   return <PaymentsFromLedger schoolId={schoolId} studentId={studentId} />
 }
 
@@ -303,7 +256,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-secondary))]">
               {formatNPR(inv.grandTotal)}
             </td>
-            <td className="px-2 py-1.5">{statusBadge(inv.status)}</td>
+            <td className="px-2 py-1.5"><StatusBadge status={inv.status} size="xs" /></td>
           </tr>
         ))}
       </tbody>
@@ -461,6 +414,7 @@ function AccountRow({
 // ============================================================================
 
 export default function StudentAccountsPage() {
+  const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -468,7 +422,7 @@ export default function StudentAccountsPage() {
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 
-  const accountList: StudentAccount[] = Array.isArray(accounts) ? accounts : []
+  const accountList: StudentAccount[] = accounts ?? []
   const filtered = searchTerm
     ? accountList.filter((a) =>
         a.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -511,23 +465,23 @@ export default function StudentAccountsPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
-        </div>
+        <TableSkeleton rows={5} cols={5} />
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
           <Users className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No student accounts found</p>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-            Student accounts are created when invoices are generated.
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1 mb-4">
+            Student accounts are created automatically when invoices are generated.
           </p>
+          <button
+            onClick={() => navigate({ to: '/invoices' as string })}
+            className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:underline"
+          >
+            Go to Invoices →
+          </button>
         </div>
       ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden"
-        >
+        <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
@@ -550,7 +504,7 @@ export default function StudentAccountsPage() {
               ))}
             </tbody>
           </table>
-        </motion.div>
+        </div>
       )}
     </div>
   )

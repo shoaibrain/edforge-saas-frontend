@@ -50,6 +50,7 @@ import {
   FileText,
   Baby,
   Building2,
+  Bug,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -441,6 +442,14 @@ const settingsModule: ModuleConfig = {
           href: '/settings/security-policies',
           permission: { action: 'manage', resource: 'settings' },
         },
+        {
+          id: 'auth-debug',
+          label: 'Auth Debug',
+          icon: Bug,
+          href: '/settings/auth-debug',
+          permission: { action: 'manage', resource: 'settings' },
+          tenantRoles: ['TenantAdmin'],
+        },
         // Fee Structures and Payment Gateways moved to Finance module (/finance/configuration/*)
         // [MVP-PARKED] Billing, Integrations, Import/Export — not needed for MVP pilot schools
         // {
@@ -558,10 +567,9 @@ const financeModule: ModuleConfig = {
       id: 'billing',
       label: 'BILLING',
       items: [
-        { id: 'billing-overview', label: 'Billing', icon: CreditCard, href: '/finance/billing', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
-        { id: 'student-accounts', label: 'Student Accounts', icon: UsersRound, href: '/finance/billing/accounts', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
-        { id: 'payments', label: 'Payments', icon: Wallet, href: '/finance/billing/payments', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
-        { id: 'reports', label: 'Reports', icon: Layers, href: '/finance/dashboard', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'invoices', label: 'Invoices', icon: CreditCard, href: '/finance/invoices', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'student-accounts', label: 'Student Accounts', icon: UsersRound, href: '/finance/accounts', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'payments', label: 'Payments', icon: Wallet, href: '/finance/payments', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
       ],
     },
     {
@@ -569,7 +577,6 @@ const financeModule: ModuleConfig = {
       label: 'CONFIGURATION',
       items: [
         { id: 'fee-structures', label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures', permission: { action: 'manage', resource: 'billing' }, requiresActiveSchool: true },
-        { id: 'payment-gateways', label: 'Payment Gateways', icon: Wallet, href: '/finance/configuration/payment-gateways', permission: { action: 'manage', resource: 'billing' }, requiresActiveSchool: true },
       ],
     },
   ],

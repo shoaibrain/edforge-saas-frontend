@@ -7,7 +7,6 @@
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
 import {
@@ -331,11 +330,7 @@ export default function RecordPaymentPage() {
   if (success) {
     return (
       <div className="p-6 max-w-lg mx-auto">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-16 space-y-4"
-        >
+        <div className="text-center py-16 space-y-4">
           <CheckCircle2 className="w-16 h-16 mx-auto text-green-500" />
           <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">
             Payment Recorded
@@ -347,19 +342,14 @@ export default function RecordPaymentPage() {
             <RotateCcw className="w-4 h-4 mr-1.5" />
             Record Another Payment
           </Button>
-        </motion.div>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="p-6 max-w-lg mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
@@ -525,7 +515,7 @@ export default function RecordPaymentPage() {
           )}
           Record Payment
         </Button>
-      </motion.div>
+      </div>
     </div>
   )
 }

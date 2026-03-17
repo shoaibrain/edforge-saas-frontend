@@ -41,7 +41,7 @@ import SecurityLandingPage from './components/landing/pages/SecurityPage'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
-// AuthDebugPage removed — dev-only utility not needed in production
+import { AuthDebugPage } from './pages/settings'
 import StudentPortalLayout from './pages/student-portal/StudentPortalLayout'
 import StudentGradesPage from './pages/student-portal/StudentGradesPage'
 import StudentAttendancePage from './pages/student-portal/StudentAttendancePage'
@@ -461,6 +461,12 @@ const settingsSecurityPoliciesRoute = createRoute({
   component: RBACSecurityPage,
 })
 
+const settingsAuthDebugRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/auth-debug',
+  component: AuthDebugPage,
+})
+
 const settingsOrganizationRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/organization',
@@ -853,6 +859,7 @@ const routeTree = rootRoute.addChildren([
       // [MVP-PARKED] settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
+      settingsAuthDebugRoute,
       // Fee Structures and Payment Gateways moved to Finance MFE
       // [MVP-PARKED] settingsBillingRoute,
       // [MVP-PARKED] settingsIntegrationsRoute,

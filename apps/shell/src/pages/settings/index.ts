@@ -26,6 +26,9 @@ export { default as EducationOrgDetailPage } from './education-org-detail'
 
 // Finance Configuration moved to Finance MFE (/finance/configuration/*)
 
+// Debug
+export { default as AuthDebugPage } from './auth-debug'
+
 // Other
 // [MVP-PARKED] export { default as IntegrationsSettingsPage } from './integrations'
 // [MVP-PARKED] export { default as BillingSettingsPage } from './billing'

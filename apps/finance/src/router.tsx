@@ -2,25 +2,24 @@
  * Finance Router Configuration
  *
  * Defines the internal routing for the Finance micro-frontend.
- * Includes billing sub-routes (invoices, payments, accounts) and dashboard.
+ * Routes are flat (no /billing/ prefix) with legacy redirects for old paths.
  */
 
 import {
     createRouter,
     createRoute,
     createRootRoute,
+    redirect,
     Outlet,
 } from '@tanstack/react-router'
 import { FinanceLayout } from './layouts/FinanceLayout'
 import { Overview } from './routes/overview'
-import { BillingModule } from './routes/billing'
 import InvoicesPage from './routes/billing/invoices/index'
 import InvoiceDetailPage from './routes/billing/invoices/$invoiceId'
 import BulkInvoicesPage from './routes/billing/invoices/bulk-generate'
 import PaymentsPage from './routes/billing/payments/index'
 import RecordPaymentPage from './routes/billing/payments/record'
 import StudentAccountsPage from './routes/billing/accounts/index'
-import FinancialDashboardPage from './routes/dashboard/index'
 import FeeStructuresPage from './routes/configuration/fee-structures'
 import PaymentGatewaysPage from './routes/configuration/payment-gateways'
 
@@ -37,7 +36,7 @@ const rootRoute = createRootRoute({
 })
 
 // ============================================================================
-// ROUTES
+// ROUTES (flat — no /billing/ prefix)
 // ============================================================================
 
 // Overview (Index)
@@ -47,60 +46,46 @@ const indexRoute = createRoute({
     component: Overview,
 })
 
-// Billing Overview
-const billingRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/billing',
-    component: BillingModule,
-})
-
-// Billing > Invoices List
+// Invoices List
 const invoicesRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/billing/invoices',
+    path: '/invoices',
     component: InvoicesPage,
 })
 
-// Billing > Invoice Detail
+// Invoice Detail
 const invoiceDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/billing/invoices/$invoiceId',
+    path: '/invoices/$invoiceId',
     component: InvoiceDetailPage,
 })
 
-// Billing > Bulk Generate Invoices
+// Bulk Generate Invoices
 const bulkGenerateRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/billing/invoices/bulk-generate',
+    path: '/invoices/bulk-generate',
     component: BulkInvoicesPage,
 })
 
-// Billing > Payments List
+// Payments List
 const paymentsRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/billing/payments',
+    path: '/payments',
     component: PaymentsPage,
 })
 
-// Billing > Record Payment
+// Record Payment
 const recordPaymentRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/billing/payments/record',
+    path: '/payments/record',
     component: RecordPaymentPage,
 })
 
-// Billing > Student Accounts
+// Student Accounts
 const accountsRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/billing/accounts',
+    path: '/accounts',
     component: StudentAccountsPage,
-})
-
-// Financial Dashboard
-const dashboardRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/dashboard',
-    component: FinancialDashboardPage,
 })
 
 // Configuration > Fee Structures
@@ -118,21 +103,64 @@ const paymentGatewaysRoute = createRoute({
 })
 
 // ============================================================================
+// LEGACY REDIRECTS
+// ============================================================================
+
+// /dashboard → / (merged into Overview)
+const dashboardRedirect = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/dashboard',
+    beforeLoad: () => { throw redirect({ to: '/' }) },
+})
+
+// /billing → /invoices (landing page removed, prefix flattened)
+const billingRedirect = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing',
+    beforeLoad: () => { throw redirect({ to: '/invoices' }) },
+})
+
+// /billing/invoices → /invoices
+const billingInvoicesRedirect = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing/invoices',
+    beforeLoad: () => { throw redirect({ to: '/invoices' }) },
+})
+
+// /billing/payments → /payments
+const billingPaymentsRedirect = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing/payments',
+    beforeLoad: () => { throw redirect({ to: '/payments' }) },
+})
+
+// /billing/accounts → /accounts
+const billingAccountsRedirect = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/billing/accounts',
+    beforeLoad: () => { throw redirect({ to: '/accounts' }) },
+})
+
+// ============================================================================
 // ROUTE TREE
 // ============================================================================
 
 const routeTree = rootRoute.addChildren([
     indexRoute,
-    billingRoute,
     bulkGenerateRoute,  // Must be before invoiceDetailRoute so /bulk-generate matches before /$invoiceId
     invoicesRoute,
     invoiceDetailRoute,
     paymentsRoute,
     recordPaymentRoute,
     accountsRoute,
-    dashboardRoute,
     feeStructuresRoute,
     paymentGatewaysRoute,
+    // Legacy redirects
+    dashboardRedirect,
+    billingRedirect,
+    billingInvoicesRedirect,
+    billingPaymentsRedirect,
+    billingAccountsRedirect,
 ])
 
 /**

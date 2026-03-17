@@ -55,7 +55,6 @@ export default defineConfig({
             zod: { singleton: true, eager: true },
             '@hookform/resolvers': { singleton: true, eager: true },
             'framer-motion': { singleton: true, eager: true },
-            '@react-spring/web': { singleton: true, eager: true },
             sonner: { singleton: true, eager: true },
           },
         }),
