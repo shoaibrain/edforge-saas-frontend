@@ -22,6 +22,8 @@ import {
   CheckSquare,
   Layers,
   GalleryVerticalEnd,
+  Bell,
+  CalendarDays,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 
@@ -184,6 +186,32 @@ export const MY_TASKS_WIDGET: WidgetDefinition = {
 }
 
 /**
+ * Home Alerts widget (admin command center)
+ */
+export const HOME_ALERTS_WIDGET: WidgetDefinition = {
+  id: 'home-alerts',
+  label: 'Alerts',
+  icon: Bell,
+  category: 'content',
+  defaultVisible: true,
+  order: 5,
+  description: 'Critical attendance and finance alerts',
+}
+
+/**
+ * Teacher Sections widget (teacher dashboard)
+ */
+export const HOME_TEACHER_SECTIONS_WIDGET: WidgetDefinition = {
+  id: 'home-teacher-sections',
+  label: 'My Sections',
+  icon: CalendarDays,
+  category: 'content',
+  defaultVisible: true,
+  order: 10,
+  description: 'Your assigned class sections',
+}
+
+/**
  * Database Views widget (future feature)
  */
 export const DATABASE_VIEWS_WIDGET: WidgetDefinition = {
@@ -206,11 +234,9 @@ export const DATABASE_VIEWS_WIDGET: WidgetDefinition = {
 export const HOME_PAGE_CONFIG: PageWidgetConfig = {
   pageType: 'home',
   widgets: [
-    RECENTLY_VISITED_WIDGET,
-    UPCOMING_EVENTS_WIDGET,
+    HOME_ALERTS_WIDGET,
+    HOME_TEACHER_SECTIONS_WIDGET,
     QUICK_ACTIONS_WIDGET,
-    WELCOME_TIP_WIDGET,
-    // MY_TASKS_WIDGET, // Enable when implemented
   ],
   settings: {
     showGreeting: true,

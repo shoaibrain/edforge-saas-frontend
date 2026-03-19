@@ -1,24 +1,18 @@
 /**
- * Home Page - Role-Aware Dynamic Dashboard
- * 
- * A Notion-inspired customizable landing page that adapts to the user's role:
- * - Administrators see management quick actions
- * - Teachers see classroom-focused actions
- * - Students see academic progress and assignments
- * - Parents see children's overview and school communications
- * 
- * All users get:
- * - Time-based personalized greeting
- * - Recently visited pages carousel
- * - Upcoming events calendar (with customization menu)
- * - Role-appropriate quick actions
- * - Contextual welcome tips
- * 
- * Widget visibility is customizable and persisted per user.
- * Three-dot menu in top right corner (handled by DynamicPageLayout).
+ * Home Page - Role-Aware School Command Center
+ *
+ * Renders a data-driven dashboard that adapts to the user's role:
+ * - Administrators see alerts, KPIs, charts, and 6 quick actions
+ * - Teachers see their assigned sections and classroom quick actions
+ * - Students see academic quick actions
+ * - Parents see family-oriented quick actions
+ *
+ * All data is fetched from existing APIs (academics, finance, identity).
+ * No mock data, no "Coming Soon" badges, no placeholder content.
  */
 
-import { useAuthStore } from '../stores/auth.store'
+import { useAuthStore, getUserRoleCategory } from '../stores/auth.store'
+import { useAppStore } from '../stores/app.store'
 import { useTranslation } from '@edforge/i18n'
 import { getGreeting } from '../lib/greeting'
 
@@ -26,15 +20,13 @@ import { getGreeting } from '../lib/greeting'
 import {
   DynamicPageLayout,
   GreetingHeader,
-  RecentlyVisitedWidget,
-  UpcomingEventsWidget,
   QuickActionsWidget,
-  WelcomeTipWidget,
-  // [MVP-PARKED] Special Programs & Ed-Fi widgets
-  // ComplianceAlertsWidget,
-  // DataHealthWidget,
-  // [/MVP-PARKED]
 } from '../components/dynamic-page'
+
+// Role-based command center layouts
+import { AdminCommandCenter } from '../components/home/AdminCommandCenter'
+import { TeacherDashboard } from '../components/home/TeacherDashboard'
+import { StudentDashboard } from '../components/home/StudentDashboard'
 
 // ============================================================================
 // HOME PAGE COMPONENT
@@ -42,11 +34,13 @@ import {
 
 export default function HomePage() {
   const user = useAuthStore((s) => s.user)
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { t } = useTranslation('dashboard')
 
+  const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const firstName = user?.displayName || user?.name?.split(' ')[0]
   const greeting = getGreeting(firstName, t)
-  
+
   return (
     <DynamicPageLayout
       pageId="home"
@@ -55,29 +49,24 @@ export default function HomePage() {
       showVisibilityMenu={true}
     >
       {/* ================================================================== */}
-      {/* RECENTLY VISITED CAROUSEL */}
+      {/* ROLE-BASED COMMAND CENTER */}
       {/* ================================================================== */}
-      <RecentlyVisitedWidget />
-
-      {/* ================================================================== */}
-      {/* UPCOMING EVENTS */}
-      {/* ================================================================== */}
-      <UpcomingEventsWidget />
-
-      {/* [MVP-PARKED] Special Programs & Ed-Fi widgets */}
-      {/* <ComplianceAlertsWidget /> */}
-      {/* <DataHealthWidget /> */}
-      {/* [/MVP-PARKED] */}
-
-      {/* ================================================================== */}
-      {/* QUICK ACTIONS - Role-Specific */}
-      {/* ================================================================== */}
-      <QuickActionsWidget />
-
-      {/* ================================================================== */}
-      {/* WELCOME TIP - Role-Specific */}
-      {/* ================================================================== */}
-      <WelcomeTipWidget />
+      {roleCategory === 'administrator' && (
+        <AdminCommandCenter schoolId={activeSchoolId} />
+      )}
+      {roleCategory === 'educator' && (
+        <TeacherDashboard schoolId={activeSchoolId} />
+      )}
+      {roleCategory === 'student' && (
+        <StudentDashboard schoolId={activeSchoolId} />
+      )}
+      {roleCategory === 'parent' && (
+        <QuickActionsWidget />
+      )}
+      {/* Fallback for no role (e.g., TenantAdmin without school assignment) */}
+      {roleCategory == null && (
+        <QuickActionsWidget />
+      )}
     </DynamicPageLayout>
   )
 }

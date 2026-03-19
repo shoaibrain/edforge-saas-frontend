@@ -317,7 +317,7 @@ function DeleteConfirmDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl">
+      <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl">
         {/* Warning icon */}
         <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50 dark:bg-red-500/10">
           <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />

@@ -124,9 +124,9 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
       <button
         type="button"
         onClick={() => credFields.length > 0 && setIsExpanded(!isExpanded)}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
+        className="w-full flex items-center gap-3 p-4 text-left hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
       >
-        <div className={`p-2 rounded-lg ${isEnabled ? 'bg-teal-100 dark:bg-teal-500/20' : 'bg-[rgb(var(--bg-tertiary))]'}`}>
+        <div className={`p-2 rounded-lg ${isEnabled ? 'bg-teal-100 dark:bg-teal-500/20' : 'bg-[rgb(var(--surface-tertiary))]'}`}>
           <Icon className={`w-5 h-5 ${isEnabled ? 'text-teal-700 dark:text-teal-400' : 'text-[rgb(var(--text-tertiary))]'}`} />
         </div>
         <div className="flex-1 min-w-0">
@@ -191,7 +191,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
                   type={field.sensitive && !showSecrets[field.key] ? 'password' : 'text'}
                   autoComplete="off"
                   className="w-full px-3 py-2 pr-10 rounded-lg border border-[rgb(var(--border-primary))]
-                    bg-[rgb(var(--bg-primary))] text-sm text-[rgb(var(--text-primary))]
+                    bg-[rgb(var(--surface-primary))] text-sm text-[rgb(var(--text-primary))]
                     focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   placeholder={field.sensitive ? '••••••••' : ''}
                 />

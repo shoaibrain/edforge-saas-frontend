@@ -202,7 +202,7 @@ export function FeeStructureForm({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
+      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))] flex-shrink-0">
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -211,7 +211,7 @@ export function FeeStructureForm({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
@@ -223,7 +223,7 @@ export function FeeStructureForm({
           <Field label="Name" error={errors.name?.message}>
             <input
               {...register('name')}
-              className="input-field"
+              className="input"
               placeholder="e.g. Annual Tuition Fee"
             />
           </Field>
@@ -232,7 +232,7 @@ export function FeeStructureForm({
           <Field label="Description" error={errors.description?.message}>
             <input
               {...register('description')}
-              className="input-field"
+              className="input"
               placeholder="Optional description"
             />
           </Field>
@@ -240,7 +240,7 @@ export function FeeStructureForm({
           {/* Academic Year */}
           <Field label="Academic Year" error={errors.academicYearId?.message}>
             {academicYears.length > 0 ? (
-              <select {...register('academicYearId')} className="input-field">
+              <select {...register('academicYearId')} className="input">
                 {academicYears.map((ay) => (
                   <option key={ay.id} value={ay.id}>
                     {ay.name}{ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}
@@ -257,7 +257,7 @@ export function FeeStructureForm({
           {/* Type + Frequency */}
           <div className="grid grid-cols-2 gap-4">
             <Field label="Type" error={errors.feeType?.message}>
-              <select {...register('feeType')} className="input-field">
+              <select {...register('feeType')} className="input">
                 {FEE_TYPES.map((ft) => (
                   <option key={ft} value={ft}>
                     {FEE_TYPE_LABELS[ft]}
@@ -266,7 +266,7 @@ export function FeeStructureForm({
               </select>
             </Field>
             <Field label="Frequency" error={errors.frequency?.message}>
-              <select {...register('frequency')} className="input-field">
+              <select {...register('frequency')} className="input">
                 {FREQUENCIES.map((freq) => (
                   <option key={freq} value={freq}>
                     {FREQUENCY_LABELS[freq]}
@@ -285,12 +285,12 @@ export function FeeStructureForm({
                 min="0"
                 max="10000000"
                 step="0.01"
-                className="input-field"
+                className="input"
                 placeholder="0.00"
               />
             </Field>
             <Field label="Tax Type" error={errors.taxType?.message}>
-              <select {...register('taxType')} className="input-field">
+              <select {...register('taxType')} className="input">
                 {TAX_TYPES.map((tt) => (
                   <option key={tt} value={tt}>{tt === 'none' ? 'None' : tt}</option>
                 ))}
@@ -303,7 +303,7 @@ export function FeeStructureForm({
                 min="0"
                 max="100"
                 step="0.1"
-                className="input-field"
+                className="input"
                 placeholder="0"
               />
             </Field>
@@ -324,7 +324,7 @@ export function FeeStructureForm({
           />
 
           {/* Enrollment & Pro-Rate Settings */}
-          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--bg-tertiary))]">
+          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
             <p className="text-xs font-medium text-[rgb(var(--text-secondary))]">Enrollment Settings</p>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -350,10 +350,10 @@ export function FeeStructureForm({
           {/* Effective dates */}
           <div className="grid grid-cols-2 gap-4">
             <Field label="Effective From" error={errors.effectiveFrom?.message}>
-              <input {...register('effectiveFrom')} type="date" className="input-field" />
+              <input {...register('effectiveFrom')} type="date" className="input" />
             </Field>
             <Field label="Effective To" error={errors.effectiveTo?.message}>
-              <input {...register('effectiveTo')} type="date" className="input-field" />
+              <input {...register('effectiveTo')} type="date" className="input" />
             </Field>
           </div>
         </form>
@@ -372,23 +372,6 @@ export function FeeStructureForm({
         </div>
       </div>
 
-      <style>{`
-        .input-field {
-          width: 100%;
-          padding: 0.5rem 0.75rem;
-          border-radius: 0.5rem;
-          border: 1px solid rgb(var(--border-primary));
-          background: rgb(var(--bg-primary));
-          color: rgb(var(--text-primary));
-          font-size: 0.875rem;
-          transition: border-color 0.15s;
-        }
-        .input-field:focus {
-          outline: none;
-          border-color: rgb(20, 184, 166);
-          box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
-        }
-      `}</style>
     </div>
   )
 }
