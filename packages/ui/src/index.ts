@@ -114,3 +114,13 @@ export { DateDisplay } from './components/DateDisplay'
 export { BsDatePicker, DateInput } from './components/BsDatePicker'
 export { SchoolDate } from './components/SchoolDate'
 
+// V2 Components
+export { StatCard, type StatCardProps } from './components/StatCard'
+export { AnimatedProgressBar, type AnimatedProgressBarProps } from './components/AnimatedProgressBar'
+export { WidgetErrorBoundaryV2 } from './components/SectionErrorBoundary'
+export { V2AlertItem, type V2AlertItemProps } from './components/V2AlertItem'
+
+// V2 Hooks
+export { useCountUp, parseFormattedValue, formatAnimatedValue } from './hooks/useCountUp'
+export { useV2ChartColors } from './hooks/useV2ChartColors'
+

@@ -1,0 +1,977 @@
+When the User Visits: https://www.edforge.app/academics
+This user is TenantAdmin
+Some of the network calls made by the application to get relevant and appropriate data for Academics Module Overview Page:
+API Cal: 
+https://www.edforge.app/api/academics/attendance/trend?schoolId=d5adb754-9997-42f0-9ee5-98f41e6c4d73&startDate=2026-02-17&endDate=2026-03-19
+REsponse:
+[
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-02-23",
+        "totalStudents": 2,
+        "totalRecorded": 2,
+        "present": 2,
+        "absent": 0,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 100
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-02-24",
+        "totalStudents": 1,
+        "totalRecorded": 1,
+        "present": 1,
+        "absent": 0,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 100
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-02-25",
+        "totalStudents": 2,
+        "totalRecorded": 2,
+        "present": 2,
+        "absent": 0,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 100
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-02-26",
+        "totalStudents": 4,
+        "totalRecorded": 4,
+        "present": 2,
+        "absent": 1,
+        "late": 0,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 50
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-02-27",
+        "totalStudents": 8,
+        "totalRecorded": 8,
+        "present": 5,
+        "absent": 1,
+        "late": 1,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 1,
+        "attendanceRate": 87.5
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-02",
+        "totalStudents": 8,
+        "totalRecorded": 8,
+        "present": 4,
+        "absent": 3,
+        "late": 0,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 50
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-03",
+        "totalStudents": 8,
+        "totalRecorded": 8,
+        "present": 7,
+        "absent": 0,
+        "late": 0,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 87.5
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-04",
+        "totalStudents": 12,
+        "totalRecorded": 12,
+        "present": 10,
+        "absent": 0,
+        "late": 1,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 91.67
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-05",
+        "totalStudents": 14,
+        "totalRecorded": 14,
+        "present": 9,
+        "absent": 1,
+        "late": 2,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 2,
+        "attendanceRate": 92.86
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-06",
+        "totalStudents": 14,
+        "totalRecorded": 14,
+        "present": 9,
+        "absent": 3,
+        "late": 1,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 71.43
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-08",
+        "totalStudents": 15,
+        "totalRecorded": 15,
+        "present": 10,
+        "absent": 3,
+        "late": 1,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 73.33
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-09",
+        "totalStudents": 7,
+        "totalRecorded": 7,
+        "present": 6,
+        "absent": 1,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 85.71
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-10",
+        "totalStudents": 7,
+        "totalRecorded": 7,
+        "present": 4,
+        "absent": 3,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 57.14
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-11",
+        "totalStudents": 7,
+        "totalRecorded": 7,
+        "present": 4,
+        "absent": 1,
+        "late": 2,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 85.71
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-12",
+        "totalStudents": 7,
+        "totalRecorded": 7,
+        "present": 7,
+        "absent": 0,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 100
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-13",
+        "totalStudents": 11,
+        "totalRecorded": 11,
+        "present": 9,
+        "absent": 2,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 81.82
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-16",
+        "totalStudents": 7,
+        "totalRecorded": 7,
+        "present": 6,
+        "absent": 1,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 85.71
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-17",
+        "totalStudents": 11,
+        "totalRecorded": 11,
+        "present": 8,
+        "absent": 3,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 72.73
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-18",
+        "totalStudents": 6,
+        "totalRecorded": 6,
+        "present": 3,
+        "absent": 1,
+        "late": 1,
+        "excused": 1,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 66.67
+    },
+    {
+        "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+        "date": "2026-03-19",
+        "totalStudents": 6,
+        "totalRecorded": 6,
+        "present": 6,
+        "absent": 0,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 100
+    }
+]
+
+API Call:
+https://www.edforge.app/api/schools/d5adb754-9997-42f0-9ee5-98f41e6c4d73/staff
+REsponse:
+{
+    "items": [
+        {
+            "staffId": "8393a2a7-31a5-4180-beb0-321335a7646d",
+            "staffUniqueId": "21cb9530-2071-7045-a111-3380509566f9",
+            "tenantId": "3909d28b-d3b8-4a45-8f3d-595a422a6e82",
+            "userId": "21cb9530-2071-7045-a111-3380509566f9",
+            "firstName": "John",
+            "lastSurname": "Smith",
+            "email": "john@snow.com",
+            "primarySchoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "schoolAssignments": [
+                {
+                    "beginDate": "2026-02-11",
+                    "role": "teacher",
+                    "department": "Mathematics",
+                    "isPrimary": true,
+                    "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73"
+                }
+            ],
+            "role": "teacher",
+            "employmentType": "full_time",
+            "employmentStatus": "active",
+            "hireDate": "2026-02-11",
+            "status": "active",
+            "createdAt": "2026-02-11T14:09:35.164Z",
+            "updatedAt": "2026-02-11T14:09:35.164Z"
+        },
+        {
+            "staffId": "8a0aeea8-1426-4625-b1bd-fd069589c0b5",
+            "staffUniqueId": "LW8004",
+            "tenantId": "3909d28b-d3b8-4a45-8f3d-595a422a6e82",
+            "firstName": "Leone",
+            "lastSurname": "Wolf",
+            "middleName": "Jack",
+            "birthDate": "1998-01-01",
+            "gender": "male",
+            "email": "leon@yahoo.com",
+            "phone": "456789033",
+            "addresses": [
+                {
+                    "stateAbbreviationDescriptor": "IL",
+                    "streetNumberName": "7654 KingsLanding Parkway",
+                    "country": "US",
+                    "city": "SpringField",
+                    "addressTypeDescriptor": "home",
+                    "postalCode": "759024"
+                }
+            ],
+            "primarySchoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "schoolAssignments": [
+                {
+                    "beginDate": "2026-02-11",
+                    "role": "teacher",
+                    "positionTitle": "Biology Teacher",
+                    "department": "Science",
+                    "isPrimary": true,
+                    "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73"
+                }
+            ],
+            "role": "teacher",
+            "employmentType": "contract",
+            "employmentStatus": "active",
+            "hireDate": "2026-02-11",
+            "title": "Biology Teacher",
+            "highlyQualifiedTeacher": true,
+            "yearsOfPriorTeachingExperience": 3,
+            "status": "active",
+            "hispanicLatinoEthnicity": true,
+            "createdAt": "2026-02-11T14:13:24.924Z",
+            "updatedAt": "2026-02-15T19:07:32.076Z"
+        },
+        {
+            "staffId": "b5f47cd5-5dc5-415e-942e-b50941f50cdb",
+            "staffUniqueId": "CL5295",
+            "tenantId": "3909d28b-d3b8-4a45-8f3d-595a422a6e82",
+            "firstName": "Cerci",
+            "lastSurname": "Lanester",
+            "birthDate": "2009-01-01",
+            "gender": "female",
+            "email": "cerci@yahoo.com",
+            "phone": "4567898765",
+            "addresses": [
+                {
+                    "stateAbbreviationDescriptor": "LA",
+                    "streetNumberName": "3345 Taylor Fontenote Street",
+                    "country": "US",
+                    "city": "Sulpher",
+                    "addressTypeDescriptor": "home",
+                    "postalCode": "45678"
+                }
+            ],
+            "primarySchoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "schoolAssignments": [
+                {
+                    "beginDate": "2026-02-12",
+                    "role": "principal",
+                    "positionTitle": "Principal",
+                    "department": "Science",
+                    "isPrimary": true,
+                    "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73"
+                }
+            ],
+            "role": "principal",
+            "employmentType": "full_time",
+            "employmentStatus": "active",
+            "hireDate": "2026-02-12",
+            "title": "Principal",
+            "status": "active",
+            "createdAt": "2026-02-12T02:56:17.441Z",
+            "updatedAt": "2026-02-16T13:37:17.702Z"
+        }
+    ],
+    "hasMore": false
+}
+
+API Call: https://www.edforge.app/api/schools/d5adb754-9997-42f0-9ee5-98f41e6c4d73/academic-years/18e9d1b3-8ad5-4172-bb94-c138909ad857/grading-periods
+REsponse:
+{"items":[],"hasMore":false}
+
+Api Call: https://www.edforge.app/api/academics/dashboard/overview?schoolId=d5adb754-9997-42f0-9ee5-98f41e6c4d73&academicYearId=18e9d1b3-8ad5-4172-bb94-c138909ad857&date=2026-03-19
+REsponse:
+{
+    "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+    "academicYearId": "18e9d1b3-8ad5-4172-bb94-c138909ad857",
+    "date": "2026-03-19",
+    "enrollment": {
+        "totalEnrolled": 22,
+        "byGradeLevel": {
+            "1": 1,
+            "2": 1,
+            "5": 3,
+            "6": 3,
+            "7": 2,
+            "8": 1,
+            "9": 2,
+            "10": 4,
+            "11": 3,
+            "K": 1,
+            "PK": 1
+        },
+        "byStatus": {
+            "enrolled": 22,
+            "pending": 0,
+            "withdrawn": 0,
+            "graduated": 0,
+            "transferred": 0
+        },
+        "recentEnrollments": 2,
+        "recentWithdrawals": 0
+    },
+    "activeSectionsCount": 10,
+    "attendance": {
+        "date": "2026-03-19",
+        "totalStudents": 22,
+        "totalRecorded": 6,
+        "present": 6,
+        "absent": 0,
+        "late": 0,
+        "excused": 0,
+        "halfDay": 0,
+        "remote": 0,
+        "attendanceRate": 27.27
+    },
+    "_cached": false
+}
+
+API Call:
+https://www.edforge.app/api/academics/attendance/alerts?schoolId=d5adb754-9997-42f0-9ee5-98f41e6c4d73&academicYearId=18e9d1b3-8ad5-4172-bb94-c138909ad857&threshold=90&startDate=2025-12-19&endDate=2026-03-19
+
+REsponse:
+{
+    "alerts": [
+        {
+            "studentId": "eb55639b-4c5f-4031-8eb0-f08ee139d405",
+            "studentName": "Mei Wong",
+            "gradeLevel": "10",
+            "attendanceRate": 70,
+            "totalDays": 10,
+            "absentDays": 3,
+            "trend": "stable"
+        },
+        {
+            "studentId": "0c49b204-b423-499d-9cb2-3e1033afd8f3",
+            "studentName": "Tyler Brooks",
+            "gradeLevel": "9",
+            "attendanceRate": 70,
+            "totalDays": 10,
+            "absentDays": 2,
+            "trend": "stable"
+        },
+        {
+            "studentId": "1b7f6929-6d42-409f-a879-5aa6f5421c15",
+            "studentName": "Olivia Garcia",
+            "gradeLevel": "1",
+            "attendanceRate": 75,
+            "totalDays": 16,
+            "absentDays": 3,
+            "trend": "stable"
+        },
+        {
+            "studentId": "71af575f-cee8-453c-8203-dc617f63b2c7",
+            "studentName": "Olivia Chen",
+            "gradeLevel": "7",
+            "attendanceRate": 75,
+            "totalDays": 16,
+            "absentDays": 4,
+            "trend": "stable"
+        },
+        {
+            "studentId": "540bf98a-3558-401b-99b7-e3d6237d36ba",
+            "studentName": "Noah Kim",
+            "gradeLevel": "8",
+            "attendanceRate": 75,
+            "totalDays": 4,
+            "absentDays": 0,
+            "trend": "stable"
+        },
+        {
+            "studentId": "50c81f2e-f6d9-4269-8362-ef1392319494",
+            "studentName": "Cool Mint",
+            "gradeLevel": "PK",
+            "attendanceRate": 75,
+            "totalDays": 12,
+            "absentDays": 2,
+            "trend": "stable"
+        },
+        {
+            "studentId": "d7d274e0-65e3-4ce7-8dcf-e4a85dd88abc",
+            "studentName": "Steven Bergsten",
+            "gradeLevel": "11",
+            "attendanceRate": 81.82,
+            "totalDays": 11,
+            "absentDays": 2,
+            "trend": "stable"
+        },
+        {
+            "studentId": "9621dfdd-b132-4276-93c8-74d81bf5a6eb",
+            "studentName": "Jaylen Carter",
+            "gradeLevel": "11",
+            "attendanceRate": 81.82,
+            "totalDays": 11,
+            "absentDays": 2,
+            "trend": "stable"
+        },
+        {
+            "studentId": "f599efdc-2136-4241-b292-416087d6acca",
+            "studentName": "Liam Brown",
+            "gradeLevel": "2",
+            "attendanceRate": 81.82,
+            "totalDays": 11,
+            "absentDays": 2,
+            "trend": "stable"
+        },
+        {
+            "studentId": "9c782031-5cae-42ac-a926-ee387bbf19b8",
+            "studentName": "Emily Johnson",
+            "gradeLevel": "6",
+            "attendanceRate": 81.82,
+            "totalDays": 11,
+            "absentDays": 1,
+            "trend": "stable"
+        },
+        {
+            "studentId": "3922c2ce-32a7-4ad8-96cd-033ff6378bc6",
+            "studentName": "Ethan Nguyen",
+            "gradeLevel": "10",
+            "attendanceRate": 83.33,
+            "totalDays": 12,
+            "absentDays": 1,
+            "trend": "stable"
+        },
+        {
+            "studentId": "05e877e4-7a0d-4750-9963-83578ef48b9d",
+            "studentName": "Aisha Johnson",
+            "gradeLevel": "10",
+            "attendanceRate": 85.71,
+            "totalDays": 7,
+            "absentDays": 0,
+            "trend": "stable"
+        }
+    ],
+    "totalAtRiskCount": 12
+}
+
+
+Same User visits Finance Module - on the Overview Page:
+some of the network api calls made:
+
+https://www.edforge.app/api/finance/schools/d5adb754-9997-42f0-9ee5-98f41e6c4d73/dashboard/summary
+{
+    "totalInvoiced": 457200,
+    "totalCollected": 148000,
+    "outstanding": 309200,
+    "overdue": 309000,
+    "collectionRate": 32.37,
+    "invoicesByStatus": {
+        "draft": 5,
+        "issued": 0,
+        "partially_paid": 1,
+        "paid": 4,
+        "overdue": 31,
+        "cancelled": 2
+    },
+    "paymentsByGateway": {
+        "cash": 9,
+        "cheque": 1,
+        "bank_transfer": 1
+    },
+    "byGradeLevel": [
+        {
+            "gradeLevel": "Unknown",
+            "invoiceCount": 36,
+            "totalInvoiced": 457200,
+            "totalCollected": 148000,
+            "outstanding": 309200
+        }
+    ],
+    "byFeeType": [
+        {
+            "feeType": "admission",
+            "invoiceCount": 8,
+            "totalAmount": 400000,
+            "collectedAmount": 140000
+        },
+        {
+            "feeType": "lab",
+            "invoiceCount": 29,
+            "totalAmount": 57200,
+            "collectedAmount": 8000
+        }
+    ],
+    "agingReport": [
+        {
+            "label": "Current",
+            "minDays": 0,
+            "maxDays": 0,
+            "count": 0,
+            "amount": 0
+        },
+        {
+            "label": "1-30 days",
+            "minDays": 1,
+            "maxDays": 30,
+            "count": 32,
+            "amount": 309200
+        },
+        {
+            "label": "31-60 days",
+            "minDays": 31,
+            "maxDays": 60,
+            "count": 0,
+            "amount": 0
+        },
+        {
+            "label": "61-90 days",
+            "minDays": 61,
+            "maxDays": 90,
+            "count": 0,
+            "amount": 0
+        },
+        {
+            "label": "90+ days",
+            "minDays": 91,
+            "maxDays": null,
+            "count": 0,
+            "amount": 0
+        }
+    ],
+    "monthlyCollections": [
+        {
+            "month": "2026-03",
+            "collected": 148000,
+            "invoiced": 457200,
+            "paymentCount": 11
+        }
+    ],
+    "recentPayments": [
+        {
+            "id": "ff3734f9-1508-4058-b0e5-0e501439fed1",
+            "amount": 1800,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0013",
+            "paidAt": "2026-03-19",
+            "createdAt": "2026-03-19T13:54:51.552Z"
+        },
+        {
+            "id": "fcd4320f-c52c-49f4-97bd-3595445c3899",
+            "amount": 1200,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0012",
+            "paidAt": "2026-03-19",
+            "createdAt": "2026-03-19T13:54:32.845Z"
+        },
+        {
+            "id": "bafaae32-94d1-43c5-ab30-9153b26b47bb",
+            "amount": 0.12,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0011",
+            "paidAt": "2026-03-19",
+            "createdAt": "2026-03-19T13:54:07.843Z"
+        },
+        {
+            "id": "2a885b2e-011c-45a5-8eaf-c8af6b1c21bc",
+            "amount": 40000,
+            "gateway": "cheque",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0010",
+            "paidAt": "2026-03-19",
+            "createdAt": "2026-03-19T04:56:26.142Z"
+        },
+        {
+            "id": "53c993c6-48c3-4ccb-9d8f-6055f3964315",
+            "amount": 1999.88,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0009",
+            "paidAt": "2026-03-19",
+            "createdAt": "2026-03-19T04:55:38.716Z"
+        },
+        {
+            "id": "5121a5b5-2c39-4481-9b68-08817987d825",
+            "amount": 2000,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0008",
+            "paidAt": "2026-03-17",
+            "createdAt": "2026-03-17T20:24:21.904Z"
+        },
+        {
+            "id": "2bc739c9-5588-46e9-924a-0638c0bd7c85",
+            "amount": 1000,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0007",
+            "paidAt": "2026-03-17",
+            "createdAt": "2026-03-17T03:22:39.944Z"
+        },
+        {
+            "id": "432cfd7d-7a86-4a6a-ac43-371b65635be0",
+            "amount": 28000,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0006",
+            "paidAt": "2026-03-17",
+            "createdAt": "2026-03-17T03:21:56.585Z"
+        },
+        {
+            "id": "92eb063d-39c0-47e6-b08a-4ea9ce74a188",
+            "amount": 50000,
+            "gateway": "bank_transfer",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0005",
+            "paidAt": "2026-03-17",
+            "createdAt": "2026-03-17T02:58:18.451Z"
+        },
+        {
+            "id": "604a424f-c362-4a01-a160-303287236ac6",
+            "amount": 2000,
+            "gateway": "cash",
+            "status": "completed",
+            "receiptNumber": "RCP-D5A-2603-0003",
+            "paidAt": "2026-03-17",
+            "createdAt": "2026-03-17T02:55:23.656Z"
+        }
+    ],
+    "recentInvoices": [
+        {
+            "id": "c5e98d77-398c-4c85-961b-e185778528c2",
+            "invoiceNumber": "INV-D5A-2603-0043",
+            "studentName": "Jaylen Carter",
+            "grandTotal": 2000,
+            "amountDue": 1000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:12.649Z"
+        },
+        {
+            "id": "15819d95-590a-4d69-910d-17356618e8f3",
+            "invoiceNumber": "INV-D5A-2603-0042",
+            "studentName": "Tyler Brooks",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:12.643Z"
+        },
+        {
+            "id": "a702d69f-ea17-4844-b1e8-6a124f935099",
+            "invoiceNumber": "INV-D5A-2603-0041",
+            "studentName": "Liam Brown",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:11.959Z"
+        },
+        {
+            "id": "148cbae6-9396-44bd-967f-15c878e29343",
+            "invoiceNumber": "INV-D5A-2603-0040",
+            "studentName": "Lilia Ivey",
+            "grandTotal": 2000,
+            "amountDue": 0,
+            "status": "paid",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:10.433Z"
+        },
+        {
+            "id": "7c59c9c0-0d71-441f-b69c-8521c0ccaa69",
+            "invoiceNumber": "INV-D5A-2603-0039",
+            "studentName": "Isabella Gonzalez",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:10.430Z"
+        },
+        {
+            "id": "b5c5d396-71b0-4269-8f37-bb25ab440865",
+            "invoiceNumber": "INV-D5A-2603-0038",
+            "studentName": "Lait Jayswal",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:10.428Z"
+        },
+        {
+            "id": "9b0d616e-9a27-4cec-8d60-54103cdea460",
+            "invoiceNumber": "INV-D5A-2603-0037",
+            "studentName": "Emily Johnson",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "draft",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:10.253Z"
+        },
+        {
+            "id": "2f03e277-a8d8-421e-8b78-b6cbb4a0a395",
+            "invoiceNumber": "INV-D5A-2603-0036",
+            "studentName": "Aisha Johnson",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:10.058Z"
+        },
+        {
+            "id": "06f23b3d-ff4a-4a68-b7e0-33565fff9bb4",
+            "invoiceNumber": "INV-D5A-2603-0035",
+            "studentName": "Sophia Hernandez",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:09.741Z"
+        },
+        {
+            "id": "88fdb90c-6bce-4ba8-ac5a-7759ac4b26ac",
+            "invoiceNumber": "INV-D5A-2603-0034",
+            "studentName": "Olivia Garcia",
+            "grandTotal": 2000,
+            "amountDue": 2000,
+            "status": "overdue",
+            "issuedDate": "2026-03-17",
+            "createdAt": "2026-03-17T03:04:09.531Z"
+        }
+    ]
+}
+
+https://www.edforge.app/api/finance/schools/d5adb754-9997-42f0-9ee5-98f41e6c4d73/fee-structures
+{
+    "items": [
+        {
+            "id": "b7d92f36-02ac-4fda-b21b-70fe1f41c6b9",
+            "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "name": "High School Admission Fee",
+            "description": "High School Admission Fee",
+            "academicYear": "2025-2026",
+            "academicYearId": "18e9d1b3-8ad5-4172-bb94-c138909ad857",
+            "feeType": "admission",
+            "amount": 50000,
+            "currency": "NPR",
+            "taxRate": 0,
+            "taxType": "none",
+            "frequency": "one_time",
+            "gradeLevels": [],
+            "isActive": true,
+            "autoApplyOnEnrollment": true,
+            "proRateOnMidTermEntry": true,
+            "effectiveFrom": "2026-03-17",
+            "version": 1,
+            "isOverride": false,
+            "enrollmentTypes": [],
+            "createdAt": "2026-03-17T01:24:34.640Z",
+            "updatedAt": "2026-03-17T01:24:34.640Z"
+        },
+        {
+            "id": "e94ea480-302b-4dd5-a731-04ea7856ca43",
+            "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "name": "Grade 11 Science Lab Fee",
+            "description": "Grade 11 Science Lab Fee",
+            "academicYear": "2025-2026",
+            "academicYearId": "18e9d1b3-8ad5-4172-bb94-c138909ad857",
+            "feeType": "lab",
+            "amount": 1200,
+            "currency": "NPR",
+            "taxRate": 0,
+            "taxType": "none",
+            "frequency": "monthly",
+            "gradeLevels": [
+                "9",
+                "10",
+                "12"
+            ],
+            "isActive": true,
+            "autoApplyOnEnrollment": true,
+            "proRateOnMidTermEntry": true,
+            "effectiveFrom": "2026-03-17",
+            "version": 1,
+            "isOverride": false,
+            "enrollmentTypes": [],
+            "createdAt": "2026-03-17T01:19:07.924Z",
+            "updatedAt": "2026-03-17T01:19:07.924Z"
+        },
+        {
+            "id": "171538e1-c072-418b-a3c4-055b329e9b9b",
+            "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "name": "Technology Fee",
+            "description": "High School Technology and Computer Science Lab Fee",
+            "academicYear": "2025-2026",
+            "academicYearId": "18e9d1b3-8ad5-4172-bb94-c138909ad857",
+            "feeType": "lab",
+            "amount": 2000,
+            "currency": "NPR",
+            "taxRate": 0,
+            "taxType": "none",
+            "frequency": "monthly",
+            "gradeLevels": [],
+            "isActive": true,
+            "autoApplyOnEnrollment": false,
+            "proRateOnMidTermEntry": true,
+            "effectiveFrom": "2026-03-17",
+            "version": 1,
+            "isOverride": false,
+            "enrollmentTypes": [],
+            "createdAt": "2026-03-17T03:02:45.944Z",
+            "updatedAt": "2026-03-17T03:02:45.944Z"
+        },
+        {
+            "id": "84c282cb-dc32-4df4-a3c6-1af4b67f2d52",
+            "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "name": "School Bus Fee",
+            "description": "School Bus Fee Route 1",
+            "academicYear": "2025-2026",
+            "academicYearId": "18e9d1b3-8ad5-4172-bb94-c138909ad857",
+            "feeType": "transport",
+            "amount": 2000,
+            "currency": "NPR",
+            "taxRate": 0,
+            "taxType": "none",
+            "frequency": "monthly",
+            "gradeLevels": [],
+            "isActive": true,
+            "autoApplyOnEnrollment": false,
+            "proRateOnMidTermEntry": true,
+            "effectiveFrom": "2026-03-19",
+            "effectiveTo": "2026-04-01",
+            "version": 1,
+            "isOverride": false,
+            "enrollmentTypes": [],
+            "createdAt": "2026-03-19T04:32:52.393Z",
+            "updatedAt": "2026-03-19T04:32:52.393Z"
+        },
+        {
+            "id": "6c25e1df-5ab3-45a7-ace0-83ac6a28919e",
+            "schoolId": "d5adb754-9997-42f0-9ee5-98f41e6c4d73",
+            "name": "School Bus Fee",
+            "description": "School Bus Fee Route 2",
+            "academicYear": "2025-2026",
+            "academicYearId": "18e9d1b3-8ad5-4172-bb94-c138909ad857",
+            "feeType": "transport",
+            "amount": 5000,
+            "currency": "NPR",
+            "taxRate": 0,
+            "taxType": "none",
+            "frequency": "monthly",
+            "gradeLevels": [],
+            "isActive": true,
+            "autoApplyOnEnrollment": false,
+            "proRateOnMidTermEntry": true,
+            "effectiveFrom": "2026-03-19",
+            "effectiveTo": "2026-05-09",
+            "version": 1,
+            "isOverride": false,
+            "enrollmentTypes": [],
+            "createdAt": "2026-03-19T04:33:39.346Z",
+            "updatedAt": "2026-03-19T04:33:39.346Z"
+        }
+    ],
+    "hasMore": false
+}

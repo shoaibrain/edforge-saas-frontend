@@ -21,6 +21,7 @@ import {
   type AttendanceAlert,
   type SectionListResponseDto,
 } from '../services/academics.service'
+export type { AttendanceAlert } from '../services/academics.service'
 import { useSchoolStaff, flattenStaffData } from './useStaff'
 import { useCurrentAcademicYear, useGradingPeriods } from './useSchool'
 import type { GradingPeriodResponseDto } from '../services/school.service'
@@ -91,6 +92,7 @@ function daysBetween(dateA: string, dateB: string): number {
 
 export interface AcademicsOverviewData {
   totalEnrolled: number | null
+  recentEnrollments: number | null
   enrollmentByGradeLevel: Record<string, number> | null
   enrollmentByStatus: Record<string, number> | null
   activeSections: number | null
@@ -205,6 +207,7 @@ export function useAcademicsOverview(
 
     return {
       totalEnrolled: canViewEnrollment ? d.enrollment.totalEnrolled : null,
+      recentEnrollments: canViewEnrollment ? d.enrollment.recentEnrollments ?? null : null,
       enrollmentByGradeLevel: canViewEnrollment ? d.enrollment.byGradeLevel : null,
       enrollmentByStatus: canViewEnrollment ? d.enrollment.byStatus : null,
       activeSections: d.activeSectionsCount,
@@ -253,6 +256,7 @@ export function useAcademicsOverview(
 
   return {
     totalEnrolled: enrollment.data?.totalEnrolled ?? null,
+    recentEnrollments: null, // Only available via unified dashboard endpoint
     enrollmentByGradeLevel: enrollment.data?.byGradeLevel ?? null,
     enrollmentByStatus: enrollment.data?.byStatus ?? null,
     activeSections: sections.data ? sections.data.items.length : null,
@@ -441,7 +445,7 @@ function useAttendanceAlertItems(
   schoolId: string | null,
   academicYearId: string | undefined,
   enabled: boolean
-): { alerts: AcademicAlert[]; isLoading: boolean } {
+): { alerts: AcademicAlert[]; rawStudents: AttendanceAlert[]; isLoading: boolean } {
   const today = useMemo(() => getTodayISO(), [])
   const startDate = useMemo(() => getDaysAgoISO(90), [])
 
@@ -495,7 +499,12 @@ function useAttendanceAlertItems(
     return items
   }, [data])
 
-  return { alerts, isLoading }
+  const rawStudents = useMemo(() => {
+    if (!data) return []
+    return [...data].sort((a, b) => a.attendanceRate - b.attendanceRate)
+  }, [data])
+
+  return { alerts, rawStudents, isLoading }
 }
 
 function useGradingDeadlineAlerts(
@@ -570,6 +579,7 @@ export function useCombinedAlerts(
   deferEnabled: boolean = true,
 ): {
   alerts: AcademicAlert[]
+  students: AttendanceAlert[]
   totalCount: number
   isLoading: boolean
 } {
@@ -592,7 +602,8 @@ export function useCombinedAlerts(
 
   return {
     alerts,
-    totalCount: attendance.alerts.length + grading.alerts.length,
+    students: attendance.rawStudents,
+    totalCount: attendance.rawStudents.length,
     isLoading,
   }
 }

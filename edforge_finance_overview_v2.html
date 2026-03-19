@@ -1,0 +1,328 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;background:#0f1117;color:#e8eaf0}
+.pg{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+.sb{background:#161b27;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column}
+.sb-top{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:12px;color:#7a8099;cursor:pointer;padding:4px 0;margin-bottom:10px}
+.back-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
+.sb-module{display:flex;align-items:center;gap:8px}
+.sb-module-icon{width:24px;height:24px;background:rgba(239,159,39,0.12);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.sb-module-icon svg{width:13px;height:13px;fill:#EF9F27}
+.sb-module-name{font-size:13px;font-weight:500;color:#c8ccd8}
+.sb-nav{padding:10px 8px}
+.sb-sec{font-size:10px;font-weight:600;color:#3a4055;text-transform:uppercase;letter-spacing:0.7px;padding:8px 8px 4px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font-size:13px;color:#7a8099;cursor:pointer;margin-bottom:1px}
+.ni:hover{background:rgba(255,255,255,0.04);color:#c8ccd8}
+.ni.on{background:rgba(239,159,39,0.1);color:#EF9F27;font-weight:500}
+.ni svg{width:14px;height:14px;flex-shrink:0;opacity:0.6}
+.ni.on svg{opacity:1}
+.main{background:#0f1117;overflow:auto}
+.topbar{height:48px;padding:0 24px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;background:#0f1117;position:sticky;top:0;z-index:10}
+.bc{display:flex;align-items:center;gap:6px;font-size:12px;color:#4a5068}
+.bc span{color:#7a8099}.bc .cur{color:#c8ccd8}
+.tb-right{display:flex;align-items:center;gap:8px}
+.export-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:5px 10px;font-size:11px;color:#9aa0b8;cursor:pointer}
+.export-btn svg{width:12px;height:12px;fill:none;stroke:currentColor}
+.filter-row{display:flex;align-items:center;gap:8px}
+.filter-chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:7px;padding:4px 10px;font-size:11px;color:#7a8099}
+.filter-chip svg{width:10px;height:10px;fill:none;stroke:currentColor;opacity:0.5}
+.body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between}
+.ph-left{display:flex;align-items:center;gap:12px}
+.ph-icon{width:36px;height:36px;background:rgba(239,159,39,0.1);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ph-icon svg{width:18px;height:18px;fill:#EF9F27}
+.ph-title{font-size:22px;font-weight:600;color:#e8eaf0;letter-spacing:-0.5px}
+.ph-sub{font-size:13px;color:#4a5068;margin-top:2px}
+.ph-actions{display:flex;align-items:center;gap:8px}
+.btn-primary{display:flex;align-items:center;gap:5px;background:#1D9E75;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:500;color:white;cursor:pointer}
+.btn-primary svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
+.btn-sec{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:7px 12px;font-size:12px;color:#9aa0b8;cursor:pointer}
+.btn-sec svg{width:12px;height:12px;fill:none;stroke:currentColor}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kpi{background:#161b27;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;position:relative;overflow:hidden;cursor:pointer}
+.kpi:hover{border-color:rgba(255,255,255,0.1)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.kpi-label{font-size:10px;font-weight:500;color:#4a5068;text-transform:uppercase;letter-spacing:0.5px}
+.kpi-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.kpi-ico svg{width:13px;height:13px}
+.kpi-val{font-size:22px;font-weight:600;letter-spacing:-0.8px;line-height:1}
+.kpi-meta{font-size:11px;color:#4a5068;margin-top:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tag{font-size:10px;font-weight:500;padding:2px 6px;border-radius:8px}
+.kpi-bar{position:absolute;bottom:0;left:0;right:0;height:2px}
+.row2{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+.card{background:#161b27;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.ct{font-size:13px;font-weight:500;color:#c8ccd8}
+.cm{font-size:11px;color:#4a5068}
+.progress-rows{display:flex;flex-direction:column;gap:11px}
+.pr{display:flex;flex-direction:column;gap:4px}
+.pr-top{display:flex;align-items:center;justify-content:space-between}
+.pr-label{font-size:12px;color:#7a8099}
+.pr-val{font-size:12px;font-weight:500}
+.pr-track{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.pr-fill{height:100%;border-radius:2px}
+.divider{height:1px;background:rgba(255,255,255,0.04);margin:4px 0}
+.status-list{display:flex;flex-direction:column;gap:7px}
+.status-item{display:flex;align-items:center;gap:8px}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.status-label{font-size:12px;color:#7a8099;flex:1}
+.status-bar-wrap{flex:2;display:flex;align-items:center;gap:8px}
+.status-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.status-fill{height:100%;border-radius:2px}
+.status-pct{font-size:11px;color:#4a5068;width:28px;text-align:right}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.aging-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.aging-bucket{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 8px;text-align:center}
+.aging-bucket.hot{background:rgba(226,75,74,0.07);border-color:rgba(226,75,74,0.15)}
+.aging-label{font-size:10px;color:#4a5068;margin-bottom:5px}
+.aging-count{font-size:16px;font-weight:600;color:#e8eaf0}
+.aging-bucket.hot .aging-count{color:#E24B4A}
+.aging-amount{font-size:10px;color:#7a8099;margin-top:2px}
+.aging-bucket.hot .aging-amount{color:#f09595}
+.feed{display:flex;flex-direction:column}
+.fi{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.fi:last-child{border-bottom:none;padding-bottom:0}
+.fi-ico{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fi-ico svg{width:11px;height:11px}
+.fi-body{flex:1;min-width:0}
+.fi-text{font-size:12px;color:#9aa0b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi-sub{font-size:10px;color:#3a4055;margin-top:1px}
+.fi-amount{font-size:12px;font-weight:500;flex-shrink:0;text-align:right}
+.fi-date{font-size:10px;color:#3a4055;margin-top:1px;text-align:right}
+.fee-breakdown{display:flex;flex-direction:column;gap:8px}
+.fee-item{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px}
+.fee-top{display:flex;align-items:center;justify-content:space-between}
+.fee-name{font-size:12px;color:#c8ccd8;font-weight:500}
+.fee-count{font-size:10px;color:#4a5068}
+.fee-stats{display:flex;align-items:center;gap:10px;margin-top:2px}
+.fee-stat{font-size:11px}
+.fee-track{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-top:4px}
+.fee-fill{height:100%;border-radius:2px}
+</style>
+
+<div class="pg">
+  <div class="sb">
+    <div class="sb-top">
+      <div class="back-btn"><svg viewBox="0 0 12 12"><path d="M8 2L4 6l4 4"/></svg>Back to home</div>
+      <div class="sb-module"><div class="sb-module-icon"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#EF9F27" stroke-width="1.4"/><path d="M8 5v3.5l2.5 1.5" stroke="#EF9F27" stroke-width="1.4" fill="none"/></svg></div><div class="sb-module-name">Finance</div></div>
+    </div>
+    <div class="sb-nav">
+      <div class="ni on"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Overview</div>
+      <div class="sb-sec">Billing</div>
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v12H2z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.3"/></svg>Invoices</div>
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a4 4 0 100 8A4 4 0 008 1zM2 14s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2z"/></svg>Student accounts</div>
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 5h12v7a2 2 0 01-2 2H4a2 2 0 01-2-2V5zM2 5V4a2 2 0 012-2h8a2 2 0 012 2v1"/></svg>Payments</div>
+      <div class="sb-sec">Configuration</div>
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v10H1z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M1 6h14" stroke="currentColor" stroke-width="1.3"/></svg>Fee structures</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="bc"><span>Home</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 2l4 3-4 3" stroke="#4a5068" stroke-width="1.5"/></svg><span class="cur">Finance</span></div>
+      <div class="tb-right">
+        <div class="filter-chip"><svg viewBox="0 0 12 12"><rect x="1" y="2" width="10" height="9" rx="1.5" fill="none" stroke="currentColor"/><path d="M4 1v2M8 1v2M1 5h10" stroke="currentColor"/></svg>All Years</div>
+        <div class="filter-chip"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.5"/></svg>Date range</div>
+        <div class="export-btn"><svg viewBox="0 0 12 12"><path d="M6 2v6M3 6l3 3 3-3M2 10h8" stroke="currentColor" stroke-linecap="round"/></svg>Export CSV</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="page-header">
+        <div class="ph-left">
+          <div class="ph-icon"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#EF9F27" stroke-width="1.4"/><path d="M8 5v3.5l2.5 1.5" stroke="#EF9F27" stroke-width="1.4" fill="none"/></svg></div>
+          <div>
+            <div class="ph-title">Finance overview</div>
+            <div class="ph-sub">Billing, payments, and fee collection for Westfield High School</div>
+          </div>
+        </div>
+        <div class="ph-actions">
+          <div class="btn-sec"><svg viewBox="0 0 12 12"><path d="M2 2h8v8H2z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4 6h4M4 4h4M4 8h2" stroke="currentColor" stroke-width="1.3"/></svg>Bulk invoice</div>
+          <div class="btn-primary"><svg viewBox="0 0 12 12"><path d="M6 2v8M2 6h8"/></svg>Record payment</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(226,75,74,0.07);border:1px solid rgba(226,75,74,0.18);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:26px;height:26px;background:rgba(226,75,74,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 16 16" fill="#E24B4A"><path d="M8 1L1 14h14L8 1zm0 4v4m0 2.5v1"/></svg></div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:#f09595">31 invoices overdue — NPR 3.09 lakh uncollected</div><div style="font-size:11px;color:#5a6070;margin-top:1px">Collection rate is 32.4%. All overdue invoices are 1–30 days past due. 5 additional drafts need to be issued.</div></div>
+        <div style="font-size:11px;font-weight:500;color:#E24B4A;border:1px solid rgba(226,75,74,0.3);background:rgba(226,75,74,0.08);border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap">Review billing</div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-top"><div class="kpi-label">Total invoiced</div><div class="kpi-ico" style="background:rgba(55,138,221,0.12)"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2h12v12H2z" stroke="#378ADD" stroke-width="1.4"/><path d="M5 6h6M5 9h4" stroke="#378ADD" stroke-width="1.3"/></svg></div></div>
+          <div class="kpi-val" style="color:#e8eaf0">NPR 4.6L</div>
+          <div class="kpi-meta"><span class="tag" style="background:rgba(55,138,221,0.12);color:#378ADD">43 invoices</span><span>this academic year</span></div>
+          <div class="kpi-bar" style="background:#378ADD"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top"><div class="kpi-label">Total collected</div><div class="kpi-ico" style="background:rgba(29,158,117,0.12)"><svg viewBox="0 0 16 16" fill="#1D9E75"><path d="M13 4L6 11 3 8"/></svg></div></div>
+          <div class="kpi-val" style="color:#1D9E75">NPR 1.48L</div>
+          <div class="kpi-meta"><span class="tag" style="background:rgba(29,158,117,0.12);color:#1D9E75">11 payments</span><span>March 2026</span></div>
+          <div class="kpi-bar" style="background:#1D9E75"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top"><div class="kpi-label">Outstanding</div><div class="kpi-ico" style="background:rgba(239,159,39,0.12)"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#EF9F27" stroke-width="1.4"/><path d="M8 5v3.5l2.5 1.5" stroke="#EF9F27" stroke-width="1.4" stroke-linecap="round"/></svg></div></div>
+          <div class="kpi-val" style="color:#EF9F27">NPR 3.09L</div>
+          <div class="kpi-meta"><span class="tag" style="background:rgba(239,159,39,0.1);color:#EF9F27">32 invoices</span><span>awaiting payment</span></div>
+          <div class="kpi-bar" style="background:#EF9F27"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top"><div class="kpi-label">Collection rate</div><div class="kpi-ico" style="background:rgba(226,75,74,0.12)"><svg viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-7" stroke="#E24B4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="kpi-val" style="color:#E24B4A">32.4%</div>
+          <div class="kpi-meta"><span class="tag" style="background:rgba(226,75,74,0.12);color:#E24B4A">Below 60% target</span><span>31 overdue</span></div>
+          <div class="kpi-bar" style="background:#E24B4A"></div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="card">
+          <div class="ch">
+            <div><div class="ct">Collection performance</div><div class="cm" style="margin-top:2px">Collected vs. outstanding vs. overdue</div></div>
+            <div style="font-size:11px;color:#4a5068">32.4% collected</div>
+          </div>
+          <div class="progress-rows">
+            <div class="pr">
+              <div class="pr-top"><span class="pr-label">Collected</span><span class="pr-val" style="color:#1D9E75">NPR 1.48 lakh</span></div>
+              <div class="pr-track"><div class="pr-fill" style="width:32.4%;background:#1D9E75"></div></div>
+            </div>
+            <div class="pr">
+              <div class="pr-top"><span class="pr-label">Outstanding (non-overdue)</span><span class="pr-val" style="color:#EF9F27">NPR 0.2L</span></div>
+              <div class="pr-track"><div class="pr-fill" style="width:0.5%;background:#EF9F27"></div></div>
+            </div>
+            <div class="pr">
+              <div class="pr-top"><span class="pr-label">Overdue 1–30 days</span><span class="pr-val" style="color:#E24B4A">NPR 3.09 lakh</span></div>
+              <div class="pr-track"><div class="pr-fill" style="width:67.6%;background:#E24B4A"></div></div>
+            </div>
+          </div>
+          <div class="divider" style="margin:14px 0 12px"></div>
+          <div style="font-size:11px;color:#4a5068;margin-bottom:8px">Fee type breakdown</div>
+          <div class="fee-breakdown">
+            <div class="fee-item">
+              <div class="fee-top"><span class="fee-name">Admission fees</span><span class="fee-count">8 invoices</span></div>
+              <div class="fee-track"><div class="fee-fill" style="width:35%;background:#1D9E75"></div></div>
+              <div class="fee-stats">
+                <span class="fee-stat" style="color:#1D9E75">NPR 1.4L collected</span>
+                <span style="font-size:11px;color:#4a5068">of NPR 4.0L invoiced</span>
+              </div>
+            </div>
+            <div class="fee-item">
+              <div class="fee-top"><span class="fee-name">Lab fees</span><span class="fee-count">29 invoices</span></div>
+              <div class="fee-track"><div class="fee-fill" style="width:14%;background:#378ADD"></div></div>
+              <div class="fee-stats">
+                <span class="fee-stat" style="color:#378ADD">NPR 8,000 collected</span>
+                <span style="font-size:11px;color:#4a5068">of NPR 57,200 invoiced</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch">
+            <div><div class="ct">Invoice status breakdown</div><div class="cm" style="margin-top:2px">43 total invoices</div></div>
+          </div>
+          <div class="status-list">
+            <div class="status-item"><div class="status-dot" style="background:#E24B4A"></div><span class="status-label">Overdue</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:72%;background:#E24B4A"></div></div><span class="status-pct" style="color:#E24B4A">72%</span></div><span style="font-size:11px;color:#f09595;min-width:16px;text-align:right">31</span></div>
+            <div class="status-item"><div class="status-dot" style="background:#888780"></div><span class="status-label">Draft</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:12%;background:#888780"></div></div><span class="status-pct" style="color:#4a5068">12%</span></div><span style="font-size:11px;color:#7a8099;min-width:16px;text-align:right">5</span></div>
+            <div class="status-item"><div class="status-dot" style="background:#1D9E75"></div><span class="status-label">Paid</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:9%;background:#1D9E75"></div></div><span class="status-pct" style="color:#1D9E75">9%</span></div><span style="font-size:11px;color:#1D9E75;min-width:16px;text-align:right">4</span></div>
+            <div class="status-item"><div class="status-dot" style="background:#EF9F27"></div><span class="status-label">Partially paid</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:2%;background:#EF9F27"></div></div><span class="status-pct" style="color:#EF9F27">2%</span></div><span style="font-size:11px;color:#EF9F27;min-width:16px;text-align:right">1</span></div>
+            <div class="status-item"><div class="status-dot" style="background:#5F5E5A"></div><span class="status-label">Cancelled</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:5%;background:#5F5E5A"></div></div><span class="status-pct" style="color:#4a5068">5%</span></div><span style="font-size:11px;color:#4a5068;min-width:16px;text-align:right">2</span></div>
+          </div>
+          <div class="divider" style="margin:12px 0"></div>
+          <div style="font-size:11px;color:#4a5068;margin-bottom:8px">Payment methods</div>
+          <div class="status-list">
+            <div class="status-item"><div class="status-dot" style="background:#1D9E75"></div><span class="status-label">Cash</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:82%;background:#1D9E75"></div></div><span class="status-pct" style="color:#1D9E75">82%</span></div><span style="font-size:11px;color:#7a8099;min-width:16px;text-align:right">9</span></div>
+            <div class="status-item"><div class="status-dot" style="background:#7F77DD"></div><span class="status-label">Cheque</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:9%;background:#7F77DD"></div></div><span class="status-pct" style="color:#7F77DD">9%</span></div><span style="font-size:11px;color:#7a8099;min-width:16px;text-align:right">1</span></div>
+            <div class="status-item"><div class="status-dot" style="background:#378ADD"></div><span class="status-label">Bank transfer</span><div class="status-bar-wrap"><div class="status-track"><div class="status-fill" style="width:9%;background:#378ADD"></div></div><span class="status-pct" style="color:#378ADD">9%</span></div><span style="font-size:11px;color:#7a8099;min-width:16px;text-align:right">1</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch" style="margin-bottom:12px">
+          <div><div class="ct">Overdue aging report</div><div class="cm" style="margin-top:2px">Outstanding invoices by days past due</div></div>
+        </div>
+        <div class="aging-grid">
+          <div class="aging-bucket"><div class="aging-label">Current</div><div class="aging-count">0</div><div class="aging-amount">NPR 0</div></div>
+          <div class="aging-bucket hot"><div class="aging-label">1–30 days</div><div class="aging-count">32</div><div class="aging-amount">NPR 3.09L</div></div>
+          <div class="aging-bucket"><div class="aging-label">31–60 days</div><div class="aging-count">0</div><div class="aging-amount">NPR 0</div></div>
+          <div class="aging-bucket"><div class="aging-label">61–90 days</div><div class="aging-count">0</div><div class="aging-amount">NPR 0</div></div>
+          <div class="aging-bucket"><div class="aging-label">90+ days</div><div class="aging-count">0</div><div class="aging-amount">NPR 0</div></div>
+        </div>
+      </div>
+
+      <div class="row3">
+        <div class="card">
+          <div class="ch" style="margin-bottom:12px">
+            <div class="ct">Recent payments</div>
+            <div style="font-size:11px;color:#1D9E75;cursor:pointer">View all</div>
+          </div>
+          <div class="feed">
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(29,158,117,0.12)"><svg viewBox="0 0 16 16" fill="#1D9E75"><path d="M13 4L6 11 3 8"/></svg></div>
+              <div class="fi-body"><div class="fi-text">RCP-D5A-2603-0013 · Cash</div><div class="fi-sub">Today · 1:54 PM</div></div>
+              <div><div class="fi-amount" style="color:#1D9E75">NPR 1,800</div><div class="fi-date">completed</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(29,158,117,0.12)"><svg viewBox="0 0 16 16" fill="#1D9E75"><path d="M13 4L6 11 3 8"/></svg></div>
+              <div class="fi-body"><div class="fi-text">RCP-D5A-2603-0012 · Cash</div><div class="fi-sub">Today · 1:54 PM</div></div>
+              <div><div class="fi-amount" style="color:#1D9E75">NPR 1,200</div><div class="fi-date">completed</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(127,119,221,0.12)"><svg viewBox="0 0 16 16" fill="#7F77DD"><path d="M2 4h12v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" fill="none" stroke="#7F77DD" stroke-width="1.3"/><path d="M2 7h12" stroke="#7F77DD" stroke-width="1.3"/></svg></div>
+              <div class="fi-body"><div class="fi-text">RCP-D5A-2603-0010 · Cheque</div><div class="fi-sub">Today · 4:56 AM</div></div>
+              <div><div class="fi-amount" style="color:#1D9E75">NPR 40,000</div><div class="fi-date">completed</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(55,138,221,0.12)"><svg viewBox="0 0 16 16" fill="#378ADD"><path d="M2 4h12v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" fill="none" stroke="#378ADD" stroke-width="1.3"/></svg></div>
+              <div class="fi-body"><div class="fi-text">RCP-D5A-2603-0005 · Bank transfer</div><div class="fi-sub">Mar 17 · Aisha Johnson</div></div>
+              <div><div class="fi-amount" style="color:#1D9E75">NPR 50,000</div><div class="fi-date">completed</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(29,158,117,0.12)"><svg viewBox="0 0 16 16" fill="#1D9E75"><path d="M13 4L6 11 3 8"/></svg></div>
+              <div class="fi-body"><div class="fi-text">RCP-D5A-2603-0006 · Cash</div><div class="fi-sub">Mar 17 · Jaylen Carter</div></div>
+              <div><div class="fi-amount" style="color:#1D9E75">NPR 28,000</div><div class="fi-date">completed</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch" style="margin-bottom:12px">
+            <div class="ct">Recent overdue invoices</div>
+            <div style="font-size:11px;color:#E24B4A;font-weight:500;cursor:pointer">View all 31</div>
+          </div>
+          <div class="feed">
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(226,75,74,0.1)"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2h12v12H2z" stroke="#E24B4A" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="#E24B4A" stroke-width="1.3"/></svg></div>
+              <div class="fi-body"><div class="fi-text">INV-0043 · Jaylen Carter</div><div class="fi-sub" style="color:#E24B4A">overdue · Mar 17</div></div>
+              <div><div class="fi-amount" style="color:#e8eaf0">NPR 2,000</div><div class="fi-date" style="color:#f09595">NPR 1,000 due</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(226,75,74,0.1)"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2h12v12H2z" stroke="#E24B4A" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="#E24B4A" stroke-width="1.3"/></svg></div>
+              <div class="fi-body"><div class="fi-text">INV-0042 · Tyler Brooks</div><div class="fi-sub" style="color:#E24B4A">overdue · Mar 17</div></div>
+              <div><div class="fi-amount" style="color:#e8eaf0">NPR 2,000</div><div class="fi-date" style="color:#f09595">full balance due</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(226,75,74,0.1)"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2h12v12H2z" stroke="#E24B4A" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="#E24B4A" stroke-width="1.3"/></svg></div>
+              <div class="fi-body"><div class="fi-text">INV-0041 · Liam Brown</div><div class="fi-sub" style="color:#E24B4A">overdue · Mar 17</div></div>
+              <div><div class="fi-amount" style="color:#e8eaf0">NPR 2,000</div><div class="fi-date" style="color:#f09595">full balance due</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(239,159,39,0.1)"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2h12v12H2z" stroke="#EF9F27" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="#EF9F27" stroke-width="1.3"/></svg></div>
+              <div class="fi-body"><div class="fi-text">INV-0037 · Emily Johnson</div><div class="fi-sub" style="color:#888780">draft · needs issuing</div></div>
+              <div><div class="fi-amount" style="color:#e8eaf0">NPR 2,000</div><div class="fi-date" style="color:#888780">not yet issued</div></div>
+            </div>
+            <div class="fi">
+              <div class="fi-ico" style="background:rgba(29,158,117,0.1)"><svg viewBox="0 0 16 16" fill="#1D9E75"><path d="M13 4L6 11 3 8"/></svg></div>
+              <div class="fi-body"><div class="fi-text">INV-0040 · Lilia Ivey</div><div class="fi-sub" style="color:#1D9E75">paid · Mar 17</div></div>
+              <div><div class="fi-amount" style="color:#1D9E75">NPR 2,000</div><div class="fi-date" style="color:#1D9E75">fully settled</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

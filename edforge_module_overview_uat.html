@@ -1,0 +1,391 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;background:#0f1117;color:#e8eaf0;padding:24px}
+.doc-header{margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.doc-title{font-size:18px;font-weight:600;color:#e8eaf0;letter-spacing:-0.3px}
+.doc-meta{font-size:12px;color:#4a5068;margin-top:4px;display:flex;gap:16px}
+.legend{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.sev{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:6px;font-weight:500}
+.sev.crit{background:rgba(226,75,74,0.1);color:#f09595;border:1px solid rgba(226,75,74,0.2)}
+.sev.high{background:rgba(239,159,39,0.1);color:#FAC775;border:1px solid rgba(239,159,39,0.2)}
+.sev.med{background:rgba(55,138,221,0.1);color:#85B7EB;border:1px solid rgba(55,138,221,0.2)}
+.sev.low{background:rgba(255,255,255,0.05);color:#7a8099;border:1px solid rgba(255,255,255,0.1)}
+.section{margin-bottom:24px}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.05)}
+.section-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-icon svg{width:11px;height:11px}
+.section-title{font-size:12px;font-weight:600;color:#c8ccd8;flex:1}
+.section-scope{font-size:10px;color:#4a5068;background:rgba(255,255,255,0.04);padding:2px 8px;border-radius:10px}
+.issue-list{display:flex;flex-direction:column;gap:6px}
+.issue{display:flex;gap:10px;padding:10px 12px;background:#161b27;border:1px solid rgba(255,255,255,0.06);border-radius:8px}
+.issue-left{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.issue-id{font-size:9px;font-weight:600;color:#3a4055;font-family:monospace}
+.issue-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap}
+.issue-badge.crit{background:rgba(226,75,74,0.15);color:#E24B4A}
+.issue-badge.high{background:rgba(239,159,39,0.12);color:#EF9F27}
+.issue-badge.med{background:rgba(55,138,221,0.12);color:#378ADD}
+.issue-badge.low{background:rgba(255,255,255,0.06);color:#5a6070}
+.issue-body{flex:1;min-width:0}
+.issue-title{font-size:12px;font-weight:500;color:#c8ccd8;margin-bottom:3px}
+.issue-desc{font-size:11px;color:#5a6070;line-height:1.5}
+.issue-fix{font-size:11px;color:#4a5068;margin-top:5px;padding:5px 8px;background:rgba(255,255,255,0.02);border-left:2px solid rgba(29,158,117,0.4);border-radius:0 4px 4px 0;line-height:1.5}
+.issue-fix strong{color:#1D9E75;font-weight:500}
+.fix-label{font-size:9px;font-weight:600;color:#1D9E75;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px}
+.pages{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.page-chip{font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,0.05);color:#4a5068}
+.page-chip.ac{background:rgba(29,158,117,0.08);color:#1D9E75}
+.page-chip.fi{background:rgba(239,159,39,0.08);color:#EF9F27}
+.page-chip.both{background:rgba(127,119,221,0.08);color:#7F77DD}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.sum-card{background:#161b27;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;text-align:center}
+.sum-num{font-size:22px;font-weight:600;letter-spacing:-0.5px}
+.sum-label{font-size:10px;color:#4a5068;margin-top:3px}
+</style>
+
+<div class="doc-header">
+  <div class="doc-title">EdForge — Module Overview Pages V2 UAT Report</div>
+  <div class="doc-meta">
+    <span>Scope: Academics Overview · Finance Overview</span>
+    <span>Build: V2 Sprint Complete</span>
+    <span>Date: March 19, 2026</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="sev crit">Critical — data incorrect or page broken</div>
+  <div class="sev high">High — significant UX/design regression</div>
+  <div class="sev med">Medium — inconsistency or polish gap</div>
+  <div class="sev low">Low — minor refinement</div>
+</div>
+
+<div class="summary-grid">
+  <div class="sum-card"><div class="sum-num" style="color:#E24B4A">6</div><div class="sum-label">Critical</div></div>
+  <div class="sum-card"><div class="sum-num" style="color:#EF9F27">9</div><div class="sum-label">High</div></div>
+  <div class="sum-card"><div class="sum-num" style="color:#378ADD">8</div><div class="sum-label">Medium</div></div>
+  <div class="sum-card"><div class="sum-num" style="color:#5a6070">5</div><div class="sum-label">Low</div></div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(226,75,74,0.12)"><svg viewBox="0 0 16 16" fill="#E24B4A"><path d="M8 1L1 14h14L8 1zm0 4v4m0 2.5v1"/></svg></div>
+    <div class="section-title">Data integrity bugs</div>
+    <div class="section-scope">Critical — wrong data shown to users</div>
+  </div>
+  <div class="issue-list">
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">D-01</div><div class="issue-badge crit">CRITICAL</div></div>
+      <div class="issue-body">
+        <div class="issue-title">At-risk student count shows 2, API returns 12</div>
+        <div class="issue-desc">The "At-Risk Students" KPI tile displays "2" but the attendance alerts API response has `totalAtRiskCount: 12` and 12 student objects in the `alerts` array. This is likely using a wrong field or wrong query parameter. A principal seeing "2 at-risk" when there are actually 12 would make critically wrong decisions.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Map `alerts.totalAtRiskCount` (= 12) to the KPI tile value. The tag "1 below 80%" is also wrong — count students where `attendanceRate < 80` from the alerts array, which yields 6 students (Mei Wong 70%, Tyler Brooks 70%, Olivia Garcia 75%, Olivia Chen 75%, Noah Kim 75%, Cool Mint 75%). Fix the count derivation logic in `useAcademicsOverviewV2`.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">D-02</div><div class="issue-badge crit">CRITICAL</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Recent enrollments shows "+0" but API returns recentEnrollments: 2</div>
+        <div class="issue-desc">The enrollment snapshot card shows "Recent enrollments: +0" but the overview API response has `enrollment.recentEnrollments: 2`. This is a field mapping error — the component is either reading the wrong field or not mapping the overview response correctly.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Map `overview.enrollment.recentEnrollments` (= 2) to the recent enrollments row. Also fix the KPI tile tag — it shows "11 grades" when it should show "+2 recent" based on this same field. The "11 grades" should appear only in the enrollment snapshot row "Grade levels covered: 11".</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">D-03</div><div class="issue-badge crit">CRITICAL</div></div>
+      <div class="issue-body">
+        <div class="issue-title">All recent payments show timestamp "Yesterday · 7:00 PM" regardless of actual time</div>
+        <div class="issue-desc">In the Finance recent payments feed, every payment shows the same relative timestamp. RCP-0013 was created at 13:54 today, RCP-0010 at 04:56 today, RCP-0005 on March 17. They should show different times. The 7:00 PM is almost certainly a UTC-to-local conversion error that collapses all timestamps to a default value.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Fix `formatRelativeDate()` in `@edforge/types`. The function must parse ISO timestamps correctly using the browser's locale timezone — use `new Date(isoString)` and then `Intl.RelativeTimeFormat` or `date-fns/formatRelative`. Never hardcode a time. Today's payments should show "Today · 1:54 PM", "Today · 4:56 AM" etc.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">D-04</div><div class="issue-badge crit">CRITICAL</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Outstanding KPI tag says "32 pending" — semantically incorrect</div>
+        <div class="issue-desc">"Pending" in finance means an invoice not yet issued. "Outstanding" means money owed. The 32 in this context are overdue invoices, not pending ones. Mixing these terms will confuse school admins and accountants who understand financial terminology.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Change the Outstanding KPI tile tag from "32 pending" to "32 awaiting payment" or simply derive from `invoicesByStatus.issued + invoicesByStatus.partially_paid + invoicesByStatus.overdue`. The overdue-specific count should appear on the Overdue tile only.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">D-05</div><div class="issue-badge crit">CRITICAL</div></div>
+      <div class="issue-body">
+        <div class="issue-title">At-risk student detail card shows alert summary rows instead of individual students</div>
+        <div class="issue-desc">The "At-risk student detail" card body shows "9 students below 80% attendance — Immediate intervention" and "6 students below 90% attendance" as grouped alert rows — this is the AlertSummary component being reused incorrectly. The prototype and spec clearly require individual student rows: avatar with initials, student name, grade level, absent day count, attendance rate with color, and mini progress bar.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Replace the alert summary component inside the at-risk card with individual student rows mapped from `alerts.alerts` sorted by `attendanceRate` ascending. Show maximum 5 rows. Each row: initials avatar (colored red when rate &lt; 80%, amber when 80–90%), name, "Grade {N} · {absentDays} absent days", rate percentage in semantic color, 50px mini progress bar. Add "View all 12 at-risk students" link at bottom.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">D-06</div><div class="issue-badge crit">CRITICAL</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Collected KPI subtitle "32.4% rate 11 this month" is misleading</div>
+        <div class="issue-desc">The Collected tile shows "NPR 1.5L" with subtitle "32.4% rate · 11 this month". The 32.4% is the collection rate — showing it under the Collected amount implies it's a month-over-month change indicator, which it is not. A user could read "32.4% rate" as "we collected 32.4% more than last month." This is a copy and context bug.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Collected tile subtitle should be "11 payments this month" only. Move collection rate to its own KPI tile (which already exists as "Collection rate 32.4%"). Remove the rate from the Collected tile completely.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(239,159,39,0.12)"><svg viewBox="0 0 16 16" fill="#EF9F27"><path d="M8 1a4 4 0 100 8A4 4 0 008 1zM2 14s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2z"/></svg></div>
+    <div class="section-title">Layout and structural issues</div>
+    <div class="section-scope">High — visible UX problems</div>
+  </div>
+  <div class="issue-list">
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-01</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Duplicate breadcrumb — shell renders it, page also renders it</div>
+        <div class="issue-desc">Both pages render their own internal breadcrumb row ("Home > Academics" and "Home > Finance") inside the content area. The shell's topbar already renders the breadcrumb. This creates two breadcrumbs stacked, wastes ~32px of vertical space, and makes the page look amateur.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Delete the internal breadcrumb component from both AcademicsOverviewV2 and FinanceOverviewV2 page components entirely. The shell's Header component handles breadcrumbs. No breadcrumb should appear inside the scrollable content area.</div>
+        <div class="pages"><div class="page-chip both">Both pages</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-02</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Page header section is visually disconnected and wastes space</div>
+        <div class="issue-desc">The "Academics overview" H1 + subtitle + year chip pattern takes up approximately 80px of vertical space before any meaningful content. On a 900px viewport, this pushes KPI tiles below the fold. More critically, the header copy is generic — "Academics overview" tells a school admin nothing they don't already know from the sidebar nav they just clicked. The Finance page repeats "Finance overview" with a generic subtitle.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Redesign the page header to be compact and contextual. Remove the large H1 entirely. Instead, use a single header row at 44px height: left side shows a 28px module icon + 14px module name in medium weight + a separator + the current date in local format. Right side shows the action buttons (for Finance) or the academic year chip + refresh indicator (for Academics). The page identity comes from the sidebar active state — the content header must deliver value, not repeat navigation.</div>
+        <div class="pages"><div class="page-chip both">Both pages</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-03</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Invoice status breakdown and payment methods are not in the two-column layout</div>
+        <div class="issue-desc">The spec and prototype show collection performance on the left and invoice status breakdown on the right as a 1.4fr / 1fr two-column row. Instead, the agent stacked them: collection performance full-width, then invoice status full-width, then payment methods without a card border. The result is a monotonous vertical scroll of horizontally identical sections with no visual rhythm.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Restore the two-column layout. Collection performance (with fee type breakdown inside) on the left at 1.4fr. Invoice status breakdown AND payment methods together in a single card on the right at 1fr, separated by an internal divider. This matches the prototype exactly.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-04</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Aging report uses 3+2 grid instead of 5-column horizontal — buckets feel cramped</div>
+        <div class="issue-desc">The aging report renders as a 3-column top row and 2-column bottom row. The 61–90 and 90+ buckets are squeezed into the bottom row at reduced height. This breaks the visual hierarchy — all 5 buckets should be equal weight in a single horizontal row to communicate the aging spectrum left-to-right.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Use `grid-template-columns: repeat(5, 1fr)` for the aging report. At tablet viewports (768–1024px), collapse to 3+2 only as a responsive fallback, not the default. Each bucket: 80px minimum height, label at top in 10px muted, count in 20px/600 semantic color (red for hot buckets), amount in 11px below.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-05</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">KPI tile label casing is inconsistent across pages — ALL CAPS vs Title Case</div>
+        <div class="issue-desc">Finance KPI tiles use "TOTAL INVOICED", "COLLECTED", "OUTSTANDING", "OVERDUE" in ALL CAPS. Academics tiles use "Total Enrolled", "Active Sections" in Title Case. The design system specifies uppercase labels in small caps using `text-transform: uppercase` with 10px/500 weight — both pages should use the same casing rule applied consistently.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>The `StatCard` component in `@edforge/ui` should apply `text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; font-weight: 500` to the label prop uniformly. Neither page should control label casing in props — the component handles it. Audit all StatCard usages and pass labels in sentence case ("Total enrolled", "Collected", "Outstanding") — the component uppercases them.</div>
+        <div class="pages"><div class="page-chip both">Both pages</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-06</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Browser-native date inputs look broken in dark theme</div>
+        <div class="issue-desc">The Finance filter row uses native `<input type="date">` elements. These render with browser-default chrome (white background, system font, calendar icon) that completely breaks the EdForge dark theme. On dark backgrounds they appear as jarring white rectangles.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Replace native date inputs with the custom date picker component already used elsewhere in the EdForge codebase (check the attendance or grading modules). If no custom date picker exists, apply CSS overrides: `color-scheme: dark` on the input for dark mode, `background: var(--bg-surface)`, `border: 1px solid var(--border-default)`, `color: var(--text-primary)`, `border-radius: 7px`. Also consider replacing the date range with quick-select chips: "This month", "Last 30 days", "This year" — far more usable than manual date entry.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-07</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Enrollment bar chart: all bars are the same teal color — no visual encoding by count</div>
+        <div class="issue-desc">The enrollment by grade level chart renders every grade bar in the same teal color regardless of student count. Grade 10 with 4 students looks identical to Pre-K with 1 student. The prototype specified color encoding: teal for count 1, blue for 2–3, amber for 4+. Without this, the chart is just a list with bars — no visual hierarchy communicates which grades are largest.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>In the grade bar component, compute color from count: `count === 1 ? '#1D9E75' : count <= 3 ? '#378ADD' : '#EF9F27'`. Apply to both the fill element and a matching left accent on the grade label text. Additionally, consider replacing the simple bar with a more expressive visualization — see design enhancement section below.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-08</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Payment method avatars show "CA" and "CH" initials — looks like user avatars</div>
+        <div class="issue-desc">Recent payments use avatar circles with "CA" for cash and "CH" for cheque. Initials in circles are a universal pattern for person avatars. Using them for payment methods creates cognitive confusion — a school accountant scanning the payments list would think these are student or staff initials. RCP-0013 showing "CA" next to "Cash · Yesterday" is redundant and misleading.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Replace avatar circles with method-specific icon squares: cash → a coin/banknote SVG icon on teal background, cheque → a document SVG on purple background, bank_transfer → a bank building SVG on blue background. These immediately communicate payment method without text. The icon mapping should live in the `formatGatewayLabel()` utility as an icon key alongside the display name.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">L-09</div><div class="issue-badge high">HIGH</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Zero-value rows in invoice status breakdown create visual noise</div>
+        <div class="issue-desc">"Issued — 0 (0%)" and "Partially paid — 0 (0%)" appear as full-height rows with zero bars. Empty data rows with visible labels communicate that the state exists but nothing is in it — this is confusing noise. A school admin sees "Partially paid" and wonders why it shows but has no data.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Filter out status rows where count === 0 from the rendered list. Only show statuses that have at least 1 invoice. For payment methods similarly, only show gateways present in `paymentsByGateway`. This makes the breakdown accurate to the actual data distribution.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(55,138,221,0.12)"><svg viewBox="0 0 16 16" fill="#378ADD"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg></div>
+    <div class="section-title">Design consistency and polish</div>
+    <div class="section-scope">Medium — inconsistencies with V2 system</div>
+  </div>
+  <div class="issue-list">
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-01</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Attendance alerts use left-border style instead of full-border card from V2 system</div>
+        <div class="issue-desc">The three attendance alert rows use a 4px left-border accent (red/amber/blue left border on a dark row) rather than the full-border card pattern from the home page V2 and the prototype. The V2 system uses `border: 1px solid rgba(color, 0.18)` on all four sides with `background: rgba(color, 0.07)`. The current left-border pattern is a different visual language.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>The `V2AlertItem` component from `@edforge/ui` must render with full-border card style: all four sides border, semantic background fill, icon square with `border-radius: 7px`. The left-border accent is a legacy pattern — remove it. Use the exact same component as the home page AlertsRow for consistency.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-02</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Attendance trend chart has no custom HTML legend</div>
+        <div class="issue-desc">The prototype and spec require a custom HTML legend below the chart showing "Actual" (teal line) and "80% target" (dashed amber line). The rendered chart has no legend — users cannot understand the dashed reference line without it.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Add the custom legend row as implemented in the home page V2 attendance trend card. It is a flex row with two items: a 16×2px teal rect + "Actual" label, and a 16×1px dashed amber rect + "80% target" label. Both in 10px muted text. Place below the canvas element within the card.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-03</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">10th Grade label wraps to two lines in enrollment chart</div>
+        <div class="issue-desc">The grade label column in the enrollment chart is too narrow, causing "10th Grade" (or "10. Grade" as it appears) to wrap onto two lines. This breaks the row height consistency and looks broken.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Set `white-space: nowrap` on grade labels and give the label column a fixed `min-width: 68px`. Use `formatGradeLabel()` utility to produce short forms: "Pre-K", "K", "Gr. 1" through "Gr. 12" to ensure labels stay on one line at any reasonable width.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-04</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Finance page icon is a flat dollar sign, not the clock/finance icon from V2 system</div>
+        <div class="issue-desc">The page header icon for Finance uses a simple dollar sign in a green circle. The home page V2 and the prototype use a clock/time icon with circular frame for finance (representing payment timing/due dates). The icon vocabulary should be consistent with how Finance is represented across the app.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Use the same finance icon as the sidebar nav item and home page quick action — the clock-circle SVG. Apply amber background `rgba(239,159,39,0.10)` and amber stroke `#EF9F27` as specified in the prototype. Green is the brand/success color — using it for the finance icon conflicts with the teal used for the Academics module.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-05</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">KPI tiles feel oversized — excessive vertical padding makes cards bloated</div>
+        <div class="issue-desc">Both pages have KPI tiles at approximately 90px+ height. The V2 design token specifies card padding of 16–18px which at this font size should produce tiles around 72–80px tall. The current implementation has either extra padding or is inheriting wrong spacing from a parent grid.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Audit the StatCard component padding. Should be exactly `padding: 16px` all sides. The internal structure is: top row (label + icon) 12px margin-bottom, value at 24px/600 lineheight 1, meta row 5px margin-top, 2px accent bar at absolute bottom. Total interior height: 12 + 12 + 24 + 5 + 14 + 12 = ~79px. If it's rendering taller, check for extra margin from the meta row or the accent bar creating layout space.</div>
+        <div class="pages"><div class="page-chip both">Both pages</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-06</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Fee type progress bars in collection performance card are too thin to read</div>
+        <div class="issue-desc">The admission fees and lab fees progress bars render at approximately 2px height — this is the same height as the KPI accent bar. At this size, the bar conveys no useful information and is invisible to most users. The fee breakdown bars should be 4px to match the main progress bars above them.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>Set fee type bar track height to `4px` with `border-radius: 2px`. The fill color for admission fees should be `#1D9E75` (35% collection rate = 35% width). Lab fees should be `#378ADD` (14% collection rate). Both bars should animate from 0 to target width on mount using the same 600ms ease-out pattern as the main bars.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-07</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Outstanding non-overdue bar shows "NPR 0" — misleading empty state</div>
+        <div class="issue-desc">The collection performance card has three bars. The middle bar "Outstanding (non-overdue)" correctly computes to approximately NPR 200 (outstanding 309,200 minus overdue 309,000). Displaying "NPR 0" with a zero-width bar and "NPR 0" as the value when the actual value is 200 looks like a bug even though it's approximately correct.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>When `outstanding - overdue < 1000` (less than NPR 1,000), hide the non-overdue outstanding row entirely. The distinction between NPR 0 and NPR 200 is not meaningful to a school accountant. The three-bar layout becomes two bars: Collected and Overdue. This is cleaner and more honest.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">P-08</div><div class="issue-badge med">MEDIUM</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Attendance trend chart bottom axis label "2/22" does not appear in the API data</div>
+        <div class="issue-desc">The x-axis of the attendance trend chart starts at "2/22" but the API trend data for the 30-day window starting February 17 has first entry on "2026-02-23". This suggests either the chart is using stale cached data or the x-axis domain is being set to a fixed range rather than derived from actual data points.</div>
+        <div class="issue-fix"><div class="fix-label">Fix required</div>The chart x-axis labels must be derived exclusively from the `date` field of each attendance trend record. Do not set a fixed domain. The first label should be the earliest date in the API response. Format dates as "M/D" (no zero-padding) using `new Date(dateStr).toLocaleDateString('en-US', {month:'numeric', day:'numeric'})`.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(127,119,221,0.12)"><svg viewBox="0 0 16 16" fill="#7F77DD"><path d="M1 1h14v10H1zM4 14h8"/><path d="M8 11v3" stroke="#7F77DD" stroke-width="1.3"/></svg></div>
+    <div class="section-title">Creative and UX enhancements</div>
+    <div class="section-scope">High impact — enterprise-grade differentiation</div>
+  </div>
+  <div class="issue-list">
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">E-01</div><div class="issue-badge low">ENHANCE</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Replace generic page header with a contextual insight summary strip</div>
+        <div class="issue-desc">Instead of "Academics overview / Manage students, classes..." which is generic navigation copy, replace the header with a contextual strip that delivers a one-sentence situational summary. For Academics: "22 students enrolled across 10 sections · Today's attendance is 50% — 11 students not yet recorded · 12 at-risk students need attention." For Finance: "NPR 4.6L invoiced · 32.4% collected · 32 invoices overdue since March 17." This transforms the header from dead navigation into actionable intelligence.</div>
+        <div class="issue-fix"><div class="fix-label">Implementation</div>Build a `PageContextBanner` component that takes a summary string derived from the fetched data. The banner is 40px tall, full-width, with 14px text in `#9aa0b8` and key metrics highlighted inline in their semantic color (teal for good, amber for warning, red for critical). It sits between the sticky header and the KPI tiles, replacing the current large H1 block.</div>
+        <div class="pages"><div class="page-chip both">Both pages</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">E-02</div><div class="issue-badge low">ENHANCE</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Finance: replace static aging report buckets with a visual spectrum chart</div>
+        <div class="issue-desc">The five aging buckets as cards is functional but not expressive. A heat-map style horizontal spectrum where bucket width is proportional to amount and color intensity increases with age (Current = faint green → 1-30 days = amber → 31-60 = red → 61-90 = deep red → 90+ = near-black red) would communicate aging urgency at a glance without reading numbers. This is the kind of creative data visualization that sets enterprise products apart.</div>
+        <div class="issue-fix"><div class="fix-label">Implementation</div>Build an `AgingSpectrumChart` component. Full-width bar divided into segments. Each segment width = `bucket.amount / totalOverdue * 100%`. Each segment has a label above (bucket name) and amount below. Color: Current `#1D9E75`, 1-30 `#EF9F27`, 31-60 `#E24B4A`, 61-90 `#A32D2D`, 90+ `#501313`. When a bucket has 0 amount, render a thin 4px divider placeholder so the spectrum stays visually complete. For the current data (all 32 invoices in 1-30 days) this would show one full amber block — a clear, immediate visual.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">E-03</div><div class="issue-badge low">ENHANCE</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Academics: replace static enrollment bar chart with an interactive bubble/dot grid</div>
+        <div class="issue-desc">The enrollment by grade level chart uses horizontal bars — the same visual pattern as the collection performance bars in Finance. Both pages start feeling like the same chart repeated. For enrollment distribution, a dot matrix or bubble grid would be more humanized: each student is represented as a colored dot grouped by grade. 22 students = 22 dots, organized in rows by grade. This makes enrollment tangible — you see individual students rather than a bar representing an abstraction.</div>
+        <div class="issue-fix"><div class="fix-label">Implementation</div>Build a `StudentDotMatrix` component. SVG grid where each student is a 8px circle with 3px gap. Group by grade level in rows, label each row with the grade name on the left. Circle color encodes grade tier: early elementary (PK-2) teal, middle (3-6) blue, high school (7-12) purple. Hovering a row highlights all dots in that grade and shows a tooltip: "Grade 10 · 4 students · 18.2% of enrollment." For 22 students this fits comfortably in a 200px card height.</div>
+        <div class="pages"><div class="page-chip ac">Academics</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">E-04</div><div class="issue-badge low">ENHANCE</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Finance: quick-select time filters instead of raw date inputs</div>
+        <div class="issue-desc">The current date range filter requires manual date entry (mm/dd/yyyy inputs) which is slow and error-prone for daily use. School accountants check finance daily — they never need arbitrary date ranges. They need "Today", "This week", "This month", "This academic year".</div>
+        <div class="issue-fix"><div class="fix-label">Implementation</div>Replace the From/To date inputs with a segmented filter control — four pill buttons: "Today", "This week", "This month", "This year". Active pill has brand background. Keep the academic year dropdown. This is a 10-second decision vs. a 30-second date-entry decision. The selected filter is passed to the data hook which computes the start/end dates internally and passes them to the API call. Keep manual date range as a "Custom" option that expands the picker inline when selected.</div>
+        <div class="pages"><div class="page-chip fi">Finance</div></div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-left"><div class="issue-id">E-05</div><div class="issue-badge low">ENHANCE</div></div>
+      <div class="issue-body">
+        <div class="issue-title">Both pages: add an empty state for sections with no data rather than showing zero-bars</div>
+        <div class="issue-desc">When a section has no data (zero overdue, no at-risk students, etc.), the current UI shows bars at zero width, counts at 0, amounts at NPR 0. This looks broken. An intentional empty state communicates that the system checked and found nothing — which is actually good news for some of these sections.</div>
+        <div class="issue-fix"><div class="fix-label">Implementation</div>For each data section, define an empty condition. Aging report: if all buckets have count === 0, show a single message "No overdue invoices — all accounts current" in teal with a checkmark. At-risk card: if `totalAtRiskCount === 0`, show "All students meeting attendance threshold" in teal. This pattern of "empty = healthy" is humanizing and reassuring — it confirms the system is working, not broken.</div>
+        <div class="pages"><div class="page-chip both">Both pages</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>

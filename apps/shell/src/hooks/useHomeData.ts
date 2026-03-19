@@ -275,13 +275,19 @@ export function useHomeAttendanceTrend(
 // HOOK: useFinanceSummary — Extended for V2
 // ============================================================================
 
+export interface FeeTypeBreakdown {
+  totalAmount: number
+  collectedAmount: number
+  invoiceCount: number
+}
+
 export interface FinanceSummaryData {
   totalInvoiced: number
   totalCollected: number
   outstanding: number
   overdue: number
   collectionRate: number
-  byFeeType?: Record<string, number>
+  byFeeType?: Record<string, FeeTypeBreakdown>
   recentPayments?: Array<{
     id: string
     amount: number
@@ -305,7 +311,18 @@ export function useFinanceSummary(schoolId: string | null) {
       outstanding: d.outstanding ?? 0,
       overdue: d.overdue ?? 0,
       collectionRate: d.collectionRate ?? 0,
-      byFeeType: d.byFeeType,
+      byFeeType: Array.isArray(d.byFeeType)
+        ? Object.fromEntries(
+            d.byFeeType.map((f: any) => [
+              f.feeType,
+              {
+                totalAmount: f.totalAmount ?? 0,
+                collectedAmount: f.collectedAmount ?? 0,
+                invoiceCount: f.invoiceCount ?? 0,
+              },
+            ])
+          )
+        : d.byFeeType,
       recentPayments: d.recentPayments,
     }
   }, [query.data])

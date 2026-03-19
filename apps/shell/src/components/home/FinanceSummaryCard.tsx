@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
-import { formatNPRShort } from '@edforge/types'
+import { formatNPRShort, formatFeeType } from '@edforge/types'
 
 interface FinanceSummaryCardProps {
   totalInvoiced: number
@@ -16,7 +16,7 @@ interface FinanceSummaryCardProps {
   outstanding: number
   overdue: number
   collectionRate: number
-  byFeeType?: Record<string, number>
+  byFeeType?: Record<string, { totalAmount: number; collectedAmount: number; invoiceCount: number }>
   isLoading: boolean
   isError: boolean
   onRetry?: () => void
@@ -92,11 +92,7 @@ function AnimatedBar({
   )
 }
 
-function formatFeeTypeName(key: string): string {
-  return key
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-}
+// formatFeeTypeName removed — using shared formatFeeType from @edforge/types
 
 export function FinanceSummaryCard({
   totalInvoiced,
@@ -230,13 +226,13 @@ export function FinanceSummaryCard({
             {/* Fee type breakdown */}
             {byFeeType && Object.keys(byFeeType).length > 0 && (
               <>
-                {Object.entries(byFeeType).map(([type, amount]) => (
+                {Object.entries(byFeeType).map(([type, breakdown]) => (
                   <div key={type} className="flex items-center justify-between">
                     <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
-                      {formatFeeTypeName(type)}
+                      {formatFeeType(type)}
                     </span>
                     <span className="text-[11px]" style={{ color: 'var(--v2-text-hint)' }}>
-                      {formatNPRShort(amount)} invoiced
+                      {formatNPRShort(breakdown.totalAmount)} invoiced
                     </span>
                   </div>
                 ))}

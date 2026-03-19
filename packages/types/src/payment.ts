@@ -204,6 +204,32 @@ export interface DashboardSummary {
   collectionRate: number // 0-100
   invoicesByStatus: Record<string, number>
   paymentsByGateway: Record<string, number>
+  byFeeType: Array<{
+    feeType: string
+    invoiceCount: number
+    totalAmount: number
+    collectedAmount: number
+  }>
+  agingReport: Array<{
+    label: string
+    minDays: number
+    maxDays: number | null
+    count: number
+    amount: number
+  }>
+  monthlyCollections: Array<{
+    month: string
+    collected: number
+    invoiced: number
+    paymentCount: number
+  }>
+  byGradeLevel: Array<{
+    gradeLevel: string
+    invoiceCount: number
+    totalInvoiced: number
+    totalCollected: number
+    outstanding: number
+  }>
   recentPayments: Array<{
     id: string
     amount: number
@@ -213,7 +239,7 @@ export interface DashboardSummary {
     paidAt?: string
     createdAt: string
   }>
-  recentInvoices?: Array<{
+  recentInvoices: Array<{
     id: string
     invoiceNumber: string
     studentName: string
@@ -332,6 +358,25 @@ export function formatNPR(
  *   formatNPRShort(150000)     → "NPR 1.5 lakh"
  *   formatNPRShort(10000000)   → "NPR 1.0 crore"
  */
+/**
+ * Compact NPR format for space-constrained KPI tiles.
+ * Uses abbreviated lakh/crore with "L"/"Cr" suffix.
+ *
+ * Examples:
+ *   formatNPRCompact(12500)      → "NPR 12,500"
+ *   formatNPRCompact(457200)     → "NPR 4.6L"
+ *   formatNPRCompact(10000000)   → "NPR 1.0Cr"
+ */
+export function formatNPRCompact(amount: number): string {
+  if (amount >= 1_00_00_000) {
+    return `NPR ${(amount / 1_00_00_000).toFixed(1)}Cr`
+  }
+  if (amount >= 1_00_000) {
+    return `NPR ${(amount / 1_00_000).toFixed(1)}L`
+  }
+  return formatNPR(amount, { decimals: 0 })
+}
+
 export function formatNPRShort(amount: number): string {
   if (amount >= 1_00_00_000) {
     return `NPR ${(amount / 1_00_00_000).toFixed(1)} crore`

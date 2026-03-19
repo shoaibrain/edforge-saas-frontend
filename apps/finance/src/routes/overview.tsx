@@ -1,290 +1,76 @@
 /**
- * Finance Overview Page (Unified)
+ * Finance Overview Page — V2
  *
- * Main landing page for the Finance module. Merges the previous
- * Overview + Dashboard into a single page with KPI cards, breakdowns,
- * filters, CSV export, and recent activity feed.
+ * Redesigned finance overview with V2 design tokens, animated KPI tiles,
+ * collection performance, invoice status, aging report, and recent activity.
  */
 
-import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Button } from '@edforge/ui'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
-  Loader2,
-  BarChart3,
-  Download,
-  TrendingUp,
-  AlertTriangle,
   DollarSign,
+  TrendingUp,
   Receipt,
-  FileText,
+  AlertTriangle,
+  FileStack,
   CreditCard,
 } from 'lucide-react'
-import { toast } from 'sonner'
+import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { formatNPRCompact } from '@edforge/types'
+
+// Helper to build tag pill props for StatCard
+function tagPill(text: string, hex: string): { text: string; color: string; bg: string } {
+  return { text, color: hex, bg: `${hex}18` }
+}
 import { useAppStore } from '../stores/app.store'
-import { useDashboardSummary, useExportInvoicesCsv, useFeeStructures } from '@edforge/finance-services'
-import { formatNPR, formatNPRShort } from '@edforge/types'
-import { formatDate } from '../utils/format-date'
-import { StatusBadge } from '../components/StatusBadge'
+import { useFinanceOverviewV2 } from '../hooks/useFinanceOverviewV2'
+import { FilterRow } from '../components/overview-v2/FilterRow'
+import { OverdueAlertBanner } from '../components/overview-v2/OverdueAlertBanner'
+import { CollectionPerformanceCard } from '../components/overview-v2/CollectionPerformanceCard'
+import { InvoiceStatusCard } from '../components/overview-v2/InvoiceStatusCard'
+import { AgingReportCard } from '../components/overview-v2/AgingReportCard'
+import { RecentPaymentsCard } from '../components/overview-v2/RecentPaymentsCard'
+import { RecentInvoicesCard } from '../components/overview-v2/RecentInvoicesCard'
 
 // ============================================================================
-// SUMMARY CARD
+// ANIMATION
 // ============================================================================
 
-function SummaryCard({
-  label,
-  value,
-  icon: Icon,
-  colorClass,
-}: {
-  label: string
-  value: string
-  icon: React.ElementType
-  colorClass: string
-}) {
-  return (
-    <div className="bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-          {label}
-        </span>
-        <div className={`p-1.5 rounded-md ${colorClass}`} aria-label={label}>
-          <Icon className="w-4 h-4" />
-        </div>
-      </div>
-      <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{value}</p>
-    </div>
-  )
-}
-
-// ============================================================================
-// PERCENTAGE BAR
-// ============================================================================
-
-function formatStatusLabel(label: string): string {
-  return label.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
-function PercentageBar({
-  label,
-  value,
-  total,
-  colorClass,
-}: {
-  label: string
-  value: number
-  total: number
-  colorClass: string
-}) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-[rgb(var(--text-secondary))]">
-          {formatStatusLabel(label)} — {value} ({pct}%)
-        </span>
-        <span className="font-medium text-[rgb(var(--text-primary))]">{pct}%</span>
-      </div>
-      <div className="h-1.5 rounded-full bg-[rgb(var(--surface-tertiary))] overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${colorClass}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// RECENT ACTIVITY FEED
-// ============================================================================
-
-interface ActivityItem {
-  type: 'invoice' | 'payment'
-  id: string
-  description: string
-  amount: string
-  status: string
-  date: string
-  navigateTo: string
-}
-
-function RecentActivityFeed({
-  recentPayments,
-  recentInvoices,
-  onNavigate,
-}: {
-  recentPayments: Array<{
-    id: string
-    amount: number
-    gateway: string
-    status: string
-    receiptNumber?: string
-    paidAt?: string
-    createdAt: string
-  }>
-  recentInvoices: Array<{
-    id: string
-    invoiceNumber: string
-    studentName: string
-    grandTotal: number
-    amountDue: number
-    status: string
-    issuedDate: string
-    createdAt: string
-  }>
-  onNavigate: (path: string) => void
-}) {
-  const activities = useMemo<ActivityItem[]>(() => {
-    const items: ActivityItem[] = []
-
-    for (const inv of recentInvoices) {
-      items.push({
-        type: 'invoice',
-        id: `inv-${inv.id}`,
-        description: `${inv.invoiceNumber} — ${inv.studentName || 'Unknown'}`,
-        amount: formatNPR(inv.grandTotal),
-        status: inv.status,
-        date: inv.createdAt,
-        navigateTo: `/invoices/${inv.id}`,
-      })
+function useMotionVariants() {
+  const prefersReduced = useReducedMotion()
+  if (prefersReduced) {
+    return {
+      stagger: { hidden: {}, visible: {} },
+      fadeInUp: { hidden: {}, visible: {} },
     }
-
-    for (const pay of recentPayments) {
-      items.push({
-        type: 'payment',
-        id: `pay-${pay.id}`,
-        description: `${pay.receiptNumber || pay.id.slice(0, 8)} via ${formatStatusLabel(pay.gateway)}`,
-        amount: formatNPR(pay.amount),
-        status: pay.status,
-        date: pay.paidAt || pay.createdAt,
-        navigateTo: '/payments',
-      })
-    }
-
-    return items
-      .sort((a, b) => b.date.localeCompare(a.date))
-      .slice(0, 10)
-  }, [recentPayments, recentInvoices])
-
-  return (
-    <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-      <div className="bg-[rgb(var(--surface-secondary))] px-4 py-3 border-b border-[rgb(var(--border-primary))]">
-        <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-          Recent Activity
-        </h2>
-      </div>
-      {activities.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-xs text-[rgb(var(--text-tertiary))]">No recent activity.</p>
-        </div>
-      ) : (
-        <div className="divide-y divide-[rgb(var(--border-primary))]">
-          {activities.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.navigateTo)}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgb(var(--surface-secondary))] transition-colors"
-            >
-              <div className={`p-1.5 rounded-md flex-shrink-0 ${
-                item.type === 'invoice'
-                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                  : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-              }`}>
-                {item.type === 'invoice'
-                  ? <FileText className="w-3.5 h-3.5" />
-                  : <CreditCard className="w-3.5 h-3.5" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-[rgb(var(--text-primary))] truncate">
-                    {item.description}
-                  </span>
-                  <span className="text-sm font-medium text-[rgb(var(--text-primary))] flex-shrink-0">
-                    {item.amount}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-2 mt-0.5">
-                  <StatusBadge status={item.status} size="xs" />
-                  <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                    {formatDate(item.date)}
-                  </span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+  }
+  return {
+    stagger: {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
+    },
+    fadeInUp: {
+      hidden: { opacity: 0, y: 14 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+    },
+  }
 }
 
 // ============================================================================
-// MAIN PAGE
+// PAGE
 // ============================================================================
-
-const invoiceStatusColors: Record<string, string> = {
-  draft: 'bg-gray-400',
-  issued: 'bg-blue-500',
-  partially_paid: 'bg-amber-500',
-  paid: 'bg-green-500',
-  overdue: 'bg-red-500',
-  cancelled: 'bg-gray-300',
-  written_off: 'bg-gray-500',
-}
-
-const gatewayColors: Record<string, string> = {
-  esewa: 'bg-green-500',
-  khalti: 'bg-purple-500',
-  fonepay: 'bg-blue-500',
-  connectips: 'bg-cyan-500',
-  stripe: 'bg-indigo-500',
-  cash: 'bg-amber-500',
-  bank_transfer: 'bg-teal-500',
-  cheque: 'bg-orange-500',
-}
 
 export function Overview() {
-  const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
-  const [academicYear, setAcademicYear] = useState('')
-
-  const filters = useMemo(() => {
-    const f: { from?: string; to?: string; academicYear?: string } = {}
-    if (fromDate) f.from = fromDate
-    if (toDate) f.to = toDate
-    if (academicYear) f.academicYear = academicYear
-    return Object.keys(f).length > 0 ? f : undefined
-  }, [fromDate, toDate, academicYear])
-
-  const { data: summary, isLoading, isError } = useDashboardSummary(schoolId ?? '', filters)
-  const { data: feeStructures } = useFeeStructures(schoolId ?? '')
-  const exportCsvMutation = useExportInvoicesCsv()
-
-  const academicYears = useMemo(() => {
-    if (!feeStructures) return []
-    const years = new Set(feeStructures.map((f) => f.academicYear).filter(Boolean))
-    return [...years].sort().reverse()
-  }, [feeStructures])
-
-  const handleExportCSV = () => {
-    if (!schoolId) return
-    exportCsvMutation.mutate(schoolId, {
-      onSuccess: () => toast.success('CSV export downloaded'),
-      onError: () => toast.error('Failed to export CSV'),
-    })
-  }
-
+  // No-school guard
   if (!schoolId) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <DollarSign className="w-12 h-12 mx-auto text-[rgb(var(--text-tertiary))] mb-4" />
-          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-1">Select a School</h2>
-          <p className="text-sm text-[rgb(var(--text-tertiary))]">
+          <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-30" style={{ color: 'var(--v2-text-hint)' }} />
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--v2-text-primary)' }}>Select a School</h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--v2-text-hint)' }}>
             Choose a school from the top navigation to view financial data.
           </p>
         </div>
@@ -292,196 +78,228 @@ export function Overview() {
     )
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
-      </div>
-    )
-  }
+  return <FinanceOverviewContent schoolId={schoolId} />
+}
 
-  if (isError) {
-    return (
-      <div className="text-center py-16">
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
-        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load financial data</p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          Please check your connection and try again.
-        </p>
-      </div>
-    )
-  }
+function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
+  const navigate = useNavigate()
+  const data = useFinanceOverviewV2(schoolId)
+  const { stagger, fadeInUp } = useMotionVariants()
 
-  if (!summary) {
-    return (
-      <div className="text-center py-16">
-        <BarChart3 className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">No financial data yet</p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          Start generating invoices to see your financial overview.
-        </p>
-      </div>
-    )
-  }
-
-  const invoiceStatuses = summary.invoicesByStatus ?? {}
-  const totalInvoiceCount = Object.values(invoiceStatuses).reduce((a, b) => a + b, 0)
-
-  const paymentGateways = summary.paymentsByGateway ?? {}
-  const totalPaymentCount = Object.values(paymentGateways).reduce((a, b) => a + b, 0)
+  const {
+    kpi,
+    isLoading,
+    invoicesByStatus,
+    totalInvoiceCount,
+    paymentsByGateway,
+    totalPaymentCount,
+    byFeeType,
+    agingReport,
+    recentPayments,
+    recentInvoices,
+    filters,
+    setFromDate,
+    setToDate,
+    setAcademicYear,
+    clearFilters,
+    hasActiveFilters,
+    academicYears,
+    handleExportCSV,
+    isExporting,
+  } = data
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            Finance Overview
-          </h1>
-          <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-            Manage billing, payments, and financial operations.
-          </p>
-        </div>
-        <Button variant="outline" onClick={handleExportCSV} disabled={exportCsvMutation.isPending}>
-          {exportCsvMutation.isPending ? (
-            <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-          ) : (
-            <Download className="w-4 h-4 mr-1.5" />
-          )}
-          Export CSV
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex items-end gap-3 flex-wrap">
-        <div>
-          <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">From</label>
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">To</label>
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-          />
-        </div>
-        {academicYears.length > 0 && (
-          <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">Academic Year</label>
-            <select
-              value={academicYear}
-              onChange={(e) => setAcademicYear(e.target.value)}
-              className="px-3 py-1.5 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-            >
-              <option value="">All Years</option>
-              {academicYears.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-        )}
-        {(fromDate || toDate || academicYear) && (
-          <button
-            onClick={() => { setFromDate(''); setToDate(''); setAcademicYear('') }}
-            className="px-3 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors"
+    <div data-v2 className="p-6 space-y-5" style={{ minHeight: '100vh' }}>
+      {/* Compact Header */}
+      <div className="flex items-center justify-between" style={{ height: 44 }}>
+        <div className="flex items-center gap-2.5">
+          <div
+            className="w-7 h-7 rounded-[7px] flex items-center justify-center"
+            style={{ background: 'rgba(29, 158, 117, 0.12)' }}
           >
-            Clear Filters
+            <DollarSign className="w-4 h-4" style={{ color: 'var(--v2-brand-primary)' }} />
+          </div>
+          <h1 className="text-[14px] font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
+            Finance
+          </h1>
+          <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+          <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate({ to: '/invoices/bulk-generate' })}
+            aria-label="Bulk invoice generation"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+            style={{
+              background: 'var(--v2-bg-elevated)',
+              borderColor: 'var(--v2-border-default)',
+              color: 'var(--v2-text-secondary)',
+            }}
+          >
+            <FileStack className="w-3.5 h-3.5" />
+            Bulk invoice
           </button>
-        )}
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <SummaryCard
-          label="Total Invoiced"
-          value={formatNPRShort(summary.totalInvoiced)}
-          icon={DollarSign}
-          colorClass="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-        />
-        <SummaryCard
-          label="Total Collected"
-          value={formatNPRShort(summary.totalCollected)}
-          icon={TrendingUp}
-          colorClass="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-        />
-        <SummaryCard
-          label="Outstanding"
-          value={formatNPRShort(summary.outstanding)}
-          icon={Receipt}
-          colorClass="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
-        />
-        <SummaryCard
-          label="Overdue"
-          value={formatNPRShort(summary.overdue)}
-          icon={AlertTriangle}
-          colorClass="bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
-        />
-        <SummaryCard
-          label="Collection Rate"
-          value={`${summary.collectionRate.toFixed(1)}%`}
-          icon={BarChart3}
-          colorClass="bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400"
-        />
-      </div>
-
-      {/* Breakdowns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="border border-[rgb(var(--border-primary))] rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4">
-            Invoice Status Breakdown
-          </h2>
-          {totalInvoiceCount === 0 ? (
-            <p className="text-xs text-[rgb(var(--text-tertiary))]">No invoices yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {Object.entries(invoiceStatuses).map(([status, count]) => (
-                <PercentageBar
-                  key={status}
-                  label={status}
-                  value={count}
-                  total={totalInvoiceCount}
-                  colorClass={invoiceStatusColors[status] || 'bg-gray-400'}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="border border-[rgb(var(--border-primary))] rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4">
-            Payment Methods Breakdown
-          </h2>
-          {totalPaymentCount === 0 ? (
-            <p className="text-xs text-[rgb(var(--text-tertiary))]">No payments yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {Object.entries(paymentGateways).map(([gateway, count]) => (
-                <PercentageBar
-                  key={gateway}
-                  label={gateway}
-                  value={count}
-                  total={totalPaymentCount}
-                  colorClass={gatewayColors[gateway] || 'bg-gray-400'}
-                />
-              ))}
-            </div>
-          )}
+          <button
+            onClick={() => navigate({ to: '/payments/record' })}
+            aria-label="Record a payment"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+            style={{
+              background: 'var(--v2-brand-primary)',
+              color: '#fff',
+            }}
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            Record payment
+          </button>
         </div>
       </div>
 
-      {/* Recent Activity Feed */}
-      <RecentActivityFeed
-        recentPayments={summary.recentPayments ?? []}
-        recentInvoices={summary.recentInvoices ?? []}
-        onNavigate={(path) => navigate({ to: path as string })}
+      {/* Filters & Export */}
+      <FilterRow
+        fromDate={filters.from || ''}
+        toDate={filters.to || ''}
+        academicYear={filters.academicYear || ''}
+        academicYears={academicYears}
+        hasActiveFilters={hasActiveFilters}
+        isExporting={isExporting}
+        onFromChange={setFromDate}
+        onToChange={setToDate}
+        onAcademicYearChange={setAcademicYear}
+        onClear={clearFilters}
+        onExport={handleExportCSV}
       />
+
+      {/* Overdue Alert */}
+      <WidgetErrorBoundaryV2>
+        <OverdueAlertBanner
+          overdue={kpi.overdue}
+          overdueCount={invoicesByStatus['overdue'] ?? 0}
+          collectionRate={kpi.collectionRate}
+          draftCount={invoicesByStatus['draft'] ?? 0}
+          agingReport={agingReport}
+        />
+      </WidgetErrorBoundaryV2>
+
+      {/* KPI Grid (4 tiles) */}
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        className="grid gap-3 grid-cols-2 lg:grid-cols-4"
+      >
+        <motion.div variants={fadeInUp}>
+          <StatCard
+            label="Total Invoiced"
+            value={formatNPRCompact(kpi.totalInvoiced)}
+            icon={DollarSign}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="var(--v2-brand-primary)"
+            barColor="var(--v2-brand-primary)"
+            tag={tagPill(`${kpi.totalInvoiceCount} invoices`, 'var(--v2-brand-primary)')}
+            loading={isLoading}
+          />
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <StatCard
+            label="Collected"
+            value={formatNPRCompact(kpi.totalCollected)}
+            icon={TrendingUp}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            tag={tagPill(`${kpi.currentMonthPaymentCount} payments`, '#1D9E75')}
+            hint="this month"
+            loading={isLoading}
+          />
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <StatCard
+            label="Outstanding"
+            value={formatNPRCompact(kpi.outstanding)}
+            icon={Receipt}
+            accentColor="rgba(239, 159, 39, 0.12)"
+            iconColor="#EF9F27"
+            barColor="#EF9F27"
+            tag={tagPill(`${kpi.outstandingInvoiceCount} awaiting`, '#EF9F27')}
+            loading={isLoading}
+          />
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <StatCard
+            label="Overdue"
+            value={formatNPRCompact(kpi.overdue)}
+            icon={AlertTriangle}
+            accentColor="rgba(226, 75, 74, 0.12)"
+            iconColor="#E24B4A"
+            barColor="#E24B4A"
+            tag={tagPill(`${invoicesByStatus['overdue'] ?? 0} invoices`, '#E24B4A')}
+            loading={isLoading}
+            valueColor={kpi.overdue > 0 ? '#E24B4A' : undefined}
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* 2-col: Collection Performance + Invoice Status */}
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        className="grid gap-4 grid-cols-1 md:grid-cols-[1.4fr_1fr]"
+      >
+        <motion.div variants={fadeInUp}>
+          <WidgetErrorBoundaryV2>
+            <CollectionPerformanceCard
+              totalInvoiced={kpi.totalInvoiced}
+              totalCollected={kpi.totalCollected}
+              outstanding={kpi.outstanding}
+              overdue={kpi.overdue}
+              collectionRate={kpi.collectionRate}
+              byFeeType={byFeeType}
+              isLoading={isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <WidgetErrorBoundaryV2>
+            <InvoiceStatusCard
+              invoicesByStatus={invoicesByStatus}
+              totalInvoiceCount={totalInvoiceCount}
+              paymentsByGateway={paymentsByGateway}
+              totalPaymentCount={totalPaymentCount}
+              isLoading={isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
+      </motion.div>
+
+      {/* Aging Report (full width) */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible">
+        <WidgetErrorBoundaryV2>
+          <AgingReportCard agingReport={agingReport} isLoading={isLoading} />
+        </WidgetErrorBoundaryV2>
+      </motion.div>
+
+      {/* 2-col: Recent Payments + Recent Invoices */}
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        className="grid gap-4 grid-cols-1 md:grid-cols-2"
+      >
+        <motion.div variants={fadeInUp}>
+          <WidgetErrorBoundaryV2>
+            <RecentPaymentsCard payments={recentPayments} isLoading={isLoading} />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <WidgetErrorBoundaryV2>
+            <RecentInvoicesCard invoices={recentInvoices} isLoading={isLoading} />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }

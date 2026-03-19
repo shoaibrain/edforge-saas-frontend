@@ -1,0 +1,35 @@
+/**
+ * EdForge V2 — Animation Keyframes
+ *
+ * Shared animation classes for V2 styled pages.
+ * Available globally via the theme package.
+ */
+
+@keyframes v2-skeleton-pulse {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes v2-bar-fill {
+  from { width: 0%; }
+}
+
+.v2-skeleton-pulse {
+  animation: v2-skeleton-pulse 1.5s ease-in-out infinite alternate;
+}
+
+.v2-bar-fill {
+  animation: v2-bar-fill var(--v2-bar-fill-duration, 600ms) ease-out forwards;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .v2-skeleton-pulse {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .v2-bar-fill {
+    animation: none;
+  }
+}

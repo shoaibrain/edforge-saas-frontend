@@ -1,0 +1,124 @@
+/**
+ * RecentInvoicesCard — V2
+ *
+ * Feed list of the most recent 5 invoices with status-coded icons.
+ */
+
+import { formatNPR, formatInvoiceStatus, formatRelativeDate } from '@edforge/types'
+
+const STATUS_COLORS: Record<string, string> = {
+  overdue: '#E24B4A',
+  draft: '#888780',
+  paid: '#1D9E75',
+  partially_paid: '#EF9F27',
+  issued: '#378ADD',
+  cancelled: '#5F5E5A',
+  written_off: '#5F5E5A',
+}
+
+interface RecentInvoice {
+  id: string
+  invoiceNumber: string
+  studentName: string
+  grandTotal: number
+  amountDue: number
+  status: string
+  issuedDate: string
+  createdAt: string
+}
+
+interface RecentInvoicesCardProps {
+  invoices: RecentInvoice[]
+  isLoading: boolean
+}
+
+function FeedSkeleton() {
+  return (
+    <div className="space-y-3">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="flex items-center gap-3">
+          <div className="w-2 h-7 rounded-sm v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="flex-1 space-y-1">
+            <div className="h-3 w-28 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div className="h-2.5 w-20 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          </div>
+          <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardProps) {
+  const top5 = invoices.slice(0, 5)
+
+  return (
+    <div
+      className="rounded-xl border flex flex-col"
+      style={{
+        background: 'var(--v2-bg-surface)',
+        borderColor: 'var(--v2-border-default)',
+        padding: 18,
+      }}
+    >
+      <h3 className="text-[13px] font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+        Recent invoices
+      </h3>
+
+      {isLoading ? (
+        <FeedSkeleton />
+      ) : top5.length === 0 ? (
+        <p className="text-[11px] py-4" style={{ color: 'var(--v2-text-hint)' }}>No invoices yet.</p>
+      ) : (
+        <div className="space-y-1">
+          {top5.map((invoice) => {
+            const statusColor = STATUS_COLORS[invoice.status] || '#888780'
+            return (
+              <div
+                key={invoice.id}
+                className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors"
+                style={{ cursor: 'default' }}
+              >
+                {/* Status bar */}
+                <div
+                  className="w-[3px] h-7 rounded-sm flex-shrink-0"
+                  style={{ background: statusColor }}
+                />
+
+                {/* Details */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                      {invoice.invoiceNumber}
+                    </span>
+                    <span
+                      className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                      style={{ background: `${statusColor}18`, color: statusColor }}
+                    >
+                      {formatInvoiceStatus(invoice.status)}
+                    </span>
+                  </div>
+                  <div className="text-[10px] truncate" style={{ color: 'var(--v2-text-faint)' }}>
+                    {invoice.studentName || 'Unknown'} · {formatRelativeDate(invoice.createdAt)}
+                  </div>
+                </div>
+
+                {/* Amount */}
+                <div className="text-right flex-shrink-0">
+                  <div className="text-[11px] font-semibold" style={{ color: 'var(--v2-text-secondary)' }}>
+                    {formatNPR(invoice.grandTotal, { decimals: 0 })}
+                  </div>
+                  {invoice.amountDue > 0 && invoice.status !== 'paid' && (
+                    <div className="text-[9px]" style={{ color: '#E24B4A' }}>
+                      {formatNPR(invoice.amountDue, { decimals: 0 })} due
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}

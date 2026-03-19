@@ -1,7 +1,7 @@
 /**
- * EdForge Home V2 — Design Tokens
+ * EdForge V2 — Design Tokens
  *
- * Scoped to [data-page="home-v2"] to avoid breaking other pages.
+ * Scoped to [data-page="home-v2"] (home page) and [data-v2] (module pages).
  * Dark theme is default; light overrides below.
  */
 
@@ -9,7 +9,8 @@
  * DARK THEME (DEFAULT)
  * ============================================================================ */
 
-[data-page="home-v2"] {
+[data-page="home-v2"],
+[data-v2] {
   /* Background stack */
   --v2-bg-app: #0f1117;
   --v2-bg-surface: #161b27;
@@ -87,7 +88,8 @@
  * LIGHT THEME OVERRIDES
  * ============================================================================ */
 
-:root:not(.dark) [data-page="home-v2"] {
+:root:not(.dark) [data-page="home-v2"],
+:root:not(.dark) [data-v2] {
   /* Background stack */
   --v2-bg-app: #f5f6f8;
   --v2-bg-surface: #ffffff;

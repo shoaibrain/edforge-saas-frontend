@@ -1,52 +1,60 @@
 /**
- * Academics Overview Page
+ * Academics Overview Page — V2
  *
- * Data-driven command center for the Academics module.
- * Fetches live KPIs, enrollment distribution, attendance trend,
- * academic alerts, and calendar context from existing APIs.
+ * Complete redesign with V2 design tokens, animated KPI tiles,
+ * attendance alerts, charts, and bottom detail row.
  */
 
 import { useMemo, useCallback } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useQueryClient } from '@tanstack/react-query'
-import { usePermission } from '@edforge/abac'
 import {
   GraduationCap,
   Users,
-  ClipboardCheck,
-  ContactRound,
-  School,
-  CalendarClock,
   LayoutGrid,
+  ClipboardCheck,
+  AlertTriangle,
+  CalendarClock,
+  School,
 } from 'lucide-react'
-import { Card } from '@edforge/ui'
-import {
-  ModuleOverviewPage,
-  type ModuleStat,
-} from '../components/ModuleOverviewPage'
+import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { getAttendanceColor } from '@edforge/types'
 import { useActiveSchoolId } from '../stores/app.store'
-import { useCurrentAcademicYear } from '../hooks/useSchool'
-import {
-  useAcademicsOverview,
-  useActiveTeacherCount,
-  useEnrollmentDistribution,
-  useCombinedAlerts,
-  useAcademicCalendarContext,
-  overviewKeys,
-} from '../hooks/useAcademicsOverview'
-import { useWidgetVisible } from '../stores/overview-widgets.store'
-import { usePerformanceMetrics } from '../hooks/usePerformanceMetrics'
+import { useAcademicsOverviewV2 } from '../hooks/useAcademicsOverviewV2'
+import { overviewKeys } from '../hooks/useAcademicsOverview'
+import { Card } from '@edforge/ui'
 
-// Widgets
-import { WidgetErrorBoundary } from '../components/overview/WidgetErrorBoundary'
-import { EmptyOverviewState } from '../components/overview/EmptyOverviewState'
-import { EnrollmentDistributionChart } from '../components/overview/EnrollmentDistributionChart'
-import { AttendanceTrendWidget } from '../components/overview/AttendanceTrendWidget'
-import { ActivityFeedWidget } from '../components/overview/ActivityFeedWidget'
-import { AcademicYearLabel } from '../components/overview/AcademicCalendarBar'
-import { MySectionsWidget } from '../components/overview/MySectionsWidget'
+// V2 components
+import { AttendanceAlertsCard } from '../components/overview-v2/AttendanceAlertsCard'
+import { AttendanceTrendChart } from '../components/overview-v2/AttendanceTrendChart'
+import { EnrollmentByGradeChart } from '../components/overview-v2/EnrollmentByGradeChart'
+import { AtRiskStudentsCard } from '../components/overview-v2/AtRiskStudentsCard'
+import { StaffRosterCard } from '../components/overview-v2/StaffRosterCard'
+import { EnrollmentSnapshotCard } from '../components/overview-v2/EnrollmentSnapshotCard'
 
 // ============================================================================
-// GUARD: No School Selected
+// ANIMATION VARIANTS
+// ============================================================================
+
+function useMotionVariants() {
+  const prefersReduced = useReducedMotion()
+  if (prefersReduced) {
+    return { staggerContainer: { hidden: {}, visible: {} }, fadeInUp: { hidden: {}, visible: {} } }
+  }
+  return {
+    staggerContainer: {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+    },
+    fadeInUp: {
+      hidden: { opacity: 0, y: 8 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+    },
+  }
+}
+
+// ============================================================================
+// GUARDS
 // ============================================================================
 
 function NoSchoolGuard() {
@@ -56,9 +64,7 @@ function NoSchoolGuard() {
         <div className="inline-flex p-3 rounded-2xl bg-teal-500/10 mb-4">
           <School className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
         </div>
-        <h2 className="text-lg font-bold text-text-primary">
-          Select a school
-        </h2>
+        <h2 className="text-lg font-bold text-text-primary">Select a school</h2>
         <p className="text-sm text-text-secondary mt-1.5">
           Choose a school from the sidebar to view the academics overview.
         </p>
@@ -67,10 +73,6 @@ function NoSchoolGuard() {
   )
 }
 
-// ============================================================================
-// GUARD: No Academic Year
-// ============================================================================
-
 function NoAcademicYearGuard() {
   return (
     <div className="max-w-6xl mx-auto pt-16 pb-12">
@@ -78,12 +80,9 @@ function NoAcademicYearGuard() {
         <div className="inline-flex p-3 rounded-2xl bg-amber-400/15 mb-4">
           <CalendarClock className="w-7 h-7 text-amber-600 dark:text-amber-400" />
         </div>
-        <h2 className="text-lg font-bold text-text-primary">
-          No active academic year
-        </h2>
+        <h2 className="text-lg font-bold text-text-primary">No active academic year</h2>
         <p className="text-sm text-text-secondary mt-1.5 max-w-sm mx-auto">
-          Set up and activate an academic year in your school calendar to see
-          overview data.
+          Set up and activate an academic year in your school calendar to see overview data.
         </p>
       </Card>
     </div>
@@ -91,250 +90,227 @@ function NoAcademicYearGuard() {
 }
 
 // ============================================================================
-// MAIN OVERVIEW COMPONENT
+// MAIN COMPONENT
 // ============================================================================
 
 export function Overview() {
   const schoolId = useActiveSchoolId()
-
-  // Guard: No school selected (setup guard is handled at AcademicsLayout level)
   if (!schoolId) return <NoSchoolGuard />
-
   return <OverviewContent schoolId={schoolId} />
 }
 
 function OverviewContent({ schoolId }: { schoolId: string }) {
   const queryClient = useQueryClient()
+  const data = useAcademicsOverviewV2(schoolId)
+  const { staggerContainer, fadeInUp } = useMotionVariants()
 
-  // ABAC: check if user can view enrollment data
-  const canViewEnrollment = usePermission('view', 'enrollment', schoolId)
-
-  // Academic year context
-  const {
-    data: currentYear,
-    isLoading: yearLoading,
-    isError: yearError,
-  } = useCurrentAcademicYear(schoolId)
-
-  const academicYearId = currentYear?.yearId
-
-  // Guard: No academic year (after loading completes)
-  if (!yearLoading && !currentYear && !yearError) {
+  // Guards
+  if (!data.academicYear.isLoading && !data.academicYear.id && !data.academicYear.isError) {
     return <NoAcademicYearGuard />
   }
 
-  // ---- Core KPI data ----
-  const overviewData = useAcademicsOverview(schoolId, academicYearId)
-  const teacherData = useActiveTeacherCount(schoolId)
-
-  // ---- Enrollment chart data ----
-  const enrollmentDistribution = useEnrollmentDistribution(
-    overviewData.enrollmentByGradeLevel
-  )
-
-  // ---- Alerts (deferred: waits for core KPIs to load) ----
-  const coreLoaded = !overviewData.isLoading
-  const alertsData = useCombinedAlerts(schoolId, academicYearId, coreLoaded)
-
-  // ---- Calendar context ----
-  const calendarContext = useAcademicCalendarContext(schoolId, academicYearId)
-
-  // ---- Widget visibility ----
-  const showActivityAlerts = useWidgetVisible('activity-alerts')
-
-  // ---- Performance metrics (dev mode logging) ----
-  const allLoaded = coreLoaded && !alertsData.isLoading
-  usePerformanceMetrics(coreLoaded, allLoaded)
-
-  // ---- Last updated ----
-  const lastUpdated = useMemo(() => {
-    if (overviewData.isLoading) return null
-    return new Date()
-  }, [overviewData.isLoading])
-
-  // ---- Refresh handler ----
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: overviewKeys.all })
   }, [queryClient])
 
-  // ---- Per-stat error detection ----
-  const hasOverviewError = overviewData.errors.length > 0
-  const retryOverview = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: overviewKeys.all })
-  }, [queryClient])
+  // Compute unrecorded attendance count
+  const unrecordedCount = useMemo(() => {
+    const summary = data.overview.todayAttendanceSummary
+    if (!summary) return undefined
+    const unrecorded = summary.totalStudents - (summary.totalRecorded ?? 0)
+    return unrecorded > 0 ? unrecorded : undefined
+  }, [data.overview.todayAttendanceSummary])
 
-  // ---- Empty state check ----
-  // Also consider attendance data — if students have attendance records,
-  // the system is active even if enrollment/sections queries return 0
-  const isEmpty =
-    !overviewData.isLoading &&
-    !teacherData.isLoading &&
-    (overviewData.totalEnrolled ?? 0) === 0 &&
-    (overviewData.activeSections ?? 0) === 0 &&
-    (teacherData.teacherCount ?? 0) === 0 &&
-    (overviewData.todayAttendanceRate === null || overviewData.todayAttendanceRate === 0)
-
-  // ---- Data inconsistency detection ----
-  // If attendance data exists but enrollment/sections return 0, the system
-  // is active but enrollment queries are failing — show "—" instead of "0"
-  const hasAttendanceButNoEnrollment =
-    (overviewData.todayAttendanceRate != null && overviewData.todayAttendanceRate > 0) &&
-    (overviewData.totalEnrolled ?? 0) === 0
-
-  // ---- Build stats array ----
-  const stats: ModuleStat[] = [
-    // Only show enrollment stat when user has enrollment view permission
-    ...(canViewEnrollment
-      ? [
-          {
-            label: 'Total Enrolled',
-            value:
-              overviewData.totalEnrolled != null && overviewData.totalEnrolled > 0
-                ? overviewData.totalEnrolled.toLocaleString()
-                : hasAttendanceButNoEnrollment
-                  ? '—'
-                  : overviewData.totalEnrolled != null
-                    ? overviewData.totalEnrolled.toLocaleString()
-                    : '—',
-            change: hasAttendanceButNoEnrollment
-              ? 'enrollment data unavailable'
-              : 'this academic year',
-            changeType: hasAttendanceButNoEnrollment ? 'negative' as const : 'neutral' as const,
-            icon: Users,
-            iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
-            iconColor: 'text-teal-600 dark:text-cyan-400',
-            loading: overviewData.isLoading,
-            error: hasOverviewError || hasAttendanceButNoEnrollment,
-            onRetry: retryOverview,
-          },
-        ]
-      : []),
-    {
-      label: 'Active Sections',
-      value:
-        overviewData.activeSections != null && overviewData.activeSections > 0
-          ? overviewData.activeSections.toString()
-          : hasAttendanceButNoEnrollment
-            ? '—'
-            : overviewData.activeSections != null
-              ? overviewData.activeSections.toString()
-              : '—',
-      change: hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0
-        ? 'section data unavailable'
-        : 'active classes',
-      changeType: hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0
-        ? 'negative'
-        : 'neutral',
-      icon: LayoutGrid,
-      iconBg: 'bg-aqua-400/20',
-      iconColor: 'text-aqua-700 dark:text-aqua-400',
-      loading: overviewData.isLoading,
-      error: hasOverviewError || (hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0),
-      onRetry: retryOverview,
-    },
-    {
-      label: 'Active Teachers',
-      value:
-        teacherData.teacherCount != null
-          ? teacherData.teacherCount.toString()
-          : '—',
-      change:
-        teacherData.onLeaveCount && teacherData.onLeaveCount > 0
-          ? `${teacherData.onLeaveCount} on leave`
-          : undefined,
-      changeType: teacherData.onLeaveCount && teacherData.onLeaveCount > 0 ? 'negative' : 'neutral',
-      icon: ContactRound,
-      iconBg: 'bg-blue-400/20',
-      iconColor: 'text-blue-700 dark:text-blue-400',
-      loading: teacherData.isLoading,
-      error: teacherData.isError,
-      onRetry: retryOverview,
-    },
-    {
-      label: "Today's Attendance",
-      value:
-        overviewData.todayAttendanceRate != null
-          ? `${overviewData.todayAttendanceRate.toFixed(1)}%`
-          : '—',
-      change: 'today',
-      changeType: 'neutral',
-      icon: ClipboardCheck,
-      iconBg: 'bg-amber-400/20',
-      iconColor: 'text-amber-600 dark:text-amber-400',
-      loading: overviewData.isLoading,
-      error: hasOverviewError,
-      onRetry: retryOverview,
-    },
-  ]
-
-  // ---- Show empty onboarding if no data ----
-  if (isEmpty) {
-    return (
-      <ModuleOverviewPage
-        moduleId="academics"
-        title="Academics"
-        description="Manage students, classes, curriculum, and grades"
-        icon={GraduationCap}
-        stats={[]}
-        lastUpdated={lastUpdated}
-        onRefresh={handleRefresh}
-      >
-        <EmptyOverviewState />
-      </ModuleOverviewPage>
-    )
-  }
+  // Attendance rate color
+  const attendanceRate = data.overview.todayAttendanceRate
+  const attendanceColor = attendanceRate != null ? getAttendanceColor(attendanceRate) : undefined
 
   return (
-    <ModuleOverviewPage
-      moduleId="academics"
-      title="Academics"
-      description="Manage students, classes, curriculum, and grades"
-      icon={GraduationCap}
-      stats={stats}
-      lastUpdated={lastUpdated}
-      onRefresh={handleRefresh}
-      calendarLabel={<AcademicYearLabel context={calendarContext} />}
-    >
-      {/* Alerts — full width, above charts for immediate visibility */}
-      {showActivityAlerts && (
-        <WidgetErrorBoundary name="Activity Feed">
-          <div data-testid="widget-activity-feed">
-            <ActivityFeedWidget
-              alerts={alertsData.alerts}
-              totalCount={alertsData.totalCount}
-              loading={alertsData.isLoading}
-            />
-          </div>
-        </WidgetErrorBoundary>
-      )}
-
-      {/* Charts grid — left: enrollment or My Sections (role-based), right: attendance */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {canViewEnrollment ? (
-          <WidgetErrorBoundary name="Enrollment Chart">
-            <div data-testid="widget-enrollment-chart">
-              <EnrollmentDistributionChart
-                data={enrollmentDistribution.data}
-                total={enrollmentDistribution.total}
-                loading={overviewData.isLoading}
-              />
+    <div data-v2 className="p-5 pb-10">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="space-y-3"
+      >
+        {/* ---- Compact Header ---- */}
+        <motion.div variants={fadeInUp} className="flex items-center justify-between" style={{ height: 44 }}>
+          <div className="flex items-center gap-2.5">
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 7,
+                background: 'rgba(29, 158, 117, 0.12)',
+              }}
+            >
+              <GraduationCap className="w-4 h-4" style={{ color: '#1D9E75' }} />
             </div>
-          </WidgetErrorBoundary>
-        ) : (
-          <WidgetErrorBoundary name="My Sections">
-            <MySectionsWidget schoolId={schoolId} />
-          </WidgetErrorBoundary>
-        )}
-
-        <WidgetErrorBoundary name="Attendance Trend">
-          <div data-testid="widget-attendance-trend">
-            <AttendanceTrendWidget
-              schoolId={schoolId}
-              enabled={!!schoolId && coreLoaded}
-            />
+            <h1
+              className="text-[14px] font-semibold"
+              style={{ color: 'var(--v2-text-primary)' }}
+            >
+              Academics
+            </h1>
+            <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+            <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+              {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
           </div>
-        </WidgetErrorBoundary>
-      </div>
-    </ModuleOverviewPage>
+          {data.academicYear.name && (
+            <span
+              className="text-[11px] px-2.5 py-1 rounded-md"
+              style={{
+                background: 'var(--v2-bg-elevated)',
+                color: 'var(--v2-text-hint)',
+              }}
+            >
+              {data.academicYear.name}
+            </span>
+          )}
+        </motion.div>
+
+        {/* ---- KPI Grid (4 tiles) ---- */}
+        <motion.div
+          variants={fadeInUp}
+          className="grid gap-[10px] grid-cols-2 lg:grid-cols-4"
+        >
+          {/* Tile 1: Total Enrolled */}
+          {data.canViewEnrollment && (
+            <StatCard
+              label="Total Enrolled"
+              value={data.overview.totalEnrolled != null ? data.overview.totalEnrolled.toLocaleString() : '—'}
+              icon={Users}
+              accentColor="rgba(29, 158, 117, 0.12)"
+              iconColor="#1D9E75"
+              barColor="#1D9E75"
+              tag={data.overview.recentEnrollments && data.overview.recentEnrollments > 0 ? { text: `+${data.overview.recentEnrollments} recent`, color: '#1D9E75', bg: 'rgba(29, 158, 117, 0.10)' } : data.enrollment.total > 0 ? { text: `${data.enrollment.data.length} grades`, color: '#1D9E75', bg: 'rgba(29, 158, 117, 0.10)' } : undefined}
+              hint="this academic year"
+              loading={data.overview.isLoading}
+              error={data.overview.errors.length > 0}
+              onRetry={handleRefresh}
+            />
+          )}
+
+          {/* Tile 2: Active Sections */}
+          <StatCard
+            label="Active Sections"
+            value={data.overview.activeSections != null ? data.overview.activeSections.toString() : '—'}
+            icon={LayoutGrid}
+            accentColor="rgba(55, 138, 221, 0.12)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            tag={data.teachers.teacherCount != null ? { text: `${data.teachers.teacherCount} teachers`, color: '#378ADD', bg: 'rgba(55, 138, 221, 0.10)' } : undefined}
+            hint="active classes"
+            loading={data.overview.isLoading}
+            error={data.overview.errors.length > 0}
+            onRetry={handleRefresh}
+          />
+
+          {/* Tile 3: Today's Attendance */}
+          <StatCard
+            label="Today's Attendance"
+            value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
+            icon={ClipboardCheck}
+            accentColor="rgba(239, 159, 39, 0.12)"
+            iconColor="#EF9F27"
+            barColor={attendanceColor || '#EF9F27'}
+            valueColor={attendanceColor}
+            tag={unrecordedCount ? { text: 'Partial data', color: '#EF9F27', bg: 'rgba(239, 159, 39, 0.10)' } : undefined}
+            hint={data.overview.todayAttendanceSummary ? `${data.overview.todayAttendanceSummary.totalRecorded} of ${data.overview.todayAttendanceSummary.totalStudents} recorded` : 'today'}
+            loading={data.overview.isLoading}
+            error={data.overview.errors.length > 0}
+            onRetry={handleRefresh}
+          />
+
+          {/* Tile 4: At-Risk Students */}
+          <StatCard
+            label="At-Risk Students"
+            value={data.alerts.totalCount.toString()}
+            icon={AlertTriangle}
+            accentColor="rgba(226, 75, 74, 0.12)"
+            iconColor="#E24B4A"
+            barColor="#E24B4A"
+            tag={data.alerts.criticalCount > 0 ? { text: `${data.alerts.criticalCount} below 80%`, color: '#E24B4A', bg: 'rgba(226, 75, 74, 0.10)' } : undefined}
+            hint="below 90% threshold"
+            loading={data.alerts.isLoading}
+          />
+        </motion.div>
+
+        {/* ---- Attendance Alerts ---- */}
+        <motion.div variants={fadeInUp}>
+          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load alerts">
+            <AttendanceAlertsCard
+              alerts={data.alerts.items}
+              totalCount={data.alerts.totalCount}
+              unrecordedCount={unrecordedCount}
+              isLoading={data.alerts.isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
+
+        {/* ---- Charts Row (2 columns) ---- */}
+        <motion.div
+          variants={fadeInUp}
+          className="grid gap-3 grid-cols-1 md:grid-cols-2"
+        >
+          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load attendance trend">
+            <AttendanceTrendChart
+              chartData={data.trend.chartData}
+              summary={data.trend.summary}
+              isLoading={data.trend.isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+
+          {data.canViewEnrollment && (
+            <WidgetErrorBoundaryV2 fallbackMessage="Unable to load enrollment chart">
+              <EnrollmentByGradeChart
+                data={data.enrollment.data}
+                total={data.enrollment.total}
+                isLoading={data.overview.isLoading}
+              />
+            </WidgetErrorBoundaryV2>
+          )}
+        </motion.div>
+
+        {/* ---- Bottom Row (3 columns) ---- */}
+        <motion.div
+          variants={fadeInUp}
+          className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_0.8fr]"
+        >
+          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load at-risk students">
+            <AtRiskStudentsCard
+              students={data.alerts.students}
+              totalAtRisk={data.alerts.totalCount}
+              isLoading={data.alerts.isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+
+          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load staff roster">
+            <StaffRosterCard
+              staff={data.staff.items}
+              activeCount={data.staff.activeCount}
+              isLoading={data.staff.isLoading}
+              isError={data.staff.isError}
+            />
+          </WidgetErrorBoundaryV2>
+
+          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load enrollment snapshot">
+            <EnrollmentSnapshotCard
+              totalEnrolled={data.overview.totalEnrolled}
+              activeSections={data.overview.activeSections}
+              gradeLevelCount={data.enrollment.data.length}
+              academicYear={data.academicYear.name ? {
+                name: data.academicYear.name,
+                startDate: data.academicYear.startDate!,
+                endDate: data.academicYear.endDate!,
+              } : null}
+              isLoading={data.overview.isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
+      </motion.div>
+    </div>
   )
 }
