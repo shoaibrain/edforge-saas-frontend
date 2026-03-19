@@ -2,7 +2,7 @@
  * Finance Overview Page — V2
  *
  * Redesigned finance overview with V2 design tokens, animated KPI tiles,
- * collection performance, invoice status, aging report, and recent activity.
+ * collection performance, billing health (unified status + aging), and recent activity.
  */
 
 import { useNavigate } from '@tanstack/react-router'
@@ -14,9 +14,10 @@ import {
   AlertTriangle,
   FileStack,
   CreditCard,
+  Inbox,
 } from 'lucide-react'
 import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
-import { formatNPRCompact } from '@edforge/types'
+import { formatNPRCompact, formatNPRShort } from '@edforge/types'
 
 // Helper to build tag pill props for StatCard
 function tagPill(text: string, hex: string): { text: string; color: string; bg: string } {
@@ -27,8 +28,7 @@ import { useFinanceOverviewV2 } from '../hooks/useFinanceOverviewV2'
 import { FilterRow } from '../components/overview-v2/FilterRow'
 import { OverdueAlertBanner } from '../components/overview-v2/OverdueAlertBanner'
 import { CollectionPerformanceCard } from '../components/overview-v2/CollectionPerformanceCard'
-import { InvoiceStatusCard } from '../components/overview-v2/InvoiceStatusCard'
-import { AgingReportCard } from '../components/overview-v2/AgingReportCard'
+import { BillingHealthCard } from '../components/overview-v2/BillingHealthCard'
 import { RecentPaymentsCard } from '../components/overview-v2/RecentPaymentsCard'
 import { RecentInvoicesCard } from '../components/overview-v2/RecentInvoicesCard'
 
@@ -54,6 +54,74 @@ function useMotionVariants() {
       visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
     },
   }
+}
+
+// ============================================================================
+// INSIGHT STRIP (E-01)
+// ============================================================================
+
+function InsightStrip({
+  totalInvoiced,
+  collectionRate,
+  overdueCount,
+  isLoading,
+}: {
+  totalInvoiced: number
+  collectionRate: number
+  overdueCount: number
+  isLoading: boolean
+}) {
+  if (isLoading) {
+    return (
+      <div
+        className="h-5 rounded-lg v2-skeleton-pulse"
+        style={{ background: 'var(--v2-bg-elevated)', width: '60%' }}
+      />
+    )
+  }
+
+  if (totalInvoiced === 0) return null
+
+  const parts: string[] = [
+    `${formatNPRShort(totalInvoiced)} invoiced`,
+    `${collectionRate.toFixed(1)}% collected`,
+  ]
+  if (overdueCount > 0) {
+    parts.push(`${overdueCount} invoice${overdueCount !== 1 ? 's' : ''} overdue`)
+  } else {
+    parts.push('no overdue')
+  }
+
+  return (
+    <p className="text-[11px] leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+      {parts.join(' · ')}
+    </p>
+  )
+}
+
+// ============================================================================
+// EMPTY STATE (E-05)
+// ============================================================================
+
+function EmptyRecentSection({ title, message }: { title: string; message: string }) {
+  return (
+    <div
+      className="rounded-xl border flex flex-col items-center justify-center py-8"
+      style={{
+        background: 'var(--v2-bg-surface)',
+        borderColor: 'var(--v2-border-default)',
+        padding: 18,
+      }}
+    >
+      <Inbox className="w-7 h-7 mb-2" style={{ color: 'var(--v2-text-hint)', opacity: 0.35 }} />
+      <h3 className="text-[12px] font-medium mb-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+        {title}
+      </h3>
+      <p className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+        {message}
+      </p>
+    </div>
+  )
 }
 
 // ============================================================================
@@ -108,56 +176,68 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
     isExporting,
   } = data
 
+  const overdueCount = invoicesByStatus['overdue'] ?? 0
+
   return (
     <div data-v2 className="p-6 space-y-5" style={{ minHeight: '100vh' }}>
-      {/* Compact Header */}
-      <div className="flex items-center justify-between" style={{ height: 44 }}>
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-            style={{ background: 'rgba(29, 158, 117, 0.12)' }}
-          >
-            <DollarSign className="w-4 h-4" style={{ color: 'var(--v2-brand-primary)' }} />
+      {/* Compact Header + Insight Strip */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between" style={{ height: 44 }}>
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-[7px] flex items-center justify-center"
+              style={{ background: 'rgba(29, 158, 117, 0.12)' }}
+            >
+              <DollarSign className="w-4 h-4" style={{ color: 'var(--v2-brand-primary)' }} />
+            </div>
+            <h1 className="text-[14px] font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
+              Finance
+            </h1>
+            <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+            <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+              {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
           </div>
-          <h1 className="text-[14px] font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
-            Finance
-          </h1>
-          <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-          <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
-            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-          </span>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate({ to: '/invoices/bulk-generate' })}
+              aria-label="Bulk invoice generation"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+              style={{
+                background: 'var(--v2-bg-elevated)',
+                borderColor: 'var(--v2-border-default)',
+                color: 'var(--v2-text-secondary)',
+              }}
+            >
+              <FileStack className="w-3.5 h-3.5" />
+              Bulk invoice
+            </button>
+            <button
+              onClick={() => navigate({ to: '/payments/record' })}
+              aria-label="Record a payment"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+              style={{
+                background: 'var(--v2-brand-primary)',
+                color: '#fff',
+              }}
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              Record payment
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate({ to: '/invoices/bulk-generate' })}
-            aria-label="Bulk invoice generation"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
-            style={{
-              background: 'var(--v2-bg-elevated)',
-              borderColor: 'var(--v2-border-default)',
-              color: 'var(--v2-text-secondary)',
-            }}
-          >
-            <FileStack className="w-3.5 h-3.5" />
-            Bulk invoice
-          </button>
-          <button
-            onClick={() => navigate({ to: '/payments/record' })}
-            aria-label="Record a payment"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
-            style={{
-              background: 'var(--v2-brand-primary)',
-              color: '#fff',
-            }}
-          >
-            <CreditCard className="w-3.5 h-3.5" />
-            Record payment
-          </button>
-        </div>
+        {/* E-01: Contextual insight strip */}
+        <InsightStrip
+          totalInvoiced={kpi.totalInvoiced}
+          collectionRate={kpi.collectionRate}
+          overdueCount={overdueCount}
+          isLoading={isLoading}
+        />
       </div>
 
-      {/* Filters & Export */}
+      {/* Filters & Export (with E-04 quick-select pills) */}
       <FilterRow
         fromDate={filters.from || ''}
         toDate={filters.to || ''}
@@ -176,7 +256,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       <WidgetErrorBoundaryV2>
         <OverdueAlertBanner
           overdue={kpi.overdue}
-          overdueCount={invoicesByStatus['overdue'] ?? 0}
+          overdueCount={overdueCount}
           collectionRate={kpi.collectionRate}
           draftCount={invoicesByStatus['draft'] ?? 0}
           agingReport={agingReport}
@@ -235,19 +315,19 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"
-            tag={tagPill(`${invoicesByStatus['overdue'] ?? 0} invoices`, '#E24B4A')}
+            tag={tagPill(`${overdueCount} invoices`, '#E24B4A')}
             loading={isLoading}
             valueColor={kpi.overdue > 0 ? '#E24B4A' : undefined}
           />
         </motion.div>
       </motion.div>
 
-      {/* 2-col: Collection Performance + Invoice Status */}
+      {/* 2-col: Collection Performance + Billing Health (merged status + aging) */}
       <motion.div
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="grid gap-4 grid-cols-1 md:grid-cols-[1.4fr_1fr]"
+        className="grid gap-4 grid-cols-1 md:grid-cols-[1.2fr_1fr]"
       >
         <motion.div variants={fadeInUp}>
           <WidgetErrorBoundaryV2>
@@ -264,22 +344,16 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         </motion.div>
         <motion.div variants={fadeInUp}>
           <WidgetErrorBoundaryV2>
-            <InvoiceStatusCard
+            <BillingHealthCard
               invoicesByStatus={invoicesByStatus}
               totalInvoiceCount={totalInvoiceCount}
               paymentsByGateway={paymentsByGateway}
               totalPaymentCount={totalPaymentCount}
+              agingReport={agingReport}
               isLoading={isLoading}
             />
           </WidgetErrorBoundaryV2>
         </motion.div>
-      </motion.div>
-
-      {/* Aging Report (full width) */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-        <WidgetErrorBoundaryV2>
-          <AgingReportCard agingReport={agingReport} isLoading={isLoading} />
-        </WidgetErrorBoundaryV2>
       </motion.div>
 
       {/* 2-col: Recent Payments + Recent Invoices */}
@@ -291,12 +365,26 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       >
         <motion.div variants={fadeInUp}>
           <WidgetErrorBoundaryV2>
-            <RecentPaymentsCard payments={recentPayments} isLoading={isLoading} />
+            {!isLoading && recentPayments.length === 0 ? (
+              <EmptyRecentSection
+                title="No payments yet"
+                message="Payments will appear here once students start paying."
+              />
+            ) : (
+              <RecentPaymentsCard payments={recentPayments} isLoading={isLoading} />
+            )}
           </WidgetErrorBoundaryV2>
         </motion.div>
         <motion.div variants={fadeInUp}>
           <WidgetErrorBoundaryV2>
-            <RecentInvoicesCard invoices={recentInvoices} isLoading={isLoading} />
+            {!isLoading && recentInvoices.length === 0 ? (
+              <EmptyRecentSection
+                title="No invoices yet"
+                message="Create invoices to start tracking billing activity."
+              />
+            ) : (
+              <RecentInvoicesCard invoices={recentInvoices} isLoading={isLoading} />
+            )}
           </WidgetErrorBoundaryV2>
         </motion.div>
       </motion.div>
