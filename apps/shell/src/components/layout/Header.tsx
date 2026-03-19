@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { motion } from 'framer-motion'
@@ -9,11 +9,15 @@ import {
   Sun,
   Monitor,
   LogOut,
+  Bell,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
+import { useHomeStore } from '../../stores/home.store'
 import { Avatar } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
+import { getGreeting } from '../../lib/greeting'
+import { adToBS, formatBSLong } from '@edforge/date-utils'
 
 import { Breadcrumbs } from './Breadcrumbs'
 
@@ -68,6 +72,100 @@ function LanguageToggle() {
         )
       })}
     </div>
+  )
+}
+
+// ============================================================================
+// V2 HOME TOPBAR LEFT — Greeting + Date
+// ============================================================================
+
+function HomeTopbarLeft() {
+  const user = useAuthStore((s) => s.user)
+  const academicYear = useHomeStore((s) => s.activeAcademicYear)
+  const { t } = useTranslation('dashboard')
+
+  const firstName = user?.displayName || user?.name?.split(' ')[0]
+  const greeting = getGreeting(firstName, t)
+
+  const dateDisplay = useMemo(() => {
+    const now = new Date()
+
+    // BS date
+    let bsPart = ''
+    try {
+      const bs = adToBS(now)
+      bsPart = `${formatBSLong(bs)} BS`
+    } catch {
+      // Fallback: skip BS date if conversion fails
+    }
+
+    // Gregorian date
+    const gregPart = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+
+    // Academic year
+    const yearPart = academicYear ? `Academic Year ${academicYear.name}` : ''
+
+    const parts = [bsPart, gregPart, yearPart].filter(Boolean)
+    return parts.join('  ·  ')
+  }, [academicYear])
+
+  return (
+    <div className="min-w-0">
+      <div
+        className="text-sm font-medium tracking-tight"
+        style={{ color: 'var(--v2-text-primary, rgb(var(--text-primary)))' }}
+      >
+        {greeting}
+      </div>
+      <div
+        className="text-[11px] mt-0.5 truncate"
+        style={{ color: 'var(--v2-text-faint, rgb(var(--text-tertiary)))' }}
+      >
+        {dateDisplay}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// NOTIFICATION BADGE
+// ============================================================================
+
+function NotificationBadge() {
+  const alertCount = useHomeStore((s) => s.alertCount)
+
+  return (
+    <button
+      className="relative flex items-center justify-center rounded-lg border transition-colors"
+      style={{
+        width: 30,
+        height: 30,
+        background: 'rgba(255, 255, 255, 0.04)',
+        borderColor: 'rgba(255, 255, 255, 0.08)',
+      }}
+      aria-label={`Notifications: ${alertCount} alerts`}
+    >
+      <Bell className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint, #7a8099)' }} />
+      {alertCount > 0 && (
+        <span
+          className="absolute -top-[3px] -right-[3px] flex items-center justify-center text-[9px] font-bold text-white rounded-full"
+          style={{
+            width: 14,
+            height: 14,
+            background: '#E24B4A',
+            border: '1.5px solid var(--v2-bg-app, #0f1117)',
+          }}
+          aria-hidden="true"
+        >
+          {alertCount}
+        </span>
+      )}
+    </button>
   )
 }
 
@@ -186,7 +284,6 @@ function UserMenu() {
                 </button>
               )}
             </MenuItem>
-            {/* COMING SOON — Help & Support menu item (re-enable when support page/URL is available) */}
           </div>
 
           <div className="border-t border-[rgb(var(--border-secondary))] py-2">
@@ -215,23 +312,22 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
+  const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
+
   return (
     <>
       <header
         className="sticky top-0 z-30 h-16 px-6 flex items-center justify-between border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
         aria-label="Global header"
       >
-        {/* Left Section - Breadcrumbs only (sidebar toggle is now edge-based) */}
+        {/* Left Section */}
         <div className="flex items-center min-w-0 flex-1">
-          <Breadcrumbs />
+          {isHomeV2 ? <HomeTopbarLeft /> : <Breadcrumbs />}
         </div>
 
-        {/* Right Section - All header actions */}
+        {/* Right Section */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* COMING SOON — Documentation button (re-enable when docs are available) */}
-          {/* COMING SOON — Notifications button (re-enable when notification system ships) */}
-
-          {/* User Menu */}
+          {isHomeV2 && <NotificationBadge />}
           <UserMenu />
         </div>
       </header>

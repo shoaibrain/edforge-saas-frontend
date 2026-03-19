@@ -1,113 +1,58 @@
 /**
- * AdminCommandCenter
+ * AdminCommandCenter — V2
  *
- * Home page layout for school administrators (Principal, VicePrincipal, Accountant, Staff).
- * Surfaces real-time school data: alerts, KPIs, attendance trends, and financial summary.
+ * Home page layout for school administrators.
+ * Surfaces real-time school data: alerts, KPIs, attendance trend,
+ * financial overview, quick actions, section attendance, and activity feed.
+ *
+ * Layout: alerts → KPI grid (4-col) → mid row (1.6fr 1fr) → bottom row (1fr 1fr 1.3fr)
  */
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
+import { motion } from 'framer-motion'
 import {
   Users,
   LayoutGrid,
   ClipboardCheck,
   Receipt,
-
-  Bell,
 } from 'lucide-react'
 import { formatNPRShort } from '@edforge/types'
-import { WidgetSection } from '../dynamic-page/WidgetSection'
-import { QuickActionsWidget } from '../dynamic-page/widgets/QuickActionsWidget'
 import { HomeStatCard } from './HomeStatCard'
 import { AlertsRow } from './AlertsRow'
 import { AttendanceTrendCard } from './AttendanceTrendCard'
 import { FinanceSummaryCard } from './FinanceSummaryCard'
+import { QuickActionsGridV2 } from './QuickActionsGridV2'
+import { AttendanceBySectionCard } from './AttendanceBySectionCard'
+import { RecentActivityFeed } from './RecentActivityFeed'
+import { SectionErrorBoundary } from './SectionErrorBoundary'
 import {
   useHomeAcademicYear,
   useAcademicsSnapshot,
   useHomeAlerts,
   useHomeAttendanceTrend,
   useFinanceSummary,
+  useSectionAttendanceItems,
+  useRecentActivityItems,
+  ATTENDANCE_THRESHOLD,
 } from '../../hooks/useHomeData'
-import type { QuickAction } from '../dynamic-page/widgets/QuickActionsWidget'
+import { useHomeStore } from '../../stores/home.store'
 
 // ============================================================================
-// EXPANDED ADMIN QUICK ACTIONS (6 items)
+// ANIMATION VARIANTS
 // ============================================================================
 
-const ADMIN_HOME_ACTIONS: QuickAction[] = [
-  {
-    id: 'add-student',
-    label: 'Add Student',
-    description: 'Enroll new student',
-    icon: Users,
-    href: '/academics/students',
-    color: {
-      bg: 'bg-teal-50 dark:bg-teal-900/10',
-      text: 'text-teal-600 dark:text-teal-400',
-      border: 'border-teal-200 dark:border-teal-800/30',
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+}
+
+const staggerContainer = {
+  visible: {
+    transition: {
+      staggerChildren: 0.06,
     },
   },
-  {
-    id: 'record-attendance',
-    label: 'Attendance',
-    description: 'Mark daily attendance',
-    icon: ClipboardCheck,
-    href: '/academics/classrooms?tab=attendance',
-    color: {
-      bg: 'bg-orange-50 dark:bg-orange-900/10',
-      text: 'text-orange-600 dark:text-orange-400',
-      border: 'border-orange-200 dark:border-orange-800/30',
-    },
-  },
-  {
-    id: 'generate-invoice',
-    label: 'Generate Invoice',
-    description: 'Bill students',
-    icon: Receipt,
-    href: '/finance/billing/invoices',
-    color: {
-      bg: 'bg-amber-50 dark:bg-amber-900/10',
-      text: 'text-amber-600 dark:text-amber-400',
-      border: 'border-amber-200 dark:border-amber-800/30',
-    },
-  },
-  {
-    id: 'view-academics',
-    label: 'Academics',
-    description: 'View overview',
-    icon: LayoutGrid,
-    href: '/academics',
-    color: {
-      bg: 'bg-blue-50 dark:bg-blue-900/10',
-      text: 'text-blue-600 dark:text-blue-400',
-      border: 'border-blue-200 dark:border-blue-800/30',
-    },
-  },
-  {
-    id: 'manage-staff',
-    label: 'Manage Staff',
-    description: 'People & HR',
-    icon: Users,
-    href: '/people/staff',
-    color: {
-      bg: 'bg-indigo-50 dark:bg-indigo-900/10',
-      text: 'text-indigo-600 dark:text-indigo-400',
-      border: 'border-indigo-200 dark:border-indigo-800/30',
-    },
-  },
-  {
-    id: 'school-settings',
-    label: 'Settings',
-    description: 'School configuration',
-    icon: LayoutGrid,
-    href: '/settings',
-    color: {
-      bg: 'bg-gray-50 dark:bg-gray-900/10',
-      text: 'text-gray-600 dark:text-gray-400',
-      border: 'border-gray-200 dark:border-gray-800/30',
-    },
-  },
-]
+}
 
 // ============================================================================
 // COMPONENT
@@ -118,42 +63,82 @@ interface AdminCommandCenterProps {
 }
 
 export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
-  // Fetch academic year first (needed by other queries)
+  const setAlertCount = useHomeStore((s) => s.setAlertCount)
+  const setActiveAcademicYear = useHomeStore((s) => s.setActiveAcademicYear)
+
+  // ── Data fetching (parallel) ────────────────────────────────────────────
   const { data: academicYear } = useHomeAcademicYear(schoolId)
   const academicYearId = academicYear?.yearId
 
-  // Core KPI data
   const snapshot = useAcademicsSnapshot(schoolId, academicYearId)
-
-  // Finance summary
-  const { data: financeSummary, isLoading: financeLoading, isError: financeError } =
+  const { data: financeSummary, isLoading: financeLoading, isError: financeError, refetch: financeRefetch } =
     useFinanceSummary(schoolId)
+  const trend = useHomeAttendanceTrend(schoolId, !!schoolId)
 
-  // Alerts (deferred until snapshot loads)
+  // Alerts (deferred until snapshot + finance load)
   const coreLoaded = !snapshot.isLoading
-  const { alerts, isLoading: alertsLoading } = useHomeAlerts(
+  const { alerts, alertCount, isLoading: alertsLoading } = useHomeAlerts(
     schoolId,
     academicYearId,
-    financeSummary?.overdue,
+    financeSummary
+      ? { overdue: financeSummary.overdue, collectionRate: financeSummary.collectionRate }
+      : undefined,
+    snapshot.todayAttendanceRate,
+    trend.summary?.avg ?? null,
     coreLoaded,
   )
 
-  // Attendance trend (parallel with snapshot)
-  const trend = useHomeAttendanceTrend(schoolId, !!schoolId)
+  // Bottom row data
+  const sectionAttendance = useSectionAttendanceItems(schoolId, academicYearId)
+  const activityFeed = useRecentActivityItems(financeSummary, financeLoading)
 
-  // Attendance color coding
-  const attendanceColor = useMemo(() => {
+  // ── Sync to store for Header ────────────────────────────────────────────
+  useEffect(() => {
+    setAlertCount(alertCount)
+  }, [alertCount, setAlertCount])
+
+  useEffect(() => {
+    setActiveAcademicYear(academicYear ?? null)
+  }, [academicYear, setActiveAcademicYear])
+
+  // ── KPI derived values ──────────────────────────────────────────────────
+  const attendanceValueColor = useMemo(() => {
     const rate = snapshot.todayAttendanceRate
     if (rate == null) return undefined
-    if (rate >= 90) return 'text-green-600 dark:text-green-400'
-    if (rate >= 75) return 'text-amber-600 dark:text-amber-400'
-    return 'text-red-600 dark:text-red-400'
+    if (rate >= 90) return '#1D9E75'
+    if (rate >= 75) return '#EF9F27'
+    return '#E24B4A'
   }, [snapshot.todayAttendanceRate])
 
+  const attendanceTag = useMemo(() => {
+    const rate = snapshot.todayAttendanceRate
+    if (rate == null) return undefined
+    if (rate >= ATTENDANCE_THRESHOLD) {
+      return {
+        text: `+${(rate - ATTENDANCE_THRESHOLD).toFixed(0)}% above target`,
+        color: '#1D9E75',
+        bg: 'var(--v2-accent-enrollment)',
+      }
+    }
+    if (rate >= 70) {
+      return {
+        text: 'Below threshold',
+        color: '#EF9F27',
+        bg: 'var(--v2-accent-attendance)',
+      }
+    }
+    return {
+      text: 'Critical',
+      color: '#E24B4A',
+      bg: 'var(--v2-accent-finance)',
+    }
+  }, [snapshot.todayAttendanceRate])
+
+  // ── Guard ───────────────────────────────────────────────────────────────
   if (!schoolId) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm text-[rgb(var(--text-tertiary))]">
+        <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
           Select a school from the sidebar to view the dashboard.
         </p>
       </div>
@@ -161,112 +146,173 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
   }
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      data-page="home-v2"
+      className="flex flex-col"
+      style={{
+        gap: 'var(--v2-section-gap, 16px)',
+        padding: 'var(--v2-content-padding-y, 20px) var(--v2-content-padding-x, 28px)',
+        background: 'var(--v2-bg-app)',
+        minHeight: '100%',
+      }}
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
       {/* ================================================================ */}
       {/* SECTION 1: Critical Alerts (conditional) */}
       {/* ================================================================ */}
-      {(alertsLoading || alerts.length > 0) && (
-        <WidgetSection
-          widgetId="home-alerts"
-          label="Alerts"
-          icon={Bell}
+      <SectionErrorBoundary fallbackMessage="Unable to load alerts">
+        {(alertsLoading || alerts.length > 0) && (
+          <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
+            <AlertsRow alerts={alerts} loading={alertsLoading} />
+          </motion.div>
+        )}
+      </SectionErrorBoundary>
+
+      {/* ================================================================ */}
+      {/* SECTION 2: School Snapshot — 4 KPI Tiles */}
+      {/* ================================================================ */}
+      <SectionErrorBoundary fallbackMessage="Unable to load KPI data">
+        <motion.div
+          variants={sectionVariants}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-2 lg:grid-cols-4"
+          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
         >
-          <AlertsRow alerts={alerts} loading={alertsLoading} />
-        </WidgetSection>
-      )}
+          <HomeStatCard
+            label="Students enrolled"
+            value={
+              snapshot.totalEnrolled != null
+                ? snapshot.totalEnrolled.toLocaleString()
+                : '—'
+            }
+            icon={Users}
+            accentColor="var(--v2-accent-enrollment)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            hint="this academic year"
+            loading={snapshot.isLoading}
+            error={snapshot.isError}
+            onRetry={() => snapshot.refetch()}
+          />
+          <HomeStatCard
+            label="Active sections"
+            value={
+              snapshot.activeSections != null
+                ? snapshot.activeSections.toString()
+                : '—'
+            }
+            icon={LayoutGrid}
+            accentColor="var(--v2-accent-academics)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            hint="active classes"
+            loading={snapshot.isLoading}
+            error={snapshot.isError}
+            onRetry={() => snapshot.refetch()}
+          />
+          <HomeStatCard
+            label="Today's attendance"
+            value={
+              snapshot.todayAttendanceRate != null
+                ? `${snapshot.todayAttendanceRate.toFixed(1)}%`
+                : '—'
+            }
+            icon={ClipboardCheck}
+            accentColor="var(--v2-accent-attendance)"
+            iconColor="#EF9F27"
+            barColor="#EF9F27"
+            tag={attendanceTag}
+            hint={trend.summary ? `30-day avg ${trend.summary.avg.toFixed(0)}%` : undefined}
+            loading={snapshot.isLoading}
+            error={snapshot.isError}
+            onRetry={() => snapshot.refetch()}
+            valueColor={attendanceValueColor}
+          />
+          <HomeStatCard
+            label="Outstanding fees"
+            value={
+              financeSummary
+                ? formatNPRShort(financeSummary.outstanding)
+                : '—'
+            }
+            icon={Receipt}
+            accentColor="var(--v2-accent-finance)"
+            iconColor="#E24B4A"
+            barColor="#E24B4A"
+            tag={
+              financeSummary && financeSummary.overdue > 0
+                ? {
+                    text: `${formatNPRShort(financeSummary.overdue)} overdue`,
+                    color: '#E24B4A',
+                    bg: 'var(--v2-accent-finance)',
+                  }
+                : undefined
+            }
+            hint={
+              financeSummary
+                ? `${financeSummary.collectionRate.toFixed(1)}% collected`
+                : undefined
+            }
+            loading={financeLoading}
+            error={financeError}
+            onRetry={() => financeRefetch()}
+          />
+        </motion.div>
+      </SectionErrorBoundary>
 
       {/* ================================================================ */}
-      {/* SECTION 2: School Snapshot — 4 Stat Tiles */}
+      {/* SECTION 3: Insights — Mid Row (1.6fr 1fr) */}
       {/* ================================================================ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <HomeStatCard
-          label="Total Enrolled"
-          value={
-            snapshot.totalEnrolled != null
-              ? snapshot.totalEnrolled.toLocaleString()
-              : '—'
-          }
-          subtitle="this academic year"
-          icon={Users}
-          iconBg="bg-teal-500/15 dark:bg-cyan-500/20"
-          iconColor="text-teal-600 dark:text-cyan-400"
-          loading={snapshot.isLoading}
-          error={snapshot.isError}
-          onRetry={() => snapshot.refetch()}
-        />
-        <HomeStatCard
-          label="Active Sections"
-          value={
-            snapshot.activeSections != null
-              ? snapshot.activeSections.toString()
-              : '—'
-          }
-          subtitle="active classes"
-          icon={LayoutGrid}
-          iconBg="bg-blue-400/20"
-          iconColor="text-blue-700 dark:text-blue-400"
-          loading={snapshot.isLoading}
-          error={snapshot.isError}
-          onRetry={() => snapshot.refetch()}
-        />
-        <HomeStatCard
-          label="Today's Attendance"
-          value={
-            snapshot.todayAttendanceRate != null
-              ? `${snapshot.todayAttendanceRate.toFixed(1)}%`
-              : '—'
-          }
-          subtitle="today"
-          icon={ClipboardCheck}
-          iconBg="bg-amber-400/20"
-          iconColor="text-amber-600 dark:text-amber-400"
-          loading={snapshot.isLoading}
-          error={snapshot.isError}
-          onRetry={() => snapshot.refetch()}
-          valueColor={attendanceColor}
-        />
-        <HomeStatCard
-          label="Outstanding Fees"
-          value={
-            financeSummary
-              ? formatNPRShort(financeSummary.outstanding)
-              : '—'
-          }
-          subtitle={
-            financeSummary && financeSummary.overdue > 0
-              ? `${formatNPRShort(financeSummary.overdue)} overdue`
-              : undefined
-          }
-          icon={Receipt}
-          iconBg="bg-rose-400/20"
-          iconColor="text-rose-600 dark:text-rose-400"
-          loading={financeLoading}
-          error={financeError}
-        />
-      </div>
+      <SectionErrorBoundary fallbackMessage="Unable to load insights">
+        <motion.div
+          variants={sectionVariants}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]"
+          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
+        >
+          <AttendanceTrendCard
+            chartData={trend.chartData}
+            summary={trend.summary}
+            isLoading={trend.isLoading}
+          />
+          <FinanceSummaryCard
+            totalInvoiced={financeSummary?.totalInvoiced ?? 0}
+            totalCollected={financeSummary?.totalCollected ?? 0}
+            outstanding={financeSummary?.outstanding ?? 0}
+            overdue={financeSummary?.overdue ?? 0}
+            collectionRate={financeSummary?.collectionRate ?? 0}
+            byFeeType={financeSummary?.byFeeType}
+            isLoading={financeLoading}
+            isError={financeError}
+            onRetry={() => financeRefetch()}
+          />
+        </motion.div>
+      </SectionErrorBoundary>
 
       {/* ================================================================ */}
-      {/* SECTION 3: Insights — 2-column grid */}
+      {/* SECTION 4: Bottom Row (1fr 1fr 1.3fr) */}
       {/* ================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AttendanceTrendCard
-          chartData={trend.chartData}
-          summary={trend.summary}
-          isLoading={trend.isLoading}
-        />
-        <FinanceSummaryCard
-          totalCollected={financeSummary?.totalCollected ?? 0}
-          outstanding={financeSummary?.outstanding ?? 0}
-          collectionRate={financeSummary?.collectionRate ?? 0}
-          isLoading={financeLoading}
-          isError={financeError}
-        />
-      </div>
-
-      {/* ================================================================ */}
-      {/* SECTION 4: Quick Actions — 6 items */}
-      {/* ================================================================ */}
-      <QuickActionsWidget actions={ADMIN_HOME_ACTIONS} columns={4} />
-    </div>
+      <SectionErrorBoundary fallbackMessage="Unable to load details">
+        <motion.div
+          variants={sectionVariants}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1.3fr]"
+          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
+        >
+          <QuickActionsGridV2 />
+          <AttendanceBySectionCard
+            sections={sectionAttendance.sections}
+            todayRate={snapshot.todayAttendanceRate}
+            isLoading={sectionAttendance.isLoading}
+          />
+          <RecentActivityFeed
+            items={activityFeed.items}
+            isLoading={activityFeed.isLoading}
+          />
+        </motion.div>
+      </SectionErrorBoundary>
+    </motion.div>
   )
 }

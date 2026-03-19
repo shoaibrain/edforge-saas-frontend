@@ -1,86 +1,204 @@
 /**
- * HomeStatCard
+ * HomeStatCard — V2 KPI Tile
  *
- * Stat tile for the home page command center.
- * Mirrors the visual design of the academics ModuleOverviewPage StatCard.
+ * Stat tile with accent bar, tag pill, count-up animation,
+ * and V2 token-based styling.
  */
 
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import {
+  useCountUp,
+  parseFormattedValue,
+  formatAnimatedValue,
+} from '../../hooks/useCountUp'
 
 export interface HomeStatCardProps {
   label: string
   value: string
   subtitle?: string
   icon: LucideIcon
-  iconBg: string
+  /** Hex color for the icon background (module accent) */
+  accentColor: string
+  /** Hex color for the icon fill */
   iconColor: string
+  /** Accent bar color at bottom of card */
+  barColor: string
+  /** Optional tag pill */
+  tag?: { text: string; color: string; bg: string }
+  /** Hint text below value */
+  hint?: string
   loading?: boolean
   error?: boolean
   onRetry?: () => void
-  /** Color class for the value text (e.g. for attendance color coding) */
+  /** Override value text color */
   valueColor?: string
+}
+
+function KpiSkeleton() {
+  return (
+    <div
+      className="relative overflow-hidden rounded-xl border p-[18px]"
+      style={{
+        background: 'var(--v2-bg-surface)',
+        borderColor: 'var(--v2-border-default)',
+      }}
+    >
+      <div className="flex items-center justify-between mb-3.5">
+        <div
+          className="h-3 w-24 rounded v2-skeleton-pulse"
+          style={{ background: 'var(--v2-bg-elevated)' }}
+        />
+        <div
+          className="w-7 h-7 rounded-[7px] v2-skeleton-pulse"
+          style={{ background: 'var(--v2-bg-elevated)' }}
+        />
+      </div>
+      <div
+        className="h-7 w-16 rounded v2-skeleton-pulse mb-1.5"
+        style={{ background: 'var(--v2-bg-elevated)' }}
+      />
+      <div className="flex items-center gap-1.5">
+        <div
+          className="h-4 w-20 rounded-full v2-skeleton-pulse"
+          style={{ background: 'var(--v2-bg-elevated)' }}
+        />
+        <div
+          className="h-3 w-16 rounded v2-skeleton-pulse"
+          style={{ background: 'var(--v2-bg-elevated)' }}
+        />
+      </div>
+      <div
+        className="absolute bottom-0 left-0 right-0"
+        style={{ height: 'var(--v2-kpi-bar-height, 2px)', background: 'var(--v2-bg-elevated)' }}
+      />
+    </div>
+  )
 }
 
 export function HomeStatCard({
   label,
   value,
-  subtitle,
   icon: Icon,
-  iconBg,
+  accentColor,
   iconColor,
+  barColor,
+  tag,
+  hint,
   loading,
   error,
   onRetry,
   valueColor,
 }: HomeStatCardProps) {
+  // Parse value for count-up animation
+  const parsed = useMemo(() => parseFormattedValue(value), [value])
+  const animatedNum = useCountUp(parsed.number, 800, { enabled: !loading && !error })
+  const displayValue = useMemo(
+    () =>
+      parsed.number > 0
+        ? formatAnimatedValue(animatedNum, parsed.number, parsed.prefix, parsed.suffix)
+        : value,
+    [animatedNum, parsed, value],
+  )
+
+  if (loading) return <KpiSkeleton />
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col p-5 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm"
+      className="relative overflow-hidden rounded-xl border cursor-pointer"
+      style={{
+        background: 'var(--v2-bg-surface)',
+        borderColor: 'var(--v2-border-default)',
+        padding: '18px 18px 14px',
+        transition: 'border-color var(--v2-transition-fast, 150ms ease)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--v2-border-hover)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'var(--v2-border-default)'
+      }}
+      role="status"
+      aria-label={`${label}: ${value}`}
     >
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconBg}`}>
-        <Icon className={`w-5 h-5 ${iconColor}`} />
-      </div>
-      <div className="mt-auto pt-4">
-        <p className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide mb-1 truncate">
+      {/* Top row: label + icon */}
+      <div className="flex items-center justify-between mb-3.5">
+        <span
+          className="text-[11px] font-medium uppercase tracking-[0.5px]"
+          style={{ color: 'var(--v2-text-faint)' }}
+        >
           {label}
-        </p>
-        {loading ? (
-          <div className="space-y-1.5">
-            <div className="h-8 w-16 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
-            <div className="h-3.5 w-12 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
-          </div>
-        ) : error ? (
-          <div className="flex items-center gap-1.5">
-            <span className="text-2xl font-semibold text-[rgb(var(--text-tertiary))]">—</span>
-            {onRetry && (
-              <button
-                onClick={onRetry}
-                className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
-                title="Retry loading"
-              >
-                <RotateCcw className="w-2.5 h-2.5" />
-                Retry
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <span className={`text-2xl font-semibold ${valueColor || 'text-[rgb(var(--text-primary))]'}`}>
-              {value}
-            </span>
-            {subtitle && (
-              <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-                {subtitle}
-              </p>
-            )}
-          </>
+        </span>
+        <div
+          className="flex items-center justify-center"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 7,
+            background: accentColor,
+          }}
+        >
+          <Icon className="w-3.5 h-3.5" style={{ color: iconColor }} />
+        </div>
+      </div>
+
+      {/* Value */}
+      {error ? (
+        <div className="flex items-center gap-1.5">
+          <span className="text-2xl font-semibold" style={{ color: 'var(--v2-text-hint)' }}>
+            —
+          </span>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded"
+              style={{
+                background: 'var(--v2-warning-bg)',
+                color: 'var(--v2-warning)',
+              }}
+              title="Retry loading"
+            >
+              <RotateCcw className="w-2.5 h-2.5" />
+              Retry
+            </button>
+          )}
+        </div>
+      ) : (
+        <span
+          className="text-[26px] font-semibold leading-none tracking-tight"
+          style={{ color: valueColor || 'var(--v2-text-primary)' }}
+        >
+          {displayValue}
+        </span>
+      )}
+
+      {/* Meta: tag + hint */}
+      <div className="flex items-center gap-1.5 mt-1.5">
+        {tag && (
+          <span
+            className="text-[10px] font-medium px-[7px] py-0.5 rounded-[10px]"
+            style={{ background: tag.bg, color: tag.color }}
+          >
+            {tag.text}
+          </span>
+        )}
+        {hint && (
+          <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+            {hint}
+          </span>
         )}
       </div>
+
+      {/* Accent bar */}
+      <div
+        className="absolute bottom-0 left-0 right-0"
+        style={{ height: 2, background: barColor }}
+      />
     </motion.div>
   )
 }
