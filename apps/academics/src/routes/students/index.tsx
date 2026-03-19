@@ -29,7 +29,6 @@ import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
   flattenStudentPages,
-  getTotalFromPages,
   useDeleteStudent,
 } from '../../hooks'
 import { useActiveSchoolId } from '../../stores'
@@ -340,8 +339,6 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
 
   // Flatten paginated data
   const students = useMemo(() => flattenStudentPages(data), [data])
-  const totalCount = getTotalFromPages(data)
-
   // V2 overview data (KPIs + alerts)
   const overviewData = useAcademicsOverviewV2(schoolId)
 

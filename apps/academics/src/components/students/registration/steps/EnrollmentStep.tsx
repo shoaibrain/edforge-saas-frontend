@@ -1,23 +1,30 @@
 /**
- * Enrollment Step
+ * Enrollment Step — V2
  *
  * Fifth step of the student registration wizard.
  * Collects enrollment type, date, academic year selection,
  * Ed-Fi descriptor fields, and transfer-specific fields.
  *
- * Sprint Alaska changes:
- * - Academic Year is now a dropdown populated from API (AK-1.5/1.6)
- * - Ed-Fi descriptor fields added (AK-2.3/2.4)
- * - Academic year status validation with visual feedback (AK-3.1)
- * - Enrollment date constrained to academic year range (AK-3.2)
- * - Enrollment step is now required (AK-2.8)
+ * V2: Collapsible sections with icons, titles, and completion indicators.
+ * Required sections expanded by default; optional sections collapsed.
  */
 
 import { useEffect, useMemo } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { TextField, DateField, RadioGroupField, SelectField, TextareaField } from '@edforge/forms'
 import { motion, AnimatePresence } from 'framer-motion'
-import { AlertTriangle, CheckCircle2, Info, Loader2 } from 'lucide-react'
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  Loader2,
+  ClipboardList,
+  CalendarDays,
+  FileText,
+  Settings,
+  ArrowRightLeft,
+  MessageSquare,
+} from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { useAcademicYears } from '../../../../hooks/useSchool'
@@ -27,6 +34,7 @@ import {
   ENTRY_TYPE_OPTIONS,
   RESIDENCY_STATUS_OPTIONS,
 } from '../../../../schemas/edfi-descriptors'
+import { CollapsibleSection } from '../CollapsibleSection'
 
 const ENROLLMENT_TYPE_RADIO = ENROLLMENT_TYPE_OPTIONS.map((o) => ({
   value: o.value,
@@ -59,7 +67,6 @@ export function EnrollmentStep({
     isError: yearsError,
   } = useAcademicYears(schoolId || '', !!schoolId)
 
-  // Filter to active years only (planning years not supported for enrollment in MVP)
   const eligibleYears = useMemo(() => {
     if (!academicYears) return []
     return academicYears.filter((y) => y.status === 'active')
@@ -72,7 +79,6 @@ export function EnrollmentStep({
     }))
   }, [eligibleYears])
 
-  // Get the selected year object
   const selectedYear = useMemo(() => {
     if (!selectedYearId || !eligibleYears.length) return null
     return eligibleYears.find((y) => y.yearId === selectedYearId) ?? null
@@ -88,12 +94,11 @@ export function EnrollmentStep({
     }
   }, [eligibleYears, selectedYearId, form])
 
-  // Auto-populate enrollment date to year's start date & constrain range
+  // Auto-populate enrollment date
   useEffect(() => {
     if (selectedYear) {
       const currentDate = form.getValues('enrollment.enrollmentDate') as string
       if (!currentDate) {
-        // Default to today if within range, else year start
         const today = new Date().toISOString().split('T')[0]
         const inRange = today >= selectedYear.startDate && today <= selectedYear.endDate
         form.setValue(
@@ -101,7 +106,6 @@ export function EnrollmentStep({
           inRange ? today : selectedYear.startDate
         )
       } else if (currentDate < selectedYear.startDate || currentDate > selectedYear.endDate) {
-        // Current date is out of range — reset to year start
         form.setValue('enrollment.enrollmentDate', selectedYear.startDate)
       }
     }
@@ -111,16 +115,22 @@ export function EnrollmentStep({
 
   return (
     <FormProvider {...form}>
-      <div className="space-y-8">
+      <div className="space-y-4">
         {/* No active academic year blocking message */}
         {noActiveYear && (
-          <div className="rounded-lg bg-red-50 border border-red-200 p-4 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div
+            className="flex items-start gap-3 rounded-lg p-3"
+            style={{
+              background: 'var(--v2-danger-bg)',
+              border: '1px solid var(--v2-danger-border)',
+            }}
+          >
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-danger)' }} />
             <div>
-              <p className="text-sm font-medium text-red-800">
+              <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--v2-danger)' }}>
                 No active academic year available
               </p>
-              <p className="text-sm text-red-700 mt-1">
+              <p style={{ fontSize: 11, color: 'var(--v2-text-secondary)', marginTop: 2 }}>
                 Please configure and activate an academic year in School Settings before enrolling students.
               </p>
             </div>
@@ -128,42 +138,64 @@ export function EnrollmentStep({
         )}
 
         {/* Enrollment Type */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Enrollment Type
-          </h3>
+        <CollapsibleSection
+          id="enrollment-type"
+          icon={ClipboardList}
+          title="Enrollment Type"
+          description="How the student is enrolling"
+          fields={['enrollment.enrollmentType']}
+          defaultExpanded
+        >
           <RadioGroupField
             name="enrollment.enrollmentType"
             options={ENROLLMENT_TYPE_RADIO}
             direction="horizontal"
             optionsClassName="grid grid-cols-2 gap-4"
           />
-        </div>
+        </CollapsibleSection>
 
         {/* Enrollment Details */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Enrollment Details
-          </h3>
+        <CollapsibleSection
+          id="enrollment-details"
+          icon={CalendarDays}
+          title="Enrollment Details"
+          description="Academic year and enrollment date"
+          fields={['enrollment.academicYearId', 'enrollment.enrollmentDate']}
+          defaultExpanded
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {/* Academic Year dropdown */}
             <div>
               {yearsLoading ? (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
                     Academic Year *
                   </label>
-                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
-                    <Loader2 className="w-4 h-4 animate-spin text-[rgb(var(--text-tertiary))]" />
-                    <span className="text-sm text-[rgb(var(--text-tertiary))]">Loading academic years...</span>
+                  <div
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
+                    style={{
+                      border: '1px solid var(--v2-border-default)',
+                      background: 'rgba(255, 255, 255, 0.04)',
+                    }}
+                  >
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--v2-text-hint)' }} />
+                    <span style={{ fontSize: 12, color: 'var(--v2-text-hint)' }}>Loading academic years...</span>
                   </div>
                 </div>
               ) : yearsError ? (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-red-500">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--v2-danger)' }}>
                     Academic Year *
                   </label>
-                  <div className="px-3 py-2.5 rounded-xl border border-red-200 bg-red-50 text-sm text-red-600">
+                  <div
+                    className="px-3 py-2.5 rounded-lg"
+                    style={{
+                      border: '1px solid var(--v2-danger-border)',
+                      background: 'var(--v2-danger-bg)',
+                      fontSize: 12,
+                      color: 'var(--v2-danger)',
+                    }}
+                  >
                     Failed to load academic years. Please refresh.
                   </div>
                 </div>
@@ -178,7 +210,6 @@ export function EnrollmentStep({
               )}
             </div>
 
-            {/* Enrollment Date with range constraints */}
             <div>
               <DateField
                 name="enrollment.enrollmentDate"
@@ -206,9 +237,15 @@ export function EnrollmentStep({
                 className="overflow-hidden mt-3"
               >
                 {selectedYear.status === 'active' ? (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-teal-50 border border-teal-200">
-                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                    <span className="text-sm text-teal-700">
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                    style={{
+                      background: 'var(--v2-success-bg)',
+                      border: '1px solid var(--v2-success-border)',
+                    }}
+                  >
+                    <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#1D9E75' }} />
+                    <span style={{ fontSize: 12, color: '#1D9E75' }}>
                       Active academic year — enrollment will be immediately active
                     </span>
                   </div>
@@ -216,16 +253,17 @@ export function EnrollmentStep({
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </CollapsibleSection>
 
-        {/* Ed-Fi Entry Details */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-1">
-            Entry Details
-          </h3>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mb-4">
-            Ed-Fi aligned descriptor fields for state reporting
-          </p>
+        {/* Entry Details */}
+        <CollapsibleSection
+          id="enrollment-entry"
+          icon={FileText}
+          title="Entry Details"
+          description="Ed-Fi descriptor fields for state reporting"
+          fields={['enrollment.entryTypeDescriptor', 'enrollment.residencyStatusDescriptor']}
+          defaultExpanded={false}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <SelectField
               name="enrollment.entryTypeDescriptor"
@@ -242,70 +280,82 @@ export function EnrollmentStep({
               helperText="Student's residency relative to the school"
             />
           </div>
-        </div>
+        </CollapsibleSection>
 
         {/* Enrollment Settings */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-1">
-            Enrollment Settings
-          </h3>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] mb-4">
-            These settings have recommended defaults. Adjust only if needed.
-          </p>
+        <CollapsibleSection
+          id="enrollment-settings"
+          icon={Settings}
+          title="Enrollment Settings"
+          description="Defaults are pre-configured — adjust only if needed"
+          fields={['enrollment.primarySchool', 'enrollment.fullTimeEquivalency', 'enrollment.repeatGradeIndicator']}
+          defaultExpanded={false}
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-            {/* Primary School toggle */}
             <div className="space-y-1">
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+              <div
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
+                style={{
+                  border: '1px solid var(--v2-border-default)',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                }}
+              >
                 <input
                   type="checkbox"
                   {...form.register('enrollment.primarySchool')}
                   id="enrollment.primarySchool"
-                  className="h-4 w-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/20"
+                  className="h-4 w-4 rounded"
                 />
                 <label
                   htmlFor="enrollment.primarySchool"
-                  className="text-sm text-[rgb(var(--text-primary))] select-none"
+                  className="text-sm select-none"
+                  style={{ color: 'var(--v2-text-primary)' }}
                 >
                   Primary School
                 </label>
               </div>
-              <p className="text-xs text-[rgb(var(--text-tertiary))] pl-1">
+              <p style={{ fontSize: 10, color: 'var(--v2-text-hint)', paddingLeft: 4 }}>
                 Is this the student's primary school of enrollment?
               </p>
             </div>
 
-            {/* Full-Time Equivalency */}
             <TextField
               name="enrollment.fullTimeEquivalency"
               label="Full-Time Equivalency (FTE)"
               type="number"
-              helperText="1.0 = full-time, 0.5 = half-time. Most students are 1.0."
+              helperText="1.0 = full-time, 0.5 = half-time"
             />
 
-            {/* Repeat Grade toggle */}
             <div className="space-y-1">
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+              <div
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
+                style={{
+                  border: '1px solid var(--v2-border-default)',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                }}
+              >
                 <input
                   type="checkbox"
                   {...form.register('enrollment.repeatGradeIndicator')}
                   id="enrollment.repeatGradeIndicator"
-                  className="h-4 w-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/20"
+                  className="h-4 w-4 rounded"
                 />
                 <label
                   htmlFor="enrollment.repeatGradeIndicator"
-                  className="text-sm text-[rgb(var(--text-primary))] select-none"
+                  className="text-sm select-none"
+                  style={{ color: 'var(--v2-text-primary)' }}
                 >
                   Repeat Grade
                 </label>
               </div>
-              <p className="text-xs text-[rgb(var(--text-tertiary))] pl-1">
+              <p style={{ fontSize: 10, color: 'var(--v2-text-hint)', paddingLeft: 4 }}>
                 Check if the student is repeating the current grade level
               </p>
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Transfer-specific fields */}
+        {/* Transfer Information (conditional) */}
         <AnimatePresence>
           {enrollmentType === 'transfer' && (
             <motion.div
@@ -315,39 +365,49 @@ export function EnrollmentStep({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-                  Transfer Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                  <TextField
-                    name="enrollment.previousSchoolName"
-                    label="Previous School"
-                    placeholder="Name of previous school"
-                    required
-                  />
-                  <TextField
-                    name="enrollment.previousSchoolAddress"
-                    label="Previous School Address"
-                    placeholder="City, State"
+              <CollapsibleSection
+                id="enrollment-transfer"
+                icon={ArrowRightLeft}
+                title="Transfer Information"
+                description="Details about the previous school"
+                fields={['enrollment.previousSchoolName', 'enrollment.previousSchoolAddress', 'enrollment.transferReason']}
+                defaultExpanded
+              >
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <TextField
+                      name="enrollment.previousSchoolName"
+                      label="Previous School"
+                      placeholder="Name of previous school"
+                      required
+                    />
+                    <TextField
+                      name="enrollment.previousSchoolAddress"
+                      label="Previous School Address"
+                      placeholder="City, State"
+                    />
+                  </div>
+                  <TextareaField
+                    name="enrollment.transferReason"
+                    label="Reason for Transfer"
+                    placeholder="Briefly describe the reason for transfer"
+                    rows={3}
                   />
                 </div>
-                <TextareaField
-                  name="enrollment.transferReason"
-                  label="Reason for Transfer"
-                  placeholder="Briefly describe the reason for transfer"
-                  rows={3}
-                />
-              </div>
+              </CollapsibleSection>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Notes */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Additional Notes
-          </h3>
+        {/* Additional Notes */}
+        <CollapsibleSection
+          id="enrollment-notes"
+          icon={MessageSquare}
+          title="Additional Notes"
+          description="Optional notes about this enrollment"
+          fields={['enrollment.notes']}
+          defaultExpanded={false}
+        >
           <TextareaField
             name="enrollment.notes"
             label="Notes"
@@ -356,12 +416,18 @@ export function EnrollmentStep({
             maxLength={2000}
             showCharCount
           />
-        </div>
+        </CollapsibleSection>
 
         {/* Auto-populated Info */}
-        <div className="rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] p-4 flex items-start gap-3">
-          <Info className="w-4 h-4 text-[rgb(var(--text-tertiary))] shrink-0 mt-0.5" />
-          <p className="text-sm text-[rgb(var(--text-secondary))]">
+        <div
+          className="flex items-start gap-3 rounded-lg p-3"
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--v2-border-default)',
+          }}
+        >
+          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-text-hint)' }} />
+          <p style={{ fontSize: 11, color: 'var(--v2-text-muted)' }}>
             <span className="font-medium">Auto-populated:</span> School, grade level, and entry grade level descriptor are automatically set based on your school context and Step 1 selections.
           </p>
         </div>

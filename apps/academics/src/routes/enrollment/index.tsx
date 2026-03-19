@@ -1,20 +1,28 @@
 /**
- * Enrollment Module
+ * Enrollment Module — V2
  *
- * Two-tab interface:
- * - Enrollment Dashboard: View, search, withdraw, and transfer enrolled students
- * - New Student Registration: The existing RegistrationWizard
+ * Two-tab interface with V2 design language:
+ * - Registration (primary, default) — New student wizard
+ * - Enrollment Records (secondary) — View, search, withdraw, transfer
+ *
+ * V2 changes:
+ * - Tab order reversed: registration first
+ * - V2 header with page icon, cancel button, academic year dropdown
+ * - Context banner below header
+ * - Academic year progress strip in content area
+ * - URL tab param support (?tab=new | ?tab=records)
  */
 
 import { useState, useMemo, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useResourcePermissions } from '@edforge/abac'
 import {
-  Users,
   UserPlus,
-  LayoutDashboard,
   Download,
   Lock,
+  Calendar,
+  X,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useSchoolGradeRange } from '../../hooks/useSchool'
@@ -43,19 +51,59 @@ import type { EnrollmentResponseDto } from '../../services/academics.service'
 // TYPES
 // ============================================================================
 
-type EnrollmentTab = 'dashboard' | 'registration'
+type EnrollmentTab = 'registration' | 'dashboard'
 
-const tabs = [
-  { id: 'dashboard' as const, label: 'Enrollment Dashboard', icon: LayoutDashboard },
-  { id: 'registration' as const, label: 'New Student', icon: UserPlus },
-]
+function getInitialTab(): EnrollmentTab {
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab === 'records') return 'dashboard'
+    if (tab === 'new') return 'registration'
+  } catch {
+    // SSR or error — fall through
+  }
+  return 'registration'
+}
+
+// ============================================================================
+// YEAR PROGRESS BAR (inline)
+// ============================================================================
+
+function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: string }) {
+  const progress = useMemo(() => {
+    const start = new Date(startDate).getTime()
+    const end = new Date(endDate).getTime()
+    const now = Date.now()
+    if (now <= start) return 0
+    if (now >= end) return 100
+    return Math.round(((now - start) / (end - start)) * 100)
+  }, [startDate, endDate])
+
+  return (
+    <div className="flex items-center gap-2">
+      <div
+        className="w-20 h-1.5 rounded-full overflow-hidden"
+        style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+      >
+        <div
+          className="h-full rounded-full"
+          style={{ width: `${progress}%`, background: '#1D9E75' }}
+        />
+      </div>
+      <span className="text-[10px]" style={{ color: 'var(--v2-text-hint)' }}>
+        {progress}%
+      </span>
+    </div>
+  )
+}
 
 // ============================================================================
 // ENROLLMENT MODULE
 // ============================================================================
 
 export function EnrollmentModule() {
-  const [activeTab, setActiveTab] = useState<EnrollmentTab>('dashboard')
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<EnrollmentTab>(getInitialTab)
   const schoolId = useActiveSchoolId() || ''
   const { gradeRange } = useSchoolGradeRange(schoolId || null)
 
@@ -113,6 +161,10 @@ export function EnrollmentModule() {
     enabled: !!schoolId && !!activeYearId,
   })
 
+  // Derived stats
+  const activeCount = summary?.byStatus?.enrolled ?? summary?.byStatus?.active ?? 0
+  const gradeLevelCount = Object.keys(summary?.byGradeLevel || {}).length
+
   // Handlers
   const handleMarkNoShow = useCallback((enrollment: EnrollmentResponseDto) => {
     const studentName = (enrollment as Record<string, unknown>).studentName || enrollment.studentId.slice(0, 8)
@@ -127,7 +179,6 @@ export function EnrollmentModule() {
   const handleExportCSV = useCallback(() => {
     if (!schoolId || !activeYearId) return
     const url = getEnrollmentExportUrl(schoolId, activeYearId)
-    // Open in new tab — the endpoint sets Content-Disposition: attachment
     window.open(`/api${url}`, '_blank')
   }, [schoolId, activeYearId])
 
@@ -144,29 +195,86 @@ export function EnrollmentModule() {
     })
   }, [schoolId, activeYearId, activeYearObj, closeYearMutation])
 
-  return (
-    <div className="min-h-full">
-      {/* Page Header */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Users className="w-5 h-5 text-text-tertiary" />
-              <h1 className="text-xl font-semibold text-text-primary tracking-tight">Student Enrollment</h1>
-              {!summaryLoading && summary && (
-                <span className="hidden sm:inline text-sm text-text-tertiary">
-                  {summary.totalEnrolled ?? 0} enrolled
-                </span>
-              )}
-            </div>
+  const handleCancelEnrollment = useCallback(() => {
+    navigate({ to: '/students' })
+  }, [navigate])
 
-            {/* Academic Year Selector + Actions */}
+  // Tab definitions (registration first)
+  const tabItems = useMemo(() => {
+    const items: { id: EnrollmentTab; label: string; count?: number }[] = [
+      { id: 'registration', label: 'Registration' },
+    ]
+    items.push({
+      id: 'dashboard',
+      label: 'Enrollment records',
+      count: summary?.totalEnrolled ?? undefined,
+    })
+    return items
+  }, [summary?.totalEnrolled])
+
+  return (
+    <div data-v2="" className="min-h-full">
+      {/* V2 Page Header */}
+      <div
+        className="px-6 py-4"
+        style={{
+          borderBottom: '1px solid var(--v2-border-default)',
+          background: 'var(--v2-bg-surface)',
+        }}
+      >
+        <div className="flex items-center justify-between">
+          {/* Left: Icon + Title */}
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: 32,
+                height: 32,
+                background: 'rgba(29, 158, 117, 0.1)',
+                borderRadius: 8,
+              }}
+            >
+              <UserPlus className="w-4 h-4" style={{ color: '#1D9E75' }} />
+            </div>
+            <h1
+              className="font-semibold"
+              style={{
+                fontSize: 18,
+                color: 'var(--v2-text-primary)',
+                letterSpacing: '-0.3px',
+              }}
+            >
+              Enroll student
+            </h1>
+          </div>
+
+          {/* Right: Cancel + Year Selector */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCancelEnrollment}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium rounded-[8px] transition-colors hover:opacity-80"
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#7a8099',
+              }}
+            >
+              <X className="w-3 h-3" />
+              Cancel enrollment
+            </button>
+
             {activeTab === 'dashboard' && academicYears && academicYears.length > 0 && (
-              <div className="flex items-center gap-2">
+              <>
                 <select
                   value={activeYearId}
                   onChange={(e) => setSelectedYearId(e.target.value)}
-                  className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="px-2.5 py-1.5 text-[12px] rounded-[8px] focus:outline-none"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    color: 'var(--v2-text-secondary)',
+                  }}
                 >
                   {academicYears.map((year: { yearId: string; name: string; status: string }) => (
                     <option key={year.yearId} value={year.yearId}>
@@ -178,10 +286,15 @@ export function EnrollmentModule() {
                   <button
                     type="button"
                     onClick={handleExportCSV}
-                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover border border-border-secondary rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium rounded-[8px] transition-colors hover:opacity-80"
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: 'var(--v2-text-hint)',
+                    }}
                     title="Export enrollments as CSV"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download className="w-3 h-3" />
                     Export
                   </button>
                 )}
@@ -190,44 +303,77 @@ export function EnrollmentModule() {
                     type="button"
                     onClick={handleCloseYear}
                     disabled={closeYearMutation.isPending}
-                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium rounded-[8px] transition-colors disabled:opacity-50"
+                    style={{
+                      background: 'rgba(239, 159, 39, 0.08)',
+                      border: '1px solid rgba(239, 159, 39, 0.2)',
+                      color: '#EF9F27',
+                    }}
                     title="Close all open enrollments for this year"
                   >
-                    <Lock className="w-4 h-4" />
+                    <Lock className="w-3 h-3" />
                     {closeYearMutation.isPending ? 'Closing...' : 'Close Year'}
                   </button>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="px-6">
-          <nav className="flex items-center space-x-1 border-b border-border-primary relative" aria-label="Enrollment tabs">
-            {tabs.filter((tab) => tab.id !== 'registration' || enrollPerms.create).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'text-text-primary'
-                    : 'text-text-tertiary hover:text-text-secondary'
-                }`}
-              >
-                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-teal-500' : 'opacity-70'}`} />
-                {tab.label}
-                {activeTab === tab.id && (
-                  <motion.div
-                    layoutId="enrollment-tab-indicator"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                )}
-              </button>
-            ))}
-          </nav>
-        </div>
+        {/* Context Banner */}
+        {!summaryLoading && (
+          <p
+            className="mt-2"
+            style={{ fontSize: 11, color: 'var(--v2-text-hint)' }}
+          >
+            Registering a new student
+            {activeYearObj ? ` · Academic year ${activeYearObj.name}` : ''}
+            {summary ? ` · ${summary.totalEnrolled ?? 0} students currently enrolled` : ''}
+          </p>
+        )}
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="px-6" style={{ background: 'var(--v2-bg-surface)' }}>
+        <nav className="flex items-center gap-1" aria-label="Enrollment tabs">
+          {tabItems
+            .filter((tab) => tab.id !== 'registration' || enrollPerms.create)
+            .map((tab) => {
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className="relative flex items-center gap-1.5 px-3 py-2.5 text-[12px] font-medium transition-colors"
+                  style={{
+                    color: isActive ? '#1D9E75' : '#5a6070',
+                    borderBottom: isActive ? '2px solid #1D9E75' : '2px solid transparent',
+                  }}
+                >
+                  {tab.label}
+                  {tab.count !== undefined && (
+                    <span
+                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                      style={{
+                        background: isActive ? 'rgba(29, 158, 117, 0.12)' : 'rgba(255, 255, 255, 0.06)',
+                        color: isActive ? '#1D9E75' : 'var(--v2-text-hint)',
+                      }}
+                    >
+                      {tab.count}
+                    </span>
+                  )}
+                  {isActive && (
+                    <motion.div
+                      layoutId="enrollment-tab-indicator"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full"
+                      style={{ background: '#1D9E75' }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                </button>
+              )
+            })}
+        </nav>
       </div>
 
       {/* Tab Content */}
@@ -241,9 +387,48 @@ export function EnrollmentModule() {
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
             {activeTab === 'dashboard' && (
-              <div className="space-y-6">
+              <div className="space-y-4">
+                {/* Academic Year Progress Strip */}
+                {activeYearObj && (
+                  <div
+                    className="flex flex-wrap items-center gap-x-4 gap-y-2"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      borderRadius: 10,
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <Calendar className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
+                    <span
+                      className="text-[11px] font-medium px-2 py-0.5"
+                      style={{
+                        background: 'rgba(29, 158, 117, 0.1)',
+                        color: '#1D9E75',
+                        borderRadius: 6,
+                      }}
+                    >
+                      {activeYearObj.name}
+                    </span>
+                    <YearProgressBar
+                      startDate={activeYearObj.startDate}
+                      endDate={activeYearObj.endDate}
+                    />
+                    <div className="ml-auto flex items-center gap-3 text-[11px]" style={{ color: 'var(--v2-text-muted)' }}>
+                      <span>
+                        <strong style={{ color: 'var(--v2-text-primary)' }}>{summary?.totalEnrolled ?? '--'}</strong> enrolled
+                      </span>
+                      <span>
+                        <strong style={{ color: 'var(--v2-text-primary)' }}>{activeCount}</strong> active
+                      </span>
+                      <span>
+                        <strong style={{ color: 'var(--v2-text-primary)' }}>{gradeLevelCount}</strong> grade levels
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <EnrollmentDashboard
-                  summary={summary}
                   isLoading={summaryLoading}
                   activeYear={activeYearObj}
                 />

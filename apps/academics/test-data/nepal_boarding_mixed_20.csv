@@ -1,0 +1,21 @@
+firstName,lastName,birthDate,gender,gradeLevel,guardianName,guardianPhone,guardianEmail
+Bipin,Dhungana,2017-04-10,male,2,Hom Dhungana,977-9841235001,hom.dhungana@gmail.com
+Shreya,Mainali,2016-08-22,female,3,Rudra Mainali,977-9841235002,rudra.mainali@gmail.com
+Santosh,Pokharel,2015-01-17,male,4,Keshav Pokharel,977-9841235003,keshav.pokharel@gmail.com
+,Baral,2014-06-05,female,5,Tika Baral,977-9841235004,tika.baral@gmail.com
+Deepa,Sapkota,2013-11-29,female,6,Yam Sapkota,977-9841235005,yam.sapkota@gmail.com
+Puspa,,2012-03-14,male,7,Devi Oli,977-9841235006,devi.oli@gmail.com
+Ramesh,Tiwari,15-03-2012,male,7,Govinda Tiwari,977-9841235007,govinda.tiwari@gmail.com
+Ayush,Regmi,2011-09-08,Male,8,Shankar Regmi,977-9841235008,shankar.regmi@gmail.com
+Bina,Dhakal,2014-02-19,female,5,Khagendra Dhakal,977-9841235009,khagendra.dhakal@gmail.com
+Lokesh,Chapagain,,male,6,Bharat Chapagain,977-9841235010,bharat.chapagain@gmail.com
+Suman,Gautam,2010-07-14,male,9,Prem Gautam,977-9841235011,prem.gautam@gmail.com
+Gita,Sedhai,2018-03-25,female,1,Ganesh Sedhai,977-9841235012,ganesh.sedhai@gmail.com
+Rajesh,Panta,2009-12-06,male,,Badri Panta,977-9841235013,badri.panta@gmail.com
+Mina,Kafle,2016-10-31,female,3,Chiranjibi Kafle,977-9841235014,chiranjibi.kafle@gmail.com
+Hari,Upreti,2015-05-20,male,4,Surendra Upreti,977-9841235015,surendra.upreti@gmail.com
+Kopila,Lamichhane,2013-08-12,female,6,Nanda Lamichhane,977-9841235016,nanda.lamichhane@gmail.com
+Pramod,Gyawali,2012-01-28,male,7,Ram Gyawali,977-9841235017,ram.gyawali@gmail.com
+Sarita,Aryal,2011-04-16,female,8,Tara Aryal,977-9841235018,tara.aryal@gmail.com
+Dinesh,Khatiwada,2010-10-09,male,9,Buddhi Khatiwada,977-9841235019,buddhi.khatiwada@gmail.com
+Reema,Baniya,2009-06-14,female,10,Nir Baniya,977-9841235020,nir.baniya@gmail.com

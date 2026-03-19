@@ -1,9 +1,17 @@
 /**
- * Registration Wizard
+ * Registration Wizard — V2
  *
  * Full-page wizard for creating a new student and enrollment.
  * Uses @edforge/wizard's WizardProvider directly (not WizardContainer)
  * to properly scope the layout within the shell's content area.
+ *
+ * V2 changes:
+ * - Green stepper (replacing amber/golden gradient)
+ * - V2 form card wrapper
+ * - Context sidebar (260px, hidden below lg)
+ * - Green Continue/Create buttons (replacing brand-gradient-warm)
+ * - V2 Back button styling
+ * - Form actions separator
  *
  * Submit flow:
  *  1. POST /academics/students → gets studentId
@@ -11,7 +19,7 @@
  *  3. Navigate to the new student's profile
  */
 
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -26,11 +34,15 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
-  X,
+  BookOpen,
+  Shield,
+  ListChecks,
 } from 'lucide-react'
 import { WizardProvider, useWizard, type WizardStep } from '@edforge/wizard'
 import { useCreateStudent, useCreateEnrollment, useCheckDuplicate } from '../../../hooks/useStudents'
 import { useActiveSchoolId } from '../../../stores/app.store'
+import { useEnrollmentSummary } from '../../../hooks/useEnrollments'
+import { useCurrentAcademicYear } from '../../../hooks'
 import { parseApiError } from '../../../services/academics.service'
 import type { DuplicateMatch } from '../../../services/academics.service'
 import { DuplicateWarning } from './DuplicateWarning'
@@ -115,75 +127,95 @@ const WIZARD_STEPS: WizardStep[] = [
 ]
 
 // ============================================================================
-// STEPPER
+// EDFI REQUIRED FIELDS
+// ============================================================================
+
+const EDFI_REQUIRED_FIELDS = [
+  { key: 'firstName', label: 'First name', field: 'firstName', step: 1 },
+  { key: 'lastName', label: 'Last name', field: 'lastName', step: 1 },
+  { key: 'dateOfBirth', label: 'Date of birth', field: 'dateOfBirth', step: 1 },
+  { key: 'gender', label: 'Gender', field: 'gender', step: 1 },
+  { key: 'gradeLevel', label: 'Grade level', field: 'currentGradeLevel', step: 1 },
+  { key: 'entryDate', label: 'Entry date', field: 'enrollment.enrollmentDate', step: 5 },
+]
+
+// ============================================================================
+// V2 STEPPER
 // ============================================================================
 
 function RegistrationStepper() {
-  const { steps, currentStep: _currentStep, getStepStatus, goToStep, canGoToStep } = useWizard()
+  const { steps, getStepStatus, goToStep, canGoToStep } = useWizard()
 
   return (
     <nav
       aria-label="Registration progress"
-      className="w-full max-w-3xl mx-auto px-6 py-6"
+      className="w-full"
+      style={{
+        background: '#161b27',
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+        borderRadius: 10,
+        padding: '14px 20px',
+      }}
     >
       <div className="flex items-center">
         {steps.map((step, index) => {
           const status = getStepStatus(index)
-          const Icon = step.icon
           const isClickable = canGoToStep(index)
           const isLast = index === steps.length - 1
 
           return (
             <div key={step.id} className="flex items-center flex-1 last:flex-none">
-              {/* Step circle + label */}
               <button
                 type="button"
                 onClick={() => isClickable && goToStep(index)}
                 disabled={!isClickable}
-                className={`
-                  flex flex-col items-center gap-1.5 group relative
-                  ${isClickable ? 'cursor-pointer' : 'cursor-default'}
-                `}
-                aria-current={status === 'current' ? 'step' : undefined}
+                className={`flex flex-col items-center gap-1 group relative ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
               >
-                {/* Circle */}
-                <motion.div
-                  initial={false}
-                  animate={{
-                    scale: status === 'current' ? 1 : 0.9,
-                  }}
-                  className={`
-                    w-9 h-9 rounded-full flex items-center justify-center
-                    text-xs font-semibold transition-all duration-300 shrink-0
-                    ${status === 'completed'
-                      ? 'bg-teal-500 text-white shadow-sm shadow-teal-500/30'
+                {/* Step dot */}
+                <div
+                  className="flex items-center justify-center shrink-0"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    ...(status === 'completed'
+                      ? { background: '#1D9E75', color: '#fff' }
                       : status === 'current'
-                        ? 'bg-gradient-to-br from-golden-500 to-caramel-500 text-white shadow-md shadow-golden-500/30 ring-[3px] ring-golden-500/20'
-                        : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] border border-[rgb(var(--border-primary))]'
-                    }
-                  `}
+                        ? {
+                            background: 'rgba(29, 158, 117, 0.2)',
+                            border: '2px solid #1D9E75',
+                            color: '#1D9E75',
+                          }
+                        : {
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            color: '#3a4055',
+                          }),
+                  }}
                 >
                   {status === 'completed' ? (
-                    <Check className="w-4 h-4" />
-                  ) : status === 'current' ? (
-                    <Icon className="w-4 h-4" />
+                    <Check className="w-3 h-3" />
                   ) : (
                     <span>{index + 1}</span>
                   )}
-                </motion.div>
+                </div>
 
                 {/* Label */}
                 <span
-                  className={`
-                    text-[11px] font-medium text-center leading-tight whitespace-nowrap
-                    hidden sm:block
-                    ${status === 'current'
-                      ? 'text-[rgb(var(--text-primary))]'
-                      : status === 'completed'
-                        ? 'text-teal-400'
-                        : 'text-[rgb(var(--text-tertiary))]'
-                    }
-                  `}
+                  className="hidden sm:block text-center leading-tight whitespace-nowrap"
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 500,
+                    marginTop: 4,
+                    color:
+                      status === 'completed'
+                        ? '#1D9E75'
+                        : status === 'current'
+                          ? '#c8ccd8'
+                          : '#3a4055',
+                  }}
                 >
                   {step.title}
                 </span>
@@ -191,15 +223,16 @@ function RegistrationStepper() {
 
               {/* Connecting line */}
               {!isLast && (
-                <div className="flex-1 mx-2 h-[2px] rounded-full bg-[rgb(var(--border-primary))] relative overflow-hidden">
-                  <motion.div
-                    initial={false}
-                    animate={{ scaleX: status === 'completed' ? 1 : 0 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    style={{ originX: 0 }}
-                    className="absolute inset-0 bg-gradient-to-r from-teal-500 to-teal-400"
-                  />
-                </div>
+                <div
+                  className="flex-1 mx-2"
+                  style={{
+                    height: 1,
+                    background:
+                      status === 'completed'
+                        ? '#1D9E75'
+                        : 'rgba(255, 255, 255, 0.06)',
+                  }}
+                />
               )}
             </div>
           )
@@ -238,7 +271,6 @@ function StepContent({
   const isFirst = currentStep === 0
   const isLast = currentStep === steps.length - 1
 
-  // Show duplicate warning on step 1 (Contact) after the check runs on leaving step 0
   const showDuplicateWarning = currentStep === 1 && (isDuplicateCheckLoading || duplicateMatches.length > 0)
 
   return (
@@ -275,7 +307,7 @@ function StepContent({
 }
 
 // ============================================================================
-// FOOTER NAVIGATION (sticky, scoped to content area)
+// V2 FOOTER NAVIGATION
 // ============================================================================
 
 function RegistrationFooter() {
@@ -285,28 +317,44 @@ function RegistrationFooter() {
   const isOptional = currentStepData?.isOptional
 
   return (
-    <div className="sticky bottom-0 z-10 bg-[rgb(var(--surface-primary))]/95 backdrop-blur-sm border-t border-[rgb(var(--border-secondary))]">
-      <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div
+      className="sticky bottom-0 z-10 backdrop-blur-sm"
+      style={{
+        background: 'var(--v2-bg-surface)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+        marginTop: 20,
+        paddingTop: 16,
+      }}
+    >
+      <div className="flex items-center justify-between">
         <div>
           {!isFirst && (
             <button
               type="button"
               onClick={goToBack}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] rounded-lg transition-colors"
+              className="flex items-center gap-2 transition-colors hover:opacity-80"
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: 8,
+                padding: '8px 16px',
+                fontSize: 12,
+                color: '#7a8099',
+              }}
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-3.5 h-3.5" />
               Back
             </button>
           )}
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Skip button for optional steps */}
           {isOptional && !isLast && (
             <button
               type="button"
               onClick={() => goToNext()}
-              className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+              className="px-4 py-2 text-[12px] font-medium transition-colors hover:opacity-80"
+              style={{ color: 'var(--v2-text-hint)' }}
             >
               Skip
             </button>
@@ -317,12 +365,13 @@ function RegistrationFooter() {
               type="button"
               onClick={() => submit()}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white brand-gradient-warm rounded-xl shadow-md shadow-golden-500/20 hover:opacity-90 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="flex items-center gap-2 px-5 py-2 text-[12px] font-semibold text-white rounded-[8px] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: '#1D9E75' }}
             >
               {isSubmitting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
-                <Check className="w-4 h-4" />
+                <Check className="w-3.5 h-3.5" />
               )}
               Create Student
             </button>
@@ -330,10 +379,11 @@ function RegistrationFooter() {
             <button
               type="button"
               onClick={() => goToNext()}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white brand-gradient-warm rounded-xl shadow-md shadow-golden-500/20 hover:opacity-90 hover:shadow-lg transition-all"
+              className="flex items-center gap-2 px-5 py-2 text-[12px] font-semibold text-white rounded-[8px] transition-all hover:opacity-90"
+              style={{ background: '#1D9E75' }}
             >
               Continue
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -343,14 +393,186 @@ function RegistrationFooter() {
 }
 
 // ============================================================================
-// WIZARD LAYOUT (replaces WizardContainer)
+// V2 CONTEXT SIDEBAR
+// ============================================================================
+
+const sidebarCardStyle = {
+  background: '#161b27',
+  border: '1px solid rgba(255, 255, 255, 0.06)',
+  borderRadius: 10,
+  padding: 14,
+}
+
+function ContextSidebar() {
+  const { steps, getStepStatus, formData, currentStep } = useWizard()
+  const schoolId = useActiveSchoolId() || ''
+  const { data: currentYear } = useCurrentAcademicYear(schoolId)
+  const { data: summary } = useEnrollmentSummary({
+    schoolId,
+    yearId: currentYear?.yearId || '',
+    enabled: !!schoolId && !!currentYear?.yearId,
+  })
+
+  const gradeLevelCount = Object.keys(summary?.byGradeLevel || {}).length
+
+  // Check EdFi fields — step-aware status
+  const edfiStatus = useMemo(() => {
+    return EDFI_REQUIRED_FIELDS.map((f) => {
+      const parts = f.field.split('.')
+      let val: unknown = formData
+      for (const p of parts) {
+        val = (val as Record<string, unknown>)?.[p]
+      }
+      return { ...f, filled: !!val }
+    })
+  }, [formData])
+
+  return (
+    <div className="hidden lg:flex flex-col gap-3" style={{ width: 260, flexShrink: 0 }}>
+      {/* Card 1: Enrollment Context */}
+      <div style={sidebarCardStyle}>
+        <div className="flex items-center gap-2 mb-3">
+          <BookOpen className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+            Enrollment Context
+          </span>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span style={{ fontSize: 10, color: '#4a5068' }}>Academic Year</span>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#c8ccd8' }}>
+              {currentYear?.name ?? '--'}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span style={{ fontSize: 10, color: '#4a5068' }}>Enrolled</span>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#c8ccd8' }}>
+              {summary?.totalEnrolled ?? '--'}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span style={{ fontSize: 10, color: '#4a5068' }}>Grade Levels</span>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#c8ccd8' }}>
+              {gradeLevelCount || '--'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Card 2: Required for EdFi */}
+      <div style={sidebarCardStyle}>
+        <div className="flex items-center gap-2 mb-3">
+          <Shield className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+            Required for EdFi
+          </span>
+        </div>
+        <div>
+          {edfiStatus.map((f, i) => (
+            <div
+              key={f.key}
+              className="flex items-center justify-between"
+              style={{
+                padding: '5px 0',
+                borderBottom: i < edfiStatus.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none',
+              }}
+            >
+              <span style={{ fontSize: 10, color: '#4a5068' }}>{f.label}</span>
+              {f.filled ? (
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#1D9E75' }}>Filled</span>
+              ) : f.step === currentStep + 1 ? (
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#EF9F27' }}>Required</span>
+              ) : (
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#EF9F27' }}>Step {f.step}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Card 3: Progress */}
+      <div style={sidebarCardStyle}>
+        <div className="flex items-center gap-2 mb-3">
+          <ListChecks className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+            Progress
+          </span>
+        </div>
+        <div className="space-y-1.5">
+          {steps.map((step, i) => {
+            const status = getStepStatus(i)
+            return (
+              <div key={step.id} className="flex items-center gap-2">
+                {status === 'completed' ? (
+                  <div
+                    className="flex items-center justify-center"
+                    style={{ width: 14, height: 14, borderRadius: '50%', background: '#1D9E75' }}
+                  >
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </div>
+                ) : status === 'current' ? (
+                  <div
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: '50%',
+                      border: '2px solid #1D9E75',
+                      background: 'transparent',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                    }}
+                  />
+                )}
+                <span
+                  style={{
+                    fontSize: 10,
+                    color:
+                      status === 'completed'
+                        ? '#1D9E75'
+                        : status === 'current'
+                          ? '#c8ccd8'
+                          : '#3a4055',
+                  }}
+                >
+                  {step.title}
+                </span>
+                <span
+                  className="ml-auto"
+                  style={{
+                    fontSize: 9,
+                    color:
+                      status === 'completed'
+                        ? '#1D9E75'
+                        : status === 'current'
+                          ? 'var(--v2-text-hint)'
+                          : '#3a4055',
+                  }}
+                >
+                  {status === 'completed' ? 'Done' : status === 'current' ? 'Current' : ''}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// WIZARD LAYOUT (V2)
 // ============================================================================
 
 function WizardLayout({
-  onCancel,
   schoolId,
 }: {
-  onCancel: () => void
   schoolId: string
 }) {
   const { currentStep, currentStepData, formData } = useWizard()
@@ -377,7 +599,6 @@ function WizardLayout({
               setIsDuplicateCheckLoading(false)
             },
             onError: () => {
-              // Silently fail — don't block registration
               setDuplicateMatches([])
               setIsDuplicateCheckLoading(false)
             },
@@ -395,30 +616,8 @@ function WizardLayout({
 
   return (
     <div className="flex flex-col min-h-0">
-      {/* Header */}
-      <div className="border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-primary))] px-6 py-4">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-[rgb(var(--text-primary))]">
-              Register New Student
-            </h1>
-            <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              Complete the steps below to add a new student.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="p-2 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] rounded-lg transition-colors"
-            aria-label="Cancel registration"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
       {/* Stepper */}
-      <div className="border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+      <div className="px-6 py-4">
         <RegistrationStepper />
       </div>
 
@@ -427,34 +626,60 @@ function WizardLayout({
         Step {currentStep + 1} of {WIZARD_STEPS.length}: {currentStepData.title}
       </div>
 
-      {/* Step title */}
-      <motion.div
-        key={`title-${currentStep}`}
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl mx-auto w-full px-6 pt-8 pb-2"
-      >
-        <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-          {currentStepData.title}
-        </h2>
-        {currentStepData.description && (
-          <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
-            {currentStepData.description}
-          </p>
-        )}
-      </motion.div>
+      {/* Main content area: Form + Sidebar */}
+      <div className="flex gap-5 px-6 pb-6 pt-2 min-h-0">
+        {/* Form Card */}
+        <div className="flex-1 min-w-0">
+          <div
+            style={{
+              background: 'var(--v2-bg-surface)',
+              border: '1px solid var(--v2-border-default)',
+              borderRadius: 12,
+              padding: 24,
+            }}
+          >
+            {/* Section title */}
+            <motion.div
+              key={`title-${currentStep}`}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5"
+            >
+              <h2
+                className="font-semibold"
+                style={{
+                  fontSize: 13,
+                  color: 'var(--v2-text-primary)',
+                  letterSpacing: '-0.2px',
+                }}
+              >
+                {currentStepData.title}
+              </h2>
+              {currentStepData.description && (
+                <p
+                  className="mt-1"
+                  style={{ fontSize: 11, color: 'var(--v2-text-muted)' }}
+                >
+                  {currentStepData.description}
+                </p>
+              )}
+            </motion.div>
 
-      {/* Step content */}
-      <div className="max-w-3xl mx-auto w-full px-6 pb-8 pt-4">
-        <StepContent
-          duplicateMatches={duplicateMatches}
-          isDuplicateCheckLoading={isDuplicateCheckLoading}
-          onDismissDuplicates={handleDismissDuplicates}
-        />
+            {/* Step content */}
+            <StepContent
+              duplicateMatches={duplicateMatches}
+              isDuplicateCheckLoading={isDuplicateCheckLoading}
+              onDismissDuplicates={handleDismissDuplicates}
+            />
+
+            {/* Footer */}
+            <RegistrationFooter />
+          </div>
+        </div>
+
+        {/* Context Sidebar */}
+        <ContextSidebar />
       </div>
-
-      {/* Sticky footer — scoped to this content area, not the viewport */}
-      <RegistrationFooter />
     </div>
   )
 }
@@ -470,24 +695,17 @@ export function RegistrationWizard() {
   const createEnrollment = useCreateEnrollment()
   const [showCancelDialog, setShowCancelDialog] = useState(false)
 
-  /**
-   * Clean an address object: strip unknown fields (e.g., "street"),
-   * map postalCode -> zipCode as safety net, remove empty strings.
-   */
   const cleanAddress = useCallback(
     (addr: Record<string, unknown> | undefined) => {
       if (!addr) return undefined
       const cleaned: Record<string, string | undefined> = {
-        // Fall back to "street" for auto-saved drafts from before the field rename
         street1: (addr.street1 as string) || (addr.street as string) || undefined,
         street2: (addr.street2 as string) || undefined,
         city: (addr.city as string) || undefined,
         state: (addr.state as string) || undefined,
-        // Prefer zipCode; fall back to postalCode for safety
         zipCode: (addr.zipCode as string) || (addr.postalCode as string) || undefined,
         country: (addr.country as string) || undefined,
       }
-      // Strip entries that are undefined or empty
       const result = Object.fromEntries(
         Object.entries(cleaned).filter(([, v]) => v !== undefined && v !== '')
       )
@@ -496,14 +714,12 @@ export function RegistrationWizard() {
     []
   )
 
-  // Build CreateStudentDto from the flat wizard data
   const buildStudentPayload = useCallback(
     (data: Record<string, unknown>): CreateStudentDto => {
       const guardians = (data.guardians as GuardianFormData[] | undefined)?.filter(
         (g) => g.firstName && g.lastName
       )
 
-      // Explicit contact info mapping — strip unknown fields & normalize address
       const rawContact = data.contactInfo as Record<string, unknown> | undefined
       const contactInfo = rawContact
         ? {
@@ -541,7 +757,6 @@ export function RegistrationWizard() {
     [schoolId, cleanAddress]
   )
 
-  // Build CreateEnrollmentDto from enrollment sub-object
   const buildEnrollmentPayload = useCallback(
     (
       data: Record<string, unknown>,
@@ -550,7 +765,6 @@ export function RegistrationWizard() {
       const enrollment = data.enrollment as Record<string, unknown> | undefined
       if (!enrollment || !enrollment.enrollmentDate) return null
 
-      // Academic year is now required — do not fall back to random UUID
       const academicYearId = enrollment.academicYearId as string
       if (!academicYearId) return null
 
@@ -570,7 +784,6 @@ export function RegistrationWizard() {
           (enrollment.previousSchoolAddress as string) || undefined,
         transferReason: (enrollment.transferReason as string) || undefined,
         notes: (enrollment.notes as string) || undefined,
-        // Ed-Fi descriptor fields
         entryGradeLevelDescriptor: GRADE_LEVEL_DESCRIPTORS[gradeLevel] || undefined,
         entryTypeDescriptor: (enrollment.entryTypeDescriptor as string) || undefined,
         enrollmentTypeDescriptor: ENROLLMENT_TYPE_DESCRIPTOR_MAP[enrollmentType] || undefined,
@@ -583,7 +796,6 @@ export function RegistrationWizard() {
     [schoolId]
   )
 
-  // Submit handler: create student -> create enrollment -> navigate
   const handleSubmit = useCallback(
     async (data: Record<string, unknown>) => {
       try {
@@ -597,7 +809,6 @@ export function RegistrationWizard() {
             toast.success(`${student.firstName} ${student.lastName} has been registered and enrolled!`)
           } catch (enrollErr) {
             const parsed = parseApiError(enrollErr)
-            // Student was created but enrollment failed — show actionable message
             if (parsed.statusCode === 409) {
               toast.warning(
                 `Student created. Enrollment conflict: ${parsed.message}. The student may already be enrolled.`
@@ -643,7 +854,7 @@ export function RegistrationWizard() {
         onCancel={handleCancel}
         autoSaveKey={schoolId ? `edforge:student-registration:${schoolId}` : undefined}
       >
-        <WizardLayout onCancel={handleCancel} schoolId={schoolId || ''} />
+        <WizardLayout schoolId={schoolId || ''} />
       </WizardProvider>
 
       <ConfirmationDialog

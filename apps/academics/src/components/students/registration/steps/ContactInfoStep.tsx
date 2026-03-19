@@ -1,15 +1,19 @@
 /**
- * Contact Information Step
+ * Contact Information Step — V2
  *
  * Second step of the student registration wizard.
  * Collects email, phone, physical address, and optional mailing address.
+ *
+ * V2: Collapsible sections with icons, titles, and completion indicators.
  */
 
 import { FormProvider } from 'react-hook-form'
+import { Phone, MapPin, Mail } from 'lucide-react'
 import { TextField, PhoneField, SelectField, ToggleField, AddressSection } from '@edforge/forms'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { PHONE_TYPE_OPTIONS } from '../../../../schemas/student.form'
+import { CollapsibleSection } from '../CollapsibleSection'
 
 export function ContactInfoStep({
   data,
@@ -22,12 +26,16 @@ export function ContactInfoStep({
 
   return (
     <FormProvider {...form}>
-      <div className="space-y-8">
-        {/* Email & Phone */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Contact Details
-          </h3>
+      <div className="space-y-4">
+        {/* Contact Details */}
+        <CollapsibleSection
+          id="contact-details"
+          icon={Phone}
+          title="Contact Details"
+          description="Email and phone information"
+          fields={['contactInfo.email', 'contactInfo.phone', 'contactInfo.phoneType']}
+          defaultExpanded
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <TextField
               name="contactInfo.email"
@@ -48,34 +56,55 @@ export function ContactInfoStep({
               placeholder="Select type"
             />
           </div>
-        </div>
+        </CollapsibleSection>
 
         {/* Physical Address */}
-        <AddressSection
-          namePrefix="contactInfo.address"
+        <CollapsibleSection
+          id="contact-address"
+          icon={MapPin}
           title="Physical Address"
-          showAddressLine2
-          showCountry
-        />
-
-        {/* Mailing Address Toggle */}
-        <div className="border-t border-[rgb(var(--border-secondary))] pt-6">
-          <ToggleField
-            name="contactInfo.useMailingAddress"
-            label="Use a different mailing address"
-            description="Enable this if the mailing address is different from the physical address above"
-          />
-        </div>
-
-        {/* Conditional Mailing Address */}
-        {useMailingAddress && (
+          description="Student's primary residential address"
+          fields={[
+            'contactInfo.address.street1',
+            'contactInfo.address.city',
+            'contactInfo.address.state',
+            'contactInfo.address.zipCode',
+          ]}
+          defaultExpanded
+        >
           <AddressSection
-            namePrefix="contactInfo.mailingAddress"
-            title="Mailing Address"
+            namePrefix="contactInfo.address"
             showAddressLine2
             showCountry
           />
-        )}
+        </CollapsibleSection>
+
+        {/* Mailing Address */}
+        <CollapsibleSection
+          id="contact-mailing"
+          icon={Mail}
+          title="Mailing Address"
+          description="Only if different from physical address"
+          fields={['contactInfo.useMailingAddress']}
+          defaultExpanded={false}
+        >
+          <div className="space-y-4">
+            <ToggleField
+              name="contactInfo.useMailingAddress"
+              label="Use a different mailing address"
+              description="Enable this if the mailing address is different from the physical address above"
+            />
+
+            {useMailingAddress && (
+              <AddressSection
+                namePrefix="contactInfo.mailingAddress"
+                title="Mailing Address"
+                showAddressLine2
+                showCountry
+              />
+            )}
+          </div>
+        </CollapsibleSection>
       </div>
     </FormProvider>
   )

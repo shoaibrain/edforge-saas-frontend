@@ -1,16 +1,21 @@
 /**
- * Medical Information Step
+ * Medical Information Step — V2
  *
  * Fourth step of the student registration wizard.
  * Collects medical info, demographics, special programs — all optional.
+ *
+ * V2: All sections default collapsed since entire step is optional.
+ * Collapsible sections with icons, titles, and completion indicators.
  */
 
 import { useCallback } from 'react'
 import { FormProvider } from 'react-hook-form'
+import { Heart, Stethoscope, Globe, Info } from 'lucide-react'
 import { TextField, SelectField } from '@edforge/forms'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { TagInput } from '../../../common/TagInput'
+import { CollapsibleSection } from '../CollapsibleSection'
 
 const ETHNICITY_OPTIONS = [
   { value: 'american_indian', label: 'American Indian / Alaska Native' },
@@ -45,7 +50,6 @@ export function MedicalStep({
 }: WizardStepProps) {
   const form = useWizardForm({ data, updateData, errors, clearError })
 
-  // Helper to safely get nested arrays from wizard data
   const getTagArray = useCallback(
     (path: string): string[] => {
       const parts = path.split('.')
@@ -62,7 +66,6 @@ export function MedicalStep({
     [data]
   )
 
-  // Update a nested tag array in the wizard data
   const updateTags = useCallback(
     (path: string, tags: string[]) => {
       const parts = path.split('.')
@@ -70,7 +73,6 @@ export function MedicalStep({
         updateData({ [parts[0]]: tags })
         return
       }
-      // e.g. "medicalInfo.allergies" → update medicalInfo.allergies
       const topKey = parts[0]
       const subKey = parts[1]
       const existing = (data[topKey] as Record<string, unknown> | undefined) ?? {}
@@ -83,17 +85,35 @@ export function MedicalStep({
 
   return (
     <FormProvider {...form}>
-      <div className="space-y-8">
+      <div className="space-y-4">
         {/* Info Banner */}
-        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700">
-          All fields on this page are optional. You can skip this step and add medical information later.
+        <div
+          className="flex items-start gap-3 rounded-lg p-3"
+          style={{
+            background: 'var(--v2-info-bg)',
+            border: '1px solid var(--v2-info-border)',
+          }}
+        >
+          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-info)' }} />
+          <p style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+            All fields on this page are optional. You can skip this step and add information later.
+          </p>
         </div>
 
-        {/* Health Conditions */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Health Information
-          </h3>
+        {/* Health Information */}
+        <CollapsibleSection
+          id="medical-health"
+          icon={Heart}
+          title="Health Information"
+          description="Allergies, medications, conditions, dietary restrictions"
+          fields={[
+            'medicalInfo.allergies',
+            'medicalInfo.medications',
+            'medicalInfo.conditions',
+            'medicalInfo.dietaryRestrictions',
+          ]}
+          defaultExpanded={false}
+        >
           <div className="space-y-4">
             <TagInput
               label="Allergies"
@@ -122,13 +142,22 @@ export function MedicalStep({
               placeholder="Type a dietary restriction and press Enter"
             />
           </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Physician */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Physician Information
-          </h3>
+        {/* Physician & Insurance */}
+        <CollapsibleSection
+          id="medical-physician"
+          icon={Stethoscope}
+          title="Physician & Insurance"
+          description="Primary care physician and insurance details"
+          fields={[
+            'medicalInfo.physicianName',
+            'medicalInfo.physicianPhone',
+            'medicalInfo.insuranceProvider',
+            'medicalInfo.insurancePolicyNumber',
+          ]}
+          defaultExpanded={false}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <TextField
               name="medicalInfo.physicianName"
@@ -151,13 +180,17 @@ export function MedicalStep({
               placeholder="Policy or ID number"
             />
           </div>
-        </div>
+        </CollapsibleSection>
 
         {/* Demographics */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Demographics
-          </h3>
+        <CollapsibleSection
+          id="medical-demographics"
+          icon={Globe}
+          title="Demographics"
+          description="Ethnicity, language, and country of birth"
+          fields={['ethnicity', 'primaryLanguage', 'homeLanguage', 'countryOfBirth']}
+          defaultExpanded={false}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <SelectField
               name="ethnicity"
@@ -183,7 +216,7 @@ export function MedicalStep({
               placeholder="Country of birth"
             />
           </div>
-        </div>
+        </CollapsibleSection>
       </div>
     </FormProvider>
   )

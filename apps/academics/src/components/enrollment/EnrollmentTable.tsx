@@ -1,9 +1,14 @@
 /**
- * EnrollmentTable Component
+ * EnrollmentTable Component — V2
  *
  * DataTable for enrollment records using TanstackDataTable from @edforge/ui.
- * Search, pagination, sorting, and skeleton are handled by the DataTable.
- * Grade-level and status filters are parent-controlled via toolbarExtra.
+ *
+ * V2 changes:
+ * - Status badge with V2 semantic colors
+ * - Type column: re_enrollment → Re-enrollment
+ * - Entry Date: MMM DD, YYYY format
+ * - Exit Date: em-dash in ghost color when empty
+ * - V2 token-based filter dropdowns
  */
 
 import { useState, useMemo } from 'react'
@@ -41,7 +46,6 @@ interface EnrollmentTableProps {
   onWithdraw?: (enrollment: EnrollmentResponseDto) => void
   onTransfer?: (enrollment: EnrollmentResponseDto) => void
   onMarkNoShow?: (enrollment: EnrollmentResponseDto) => void
-  /** School's configured grade range for filtering the grade dropdown */
   schoolGradeRange?: { start: string; end: string } | null
 }
 
@@ -54,19 +58,61 @@ const statusOptions = [
 ]
 
 // ============================================================================
-// BADGE HELPERS
+// V2 STATUS BADGE
 // ============================================================================
 
-function getStatusBadge(status: string) {
-  const styles: Record<string, string> = {
-    enrolled: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-    active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-    pending: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-    withdrawn: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-    transferred: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    graduated: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
+  enrolled: { bg: 'rgba(29, 158, 117, 0.10)', color: '#1D9E75' },
+  active: { bg: 'rgba(29, 158, 117, 0.10)', color: '#1D9E75' },
+  pending: { bg: 'rgba(239, 159, 39, 0.10)', color: '#EF9F27' },
+  withdrawn: { bg: 'rgba(226, 75, 74, 0.10)', color: '#E24B4A' },
+  transferred: { bg: 'rgba(55, 138, 221, 0.10)', color: '#378ADD' },
+  graduated: { bg: 'rgba(127, 119, 221, 0.10)', color: '#7F77DD' },
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const style = STATUS_STYLES[status] || { bg: 'rgba(255, 255, 255, 0.06)', color: 'var(--v2-text-hint)' }
+  return (
+    <span
+      className="inline-flex"
+      style={{
+        background: style.bg,
+        color: style.color,
+        borderRadius: 10,
+        padding: '2px 8px',
+        fontSize: 10,
+        fontWeight: 500,
+        textTransform: 'capitalize',
+      }}
+    >
+      {status}
+    </span>
+  )
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function formatDate(dateStr: string | undefined | null): string {
+  if (!dateStr) return '\u2014'
+  try {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  } catch {
+    return '\u2014'
   }
-  return styles[status] || 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400'
+}
+
+function formatEnrollmentType(type: string | undefined | null): string {
+  if (!type) return '\u2014'
+  return type
+    .replace(/_/g, '-')
+    .replace(/^(.)/, (m) => m.toUpperCase())
+    .replace(/-(.)/g, (_, c) => `-${c}`)
 }
 
 // ============================================================================
@@ -94,37 +140,47 @@ function ActionMenu({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
+        className="p-1.5 rounded-md transition-colors hover:opacity-80"
+        style={{ color: 'var(--v2-text-hint)' }}
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-44 bg-surface-primary border border-border-secondary rounded-lg shadow-lg py-1">
+          <div
+            className="absolute right-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg"
+            style={{
+              background: 'var(--v2-bg-elevated)',
+              border: '1px solid var(--v2-border-default)',
+            }}
+          >
             <button
               type="button"
               onClick={() => { onWithdraw(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+              style={{ color: '#E24B4A' }}
             >
-              <UserMinus className="w-4 h-4 text-red-500" />
+              <UserMinus className="w-3.5 h-3.5" />
               Withdraw
             </button>
             <button
               type="button"
               onClick={() => { onTransfer(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+              style={{ color: '#378ADD' }}
             >
-              <ArrowRightLeft className="w-4 h-4 text-blue-500" />
+              <ArrowRightLeft className="w-3.5 h-3.5" />
               Transfer
             </button>
             {onMarkNoShow && (
               <button
                 type="button"
                 onClick={() => { onMarkNoShow(); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                style={{ color: '#EF9F27' }}
               >
-                <UserX className="w-4 h-4 text-orange-500" />
+                <UserX className="w-3.5 h-3.5" />
                 Mark No-Show
               </button>
             )}
@@ -136,31 +192,14 @@ function ActionMenu({
 }
 
 // ============================================================================
-// DATE HELPER
-// ============================================================================
-
-function formatDate(dateStr: string | undefined | null): string {
-  if (!dateStr) return '\u2014'
-  try {
-    return new Date(dateStr).toLocaleDateString()
-  } catch {
-    return '\u2014'
-  }
-}
-
-// ============================================================================
 // COMPONENT
 // ============================================================================
 
 export function EnrollmentTable({
   enrollments,
   isLoading,
-  // hasMore and onLoadMore are kept in the interface for backwards compat
-  // but pagination is now handled by the DataTable
   hasMore: _hasMore,
   onLoadMore: _onLoadMore,
-  // searchTerm and onSearchChange are kept in the interface for backwards compat
-  // but globalFilter search is now handled internally by the DataTable
   searchTerm: _searchTerm,
   onSearchChange: _onSearchChange,
   gradeLevel,
@@ -173,12 +212,8 @@ export function EnrollmentTable({
   schoolGradeRange,
 }: EnrollmentTableProps) {
   const gradeLevelOptions = useFilteredGradeOptions(schoolGradeRange)
-
   const hasActions = !!(onWithdraw || onTransfer || onMarkNoShow)
 
-  // ------------------------------------------------------------------
-  // Column definitions
-  // ------------------------------------------------------------------
   const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(() => {
     const cols: ColumnDef<EnrollmentResponseDto, unknown>[] = [
       {
@@ -189,7 +224,10 @@ export function EnrollmentTable({
         header: 'Student',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span className="font-medium text-text-primary">
+          <span
+            className="font-medium"
+            style={{ fontSize: 12, color: 'var(--v2-text-primary)' }}
+          >
             {getValue<string>()}
           </span>
         ),
@@ -199,23 +237,16 @@ export function EnrollmentTable({
         header: 'Grade Level',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span className="text-text-secondary">{getValue<string>()}</span>
+          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+            {getValue<string>()}
+          </span>
         ),
       },
       {
         accessorKey: 'status',
         header: 'Status',
         enableSorting: true,
-        cell: ({ getValue }) => {
-          const status = getValue<string>()
-          return (
-            <span
-              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(status)}`}
-            >
-              {status}
-            </span>
-          )
-        },
+        cell: ({ getValue }) => <StatusBadge status={getValue<string>()} />,
       },
       {
         accessorFn: (row) => row.entryDate || row.enrollmentDate || null,
@@ -223,7 +254,7 @@ export function EnrollmentTable({
         header: 'Entry Date',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span className="text-text-secondary">
+          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
             {formatDate(getValue<string | null>())}
           </span>
         ),
@@ -233,25 +264,32 @@ export function EnrollmentTable({
         id: 'exitDate',
         header: 'Exit Date',
         enableSorting: true,
-        cell: ({ getValue }) => (
-          <span className="text-text-secondary">
-            {formatDate(getValue<string | null>())}
-          </span>
-        ),
+        cell: ({ getValue }) => {
+          const val = getValue<string | null>()
+          return (
+            <span
+              style={{
+                fontSize: 12,
+                color: val ? 'var(--v2-text-secondary)' : 'var(--v2-text-ghost)',
+              }}
+            >
+              {formatDate(val)}
+            </span>
+          )
+        },
       },
       {
         accessorKey: 'enrollmentType',
         header: 'Type',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span className="text-text-secondary capitalize">
-            {getValue<string>() || '\u2014'}
+          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+            {formatEnrollmentType(getValue<string>())}
           </span>
         ),
       },
     ]
 
-    // Actions column (only if action callbacks are provided)
     if (hasActions) {
       cols.push(
         createActionsColumn<EnrollmentResponseDto>({
@@ -273,10 +311,6 @@ export function EnrollmentTable({
     return cols
   }, [hasActions, onWithdraw, onTransfer, onMarkNoShow])
 
-  // ------------------------------------------------------------------
-  // Pre-filter data by grade-level and status (parent-controlled)
-  // Search / globalFilter is handled internally by TanstackDataTable
-  // ------------------------------------------------------------------
   const filteredData = useMemo(() => {
     let result = enrollments
     if (gradeLevel) {
@@ -288,9 +322,6 @@ export function EnrollmentTable({
     return result
   }, [enrollments, gradeLevel, statusFilter])
 
-  // ------------------------------------------------------------------
-  // Render
-  // ------------------------------------------------------------------
   return (
     <TanstackDataTable<EnrollmentResponseDto>
       columns={columns}
@@ -301,7 +332,7 @@ export function EnrollmentTable({
       pagination={{ pageSize: 20 }}
       searchPlaceholder="Search students..."
       emptyState={{
-        icon: <Users className="w-10 h-10 text-text-tertiary opacity-40" />,
+        icon: <Users className="w-10 h-10" style={{ color: 'var(--v2-text-ghost)', opacity: 0.4 }} />,
         title: 'No enrollments found',
         description: 'Try adjusting your filters or search term.',
       }}
@@ -311,7 +342,12 @@ export function EnrollmentTable({
           <select
             value={gradeLevel ?? ''}
             onChange={(e) => onGradeLevelChange(e.target.value || null)}
-            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none"
+            style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              color: 'var(--v2-text-secondary)',
+            }}
           >
             <option value="">All Grades</option>
             {gradeLevelOptions.map((opt) => (
@@ -321,7 +357,12 @@ export function EnrollmentTable({
           <select
             value={statusFilter ?? ''}
             onChange={(e) => onStatusChange(e.target.value || null)}
-            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none"
+            style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              color: 'var(--v2-text-secondary)',
+            }}
           >
             <option value="">All Status</option>
             {statusOptions.map((s) => (
@@ -332,9 +373,14 @@ export function EnrollmentTable({
             <button
               type="button"
               onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] rounded-lg transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] rounded-[8px] transition-colors hover:opacity-80"
+              style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                color: 'var(--v2-text-hint)',
+              }}
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3 h-3" />
               Clear
             </button>
           )}

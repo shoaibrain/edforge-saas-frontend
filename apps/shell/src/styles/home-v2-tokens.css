@@ -85,6 +85,58 @@
 }
 
 /* ============================================================================
+ * V2 FORM INPUT OVERRIDES (Task 3f — scoped under [data-v2])
+ * ============================================================================ */
+
+[data-v2] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+[data-v2] select,
+[data-v2] textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 12px;
+  color: var(--v2-text-primary);
+  outline: none;
+  transition: border-color var(--v2-transition-fast);
+}
+
+[data-v2] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):focus,
+[data-v2] select:focus,
+[data-v2] textarea:focus {
+  border-color: rgba(29, 158, 117, 0.5);
+}
+
+[data-v2] input::placeholder,
+[data-v2] textarea::placeholder {
+  color: var(--v2-text-ghost);
+}
+
+[data-v2] input[type="date"],
+[data-v2] input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+[data-v2] .required-asterisk,
+[data-v2] label .text-red-500,
+[data-v2] label .text-danger {
+  color: var(--v2-danger);
+}
+
+/* Light mode overrides for form inputs */
+:root:not(.dark) [data-v2] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+:root:not(.dark) [data-v2] select,
+:root:not(.dark) [data-v2] textarea {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--v2-border-default);
+}
+
+:root:not(.dark) [data-v2] input[type="date"],
+:root:not(.dark) [data-v2] input[type="datetime-local"] {
+  color-scheme: light;
+}
+
+/* ============================================================================
  * LIGHT THEME OVERRIDES
  * ============================================================================ */
 
