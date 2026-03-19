@@ -1,7 +1,11 @@
-/**
- * Vitest Global Setup
- *
- * Registers @testing-library/jest-dom matchers for all tests.
- */
+import '@testing-library/jest-dom'
+import { server } from './mocks/server'
 
-import '@testing-library/jest-dom/vitest'
+// Start MSW server before all tests
+beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }))
+
+// Reset handlers between tests so per-test overrides don't leak
+afterEach(() => server.resetHandlers())
+
+// Clean up after all tests
+afterAll(() => server.close())

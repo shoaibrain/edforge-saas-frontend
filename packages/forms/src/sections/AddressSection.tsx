@@ -120,7 +120,7 @@ export function AddressSection({
       <div className="grid grid-cols-1 gap-4">
         {/* Street Address */}
         <TextField
-          name={`${prefix}street`}
+          name={`${prefix}street1`}
           label="Street Address"
           placeholder="123 Main Street"
           disabled={disabled}

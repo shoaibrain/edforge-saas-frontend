@@ -5,22 +5,24 @@
  * Integrated with backend Security API and Cognito.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
+  AlertCircle,
   AlertTriangle,
   Check,
+  Eye,
+  EyeOff,
   Key,
-  Monitor,
   RotateCcw,
-  Shield,
-  type LucideIcon,
+  X,
 } from 'lucide-react'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Button } from '@edforge/ui'
+import axios from 'axios'
+import { Button, Modal, ModalFooter, ComingSoonBanner } from '@edforge/ui'
 import { TextField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
 import {
@@ -35,6 +37,48 @@ import {
   fadeInUp,
 } from '@/components/settings/SettingsShared'
 import { usersService, type SecurityOverview } from '@/services/users.service'
+
+// ============================================================================
+// PASSWORD REQUIREMENTS CHECKLIST
+// ============================================================================
+
+const PASSWORD_REQUIREMENTS = [
+  { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
+  { label: 'Uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
+  { label: 'Lowercase letter', test: (p: string) => /[a-z]/.test(p) },
+  { label: 'Number', test: (p: string) => /[0-9]/.test(p) },
+  { label: 'Special character', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+] as const
+
+function PasswordRequirements({ password }: { password: string }) {
+  if (!password) return null
+
+  return (
+    <div className="mt-3 space-y-1.5">
+      {PASSWORD_REQUIREMENTS.map((req) => {
+        const met = req.test(password)
+        return (
+          <div key={req.label} className="flex items-center gap-2 text-xs">
+            {met ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500" />
+            ) : (
+              <X className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+            )}
+            <span
+              className={
+                met
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-[rgb(var(--text-tertiary))]'
+              }
+            >
+              {req.label}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 // ============================================================================
 // PASSWORD STRENGTH INDICATOR
@@ -93,6 +137,26 @@ interface PasswordChangeModalProps {
   onSuccess: () => void
 }
 
+function PasswordVisibilityToggle({
+  visible,
+  onToggle,
+}: {
+  visible: boolean
+  onToggle: () => void
+}) {
+  const Icon = visible ? EyeOff : Eye
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="p-0.5 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+      aria-label={visible ? 'Hide password' : 'Show password'}
+    >
+      <Icon className="w-4 h-4" />
+    </button>
+  )
+}
+
 function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModalProps) {
   const user = useAuthStore((s) => s.user)
   const [showPasswords, setShowPasswords] = useState({
@@ -100,6 +164,7 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
     new: false,
     confirm: false,
   })
+  const [formError, setFormError] = useState<string | null>(null)
 
   const methods = useForm<PasswordChangeFormValues>({
     resolver: zodResolver(passwordChangeSchema),
@@ -118,6 +183,12 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
   } = methods
   const newPassword = watch('newPassword')
 
+  // Clear inline error when the user edits any field
+  const allFields = watch()
+  useEffect(() => {
+    if (formError) setFormError(null)
+  }, [allFields.currentPassword, allFields.newPassword, allFields.confirmPassword]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const changeMutation = useMutation({
     mutationFn: (data: PasswordChangeFormValues) =>
       usersService.changePassword(user!.id, {
@@ -125,122 +196,123 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
         newPassword: data.newPassword,
       }),
     onSuccess: () => {
+      setFormError(null)
       reset()
       onSuccess()
       onClose()
     },
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : 'Failed to change password')
+      let message = 'Failed to change password'
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const data = err.response.data as Record<string, unknown>
+        if (typeof data.message === 'string') {
+          message = data.message
+        }
+      } else if (err instanceof Error) {
+        message = err.message
+      }
+      setFormError(message)
     },
   })
 
   const onSubmit = async (data: PasswordChangeFormValues) => {
+    setFormError(null)
     try {
       await changeMutation.mutateAsync(data)
     } catch {
-      // Error handled via toast
+      // Error handled in onError callback
     }
   }
 
-  if (!isOpen) return null
+  const handleClose = () => {
+    if (isSubmitting) return
+    setFormError(null)
+    reset()
+    setShowPasswords({ current: false, new: false, confirm: false })
+    onClose()
+  }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      >
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      title="Change Password"
+      description="Enter your current password and choose a new one."
+      size="md"
+    >
+      {/* Inline error banner */}
+      {formError && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md mx-4 p-6 rounded-2xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-xl"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-start gap-2.5 p-3 mb-5 rounded-xl bg-red-500/10 border border-red-500/20"
         >
-          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-1">Change Password</h2>
-          <p className="text-sm text-[rgb(var(--text-tertiary))] mb-6">
-            Enter your current password and choose a new one
-          </p>
-
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="relative">
-                <TextField
-                  name="currentPassword"
-                  label="Current Password"
-                  type={showPasswords.current ? 'text' : 'password'}
-                  placeholder="Enter current password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasswords((p) => ({ ...p, current: !p.current }))}
-                  className="absolute right-3 top-8 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
-                >
-                  {showPasswords.current ? (
-                    <span className="text-xs font-semibold">Hide</span>
-                  ) : (
-                    <span className="text-xs font-semibold">Show</span>
-                  )}
-                </button>
-              </div>
-
-              <div className="relative">
-                <TextField
-                  name="newPassword"
-                  label="New Password"
-                  type={showPasswords.new ? 'text' : 'password'}
-                  placeholder="Enter new password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasswords((p) => ({ ...p, new: !p.new }))}
-                  className="absolute right-3 top-8 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
-                >
-                  {showPasswords.new ? (
-                    <span className="text-xs font-semibold">Hide</span>
-                  ) : (
-                    <span className="text-xs font-semibold">Show</span>
-                  )}
-                </button>
-                <PasswordStrengthIndicator password={newPassword || ''} />
-              </div>
-
-              <div className="relative">
-                <TextField
-                  name="confirmPassword"
-                  label="Confirm New Password"
-                  type={showPasswords.confirm ? 'text' : 'password'}
-                  placeholder="Confirm new password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasswords((p) => ({ ...p, confirm: !p.confirm }))}
-                  className="absolute right-3 top-8 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
-                >
-                  {showPasswords.confirm ? (
-                    <span className="text-xs font-semibold">Hide</span>
-                  ) : (
-                    <span className="text-xs font-semibold">Show</span>
-                  )}
-                </button>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting} className="flex-1">
-                  {isSubmitting ? 'Changing...' : 'Change Password'}
-                </Button>
-              </div>
-            </form>
-          </FormProvider>
+          <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+          <span className="text-sm text-red-600 dark:text-red-400">{formError}</span>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+      )}
+
+      <FormProvider {...methods}>
+        <form id="password-change-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <TextField
+            name="currentPassword"
+            label="Current Password"
+            type={showPasswords.current ? 'text' : 'password'}
+            placeholder="Enter current password"
+            suffix={
+              <PasswordVisibilityToggle
+                visible={showPasswords.current}
+                onToggle={() => setShowPasswords((p) => ({ ...p, current: !p.current }))}
+              />
+            }
+          />
+
+          <div>
+            <TextField
+              name="newPassword"
+              label="New Password"
+              type={showPasswords.new ? 'text' : 'password'}
+              placeholder="Enter new password"
+              suffix={
+                <PasswordVisibilityToggle
+                  visible={showPasswords.new}
+                  onToggle={() => setShowPasswords((p) => ({ ...p, new: !p.new }))}
+                />
+              }
+            />
+            <PasswordStrengthIndicator password={newPassword || ''} />
+            <PasswordRequirements password={newPassword || ''} />
+          </div>
+
+          <TextField
+            name="confirmPassword"
+            label="Confirm New Password"
+            type={showPasswords.confirm ? 'text' : 'password'}
+            placeholder="Confirm new password"
+            suffix={
+              <PasswordVisibilityToggle
+                visible={showPasswords.confirm}
+                onToggle={() => setShowPasswords((p) => ({ ...p, confirm: !p.confirm }))}
+              />
+            }
+          />
+        </form>
+      </FormProvider>
+
+      <ModalFooter>
+        <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          form="password-change-form"
+          isLoading={isSubmitting}
+          disabled={isSubmitting}
+        >
+          Change Password
+        </Button>
+      </ModalFooter>
+    </Modal>
   )
 }
 
@@ -333,7 +405,7 @@ function SecurityOverviewCard({
 
       <div className="space-y-2">
         <StatusItem label="Password" value={passwordText} tone={passwordTone} />
-        <StatusItem label="Two-Factor" value={overview.mfaEnabled ? 'Enabled' : 'Not enabled'} tone={overview.mfaEnabled ? 'good' : 'warn'} />
+        <StatusItem label="Two-Factor" value="Coming soon" tone="neutral" />
         <StatusItem
           label="Sessions"
           value={`${overview.activeSessions} active session${overview.activeSessions === 1 ? '' : 's'}`}
@@ -341,85 +413,28 @@ function SecurityOverviewCard({
         />
       </div>
 
-      {overview.recommendations?.length > 0 && (
-        <div className="pt-2 border-t border-[rgb(var(--border-secondary))]">
-          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span className="text-xs font-semibold">Recommendations</span>
-          </div>
-          <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
-            {overview.recommendations.map((rec, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="text-amber-500">•</span>
-                <span>{rec}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </motion.div>
-  )
-}
-
-// ============================================================================
-// COMING SOON PANEL
-// ============================================================================
-
-interface ComingSoonPanelProps {
-  icon: LucideIcon
-  title: string
-  description: string
-  features: string[]
-  actionLabel?: string
-}
-
-function ComingSoonPanel({
-  icon: Icon,
-  title,
-  description,
-  features,
-  actionLabel,
-}: ComingSoonPanelProps) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
-    >
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="w-14 h-14 rounded-full bg-teal-500/10 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
-          <p className="text-sm text-[rgb(var(--text-secondary))] max-w-xl">
-            {description}
-          </p>
-        </div>
-
-        <div className="w-full max-w-xl space-y-2">
-          {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-2 text-sm text-[rgb(var(--text-secondary))]">
-              <Check className="w-4 h-4 text-teal-600 dark:text-cyan-400 mt-0.5" />
-              <span>{feature}</span>
+      {/* Filter out recommendations for unreleased features (2FA/MFA) */}
+      {(() => {
+        const filteredRecs = overview.recommendations?.filter(
+          (rec) => !/two.?factor|2fa|mfa/i.test(rec)
+        ) ?? []
+        return filteredRecs.length > 0 ? (
+          <div className="pt-2 border-t border-[rgb(var(--border-secondary))]">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-xs font-semibold">Recommendations</span>
             </div>
-          ))}
-        </div>
-
-        {actionLabel && (
-          <Button
-            type="button"
-            variant="outline"
-            disabled
-            className="mt-2 cursor-not-allowed opacity-60"
-          >
-            {actionLabel}
-          </Button>
-        )}
-
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          Coming in a future update
-        </p>
-      </div>
+            <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
+              {filteredRecs.map((rec, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-amber-500">&bull;</span>
+                  <span>{rec}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null
+      })()}
     </motion.div>
   )
 }
@@ -480,6 +495,7 @@ function SecurityTabs({
 
 export default function SecurityPage() {
   const user = useAuthStore((s) => s.user)
+  const queryClient = useQueryClient()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [activeTab, setActiveTab] = useState<SecurityTab>('password')
 
@@ -497,6 +513,15 @@ export default function SecurityPage() {
 
   const handlePasswordSuccess = () => {
     toast.success('Password changed successfully')
+
+    // Optimistic update — show "Changed today" immediately even if
+    // backend is slow to update the passwordLastChanged timestamp.
+    queryClient.setQueryData<SecurityOverview>(['security', user?.id], (old) =>
+      old
+        ? { ...old, passwordLastChanged: new Date().toISOString() }
+        : old
+    )
+
     refetchOverview()
   }
 
@@ -549,6 +574,7 @@ export default function SecurityPage() {
               </motion.div>
             )}
 
+            {/* COMING_SOON: mfa — Replace ComingSoonBanner with MFA settings when 2FA ships */}
             {activeTab === 'mfa' && (
               <motion.div
                 key="mfa"
@@ -557,20 +583,20 @@ export default function SecurityPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <ComingSoonPanel
-                  icon={Shield}
+                <ComingSoonBanner
+                  variant="security"
                   title="Two-Factor Authentication"
-                  description="Add an extra layer of security to your account. When enabled, you'll need your password plus a verification code from your authenticator app each time you sign in."
+                  description="Add an extra layer of security to your account with authenticator apps and backup codes."
                   features={[
-                    'Supports Google Authenticator, Authy, and more',
+                    'Google Authenticator, Authy, and other TOTP apps',
                     'Backup codes for account recovery',
                     'Required for sensitive operations',
                   ]}
-                  actionLabel="Set Up Two-Factor Auth"
                 />
               </motion.div>
             )}
 
+            {/* COMING_SOON: sessions — Replace ComingSoonBanner with session management when it ships */}
             {activeTab === 'sessions' && (
               <motion.div
                 key="sessions"
@@ -579,14 +605,14 @@ export default function SecurityPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <ComingSoonPanel
-                  icon={Monitor}
+                <ComingSoonBanner
+                  variant="security"
                   title="Session Management"
-                  description="View and manage all devices where you're currently signed in. Revoke access to any session you don't recognize."
+                  description="See where you're signed in and manage active sessions across your devices."
                   features={[
-                    'See all active sessions and devices',
+                    'View all active sessions and devices',
                     'Revoke individual or all sessions',
-                    'View recent login history',
+                    'Recent login history',
                   ]}
                 />
               </motion.div>

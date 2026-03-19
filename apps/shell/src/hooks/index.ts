@@ -36,3 +36,8 @@ export type {
 
 // User management hooks
 export { useUsers, useChangeGlobalRole, useUpdateUserStatus, useDeleteUser, userKeys } from './useUsers'
+
+// Portal identity hooks
+export { useStudentIdentity } from './useStudentIdentity'
+export { useParentChildren } from './useParentChildren'
+export type { ChildProfile } from './useParentChildren'

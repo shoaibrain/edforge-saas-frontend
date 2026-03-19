@@ -2,13 +2,15 @@
  * Grades & Assessments Module
  *
  * Unified gradebook management with three tabs:
+ * - Overview: School-wide grade analytics and at-risk students
  * - Gradebook: Section-based grade viewing, inline editing, and bulk entry
- * - Dashboard: School-wide grade analytics and at-risk students
  * - Grading Policies: Policy CRUD management
  */
 
-import { useState, useMemo, useEffect, lazy, Suspense } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useResourcePermissions } from '@edforge/abac'
 import {
   GraduationCap,
   BookCheck,
@@ -17,6 +19,8 @@ import {
   Plus,
   Lock,
   AlertTriangle,
+  Calendar,
+  RefreshCw,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useGradesStore } from '../../stores/grades.store'
@@ -28,22 +32,21 @@ import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
 import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
-
-const GradeDashboard = lazy(() => import('./dashboard'))
+import { GradeOverview } from './overview'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type GradesTab = 'gradebook' | 'dashboard' | 'policies'
+type GradesTab = 'overview' | 'gradebook' | 'policies'
 
 // ============================================================================
 // TAB CONFIG
 // ============================================================================
 
 const tabs = [
+  { id: 'overview' as const, label: 'Overview', icon: BarChart3 },
   { id: 'gradebook' as const, label: 'Gradebook', icon: BookCheck },
-  { id: 'dashboard' as const, label: 'Dashboard', icon: BarChart3 },
   { id: 'policies' as const, label: 'Grading Policies', icon: Settings },
 ]
 
@@ -52,8 +55,12 @@ const tabs = [
 // ============================================================================
 
 export function GradesModule() {
-  const [activeTab, setActiveTab] = useState<GradesTab>('gradebook')
+  const [activeTab, setActiveTab] = useState<GradesTab>('overview')
+  const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+
+  // ABAC: check what this user can do with grades
+  const gradePerms = useResourcePermissions('grades')
   const selectedSectionId = useGradesStore((s) => s.selectedSectionId)
   const setSelectedSectionId = useGradesStore((s) => s.setSelectedSectionId)
   const selectedTermId = useGradesStore((s) => s.selectedTermId)
@@ -91,6 +98,13 @@ export function GradesModule() {
     enabled: !!schoolId,
   })
   const sections = useMemo(() => flattenSectionPages(sectionsData), [sectionsData])
+
+  // Auto-select first section when sections load and nothing is selected
+  useEffect(() => {
+    if (!selectedSectionId && sections.length > 0 && sections.length <= 5) {
+      setSelectedSectionId(sections[0].sectionId)
+    }
+  }, [sections, selectedSectionId, setSelectedSectionId])
 
   // Section grades
   const { data: gradebook, isLoading: gradesLoading } = useSectionGrades(
@@ -131,32 +145,60 @@ export function GradesModule() {
     return grades.length > 0 && grades.every((g) => g.isFinal)
   }, [gradebook])
 
+  const handleViewReportCard = useCallback(
+    (studentId: string, studentName: string) => {
+      navigate({
+        to: '/classrooms/report-card',
+        search: { studentId, studentName },
+      })
+    },
+    [navigate]
+  )
+
   return (
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-              <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-text-primary">
+                  Grades & Assessments
+                </h1>
+                <p className="text-text-secondary mt-0.5">
+                  Manage gradebook, record grades, and configure grading policies
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">
-                Grades & Assessments
-              </h1>
-              <p className="text-text-secondary mt-0.5">
-                Manage gradebook, record grades, and configure grading policies
-              </p>
-            </div>
+            {currentYear?.name && (
+              <div className="flex items-center gap-4 text-text-tertiary">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span className="text-xs">{currentYear.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span className="text-xs">Updated just now</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Tab Navigation */}
         <div className="px-6">
-          <nav className="flex items-center space-x-1 border-b border-border-primary relative" aria-label="Grades tabs">
+          <nav className="flex items-center space-x-1 border-b border-border-primary relative" aria-label="Grades tabs" role="tablist">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === tab.id
@@ -180,7 +222,7 @@ export function GradesModule() {
       </div>
 
       {/* Tab Content */}
-      <div className="p-6 min-h-[500px]">
+      <div className="p-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -192,14 +234,17 @@ export function GradesModule() {
             {activeTab === 'gradebook' && (
               <div className="space-y-6">
                 {/* Section & Term Selectors + Actions */}
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  {/* Selectors */}
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  {!sectionsLoading && sections.length === 0 ? (
+                    <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-[250px]">
+                      No sections assigned. Contact your administrator.
+                    </div>
+                  ) : (
                     <select
                       value={selectedSectionId ?? ''}
                       onChange={(e) => setSelectedSectionId(e.target.value || null)}
                       disabled={sectionsLoading}
-                      className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 min-w-[250px]"
+                      className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 min-w-[250px]"
                     >
                       <option value="">Select a section...</option>
                       {sections.map((s) => (
@@ -208,57 +253,62 @@ export function GradesModule() {
                         </option>
                       ))}
                     </select>
+                  )}
 
-                    {gradingPeriods && gradingPeriods.length > 0 && (
-                      <select
-                        value={selectedTermId ?? ''}
-                        onChange={(e) => setSelectedTermId(e.target.value || null)}
-                        className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-                      >
-                        <option value="">Select grading period...</option>
-                        {gradingPeriods.map((gp: { periodId: string; name: string }) => (
-                          <option key={gp.periodId} value={gp.periodId}>
-                            {gp.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
+                  {gradingPeriods && gradingPeriods.length > 0 && (
+                    <select
+                      value={selectedTermId ?? ''}
+                      onChange={(e) => setSelectedTermId(e.target.value || null)}
+                      className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    >
+                      <option value="">Select grading period...</option>
+                      {gradingPeriods.map((gp: { periodId: string; name: string }) => (
+                        <option key={gp.periodId} value={gp.periodId}>
+                          {gp.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
 
-                  {/* Actions — require both section and term */}
+                  {/* Actions — adjacent to selectors */}
                   {selectedSectionId && (
-                    <div className="flex items-center gap-2">
+                    <>
+                      <div className="w-px h-6 bg-border-primary/30" />
                       {hasGradingPeriods && !selectedTermId && (
-                        <span className="text-xs text-amber-600 dark:text-amber-400 mr-1">
-                          Select a grading period to record grades
+                        <span className="text-xs text-caramel-300">
+                          Select a grading period
                         </span>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => setShowBulkModal(true)}
-                        disabled={!effectiveTermId || !currentYear?.yearId}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Record Grades
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowFinalize(true)}
-                        disabled={!effectiveTermId || !currentYear?.yearId}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Lock className="w-4 h-4" />
-                        Finalize Grades
-                      </button>
-                    </div>
+                      {gradePerms.create && (
+                        <button
+                          type="button"
+                          onClick={() => setShowBulkModal(true)}
+                          disabled={!effectiveTermId || !currentYear?.yearId}
+                          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          Record
+                        </button>
+                      )}
+                      {gradePerms.edit && (
+                        <button
+                          type="button"
+                          onClick={() => setShowFinalize(true)}
+                          disabled={!effectiveTermId || !currentYear?.yearId}
+                          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-text-secondary border border-border-primary rounded-lg hover:bg-surface-tertiary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          Finalize
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
 
                 {/* No Grading Policy Warning */}
                 {hasNoPolicies && selectedSectionId && (
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-caramel-50/40 dark:bg-caramel-500/8 border border-caramel-300/25 dark:border-caramel-400/15">
+                    <AlertTriangle className="w-6 h-6 text-golden-400 flex-shrink-0" />
                     <div>
                       <p className="text-sm text-text-primary font-medium">No grading policy configured</p>
                       <p className="text-xs text-text-secondary mt-0.5">
@@ -266,7 +316,7 @@ export function GradesModule() {
                         <button
                           type="button"
                           onClick={() => setActiveTab('policies')}
-                          className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
+                          className="text-golden-400 hover:text-golden-300 font-medium hover:underline transition-colors"
                         >
                           Create a policy
                         </button>
@@ -277,8 +327,8 @@ export function GradesModule() {
 
                 {/* No Default Policy Warning */}
                 {hasNoDefaultPolicy && selectedSectionId && (
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-                    <AlertTriangle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-cyan-50/30 dark:bg-cyan-500/8 border border-cyan-300/25 dark:border-cyan-400/15">
+                    <AlertTriangle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm text-text-primary font-medium">No default grading policy set</p>
                       <p className="text-xs text-text-secondary mt-0.5">
@@ -286,7 +336,7 @@ export function GradesModule() {
                         <button
                           type="button"
                           onClick={() => setActiveTab('policies')}
-                          className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
+                          className="text-cyan-400 hover:text-cyan-300 font-medium hover:underline transition-colors"
                         >
                           Set a default policy
                         </button>
@@ -297,8 +347,8 @@ export function GradesModule() {
 
                 {/* Gradebook Content */}
                 {!currentYear?.yearId ? (
-                  <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20 p-12 text-center">
-                    <GraduationCap className="w-12 h-12 mx-auto text-amber-500 mb-4" />
+                  <div className="bg-caramel-50/40 dark:bg-caramel-500/8 rounded-xl border border-caramel-300/25 dark:border-caramel-400/15 p-12 text-center">
+                    <GraduationCap className="w-12 h-12 mx-auto text-golden-400 mb-4" />
                     <h4 className="text-lg font-medium text-text-primary mb-2">
                       No Academic Year Configured
                     </h4>
@@ -323,44 +373,41 @@ export function GradesModule() {
                     isLoading={gradesLoading}
                     sectionId={selectedSectionId}
                     courseId={selectedSection?.courseId}
+                    courseName={selectedSection?.courseName}
                     schoolId={schoolId}
                     termId={effectiveTermId || ''}
                     academicYearId={currentYear?.yearId}
                     teacherId={selectedSection?.primaryTeacherId}
-                    disabled={hasAllFinalized || !effectiveTermId}
-                    onAddAssignment={effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
+                    disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
+                    onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
+                    onViewReportCard={handleViewReportCard}
                   />
                 )}
               </div>
             )}
 
-            {activeTab === 'dashboard' && (
-              <Suspense
-                fallback={
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-surface-hover rounded-lg" />
-                            <div className="space-y-2">
-                              <div className="h-3 w-16 bg-surface-hover rounded" />
-                              <div className="h-6 w-12 bg-surface-hover rounded" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                }
-              >
-                <GradeDashboard
+            {activeTab === 'overview' && (
+              currentYear?.yearId ? (
+                <GradeOverview
                   schoolId={schoolId}
-                  academicYearId={currentYear?.yearId || ''}
-                  sections={sections}
-                  isLoadingSections={sectionsLoading}
+                  academicYearId={currentYear.yearId}
+                  policyWeights={defaultPolicy?.categoryWeights}
                 />
-              </Suspense>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-surface-hover rounded-lg" />
+                        <div className="space-y-2">
+                          <div className="h-3 w-16 bg-surface-hover rounded" />
+                          <div className="h-6 w-12 bg-surface-hover rounded" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
             )}
 
             {activeTab === 'policies' && <GradingPolicyList />}
@@ -376,6 +423,7 @@ export function GradesModule() {
           students={roster?.students ?? []}
           sectionId={selectedSectionId}
           courseId={selectedSection.courseId}
+          courseName={selectedSection.courseName}
           schoolId={schoolId}
           termId={effectiveTermId}
           academicYearId={currentYear.yearId}

@@ -59,3 +59,7 @@ export function expectSchemaInvalid(
 
 export { render } from '@testing-library/react'
 export { default as userEvent } from '@testing-library/user-event'
+
+// MSW mock server + data — import in tests for per-test overrides
+export { server } from './mocks/server'
+export * as mockData from './mocks/data'

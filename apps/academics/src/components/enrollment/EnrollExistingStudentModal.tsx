@@ -11,7 +11,7 @@
  * Sprint 8 - ENRL-02
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -25,6 +25,9 @@ import {
   RESIDENCY_STATUS_OPTIONS,
 } from '../../schemas/edfi-descriptors'
 import { parseApiError } from '../../services/academics.service'
+import { useSchoolGradeRange } from '../../hooks/useSchool'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -54,14 +57,6 @@ const enrollFormSchema = z.object({
 type EnrollFormData = z.infer<typeof enrollFormSchema>
 
 // ============================================================================
-// GRADE LEVEL OPTIONS
-// ============================================================================
-
-const GRADE_LEVEL_OPTIONS = Object.entries(GRADE_LEVEL_DESCRIPTORS).map(
-  ([value, label]) => ({ value, label })
-)
-
-// ============================================================================
 // ENROLLMENT TYPE OPTIONS
 // ============================================================================
 
@@ -84,6 +79,17 @@ export function EnrollExistingStudentModal({
   const schoolId = useActiveSchoolId() || ''
   const firstInputRef = useRef<HTMLSelectElement>(null)
   const enrollMutation = useCreateEnrollment()
+  const { gradeRange } = useSchoolGradeRange(schoolId || null)
+  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
+
+  // Include student's current grade even if outside school range
+  const gradeOptions = useMemo(() => {
+    const currentGrade = student.currentGradeLevel
+    if (!currentGrade) return filteredGradeOptions
+    if (filteredGradeOptions.some((o) => o.value === currentGrade)) return filteredGradeOptions
+    const extraOpt = GRADE_LEVEL_OPTIONS.find((o) => o.value === currentGrade)
+    return extraOpt ? [...filteredGradeOptions, extraOpt] : filteredGradeOptions
+  }, [filteredGradeOptions, student.currentGradeLevel])
 
   // Fetch academic years for this school
   const { data: academicYears = [] } = useAcademicYears(schoolId, !!schoolId)
@@ -292,7 +298,7 @@ export function EnrollExistingStudentModal({
               disabled={isSubmitting}
             >
               <option value="">Select grade...</option>
-              {GRADE_LEVEL_OPTIONS.map((opt) => (
+              {gradeOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>

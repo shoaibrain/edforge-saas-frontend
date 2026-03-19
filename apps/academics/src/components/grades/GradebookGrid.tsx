@@ -7,7 +7,7 @@
  */
 
 import { useState, useMemo, useRef, useCallback } from 'react'
-import { GraduationCap, Lock, Plus } from 'lucide-react'
+import { GraduationCap, Lock, Plus, FileText } from 'lucide-react'
 import { useRecordGrade } from '../../hooks/useGrades'
 import type { GradeRecord } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
@@ -22,12 +22,14 @@ interface GradebookGridProps {
   isLoading: boolean
   sectionId?: string
   courseId?: string
+  courseName?: string
   schoolId?: string
   termId?: string
   academicYearId?: string
   teacherId?: string
   disabled?: boolean
   onAddAssignment?: () => void
+  onViewReportCard?: (studentId: string, studentName: string) => void
 }
 
 interface MergedStudent {
@@ -72,11 +74,13 @@ export function GradebookGrid({
   isLoading,
   sectionId,
   courseId,
+  courseName,
   schoolId,
   termId,
   academicYearId,
   teacherId,
   disabled,
+  onViewReportCard,
   onAddAssignment,
 }: GradebookGridProps) {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
@@ -169,6 +173,7 @@ export function GradebookGrid({
         studentId: student.studentId,
         studentName: student.studentName,
         courseId: courseId!,
+        courseName,
         sectionId: sectionId!,
         schoolId: schoolId!,
         termId: termId!,
@@ -184,7 +189,7 @@ export function GradebookGrid({
         },
       })
     },
-    [canEdit, courseId, sectionId, schoolId, termId, academicYearId, teacherId, recordGradeMutation, grades]
+    [canEdit, courseId, courseName, sectionId, schoolId, termId, academicYearId, teacherId, recordGradeMutation, grades]
   )
 
   const handleKeyDown = useCallback(
@@ -333,7 +338,7 @@ export function GradebookGrid({
             const isFinal = grade?.isFinal ?? false
 
             return (
-              <tr key={student.studentId} className="hover:bg-surface-secondary/50 transition-colors">
+              <tr key={student.studentId} className="group hover:bg-surface-secondary/50 transition-colors">
                 {/* Student name */}
                 <td className="sticky left-0 z-10 bg-surface-primary px-4 py-3 border-r border-border-secondary">
                   <div className="flex items-center gap-2">
@@ -342,6 +347,16 @@ export function GradebookGrid({
                     </span>
                     {isFinal && (
                       <Lock className="w-3 h-3 text-text-tertiary" aria-label="Grade finalized" />
+                    )}
+                    {onViewReportCard && (
+                      <button
+                        type="button"
+                        onClick={() => onViewReportCard(student.studentId, student.studentName)}
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-teal-500 transition-all"
+                        title="View Report Card"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                      </button>
                     )}
                   </div>
                 </td>

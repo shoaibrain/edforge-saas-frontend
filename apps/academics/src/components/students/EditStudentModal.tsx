@@ -8,7 +8,7 @@
  * Sprint 8 - EDIT-01
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,7 +16,10 @@ import { Loader2, Save } from 'lucide-react'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
 import { useUpdateStudent } from '../../hooks'
 import { parseApiError } from '../../services/academics.service'
-import { GRADE_LEVEL_DESCRIPTORS } from '../../schemas/edfi-descriptors'
+import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolGradeRange } from '../../hooks/useSchool'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -57,10 +60,6 @@ const GENDER_OPTIONS = [
   { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ] as const
 
-const GRADE_LEVEL_OPTIONS = Object.entries(GRADE_LEVEL_DESCRIPTORS).map(
-  ([value, label]) => ({ value, label })
-)
-
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -72,6 +71,18 @@ export function EditStudentModal({
 }: EditStudentModalProps) {
   const firstInputRef = useRef<HTMLInputElement>(null)
   const updateMutation = useUpdateStudent()
+  const schoolId = useActiveSchoolId()
+  const { gradeRange } = useSchoolGradeRange(schoolId)
+  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
+
+  // Include student's current grade even if outside school range
+  const gradeOptions = useMemo(() => {
+    const currentGrade = student.currentGradeLevel
+    if (!currentGrade) return filteredGradeOptions
+    if (filteredGradeOptions.some((o) => o.value === currentGrade)) return filteredGradeOptions
+    const extraOpt = GRADE_LEVEL_OPTIONS.find((o) => o.value === currentGrade)
+    return extraOpt ? [...filteredGradeOptions, extraOpt] : filteredGradeOptions
+  }, [filteredGradeOptions, student.currentGradeLevel])
 
   const {
     register,
@@ -279,7 +290,7 @@ export function EditStudentModal({
             disabled={isSubmitting}
           >
             <option value="">Select grade...</option>
-            {GRADE_LEVEL_OPTIONS.map((o) => (
+            {gradeOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>

@@ -7,10 +7,10 @@
 
 import { motion } from 'framer-motion'
 import type { WizardStepProps } from '@edforge/wizard'
-import { AnimatedInput, AnimatedSelect } from './BasicInfoStep'
+import { AnimatedSelect } from './BasicInfoStep'
 import { useLocalEducationAgencies } from '@/hooks/useEducationOrgs'
 
-export function OrganizationStep({ data, updateData, errors, clearError }: WizardStepProps) {
+export function OrganizationStep({ data, updateData, clearError }: WizardStepProps) {
   const { data: leaList } = useLocalEducationAgencies()
   const leas = leaList?.items || []
 
@@ -47,31 +47,11 @@ export function OrganizationStep({ data, updateData, errors, clearError }: Wizar
         </p>
       </div>
 
-      {/* Principal Information */}
+      {/* Principal can be assigned later via school settings */}
       <div className="pt-4 border-t border-[rgb(var(--border-secondary))]">
-        <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium mb-3">
-          Principal Information
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">
+          Principal information can be added later in school settings.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <AnimatedInput
-            label="Principal Name"
-            placeholder="e.g., Dr. Jane Smith"
-            autoComplete="name"
-            maxLength={100}
-            value={(data.principalName as string) || ''}
-            onChange={handleChange('principalName')}
-            error={errors.principalName}
-          />
-          <AnimatedInput
-            label="Principal Email"
-            type="email"
-            placeholder="principal@school.edu"
-            autoComplete="email"
-            value={(data.principalEmail as string) || ''}
-            onChange={handleChange('principalEmail')}
-            error={errors.principalEmail}
-          />
-        </div>
       </div>
     </motion.div>
   )

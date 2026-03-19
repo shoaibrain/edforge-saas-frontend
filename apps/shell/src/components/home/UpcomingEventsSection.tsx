@@ -325,7 +325,7 @@ export function UpcomingEventsSection({
         </div>
 
         <Link
-          to={"/messages/" as any}
+          to={"/academics/calendar" as any}
           className="flex items-center gap-1 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:underline"
         >
           View all

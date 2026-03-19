@@ -8,7 +8,8 @@
 
 import { useMemo } from 'react'
 import { UsersRound, Key } from 'lucide-react'
-import { DataTable, type Column } from '../ui'
+import { useTranslation } from '@edforge/i18n'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleBadge } from './StaffRoleBadge'
 import { StaffStatusBadge } from './StaffStatusBadge'
@@ -22,9 +23,6 @@ import { formatDate } from '../../lib/utils'
 interface StaffTableProps {
   staff: StaffResponseDto[]
   isLoading?: boolean
-  hasMore?: boolean
-  isFetchingMore?: boolean
-  onLoadMore?: () => void
   onAddStaff?: () => void
   onViewStaff?: (staff: StaffResponseDto) => void
 }
@@ -36,110 +34,112 @@ interface StaffTableProps {
 export function StaffTable({
   staff,
   isLoading = false,
-  hasMore = false,
-  isFetchingMore = false,
-  onLoadMore,
   onAddStaff,
   onViewStaff,
 }: StaffTableProps) {
-  const columns: Column<StaffResponseDto>[] = useMemo(
+  const { t } = useTranslation('people')
+
+  const columns: ColumnDef<StaffResponseDto, unknown>[] = useMemo(
     () => [
       {
-        key: 'name',
-        header: 'Staff',
-        sortable: true,
-        width: '280px',
-        render: (s) => (
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
-              <img
-                src={getStaffAvatar(s.staffId)}
-                alt={`${s.firstName} ${s.lastSurname}`}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+        id: 'name',
+        accessorFn: (row) => `${row.firstName} ${row.lastSurname}`,
+        header: t('tableHeaders.staff'),
+        size: 280,
+        cell: ({ row }) => {
+          const s = row.original
+          return (
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
+                <img
+                  src={getStaffAvatar(s.staffId)}
+                  alt={`${s.firstName} ${s.lastSurname}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium text-text-primary truncate">
+                  {s.firstName} {s.lastSurname}
+                </p>
+                <p className="text-xs text-text-tertiary truncate">{s.email}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="font-medium text-text-primary truncate">
-                {s.firstName} {s.lastSurname}
-              </p>
-              <p className="text-xs text-text-tertiary truncate">{s.email}</p>
-            </div>
-          </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'role',
+        header: t('tableHeaders.role'),
+        size: 140,
+        cell: ({ row }) => <StaffRoleBadge role={row.original.role} />,
+      },
+      {
+        accessorKey: 'employmentStatus',
+        header: t('tableHeaders.status'),
+        size: 120,
+        cell: ({ row }) => <StaffStatusBadge status={row.original.employmentStatus} />,
+      },
+      {
+        accessorKey: 'hireDate',
+        header: t('tableHeaders.hired'),
+        size: 120,
+        cell: ({ row }) => (
+          <span className="text-text-secondary">{formatDate(row.original.hireDate)}</span>
         ),
       },
       {
-        key: 'role',
-        header: 'Role',
-        sortable: true,
-        width: '140px',
-        render: (s) => <StaffRoleBadge role={s.role} />,
-      },
-      {
-        key: 'employmentStatus',
-        header: 'Status',
-        sortable: true,
-        width: '120px',
-        render: (s) => <StaffStatusBadge status={s.employmentStatus} />,
-      },
-      {
-        key: 'hireDate',
-        header: 'Hired',
-        sortable: true,
-        width: '120px',
-        render: (s) => (
-          <span className="text-text-secondary">{formatDate(s.hireDate)}</span>
-        ),
-      },
-      {
-        key: 'department',
-        header: 'Department',
-        width: '140px',
-        render: (s) => (
+        accessorKey: 'departmentName',
+        header: t('tableHeaders.department'),
+        size: 140,
+        enableSorting: false,
+        cell: ({ row }) => (
           <span className="text-text-secondary text-sm">
-            {s.department || '—'}
+            {row.original.departmentName || '—'}
           </span>
         ),
       },
       {
-        key: 'systemAccess',
-        header: 'System Access',
-        width: '130px',
-        render: (s) =>
-          s.userId ? (
+        id: 'systemAccess',
+        accessorFn: (row) => (row.userId ? 'active' : 'none'),
+        header: t('tableHeaders.systemAccess'),
+        size: 130,
+        enableSorting: false,
+        cell: ({ row }) => {
+          const s = row.original
+          return s.userId ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">
               <Key className="w-3 h-3" />
-              Active
+              {t('systemAccess.active')}
             </span>
           ) : (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-500/20 dark:text-slate-400">
-              No Access
+              {t('systemAccess.noAccess')}
             </span>
-          ),
+          )
+        },
       },
     ],
-    [],
+    [t],
   )
 
   return (
-    <DataTable
+    <TanstackDataTable
       columns={columns}
       data={staff}
-      keyExtractor={(s) => s.staffId}
+      getRowId={(s) => s.staffId}
       isLoading={isLoading}
-      skeletonRows={8}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
+      maxHeight="calc(100vh - 13rem)"
       emptyState={{
         icon: <UsersRound className="w-12 h-12" />,
-        title: 'No staff members found',
-        description:
-          'Get started by adding your first staff member to the directory.',
+        title: t('empty.noStaff'),
+        description: t('empty.getStarted'),
         action: onAddStaff
-          ? { label: 'Add Staff Member', onClick: onAddStaff }
+          ? { label: t('staffDirectory.addStaff'), onClick: onAddStaff }
           : undefined,
       }}
-      hasMore={hasMore}
-      isFetchingMore={isFetchingMore}
-      onLoadMore={onLoadMore}
       onRowClick={onViewStaff}
     />
   )

@@ -51,7 +51,7 @@ function DynamicPageLayoutInner({
   maxWidth = 'max-w-5xl',
 }: Omit<DynamicPageLayoutProps, 'pageId' | 'pageType' | 'customWidgets' | 'title' | 'description' | 'icon'>) {
   return (
-    <div className={`${maxWidth} mx-auto space-y-10 pb-12 relative`}>
+    <div className={`${maxWidth} mx-auto p-6 space-y-10 pb-12 relative`}>
       {/* Three-dot menu in top right corner - Notion style */}
       {showVisibilityMenu && (
         <motion.div

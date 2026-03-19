@@ -13,37 +13,64 @@ import {
   Outlet,
   redirect,
   useNavigate,
+  useParams,
+  type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { ShellProvider } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingScreen } from './components/layout/LoadingScreen'
 import { NotFound } from './components/layout/NotFound'
+import { ComingSoon } from './components/layout/ComingSoon'
 // Pages
 import { LoginPage } from './components/layout/LoginPage'
 import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
+import { useLocaleEffect, useTranslation } from '@edforge/i18n'
+
+// Landing Pages (public)
+import { PublicLayout } from './components/landing/PublicLayout'
+import { PublicErrorBoundary } from './components/landing/PublicErrorBoundary'
+import LandingPage from './components/landing/pages/LandingPage'
+import AboutPage from './components/landing/pages/AboutPage'
+import ContactPage from './components/landing/pages/ContactPage'
+import PrivacyPage from './components/landing/pages/PrivacyPage'
+import TermsPage from './components/landing/pages/TermsPage'
+import SecurityLandingPage from './components/landing/pages/SecurityPage'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
-import AuthDebugPage from './pages/AuthDebugPage'
+import { AuthDebugPage } from './pages/settings'
+import StudentPortalLayout from './pages/student-portal/StudentPortalLayout'
+import StudentGradesPage from './pages/student-portal/StudentGradesPage'
+import StudentAttendancePage from './pages/student-portal/StudentAttendancePage'
+import StudentSchedulePage from './pages/student-portal/StudentSchedulePage'
+import ParentPortalLayout from './pages/parent-portal/ParentPortalLayout'
+import ParentOverviewPage from './pages/parent-portal/ParentOverviewPage'
+import ParentGradesPage from './pages/parent-portal/ParentGradesPage'
+import ParentAttendancePage from './pages/parent-portal/ParentAttendancePage'
+import ParentSchedulePage from './pages/parent-portal/ParentSchedulePage'
+import FeePaymentPage from './pages/parent-portal/FeePaymentPage'
+import PaymentCallbackPage from './pages/payments/callback'
+import ReceiptPage from './pages/payments/receipt'
+// Fee Structures and Payment Gateways moved to Finance MFE (/finance/configuration/*)
 import {
   AccountPage,
   SecurityPage,
-  NotificationsPage,
+  // [MVP-PARKED] NotificationsPage,  // merged into PreferencesPage
   PreferencesPage,
   WorkspaceSettingsPage,
   SchoolDetailPage,
   SchoolCreatePage,
   OrganizationSettingsPage,
   EducationOrgDetailPage,
-  EdFiExportPreviewPage,
+  // [MVP-PARKED] EdFiExportPreviewPage,
   RBACSecurityPage,
-  IntegrationsSettingsPage,
-  BillingSettingsPage,
+  // [MVP-PARKED] IntegrationsSettingsPage,
+  // [MVP-PARKED] BillingSettingsPage,
   PeopleSettingsPage,
-  DangerZonePage,
+  // [MVP-PARKED] DangerZonePage,
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React from 'react'
@@ -58,31 +85,35 @@ const FinanceModule = React.lazy(async () => {
   if (!module) throw new Error('Failed to load Finance remote')
   return module
 })
-const SpecialProgramsModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('special-programs/SpecialProgramsModule')
-  if (!module) throw new Error('Failed to load Special Programs remote')
-  return module
-})
+// [MVP-PARKED] Special Programs module
+// const SpecialProgramsModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('special-programs/SpecialProgramsModule')
+//   if (!module) throw new Error('Failed to load Special Programs remote')
+//   return module
+// })
+// [/MVP-PARKED]
 const PeopleModule = React.lazy(async () => {
   const module = await loadRemote<{ default: React.ComponentType }>('people/PeopleModule')
   if (!module) throw new Error('Failed to load People remote')
   return module
 })
-const MessagesModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('messages/MessagesModule')
-  if (!module) throw new Error('Failed to load Messages remote')
-  return module
-})
-const AnalyticsModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
-  if (!module) throw new Error('Failed to load Analytics remote')
-  return module
-})
-const EdFiModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('edfi/EdFiModule')
-  if (!module) throw new Error('Failed to load Ed-Fi remote')
-  return module
-})
+// [MVP-PARKED] Messages, Analytics, Ed-Fi modules
+// const MessagesModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('messages/MessagesModule')
+//   if (!module) throw new Error('Failed to load Messages remote')
+//   return module
+// })
+// const AnalyticsModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
+//   if (!module) throw new Error('Failed to load Analytics remote')
+//   return module
+// })
+// const EdFiModule = React.lazy(async () => {
+//   const module = await loadRemote<{ default: React.ComponentType }>('edfi/EdFiModule')
+//   if (!module) throw new Error('Failed to load Ed-Fi remote')
+//   return module
+// })
+// [/MVP-PARKED]
 
 // ============================================================================
 // THEME SYNC COMPONENT
@@ -104,6 +135,9 @@ function ThemeSync() {
 // ============================================================================
 
 function RootLayout() {
+  // Sync <html lang> attribute and Devanagari font loading with i18n locale
+  useLocaleEffect()
+
   return (
     <ShellProvider>
       <ThemeSync />
@@ -225,7 +259,7 @@ function OAuthCallbackHandler() {
 
 function IndexPage() {
   const navigate = useNavigate()
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const isAuthenticatedState = useAuthStore((s) => s.isAuthenticated)
   const isLoading = useAuthStore((s) => s.isLoading)
   const user = useAuthStore((s) => s.user)
 
@@ -238,15 +272,20 @@ function IndexPage() {
       return
     }
 
-    if (isAuthenticated && user) {
+    // If authenticated, redirect to home. Otherwise show landing page.
+    if (isAuthenticatedState && user) {
       navigate({ to: '/home', replace: true })
-    } else {
-      navigate({ to: '/login', replace: true })
     }
-  }, [isAuthenticated, isLoading, user, navigate, isOAuthCallback])
+    // Unauthenticated users see the landing page (no redirect to /login)
+  }, [isAuthenticatedState, isLoading, user, navigate, isOAuthCallback])
 
   if (isOAuthCallback) {
     return <OAuthCallbackHandler />
+  }
+
+  // Show landing page for unauthenticated users
+  if (!isLoading && !isAuthenticatedState) {
+    return <LandingPage />
   }
 
   return <LoadingScreen message="Loading..." />
@@ -256,6 +295,47 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: IndexPage,
+})
+
+// ============================================================================
+// PUBLIC ROUTES - Landing page sub-pages (about, contact, etc.)
+// ============================================================================
+
+const publicRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: '_public',
+  component: PublicLayout,
+  errorComponent: PublicErrorBoundary,
+})
+
+const aboutRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/about',
+  component: AboutPage,
+})
+
+const contactRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/contact',
+  component: ContactPage,
+})
+
+const privacyRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/privacy',
+  component: PrivacyPage,
+})
+
+const termsRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/terms',
+  component: TermsPage,
+})
+
+const securityLandingRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/security',
+  component: SecurityLandingPage,
 })
 
 // Keep the /auth/callback route as a fallback
@@ -347,11 +427,15 @@ const settingsSecurityRoute = createRoute({
   component: SecurityPage,
 })
 
+// [MVP-PARKED] Notifications merged into Preferences page — redirect for bookmarks
 const settingsNotificationsRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/notifications',
-  component: NotificationsPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/settings/preferences' })
+  },
 })
+// [/MVP-PARKED]
 
 const settingsGeneralRoute = createRoute({
   getParentRoute: () => settingsRoute,
@@ -377,6 +461,12 @@ const settingsSecurityPoliciesRoute = createRoute({
   component: RBACSecurityPage,
 })
 
+const settingsAuthDebugRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/auth-debug',
+  component: AuthDebugPage,
+})
+
 const settingsOrganizationRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/organization',
@@ -389,11 +479,13 @@ const settingsEdOrgDetailRoute = createRoute({
   component: EducationOrgDetailPage,
 })
 
-const settingsEdFiExportPreviewRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/organization/edfi-preview',
-  component: EdFiExportPreviewPage,
-})
+// [MVP-PARKED] Ed-Fi export preview settings route
+// const settingsEdFiExportPreviewRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/organization/edfi-preview',
+//   component: EdFiExportPreviewPage,
+// })
+// [/MVP-PARKED]
 
 // New: School detail under organization hierarchy
 const settingsOrgSchoolDetailRoute = createRoute({
@@ -412,29 +504,33 @@ const settingsOrgSchoolCreateRoute = createRoute({
   }),
 })
 
-const settingsBillingRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/billing',
-  component: BillingSettingsPage,
-})
+// Fee Structures and Payment Gateways moved to Finance MFE (/finance/configuration/*)
 
-const settingsIntegrationsRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/integrations',
-  component: IntegrationsSettingsPage,
-})
-
-const settingsImportExportRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/import-export',
-  component: IntegrationsSettingsPage, // Import/Export as part of Integrations
-})
-
-const settingsDangerZoneRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: '/danger-zone',
-  component: DangerZonePage,
-})
+// [MVP-PARKED] Billing, Integrations, Import/Export, Danger Zone — not needed for MVP pilot schools
+// const settingsBillingRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/billing',
+//   component: BillingSettingsPage,
+// })
+//
+// const settingsIntegrationsRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/integrations',
+//   component: IntegrationsSettingsPage,
+// })
+//
+// const settingsImportExportRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/import-export',
+//   component: IntegrationsSettingsPage,
+// })
+//
+// const settingsDangerZoneRoute = createRoute({
+//   getParentRoute: () => settingsRoute,
+//   path: '/danger-zone',
+//   component: DangerZonePage,
+// })
+// [/MVP-PARKED]
 
 // ============================================================================
 // ACADEMICS ROUTES
@@ -452,13 +548,9 @@ const academicsRoute = createRoute({
 
 
 
-// ============================================================================
-// FINANCE ROUTES
-// ============================================================================
-
 const financeRoute = createRoute({
   getParentRoute: () => protectedRoute,
-  path: '/finance/$', // Splat route
+  path: '/finance/$',
   component: () => (
     <Suspense fallback={<LoadingScreen />}>
       <FinanceModule />
@@ -483,57 +575,87 @@ const peopleRoute = createRoute({
   ),
 })
 
-// ============================================================================
-// MESSAGES ROUTES
-// ============================================================================
+// [MVP-PARKED] Messages, Analytics, Ed-Fi route definitions
+// const messagesRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/messages/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <MessagesModule />
+//     </Suspense>
+//   ),
+// })
+// const analyticsRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/analytics/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <AnalyticsModule />
+//     </Suspense>
+//   ),
+// })
+// const edfiRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/edfi/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <EdFiModule />
+//     </Suspense>
+//   ),
+// })
+// [/MVP-PARKED]
 
-const messagesRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/messages/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <MessagesModule />
-    </Suspense>
-  ),
-})
-
-// ============================================================================
-// ANALYTICS ROUTES
-// ============================================================================
-
-const analyticsRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/analytics/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <AnalyticsModule />
-    </Suspense>
-  ),
-})
-
-// ============================================================================
-// ED-FI / STATE REPORTING ROUTES
-// ============================================================================
-
-const edfiRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/edfi/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <EdFiModule />
-    </Suspense>
-  ),
-})
+// [REMOVED] AuthDebugPage — dev-only utility removed for production
 
 // ============================================================================
-// AUTH DEBUG ROUTE
+// PORTAL ERROR COMPONENT
 // ============================================================================
 
-const authDebugRoute2 = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/auth-debug',
-  component: AuthDebugPage,
-})
+function PortalPageError({ error, reset }: ErrorComponentProps) {
+  const { t } = useTranslation('errors')
+
+  return (
+    <div className="min-h-[400px] flex items-center justify-center p-6">
+      <div className="max-w-lg w-full text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
+          {t('generic')}
+        </h2>
+        <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
+          {t('genericDescription')}
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={reset}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-medium text-sm transition-colors"
+          >
+            {t('tryAgain', { ns: 'common' })}
+          </button>
+          <a
+            href="/home"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+          >
+            {t('goHome', { ns: 'common' })}
+          </a>
+        </div>
+        {import.meta.env.DEV && error && (
+          <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+            <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">{t('developerInfo')}</summary>
+            <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-red-500 font-mono overflow-x-auto max-h-40">
+              {error.message}
+              {'\n\n'}
+              {error.stack}
+            </pre>
+          </details>
+        )}
+      </div>
+    </div>
+  )
+}
 
 // ============================================================================
 // PORTAL ROUTES
@@ -542,28 +664,168 @@ const authDebugRoute2 = createRoute({
 const studentPortalRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/student-portal',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Student Portal</h1><p className="text-gray-500 mt-2">Student portal coming soon...</p></div>,
+  component: StudentPortalLayout,
+})
+
+const studentPortalIndexRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/',
+  beforeLoad: () => {
+    throw redirect({ to: '/student-portal/grades' })
+  },
+  component: () => null,
+})
+
+const studentPortalGradesRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/grades',
+  component: StudentGradesPage,
+  errorComponent: PortalPageError,
+})
+
+const studentPortalAttendanceRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/attendance',
+  component: StudentAttendancePage,
+  errorComponent: PortalPageError,
+})
+
+const studentPortalScheduleRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/schedule',
+  component: StudentSchedulePage,
+  errorComponent: PortalPageError,
+})
+
+const studentPortalAssignmentsRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/assignments',
+  component: () => <ComingSoon moduleName="Assignments" />,
+})
+
+const studentPortalCurriculumRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/curriculum',
+  component: () => <ComingSoon moduleName="Curriculum" />,
+})
+
+const studentPortalCalendarRoute = createRoute({
+  getParentRoute: () => studentPortalRoute,
+  path: '/calendar',
+  component: () => <ComingSoon moduleName="School Calendar" />,
 })
 
 const parentPortalRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/parent-portal',
-  component: () => <div className="p-6"><h1 className="text-2xl font-bold">Parent Portal</h1><p className="text-gray-500 mt-2">Parent portal coming soon...</p></div>,
+  component: ParentPortalLayout,
 })
 
+const parentPortalIndexRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/',
+  component: ParentOverviewPage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalGradesRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/grades',
+  component: ParentGradesPage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalAttendanceRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/attendance',
+  component: ParentAttendancePage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalScheduleRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/schedule',
+  component: ParentSchedulePage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalFeesRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/fees',
+  component: FeePaymentPage,
+  errorComponent: PortalPageError,
+})
+
+const parentPortalCalendarRoute = createRoute({
+  getParentRoute: () => parentPortalRoute,
+  path: '/calendar',
+  component: () => <ComingSoon moduleName="School Calendar" />,
+})
+
+// [MVP-PARKED] Special Programs route definition
+// const specialProgramsRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: '/special-programs/$',
+//   component: () => (
+//     <Suspense fallback={<LoadingScreen />}>
+//       <SpecialProgramsModule />
+//     </Suspense>
+//   ),
+// })
+// [/MVP-PARKED]
+
 // ============================================================================
-// SPECIAL PROGRAMS ROUTES
+// [MVP-PARKED] COMING SOON CATCH-ALL ROUTES
 // ============================================================================
 
-const specialProgramsRoute = createRoute({
+const messagesComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/messages/$',
+  component: () => <ComingSoon moduleName="Messages" />,
+})
+
+const analyticsComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/analytics/$',
+  component: () => <ComingSoon moduleName="Analytics" />,
+})
+
+const edfiComingSoonRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/edfi/$',
+  component: () => <ComingSoon moduleName="State Reporting" />,
+})
+
+const specialProgramsComingSoonRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/special-programs/$',
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <SpecialProgramsModule />
-    </Suspense>
-  ),
+  component: () => <ComingSoon moduleName="Special Programs" />,
 })
+
+// ============================================================================
+// PAYMENT ROUTES (callback + receipt)
+// ============================================================================
+
+const paymentCallbackRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/payments/callback',
+  component: PaymentCallbackPage,
+  errorComponent: PortalPageError,
+})
+
+const paymentReceiptRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/payments/$paymentId/receipt',
+  component: PaymentReceiptRouteComponent,
+  errorComponent: PortalPageError,
+})
+
+function PaymentReceiptRouteComponent() {
+  const params = useParams({ strict: false }) as { paymentId?: string }
+  return <ReceiptPage paymentId={params.paymentId ?? ''} />
+}
+
+// [/MVP-PARKED]
 
 // ============================================================================
 // ROUTE TREE
@@ -573,6 +835,13 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   authCallbackRoute,
+  publicRoute.addChildren([
+    aboutRoute,
+    contactRoute,
+    privacyRoute,
+    termsRoute,
+    securityLandingRoute,
+  ]),
   protectedRoute.addChildren([
     homeRoute,
     settingsRoute.addChildren([
@@ -587,24 +856,51 @@ const routeTree = rootRoute.addChildren([
       settingsOrgSchoolDetailRoute,
       settingsOrgSchoolCreateRoute,
       settingsEdOrgDetailRoute,
-      settingsEdFiExportPreviewRoute,
+      // [MVP-PARKED] settingsEdFiExportPreviewRoute,
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
-      settingsBillingRoute,
-      settingsIntegrationsRoute,
-      settingsImportExportRoute,
-      settingsDangerZoneRoute,
+      settingsAuthDebugRoute,
+      // Fee Structures and Payment Gateways moved to Finance MFE
+      // [MVP-PARKED] settingsBillingRoute,
+      // [MVP-PARKED] settingsIntegrationsRoute,
+      // [MVP-PARKED] settingsImportExportRoute,
+      // [MVP-PARKED] settingsDangerZoneRoute,
     ]),
     academicsRoute,
     financeRoute,
     peopleRoute,
-    messagesRoute,
-    analyticsRoute,
-    edfiRoute,
-    specialProgramsRoute,
-    studentPortalRoute,
-    parentPortalRoute,
-    authDebugRoute2,
+    // [MVP-PARKED] Original module routes removed from tree
+    // messagesRoute,
+    // analyticsRoute,
+    // edfiRoute,
+    // specialProgramsRoute,
+    // Coming Soon catch-all routes for parked modules
+    messagesComingSoonRoute,
+    analyticsComingSoonRoute,
+    edfiComingSoonRoute,
+    specialProgramsComingSoonRoute,
+    // financeComingSoonRoute removed — finance is now live
+    // [/MVP-PARKED]
+    // Payment routes
+    paymentCallbackRoute,
+    paymentReceiptRoute,
+    studentPortalRoute.addChildren([
+      studentPortalIndexRoute,
+      studentPortalGradesRoute,
+      studentPortalAttendanceRoute,
+      studentPortalScheduleRoute,
+      studentPortalAssignmentsRoute,
+      studentPortalCurriculumRoute,
+      studentPortalCalendarRoute,
+    ]),
+    parentPortalRoute.addChildren([
+      parentPortalIndexRoute,
+      parentPortalGradesRoute,
+      parentPortalAttendanceRoute,
+      parentPortalScheduleRoute,
+      parentPortalFeesRoute,
+      parentPortalCalendarRoute,
+    ]),
   ]),
 ])
 

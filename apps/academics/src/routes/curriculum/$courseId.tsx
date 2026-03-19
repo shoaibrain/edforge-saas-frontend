@@ -31,6 +31,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { z } from 'zod'
+import { useResourcePermissions } from '@edforge/abac'
 import { useCourse, useUpdateCourse } from '../../hooks/useCourses'
 import {
   useSections,
@@ -54,7 +55,6 @@ import {
   getCapacityTextColor,
 } from '../../schemas/section.form'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
-import { SectionDrawer } from '../../components/scheduling/SectionDrawer'
 import type { CourseResponseDto, SectionResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -442,7 +442,7 @@ function SectionsTab({
         </p>
         <button
           type="button"
-          onClick={() => navigate({ to: '/scheduling' })}
+          onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -577,9 +577,6 @@ export function CourseDetailPage() {
   const [courseDrawerOpen, setCourseDrawerOpen] = useState(false)
   const [courseDrawerMode, setCourseDrawerMode] = useState<DrawerMode>('edit')
 
-  // Section drawer for viewing sections
-  const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
-  const [selectedSection, setSelectedSection] = useState<SectionResponseDto | null>(null)
 
   // Validate courseId
   const isValidId = useMemo(() => {
@@ -590,6 +587,9 @@ export function CourseDetailPage() {
       return false
     }
   }, [courseId])
+
+  // ABAC: check course permissions
+  const coursePerms = useResourcePermissions('courses')
 
   const { data: course, isLoading, error } = useCourse({
     courseId,
@@ -609,8 +609,7 @@ export function CourseDetailPage() {
   }
 
   const handleViewSection = (section: SectionResponseDto) => {
-    setSelectedSection(section)
-    setSectionDrawerOpen(true)
+    navigate({ to: `/classrooms/${section.sectionId}` })
   }
 
   // Loading
@@ -701,11 +700,13 @@ export function CourseDetailPage() {
                 />
                 {course.isActive ? 'Active' : 'Inactive'}
               </div>
-              <ActionsDropdown
-                onEdit={() => setCourseDrawerOpen(true)}
-                onToggleActive={handleToggleActive}
-                isActive={course.isActive}
-              />
+              {coursePerms.edit && (
+                <ActionsDropdown
+                  onEdit={() => setCourseDrawerOpen(true)}
+                  onToggleActive={handleToggleActive}
+                  isActive={course.isActive}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -778,16 +779,6 @@ export function CourseDetailPage() {
         onModeChange={setCourseDrawerMode}
       />
 
-      {/* Section Drawer (for viewing a section from the Sections tab) */}
-      <SectionDrawer
-        open={sectionDrawerOpen}
-        onClose={() => {
-          setSectionDrawerOpen(false)
-          setSelectedSection(null)
-        }}
-        mode="view"
-        section={selectedSection}
-      />
     </div>
   )
 }

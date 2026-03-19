@@ -1,4 +1,8 @@
 /**
+ * @deprecated This component has been superseded by the OverviewTab academic dashboard.
+ * Schedule and attendance data are now displayed in the Overview tab.
+ * Kept for backward compatibility — do not use in new code.
+ *
  * ScheduleTab Component
  *
  * Combines class schedule and attendance summary into one tab.
@@ -335,7 +339,8 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Link
-            to="/attendance"
+            to="/classrooms"
+            search={{ tab: 'attendance' }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
@@ -343,7 +348,8 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
             <ExternalLink className="w-3 h-3" />
           </Link>
           <Link
-            to="/grades"
+            to="/classrooms"
+            search={{ tab: 'gradebook' }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors"
           >
             <GraduationCap className="w-3.5 h-3.5" />

@@ -2,17 +2,13 @@
  * TeacherTable Component
  *
  * DataTable for faculty directory with search and role filtering.
+ * Uses TanstackDataTable from @edforge/ui for table rendering,
+ * sorting, pagination, and built-in search.
  */
 
-import { useState } from 'react'
-import {
-  Search,
-  Users,
-  Mail,
-  ChevronRight,
-  X,
-} from 'lucide-react'
-import { useDebounce } from '../../hooks'
+import { useState, useMemo } from 'react'
+import { Mail, Users, X } from 'lucide-react'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 
 // ============================================================================
 // TYPES
@@ -36,6 +32,10 @@ interface TeacherTableProps {
   onSelect: (member: StaffMember) => void
 }
 
+// ============================================================================
+// BADGE HELPERS
+// ============================================================================
+
 function getStatusBadge(status: string) {
   const styles: Record<string, string> = {
     active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
@@ -58,146 +58,134 @@ function getRoleBadge(role: string) {
 }
 
 // ============================================================================
+// COLUMN DEFINITIONS
+// ============================================================================
+
+const columns: ColumnDef<StaffMember, unknown>[] = [
+  {
+    accessorFn: (row) => `${row.firstName} ${row.lastSurname || row.lastName || ''}`,
+    id: 'name',
+    header: 'Name',
+    cell: ({ getValue }) => (
+      <span className="font-medium text-text-primary">
+        {getValue<string>()}
+      </span>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+    cell: ({ row }) => {
+      const email = row.original.email
+      return email ? (
+        <span className="flex items-center gap-1.5 text-text-secondary">
+          <Mail className="w-3.5 h-3.5 text-text-tertiary" />
+          {email}
+        </span>
+      ) : (
+        <span className="text-text-tertiary">&mdash;</span>
+      )
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+    cell: ({ row }) => {
+      const role = row.original.role
+      return role ? (
+        <span
+          className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getRoleBadge(role)}`}
+        >
+          {role.replace(/_/g, ' ')}
+        </span>
+      ) : (
+        <span className="text-text-tertiary">&mdash;</span>
+      )
+    },
+    enableSorting: true,
+  },
+  {
+    accessorFn: (row) => row.employmentStatus || row.status || 'active',
+    id: 'status',
+    header: 'Status',
+    cell: ({ getValue }) => {
+      const status = getValue<string>()
+      return (
+        <span
+          className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusBadge(status)}`}
+        >
+          {status.replace(/_/g, ' ')}
+        </span>
+      )
+    },
+    enableSorting: true,
+  },
+]
+
+// ============================================================================
 // COMPONENT
 // ============================================================================
 
 export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) {
-  const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string | null>(null)
-  const debouncedSearch = useDebounce(searchTerm, 300)
 
-  // Client-side filtering
-  const filtered = staff.filter((member) => {
-    if (debouncedSearch) {
-      const name = `${member.firstName} ${member.lastSurname || member.lastName || ''}`.toLowerCase()
-      const email = (member.email || '').toLowerCase()
-      const term = debouncedSearch.toLowerCase()
-      if (!name.includes(term) && !email.includes(term)) return false
-    }
-    if (roleFilter && member.role !== roleFilter) return false
-    return true
-  })
+  // Derive unique roles from the full staff list
+  const roles = useMemo(
+    () => [...new Set(staff.map((m) => m.role).filter(Boolean))] as string[],
+    [staff]
+  )
 
-  const roles = [...new Set(staff.map((m) => m.role).filter(Boolean))]
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-14 bg-surface-secondary rounded-lg animate-pulse" />
-        ))}
-      </div>
-    )
-  }
+  // Pre-filter by role before handing data to the DataTable
+  // (search / globalFilter is handled internally by TanstackDataTable)
+  const filteredByRole = useMemo(
+    () => (roleFilter ? staff.filter((m) => m.role === roleFilter) : staff),
+    [staff, roleFilter]
+  )
 
   return (
-    <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name or email..."
-            className="w-full pl-10 pr-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-          />
-        </div>
-        <select
-          value={roleFilter ?? ''}
-          onChange={(e) => setRoleFilter(e.target.value || null)}
-          className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        >
-          <option value="">All Roles</option>
-          {roles.map((r) => (
-            <option key={r} value={r}>{(r || '').replace(/_/g, ' ')}</option>
-          ))}
-        </select>
-        {roleFilter && (
-          <button
-            type="button"
-            onClick={() => setRoleFilter(null)}
-            className="flex items-center gap-1 px-3 py-2.5 text-sm text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+    <TanstackDataTable<StaffMember>
+      columns={columns}
+      data={filteredByRole}
+      getRowId={(row) => row.staffId || row.userId || row.email || ''}
+      isLoading={isLoading}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
+      searchPlaceholder="Search by name or email..."
+      onRowClick={onSelect}
+      emptyState={{
+        icon: <Users className="w-10 h-10 text-text-tertiary opacity-40" />,
+        title: 'No staff found',
+        description: 'Try adjusting your search or filters.',
+      }}
+      maxHeight="calc(100vh - 13rem)"
+      toolbarExtra={
+        <div className="flex items-center gap-2">
+          <select
+            value={roleFilter ?? ''}
+            onChange={(e) => setRoleFilter(e.target.value || null)}
+            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
           >
-            <X className="w-3.5 h-3.5" />
-            Clear
-          </button>
-        )}
-        <span className="text-xs text-text-tertiary ml-auto">
-          {filtered.length} of {staff.length} staff
-        </span>
-      </div>
-
-      {/* Table */}
-      {filtered.length === 0 ? (
-        <div className="py-12 text-center">
-          <Users className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-          <h4 className="text-sm font-medium text-text-primary mb-1">
-            No staff found
-          </h4>
-          <p className="text-xs text-text-tertiary">
-            Try adjusting your search or filters.
-          </p>
+            <option value="">All Roles</option>
+            {roles.map((r) => (
+              <option key={r} value={r}>
+                {r.replace(/_/g, ' ')}
+              </option>
+            ))}
+          </select>
+          {roleFilter && (
+            <button
+              type="button"
+              onClick={() => setRoleFilter(null)}
+              className="flex items-center gap-1 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] rounded-lg transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear
+            </button>
+          )}
         </div>
-      ) : (
-        <div className="rounded-xl border border-border-secondary overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-surface-secondary">
-                <th className="px-4 py-3 text-left font-semibold text-text-primary">Name</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Email</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Role</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Status</th>
-                <th className="px-4 py-3 w-10" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-secondary">
-              {filtered.map((member) => {
-                const id = member.staffId || member.userId || member.email || ''
-                const name = `${member.firstName} ${member.lastSurname || member.lastName || ''}`
-                const status = member.employmentStatus || member.status || 'active'
-                return (
-                  <tr
-                    key={id}
-                    onClick={() => onSelect(member)}
-                    className="hover:bg-surface-secondary/50 transition-colors cursor-pointer"
-                  >
-                    <td className="px-4 py-3 font-medium text-text-primary">{name}</td>
-                    <td className="px-4 py-3">
-                      {member.email ? (
-                        <span className="flex items-center gap-1.5 text-text-secondary">
-                          <Mail className="w-3.5 h-3.5 text-text-tertiary" />
-                          {member.email}
-                        </span>
-                      ) : (
-                        <span className="text-text-tertiary">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {member.role ? (
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getRoleBadge(member.role)}`}>
-                          {member.role.replace(/_/g, ' ')}
-                        </span>
-                      ) : (
-                        <span className="text-text-tertiary">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusBadge(status)}`}>
-                        {status.replace(/_/g, ' ')}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <ChevronRight className="w-4 h-4 text-text-tertiary" />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      }
+    />
   )
 }

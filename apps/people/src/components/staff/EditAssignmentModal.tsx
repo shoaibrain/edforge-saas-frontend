@@ -14,6 +14,7 @@ import { updateStaffAssignmentSchema, type UpdateStaffAssignmentDto, type StaffA
 import { Modal, ModalFooter, Button } from '../ui'
 import { useUpdateAssignment } from '../../hooks'
 import { STAFF_ROLE_OPTIONS } from './wizard/staff-wizard.utils'
+import { useDepartments } from './wizard/steps/AssignmentStep'
 import { parseApiError } from '../../services/people.service'
 
 // ============================================================================
@@ -52,13 +53,14 @@ export function EditAssignmentModal({
   })
 
   const fteValue = watch('fullTimeEquivalency')
+  const { data: departments = [], isLoading: loadingDepts } = useDepartments(assignment?.schoolId)
 
   // Populate form when assignment changes
   useEffect(() => {
     if (open && assignment) {
       reset({
         role: assignment.role,
-        department: assignment.department ?? '',
+        departmentId: assignment.departmentId ?? '',
         isPrimary: assignment.isPrimary,
         positionTitle: assignment.positionTitle ?? '',
         fullTimeEquivalency: assignment.fullTimeEquivalency ?? 1.0,
@@ -156,17 +158,20 @@ export function EditAssignmentModal({
             )}
           </div>
           <div>
-            <label htmlFor="edit-assign-department" className="block text-sm font-medium text-text-primary mb-1.5">
+            <label htmlFor="edit-assign-departmentId" className="block text-sm font-medium text-text-primary mb-1.5">
               Department
             </label>
-            <input
-              id="edit-assign-department"
-              type="text"
-              {...register('department')}
-              className={inputClass(!!errors.department)}
-              placeholder="e.g., Mathematics"
-              disabled={isSubmitting}
-            />
+            <select
+              id="edit-assign-departmentId"
+              {...register('departmentId')}
+              className={inputClass(!!errors.departmentId)}
+              disabled={isSubmitting || loadingDepts}
+            >
+              <option value="">{loadingDepts ? 'Loading...' : 'Select department...'}</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+              ))}
+            </select>
           </div>
         </div>
 

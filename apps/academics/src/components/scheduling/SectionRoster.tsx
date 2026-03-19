@@ -1,28 +1,29 @@
 /**
  * SectionRoster Component
  *
- * Displays and manages enrolled students for a section.
+ * Displays and manages enrolled students for a section using the TanstackDataTable.
  * Supports add (via StudentSelector modal) and remove operations.
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Users,
   UserPlus,
-  Trash2,
+  MoreHorizontal,
   Loader2,
-  GraduationCap,
+  UserMinus,
 } from 'lucide-react'
 import type { SectionResponseDto, StudentSectionResponseDto } from '@aibrains/shared-types'
+import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { useSectionRoster, useRemoveStudent } from '../../hooks/useSections'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
   getCapacityColor,
   getCapacityPercent,
-  getCapacityLabel,
 } from '../../schemas/section.form'
 import { ConfirmationDialog } from '../common/ConfirmationDialog'
 import { StudentSelector } from '../common/StudentSelector'
+import { UserAvatar } from '../common/UserAvatar'
 
 // ============================================================================
 // TYPES
@@ -33,87 +34,121 @@ interface SectionRosterProps {
 }
 
 // ============================================================================
-// CAPACITY HEADER
+// DATE FORMATTING
 // ============================================================================
 
-function CapacityHeader({
+function formatEnrolledDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  } catch {
+    return iso
+  }
+}
+
+// ============================================================================
+// ROW ACTIONS DROPDOWN
+// ============================================================================
+
+function RowActions({
+  onRemove,
+  isRemoving,
+  studentName,
+}: {
+  onRemove: () => void
+  isRemoving: boolean
+  studentName: string
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        disabled={isRemoving}
+        className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors disabled:opacity-50"
+        aria-label={`Actions for ${studentName}`}
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        {isRemoving ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <MoreHorizontal className="w-4 h-4" />
+        )}
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop to close dropdown */}
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="absolute right-0 top-full mt-1 z-20 w-48 rounded-lg border border-border-secondary bg-surface-primary shadow-lg py-1">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false)
+                onRemove()
+              }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+            >
+              <UserMinus className="w-4 h-4" />
+              Remove from Section
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// COMPACT CAPACITY HEADER
+// ============================================================================
+
+function CapacityBar({
   current,
   max,
+  isFull,
+  onAddStudents,
 }: {
   current: number
   max: number
+  isFull: boolean
+  onAddStudents: () => void
 }) {
   const percent = getCapacityPercent(current, max)
   const barColor = getCapacityColor(current, max)
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-sm font-medium text-text-primary">
-            {getCapacityLabel(current, max)} students
-          </span>
-          <span className="text-xs text-text-tertiary">{percent}% full</span>
-        </div>
-        <div className="h-2 bg-surface-secondary rounded-full overflow-hidden">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <span className="text-sm font-medium text-text-primary whitespace-nowrap">
+          {current}/{max} enrolled
+        </span>
+        <div className="h-1 flex-1 max-w-[120px] bg-surface-secondary rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all ${barColor}`}
             style={{ width: `${percent}%` }}
           />
         </div>
       </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// STUDENT ROW
-// ============================================================================
-
-function StudentRow({
-  student,
-  onRemove,
-  isRemoving,
-}: {
-  student: StudentSectionResponseDto
-  onRemove: () => void
-  isRemoving: boolean
-}) {
-  return (
-    <div className="flex items-center justify-between py-3 px-4 hover:bg-surface-secondary/50 transition-colors rounded-lg">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 flex items-center justify-center">
-          <GraduationCap className="w-4 h-4 text-teal-600" />
-        </div>
-        <div>
-          <div className="text-sm font-medium text-text-primary">
-            {student.studentName || student.studentId}
-          </div>
-          <div className="flex items-center gap-2 text-xs text-text-tertiary">
-            {student.studentNumber && (
-              <span>#{student.studentNumber}</span>
-            )}
-            {student.currentGradeLevel && (
-              <span className="px-1.5 py-0.5 rounded bg-surface-tertiary text-text-secondary font-medium">
-                {student.currentGradeLevel}
-              </span>
-            )}
-            <span>Enrolled {new Date(student.enrolledAt).toLocaleDateString()}</span>
-          </div>
-        </div>
-      </div>
       <button
         type="button"
-        onClick={onRemove}
-        disabled={isRemoving}
-        className="p-1.5 rounded-md text-text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-        aria-label="Remove student"
+        onClick={onAddStudents}
+        disabled={isFull}
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/30 dark:hover:bg-teal-950/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Add students to section"
       >
-        {isRemoving ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Trash2 className="w-4 h-4" />
-        )}
+        <UserPlus className="w-3.5 h-3.5" />
+        Add Students
       </button>
     </div>
   )
@@ -150,75 +185,145 @@ export function SectionRoster({ section }: SectionRosterProps) {
 
   const isFull = section.currentEnrollment >= section.maxEnrollment
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-8 bg-surface-secondary rounded-lg animate-pulse" />
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-14 bg-surface-secondary rounded-lg animate-pulse" />
-        ))}
-      </div>
-    )
-  }
+  // ---- Column Definitions ----
+  const columns: ColumnDef<StudentSectionResponseDto, unknown>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'studentName',
+        header: 'Name',
+        size: 240,
+        cell: ({ row }) => {
+          const student = row.original
+          const displayName = student.studentName || student.studentId
+          return (
+            <div className="flex items-center gap-3">
+              <UserAvatar
+                userId={student.studentId}
+                userName={displayName}
+                role="student"
+                size="md"
+              />
+              <span className="text-sm font-medium text-text-primary truncate">
+                {displayName}
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'studentNumber',
+        header: 'Student ID',
+        size: 140,
+        cell: ({ row }) => {
+          const studentNumber = row.original.studentNumber
+          return studentNumber ? (
+            <span className="text-sm font-mono text-text-secondary">
+              {studentNumber}
+            </span>
+          ) : (
+            <span className="text-sm text-text-tertiary">&mdash;</span>
+          )
+        },
+      },
+      {
+        accessorKey: 'currentGradeLevel',
+        header: 'Grade',
+        size: 100,
+        cell: ({ row }) => {
+          const gradeLevel = row.original.currentGradeLevel
+          return gradeLevel ? (
+            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-secondary">
+              {gradeLevel}
+            </span>
+          ) : (
+            <span className="text-sm text-text-tertiary">&mdash;</span>
+          )
+        },
+      },
+      {
+        accessorKey: 'enrolledAt',
+        header: 'Enrolled',
+        size: 130,
+        cell: ({ row }) => (
+          <span className="text-sm text-text-secondary">
+            {formatEnrolledDate(row.original.enrolledAt)}
+          </span>
+        ),
+      },
+      createActionsColumn<StudentSectionResponseDto>({
+        cell: ({ row }) => {
+          const student = row.original
+          const displayName = student.studentName || student.studentId
+          const isCurrentlyRemoving =
+            removeMutation.isPending &&
+            removeMutation.variables?.studentId === student.studentId
+          return (
+            <RowActions
+              onRemove={() => setRemoveTarget(student)}
+              isRemoving={isCurrentlyRemoving}
+              studentName={displayName}
+            />
+          )
+        },
+      }),
+    ],
+    [removeMutation.isPending, removeMutation.variables?.studentId]
+  )
 
   return (
     <div className="space-y-4">
-      {/* Capacity Header */}
-      <CapacityHeader
-        current={roster?.totalCount ?? section.currentEnrollment}
-        max={section.maxEnrollment}
-      />
-
-      {/* Actions */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-text-primary">
-          Enrolled Students
-        </h3>
-        <button
-          type="button"
-          onClick={() => setShowSelector(true)}
-          disabled={isFull}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <UserPlus className="w-3.5 h-3.5" />
-          Add Students
-        </button>
-      </div>
-
-      {/* Student List */}
-      {students.length === 0 ? (
-        <div className="py-12 text-center">
-          <Users className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-          <h4 className="text-sm font-medium text-text-primary mb-1">
-            No students enrolled yet
-          </h4>
-          <p className="text-xs text-text-tertiary max-w-xs mx-auto mb-4">
-            Add students to this section to build your class roster.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowSelector(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add Students
-          </button>
-        </div>
-      ) : (
-        <div className="divide-y divide-border-secondary rounded-lg border border-border-secondary overflow-hidden">
-          {students.map((student) => (
-            <StudentRow
-              key={student.studentId}
-              student={student}
-              onRemove={() => setRemoveTarget(student)}
-              isRemoving={
-                removeMutation.isPending &&
-                removeMutation.variables?.studentId === student.studentId
-              }
-            />
-          ))}
+      {/* Instructor Card */}
+      {section.primaryTeacherId && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-surface-secondary/60 rounded-lg border border-border-secondary">
+          <UserAvatar
+            userId={section.primaryTeacherId}
+            userName={section.primaryTeacherName || 'Teacher'}
+            role="staff"
+            size="md"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-text-primary truncate">
+              {section.primaryTeacherName || 'Teacher'}
+            </p>
+            <p className="text-xs text-text-tertiary">Primary Instructor</p>
+          </div>
+          <span className="flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400">
+            Teacher
+          </span>
         </div>
       )}
+
+      {/* Compact Capacity Header */}
+      <CapacityBar
+        current={roster?.totalCount ?? section.currentEnrollment}
+        max={section.maxEnrollment}
+        isFull={isFull}
+        onAddStudents={() => setShowSelector(true)}
+      />
+
+      {/* Data Table */}
+      <TanstackDataTable
+        columns={columns}
+        data={students}
+        getRowId={(student) => student.studentId}
+        isLoading={isLoading}
+        enableSorting={true}
+        searchPlaceholder="Search by name or student ID..."
+        pagination={{ pageSize: 20 }}
+        emptyState={{
+          icon: <Users className="w-10 h-10" />,
+          title: 'No students enrolled yet',
+          description: 'Add students to this section to build your class roster.',
+          action: {
+            label: 'Add Students',
+            onClick: () => setShowSelector(true),
+          },
+        }}
+        onRowClick={(_student) => {
+          // Row click preserved for future navigation
+        }}
+        maxHeight="calc(100vh - 13rem)"
+      />
 
       {/* Student Selector Modal */}
       <StudentSelector

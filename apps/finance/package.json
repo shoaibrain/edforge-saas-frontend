@@ -12,9 +12,12 @@
   },
   "dependencies": {
     "@edforge/abac": "workspace:*",
+    "@edforge/api-client": "workspace:*",
+    "@edforge/finance-services": "workspace:*",
     "@edforge/theme": "workspace:*",
     "@edforge/types": "workspace:*",
     "@edforge/ui": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
     "@tanstack/react-router": "^1.82.0",
     "@tanstack/react-query": "^5.60.0",
     "@tanstack/react-table": "^8.20.0",
@@ -23,12 +26,12 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.0",
+    "sonner": "^1.7.0",
     "zod": "^3.24.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@edforge/config": "workspace:*",
-    "@hookform/resolvers": "^3.9.0",
     "@module-federation/enhanced": "^0.8.0",
     "@module-federation/rsbuild-plugin": "^0.8.0",
     "@rsbuild/core": "^1.1.0",

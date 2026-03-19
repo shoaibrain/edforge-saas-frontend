@@ -5,12 +5,16 @@
  */
 
 import { motion } from 'framer-motion'
+import { useTranslation } from '@edforge/i18n'
 
 interface LoadingScreenProps {
   message?: string
 }
 
-export function LoadingScreen({ message = 'Loading module...' }: LoadingScreenProps) {
+export function LoadingScreen({ message }: LoadingScreenProps) {
+  const { t } = useTranslation('errors')
+  const displayMessage = message || t('loadingModule')
+
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <motion.div
@@ -50,7 +54,7 @@ export function LoadingScreen({ message = 'Loading module...' }: LoadingScreenPr
         </div>
 
         {/* Loading Text */}
-        <p className="text-text-secondary text-sm">{message}</p>
+        <p className="text-text-secondary text-sm">{displayMessage}</p>
 
         {/* Progress Dots */}
         <div className="flex gap-1.5">
@@ -74,4 +78,3 @@ export function LoadingScreen({ message = 'Loading module...' }: LoadingScreenPr
     </div>
   )
 }
-

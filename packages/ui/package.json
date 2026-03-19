@@ -25,7 +25,8 @@
   },
   "peerDependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@tanstack/react-table": "^8.20.0"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@edforge/config": "workspace:*",
     "@edforge/types": "workspace:*",
+    "@tanstack/react-table": "^8.20.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "react": "^19.0.0",

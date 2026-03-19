@@ -15,7 +15,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           'rounded-2xl border transition-all duration-200',
           glass
             ? 'glass'
-            : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] shadow-sm hover:shadow-md',
+            : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary)/0.6)] shadow-sm hover:shadow-md',
           className
         )}
         {...props}

@@ -28,21 +28,24 @@ interface ActivityFeedWidgetProps {
 
 const SEVERITY_STYLES = {
   critical: {
-    bg: 'bg-red-500/10 dark:bg-red-500/15',
+    bg: 'bg-red-50 dark:bg-red-500/10',
     text: 'text-red-600 dark:text-red-400',
     badge: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+    border: 'border-l-4 border-red-500',
     label: 'Critical',
   },
   warning: {
-    bg: 'bg-amber-500/10 dark:bg-amber-500/15',
+    bg: 'bg-amber-50 dark:bg-amber-500/10',
     text: 'text-amber-600 dark:text-amber-400',
     badge: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+    border: 'border-l-4 border-amber-400',
     label: 'Warning',
   },
   info: {
-    bg: 'bg-teal-500/10 dark:bg-teal-500/15',
+    bg: 'bg-teal-50 dark:bg-teal-500/10',
     text: 'text-teal-600 dark:text-teal-400',
     badge: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
+    border: 'border-l-4 border-teal-500',
     label: 'Info',
   },
 }
@@ -86,9 +89,9 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
       transition={{ delay: index * 0.05, duration: 0.25 }}
     >
       <Link to={alert.href as any}>
-        <div className="group flex items-center gap-3 p-3 rounded-xl hover:bg-interactive-hover transition-colors cursor-pointer">
+        <div className={`group flex items-center gap-3 p-4 rounded-r-lg ${style.bg} ${style.border} cursor-pointer hover:brightness-[0.98] dark:hover:brightness-110 transition-all`}>
           {/* Severity + Type icons */}
-          <div className={`relative p-2 rounded-lg ${style.bg} flex-shrink-0`}>
+          <div className="relative p-2 rounded-lg bg-white/60 dark:bg-white/10 flex-shrink-0">
             <TypeIcon className={`w-5 h-5 ${style.text}`} />
             <div className="absolute -top-1 -right-1">
               <SeverityIcon className={`w-3.5 h-3.5 ${style.text}`} />
@@ -102,7 +105,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
                 {alert.title}
               </p>
               <span
-                className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${style.badge} flex-shrink-0`}
+                className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${style.badge} flex-shrink-0`}
               >
                 {style.label}
               </span>
@@ -114,7 +117,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
 
           {/* Count badge */}
           {alert.count != null && (
-            <span className="text-xs font-medium text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-full flex-shrink-0">
+            <span className="text-xs font-medium text-text-secondary bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-full flex-shrink-0">
               {alert.count}
             </span>
           )}
@@ -140,7 +143,7 @@ export function ActivityFeedWidget({
   const hasMore = totalCount > 5
 
   return (
-    <Card className="p-5 border-border-secondary flex-1 flex flex-col">
+    <Card className="p-5 border-border-secondary flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <div className="p-1.5 rounded-lg bg-amber-500/10">
@@ -169,7 +172,7 @@ export function ActivityFeedWidget({
             </p>
           </div>
         ) : (
-          <ul role="list" className="space-y-1">
+          <ul role="list" className="space-y-2">
             {displayAlerts.map((alert, index) => (
               <AlertItem key={alert.id} alert={alert} index={index} />
             ))}
@@ -181,7 +184,8 @@ export function ActivityFeedWidget({
       {hasMore && (
         <div className="pt-3 mt-2 border-t border-border-secondary">
           <Link
-            to="/attendance"
+            to="/classrooms"
+            search={{ tab: 'attendance' }}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:text-teal-700 dark:hover:text-cyan-300 transition-colors"
           >
             View all ({totalCount})

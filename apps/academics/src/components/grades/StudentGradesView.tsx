@@ -1,4 +1,7 @@
 /**
+ * @deprecated This component has been superseded by the OverviewTab academic dashboard
+ * which includes grade summary inline. Kept for standalone route use if needed.
+ *
  * StudentGradesView Component
  *
  * Displays a student's grades across all courses with GPA summary.

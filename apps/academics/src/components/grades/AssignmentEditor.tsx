@@ -8,6 +8,7 @@
 import { useState, useMemo } from 'react'
 import { X, Loader2, Save, Plus, ClipboardPaste, BarChart2 } from 'lucide-react'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
+import type { AssessmentCategory } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -57,6 +58,7 @@ export function AssignmentEditor({
   const [assignmentName, setAssignmentName] = useState('')
   const [possiblePoints, setPossiblePoints] = useState('100')
   const [categoryId, setCategoryId] = useState('homework')
+  const [assessmentPurpose, setAssessmentPurpose] = useState<AssessmentCategory | ''>('')
   const [dueDate, setDueDate] = useState('')
   const [showBulkPaste, setShowBulkPaste] = useState(false)
   const [pasteText, setPasteText] = useState('')
@@ -153,6 +155,7 @@ export function AssignmentEditor({
           assignmentName: assignmentName.trim(),
           assignmentType: categoryId,
           categoryId,
+          assessmentCategory: assessmentPurpose || undefined,
           possiblePoints: possiblePts,
         },
         grades: students.map((s) => ({
@@ -187,6 +190,7 @@ export function AssignmentEditor({
           assignmentName: assignmentName.trim(),
           assignmentType: categoryId,
           categoryId,
+          assessmentCategory: assessmentPurpose || undefined,
           possiblePoints: possiblePts,
         },
         grades,
@@ -263,16 +267,32 @@ export function AssignmentEditor({
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Due Date
-              </label>
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">
+                  Assessment Purpose
+                </label>
+                <select
+                  value={assessmentPurpose}
+                  onChange={(e) => setAssessmentPurpose(e.target.value as AssessmentCategory | '')}
+                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                >
+                  <option value="">Auto-detect</option>
+                  <option value="formative">Formative</option>
+                  <option value="summative">Summative</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">
+                  Due Date
+                </label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                />
+              </div>
             </div>
           </div>
 

@@ -3,7 +3,7 @@
  *
  * Displays a paginated table of courses with sorting, row actions,
  * subject area badges, grade level chips, and status indicators.
- * Follows the same DataTable pattern as StudentTable.
+ * Uses the TanstackDataTable with ColumnDef-based column definitions.
  */
 
 import { useMemo, useState } from 'react'
@@ -16,7 +16,7 @@ import {
   ToggleLeft,
   ToggleRight,
 } from 'lucide-react'
-import { DataTable, type Column } from '@edforge/ui'
+import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import {
   getSubjectAreaLabel,
@@ -34,9 +34,6 @@ import {
 interface CourseTableProps {
   courses: CourseResponseDto[]
   isLoading?: boolean
-  hasMore?: boolean
-  isFetchingMore?: boolean
-  onLoadMore?: () => void
   onAddCourse?: () => void
   onViewCourse?: (course: CourseResponseDto) => void
   onEditCourse?: (course: CourseResponseDto) => void
@@ -51,8 +48,8 @@ interface CourseTableProps {
 interface RowActionsProps {
   course: CourseResponseDto
   onView: () => void
-  onEdit: () => void
-  onToggleActive: () => void
+  onEdit?: () => void
+  onToggleActive?: () => void
   onNavigate?: () => void
 }
 
@@ -109,43 +106,47 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
                 View Full Details
               </button>
             )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onEdit()
-              }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
-            >
-              <Pencil className="w-4 h-4" />
-              Edit Course
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onToggleActive()
-              }}
-              className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${
-                course.isActive
-                  ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10'
-                  : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-              }`}
-            >
-              {course.isActive ? (
-                <>
-                  <ToggleLeft className="w-4 h-4" />
-                  Deactivate
-                </>
-              ) : (
-                <>
-                  <ToggleRight className="w-4 h-4" />
-                  Activate
-                </>
-              )}
-            </button>
+            {onEdit && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onEdit()
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              >
+                <Pencil className="w-4 h-4" />
+                Edit Course
+              </button>
+            )}
+            {onToggleActive && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onToggleActive()
+                }}
+                className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${
+                  course.isActive
+                    ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10'
+                    : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                }`}
+              >
+                {course.isActive ? (
+                  <>
+                    <ToggleLeft className="w-4 h-4" />
+                    Deactivate
+                  </>
+                ) : (
+                  <>
+                    <ToggleRight className="w-4 h-4" />
+                    Activate
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </>
       )}
@@ -222,110 +223,113 @@ function StatusDot({ isActive }: { isActive: boolean }) {
 export function CourseTable({
   courses,
   isLoading = false,
-  hasMore = false,
-  isFetchingMore = false,
-  onLoadMore,
   onAddCourse,
   onViewCourse,
   onEditCourse,
   onToggleActive,
   onNavigateToCourse,
 }: CourseTableProps) {
-  const columns: Column<CourseResponseDto>[] = useMemo(
+  const columns: ColumnDef<CourseResponseDto, unknown>[] = useMemo(
     () => [
       {
-        key: 'courseCode',
+        accessorKey: 'courseCode',
         header: 'Code',
-        sortable: true,
-        width: '120px',
-        render: (course) => (
+        size: 120,
+        cell: ({ row }) => (
           <span className="font-mono text-xs font-semibold text-text-primary bg-surface-tertiary px-2 py-0.5 rounded">
-            {course.courseCode}
+            {row.original.courseCode}
           </span>
         ),
       },
       {
-        key: 'courseName',
+        accessorKey: 'courseName',
         header: 'Course Name',
-        sortable: true,
-        width: '240px',
-        render: (course) => (
+        size: 240,
+        cell: ({ row }) => (
           <div className="min-w-0">
             <p className="font-medium text-text-primary truncate">
-              {course.courseName}
+              {row.original.courseName}
             </p>
-            {course.departmentName && (
+            {row.original.departmentName && (
               <p className="text-xs text-text-tertiary truncate">
-                {course.departmentName}
+                {row.original.departmentName}
               </p>
             )}
           </div>
         ),
       },
       {
-        key: 'subjectArea',
+        accessorKey: 'subjectArea',
         header: 'Subject',
-        sortable: true,
-        width: '160px',
-        render: (course) => <SubjectBadge value={course.subjectArea} />,
+        size: 160,
+        cell: ({ row }) => <SubjectBadge value={row.original.subjectArea} />,
       },
       {
-        key: 'gradeLevels',
+        accessorKey: 'gradeLevels',
         header: 'Grades',
-        width: '140px',
-        render: (course) => <GradeLevelChips grades={course.gradeLevels} />,
+        size: 140,
+        enableSorting: false,
+        cell: ({ row }) => <GradeLevelChips grades={row.original.gradeLevels} />,
       },
       {
-        key: 'credits',
+        accessorKey: 'credits',
         header: 'Credits',
-        sortable: true,
-        width: '100px',
-        render: (course) => (
+        size: 100,
+        cell: ({ row }) => (
           <div className="text-right">
-            <span className="font-medium text-text-primary">{course.credits}</span>
-            {course.creditType && (
+            <span className="font-medium text-text-primary">{row.original.credits}</span>
+            {row.original.creditType && (
               <span className="ml-1 text-xs text-text-tertiary">
-                {getCreditTypeLabel(course.creditType)}
+                {getCreditTypeLabel(row.original.creditType)}
               </span>
             )}
           </div>
         ),
       },
       {
-        key: 'courseType',
+        accessorKey: 'courseType',
         header: 'Type',
-        sortable: true,
-        width: '110px',
-        render: (course) => <CourseTypeBadge value={course.courseType} />,
+        size: 110,
+        cell: ({ row }) => <CourseTypeBadge value={row.original.courseType} />,
       },
       {
-        key: 'typicalDuration',
+        accessorKey: 'typicalDuration',
         header: 'Duration',
-        width: '100px',
-        render: (course) => (
+        size: 100,
+        enableSorting: false,
+        cell: ({ row }) => (
           <span className="text-sm text-text-secondary">
-            {getDurationLabel(course.typicalDuration)}
+            {getDurationLabel(row.original.typicalDuration)}
           </span>
         ),
       },
       {
-        key: 'isActive',
+        accessorKey: 'isActive',
         header: 'Status',
-        sortable: true,
-        width: '90px',
-        render: (course) => <StatusDot isActive={course.isActive} />,
+        size: 90,
+        cell: ({ row }) => <StatusDot isActive={row.original.isActive} />,
       },
+      createActionsColumn<CourseResponseDto>({
+        cell: ({ row }) => (
+          <RowActions
+            course={row.original}
+            onView={() => onViewCourse?.(row.original)}
+            onEdit={() => onEditCourse?.(row.original)}
+            onToggleActive={() => onToggleActive?.(row.original)}
+            onNavigate={onNavigateToCourse ? () => onNavigateToCourse(row.original) : undefined}
+          />
+        ),
+      }),
     ],
-    []
+    [onViewCourse, onEditCourse, onToggleActive, onNavigateToCourse]
   )
 
   return (
-    <DataTable
+    <TanstackDataTable
       columns={columns}
       data={courses}
-      keyExtractor={(course) => course.courseId}
+      getRowId={(course) => course.courseId}
       isLoading={isLoading}
-      skeletonRows={8}
       emptyState={{
         icon: <BookOpen className="w-12 h-12" />,
         title: 'No courses found',
@@ -335,19 +339,10 @@ export function CourseTable({
           ? { label: 'Add Course', onClick: onAddCourse }
           : undefined,
       }}
-      hasMore={hasMore}
-      isFetchingMore={isFetchingMore}
-      onLoadMore={onLoadMore}
+      pagination={{ pageSize: 20 }}
+      enableSorting={true}
       onRowClick={onViewCourse}
-      rowActions={(course) => (
-        <RowActions
-          course={course}
-          onView={() => onViewCourse?.(course)}
-          onEdit={() => onEditCourse?.(course)}
-          onToggleActive={() => onToggleActive?.(course)}
-          onNavigate={onNavigateToCourse ? () => onNavigateToCourse(course) : undefined}
-        />
-      )}
+      maxHeight="calc(100vh - 13rem)"
     />
   )
 }

@@ -33,7 +33,8 @@ import {
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { Button } from '@edforge/ui'
+import { Button, DateInput } from '@edforge/ui'
+import { getAcademicYearLabel } from '@aibrains/shared-types'
 
 // ============================================================================
 // LOCAL TYPES
@@ -186,9 +187,10 @@ interface CreateAcademicYearModalProps {
   onSubmit: (data: CreateAcademicYearWithTerms) => void
   isLoading: boolean
   schoolId: string
+  calendarSystem?: string
 }
 
-function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolId }: CreateAcademicYearModalProps) {
+function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolId, calendarSystem = 'gregorian' }: CreateAcademicYearModalProps) {
   const [name, setName] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -260,6 +262,37 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Create Academic Year</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <DateInput
+                label="Start Date"
+                value={startDate}
+                onChange={(iso) => {
+                  setStartDate(iso)
+                  if (iso && endDate) {
+                    try { setName(getAcademicYearLabel(iso, endDate, calendarSystem)) } catch { /* ignore */ }
+                  }
+                }}
+                calendarSystem={calendarSystem}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <DateInput
+                label="End Date"
+                value={endDate}
+                onChange={(iso) => {
+                  setEndDate(iso)
+                  if (startDate && iso) {
+                    try { setName(getAcademicYearLabel(startDate, iso, calendarSystem)) } catch { /* ignore */ }
+                  }
+                }}
+                calendarSystem={calendarSystem}
+                className="w-full"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
               Year Name
@@ -269,36 +302,14 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              placeholder="e.g., 2025-2026"
+              placeholder={calendarSystem === 'bikram_sambat' ? 'e.g., 2082-2083' : 'e.g., 2025-2026'}
               className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50"
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                End Date
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50"
-              />
-            </div>
+            {calendarSystem === 'bikram_sambat' && (
+              <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
+                Year name is auto-generated from Bikram Sambat dates
+              </p>
+            )}
           </div>
 
           <div>
@@ -373,9 +384,10 @@ interface EditAcademicYearModalProps {
   onClose: () => void
   onSubmit: (data: UpdateAcademicYearDto) => void
   isLoading: boolean
+  calendarSystem?: string
 }
 
-function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading }: EditAcademicYearModalProps) {
+function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, calendarSystem = 'gregorian' }: EditAcademicYearModalProps) {
   const [name, setName] = useState(year?.name || '')
   const [startDate, setStartDate] = useState(year?.startDate || '')
   const [endDate, setEndDate] = useState(year?.endDate || '')
@@ -442,29 +454,23 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading }: E
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                Start Date
-              </label>
-              <input
-                type="date"
+              <DateInput
+                label="Start Date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
+                onChange={(iso) => setStartDate(iso)}
+                calendarSystem={calendarSystem}
                 disabled={!canEdit}
-                className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                End Date
-              </label>
-              <input
-                type="date"
+              <DateInput
+                label="End Date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
+                onChange={(iso) => setEndDate(iso)}
+                calendarSystem={calendarSystem}
                 disabled={!canEdit}
-                className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full"
               />
             </div>
           </div>
@@ -604,6 +610,16 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
   const [yearToActivate, setYearToActivate] = useState<AcademicYear | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+
+  // Fetch school to get calendarSystem
+  const { data: school } = useQuery({
+    queryKey: ['school', schoolId],
+    queryFn: () => tenantService.getSchool(schoolId),
+    enabled: !!schoolId,
+    staleTime: 10 * 60 * 1000,
+  })
+
+  const calendarSystem = school?.calendarSystem || 'gregorian'
 
   // Fetch academic years
   const {
@@ -947,6 +963,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
             onSubmit={(data) => createMutation.mutate(data)}
             isLoading={createMutation.isPending}
             schoolId={schoolId}
+            calendarSystem={calendarSystem}
           />
         )}
         {yearToEdit && (
@@ -956,6 +973,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
             onClose={() => setYearToEdit(null)}
             onSubmit={(data) => updateMutation.mutate({ yearId: yearToEdit.id, data })}
             isLoading={updateMutation.isPending}
+            calendarSystem={calendarSystem}
           />
         )}
         {yearToActivate && (

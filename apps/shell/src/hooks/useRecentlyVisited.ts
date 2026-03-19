@@ -18,10 +18,12 @@ import {
   BookOpen,
   ClipboardList,
   Calendar,
-  BarChart3,
-  Video,
+  // [MVP-PARKED] Unused icons from parked module metadata
+  // BarChart3,
+  // Video,
+  // MessageSquare,
+  // [/MVP-PARKED]
   UserCog,
-  MessageSquare,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -56,10 +58,12 @@ const ICON_MAP: Record<string, LucideIcon> = {
   BookOpen,
   ClipboardList,
   Calendar,
-  BarChart3,
-  Video,
+  // [MVP-PARKED] Parked module icons
+  // BarChart3,
+  // Video,
+  // MessageSquare,
+  // [/MVP-PARKED]
   UserCog,
-  MessageSquare,
 }
 
 export function getIconComponent(iconName: string): LucideIcon {
@@ -82,17 +86,20 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/academics/students': { title: 'Students', icon: 'Users', module: 'academics' },
   '/academics/teachers': { title: 'Teachers', icon: 'UserCog', module: 'academics' },
   '/academics/classrooms': { title: 'Classrooms', icon: 'BookOpen', module: 'academics' },
-  '/academics/attendance': { title: 'Attendance', icon: 'ClipboardList', module: 'academics' },
   '/academics/gradebooks': { title: 'Gradebooks', icon: 'GraduationCap', module: 'academics' },
   '/finance': { title: 'Finance', icon: 'DollarSign', module: 'finance' },
-  '/finance/tuition': { title: 'Tuition', icon: 'DollarSign', module: 'finance' },
-  '/finance/fees': { title: 'Fees', icon: 'DollarSign', module: 'finance' },
-  '/finance/reports': { title: 'Reports', icon: 'BarChart3', module: 'finance' },
+  '/finance/billing': { title: 'Billing', icon: 'DollarSign', module: 'finance' },
+  '/finance/billing/invoices': { title: 'Invoices', icon: 'DollarSign', module: 'finance' },
+  '/finance/billing/payments': { title: 'Payments', icon: 'DollarSign', module: 'finance' },
+  '/finance/dashboard': { title: 'Financial Dashboard', icon: 'BarChart3', module: 'finance' },
+  '/finance/ledger': { title: 'Ledger', icon: 'BookOpen', module: 'finance' },
   '/people': { title: 'People', icon: 'Users', module: 'people' },
   '/people/staff': { title: 'Staff', icon: 'UserCog', module: 'people' },
   '/people/parents': { title: 'Parents', icon: 'Users', module: 'people' },
-  '/messages': { title: 'Messages', icon: 'Mail', module: 'messages' },
-  '/analytics': { title: 'Analytics', icon: 'BarChart3', module: 'analytics' },
+  // [MVP-PARKED] Parked module page metadata
+  // '/messages': { title: 'Messages', icon: 'Mail', module: 'messages' },
+  // '/analytics': { title: 'Analytics', icon: 'BarChart3', module: 'analytics' },
+  // [/MVP-PARKED]
   '/settings': { title: 'Settings', icon: 'Settings', module: 'settings' },
 }
 
@@ -208,8 +215,8 @@ export const MOCK_RECENT_PAGES: VisitedPage[] = [
     visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
   },
   {
-    path: '/finance/tuition',
-    title: 'Tuition',
+    path: '/finance/billing',
+    title: 'Billing',
     icon: 'DollarSign',
     module: 'finance',
     visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
@@ -228,12 +235,14 @@ export const MOCK_RECENT_PAGES: VisitedPage[] = [
     module: 'academics',
     visitedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
   },
-  {
-    path: '/analytics',
-    title: 'Analytics',
-    icon: 'BarChart3',
-    module: 'analytics',
-    visitedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 days ago
-  },
+  // [MVP-PARKED] Analytics mock entry
+  // {
+  //   path: '/analytics',
+  //   title: 'Analytics',
+  //   icon: 'BarChart3',
+  //   module: 'analytics',
+  //   visitedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 days ago
+  // },
+  // [/MVP-PARKED]
 ]
 

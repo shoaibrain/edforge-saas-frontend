@@ -15,6 +15,5 @@ export { EditAssignmentModal, type EditAssignmentModalProps } from './EditAssign
 export { CredentialsSection } from './CredentialsSection'
 export { CredentialModal, type CredentialModalProps } from './CredentialModal'
 export { EmploymentHistory } from './EmploymentHistory'
-export { SectionAssociations } from './SectionAssociations'
 export { LeaveManagement } from './LeaveManagement'
 export { CreateLeaveModal, type CreateLeaveModalProps } from './CreateLeaveModal'

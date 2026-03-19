@@ -8,8 +8,9 @@
  * Sprint 5 — Rostering & Attendance
  */
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePermission } from '@edforge/abac'
 import {
   ClipboardCheck,
   Loader2,
@@ -19,6 +20,8 @@ import {
   WifiOff,
   Check,
   CloudOff,
+  Calendar,
+  RefreshCw,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -27,10 +30,14 @@ import {
 } from '../../stores/attendance.store'
 import {
   useAttendanceSummary,
-  useAttendanceRecords,
-  useRecordBulkAttendance,
   useCalendarDate,
+  useAttendanceOverview,
 } from '../../hooks/useAttendance'
+import {
+  useSectionAttendanceRecords,
+  useRecordBulkSectionAttendance,
+  useUpdateSectionAttendance,
+} from '../../hooks/useSectionAttendance'
 import { useSections, flattenSectionPages, useSectionRoster } from '../../hooks'
 import { useCurrentAcademicYear } from '../../hooks'
 import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
@@ -181,12 +188,30 @@ function SectionSelector({
   selectedId,
   onSelect,
   isLoading,
+  completedSectionIds,
 }: {
   sections: Array<{ sectionId: string; sectionNumber: string; courseName?: string; courseCode?: string }>
   selectedId: string | null
   onSelect: (id: string | null) => void
   isLoading: boolean
+  /** Task 4.1: Section IDs that have completed attendance today */
+  completedSectionIds?: Set<string>
 }) {
+  // Auto-select first section when sections load and nothing is selected
+  useEffect(() => {
+    if (!selectedId && sections.length > 0 && sections.length <= 5) {
+      onSelect(sections[0].sectionId)
+    }
+  }, [sections, selectedId, onSelect])
+
+  if (!isLoading && sections.length === 0) {
+    return (
+      <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg max-w-xs">
+        No sections assigned. Contact your administrator.
+      </div>
+    )
+  }
+
   return (
     <div className="relative">
       <select
@@ -198,6 +223,7 @@ function SectionSelector({
         <option value="">Select a section...</option>
         {sections.map((s) => (
           <option key={s.sectionId} value={s.sectionId}>
+            {completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}
             {s.courseName || s.courseCode || 'Section'} - {s.sectionNumber}
           </option>
         ))}
@@ -222,6 +248,10 @@ export function AttendanceModule() {
   const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
   const dateActions = useAttendanceDateActions()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+
+  // ABAC: check if user can create/edit attendance
+  const canCreateAttendance = usePermission('create', 'attendance')
+  const exportPortalRef = useRef<HTMLDivElement>(null)
 
   // Fetch current academic year for sections query
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -248,32 +278,30 @@ export function AttendanceModule() {
     enabled: !!selectedSectionId && !!schoolId,
   })
 
-  // Fetch daily summary
+  // Fetch daily summary (with academicYearId for enrollment-based totalStudents)
   const { data: summary, isLoading: summaryLoading } = useAttendanceSummary({
     schoolId,
     date: selectedDate,
+    academicYearId: currentYear?.yearId,
     enabled: !!schoolId,
   })
 
-  // Fetch existing attendance records for the selected date
-  const { data: attendanceRecords } = useAttendanceRecords({
+  // Fetch section-specific attendance records (no client-side filtering needed)
+  const { data: sectionRecords } = useSectionAttendanceRecords({
+    sectionId: selectedSectionId || '',
     schoolId,
     date: selectedDate,
     enabled: !!schoolId && !!selectedSectionId && activeTab === 'daily-entry',
   })
 
-  // Filter records to only students in the selected section's roster
   const existingRecords = useMemo(() => {
-    if (!attendanceRecords || !roster?.students) return []
-    const rosterStudentIds = new Set(roster.students.map((s) => s.studentId))
-    return attendanceRecords
-      .filter((r) => rosterStudentIds.has(r.studentId))
-      .map((r) => ({
-        studentId: r.studentId,
-        status: r.status,
-        notes: r.notes,
-      }))
-  }, [attendanceRecords, roster?.students])
+    if (!sectionRecords) return []
+    return sectionRecords.map((r) => ({
+      studentId: r.studentId,
+      status: r.status as AttendanceStatus,
+      notes: r.notes,
+    }))
+  }, [sectionRecords])
 
   // Calendar date check (Sprint 5)
   const { data: calendarDate } = useCalendarDate({
@@ -285,8 +313,28 @@ export function AttendanceModule() {
   const isNonInstructional = calendarDate != null &&
     !calendarDate.isInstructionalDay
 
-  // Bulk attendance mutation
-  const bulkMutation = useRecordBulkAttendance()
+  // Section-level mutations
+  const bulkMutation = useRecordBulkSectionAttendance()
+  const updateMutation = useUpdateSectionAttendance()
+
+  // Task 4.1: Fetch overview for section completion indicators
+  const { data: overviewData } = useAttendanceOverview({
+    schoolId,
+    academicYearId: currentYear?.yearId || '',
+    date: selectedDate,
+    enabled: !!schoolId && !!currentYear?.yearId && activeTab === 'daily-entry',
+  })
+
+  // Task 4.1: Build completed section IDs set
+  const completedSectionIds = useMemo(() => {
+    const ids = new Set<string>()
+    if (overviewData?.sectionCompletion?.sections) {
+      for (const s of overviewData.sectionCompletion.sections) {
+        if (s.isComplete) ids.add(s.sectionId)
+      }
+    }
+    return ids
+  }, [overviewData])
 
   // Offline resilience (Sprint 5)
   const offlineState = useOfflineAttendance({
@@ -317,20 +365,68 @@ export function AttendanceModule() {
     [schoolId, selectedSectionId, offlineState]
   )
 
+  const handleCorrection = useCallback(
+    (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => {
+      if (!schoolId || !selectedSectionId) return
+      // Check if this student already has a record for this date
+      const hasExisting = sectionRecords?.some((r) => r.studentId === record.studentId)
+      if (hasExisting) {
+        // PATCH existing record
+        updateMutation.mutate({
+          date: selectedDate,
+          sectionId: selectedSectionId,
+          studentId: record.studentId,
+          status: record.status,
+          notes: record.notes,
+          excuseReason: record.excuseType,
+          schoolId,
+        })
+      } else {
+        // POST new record via bulk endpoint (single-record array)
+        bulkMutation.mutate({
+          date: selectedDate,
+          schoolId,
+          sectionId: selectedSectionId,
+          records: [{ studentId: record.studentId, status: record.status, notes: record.notes }],
+        })
+      }
+    },
+    [schoolId, selectedSectionId, selectedDate, sectionRecords, updateMutation, bulkMutation]
+  )
+
   return (
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 pt-6 pb-0">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-              <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
+                <p className="text-text-secondary mt-0.5">
+                  Record and review attendance by class section
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
-              <p className="text-text-secondary mt-0.5">
-                Record and review attendance by class section
-              </p>
+            {/* Task 2.1: Academic Year Context Bar + Export portal */}
+            <div className="flex items-center gap-4">
+              {currentYear && (
+                <div className="flex items-center gap-4 text-xs text-text-tertiary">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{currentYear.name || 'Academic Year'}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                </div>
+              )}
+              {/* Portal target for dashboard Export button */}
+              <div ref={exportPortalRef} />
             </div>
           </div>
 
@@ -342,6 +438,7 @@ export function AttendanceModule() {
                 selectedId={selectedSectionId}
                 onSelect={setSelectedSectionId}
                 isLoading={sectionsLoading}
+                completedSectionIds={completedSectionIds}
               />
               <DateSelector
                 selectedDate={selectedDate}
@@ -377,6 +474,7 @@ export function AttendanceModule() {
                 schoolId={schoolId}
                 academicYearId={currentYear?.yearId || ''}
                 currentDate={selectedDate}
+                exportPortalRef={exportPortalRef}
               />
             )}
 
@@ -422,8 +520,9 @@ export function AttendanceModule() {
                     existingRecords={existingRecords}
                     onSave={handleSave}
                     isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
-                    disabled={isNonInstructional}
+                    disabled={isNonInstructional || !canCreateAttendance}
                     saveStatus={offlineState.saveStatus}
+                    onCorrection={handleCorrection}
                   />
                 )}
               </div>

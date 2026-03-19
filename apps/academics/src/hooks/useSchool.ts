@@ -8,11 +8,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
+  getSchoolProfile,
   getAcademicYears,
   getCurrentAcademicYear,
   getGradingPeriods,
   setCurrentAcademicYear,
   updateAcademicYearStatus,
+  type SchoolProfileDto,
   type AcademicYearResponseDto,
   type GradingPeriodResponseDto,
 } from '../services/school.service'
@@ -24,12 +26,40 @@ import { parseApiError } from '../services/academics.service'
 
 export const schoolKeys = {
   all: ['school'] as const,
+  profile: (schoolId: string) =>
+    [...schoolKeys.all, 'profile', schoolId] as const,
   academicYears: (schoolId: string) =>
     [...schoolKeys.all, 'academic-years', schoolId] as const,
   currentYear: (schoolId: string) =>
     [...schoolKeys.all, 'current-year', schoolId] as const,
   gradingPeriods: (schoolId: string, yearId: string) =>
     [...schoolKeys.all, 'grading-periods', schoolId, yearId] as const,
+}
+
+// ============================================================================
+// SCHOOL PROFILE
+// ============================================================================
+
+/**
+ * Hook to fetch a school's profile including gradeRange.
+ * Cached for 5 minutes — gradeRange rarely changes mid-session.
+ */
+export function useSchoolProfile(schoolId: string | null, enabled = true) {
+  return useQuery<SchoolProfileDto, Error>({
+    queryKey: schoolKeys.profile(schoolId!),
+    queryFn: () => getSchoolProfile(schoolId!),
+    enabled: enabled && !!schoolId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  })
+}
+
+/**
+ * Convenience hook that returns just the grade range from the school profile.
+ */
+export function useSchoolGradeRange(schoolId: string | null) {
+  const { data: profile, isLoading } = useSchoolProfile(schoolId)
+  return { gradeRange: profile?.gradeRange ?? null, isLoading }
 }
 
 // ============================================================================
@@ -59,6 +89,11 @@ export function useCurrentAcademicYear(schoolId: string, enabled = true) {
     enabled: enabled && !!schoolId,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
+    // Don't retry on 404 — new schools won't have a current academic year yet
+    retry: (failureCount, error) => {
+      if (error?.message?.includes('404') || error?.message?.includes('not found')) return false
+      return failureCount < 2
+    },
   })
 }
 

@@ -1,7 +1,7 @@
 {
   "buildCommand": "bash scripts/build-deploy.sh",
   "outputDirectory": "output",
-  "installCommand": "pnpm install",
+  "installCommand": "npm i -g pnpm@9.15.0 && pnpm install",
   "framework": null,
   "rewrites": [
     { "source": "/remotes/:path*", "destination": "/remotes/:path*" },

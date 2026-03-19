@@ -7,6 +7,12 @@
 
 import { z } from 'zod'
 
+// Empty string → undefined for optional UUID fields (prevents silent validation failures)
+const optionalUuid = z.preprocess(
+  (val) => (val === '' || val === null ? undefined : val),
+  z.string().uuid().optional(),
+)
+
 // Step 1: Personal Information — core identity fields
 export const personalInfoStepSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(75),
@@ -40,7 +46,7 @@ export const employmentStepSchema = z.object({
     { errorMap: () => ({ message: 'Select employment type' }) },
   ),
   hireDate: z.string().min(1, 'Hire date is required'),
-  department: z.string().max(100).optional(),
+  departmentId: optionalUuid,
   title: z.string().max(100).optional(),
   highlyQualifiedTeacher: z.boolean().optional(),
   yearsOfPriorTeachingExperience: z.coerce.number().int().min(0).optional(),
@@ -51,9 +57,12 @@ export const employmentStepSchema = z.object({
 
 // Step 4: School Assignment — primary school required
 export const assignmentStepSchema = z.object({
-  primarySchoolId: z.string().uuid('Select a primary school'),
+  primarySchoolId: z.preprocess(
+    (val) => (val === '' || val === null ? undefined : val),
+    z.string().uuid('Select a primary school'),
+  ),
   primaryAssignmentRole: z.string().optional(),
-  primaryAssignmentDepartment: z.string().max(100).optional(),
+  primaryAssignmentDepartmentId: optionalUuid,
   primaryAssignmentBeginDate: z.string().optional(),
   primaryAssignmentFte: z.coerce.number().min(0).max(1).optional(),
 }).passthrough()

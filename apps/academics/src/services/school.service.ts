@@ -127,10 +127,39 @@ export async function updateAcademicYearStatus(
 }
 
 // ============================================================================
+// SCHOOL PROFILE
+// ============================================================================
+
+/**
+ * Minimal school profile for grade-range filtering.
+ * The Shell's mapApiSchool() strips gradeRange, so the Academics MFE
+ * fetches directly to get the full response including gradeRange.
+ */
+export interface SchoolProfileDto {
+  schoolId: string
+  name: string
+  schoolCode: string
+  schoolType: string
+  gradeRange?: { start: string; end: string }
+  status: string
+}
+
+/**
+ * Get a school's profile including gradeRange.
+ * GET /schools/:schoolId
+ */
+export async function getSchoolProfile(
+  schoolId: string
+): Promise<SchoolProfileDto> {
+  return apiGet<SchoolProfileDto>(`/schools/${schoolId}`)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
 export const schoolService = {
+  getSchoolProfile,
   getAcademicYears,
   getCurrentAcademicYear,
   getGradingPeriods,

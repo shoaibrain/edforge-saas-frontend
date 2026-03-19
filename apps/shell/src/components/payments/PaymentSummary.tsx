@@ -1,0 +1,101 @@
+/**
+ * PaymentSummary
+ *
+ * NPR breakdown showing subtotal, tax, discount, and grand total.
+ * Uses Nepal-style number formatting with lakh/crore grouping.
+ */
+
+import type { Invoice } from '@edforge/types'
+import { formatNPR } from '@edforge/types'
+import { useTranslation } from '@edforge/i18n'
+
+interface PaymentSummaryProps {
+  invoice: Invoice
+  compact?: boolean
+}
+
+export function PaymentSummary({ invoice, compact = false }: PaymentSummaryProps) {
+  const { t, i18n } = useTranslation('payments')
+  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
+  const fmt = (amount: number) => formatNPR(amount, { locale })
+
+  if (compact) {
+    return (
+      <div className="flex items-center justify-between py-2">
+        <span className="text-sm text-[rgb(var(--text-secondary))]">
+          {t('summary.amountDue')}
+        </span>
+        <span className="text-lg font-bold text-[rgb(var(--text-primary))]">
+          {fmt(invoice.amountDue)}
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2 text-sm">
+      <SummaryRow label={t('summary.subtotal')} value={fmt(invoice.subtotal)} />
+      {invoice.discountTotal > 0 && (
+        <SummaryRow
+          label={t('summary.discountTotal')}
+          value={`-${fmt(invoice.discountTotal)}`}
+          className="text-emerald-600 dark:text-emerald-400"
+        />
+      )}
+      {invoice.taxTotal > 0 && (
+        <SummaryRow label={t('summary.taxTotal')} value={fmt(invoice.taxTotal)} />
+      )}
+      <div className="border-t border-[rgb(var(--border-primary))] pt-2 mt-2">
+        <SummaryRow
+          label={t('summary.grandTotal')}
+          value={fmt(invoice.grandTotal)}
+          bold
+        />
+      </div>
+      {invoice.amountPaid > 0 && (
+        <SummaryRow
+          label={t('summary.amountPaid')}
+          value={`-${fmt(invoice.amountPaid)}`}
+          className="text-emerald-600 dark:text-emerald-400"
+        />
+      )}
+      {invoice.amountDue > 0 && invoice.amountDue !== invoice.grandTotal && (
+        <div className="border-t border-[rgb(var(--border-primary))] pt-2">
+          <SummaryRow
+            label={t('summary.balanceDue')}
+            value={fmt(invoice.amountDue)}
+            bold
+            className="text-red-600 dark:text-red-400"
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SummaryRow({
+  label,
+  value,
+  bold,
+  className,
+}: {
+  label: string
+  value: string
+  bold?: boolean
+  className?: string
+}) {
+  return (
+    <div className={`flex justify-between ${className ?? ''}`}>
+      <span
+        className={`${bold ? 'font-semibold' : ''} text-[rgb(var(--text-secondary))]`}
+      >
+        {label}
+      </span>
+      <span
+        className={`${bold ? 'font-bold text-[rgb(var(--text-primary))]' : 'text-[rgb(var(--text-primary))]'}`}
+      >
+        {value}
+      </span>
+    </div>
+  )
+}

@@ -3,6 +3,7 @@
  *
  * Step 5: Read-only summary of all entered data + Ed-Fi JSON preview.
  * No editable fields — user reviews before final submit.
+ * Displays human-readable labels for descriptors and grade levels.
  */
 
 import { useMemo } from 'react'
@@ -12,10 +13,51 @@ import type { WizardStepProps } from '@edforge/wizard'
 import { EdFiPreview } from '@/components/settings/EdFiPreview'
 import type { CreateSchoolDto } from '@aibrains/shared-types'
 import {
+  SCHOOL_CATEGORY_DESCRIPTORS,
+  SCHOOL_TYPE_DESCRIPTORS,
+  SCHOOL_GRADE_LEVEL_DESCRIPTORS,
+  CHARTER_STATUS_DESCRIPTORS,
+  ADMINISTRATIVE_FUNDING_CONTROL_DESCRIPTORS,
+} from '@aibrains/shared-types'
+import {
   SCHOOL_TYPE_LABELS,
   GRADE_OPTIONS,
+  COUNTRY_OPTIONS,
+  US_TIMEZONE_OPTIONS,
   transformWizardDataToDto,
 } from '../school-wizard.utils'
+
+// ============================================================================
+// DESCRIPTOR LABEL HELPERS
+// ============================================================================
+
+function getCategoryLabel(value: string): string {
+  return SCHOOL_CATEGORY_DESCRIPTORS.find((d) => d.value === value)?.label || value
+}
+
+function getSchoolTypeDescriptorLabel(value: string): string {
+  return SCHOOL_TYPE_DESCRIPTORS.find((d) => d.value === value)?.label || value
+}
+
+function getGradeLevelDescriptorLabel(value: string): string {
+  return SCHOOL_GRADE_LEVEL_DESCRIPTORS.find((d) => d.value === value)?.label || value
+}
+
+function getCharterStatusLabel(value: string): string {
+  return CHARTER_STATUS_DESCRIPTORS.find((d) => d.value === value)?.label || value
+}
+
+function getAdminFundingLabel(value: string): string {
+  return ADMINISTRATIVE_FUNDING_CONTROL_DESCRIPTORS.find((d) => d.value === value)?.label || value
+}
+
+function getCountryLabel(value: string): string {
+  return COUNTRY_OPTIONS.find((c) => c.value === value)?.label || value
+}
+
+function getTimezoneLabel(value: string): string {
+  return US_TIMEZONE_OPTIONS.find((t) => t.value === value)?.label || value
+}
 
 // ============================================================================
 // SUMMARY FIELD
@@ -85,6 +127,14 @@ export function ReviewStep({ data }: WizardStepProps) {
     (data.schoolTypeDescriptor as string)
   )
 
+  // Human-readable values
+  const categories = (data.schoolCategories as string[]) || []
+  const gradeLevels = (data.gradeLevels as string[]) || []
+  const idCodes = (data.identificationCodes as unknown[]) || []
+  const instPhones = (data.institutionTelephones as unknown[]) || []
+  const timezone = data.timezone as string
+  const country = data['address.country'] as string
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       {/* Header */}
@@ -113,7 +163,7 @@ export function ReviewStep({ data }: WizardStepProps) {
       </SummarySection>
 
       {/* Location & Contact */}
-      <SummarySection title="Location & Contact" icon={MapPin} isEmpty={!hasAddress && !hasContact}>
+      <SummarySection title="Location & Contact" icon={MapPin} isEmpty={!hasAddress && !hasContact && !timezone}>
         {hasAddress && (
           <>
             <SummaryField
@@ -126,7 +176,7 @@ export function ReviewStep({ data }: WizardStepProps) {
                 .filter(Boolean)
                 .join('\n')}
             />
-            <SummaryField label="Country" value={data['address.country'] as string} />
+            <SummaryField label="Country" value={country ? getCountryLabel(country) : undefined} />
           </>
         )}
         {hasContact && (
@@ -136,44 +186,60 @@ export function ReviewStep({ data }: WizardStepProps) {
             <SummaryField label="Website" value={data.website as string} />
           </>
         )}
+        {timezone && <SummaryField label="Timezone" value={getTimezoneLabel(timezone)} />}
       </SummarySection>
 
       {/* Organization */}
       <SummarySection title="Organization" icon={Users} isEmpty={!hasOrg}>
-        <SummaryField label="District (LEA)" value={data.localEducationAgencyId as string} mono />
+        <SummaryField label="District (LEA)" value={(data._leaName as string) || (data.localEducationAgencyId as string)} />
         <SummaryField label="Principal" value={data.principalName as string} />
         <SummaryField label="Principal Email" value={data.principalEmail as string} />
       </SummarySection>
 
       {/* Ed-Fi Compliance */}
       <SummarySection title="Ed-Fi Compliance" icon={Tag} isEmpty={!hasEdFi}>
-        {(data.schoolCategories as string[])?.length > 0 && (
+        {categories.length > 0 && (
           <SummaryField
             label="Categories"
-            value={(data.schoolCategories as string[]).join(', ')}
+            value={categories.map(getCategoryLabel).join(', ')}
           />
         )}
-        <SummaryField label="Ed-Fi School Type" value={data.schoolTypeDescriptor as string} />
-        {(data.gradeLevels as string[])?.length > 0 && (
+        {(data.schoolTypeDescriptor as string) && (
+          <SummaryField
+            label="Ed-Fi School Type"
+            value={getSchoolTypeDescriptorLabel(data.schoolTypeDescriptor as string)}
+          />
+        )}
+        {gradeLevels.length > 0 && (
           <SummaryField
             label="Grade Levels"
-            value={`${(data.gradeLevels as string[]).length} grade levels`}
+            value={gradeLevels.map(getGradeLevelDescriptorLabel).join(', ')}
           />
         )}
-        {(data.identificationCodes as unknown[])?.length > 0 && (
+        {idCodes.length > 0 && (
           <SummaryField
             label="ID Codes"
-            value={`${(data.identificationCodes as unknown[]).length} identification code(s)`}
+            value={`${idCodes.length} identification code(s)`}
           />
         )}
-        {(data.institutionTelephones as unknown[])?.length > 0 && (
+        {instPhones.length > 0 && (
           <SummaryField
             label="Institution Phones"
-            value={`${(data.institutionTelephones as unknown[]).length} phone number(s)`}
+            value={`${instPhones.length} phone number(s)`}
           />
         )}
-        <SummaryField label="Charter Status" value={data.charterStatusDescriptor as string} />
-        <SummaryField label="Admin Funding" value={data.administrativeFundingControlDescriptor as string} />
+        {(data.charterStatusDescriptor as string) && (
+          <SummaryField
+            label="Charter Status"
+            value={getCharterStatusLabel(data.charterStatusDescriptor as string)}
+          />
+        )}
+        {(data.administrativeFundingControlDescriptor as string) && (
+          <SummaryField
+            label="Admin Funding"
+            value={getAdminFundingLabel(data.administrativeFundingControlDescriptor as string)}
+          />
+        )}
       </SummarySection>
 
       {/* Ed-Fi JSON Preview */}

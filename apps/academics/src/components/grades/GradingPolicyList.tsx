@@ -12,6 +12,7 @@ import {
   Edit3,
   Scale,
 } from 'lucide-react'
+import { useResourcePermissions } from '@edforge/abac'
 import { useGradingPolicies } from '../../hooks/useGrades'
 import { useActiveSchoolId } from '../../stores/app.store'
 import type { GradingPolicyResponse } from '../../services/academics.service'
@@ -26,7 +27,7 @@ function PolicyCard({
   onEdit,
 }: {
   policy: GradingPolicyResponse
-  onEdit: (policy: GradingPolicyResponse) => void
+  onEdit?: (policy: GradingPolicyResponse) => void
 }) {
   const totalWeight = policy.categoryWeights.reduce((sum, c) => sum + c.weight, 0)
 
@@ -42,14 +43,16 @@ function PolicyCard({
             </span>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => onEdit(policy)}
-          className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
-          aria-label="Edit policy"
-        >
-          <Edit3 className="w-4 h-4" />
-        </button>
+        {onEdit && (
+          <button
+            type="button"
+            onClick={() => onEdit(policy)}
+            className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
+            aria-label="Edit policy"
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Grade Scale Preview */}
@@ -104,6 +107,7 @@ function PolicyCard({
 
 export function GradingPolicyList() {
   const schoolId = useActiveSchoolId() || ''
+  const gradePerms = useResourcePermissions('grades')
   const { data: policies, isLoading } = useGradingPolicies(schoolId)
   const [editingPolicy, setEditingPolicy] = useState<GradingPolicyResponse | null>(null)
   const [showCreate, setShowCreate] = useState(false)
@@ -126,14 +130,16 @@ export function GradingPolicyList() {
           <h3 className="text-sm font-semibold text-text-primary">Grading Policies</h3>
           <span className="text-xs text-text-tertiary">({policies?.length ?? 0})</span>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          New Policy
-        </button>
+        {gradePerms.create && (
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            New Policy
+          </button>
+        )}
       </div>
 
       {(!policies || policies.length === 0) ? (
@@ -145,14 +151,16 @@ export function GradingPolicyList() {
           <p className="text-xs text-text-tertiary max-w-sm mx-auto mb-4">
             Create a grading policy to define grade scales, category weights, and rounding rules.
           </p>
-          <button
-            type="button"
-            onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Create Policy
-          </button>
+          {gradePerms.create && (
+            <button
+              type="button"
+              onClick={() => setShowCreate(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Create Policy
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -160,7 +168,7 @@ export function GradingPolicyList() {
             <PolicyCard
               key={policy.policyId}
               policy={policy}
-              onEdit={setEditingPolicy}
+              onEdit={gradePerms.edit ? setEditingPolicy : undefined}
             />
           ))}
         </div>

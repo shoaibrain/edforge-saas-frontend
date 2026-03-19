@@ -311,7 +311,7 @@ export function SectionRosterPage() {
           </p>
           <button
             type="button"
-            onClick={() => navigate({ to: '/scheduling' })}
+            onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -333,7 +333,7 @@ export function SectionRosterPage() {
           <div className="flex items-center gap-4 mb-4">
             <button
               type="button"
-              onClick={() => navigate({ to: `/scheduling/${sectionId}` })}
+              onClick={() => navigate({ to: `/classrooms/${sectionId}` })}
               className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
               aria-label="Back to section"
             >

@@ -1,0 +1,123 @@
+/**
+ * EdForge Home V2 — Design Tokens
+ *
+ * Scoped to [data-page="home-v2"] to avoid breaking other pages.
+ * Dark theme is default; light overrides below.
+ */
+
+/* ============================================================================
+ * DARK THEME (DEFAULT)
+ * ============================================================================ */
+
+[data-page="home-v2"] {
+  /* Background stack */
+  --v2-bg-app: #0f1117;
+  --v2-bg-surface: #161b27;
+  --v2-bg-elevated: #1e2436;
+
+  /* Text stack */
+  --v2-text-primary: #e8eaf0;
+  --v2-text-secondary: #c8ccd8;
+  --v2-text-muted: #9aa0b8;
+  --v2-text-hint: #7a8099;
+  --v2-text-faint: #4a5068;
+  --v2-text-ghost: #3a4055;
+
+  /* Borders */
+  --v2-border-default: rgba(255, 255, 255, 0.06);
+  --v2-border-hover: rgba(255, 255, 255, 0.10);
+  --v2-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Semantic colors */
+  --v2-brand-primary: #1D9E75;
+  --v2-brand-deep: #0F6E56;
+  --v2-info: #378ADD;
+  --v2-warning: #EF9F27;
+  --v2-danger: #E24B4A;
+  --v2-accent-purple: #7F77DD;
+  --v2-coral: #D85A30;
+
+  /* Semantic backgrounds */
+  --v2-danger-bg: rgba(226, 75, 74, 0.08);
+  --v2-warning-bg: rgba(239, 159, 39, 0.08);
+  --v2-success-bg: rgba(29, 158, 117, 0.08);
+  --v2-info-bg: rgba(55, 138, 221, 0.08);
+
+  /* Semantic borders */
+  --v2-danger-border: rgba(226, 75, 74, 0.20);
+  --v2-warning-border: rgba(239, 159, 39, 0.20);
+  --v2-success-border: rgba(29, 158, 117, 0.20);
+  --v2-info-border: rgba(55, 138, 221, 0.20);
+
+  /* Module accent backgrounds */
+  --v2-accent-enrollment: rgba(29, 158, 117, 0.12);
+  --v2-accent-academics: rgba(55, 138, 221, 0.12);
+  --v2-accent-attendance: rgba(239, 159, 39, 0.12);
+  --v2-accent-finance: rgba(226, 75, 74, 0.12);
+  --v2-accent-staff: rgba(216, 90, 48, 0.10);
+  --v2-accent-reports: rgba(127, 119, 221, 0.12);
+  --v2-accent-settings: rgba(90, 96, 112, 0.15);
+
+  /* Chart grid */
+  --v2-chart-grid: rgba(255, 255, 255, 0.04);
+
+  /* Spacing */
+  --v2-grid-gap: 12px;
+  --v2-section-gap: 16px;
+  --v2-content-padding-y: 20px;
+  --v2-content-padding-x: 28px;
+  --v2-card-padding: 18px;
+
+  /* Sizing */
+  --v2-card-radius: 12px;
+  --v2-icon-size: 28px;
+  --v2-icon-radius: 7px;
+  --v2-alert-radius: 10px;
+  --v2-qa-radius: 9px;
+  --v2-kpi-bar-height: 2px;
+
+  /* Transitions */
+  --v2-transition-fast: 150ms ease;
+  --v2-transition-medium: 300ms ease-out;
+  --v2-bar-fill-duration: 600ms;
+  --v2-countup-duration: 800ms;
+}
+
+/* ============================================================================
+ * LIGHT THEME OVERRIDES
+ * ============================================================================ */
+
+:root:not(.dark) [data-page="home-v2"] {
+  /* Background stack */
+  --v2-bg-app: #f5f6f8;
+  --v2-bg-surface: #ffffff;
+  --v2-bg-elevated: #f0f2f5;
+
+  /* Text stack */
+  --v2-text-primary: #1a1f2e;
+  --v2-text-secondary: #374151;
+  --v2-text-muted: #6b7280;
+  --v2-text-hint: #9aa0b8;
+  --v2-text-faint: #b0b6c8;
+  --v2-text-ghost: #d1d5db;
+
+  /* Borders */
+  --v2-border-default: #e0e4ec;
+  --v2-border-hover: #c8cdd8;
+  --v2-border-strong: #9aa0b8;
+
+  /* Semantic backgrounds */
+  --v2-danger-bg: #fff1f1;
+  --v2-warning-bg: #fffbf0;
+  --v2-success-bg: #f0faf5;
+  --v2-info-bg: #f0f7ff;
+
+  /* Semantic borders */
+  --v2-danger-border: #fecaca;
+  --v2-warning-border: #fed7aa;
+  --v2-success-border: #6ee7b7;
+  --v2-info-border: #bfdbfe;
+
+  /* Chart grid */
+  --v2-chart-grid: rgba(0, 0, 0, 0.04);
+}

@@ -5,7 +5,9 @@
  * Disables future dates for attendance recording.
  */
 
+import { useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { formatBSLong, adToBS } from '../../lib/bikram-sambat'
 
 interface DateSelectorProps {
   selectedDate: string
@@ -33,6 +35,11 @@ export function DateSelector({
     month: 'long',
     day: 'numeric',
   })
+
+  // Task 5.6: Bikram Sambat date display
+  const bsDateLabel = useMemo(() => {
+    return formatBSLong(adToBS(selectedDate))
+  }, [selectedDate])
 
   return (
     <div className="flex items-center gap-3">
@@ -68,9 +75,13 @@ export function DateSelector({
             className="absolute inset-0 opacity-0 cursor-pointer"
             aria-label="Select date"
           />
-          <div className="flex items-center gap-2 px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg cursor-pointer hover:bg-surface-hover transition-colors">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg cursor-pointer hover:bg-surface-hover transition-colors">
             <Calendar className="w-4 h-4 text-text-tertiary" />
-            <span className="text-sm font-medium text-text-primary">{formattedDate}</span>
+            <div>
+              <span className="text-sm font-medium text-text-primary block">{formattedDate}</span>
+              {/* Task 5.6: BS date below Gregorian */}
+              <span className="text-[10px] text-text-tertiary block">{bsDateLabel} BS</span>
+            </div>
           </div>
         </div>
 

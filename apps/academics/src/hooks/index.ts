@@ -11,6 +11,8 @@ export {
   useCreateEnrollment,
   useUpdateStudent,
   useDeleteStudent,
+  useGrantPortalAccess,
+  useCreateStudentAccount,
   flattenStudentPages,
   getTotalFromPages,
   studentKeys,
@@ -48,6 +50,8 @@ export {
   staffKeys,
 } from './useStaff'
 export {
+  useSchoolProfile,
+  useSchoolGradeRange,
   useAcademicYears,
   useCurrentAcademicYear,
   useGradingPeriods,
@@ -55,6 +59,7 @@ export {
   useUpdateAcademicYearStatus,
   schoolKeys,
 } from './useSchool'
+export { useFilteredGradeOptions } from './useGradeOptions'
 export {
   useAttendanceSummary,
   useStudentAttendance,
@@ -67,6 +72,14 @@ export {
   useAttendanceAlerts,
   attendanceKeys,
 } from './useAttendance'
+export {
+  useSectionAttendanceRecords,
+  useRecordSectionAttendance,
+  useRecordBulkSectionAttendance,
+  useUpdateSectionAttendance,
+  useStudentSectionAttendance,
+  sectionAttendanceKeys,
+} from './useSectionAttendance'
 export { useOfflineAttendance } from './useOfflineAttendance'
 export type { SaveStatus } from './useOfflineAttendance'
 export {
@@ -87,6 +100,8 @@ export {
   useEnrollmentSummary,
   useWithdrawStudent,
   useTransferStudent,
+  useMarkNoShow,
+  useCloseAcademicYear,
   enrollmentKeys,
 } from './useEnrollments'
 export { useStudentProfileActions } from './useStudentProfileActions'

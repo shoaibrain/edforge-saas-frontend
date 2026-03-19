@@ -64,6 +64,8 @@ export interface TenantIntegrations {
 /**
  * Represents a school within a tenant
  */
+export type SchoolStatus = 'active' | 'inactive' | 'setup' | 'suspended' | 'closed'
+
 export interface School {
   id: string
   tenantId: string
@@ -72,9 +74,12 @@ export interface School {
   address?: SchoolAddress
   phone?: string
   email?: string
-  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-  /** Active status */
+  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'charter' | 'private' | 'vocational' | 'special_education' | 'other'
+  status: SchoolStatus
+  /** @deprecated Use `status === 'active'` instead */
   isActive: boolean
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
+  currentAcademicYearId?: string
 }
 
 /**
@@ -87,6 +92,13 @@ export interface SchoolAddress {
   state: string
   postalCode: string
   country: string
+  wardNumber?: string
+  municipality?: string
+  district?: string
+  province?: string
+  region?: string
+  zipCode?: string
+  [key: string]: string | undefined
 }
 
 /**
@@ -130,12 +142,6 @@ export interface WorkspaceSettings {
     defaultTimeFormat: '12h' | '24h'
     defaultWeekStartsOn: 'sunday' | 'monday'
   }
-  /** Academic calendar defaults */
-  calendar: {
-    defaultAcademicYearStart: string // e.g., "08-15" (month-day)
-    defaultAcademicYearEnd: string   // e.g., "06-15"
-    defaultTermStructure: 'semester' | 'trimester' | 'quarter'
-  }
   /** Organization branding */
   branding: {
     organizationName: string
@@ -145,7 +151,6 @@ export interface WorkspaceSettings {
   }
   /** Policy defaults */
   policies: {
-    defaultGradingScale: 'letter' | 'percentage' | 'points' | 'custom'
     defaultAttendancePolicy: 'daily' | 'period' | 'both'
   }
   /** Lock status - prevents changes when academic year is active */

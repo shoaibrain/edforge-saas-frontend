@@ -29,11 +29,15 @@ import {
   X,
   Download,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
 import { usePermission } from '@edforge/abac'
+import { getRoleI18nKey } from '../components/staff/StaffRoleBadge'
+import { getStatusI18nKey } from '../components/staff/StaffStatusBadge'
 
 import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'
+import { useActiveSchoolId } from '../stores/app.store'
 import { Button } from '../components/ui'
 import {
   CreateUserModal,
@@ -49,27 +53,14 @@ import { parseApiError } from '../services/people.service'
 // CONSTANTS
 // ============================================================================
 
-const ROLE_FILTER_OPTIONS: { value: StaffRole; label: string }[] = [
-  { value: 'teacher', label: 'Teacher' },
-  { value: 'principal', label: 'Principal' },
-  { value: 'vice_principal', label: 'Vice Principal' },
-  { value: 'counselor', label: 'Counselor' },
-  { value: 'librarian', label: 'Librarian' },
-  { value: 'nurse', label: 'Nurse' },
-  { value: 'admin_staff', label: 'Admin Staff' },
-  { value: 'support_staff', label: 'Support Staff' },
-  { value: 'it_staff', label: 'IT Staff' },
-  { value: 'substitute', label: 'Substitute' },
-  { value: 'contractor', label: 'Contractor' },
+// Filter option values — labels are resolved via i18n at render time
+const ROLE_FILTER_VALUES: StaffRole[] = [
+  'teacher', 'principal', 'vice_principal', 'counselor', 'librarian',
+  'nurse', 'admin_staff', 'support_staff', 'it_staff', 'substitute', 'contractor',
 ]
 
-const STATUS_FILTER_OPTIONS: { value: EmploymentStatus; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'on_leave', label: 'On Leave' },
-  { value: 'suspended', label: 'Suspended' },
-  { value: 'terminated', label: 'Terminated' },
-  { value: 'retired', label: 'Retired' },
-  { value: 'resigned', label: 'Resigned' },
+const STATUS_FILTER_VALUES: EmploymentStatus[] = [
+  'active', 'on_leave', 'suspended', 'terminated', 'retired', 'resigned',
 ]
 
 // ============================================================================
@@ -130,7 +121,6 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 interface StaffFilters {
   role?: StaffRole
   employmentStatus?: EmploymentStatus
-  department?: string
 }
 
 // ============================================================================
@@ -138,8 +128,10 @@ interface StaffFilters {
 // ============================================================================
 
 export default function StaffPage() {
+  const { t } = useTranslation('people')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const schoolId = useActiveSchoolId()
 
   // ABAC permission checks for staff management
   const canCreate = usePermission('create', 'staff')
@@ -193,26 +185,24 @@ export default function StaffPage() {
   const {
     items: staffMembers,
     isLoading,
-    hasMore,
-    loadMore,
-    isFetchingNextPage,
     error,
     refetch,
     totalLoaded,
   } = usePaginatedQuery<StaffResponseDto>({
-    queryKey: ['staff', debouncedSearch, filters],
+    queryKey: ['staff', schoolId, debouncedSearch, filters],
     queryFn: ({ limit, cursor }) =>
       staffService.listStaff({
         limit,
         cursor,
         search: debouncedSearch || undefined,
+        schoolId: schoolId || undefined,
         ...filters,
       }),
     limit: 20,
   })
 
   // Query key for cache operations
-  const staffQueryKey = ['staff', debouncedSearch, filters]
+  const staffQueryKey = ['staff', schoolId, debouncedSearch, filters]
 
   // Optimistic delete mutation
   const deleteMutation = useMutation({
@@ -242,7 +232,7 @@ export default function StaffPage() {
       toast.error(message)
     },
     onSuccess: () => {
-      toast.success('Staff member deleted successfully')
+      toast.success(t('toast.deleteSuccess'))
       modal.close()
     },
     onSettled: () => {
@@ -309,11 +299,11 @@ export default function StaffPage() {
             <UsersRound className="w-6 h-6 text-red-600 dark:text-red-400" />
           </div>
           <h3 className="text-lg font-medium text-text-primary mb-2">
-            Failed to load staff
+            {t('error.failedToLoad')}
           </h3>
           <p className="text-text-secondary mb-4">{message}</p>
           {isRetryable && (
-            <Button onClick={() => refetch()}>Try Again</Button>
+            <Button onClick={() => refetch()}>{t('error.tryAgain')}</Button>
           )}
         </div>
       </div>
@@ -331,9 +321,9 @@ export default function StaffPage() {
                 <UsersRound className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-text-primary">Staff Directory</h1>
+                <h1 className="text-2xl font-bold text-text-primary">{t('staffDirectory.title')}</h1>
                 <p className="text-text-secondary mt-1">
-                  Manage your organization's staff members and their access
+                  {t('staffDirectory.description')}
                 </p>
               </div>
             </div>
@@ -342,7 +332,7 @@ export default function StaffPage() {
                 <div className="flex">
                   <Button onClick={() => navigate({ to: '/staff/new' })}>
                     <UserPlus className="w-4 h-4 mr-2" />
-                    Add Staff Member
+                    {t('staffDirectory.addStaff')}
                   </Button>
                   <button
                     type="button"
@@ -365,8 +355,8 @@ export default function StaffPage() {
                     >
                       <Zap className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                       <div className="text-left">
-                        <div className="font-medium">Quick Add User</div>
-                        <div className="text-xs text-[rgb(var(--text-tertiary))]">Create user account only</div>
+                        <div className="font-medium">{t('quickAdd.title')}</div>
+                        <div className="text-xs text-[rgb(var(--text-tertiary))]">{t('quickAdd.description')}</div>
                       </div>
                     </button>
                   </div>
@@ -382,28 +372,28 @@ export default function StaffPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard
             icon={Users}
-            label="Total Staff"
+            label={t('stats.totalStaff')}
             value={isLoading ? '-' : totalLoaded.toString()}
             accent="text-blue-600 dark:text-blue-400"
             bg="bg-blue-500/10"
           />
           <StatCard
             icon={GraduationCap}
-            label="Teachers"
+            label={t('stats.teachers')}
             value={isLoading ? '-' : teacherCount.toString()}
             accent="text-emerald-600 dark:text-emerald-400"
             bg="bg-emerald-500/10"
           />
           <StatCard
             icon={Briefcase}
-            label="Support Staff"
+            label={t('stats.supportStaff')}
             value={isLoading ? '-' : supportCount.toString()}
             accent="text-purple-600 dark:text-purple-400"
             bg="bg-purple-500/10"
           />
           <StatCard
             icon={Award}
-            label="Administrators"
+            label={t('stats.administrators')}
             value={isLoading ? '-' : adminCount.toString()}
             accent="text-amber-600 dark:text-amber-400"
             bg="bg-amber-500/10"
@@ -419,7 +409,7 @@ export default function StaffPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or email..."
+                placeholder={t('staffDirectory.searchPlaceholder')}
                 className="w-full pl-10 pr-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-colors"
               />
             </div>
@@ -433,7 +423,7 @@ export default function StaffPage() {
               }`}
             >
               <Filter className="w-4 h-4" />
-              Filters
+              {t('filters.label')}
               {activeFilterCount > 0 && (
                 <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-teal-500 text-white">
                   {activeFilterCount}
@@ -447,7 +437,7 @@ export default function StaffPage() {
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-secondary bg-surface-secondary text-text-secondary hover:text-text-primary transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download className="w-4 h-4" />
-              Export CSV
+              {t('filters.exportCsv')}
             </button>
           </div>
 
@@ -456,40 +446,34 @@ export default function StaffPage() {
             <div className="bg-surface-secondary border border-border-secondary rounded-xl p-4 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">Role</label>
+                  <label className="block text-xs font-medium text-text-secondary">{t('filters.role')}</label>
                   <select
                     value={filters.role || ''}
                     onChange={(e) => updateFilter('role', e.target.value as StaffRole || undefined)}
                     className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
                   >
-                    <option value="">All Roles</option>
-                    {ROLE_FILTER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
+                    <option value="">{t('filters.allRoles')}</option>
+                    {ROLE_FILTER_VALUES.map((role) => (
+                      <option key={role} value={role}>
+                        {t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">Employment Status</label>
+                  <label className="block text-xs font-medium text-text-secondary">{t('filters.employmentStatus')}</label>
                   <select
                     value={filters.employmentStatus || ''}
                     onChange={(e) => updateFilter('employmentStatus', e.target.value as EmploymentStatus || undefined)}
                     className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
                   >
-                    <option value="">All Statuses</option>
-                    {STATUS_FILTER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
+                    <option value="">{t('filters.allStatuses')}</option>
+                    {STATUS_FILTER_VALUES.map((status) => (
+                      <option key={status} value={status}>
+                        {t(`employmentStatus.${getStatusI18nKey(status)}`, { defaultValue: status })}
+                      </option>
                     ))}
                   </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">Department</label>
-                  <input
-                    type="text"
-                    value={filters.department || ''}
-                    onChange={(e) => updateFilter('department', e.target.value || undefined)}
-                    placeholder="Filter by department..."
-                    className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
-                  />
                 </div>
               </div>
             </div>
@@ -500,20 +484,14 @@ export default function StaffPage() {
             <div className="flex items-center gap-2 flex-wrap">
               {filters.role && (
                 <FilterChip
-                  label={`Role: ${ROLE_FILTER_OPTIONS.find((o) => o.value === filters.role)?.label || filters.role}`}
+                  label={`${t('filters.role')}: ${t(`roles.${getRoleI18nKey(filters.role)}`, { defaultValue: filters.role })}`}
                   onRemove={() => updateFilter('role', undefined)}
                 />
               )}
               {filters.employmentStatus && (
                 <FilterChip
-                  label={`Status: ${STATUS_FILTER_OPTIONS.find((o) => o.value === filters.employmentStatus)?.label || filters.employmentStatus}`}
+                  label={`${t('tableHeaders.status')}: ${t(`employmentStatus.${getStatusI18nKey(filters.employmentStatus)}`, { defaultValue: filters.employmentStatus })}`}
                   onRemove={() => updateFilter('employmentStatus', undefined)}
-                />
-              )}
-              {filters.department && (
-                <FilterChip
-                  label={`Dept: ${filters.department}`}
-                  onRemove={() => updateFilter('department', undefined)}
                 />
               )}
               <button
@@ -521,7 +499,7 @@ export default function StaffPage() {
                 onClick={clearAllFilters}
                 className="text-xs text-text-tertiary hover:text-text-primary transition-colors"
               >
-                Clear all
+                {t('filters.clearAll')}
               </button>
             </div>
           )}
@@ -531,9 +509,6 @@ export default function StaffPage() {
         <StaffTable
           staff={staffMembers}
           isLoading={isLoading}
-          hasMore={hasMore}
-          isFetchingMore={isFetchingNextPage}
-          onLoadMore={loadMore}
           onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
           onViewStaff={handleViewStaff}
         />

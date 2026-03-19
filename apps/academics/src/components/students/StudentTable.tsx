@@ -8,7 +8,7 @@
 
 import { useMemo } from 'react'
 import { User } from 'lucide-react'
-import { DataTable, type Column } from '@edforge/ui'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
 
@@ -21,12 +21,6 @@ interface StudentTableProps {
   students: StudentResponseDto[]
   /** Whether data is loading */
   isLoading?: boolean
-  /** Whether there are more items to load */
-  hasMore?: boolean
-  /** Whether currently fetching more items */
-  isFetchingMore?: boolean
-  /** Callback when "Load More" is clicked */
-  onLoadMore?: () => void
   /** Callback when "Add Student" is clicked (empty state) */
   onAddStudent?: () => void
   /** Callback when a student row is clicked (opens drawer) */
@@ -74,92 +68,91 @@ function getAvatarUrl(seed: string): string {
 export function StudentTable({
   students,
   isLoading = false,
-  hasMore = false,
-  isFetchingMore = false,
-  onLoadMore,
   onAddStudent,
   onViewStudent,
 }: StudentTableProps) {
-  // Define columns
-  const columns: Column<StudentResponseDto>[] = useMemo(
+  // Define columns using TanStack ColumnDef format
+  const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(
     () => [
       {
-        key: 'fullName',
+        accessorKey: 'fullName',
         header: 'Student',
-        sortable: true,
-        width: '280px',
-        render: (student) => (
-          <div className="flex items-center gap-3">
-            {/* DiceBear Adventurer Avatar */}
-            <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
-              <img
-                src={getAvatarUrl(student.studentId)}
-                alt={getInitials(student.firstName, student.lastName)}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-            {/* Name and student number */}
-            <div className="min-w-0">
-              <p className="font-medium text-text-primary truncate">
-                {student.fullName}
-              </p>
-              {student.studentNumber && (
-                <p className="text-xs text-text-tertiary truncate">
-                  #{student.studentNumber}
+        size: 280,
+        cell: ({ row }) => {
+          const student = row.original
+          return (
+            <div className="flex items-center gap-3">
+              {/* DiceBear Adventurer Avatar */}
+              <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
+                <img
+                  src={getAvatarUrl(student.studentId)}
+                  alt={getInitials(student.firstName, student.lastName)}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              {/* Name and student number */}
+              <div className="min-w-0">
+                <p className="font-medium text-text-primary truncate">
+                  {student.fullName}
                 </p>
-              )}
+                {student.studentNumber && (
+                  <p className="text-xs text-text-tertiary truncate">
+                    #{student.studentNumber}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ),
+          )
+        },
       },
       {
-        key: 'studentNumber',
+        accessorKey: 'studentNumber',
         header: 'Student ID',
-        sortable: true,
-        width: '160px',
-        render: (student) => (
+        size: 160,
+        cell: ({ row }) => (
           <span className="text-sm font-mono text-text-secondary">
-            {student.studentNumber || '—'}
+            {row.original.studentNumber || '—'}
           </span>
         ),
       },
       {
-        key: 'currentGradeLevel',
+        accessorKey: 'currentGradeLevel',
         header: 'Grade',
-        sortable: true,
-        width: '100px',
-        render: (student) => (
+        size: 100,
+        cell: ({ row }) => (
           <span className="font-medium text-text-primary">
-            {student.currentGradeLevel}
+            {row.original.currentGradeLevel}
           </span>
         ),
       },
       {
-        key: 'status',
+        accessorKey: 'status',
         header: 'Status',
-        sortable: true,
-        width: '120px',
-        render: (student) => <StudentStatusBadge status={student.status} />,
+        size: 120,
+        cell: ({ row }) => (
+          <StudentStatusBadge status={row.original.status} />
+        ),
       },
       {
-        key: 'enrollmentDate',
+        accessorKey: 'enrollmentDate',
         header: 'Enrolled',
-        sortable: true,
-        width: '140px',
-        render: (student) => (
+        size: 140,
+        cell: ({ row }) => (
           <span className="text-text-secondary">
-            {formatDate(student.enrollmentDate)}
+            {formatDate(row.original.enrollmentDate)}
           </span>
         ),
       },
       {
-        key: 'contactInfo.email',
+        accessorFn: (row) => row.contactInfo?.email,
+        id: 'contactInfo',
         header: 'Contact',
-        width: '200px',
-        render: (student) => {
-          const email = student.contactInfo?.email
-          const phone = student.contactInfo?.phone
+        size: 200,
+        enableSorting: false,
+        cell: ({ row }) => {
+          const email = row.original.contactInfo?.email
+          const phone = row.original.contactInfo?.phone
           return (
             <div className="min-w-0">
               {email && (
@@ -180,12 +173,12 @@ export function StudentTable({
   )
 
   return (
-    <DataTable
+    <TanstackDataTable
       columns={columns}
       data={students}
-      keyExtractor={(student) => student.studentId}
       isLoading={isLoading}
-      skeletonRows={8}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
       emptyState={{
         icon: <User className="w-12 h-12" />,
         title: 'No students found',
@@ -198,10 +191,8 @@ export function StudentTable({
             }
           : undefined,
       }}
-      hasMore={hasMore}
-      isFetchingMore={isFetchingMore}
-      onLoadMore={onLoadMore}
       onRowClick={onViewStudent}
+      maxHeight="calc(100vh - 13rem)"
     />
   )
 }

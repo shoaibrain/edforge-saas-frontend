@@ -2,12 +2,14 @@
  * useAttendance Hooks
  *
  * React Query hooks for attendance recording, summaries, and history.
+ * Task 1.13: Added useAttendanceOverview hook
  */
 
 import {
   useQuery,
   useMutation,
   useQueryClient,
+  keepPreviousData,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
@@ -21,6 +23,7 @@ import {
   getCalendarDate,
   getAttendanceTrend,
   getAttendanceAlerts,
+  getAttendanceOverview,
   parseApiError,
   type CreateAttendanceParams,
   type BulkAttendanceParams,
@@ -31,6 +34,7 @@ import {
   type AttendanceStatus,
   type CalendarDateInfo,
   type AttendanceAlert,
+  type AttendanceOverviewResponse,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -56,6 +60,8 @@ export const attendanceKeys = {
     [...attendanceKeys.all, 'records', schoolId, date] as const,
   calendarDate: (schoolId: string, date: string) =>
     [...attendanceKeys.all, 'calendar-date', schoolId, date] as const,
+  overview: (schoolId: string, academicYearId: string, date: string) =>
+    [...attendanceKeys.all, 'overview', schoolId, academicYearId, date] as const,
 }
 
 // ============================================================================
@@ -65,6 +71,7 @@ export const attendanceKeys = {
 interface UseAttendanceSummaryOptions {
   schoolId: string
   date: string
+  academicYearId?: string
   enabled?: boolean
 }
 
@@ -74,11 +81,12 @@ interface UseAttendanceSummaryOptions {
 export function useAttendanceSummary({
   schoolId,
   date,
+  academicYearId,
   enabled = true,
 }: UseAttendanceSummaryOptions) {
   return useQuery<DailyAttendanceSummary, Error>({
     queryKey: attendanceKeys.summary(schoolId, date),
-    queryFn: () => getAttendanceSummary(schoolId, date),
+    queryFn: () => getAttendanceSummary(schoolId, date, academicYearId),
     enabled: enabled && !!schoolId && !!date,
     staleTime: 30 * 1000, // 30 seconds - attendance changes frequently
     refetchOnWindowFocus: true,
@@ -148,6 +156,7 @@ export function useStudentAttendance({
 
 interface UseStudentAttendanceSummaryOptions {
   studentId: string
+  schoolId?: string
   enabled?: boolean
 }
 
@@ -156,11 +165,12 @@ interface UseStudentAttendanceSummaryOptions {
  */
 export function useStudentAttendanceSummary({
   studentId,
+  schoolId,
   enabled = true,
 }: UseStudentAttendanceSummaryOptions) {
   return useQuery<StudentAttendanceSummary, Error>({
     queryKey: attendanceKeys.studentSummary(studentId),
-    queryFn: () => getStudentAttendanceSummary(studentId),
+    queryFn: () => getStudentAttendanceSummary(studentId, schoolId),
     enabled: enabled && !!studentId,
     staleTime: 2 * 60 * 1000,
   })
@@ -216,6 +226,11 @@ export function useRecordBulkAttendance() {
       queryClient.invalidateQueries({
         queryKey: attendanceKeys.studentSummaries(),
       })
+      // Task 1.13: Invalidate overview cache on bulk save
+      queryClient.invalidateQueries({
+        queryKey: attendanceKeys.all,
+        predicate: (query) => query.queryKey.includes('overview'),
+      })
       if (result.errors.length > 0) {
         toast.warning(`Attendance saved with ${result.errors.length} error(s)`)
       } else {
@@ -239,13 +254,16 @@ export function useUpdateAttendance() {
   return useMutation<
     AttendanceRecord,
     Error,
-    { date: string; studentId: string; status: AttendanceStatus; notes?: string; schoolId: string }
+    { date: string; studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string; schoolId: string; expectedVersion?: number }
   >({
-    mutationFn: ({ date, studentId, status, notes }) =>
-      updateAttendance(date, studentId, { status, notes }),
+    mutationFn: ({ date, studentId, status, notes, excuseType, expectedVersion, schoolId }) =>
+      updateAttendance(date, studentId, { status, notes, excuseType, expectedVersion } as any, schoolId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: attendanceKeys.summary(variables.schoolId, variables.date),
+      })
+      queryClient.invalidateQueries({
+        queryKey: attendanceKeys.records(variables.schoolId, variables.date),
       })
       queryClient.invalidateQueries({
         queryKey: attendanceKeys.studentHistories(),
@@ -257,13 +275,17 @@ export function useUpdateAttendance() {
     },
     onError: (error) => {
       const parsed = parseApiError(error)
-      toast.error(parsed.message)
+      if (parsed.statusCode === 409) {
+        toast.error('Someone else updated this record. Refresh to see their changes.')
+      } else {
+        toast.error(parsed.message)
+      }
     },
   })
 }
 
 // ============================================================================
-// CALENDAR DATE CHECK (Sprint 5)
+// CALENDAR DATE CHECK
 // ============================================================================
 
 /**
@@ -288,7 +310,7 @@ export function useCalendarDate({
 }
 
 // ============================================================================
-// ATTENDANCE TREND (Sprint 5)
+// ATTENDANCE TREND
 // ============================================================================
 
 /**
@@ -314,7 +336,7 @@ export function useAttendanceTrend({
 }
 
 // ============================================================================
-// ATTENDANCE ALERTS (Sprint 5)
+// ATTENDANCE ALERTS
 // ============================================================================
 
 /**
@@ -340,5 +362,33 @@ export function useAttendanceAlerts({
     queryFn: () => getAttendanceAlerts(schoolId, academicYearId, threshold, startDate, endDate),
     enabled: enabled && !!schoolId && !!academicYearId,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ============================================================================
+// ATTENDANCE OVERVIEW (Task 1.13)
+// ============================================================================
+
+/**
+ * Hook to fetch comprehensive attendance overview (single aggregate endpoint)
+ * Replaces separate summary + trend + alerts hooks for the dashboard
+ */
+export function useAttendanceOverview({
+  schoolId,
+  academicYearId,
+  date,
+  enabled = true,
+}: {
+  schoolId: string
+  academicYearId: string
+  date: string
+  enabled?: boolean
+}) {
+  return useQuery<AttendanceOverviewResponse, Error>({
+    queryKey: attendanceKeys.overview(schoolId, academicYearId, date),
+    queryFn: () => getAttendanceOverview({ schoolId, academicYearId, date }),
+    enabled: enabled && !!schoolId && !!academicYearId && !!date,
+    staleTime: 60 * 1000, // 60 seconds - matches backend cache
+    placeholderData: keepPreviousData, // Prevents loading flicker on date change
   })
 }

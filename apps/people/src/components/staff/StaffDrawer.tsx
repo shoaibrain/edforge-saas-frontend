@@ -32,9 +32,10 @@ import {
   School,
   Building2,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffStatusBadge } from './StaffStatusBadge'
-import { getRoleLabel } from './StaffRoleBadge'
+import { getRoleI18nKey } from './StaffRoleBadge'
 import { getStaffAvatar } from '../../lib/avatar'
 import { formatDate, formatEmploymentType } from '../../lib/utils'
 
@@ -67,6 +68,7 @@ function ActionsDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const navigate = useNavigate()
+  const { t } = useTranslation('people')
 
   return (
     <div className="relative">
@@ -93,7 +95,7 @@ function ActionsDropdown({
               className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Eye className="w-4 h-4" />
-              View Full Profile
+              {t('drawer.viewFullProfile')}
             </button>
             {onEdit && (
               <button
@@ -105,7 +107,7 @@ function ActionsDropdown({
                 className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
               >
                 <Pencil className="w-4 h-4" />
-                Edit Staff Member
+                {t('drawer.editStaff')}
               </button>
             )}
             {onDelete && (
@@ -120,7 +122,7 @@ function ActionsDropdown({
                   className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Delete Staff Member
+                  {t('drawer.deleteStaff')}
                 </button>
               </>
             )}
@@ -196,6 +198,7 @@ export function StaffDrawer({
   onEdit,
   onDelete,
 }: StaffDrawerProps) {
+  const { t } = useTranslation('people')
   const navigate = useNavigate()
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -275,7 +278,7 @@ export function StaffDrawer({
                       <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary">
-                      Staff Details
+                      {t('drawer.title')}
                     </h2>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -329,23 +332,23 @@ export function StaffDrawer({
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
-                          {getRoleLabel(staff.role)}
+                          {t(`roles.${getRoleI18nKey(staff.role)}`, { defaultValue: staff.role })}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">Role</p>
+                        <p className="text-[11px] text-text-tertiary">{t('tableHeaders.role')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <BookOpen className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
-                          {staff.department || '—'}
+                          {staff.departmentName || '—'}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">Department</p>
+                        <p className="text-[11px] text-text-tertiary">{t('tableHeaders.department')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <Clock className="w-4 h-4 text-amber-500 mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {formatEmploymentType(staff.employmentType)}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">Type</p>
+                        <p className="text-[11px] text-text-tertiary">{t('drawer.type')}</p>
                       </div>
                     </div>
                   </div>
@@ -353,22 +356,22 @@ export function StaffDrawer({
                   {/* Section cards */}
                   <div className="px-6 py-5 space-y-4">
                     {/* Employment Info */}
-                    <SectionCard icon={Briefcase} title="Employment Information">
+                    <SectionCard icon={Briefcase} title={t('sections.employmentInfo')}>
                       <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                         <DetailField
                           icon={Calendar}
-                          label="Hire Date"
+                          label={t('fields.hireDate')}
                           value={formatDate(staff.hireDate)}
                         />
                         <DetailField
                           icon={Clock}
-                          label="Employment Type"
+                          label={t('fields.employmentType')}
                           value={formatEmploymentType(staff.employmentType)}
                         />
                         {staff.title && (
                           <DetailField
                             icon={Briefcase}
-                            label="Title"
+                            label={t('fields.title')}
                             accent="text-indigo-500"
                             value={staff.title}
                           />
@@ -376,7 +379,7 @@ export function StaffDrawer({
                         {staff.primarySchoolName && (
                           <DetailField
                             icon={School}
-                            label="Primary School"
+                            label={t('fields.primarySchool')}
                             value={staff.primarySchoolName}
                           />
                         )}
@@ -384,17 +387,17 @@ export function StaffDrawer({
                     </SectionCard>
 
                     {/* Contact Information */}
-                    <SectionCard icon={Mail} title="Contact Information">
+                    <SectionCard icon={Mail} title={t('sections.contactInfo')}>
                       <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                         <DetailField
                           icon={Mail}
-                          label="Email"
+                          label={t('fields.email')}
                           accent="text-blue-500"
                           value={staff.email}
                         />
                         <DetailField
                           icon={Phone}
-                          label="Phone"
+                          label={t('fields.phone')}
                           accent="text-green-500"
                           value={staff.phone}
                         />
@@ -403,7 +406,7 @@ export function StaffDrawer({
                         <div className="mt-3 pt-3 border-t border-border-secondary">
                           <DetailField
                             icon={MapPin}
-                            label="Address"
+                            label={t('fields.address')}
                             value={addressStr}
                           />
                         </div>
@@ -412,7 +415,7 @@ export function StaffDrawer({
 
                     {/* School Assignments */}
                     {staff.schoolAssignments && staff.schoolAssignments.length > 0 && (
-                      <SectionCard icon={Building2} title="School Assignments">
+                      <SectionCard icon={Building2} title={t('sections.schoolAssignments')}>
                         <div className="space-y-3">
                           {staff.schoolAssignments.map((assignment, i) => (
                             <div
@@ -421,17 +424,17 @@ export function StaffDrawer({
                             >
                               <div className="flex items-center justify-between mb-2.5">
                                 <p className="text-sm font-semibold text-text-primary">
-                                  {getRoleLabel(assignment.role)}
+                                  {t(`roles.${getRoleI18nKey(assignment.role)}`, { defaultValue: assignment.role })}
                                 </p>
                                 <div className="flex items-center gap-2">
-                                  {assignment.department && (
+                                  {assignment.departmentName && (
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-surface-tertiary text-text-secondary">
-                                      {assignment.department}
+                                      {assignment.departmentName}
                                     </span>
                                   )}
                                   {assignment.isPrimary && (
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                                      Primary
+                                      {t('drawer.primary')}
                                     </span>
                                   )}
                                 </div>
@@ -445,7 +448,7 @@ export function StaffDrawer({
                                 )}
                                 <span className="flex items-center gap-1.5">
                                   <Calendar className="w-3.5 h-3.5 text-text-tertiary" />
-                                  Since {formatDate(assignment.beginDate)}
+                                  {t('drawer.since', { date: formatDate(assignment.beginDate) })}
                                 </span>
                               </div>
                             </div>
@@ -455,18 +458,18 @@ export function StaffDrawer({
                     )}
 
                     {/* System Access */}
-                    <SectionCard icon={Key} title="System Access">
+                    <SectionCard icon={Key} title={t('sections.systemAccess')}>
                       <div className="flex items-center gap-3">
                         {staff.userId ? (
                           <>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/10">
                               <Key className="w-3.5 h-3.5" />
-                              Linked User Account
+                              {t('systemAccess.linkedAccount')}
                             </span>
                           </>
                         ) : (
                           <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-500/20 dark:text-slate-400 border border-slate-500/10">
-                            No user account linked
+                            {t('systemAccess.noAccountLinked')}
                           </span>
                         )}
                       </div>
@@ -481,7 +484,7 @@ export function StaffDrawer({
                     onClick={handleViewFullProfile}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium text-sm transition-colors shadow-sm"
                   >
-                    View Full Profile
+                    {t('drawer.viewFullProfile')}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>

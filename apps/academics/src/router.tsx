@@ -1,7 +1,18 @@
 /**
  * Academics Router Configuration
- * 
+ *
  * Defines the internal routing for the Academics micro-frontend.
+ *
+ * Route consolidation:
+ * - /classrooms → Unified Classrooms module (replaces /scheduling, /grades, /attendance)
+ * - /classrooms/create → Section create page
+ * - /classrooms/$sectionId → Classroom detail page
+ * - /classrooms/$sectionId/edit → Section edit page
+ * - /classrooms/report-card → Report card page
+ * - /curriculum → Curriculum module (courses, grade levels, standards)
+ * - /students → Students module
+ *
+ * Legacy routes (/scheduling, /grades, /attendance, etc.) redirect to /classrooms.
  */
 
 import {
@@ -9,33 +20,28 @@ import {
     createRoute,
     createRootRoute,
     Outlet,
+    redirect,
 } from '@tanstack/react-router'
+import { z } from 'zod'
 import { AcademicsLayout } from './layouts/AcademicsLayout'
 import { Overview } from './routes/overview'
-import { AttendanceModule } from './routes/attendance'
 import { StudentsModule } from './routes/students'
 import { StudentProfilePage } from './routes/students/$studentId'
 import { TeachersModule } from './routes/teachers'
-import { GradebookModule } from './routes/gradebook'
 import { EnrollmentModule } from './routes/enrollment'
 import { StudentProfilesModule } from './routes/students/profiles'
-import { ClassroomsModule } from './routes/classrooms'
-import { SchedulesModule } from './routes/schedules'
-import { TimetablesModule } from './routes/timetables'
-import { GradeLevelsModule } from './routes/grade-levels'
-import { CoursesModule } from './routes/courses'
-import { StandardsModule } from './routes/standards'
-import { AssessmentsModule } from './routes/assessments'
-import { ExamsModule } from './routes/exams'
 import { CalendarModule } from './routes/calendar'
-import { GradesModule } from './routes/grades'
-import { SchedulingModule } from './routes/scheduling'
-import { SectionDetailPage } from './routes/scheduling/$sectionId'
 import { SectionRosterPage } from './routes/sections/roster'
 import { BulkRosteringPage } from './routes/rostering'
 import { CurriculumModule } from './routes/curriculum'
 import { CourseDetailPage } from './routes/curriculum/$courseId'
 import { ReportCardPage } from './routes/grades/report-card'
+
+// Classrooms — consolidated Scheduling + Grades + Attendance
+import { ClassroomsModule } from './routes/classrooms'
+import { ClassroomDetailPage } from './routes/classrooms/$sectionId'
+import { SectionCreatePage } from './routes/classrooms/create'
+import { SectionEditPage } from './routes/classrooms/$sectionId.edit'
 
 // ============================================================================
 // ROOT ROUTE
@@ -92,70 +98,7 @@ const teachersRoute = createRoute({
     component: TeachersModule,
 })
 
-// Classes & Scheduling
-const classroomsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/classrooms',
-    component: ClassroomsModule,
-})
-
-const schedulesRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/schedules',
-    component: SchedulesModule,
-})
-
-const timetablesRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/timetables',
-    component: TimetablesModule,
-})
-
-// Curriculum
-const gradeLevelsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/grade-levels',
-    component: GradeLevelsModule,
-})
-
-const coursesRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/courses',
-    component: CoursesModule,
-})
-
-const standardsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/standards',
-    component: StandardsModule,
-})
-
-// Assessment
-const gradebooksRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/gradebooks',
-    component: GradebookModule,
-})
-
-const assessmentsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/assessments',
-    component: AssessmentsModule,
-})
-
-const examsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/exams',
-    component: ExamsModule,
-})
-
-// Tracking
-const attendanceRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/attendance',
-    component: AttendanceModule,
-})
-
+// Calendar
 const calendarRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/calendar',
@@ -163,50 +106,209 @@ const calendarRoute = createRoute({
 })
 
 // ============================================================================
-// CONSOLIDATED ROUTES (Workflow-Oriented)
-// These new routes map to the simplified sidebar navigation
+// CLASSROOMS — Nested route tree
 // ============================================================================
 
-// Grades & Assessments - Consolidated view of gradebooks, assessments, and exams
-const gradesRoute = createRoute({
+// Layout route: /classrooms (passthrough)
+const classroomsLayoutRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/grades',
-    component: GradesModule,
+    path: '/classrooms',
+    component: () => <Outlet />,
 })
 
-// Scheduling - Consolidated view of schedules, timetables, and classrooms
-const schedulingRoute = createRoute({
+// Index: /classrooms (list page)
+const classroomsIndexRoute = createRoute({
+    getParentRoute: () => classroomsLayoutRoute,
+    path: '/',
+    component: ClassroomsModule,
+    validateSearch: (search: Record<string, unknown>) => {
+        // Backward compat: map removed tab IDs to their replacements
+        let tab = search.tab
+        if (tab === 'my-classes') tab = 'overview'
+
+        return {
+            tab: z
+                .enum(['overview', 'gradebook', 'policies', 'attendance'])
+                .optional()
+                .catch(undefined)
+                .parse(tab),
+        }
+    },
+})
+
+// Create: /classrooms/create
+const classroomsCreateRoute = createRoute({
+    getParentRoute: () => classroomsLayoutRoute,
+    path: '/create',
+    component: SectionCreatePage,
+})
+
+// Report Card: /classrooms/report-card
+const reportCardRoute = createRoute({
+    getParentRoute: () => classroomsLayoutRoute,
+    path: '/report-card',
+    component: ReportCardPage,
+})
+
+// Detail: /classrooms/$sectionId
+const classroomDetailRoute = createRoute({
+    getParentRoute: () => classroomsLayoutRoute,
+    path: '/$sectionId',
+    component: ClassroomDetailPage,
+    validateSearch: (search: Record<string, unknown>) => ({
+        tab: z
+            .enum(['stream', 'classwork', 'people', 'progress', 'grades', 'attendance'])
+            .optional()
+            .catch(undefined)
+            .parse(search.tab),
+        view: z
+            .enum(['overview', 'gradebook', 'attendance'])
+            .optional()
+            .catch(undefined)
+            .parse(search.view),
+    }),
+})
+
+// Edit: /classrooms/$sectionId/edit
+const classroomEditRoute = createRoute({
+    getParentRoute: () => classroomDetailRoute,
+    path: '/edit',
+    component: SectionEditPage,
+})
+
+// ============================================================================
+// LEGACY REDIRECTS — Redirect old routes to /classrooms
+// ============================================================================
+
+const schedulingRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/scheduling',
-    component: SchedulingModule,
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: undefined } })
+    },
+    component: () => null,
 })
 
-// Section detail - individual section view
-const sectionDetailRoute = createRoute({
+const schedulingDetailRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/scheduling/$sectionId',
-    component: SectionDetailPage,
+    beforeLoad: ({ params }) => {
+        throw redirect({ to: '/classrooms/$sectionId', params: { sectionId: params.sectionId }, search: { tab: undefined, view: undefined } })
+    },
+    component: () => null,
 })
 
-// Section roster management (Sprint 5)
+const gradesRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/grades',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: 'gradebook' } })
+    },
+    component: () => null,
+})
+
+const attendanceRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/attendance',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: 'attendance' } })
+    },
+    component: () => null,
+})
+
+const attendanceDashboardRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/attendance/dashboard',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: 'attendance' } })
+    },
+    component: () => null,
+})
+
+const schedulesRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/schedules',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: undefined } })
+    },
+    component: () => null,
+})
+
+const timetablesRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/timetables',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: undefined } })
+    },
+    component: () => null,
+})
+
+const gradebooksRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/gradebooks',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: 'gradebook' } })
+    },
+    component: () => null,
+})
+
+const assessmentsRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/assessments',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: 'gradebook' } })
+    },
+    component: () => null,
+})
+
+const examsRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/exams',
+    beforeLoad: () => {
+        throw redirect({ to: '/classrooms', search: { tab: 'gradebook' } })
+    },
+    component: () => null,
+})
+
+const gradeLevelsRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/grade-levels',
+    beforeLoad: () => {
+        throw redirect({ to: '/curriculum' })
+    },
+    component: () => null,
+})
+
+const coursesRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/courses',
+    beforeLoad: () => {
+        throw redirect({ to: '/curriculum' })
+    },
+    component: () => null,
+})
+
+const standardsRedirectRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/standards',
+    beforeLoad: () => {
+        throw redirect({ to: '/curriculum' })
+    },
+    component: () => null,
+})
+
+// Section roster management
 const sectionRosterRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/sections/$sectionId/roster',
     component: SectionRosterPage,
 })
 
-// Bulk rostering matrix (Sprint 5)
+// Bulk rostering matrix
 const rosteringRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/rostering',
     component: BulkRosteringPage,
-})
-
-// Student Report Card (Sprint 6)
-const reportCardRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/grades/report-card',
-    component: ReportCardPage,
 })
 
 // Curriculum - Consolidated view of courses, grade levels, and standards
@@ -234,22 +336,31 @@ const routeTree = rootRoute.addChildren([
     studentProfileRoute,
     studentProfilesRoute,
     teachersRoute,
-    classroomsRoute,
-    schedulesRoute,
-    timetablesRoute,
-    gradeLevelsRoute,
-    coursesRoute,
-    standardsRoute,
-    gradebooksRoute,
-    assessmentsRoute,
-    examsRoute,
-    attendanceRoute,
     calendarRoute,
-    // Consolidated routes
-    gradesRoute,
-    reportCardRoute,
-    schedulingRoute,
-    sectionDetailRoute,
+    // Classrooms (nested tree)
+    classroomsLayoutRoute.addChildren([
+        classroomsIndexRoute,
+        classroomsCreateRoute,
+        reportCardRoute,
+        classroomDetailRoute.addChildren([
+            classroomEditRoute,
+        ]),
+    ]),
+    // Legacy redirects
+    schedulingRedirectRoute,
+    schedulingDetailRedirectRoute,
+    gradesRedirectRoute,
+    attendanceRedirectRoute,
+    attendanceDashboardRedirectRoute,
+    schedulesRedirectRoute,
+    timetablesRedirectRoute,
+    gradebooksRedirectRoute,
+    assessmentsRedirectRoute,
+    examsRedirectRoute,
+    gradeLevelsRedirectRoute,
+    coursesRedirectRoute,
+    standardsRedirectRoute,
+    // Other routes
     sectionRosterRoute,
     rosteringRoute,
     curriculumRoute,

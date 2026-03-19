@@ -59,18 +59,16 @@ export function EnrollmentStep({
     isError: yearsError,
   } = useAcademicYears(schoolId || '', !!schoolId)
 
-  // Filter to eligible years (active + planning) and build select options
+  // Filter to active years only (planning years not supported for enrollment in MVP)
   const eligibleYears = useMemo(() => {
     if (!academicYears) return []
-    return academicYears.filter(
-      (y) => y.status === 'active' || y.status === 'planning'
-    )
+    return academicYears.filter((y) => y.status === 'active')
   }, [academicYears])
 
   const yearOptions = useMemo(() => {
     return eligibleYears.map((y) => ({
       value: y.yearId,
-      label: `${y.name}${y.status === 'planning' ? ' (Planning)' : y.isCurrent ? ' (Current)' : ''}`,
+      label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
     }))
   }, [eligibleYears])
 
@@ -137,7 +135,8 @@ export function EnrollmentStep({
           <RadioGroupField
             name="enrollment.enrollmentType"
             options={ENROLLMENT_TYPE_RADIO}
-            direction="vertical"
+            direction="horizontal"
+            optionsClassName="grid grid-cols-2 gap-4"
           />
         </div>
 
@@ -213,13 +212,6 @@ export function EnrollmentStep({
                       Active academic year — enrollment will be immediately active
                     </span>
                   </div>
-                ) : selectedYear.status === 'planning' ? (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span className="text-sm text-amber-700">
-                      This academic year is in Planning status. Enrollment will be set to Pending until the year is activated.
-                    </span>
-                  </div>
                 ) : null}
               </motion.div>
             )}
@@ -252,53 +244,63 @@ export function EnrollmentStep({
           </div>
         </div>
 
-        {/* Ed-Fi Enrollment Configuration */}
+        {/* Enrollment Settings */}
         <div>
           <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-1">
-            Enrollment Configuration
+            Enrollment Settings
           </h3>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mb-4">
-            Additional enrollment parameters with smart defaults
+            These settings have recommended defaults. Adjust only if needed.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
             {/* Primary School toggle */}
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
-              <input
-                type="checkbox"
-                {...form.register('enrollment.primarySchool')}
-                id="enrollment.primarySchool"
-                className="h-4 w-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/20"
-              />
-              <label
-                htmlFor="enrollment.primarySchool"
-                className="text-sm text-[rgb(var(--text-primary))] select-none"
-              >
-                Primary School
-              </label>
+            <div className="space-y-1">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+                <input
+                  type="checkbox"
+                  {...form.register('enrollment.primarySchool')}
+                  id="enrollment.primarySchool"
+                  className="h-4 w-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/20"
+                />
+                <label
+                  htmlFor="enrollment.primarySchool"
+                  className="text-sm text-[rgb(var(--text-primary))] select-none"
+                >
+                  Primary School
+                </label>
+              </div>
+              <p className="text-xs text-[rgb(var(--text-tertiary))] pl-1">
+                Is this the student's primary school of enrollment?
+              </p>
             </div>
 
             {/* Full-Time Equivalency */}
             <TextField
               name="enrollment.fullTimeEquivalency"
-              label="FTE"
+              label="Full-Time Equivalency (FTE)"
               type="number"
-              helperText="0.0 – 1.0 (1.0 = full time)"
+              helperText="1.0 = full-time, 0.5 = half-time. Most students are 1.0."
             />
 
             {/* Repeat Grade toggle */}
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
-              <input
-                type="checkbox"
-                {...form.register('enrollment.repeatGradeIndicator')}
-                id="enrollment.repeatGradeIndicator"
-                className="h-4 w-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/20"
-              />
-              <label
-                htmlFor="enrollment.repeatGradeIndicator"
-                className="text-sm text-[rgb(var(--text-primary))] select-none"
-              >
-                Repeat Grade
-              </label>
+            <div className="space-y-1">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+                <input
+                  type="checkbox"
+                  {...form.register('enrollment.repeatGradeIndicator')}
+                  id="enrollment.repeatGradeIndicator"
+                  className="h-4 w-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/20"
+                />
+                <label
+                  htmlFor="enrollment.repeatGradeIndicator"
+                  className="text-sm text-[rgb(var(--text-primary))] select-none"
+                >
+                  Repeat Grade
+                </label>
+              </div>
+              <p className="text-xs text-[rgb(var(--text-tertiary))] pl-1">
+                Check if the student is repeating the current grade level
+              </p>
             </div>
           </div>
         </div>
@@ -322,6 +324,7 @@ export function EnrollmentStep({
                     name="enrollment.previousSchoolName"
                     label="Previous School"
                     placeholder="Name of previous school"
+                    required
                   />
                   <TextField
                     name="enrollment.previousSchoolAddress"

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="url(#bg)"/>
+  <!-- Rising bar chart -->
+  <g transform="translate(480, 150)" fill="white" fill-opacity="0.1" stroke="none">
+    <rect x="0" y="-30" width="14" height="30" rx="2"/>
+    <rect x="20" y="-50" width="14" height="50" rx="2"/>
+    <rect x="40" y="-45" width="14" height="45" rx="2"/>
+    <rect x="60" y="-70" width="14" height="70" rx="2"/>
+    <rect x="80" y="-60" width="14" height="60" rx="2"/>
+    <rect x="100" y="-90" width="14" height="90" rx="2"/>
+  </g>
+  <!-- Line graph trending up -->
+  <g fill="none" stroke="white" stroke-opacity="0.12" stroke-width="2" stroke-linecap="round">
+    <path d="M400,120 L430,100 L460,110 L490,80 L520,85 L550,55 L580,60"/>
+    <circle cx="400" cy="120" r="3" fill="white" fill-opacity="0.1"/>
+    <circle cx="490" cy="80" r="3" fill="white" fill-opacity="0.1"/>
+    <circle cx="580" cy="60" r="3" fill="white" fill-opacity="0.1"/>
+  </g>
+  <!-- Briefcase -->
+  <g transform="translate(680, 80)" fill="none" stroke="white" stroke-opacity="0.12" stroke-width="1.5">
+    <rect x="-22" y="-12" width="44" height="30" rx="4"/>
+    <path d="M-8,-12 L-8,-18 C-8,-22 8,-22 8,-18 L8,-12"/>
+    <line x1="-22" y1="0" x2="22" y2="0" stroke-opacity="0.08"/>
+  </g>
+  <!-- Pie chart -->
+  <g transform="translate(400, 65)" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="1.5">
+    <circle r="22"/>
+    <line x1="0" y1="0" x2="0" y2="-22"/>
+    <line x1="0" y1="0" x2="19" y2="11"/>
+    <line x1="0" y1="0" x2="-15" y2="16"/>
+    <path d="M0,-22 A22,22 0 0,1 19,11" fill="white" fill-opacity="0.06"/>
+  </g>
+  <!-- Dollar sign -->
+  <text x="730" y="55" font-family="sans-serif" font-size="36" font-weight="bold" fill="white" fill-opacity="0.08">$</text>
+  <!-- Handshake outline -->
+  <g transform="translate(620, 150)" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1.5" stroke-linecap="round">
+    <path d="M-20,0 L-10,-5 L0,0 L10,-5 L20,0"/>
+    <path d="M-20,0 L-25,5"/><path d="M20,0 L25,5"/>
+  </g>
+  <!-- Calculator -->
+  <g transform="translate(750, 140)" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1">
+    <rect x="-12" y="-18" width="24" height="36" rx="3"/>
+    <rect x="-8" y="-14" width="16" height="8" rx="1" fill="white" fill-opacity="0.04"/>
+    <circle cx="-4" cy="2" r="2" fill="white" fill-opacity="0.04"/>
+    <circle cx="4" cy="2" r="2" fill="white" fill-opacity="0.04"/>
+    <circle cx="-4" cy="10" r="2" fill="white" fill-opacity="0.04"/>
+    <circle cx="4" cy="10" r="2" fill="white" fill-opacity="0.04"/>
+  </g>
+  <!-- Scattered dots -->
+  <circle cx="360" cy="45" r="2" fill="white" fill-opacity="0.04"/>
+  <circle cx="660" cy="170" r="3" fill="white" fill-opacity="0.05"/>
+</svg>

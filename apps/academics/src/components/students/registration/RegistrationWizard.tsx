@@ -422,6 +422,11 @@ function WizardLayout({
         <RegistrationStepper />
       </div>
 
+      {/* Screen reader step announcement */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        Step {currentStep + 1} of {WIZARD_STEPS.length}: {currentStepData.title}
+      </div>
+
       {/* Step title */}
       <motion.div
         key={`title-${currentStep}`}
@@ -473,7 +478,8 @@ export function RegistrationWizard() {
     (addr: Record<string, unknown> | undefined) => {
       if (!addr) return undefined
       const cleaned: Record<string, string | undefined> = {
-        street1: (addr.street1 as string) || undefined,
+        // Fall back to "street" for auto-saved drafts from before the field rename
+        street1: (addr.street1 as string) || (addr.street as string) || undefined,
         street2: (addr.street2 as string) || undefined,
         city: (addr.city as string) || undefined,
         state: (addr.state as string) || undefined,
@@ -525,12 +531,6 @@ export function RegistrationWizard() {
           ? (guardians as CreateStudentDto['guardians'])
           : undefined,
         medicalInfo: data.medicalInfo as CreateStudentDto['medicalInfo'],
-        specialPrograms: (data.specialPrograms as string[])?.length
-          ? (data.specialPrograms as string[])
-          : undefined,
-        accommodations: (data.accommodations as string[])?.length
-          ? (data.accommodations as string[])
-          : undefined,
         ethnicity: (data.ethnicity as string) || undefined,
         primaryLanguage: (data.primaryLanguage as string) || undefined,
         homeLanguage: (data.homeLanguage as string) || undefined,
@@ -641,6 +641,7 @@ export function RegistrationWizard() {
         }}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
+        autoSaveKey={schoolId ? `edforge:student-registration:${schoolId}` : undefined}
       >
         <WizardLayout onCancel={handleCancel} schoolId={schoolId || ''} />
       </WizardProvider>

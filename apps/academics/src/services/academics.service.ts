@@ -9,6 +9,12 @@ import axios from 'axios'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
 
 // ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
+
+// ============================================================================
 // TYPES - Import from @aibrains/shared-types
 // ============================================================================
 
@@ -54,6 +60,10 @@ export type {
   ClassPeriodListResponseDto,
   LocationResponseDto,
   LocationListResponseDto,
+  ClassworkItemResponseDto,
+  ClassworkTopicResponseDto,
+  SectionClassworkResponseDto,
+  CreateClassworkItemDto,
 } from '@aibrains/shared-types'
 
 // Import for internal use
@@ -84,6 +94,10 @@ import type {
   UpdateCourseOfferingDto,
   ClassPeriodListResponseDto,
   LocationListResponseDto,
+  ClassworkItemResponseDto,
+  ClassworkTopicResponseDto,
+  SectionClassworkResponseDto,
+  CreateClassworkItemDto,
 } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -298,6 +312,56 @@ export interface PaginationQuery {
 }
 
 // ============================================================================
+// DASHBOARD OVERVIEW (Unified endpoint)
+// ============================================================================
+
+export interface DashboardEnrollmentSummary {
+  totalEnrolled: number
+  byGradeLevel: Record<string, number>
+  byStatus: Record<string, number>
+  recentEnrollments: number
+  recentWithdrawals: number
+}
+
+export interface DashboardAttendanceSummary {
+  date: string
+  totalStudents: number
+  totalRecorded: number
+  present: number
+  absent: number
+  late: number
+  excused: number
+  halfDay: number
+  remote: number
+  attendanceRate: number
+}
+
+export interface DashboardOverviewResponse {
+  schoolId: string
+  academicYearId: string
+  date: string
+  enrollment: DashboardEnrollmentSummary
+  activeSectionsCount: number
+  attendance: DashboardAttendanceSummary | null
+  _cached: boolean
+}
+
+/**
+ * Get unified dashboard overview (enrollment + sections + attendance)
+ * GET /academics/dashboard/overview
+ */
+export async function getDashboardOverview(
+  schoolId: string,
+  academicYearId: string,
+  date: string,
+): Promise<DashboardOverviewResponse> {
+  if (DEBUG) console.debug('[Academics Service] getDashboardOverview', { schoolId, academicYearId, date })
+  return apiGet<DashboardOverviewResponse>('/academics/dashboard/overview', {
+    schoolId, academicYearId, date,
+  })
+}
+
+// ============================================================================
 // STUDENT CRUD OPERATIONS
 // ============================================================================
 
@@ -308,6 +372,11 @@ export interface PaginationQuery {
 export async function getStudents(
   params: StudentFilterDto & PaginationQuery
 ): Promise<StudentListResponseDto> {
+  if (DEBUG) console.debug('[Academics Service] getStudents', {
+    schoolId: params.schoolId,
+    gradeLevel: params.gradeLevel,
+    hasSearch: !!params.searchTerm,
+  })
   // Build query params, filtering out undefined values
   const queryParams: Record<string, unknown> = {}
 
@@ -325,10 +394,12 @@ export async function getStudents(
 
 /**
  * Get student by ID
- * GET /academics/students/:id
+ * GET /academics/students/:id?schoolId=
  */
-export async function getStudent(studentId: string): Promise<StudentResponseDto> {
-  return apiGet<StudentResponseDto>(`/academics/students/${studentId}`)
+export async function getStudent(studentId: string, schoolId?: string): Promise<StudentResponseDto> {
+  const params: Record<string, unknown> = {}
+  if (schoolId) params.schoolId = schoolId
+  return apiGet<StudentResponseDto>(`/academics/students/${studentId}`, params)
 }
 
 /**
@@ -336,19 +407,25 @@ export async function getStudent(studentId: string): Promise<StudentResponseDto>
  *
  * GET /academics/students/:id/profile
  */
-export async function getStudentProfile(studentId: string): Promise<StudentProfileResponseDto> {
-  return apiGet<StudentProfileResponseDto>(`/academics/students/${studentId}/profile`)
+export async function getStudentProfile(studentId: string, schoolId?: string): Promise<StudentProfileResponseDto> {
+  const params: Record<string, unknown> = {}
+  if (schoolId) params.schoolId = schoolId
+  return apiGet<StudentProfileResponseDto>(`/academics/students/${studentId}/profile`, params)
 }
 
 /**
  * Update student
- * PATCH /academics/students/:id
+ * PATCH /academics/students/:id?schoolId=
  */
 export async function updateStudent(
   studentId: string,
-  data: UpdateStudentDto
+  data: UpdateStudentDto,
+  schoolId?: string,
 ): Promise<StudentResponseDto> {
-  return apiPatch<StudentResponseDto>(`/academics/students/${studentId}`, data)
+  const url = schoolId
+    ? `/academics/students/${studentId}?schoolId=${schoolId}`
+    : `/academics/students/${studentId}`
+  return apiPatch<StudentResponseDto>(url, data)
 }
 
 /**
@@ -363,10 +440,13 @@ export async function createStudent(
 
 /**
  * Delete student
- * DELETE /academics/students/:id
+ * DELETE /academics/students/:id?schoolId=
  */
-export async function deleteStudent(studentId: string): Promise<void> {
-  return apiDelete(`/academics/students/${studentId}`)
+export async function deleteStudent(studentId: string, schoolId?: string): Promise<void> {
+  const url = schoolId
+    ? `/academics/students/${studentId}?schoolId=${schoolId}`
+    : `/academics/students/${studentId}`
+  return apiDelete(url)
 }
 
 // ============================================================================
@@ -438,6 +518,10 @@ export async function importStudentsCsv(
 export async function createEnrollment(
   data: CreateEnrollmentDto
 ): Promise<EnrollmentResponseDto> {
+  if (DEBUG) console.debug('[Academics Service] createEnrollment', {
+    schoolId: (data as any).schoolId,
+    yearId: (data as any).academicYearId,
+  })
   return apiPost<EnrollmentResponseDto>('/academics/enrollments', data)
 }
 
@@ -654,6 +738,7 @@ export interface CreateAttendanceParams {
 
 export interface BulkAttendanceRecord {
   studentId: string
+  studentName?: string
   status: AttendanceStatus
   notes?: string
 }
@@ -691,11 +776,13 @@ export interface DailyAttendanceSummary {
   date: string
   schoolId: string
   totalStudents: number
+  totalRecorded?: number
   present: number
   absent: number
   late: number
   excused: number
   halfDay: number
+  remote?: number
   attendanceRate: number
   byGradeLevel?: Record<string, {
     total: number
@@ -735,6 +822,11 @@ export async function recordAttendance(
 export async function recordBulkAttendance(
   data: BulkAttendanceParams
 ): Promise<BulkAttendanceResponse> {
+  if (DEBUG) console.debug('[Academics Service] recordBulkAttendance', {
+    batchSize: data.records.length,
+    schoolId: data.schoolId,
+    date: data.date,
+  })
   return apiPost<BulkAttendanceResponse>('/academics/attendance/bulk', data)
 }
 
@@ -758,23 +850,24 @@ export async function getAttendanceByDate(
  */
 export async function getAttendanceSummary(
   schoolId: string,
-  date: string
+  date: string,
+  academicYearId?: string
 ): Promise<DailyAttendanceSummary> {
-  return apiGet<DailyAttendanceSummary>('/academics/attendance/summary', {
-    schoolId,
-    date,
-  })
+  const params: Record<string, string> = { schoolId, date }
+  if (academicYearId) params.academicYearId = academicYearId
+  return apiGet<DailyAttendanceSummary>('/academics/attendance/summary', params)
 }
 
 /**
  * Get student attendance history
- * GET /academics/attendance/student/:id?startDate=&endDate=
+ * GET /academics/attendance/student/:id?schoolId=&startDate=&endDate=
  */
 export async function getStudentAttendance(
   studentId: string,
-  params?: { startDate?: string; endDate?: string }
+  params?: { schoolId?: string; startDate?: string; endDate?: string }
 ): Promise<AttendanceRecord[]> {
   const queryParams: Record<string, unknown> = {}
+  if (params?.schoolId) queryParams.schoolId = params.schoolId
   if (params?.startDate) queryParams.startDate = params.startDate
   if (params?.endDate) queryParams.endDate = params.endDate
   return apiGet<AttendanceRecord[]>(`/academics/attendance/student/${studentId}`, queryParams)
@@ -782,12 +875,15 @@ export async function getStudentAttendance(
 
 /**
  * Get student attendance summary (rate + counts)
- * GET /academics/attendance/student/:id/summary
+ * GET /academics/attendance/student/:id/summary?schoolId=
  */
 export async function getStudentAttendanceSummary(
-  studentId: string
+  studentId: string,
+  schoolId?: string,
 ): Promise<StudentAttendanceSummary> {
-  return apiGet<StudentAttendanceSummary>(`/academics/attendance/student/${studentId}/summary`)
+  const params: Record<string, string> = {}
+  if (schoolId) params.schoolId = schoolId
+  return apiGet<StudentAttendanceSummary>(`/academics/attendance/student/${studentId}/summary`, params)
 }
 
 /**
@@ -797,9 +893,157 @@ export async function getStudentAttendanceSummary(
 export async function updateAttendance(
   date: string,
   studentId: string,
-  data: { status: AttendanceStatus; notes?: string }
+  data: { status: AttendanceStatus; notes?: string },
+  schoolId?: string,
 ): Promise<AttendanceRecord> {
-  return apiPatch<AttendanceRecord>(`/academics/attendance/${date}/${studentId}`, data)
+  const url = schoolId
+    ? `/academics/attendance/${date}/${studentId}?schoolId=${schoolId}`
+    : `/academics/attendance/${date}/${studentId}`
+  return apiPatch<AttendanceRecord>(url, data)
+}
+
+// ============================================================================
+// SECTION ATTENDANCE (Ed-Fi: StudentSectionAttendanceEvent)
+// ============================================================================
+
+export interface CreateSectionAttendanceParams {
+  studentId: string
+  sectionId: string
+  schoolId: string
+  date: string
+  status: AttendanceStatus
+  academicYearId?: string
+  checkInTime?: string
+  notes?: string
+  excuseReason?: string
+}
+
+export interface BulkSectionAttendanceRecord {
+  studentId: string
+  studentName?: string
+  status: AttendanceStatus
+  checkInTime?: string
+  notes?: string
+}
+
+export interface BulkSectionAttendanceParams {
+  sectionId: string
+  date: string
+  schoolId: string
+  academicYearId?: string
+  records: BulkSectionAttendanceRecord[]
+}
+
+export interface SectionAttendanceRecord {
+  sectionAttendanceId: string
+  studentId: string
+  studentName?: string
+  schoolId: string
+  sectionId: string
+  courseName?: string
+  courseCode?: string
+  date: string
+  status: AttendanceStatus
+  checkInTime?: string
+  checkOutTime?: string
+  durationMinutes?: number
+  excuseType?: string
+  excuseReason?: string
+  notes?: string
+  parentNotified: boolean
+  parentNotifiedAt?: string
+  createdAt: string
+  updatedAt: string
+  createdBy?: string
+  updatedBy?: string
+  version?: number
+}
+
+export interface BulkSectionAttendanceResponse {
+  success: boolean
+  date: string
+  schoolId: string
+  sectionId: string
+  totalProcessed: number
+  recordsCreated: number
+  recordsUpdated: number
+  errors: Array<{ studentId: string; error: string }>
+}
+
+/**
+ * Record single section attendance
+ * POST /academics/section-attendance
+ */
+export async function recordSectionAttendance(
+  data: CreateSectionAttendanceParams
+): Promise<SectionAttendanceRecord> {
+  return apiPost<SectionAttendanceRecord>('/academics/section-attendance', data)
+}
+
+/**
+ * Record bulk section attendance
+ * POST /academics/section-attendance/bulk
+ */
+export async function recordBulkSectionAttendance(
+  data: BulkSectionAttendanceParams
+): Promise<BulkSectionAttendanceResponse> {
+  if (DEBUG) console.debug('[Academics Service] recordBulkSectionAttendance', {
+    batchSize: data.records.length,
+    sectionId: data.sectionId,
+    date: data.date,
+  })
+  return apiPost<BulkSectionAttendanceResponse>('/academics/section-attendance/bulk', data)
+}
+
+/**
+ * Get section attendance by date
+ * GET /academics/section-attendance?sectionId=&schoolId=&date=
+ */
+export async function getSectionAttendanceByDate(
+  sectionId: string,
+  schoolId: string,
+  date: string,
+): Promise<{ items: SectionAttendanceRecord[]; hasMore: boolean }> {
+  return apiGet<{ items: SectionAttendanceRecord[]; hasMore: boolean }>(
+    '/academics/section-attendance',
+    { sectionId, schoolId, date },
+  )
+}
+
+/**
+ * Get student section attendance history
+ * GET /academics/section-attendance/student/:studentId?sectionId=&schoolId=&startDate=&endDate=
+ */
+export async function getStudentSectionAttendance(
+  studentId: string,
+  params?: { sectionId?: string; schoolId?: string; startDate?: string; endDate?: string }
+): Promise<SectionAttendanceRecord[]> {
+  const queryParams: Record<string, string> = {}
+  if (params?.sectionId) queryParams.sectionId = params.sectionId
+  if (params?.schoolId) queryParams.schoolId = params.schoolId
+  if (params?.startDate) queryParams.startDate = params.startDate
+  if (params?.endDate) queryParams.endDate = params.endDate
+  return apiGet<SectionAttendanceRecord[]>(
+    `/academics/section-attendance/student/${studentId}`,
+    queryParams,
+  )
+}
+
+/**
+ * Update section attendance (correction)
+ * PATCH /academics/section-attendance/:date/:sectionId/:studentId?schoolId=
+ */
+export async function updateSectionAttendance(
+  date: string,
+  sectionId: string,
+  studentId: string,
+  data: { status?: AttendanceStatus; notes?: string; excuseReason?: string; expectedVersion?: number },
+  schoolId?: string,
+): Promise<SectionAttendanceRecord> {
+  const url = schoolId
+    ? `/academics/section-attendance/${date}/${sectionId}/${studentId}?schoolId=${schoolId}`
+    : `/academics/section-attendance/${date}/${sectionId}/${studentId}`
+  return apiPatch<SectionAttendanceRecord>(url, data)
 }
 
 // ============================================================================
@@ -859,6 +1103,12 @@ export async function getEnrollments(
   yearId: string,
   params?: EnrollmentFilterParams
 ): Promise<EnrollmentListResponse> {
+  if (DEBUG) console.debug('[Academics Service] getEnrollments', {
+    schoolId,
+    yearId,
+    gradeLevel: params?.gradeLevel,
+    status: params?.status,
+  })
   const queryParams: Record<string, unknown> = {}
   if (params?.gradeLevel) queryParams.gradeLevel = params.gradeLevel
   if (params?.status) queryParams.status = params.status
@@ -915,59 +1165,67 @@ export async function transferStudent(
   )
 }
 
+/**
+ * Mark an enrollment as no-show
+ * POST /academics/schools/:schoolId/years/:yearId/students/:studentId/no-show
+ */
+export async function markNoShow(
+  schoolId: string,
+  yearId: string,
+  studentId: string,
+): Promise<EnrollmentResponseDto> {
+  return apiPost(
+    `/academics/schools/${schoolId}/years/${yearId}/students/${studentId}/no-show`,
+    {}
+  )
+}
+
+/**
+ * Close all open enrollments for a completed academic year
+ * POST /academics/schools/:schoolId/years/:yearId/enrollments/close-year
+ */
+export async function closeAcademicYearEnrollments(
+  schoolId: string,
+  yearId: string,
+  lastDayOfSchool: string,
+): Promise<{ closed: number; alreadyClosed: number; errors: number }> {
+  return apiPost(
+    `/academics/schools/${schoolId}/years/${yearId}/enrollments/close-year`,
+    { lastDayOfSchool }
+  )
+}
+
+/**
+ * Export enrollments as CSV file download
+ * GET /academics/schools/:schoolId/years/:yearId/enrollments/export
+ */
+export function getEnrollmentExportUrl(schoolId: string, yearId: string): string {
+  return `/academics/schools/${schoolId}/years/${yearId}/enrollments/export`
+}
+
 // ============================================================================
-// GRADING POLICY OPERATIONS
+// GRADING POLICY & GRADE TYPES (from @aibrains/shared-types)
 // ============================================================================
 
-export interface GradingScaleEntry {
-  letter: string
-  minPercentage: number
-  maxPercentage: number
-  gpaPoints: number
-}
+import type {
+  AssessmentCategory,
+  GradingPolicyResponseDto,
+  CreateGradingPolicyDto,
+  UpdateGradingPolicyDto,
+  GradingScaleEntryDto,
+  CategoryWeightDto,
+  GradeOverviewResponseDto,
+  BulkFinalizeParamsDto,
+  BulkFinalizeResponseDto,
+} from '@aibrains/shared-types'
+export type { AssessmentCategory } from '@aibrains/shared-types'
 
-export interface CategoryWeight {
-  categoryId: string
-  categoryName: string
-  weight: number
-  dropLowest?: number
-}
-
-export interface GradingPolicyResponse {
-  policyId: string
-  schoolId: string
-  policyName: string
-  description?: string
-  gradingScale: GradingScaleEntry[]
-  categoryWeights: CategoryWeight[]
-  roundingRule: 'up' | 'down' | 'nearest'
-  minimumPassingGrade: number
-  isDefault: boolean
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateGradingPolicyParams {
-  schoolId: string
-  policyName: string
-  description?: string
-  gradingScale: GradingScaleEntry[]
-  categoryWeights: CategoryWeight[]
-  roundingRule: 'up' | 'down' | 'nearest'
-  minimumPassingGrade: number
-  isDefault?: boolean
-}
-
-export interface UpdateGradingPolicyParams {
-  policyName?: string
-  description?: string
-  gradingScale?: GradingScaleEntry[]
-  categoryWeights?: CategoryWeight[]
-  roundingRule?: 'up' | 'down' | 'nearest'
-  minimumPassingGrade?: number
-  isDefault?: boolean
-}
+// Backward-compatible aliases for existing consumers
+export type GradingScaleEntry = GradingScaleEntryDto
+export type CategoryWeight = CategoryWeightDto
+export type GradingPolicyResponse = GradingPolicyResponseDto
+export type CreateGradingPolicyParams = CreateGradingPolicyDto
+export type UpdateGradingPolicyParams = UpdateGradingPolicyDto
 
 /**
  * List grading policies for a school
@@ -1028,6 +1286,7 @@ export interface AssignmentInfo {
   assignmentName: string
   assignmentType: string
   categoryId: string
+  assessmentCategory?: AssessmentCategory
   possiblePoints: number
   earnedPoints?: number
 }
@@ -1076,6 +1335,7 @@ export interface GradeRecord {
     assignmentName: string
     assignmentType: string
     categoryId: string
+    assessmentCategory?: AssessmentCategory
     possiblePoints: number
     earnedPoints?: number
     gradedAt: string
@@ -1111,6 +1371,7 @@ export interface StudentGradesResponse {
 export async function recordGrade(
   data: RecordGradeParams
 ): Promise<void> {
+  if (DEBUG) console.debug('[Academics Service] recordGrade', { studentId: data.studentId, sectionId: data.sectionId })
   return apiPost('/academics/grades/record', data)
 }
 
@@ -1135,6 +1396,7 @@ export async function getSectionGrades(
   sectionId: string,
   params: { schoolId: string; termId?: string }
 ): Promise<SectionGradebookResponse> {
+  if (DEBUG) console.debug('[Academics Service] getSectionGrades', { sectionId, termId: params.termId })
   const response = await apiGet<GradeRecord[] | SectionGradebookResponse>(
     `/academics/grades/section/${sectionId}`,
     params
@@ -1150,41 +1412,47 @@ export async function getSectionGrades(
   return response
 }
 
+// GradeOverviewResponse and BulkFinalize types aliased from shared-types (see imports above)
+export type GradeOverviewResponse = GradeOverviewResponseDto
+export type BulkFinalizeParams = BulkFinalizeParamsDto
+export type BulkFinalizeResponse = BulkFinalizeResponseDto
+
+/**
+ * Get grade overview for a school
+ * GET /academics/grades/overview?schoolId=&academicYearId=
+ */
+export async function getGradeOverview(
+  params: { schoolId: string; academicYearId: string }
+): Promise<GradeOverviewResponse> {
+  return apiGet<GradeOverviewResponse>('/academics/grades/overview', params)
+}
+
 /**
  * Get student's grades
- * GET /academics/students/:id/grades?academicYearId=&termId=
+ * GET /academics/students/:id/grades?schoolId=&academicYearId=&termId=
  */
 export async function getStudentGrades(
   studentId: string,
-  params?: { academicYearId?: string; termId?: string }
+  params?: { schoolId?: string; academicYearId?: string; termId?: string }
 ): Promise<StudentGradesResponse> {
   return apiGet<StudentGradesResponse>(`/academics/students/${studentId}/grades`, params)
 }
 
 /**
  * Finalize a grade (lock it)
- * PATCH /academics/grades/:gradeId/finalize
+ * PATCH /academics/grades/:gradeId/finalize?schoolId=
  */
-export async function finalizeGrade(gradeId: string): Promise<void> {
-  return apiPatch(`/academics/grades/${gradeId}/finalize`, {})
+export async function finalizeGrade(gradeId: string, schoolId?: string): Promise<void> {
+  const url = schoolId
+    ? `/academics/grades/${gradeId}/finalize?schoolId=${schoolId}`
+    : `/academics/grades/${gradeId}/finalize`
+  return apiPatch(url, {})
 }
 
 /**
  * Bulk-finalize all grades for a section in a term
  * POST /academics/grades/finalize/bulk
  */
-export interface BulkFinalizeParams {
-  sectionId: string
-  termId: string
-  schoolId: string
-}
-
-export interface BulkFinalizeResponse {
-  finalized: number
-  alreadyFinalized: number
-  errors: Array<{ studentId: string; courseId: string; error: string }>
-}
-
 export async function bulkFinalizeGrades(
   data: BulkFinalizeParams
 ): Promise<BulkFinalizeResponse> {
@@ -1338,6 +1606,7 @@ export async function getAttendanceTrend(
   startDate: string,
   endDate: string,
 ): Promise<DailyAttendanceSummary[]> {
+  if (DEBUG) console.debug('[Academics Service] getAttendanceTrend', { schoolId, startDate, endDate })
   return apiGet<DailyAttendanceSummary[]>('/academics/attendance/trend', {
     schoolId,
     startDate,
@@ -1352,9 +1621,43 @@ export async function getAttendanceTrend(
 export interface AttendanceAlert {
   studentId: string
   studentName: string
+  gradeLevel?: string
   attendanceRate: number
   totalDays: number
   absentDays: number
+  trend: 'improving' | 'declining' | 'stable'
+}
+
+export interface AttendanceOverviewResponse {
+  todaySummary: DailyAttendanceSummary & { totalRecorded: number; remote?: number }
+  sectionCompletion: {
+    totalSections: number
+    sectionsWithAttendance: number
+    sections: Array<{
+      sectionId: string
+      sectionNumber: string
+      courseName: string
+      studentCount: number
+      recordedCount: number
+      isComplete: boolean
+    }>
+  }
+  trend: DailyAttendanceSummary[]
+  periodAverages: {
+    last7Days: number
+    last30Days: number
+    academicYear: number
+  }
+  atRiskStudents: AttendanceAlert[]
+  totalAtRiskCount: number
+  absenceBreakdown: {
+    unexcused: number
+    excused: number
+    late: number
+    halfDay: number
+    remote: number
+  }
+  dayOfWeekPattern: Record<string, { avgRate: number; avgAbsent: number }>
 }
 
 /**
@@ -1368,13 +1671,182 @@ export async function getAttendanceAlerts(
   startDate: string,
   endDate: string,
 ): Promise<AttendanceAlert[]> {
-  return apiGet<AttendanceAlert[]>('/academics/attendance/alerts', {
-    schoolId,
-    academicYearId,
-    threshold,
-    startDate,
-    endDate,
-  })
+  if (DEBUG) console.debug('[Academics Service] getAttendanceAlerts', { threshold, academicYearId })
+  const res = await apiGet<{ alerts: AttendanceAlert[]; totalAtRiskCount: number } | AttendanceAlert[]>(
+    '/academics/attendance/alerts',
+    { schoolId, academicYearId, threshold, startDate, endDate },
+  )
+  // Backend returns { alerts, totalAtRiskCount } — unwrap to array
+  return Array.isArray(res) ? res : res.alerts
+}
+
+// ============================================================================
+// ATTENDANCE OVERVIEW (Task 1.13)
+// ============================================================================
+
+/**
+ * Get attendance overview (aggregate dashboard endpoint)
+ * GET /academics/attendance/overview?schoolId=&academicYearId=&date=
+ */
+export async function getAttendanceOverview(
+  params: { schoolId: string; academicYearId: string; date: string }
+): Promise<AttendanceOverviewResponse> {
+  return apiGet<AttendanceOverviewResponse>('/academics/attendance/overview', params)
+}
+
+// ============================================================================
+// PARENT PORTAL ACCESS
+// ============================================================================
+
+/**
+ * Create a parent portal account via Identity service
+ */
+export async function createParentAccount(data: {
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  schoolId: string
+  studentId: string
+  guardianId?: string
+}): Promise<{ userId: string; email: string; schoolRole: string }> {
+  return apiPost('/identity/users/parent-accounts', data)
+}
+
+/**
+ * Create a student portal account via Identity service
+ */
+export async function createStudentAccount(data: {
+  email: string
+  firstName: string
+  lastName: string
+  schoolId: string
+  studentId: string
+}): Promise<{ userId: string; email: string; schoolRole: string }> {
+  return apiPost('/identity/users/student-accounts', data)
+}
+
+/**
+ * Link a guardian record to a user account (portal access)
+ */
+export async function linkGuardianToUser(
+  studentId: string,
+  data: { userId: string; guardianId?: string; guardianEmail: string },
+  schoolId?: string
+): Promise<{ linked: boolean }> {
+  const qs = schoolId ? `?schoolId=${schoolId}` : ''
+  return apiPost(`/academics/students/${studentId}/link-guardian${qs}`, data)
+}
+
+// ============================================================================
+// CLASSWORK
+// ============================================================================
+
+/**
+ * Get all classwork items and topics for a section
+ * GET /academics/classwork?sectionId=&schoolId=
+ */
+export async function getClassworkItems(
+  sectionId: string,
+  schoolId: string
+): Promise<SectionClassworkResponseDto> {
+  return apiGet<SectionClassworkResponseDto>(
+    `/academics/classwork?sectionId=${sectionId}&schoolId=${schoolId}`
+  )
+}
+
+/**
+ * Create a classwork item
+ * POST /academics/classwork
+ */
+export async function createClassworkItem(
+  data: CreateClassworkItemDto
+): Promise<ClassworkItemResponseDto> {
+  return apiPost<ClassworkItemResponseDto>('/academics/classwork', data)
+}
+
+/**
+ * Update a classwork item
+ * PATCH /academics/classwork/:itemId?schoolId=&sectionId=
+ */
+export async function updateClassworkItem(
+  itemId: string,
+  schoolId: string,
+  sectionId: string,
+  data: Record<string, unknown>
+): Promise<ClassworkItemResponseDto> {
+  return apiPatch<ClassworkItemResponseDto>(
+    `/academics/classwork/${itemId}?schoolId=${schoolId}&sectionId=${sectionId}`,
+    data
+  )
+}
+
+/**
+ * Delete a classwork item
+ * DELETE /academics/classwork/:itemId?schoolId=&sectionId=
+ */
+export async function deleteClassworkItem(
+  itemId: string,
+  schoolId: string,
+  sectionId: string
+): Promise<void> {
+  return apiDelete(
+    `/academics/classwork/${itemId}?schoolId=${schoolId}&sectionId=${sectionId}`
+  )
+}
+
+/**
+ * Create a classwork topic
+ * POST /academics/classwork/topics
+ */
+export async function createClassworkTopic(
+  data: { sectionId: string; schoolId: string; name: string }
+): Promise<ClassworkTopicResponseDto> {
+  return apiPost<ClassworkTopicResponseDto>('/academics/classwork/topics', data)
+}
+
+/**
+ * Update a classwork topic
+ * PATCH /academics/classwork/topics/:topicId?schoolId=&sectionId=
+ */
+export async function updateClassworkTopic(
+  topicId: string,
+  schoolId: string,
+  sectionId: string,
+  data: { name?: string; sortOrder?: number }
+): Promise<ClassworkTopicResponseDto> {
+  return apiPatch<ClassworkTopicResponseDto>(
+    `/academics/classwork/topics/${topicId}?schoolId=${schoolId}&sectionId=${sectionId}`,
+    data
+  )
+}
+
+/**
+ * Delete a classwork topic
+ * DELETE /academics/classwork/topics/:topicId?schoolId=&sectionId=
+ */
+export async function deleteClassworkTopic(
+  topicId: string,
+  schoolId: string,
+  sectionId: string
+): Promise<void> {
+  return apiDelete(
+    `/academics/classwork/topics/${topicId}?schoolId=${schoolId}&sectionId=${sectionId}`
+  )
+}
+
+/**
+ * Reorder classwork items and topics within a section
+ * PATCH /academics/classwork/reorder
+ */
+export async function reorderClassworkItems(
+  data: {
+    schoolId: string
+    sectionId: string
+    items: Array<{ id: string; type: 'item' | 'topic'; sortOrder: number; topicId?: string | null }>
+  }
+): Promise<void> {
+  return apiPatch('/academics/classwork/reorder', data)
 }
 
 // ============================================================================
@@ -1395,6 +1867,9 @@ export const academicsService = {
   getEnrollmentSummary,
   withdrawStudent,
   transferStudent,
+  markNoShow,
+  closeAcademicYearEnrollments,
+  getEnrollmentExportUrl,
   // Course CRUD
   getCourses,
   getCourse,
@@ -1448,4 +1923,17 @@ export const academicsService = {
   // Attendance Trend & Alerts (Sprint 5)
   getAttendanceTrend,
   getAttendanceAlerts,
+  // Portal Access
+  createParentAccount,
+  createStudentAccount,
+  linkGuardianToUser,
+  // Classwork (Sprint 3B)
+  getClassworkItems,
+  createClassworkItem,
+  updateClassworkItem,
+  deleteClassworkItem,
+  createClassworkTopic,
+  updateClassworkTopic,
+  deleteClassworkTopic,
+  reorderClassworkItems,
 }

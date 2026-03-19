@@ -102,6 +102,20 @@
   animation: slide-in-right 0.3s ease-out;
 }
 
+/* Shimmer animation for loading progress bars */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
 /* Staggered animation delays */
 .stagger-1 {
   animation-delay: 0.05s;
@@ -117,6 +131,33 @@
 }
 .stagger-5 {
   animation-delay: 0.25s;
+}
+
+/* Print utilities */
+@media print {
+  /* Hide shell navigation, sidebar, and overlays when printing */
+  nav, aside, [data-shell-sidebar], [data-shell-topbar] {
+    display: none !important;
+  }
+
+  /* Ensure main content fills the page */
+  main, [data-shell-main] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Clean background for printing */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Prevent page breaks inside table rows and cards */
+  tr, .print-no-break {
+    page-break-inside: avoid;
+  }
 }
 
 /* Overlay utilities */

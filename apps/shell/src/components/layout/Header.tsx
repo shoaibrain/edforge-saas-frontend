@@ -1,22 +1,173 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
+import { motion } from 'framer-motion'
 import {
-  Bell,
   User,
   Settings,
-  FileText,
   Moon,
   Sun,
   Monitor,
   LogOut,
-  HelpCircle,
+  Bell,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
 import { useThemeStore, type Theme } from '../../stores/theme.store'
+import { useHomeStore } from '../../stores/home.store'
 import { Avatar } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
+import { getGreeting } from '../../lib/greeting'
+import { adToBS, formatBSLong } from '@edforge/date-utils'
 
 import { Breadcrumbs } from './Breadcrumbs'
+
+// ============================================================================
+// LANGUAGE SLIDING TOGGLE
+// ============================================================================
+
+const LANG_OPTIONS = [
+  { code: 'en', label: 'EN' },
+  { code: 'ne', label: 'NP' },
+] as const
+
+function LanguageToggle() {
+  const { i18n } = useTranslation()
+  const currentLang = i18n.language || 'en'
+
+  const handleSwitch = (code: string) => (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    i18n.changeLanguage(code)
+  }
+
+  return (
+    <div
+      className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
+      role="radiogroup"
+      aria-label="Language"
+    >
+      {LANG_OPTIONS.map(({ code, label }) => {
+        const isActive = currentLang === code
+        return (
+          <button
+            key={code}
+            role="radio"
+            aria-checked={isActive}
+            onClick={handleSwitch(code)}
+            className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
+              isActive
+                ? 'text-white'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="lang-toggle-pill"
+                className="absolute inset-0 bg-teal-500 dark:bg-cyan-500 rounded-md shadow-sm"
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{label}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ============================================================================
+// V2 HOME TOPBAR LEFT — Greeting + Date
+// ============================================================================
+
+function HomeTopbarLeft() {
+  const user = useAuthStore((s) => s.user)
+  const academicYear = useHomeStore((s) => s.activeAcademicYear)
+  const { t } = useTranslation('dashboard')
+
+  const firstName = user?.displayName || user?.name?.split(' ')[0]
+  const greeting = getGreeting(firstName, t)
+
+  const dateDisplay = useMemo(() => {
+    const now = new Date()
+
+    // BS date
+    let bsPart = ''
+    try {
+      const bs = adToBS(now)
+      bsPart = `${formatBSLong(bs)} BS`
+    } catch {
+      // Fallback: skip BS date if conversion fails
+    }
+
+    // Gregorian date
+    const gregPart = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+
+    // Academic year
+    const yearPart = academicYear ? `Academic Year ${academicYear.name}` : ''
+
+    const parts = [bsPart, gregPart, yearPart].filter(Boolean)
+    return parts.join('  ·  ')
+  }, [academicYear])
+
+  return (
+    <div className="min-w-0">
+      <div
+        className="text-sm font-medium tracking-tight"
+        style={{ color: 'var(--v2-text-primary, rgb(var(--text-primary)))' }}
+      >
+        {greeting}
+      </div>
+      <div
+        className="text-[11px] mt-0.5 truncate"
+        style={{ color: 'var(--v2-text-faint, rgb(var(--text-tertiary)))' }}
+      >
+        {dateDisplay}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// NOTIFICATION BADGE
+// ============================================================================
+
+function NotificationBadge() {
+  const alertCount = useHomeStore((s) => s.alertCount)
+
+  return (
+    <button
+      className="relative flex items-center justify-center rounded-lg border transition-colors"
+      style={{
+        width: 30,
+        height: 30,
+        background: 'rgba(255, 255, 255, 0.04)',
+        borderColor: 'rgba(255, 255, 255, 0.08)',
+      }}
+      aria-label={`Notifications: ${alertCount} alerts`}
+    >
+      <Bell className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint, #7a8099)' }} />
+      {alertCount > 0 && (
+        <span
+          className="absolute -top-[3px] -right-[3px] flex items-center justify-center text-[9px] font-bold text-white rounded-full"
+          style={{
+            width: 14,
+            height: 14,
+            background: '#E24B4A',
+            border: '1.5px solid var(--v2-bg-app, #0f1117)',
+          }}
+          aria-hidden="true"
+        >
+          {alertCount}
+        </span>
+      )}
+    </button>
+  )
+}
 
 // ============================================================================
 // USER MENU WITH THEME PICKER
@@ -27,13 +178,15 @@ function UserMenu() {
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
   const { theme, setTheme } = useThemeStore()
+  const { t: tNav } = useTranslation('nav')
+  const { t: tSettings } = useTranslation('settings')
 
   if (!user) return null
 
   const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
+    { value: 'light', icon: Sun, label: tSettings('preferences.themeLight') },
+    { value: 'dark', icon: Moon, label: tSettings('preferences.themeDark') },
+    { value: 'system', icon: Monitor, label: tSettings('preferences.themeSystem') },
   ]
 
   return (
@@ -72,10 +225,9 @@ function UserMenu() {
             </div>
           </div>
 
-          {/* Theme Picker */}
+          {/* Quick Preferences: Theme + Language */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">Theme</span>
               <div className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]">
                 {themes.map(({ value, icon: Icon, label }) => (
                   <button
@@ -95,6 +247,7 @@ function UserMenu() {
                   </button>
                 ))}
               </div>
+              <LanguageToggle />
             </div>
           </div>
 
@@ -109,8 +262,8 @@ function UserMenu() {
                     <User className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">My Profile</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">View and edit profile</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('myProfile')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('viewEditProfile')}</p>
                   </div>
                 </button>
               )}
@@ -125,21 +278,8 @@ function UserMenu() {
                     <Settings className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Settings</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">Manage preferences</p>
-                  </div>
-                </button>
-              )}
-            </MenuItem>
-            <MenuItem>
-              {({ active }) => (
-                <button className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}>
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] flex items-center justify-center">
-                    <HelpCircle className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Help & Support</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">Get help with Edforge</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('settings')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('managePreferences')}</p>
                   </div>
                 </button>
               )}
@@ -156,7 +296,7 @@ function UserMenu() {
                   <div className="w-8 h-8 rounded-lg bg-rust-100 dark:bg-rust-900/30 flex items-center justify-center">
                     <LogOut className="w-4 h-4 text-rust-500" />
                   </div>
-                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">Sign out</span>
+                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">{tNav('signOut')}</span>
                 </button>
               )}
             </MenuItem>
@@ -172,37 +312,22 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
+  const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
+
   return (
     <>
       <header
         className="sticky top-0 z-30 h-16 px-6 flex items-center justify-between border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
         aria-label="Global header"
       >
-        {/* Left Section - Breadcrumbs only (sidebar toggle is now edge-based) */}
+        {/* Left Section */}
         <div className="flex items-center min-w-0 flex-1">
-          <Breadcrumbs />
+          {isHomeV2 ? <HomeTopbarLeft /> : <Breadcrumbs />}
         </div>
 
-        {/* Right Section - All header actions */}
+        {/* Right Section */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Documentation */}
-          <button
-            className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label="Documentation"
-          >
-            <FileText className="w-5 h-5" />
-          </button>
-
-          {/* Notifications */}
-          <button
-            className="relative p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-rust-500 rounded-full ring-2 ring-[rgb(var(--surface-secondary))]" />
-          </button>
-
-          {/* User Menu */}
+          {isHomeV2 && <NotificationBadge />}
           <UserMenu />
         </div>
       </header>

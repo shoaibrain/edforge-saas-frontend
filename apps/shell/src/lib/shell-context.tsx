@@ -6,12 +6,12 @@
  * - Tenant context
  * - Active school selection
  * - ABAC permissions
- * 
+ *
  * Integrates with AWS Cognito and backend APIs for real data.
  */
 
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
 import type { UserIdentity, Tenant, School, SchoolYear } from '@edforge/types'
 import { useAuthStore, type AuthStore } from '../stores/auth.store'
@@ -27,7 +27,6 @@ export interface ShellContextValue {
   user: UserIdentity | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (userId: string) => void
   logout: () => Promise<void>
 
   // Tenant
@@ -60,63 +59,6 @@ export interface ShellContextValue {
 const ShellContext = createContext<ShellContextValue | null>(null)
 
 // ============================================================================
-// MOCK DATA (Fallback for development when API is unavailable)
-// ============================================================================
-
-const MOCK_TENANT: Tenant = {
-  id: 'demo-district',
-  name: 'Demo School District',
-  subdomain: 'demo',
-  schools: ['school-001', 'school-002', 'school-003'],
-  activeSchoolYear: '2024-2025',
-  features: {
-    edfiEnabled: true,
-    googleWorkspaceEnabled: true,
-    microsoftEnabled: false,
-    advancedAnalytics: true,
-  },
-}
-
-const MOCK_SCHOOLS: School[] = [
-  {
-    id: 'school-001',
-    tenantId: 'demo-district',
-    name: 'Lincoln High School',
-    code: 'LHS',
-    type: 'high',
-    isActive: true,
-  },
-  {
-    id: 'school-002',
-    tenantId: 'demo-district',
-    name: 'Washington Elementary',
-    code: 'WES',
-    type: 'elementary',
-    isActive: true,
-  },
-  {
-    id: 'school-003',
-    tenantId: 'demo-district',
-    name: 'Jefferson Middle School',
-    code: 'JMS',
-    type: 'middle',
-    isActive: true,
-  },
-]
-
-const MOCK_SCHOOL_YEAR: SchoolYear = {
-  id: 'sy-2024-2025',
-  name: '2024-2025',
-  startDate: '2024-08-15',
-  endDate: '2025-06-15',
-  isCurrent: true,
-  terms: [
-    { id: 'fall', name: 'Fall Semester', startDate: '2024-08-15', endDate: '2024-12-20', type: 'semester' },
-    { id: 'spring', name: 'Spring Semester', startDate: '2025-01-06', endDate: '2025-06-15', type: 'semester' },
-  ],
-}
-
-// ============================================================================
 // SHELL CONTEXT PROVIDER
 // ============================================================================
 
@@ -125,12 +67,11 @@ interface ShellProviderProps {
 }
 
 export function ShellProvider({ children }: ShellProviderProps) {
-  // Auth store - with proper type annotations
+  // Auth store
   const user = useAuthStore((s: AuthStore) => s.user)
   const isAuthenticated = useAuthStore((s: AuthStore) => s.isAuthenticated)
   const isAuthLoading = useAuthStore((s: AuthStore) => s.isLoading)
   const initializeAuth = useAuthStore((s: AuthStore) => s.initializeAuth)
-  const loginAsMock = useAuthStore((s: AuthStore) => s.loginAsMock)
   const logout = useAuthStore((s: AuthStore) => s.logout)
   const setUser = useAuthStore((s: AuthStore) => s.setUser)
   const tenantName = useAuthStore((s: AuthStore) => s.tenantName)
@@ -140,9 +81,13 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const {
     activeSchoolId,
     setActiveSchoolId,
+    setActiveSchoolStatus,
+    setSchoolTransitioning,
     sidebarCollapsed,
     toggleSidebar,
   } = useAppStore()
+
+  const queryClient = useQueryClient()
 
   // Theme (using 'system' as default for now)
   const theme: 'light' | 'dark' | 'system' = 'system'
@@ -169,19 +114,16 @@ export function ShellProvider({ children }: ShellProviderProps) {
   })
 
   // Track if we've already synced assignments for this userProfile
-  // This prevents infinite loops when setUser updates the user object
   const lastSyncedAssignmentsRef = useRef<string | null>(null)
 
-  // Update user with fetched assignments - only when assignments actually change
+  // Update user with fetched assignments — only when assignments actually change
   useEffect(() => {
     if (!userProfile || !user) return
 
-    // Create a stable key from the assignments to detect actual changes
     const assignmentsKey = userProfile.assignments
       ? JSON.stringify(userProfile.assignments.map(a => `${a.schoolId}:${a.role}`).sort())
       : null
 
-    // Only update if assignments have actually changed
     if (assignmentsKey && assignmentsKey !== lastSyncedAssignmentsRef.current) {
       lastSyncedAssignmentsRef.current = assignmentsKey
       setUser(user, userProfile.assignments)
@@ -212,7 +154,6 @@ export function ShellProvider({ children }: ShellProviderProps) {
     queryFn: async () => {
       const year = await tenantService.getCurrentAcademicYear(activeSchoolId!)
       if (!year) return null
-      // Map AcademicYear → SchoolYear for context compatibility
       return {
         id: year.id,
         name: year.name,
@@ -228,19 +169,17 @@ export function ShellProvider({ children }: ShellProviderProps) {
   })
 
   // ============================================================================
-  // COMPUTED VALUES
+  // COMPUTED VALUES — no mock fallbacks; null when API data is unavailable
   // ============================================================================
 
-  // Use API data or fallback to mock data for development
-  const effectiveTenant = tenant ?? (isAuthenticated ? MOCK_TENANT : null)
-  const effectiveSchools = schools ?? (isAuthenticated ? MOCK_SCHOOLS : [])
-  const effectiveSchoolYear = schoolYear ?? (isAuthenticated ? MOCK_SCHOOL_YEAR : null)
+  const effectiveTenant = tenant ?? null
+  const effectiveSchools = schools ?? []
+  const effectiveSchoolYear = schoolYear ?? null
 
   // Filter schools user has access to based on assignments
   const availableSchools = useMemo(() => {
     if (!user) return []
 
-    // Ensure effectiveSchools is always an array
     const schoolsList = Array.isArray(effectiveSchools) ? effectiveSchools : []
 
     // TenantAdmin has access to all schools
@@ -258,12 +197,81 @@ export function ShellProvider({ children }: ShellProviderProps) {
     return availableSchools.find((s) => s.id === activeSchoolId) ?? null
   }, [activeSchoolId, availableSchools])
 
-  // Auto-select first school if none selected
+  // Consolidated auto-select: restore from localStorage or pick first available
   useEffect(() => {
-    if (user && !activeSchoolId && availableSchools.length > 0) {
+    if (!user || availableSchools.length === 0) return
+    if (activeSchoolId && availableSchools.some((s) => s.id === activeSchoolId)) return
+
+    // Try to restore user's last-used school
+    const savedId = localStorage.getItem(`edforge-active-school-${user.id}`)
+    if (savedId && availableSchools.some((s) => s.id === savedId)) {
+      setActiveSchoolId(savedId)
+    } else {
       setActiveSchoolId(availableSchools[0].id)
     }
   }, [user, activeSchoolId, availableSchools, setActiveSchoolId])
+
+  // Persist school selection to localStorage for restore on next login
+  useEffect(() => {
+    if (activeSchoolId && user?.id) {
+      localStorage.setItem(`edforge-active-school-${user.id}`, activeSchoolId)
+    }
+  }, [activeSchoolId, user?.id])
+
+  // Sync activeSchoolStatus to cookie store so MFEs can read it
+  useEffect(() => {
+    setActiveSchoolStatus(activeSchool?.status ?? null)
+  }, [activeSchool?.status, setActiveSchoolStatus])
+
+  // ============================================================================
+  // CACHE INVALIDATION ON SCHOOL CHANGE
+  // Cancels in-flight queries for old school, removes their cache, and
+  // invalidates any existing cache for the new school to force refetch.
+  // ============================================================================
+
+  const prevSchoolIdRef = useRef<string | null>(activeSchoolId)
+
+  useEffect(() => {
+    const prevId = prevSchoolIdRef.current
+    prevSchoolIdRef.current = activeSchoolId
+
+    // Skip on initial mount or when school hasn't actually changed
+    if (prevId === activeSchoolId) return
+
+    // Deep-search predicate: finds schoolId at any position in the query key
+    // array, or inside a filter/params object.
+    const matchesSchool = (schoolId: string) => (query: { queryKey: readonly unknown[] }) => {
+      return query.queryKey.some((segment) => {
+        if (typeof segment === 'string' && segment === schoolId) return true
+        if (typeof segment === 'object' && segment !== null) {
+          const obj = segment as Record<string, unknown>
+          if (obj.schoolId === schoolId) return true
+        }
+        return false
+      })
+    }
+
+    // 1. Cancel any in-flight requests for the old school
+    if (prevId) {
+      queryClient.cancelQueries({ predicate: matchesSchool(prevId) })
+      // 2. Remove stale cache for the old school
+      queryClient.removeQueries({ predicate: matchesSchool(prevId) })
+    }
+
+    // 3. If switching to a real school, invalidate existing cache (force refetch)
+    if (activeSchoolId) {
+      queryClient.invalidateQueries({ predicate: matchesSchool(activeSchoolId) })
+    }
+  }, [activeSchoolId, queryClient])
+
+  // Clear the transition flag once all queries have settled
+  const fetchingCount = useIsFetching()
+
+  useEffect(() => {
+    if (fetchingCount === 0) {
+      setSchoolTransitioning(false)
+    }
+  }, [fetchingCount, setSchoolTransitioning])
 
   // ============================================================================
   // NAVIGATION
@@ -289,7 +297,6 @@ export function ShellProvider({ children }: ShellProviderProps) {
       user,
       isAuthenticated,
       isLoading,
-      login: (userId: string) => loginAsMock(userId),
       logout,
       tenant: effectiveTenant,
       tenantId: user?.tenantId ?? effectiveTenant?.id ?? null,
@@ -310,7 +317,6 @@ export function ShellProvider({ children }: ShellProviderProps) {
       user,
       isAuthenticated,
       isLoading,
-      loginAsMock,
       logout,
       effectiveTenant,
       tenantName,

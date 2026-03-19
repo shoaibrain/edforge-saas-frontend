@@ -101,7 +101,7 @@ const ACTION_CARDS: ActionCard[] = [
     title: 'Attendance',
     description: 'Track daily attendance, absences, and tardiness patterns',
     icon: ClipboardList,
-    href: '/academics/attendance',
+    href: '/academics/classrooms?tab=attendance',
     color: 'golden',
   },
   {

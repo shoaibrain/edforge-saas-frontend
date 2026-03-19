@@ -1,15 +1,142 @@
 /**
  * FinanceLayout
- * 
- * Passthrough layout for the Finance module.
+ *
+ * Layout wrapper for the Finance module.
+ * Includes a React Error Boundary so that rendering failures in any
+ * child route are caught gracefully instead of white-screening the app.
+ *
  * The Shell's AppShell handles all layout concerns (Header, Sidebar).
  * MFE modules should only render their content.
  */
 
-import type { ReactNode } from 'react'
+import { Component, useEffect, useRef } from 'react'
+import type { ReactNode, ErrorInfo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { AlertTriangle, RotateCw, Home } from 'lucide-react'
+import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
+import { useAppStore } from '../stores/app.store'
+
+// ============================================================================
+// ERROR BOUNDARY (must be a class component)
+// ============================================================================
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+}
+
+class FinanceErrorBoundary extends Component<
+  { children: ReactNode },
+  ErrorBoundaryState
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('[FinanceErrorBoundary] Uncaught rendering error:', error)
+    console.error('[FinanceErrorBoundary] Component stack:', info.componentStack)
+  }
+
+  handleReload = () => {
+    window.location.reload()
+  }
+
+  handleGoToOverview = () => {
+    window.location.href = '/finance'
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center min-h-[60vh] p-6">
+          <div className="w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
+            <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+                Something went wrong
+              </h2>
+              <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
+                An unexpected error occurred in the Finance module. You can try
+                reloading the page or navigating back to the overview.
+              </p>
+            </div>
+
+            {this.state.error && (
+              <p className="text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-secondary))] rounded-lg px-3 py-2 font-mono break-all">
+                {this.state.error.message}
+              </p>
+            )}
+
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                onClick={this.handleReload}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+              >
+                <RotateCw className="w-4 h-4" />
+                Reload
+              </button>
+              <button
+                onClick={this.handleGoToOverview}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+              >
+                <Home className="w-4 h-4" />
+                Go to Overview
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+
+// ============================================================================
+// LAYOUT
+// ============================================================================
 
 export function FinanceLayout({ children }: { children: ReactNode }) {
-    // Shell's AppShell provides the layout (Header + Sidebar)
-    // This module just renders its content
-    return <>{children}</>
+  const navigate = useNavigate()
+  const prevSchoolRef = useRef<string | null>(null)
+
+  // Sync school context from Shell broadcasts.
+  // On mount, grab the current context synchronously in case the Shell
+  // already broadcast before this MFE mounted.
+  useEffect(() => {
+    const { setActiveSchoolId } = useAppStore.getState()
+    const initial = getSchoolContext()
+    if (initial.schoolId) {
+      setActiveSchoolId(initial.schoolId)
+      prevSchoolRef.current = initial.schoolId
+    }
+    return onSchoolChange(({ schoolId }) => {
+      const prevId = prevSchoolRef.current
+      prevSchoolRef.current = schoolId
+
+      setActiveSchoolId(schoolId)
+
+      // On school switch (not initial mount), redirect to module root
+      if (prevId && prevId !== schoolId) {
+        navigate({ to: '/' })
+      }
+    })
+  }, [navigate])
+
+  // Shell's AppShell provides the layout (Header + Sidebar)
+  // This module just renders its content, wrapped in an error boundary
+  return (
+    <FinanceErrorBoundary>
+      {children}
+    </FinanceErrorBoundary>
+  )
 }

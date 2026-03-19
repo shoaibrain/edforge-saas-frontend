@@ -8,6 +8,7 @@
 
 import { useMemo, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { usePermission } from '@edforge/abac'
 import {
   GraduationCap,
   Users,
@@ -33,6 +34,7 @@ import {
   overviewKeys,
 } from '../hooks/useAcademicsOverview'
 import { useWidgetVisible } from '../stores/overview-widgets.store'
+import { usePerformanceMetrics } from '../hooks/usePerformanceMetrics'
 
 // Widgets
 import { WidgetErrorBoundary } from '../components/overview/WidgetErrorBoundary'
@@ -41,6 +43,7 @@ import { EnrollmentDistributionChart } from '../components/overview/EnrollmentDi
 import { AttendanceTrendWidget } from '../components/overview/AttendanceTrendWidget'
 import { ActivityFeedWidget } from '../components/overview/ActivityFeedWidget'
 import { AcademicYearLabel } from '../components/overview/AcademicCalendarBar'
+import { MySectionsWidget } from '../components/overview/MySectionsWidget'
 
 // ============================================================================
 // GUARD: No School Selected
@@ -94,7 +97,7 @@ function NoAcademicYearGuard() {
 export function Overview() {
   const schoolId = useActiveSchoolId()
 
-  // Guard: No school selected
+  // Guard: No school selected (setup guard is handled at AcademicsLayout level)
   if (!schoolId) return <NoSchoolGuard />
 
   return <OverviewContent schoolId={schoolId} />
@@ -102,6 +105,9 @@ export function Overview() {
 
 function OverviewContent({ schoolId }: { schoolId: string }) {
   const queryClient = useQueryClient()
+
+  // ABAC: check if user can view enrollment data
+  const canViewEnrollment = usePermission('view', 'enrollment', schoolId)
 
   // Academic year context
   const {
@@ -126,14 +132,19 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
     overviewData.enrollmentByGradeLevel
   )
 
-  // ---- Alerts ----
-  const alertsData = useCombinedAlerts(schoolId, academicYearId)
+  // ---- Alerts (deferred: waits for core KPIs to load) ----
+  const coreLoaded = !overviewData.isLoading
+  const alertsData = useCombinedAlerts(schoolId, academicYearId, coreLoaded)
 
   // ---- Calendar context ----
   const calendarContext = useAcademicCalendarContext(schoolId, academicYearId)
 
   // ---- Widget visibility ----
   const showActivityAlerts = useWidgetVisible('activity-alerts')
+
+  // ---- Performance metrics (dev mode logging) ----
+  const allLoaded = coreLoaded && !alertsData.isLoading
+  usePerformanceMetrics(coreLoaded, allLoaded)
 
   // ---- Last updated ----
   const lastUpdated = useMemo(() => {
@@ -146,41 +157,80 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
     queryClient.invalidateQueries({ queryKey: overviewKeys.all })
   }, [queryClient])
 
+  // ---- Per-stat error detection ----
+  const hasOverviewError = overviewData.errors.length > 0
+  const retryOverview = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: overviewKeys.all })
+  }, [queryClient])
+
   // ---- Empty state check ----
+  // Also consider attendance data — if students have attendance records,
+  // the system is active even if enrollment/sections queries return 0
   const isEmpty =
     !overviewData.isLoading &&
     !teacherData.isLoading &&
     (overviewData.totalEnrolled ?? 0) === 0 &&
     (overviewData.activeSections ?? 0) === 0 &&
-    (teacherData.teacherCount ?? 0) === 0
+    (teacherData.teacherCount ?? 0) === 0 &&
+    (overviewData.todayAttendanceRate === null || overviewData.todayAttendanceRate === 0)
+
+  // ---- Data inconsistency detection ----
+  // If attendance data exists but enrollment/sections return 0, the system
+  // is active but enrollment queries are failing — show "—" instead of "0"
+  const hasAttendanceButNoEnrollment =
+    (overviewData.todayAttendanceRate != null && overviewData.todayAttendanceRate > 0) &&
+    (overviewData.totalEnrolled ?? 0) === 0
 
   // ---- Build stats array ----
   const stats: ModuleStat[] = [
-    {
-      label: 'Total Enrolled',
-      value:
-        overviewData.totalEnrolled != null
-          ? overviewData.totalEnrolled.toLocaleString()
-          : '—',
-      change: 'this academic year',
-      changeType: 'neutral',
-      icon: Users,
-      iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
-      iconColor: 'text-teal-600 dark:text-cyan-400',
-      loading: overviewData.isLoading,
-    },
+    // Only show enrollment stat when user has enrollment view permission
+    ...(canViewEnrollment
+      ? [
+          {
+            label: 'Total Enrolled',
+            value:
+              overviewData.totalEnrolled != null && overviewData.totalEnrolled > 0
+                ? overviewData.totalEnrolled.toLocaleString()
+                : hasAttendanceButNoEnrollment
+                  ? '—'
+                  : overviewData.totalEnrolled != null
+                    ? overviewData.totalEnrolled.toLocaleString()
+                    : '—',
+            change: hasAttendanceButNoEnrollment
+              ? 'enrollment data unavailable'
+              : 'this academic year',
+            changeType: hasAttendanceButNoEnrollment ? 'negative' as const : 'neutral' as const,
+            icon: Users,
+            iconBg: 'bg-teal-500/15 dark:bg-cyan-500/20',
+            iconColor: 'text-teal-600 dark:text-cyan-400',
+            loading: overviewData.isLoading,
+            error: hasOverviewError || hasAttendanceButNoEnrollment,
+            onRetry: retryOverview,
+          },
+        ]
+      : []),
     {
       label: 'Active Sections',
       value:
-        overviewData.activeSections != null
+        overviewData.activeSections != null && overviewData.activeSections > 0
           ? overviewData.activeSections.toString()
-          : '—',
-      change: 'active classes',
-      changeType: 'neutral',
+          : hasAttendanceButNoEnrollment
+            ? '—'
+            : overviewData.activeSections != null
+              ? overviewData.activeSections.toString()
+              : '—',
+      change: hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0
+        ? 'section data unavailable'
+        : 'active classes',
+      changeType: hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0
+        ? 'negative'
+        : 'neutral',
       icon: LayoutGrid,
       iconBg: 'bg-aqua-400/20',
       iconColor: 'text-aqua-700 dark:text-aqua-400',
       loading: overviewData.isLoading,
+      error: hasOverviewError || (hasAttendanceButNoEnrollment && (overviewData.activeSections ?? 0) === 0),
+      onRetry: retryOverview,
     },
     {
       label: 'Active Teachers',
@@ -197,6 +247,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       iconBg: 'bg-blue-400/20',
       iconColor: 'text-blue-700 dark:text-blue-400',
       loading: teacherData.isLoading,
+      error: teacherData.isError,
+      onRetry: retryOverview,
     },
     {
       label: "Today's Attendance",
@@ -210,6 +262,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       iconBg: 'bg-amber-400/20',
       iconColor: 'text-amber-600 dark:text-amber-400',
       loading: overviewData.isLoading,
+      error: hasOverviewError,
+      onRetry: retryOverview,
     },
   ]
 
@@ -241,33 +295,45 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
       onRefresh={handleRefresh}
       calendarLabel={<AcademicYearLabel context={calendarContext} />}
     >
-      {/* Charts grid — left: enrollment, right: attendance + alerts stacked */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <WidgetErrorBoundary name="Enrollment Chart">
-          <EnrollmentDistributionChart
-            data={enrollmentDistribution.data}
-            total={enrollmentDistribution.total}
-            loading={overviewData.isLoading}
-          />
+      {/* Alerts — full width, above charts for immediate visibility */}
+      {showActivityAlerts && (
+        <WidgetErrorBoundary name="Activity Feed">
+          <div data-testid="widget-activity-feed">
+            <ActivityFeedWidget
+              alerts={alertsData.alerts}
+              totalCount={alertsData.totalCount}
+              loading={alertsData.isLoading}
+            />
+          </div>
         </WidgetErrorBoundary>
+      )}
 
-        <div className="flex flex-col gap-6">
-          <WidgetErrorBoundary name="Attendance Trend">
+      {/* Charts grid — left: enrollment or My Sections (role-based), right: attendance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {canViewEnrollment ? (
+          <WidgetErrorBoundary name="Enrollment Chart">
+            <div data-testid="widget-enrollment-chart">
+              <EnrollmentDistributionChart
+                data={enrollmentDistribution.data}
+                total={enrollmentDistribution.total}
+                loading={overviewData.isLoading}
+              />
+            </div>
+          </WidgetErrorBoundary>
+        ) : (
+          <WidgetErrorBoundary name="My Sections">
+            <MySectionsWidget schoolId={schoolId} />
+          </WidgetErrorBoundary>
+        )}
+
+        <WidgetErrorBoundary name="Attendance Trend">
+          <div data-testid="widget-attendance-trend">
             <AttendanceTrendWidget
               schoolId={schoolId}
-              enabled={!!schoolId}
+              enabled={!!schoolId && coreLoaded}
             />
-          </WidgetErrorBoundary>
-          {showActivityAlerts && (
-            <WidgetErrorBoundary name="Activity Feed">
-              <ActivityFeedWidget
-                alerts={alertsData.alerts}
-                totalCount={alertsData.totalCount}
-                loading={alertsData.isLoading}
-              />
-            </WidgetErrorBoundary>
-          )}
-        </div>
+          </div>
+        </WidgetErrorBoundary>
       </div>
     </ModuleOverviewPage>
   )

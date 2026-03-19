@@ -7,7 +7,7 @@
 
 import { useCallback } from 'react'
 import { FormProvider } from 'react-hook-form'
-import { TextField, CheckboxField, SelectField } from '@edforge/forms'
+import { TextField, SelectField } from '@edforge/forms'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { TagInput } from '../../../common/TagInput'
@@ -120,39 +120,6 @@ export function MedicalStep({
               value={getTagArray('medicalInfo.dietaryRestrictions')}
               onChange={(tags) => updateTags('medicalInfo.dietaryRestrictions', tags)}
               placeholder="Type a dietary restriction and press Enter"
-            />
-          </div>
-        </div>
-
-        {/* Special Education */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Special Education
-          </h3>
-          <div className="flex flex-wrap gap-x-8 gap-y-3 mb-4">
-            <CheckboxField
-              name="medicalInfo.hasIEP"
-              label="Individualized Education Program (IEP)"
-              description="Student has an active IEP"
-            />
-            <CheckboxField
-              name="medicalInfo.has504Plan"
-              label="Section 504 Plan"
-              description="Student has an active 504 plan"
-            />
-          </div>
-          <div className="space-y-4">
-            <TagInput
-              label="Special Programs"
-              value={getTagArray('specialPrograms')}
-              onChange={(tags) => updateTags('specialPrograms', tags)}
-              placeholder="e.g. Gifted & Talented, ESL, Title I"
-            />
-            <TagInput
-              label="Accommodations"
-              value={getTagArray('accommodations')}
-              onChange={(tags) => updateTags('accommodations', tags)}
-              placeholder="e.g. Extended time, Preferential seating"
             />
           </div>
         </div>

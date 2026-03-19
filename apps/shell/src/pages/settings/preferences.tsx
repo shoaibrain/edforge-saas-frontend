@@ -1,44 +1,50 @@
 /**
- * User Preferences Page
- * 
- * Personal display preferences for the logged-in user.
+ * Preferences & Notifications Page
+ *
+ * Personal display preferences and notification settings for the logged-in user.
  * Organization-wide settings have been moved to Workspace Settings.
- * 
+ *
  * User-specific settings:
  * - Theme (light/dark/system)
  * - Default School (for multi-school users)
+ * - Notification category preferences (MVP: Announcements, Attendance, Grades, Calendar)
  */
 
-import { useState, useEffect, useMemo } from 'react'
-import { Link } from '@tanstack/react-router'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { 
-  Palette, 
+import {
+  Palette,
   Sun,
   Moon,
   Monitor,
   School,
   Check,
-  ArrowRight,
-  Building2,
-  Info,
+  Bell,
+  Megaphone,
+  ClipboardCheck,
+  GraduationCap,
+  Calendar,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuthStore, MOCK_SCHOOLS } from '@/stores/auth.store'
+import { useAuthStore } from '@/stores/auth.store'
+import { useShell } from '@/lib/shell-context'
 import { useThemeStore, type Theme } from '@/stores/theme.store'
 import {
   SettingsPageHeader,
   SettingsSection,
   SettingsCard,
+  SettingsToggleRow,
   SettingsSkeleton,
+  UnsavedChangesBar,
   staggerChildren,
-  fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { 
-  usersService, 
-  type UserPreferences, 
-  type UpdatePreferencesDto 
+import {
+  usersService,
+  type UserPreferences,
+  type UpdatePreferencesDto,
+  type NotificationSettings,
+  type NotificationCategorySettings,
 } from '@/services/users.service'
 
 // ============================================================================
@@ -49,6 +55,19 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun; descriptio
   { value: 'light', label: 'Light', icon: Sun, description: 'Always use light mode' },
   { value: 'dark', label: 'Dark', icon: Moon, description: 'Always use dark mode' },
   { value: 'system', label: 'System', icon: Monitor, description: 'Match your system settings' },
+]
+
+/** MVP notification categories — core school operations only */
+const MVP_NOTIFICATION_CATEGORIES: {
+  key: keyof NotificationCategorySettings
+  label: string
+  description: string
+  icon: typeof Bell
+}[] = [
+  { key: 'announcements', label: 'Announcements', description: 'School-wide and class announcements', icon: Megaphone },
+  { key: 'attendance', label: 'Attendance', description: 'Attendance alerts and absence notifications', icon: ClipboardCheck },
+  { key: 'grades', label: 'Grades & Assessments', description: 'Grade updates and assessment results', icon: GraduationCap },
+  { key: 'calendar', label: 'Calendar & Events', description: 'Upcoming events and schedule changes', icon: Calendar },
 ]
 
 // ============================================================================
@@ -163,35 +182,6 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
   )
 }
 
-// ============================================================================
-// WORKSPACE SETTINGS LINK
-// ============================================================================
-
-function WorkspaceSettingsLink() {
-  return (
-    <motion.div variants={fadeInUp}>
-      <Link
-        to="/settings/workspace"
-        className="flex items-center justify-between p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500/30 hover:shadow-md transition-all group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-teal-500/10">
-            <Building2 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-          </div>
-          <div>
-            <p className="font-medium text-[rgb(var(--text-primary))] group-hover:text-teal-700 dark:group-hover:text-teal-400">
-              Workspace Settings
-            </p>
-            <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              Manage organization-wide settings like timezone, language, and date formats
-            </p>
-          </div>
-        </div>
-        <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
-      </Link>
-    </motion.div>
-  )
-}
 
 // ============================================================================
 // MAIN COMPONENT
@@ -199,16 +189,33 @@ function WorkspaceSettingsLink() {
 
 export default function PreferencesPage() {
   const user = useAuthStore((s) => s.user)
+  const { availableSchools } = useShell()
   const queryClient = useQueryClient()
   
   // Theme store for local theme sync
   const { theme: localTheme, setTheme: setLocalTheme } = useThemeStore()
   
-  // Local state
-  
   // Local form state (used for immediate UI updates)
   const [theme, setTheme] = useState<Theme>(localTheme)
   const [defaultSchoolId, setDefaultSchoolId] = useState<string | undefined>()
+
+  // Notification category state
+  const [categories, setCategories] = useState<NotificationCategorySettings>({
+    announcements: true,
+    attendance: true,
+    grades: true,
+    messages: true,    // preserved for backend compat (parked in UI)
+    calendar: true,
+    billing: true,     // preserved for backend compat (parked in UI)
+    security: true,    // preserved for backend compat (parked in UI)
+  })
+
+  // Track server state for dirty detection
+  const serverStateRef = useRef<{
+    theme: Theme
+    defaultSchoolId: string | undefined
+    categories: NotificationCategorySettings
+  } | null>(null)
 
   // Fetch preferences from API
   const {
@@ -227,6 +234,8 @@ export default function PreferencesPage() {
     mutationFn: (data: UpdatePreferencesDto) => usersService.updatePreferences(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['preferences', user?.id] })
+      // Immediately sync server ref so isDirty becomes false
+      serverStateRef.current = { theme, defaultSchoolId, categories }
       toast.success('Preferences saved')
     },
     onError: (err: Error) => {
@@ -237,39 +246,91 @@ export default function PreferencesPage() {
   // Update local state when preferences load
   useEffect(() => {
     if (preferences) {
-      setTheme(preferences.theme)
-      setDefaultSchoolId(preferences.defaultSchoolId)
-      
-      // Sync theme with local store
-      setLocalTheme(preferences.theme)
+      const serverTheme = preferences.theme as Theme
+      const serverSchoolId = preferences.defaultSchoolId
+      const serverCategories = preferences.notifications?.categories ?? {
+        announcements: true, attendance: true, grades: true,
+        messages: true, calendar: true, billing: true, security: true,
+      }
+
+      setTheme(serverTheme)
+      setDefaultSchoolId(serverSchoolId)
+      setLocalTheme(serverTheme)
+      setCategories(serverCategories)
+
+      serverStateRef.current = {
+        theme: serverTheme,
+        defaultSchoolId: serverSchoolId,
+        categories: serverCategories,
+      }
     }
   }, [preferences, setLocalTheme])
 
-  // Handle theme change with immediate local update
+  // Dirty detection — plain expression (not memoized) so it recalculates when ref updates
+  const isDirty = serverStateRef.current !== null
+    && (theme !== serverStateRef.current.theme
+      || defaultSchoolId !== serverStateRef.current.defaultSchoolId
+      || JSON.stringify(categories) !== JSON.stringify(serverStateRef.current.categories))
+
+  // Handle theme change with immediate visual feedback (no auto-save)
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
-    setLocalTheme(newTheme) // Immediate local update
-    
-    // Save to backend
-    updateMutation.mutate({ theme: newTheme })
+    setLocalTheme(newTheme) // Immediate visual update
   }
 
-  // Save preference changes
-  const handlePreferenceChange = <K extends keyof UpdatePreferencesDto>(
-    key: K,
-    value: UpdatePreferencesDto[K]
+  // Handle notification category toggle (local only)
+  const handleCategoryToggle = useCallback((
+    category: keyof NotificationCategorySettings,
+    enabled: boolean,
   ) => {
-    updateMutation.mutate({ [key]: value })
-  }
+    setCategories(prev => ({ ...prev, [category]: enabled }))
+  }, [])
 
-  // Get schools for selector (from user assignments)
+  // Save all pending changes in a single API call
+  const handleSave = useCallback(() => {
+    const dto: UpdatePreferencesDto = {}
+    const server = serverStateRef.current
+    if (!server) return
+
+    if (theme !== server.theme) {
+      dto.theme = theme
+    }
+    if (defaultSchoolId !== server.defaultSchoolId) {
+      dto.defaultSchoolId = defaultSchoolId
+    }
+    if (JSON.stringify(categories) !== JSON.stringify(server.categories)) {
+      const notifications: NotificationSettings = {
+        channels: preferences?.notifications?.channels ?? {
+          email: { enabled: true, digest: 'immediate' as const },
+          push: { enabled: true },
+          sms: { enabled: false, phone: '' },
+        },
+        categories,
+      }
+      dto.notifications = notifications
+    }
+
+    updateMutation.mutate(dto)
+  }, [theme, defaultSchoolId, categories, preferences, updateMutation])
+
+  // Reset all local state to server values
+  const handleReset = useCallback(() => {
+    if (!serverStateRef.current) return
+    const server = serverStateRef.current
+    setTheme(server.theme)
+    setLocalTheme(server.theme) // Revert visual theme
+    setDefaultSchoolId(server.defaultSchoolId)
+    setCategories(server.categories)
+  }, [setLocalTheme])
+
+  // Get schools for selector (from real school data via shell context)
   const schools = useMemo(() => {
-    if (!user?.assignments) return []
-    return Object.keys(user.assignments).map((schoolId) => ({
-      id: schoolId,
-      name: MOCK_SCHOOLS[schoolId]?.name || `School ${schoolId}`,
+    if (!availableSchools || availableSchools.length === 0) return []
+    return availableSchools.map((school) => ({
+      id: school.id,
+      name: school.name,
     }))
-  }, [user?.assignments])
+  }, [availableSchools])
 
   // Loading state
   if (isLoading) {
@@ -283,7 +344,7 @@ export default function PreferencesPage() {
   // Error state - show UI anyway with local theme
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -292,8 +353,8 @@ export default function PreferencesPage() {
       >
         {/* Header */}
         <SettingsPageHeader
-          title="My Preferences"
-          description="Personal display settings for your account"
+          title="Preferences"
+          description="Personal display and appearance settings"
           icon={Palette}
         />
 
@@ -318,7 +379,6 @@ export default function PreferencesPage() {
                 value={defaultSchoolId}
                 onChange={(value) => {
                   setDefaultSchoolId(value || undefined)
-                  handlePreferenceChange('defaultSchoolId', value || undefined)
                 }}
                 schools={schools}
               />
@@ -326,20 +386,41 @@ export default function PreferencesPage() {
           </SettingsSection>
         )}
 
-        {/* Link to Workspace Settings */}
-        <motion.div variants={fadeInUp}>
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] mb-4">
-            <Info className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-[rgb(var(--text-secondary))]">
-                <strong>Looking for regional settings?</strong> Organization-wide settings like
-                timezone, language, date format, and week start day are now managed in Workspace Settings.
-              </p>
-            </div>
+        {/* Notification Preferences — disabled for pilot release */}
+        <SettingsSection
+          title="Notification Preferences"
+          icon={Bell}
+          description="Choose which notifications you'd like to receive"
+        >
+          <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-teal-500/5 border border-teal-500/10">
+            <Bell className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+            <p className="text-sm text-[rgb(var(--text-secondary))]">
+              Notification preferences are coming soon. We'll let you know when this is ready!
+            </p>
           </div>
-          <WorkspaceSettingsLink />
-        </motion.div>
+          <div className="space-y-1">
+            {MVP_NOTIFICATION_CATEGORIES.map((cat) => (
+              <SettingsToggleRow
+                key={cat.key}
+                icon={cat.icon}
+                title={cat.label}
+                description={cat.description}
+                checked={categories[cat.key]}
+                onChange={(checked) => handleCategoryToggle(cat.key, checked)}
+                disabled
+              />
+            ))}
+          </div>
+        </SettingsSection>
+
       </motion.div>
+
+      <UnsavedChangesBar
+        isDirty={isDirty}
+        onReset={handleReset}
+        onSave={handleSave}
+        isSaving={updateMutation.isPending}
+      />
     </div>
   )
 }

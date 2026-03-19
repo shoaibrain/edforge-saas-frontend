@@ -152,7 +152,8 @@ export function AttendanceTrendWidget({
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="var(--color-border-secondary, #e5e7eb)"
+                  stroke="#e2e8f0"
+                  strokeOpacity={0.5}
                   vertical={false}
                 />
                 <XAxis
@@ -223,7 +224,8 @@ export function AttendanceTrendWidget({
       {/* Footer link */}
       <div className="pt-3 mt-auto border-t border-border-secondary">
         <Link
-          to="/attendance"
+          to="/classrooms"
+          search={{ tab: 'attendance' }}
           className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:text-teal-700 dark:hover:text-cyan-300 transition-colors"
         >
           View Attendance

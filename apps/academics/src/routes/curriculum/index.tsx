@@ -11,6 +11,7 @@
 
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useResourcePermissions } from '@edforge/abac'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
@@ -22,6 +23,7 @@ import {
   Download,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolGradeRange } from '../../hooks/useSchool'
 import { useCourseFilters } from '../../stores/courses.store'
 import {
   useCourses,
@@ -210,6 +212,10 @@ export function CurriculumModule() {
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+  const { gradeRange } = useSchoolGradeRange(schoolId)
+
+  // ABAC: check course/curriculum permissions
+  const coursePerms = useResourcePermissions('courses')
   const filters = useCourseFilters()
 
   // Drawer state
@@ -235,9 +241,6 @@ export function CurriculumModule() {
   const {
     data: coursesData,
     isLoading,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
   } = useCourses({
     schoolId: schoolId || '',
     filters: queryFilters,
@@ -299,24 +302,21 @@ export function CurriculumModule() {
     <div className="min-h-full">
       {/* Page Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20">
-                <BookOpen className="w-6 h-6 text-rose-600 dark:text-rose-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">
-                  Curriculum Management
-                </h1>
-                <p className="text-text-secondary mt-0.5 text-sm">
-                  Define courses, map learning standards, and organize curriculum
-                  by grade level
-                </p>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <BookOpen className="w-5 h-5 text-text-tertiary" />
+              <h1 className="text-xl font-semibold text-text-primary tracking-tight">
+                Curriculum Management
+              </h1>
+              {!isLoading && (
+                <span className="hidden sm:inline text-sm text-text-tertiary">
+                  {totalCount ?? stats.total} courses
+                </span>
+              )}
             </div>
 
-            {activeTab === 'courses' && (
+            {activeTab === 'courses' && coursePerms.create && (
               <PageActionsDropdown onAddCourse={openCreateDrawer} />
             )}
           </div>
@@ -420,13 +420,10 @@ export function CurriculumModule() {
                 <CourseTable
                   courses={courses}
                   isLoading={isLoading}
-                  hasMore={!!hasNextPage}
-                  isFetchingMore={isFetchingNextPage}
-                  onLoadMore={() => fetchNextPage()}
-                  onAddCourse={openCreateDrawer}
+                  onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
                   onViewCourse={openViewDrawer}
-                  onEditCourse={openEditDrawer}
-                  onToggleActive={handleToggleActive}
+                  onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
+                  onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
                   onNavigateToCourse={navigateToCourse}
                 />
               </div>
@@ -437,6 +434,7 @@ export function CurriculumModule() {
                 courses={courses}
                 isLoading={isLoading}
                 onViewCourse={openViewDrawer}
+                schoolGradeRange={gradeRange ?? undefined}
               />
             )}
 
@@ -452,6 +450,7 @@ export function CurriculumModule() {
         mode={drawerMode}
         course={selectedCourse}
         onModeChange={setDrawerMode}
+        schoolGradeRange={gradeRange}
       />
     </div>
   )

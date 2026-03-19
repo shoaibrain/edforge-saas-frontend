@@ -17,6 +17,8 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import { Grid3x3, Loader2, AlertTriangle, Check, Plus, Minus, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolGradeRange } from '../../hooks/useSchool'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks'
 import { useStudents, flattenStudentPages } from '../../hooks/useStudents'
 import {
@@ -72,12 +74,6 @@ interface MatrixSection {
 const STUDENT_LIMIT = 200
 const ROW_HEIGHT_PX = 48
 
-const GRADE_LEVEL_OPTIONS = [
-  'All Grades',
-  'PK', 'KG',
-  '1', '2', '3', '4', '5', '6',
-  '7', '8', '9', '10', '11', '12',
-] as const
 
 // ============================================================================
 // HELPER: Build initial enrollment set from roster data
@@ -389,11 +385,13 @@ function SummaryBar({
 export function BulkRosteringPage() {
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
+  const { gradeRange } = useSchoolGradeRange(schoolId || null)
+  const gradeLevelOptions = useFilteredGradeOptions(gradeRange)
 
   // ---------------------------------------------------------------------------
   // Filters
   // ---------------------------------------------------------------------------
-  const [gradeLevelFilter, setGradeLevelFilter] = useState<string>('All Grades')
+  const [gradeLevelFilter, setGradeLevelFilter] = useState<string>('')
   const [courseFilter, setCourseFilter] = useState<string>('')
 
   // ---------------------------------------------------------------------------
@@ -408,7 +406,7 @@ export function BulkRosteringPage() {
     schoolId,
     filters: {
       status: 'active',
-      ...(gradeLevelFilter !== 'All Grades' ? { gradeLevel: gradeLevelFilter } : {}),
+      ...(gradeLevelFilter ? { gradeLevel: gradeLevelFilter } : {}),
     },
     limit: STUDENT_LIMIT,
     enabled: !!schoolId,
@@ -693,9 +691,10 @@ export function BulkRosteringPage() {
             }}
             className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
           >
-            {GRADE_LEVEL_OPTIONS.map((grade) => (
-              <option key={grade} value={grade}>
-                {grade === 'All Grades' ? grade : `Grade ${grade}`}
+            <option value="">All Grades</option>
+            {gradeLevelOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
               </option>
             ))}
           </select>

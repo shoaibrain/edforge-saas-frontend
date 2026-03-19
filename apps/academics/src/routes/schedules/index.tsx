@@ -43,7 +43,8 @@ export function SchedulesModule() {
                 timetables, and classrooms in one place.
               </p>
               <Link
-                to="/scheduling"
+                to="/classrooms"
+                search={{ tab: undefined }}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <span>Go to Master Scheduling</span>

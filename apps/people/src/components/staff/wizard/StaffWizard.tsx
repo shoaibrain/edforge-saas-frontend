@@ -8,7 +8,7 @@
  * when the user account toggle is enabled in the Employment step.
  */
 
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { ArrowLeft, User, Mail, Briefcase, Building2, CheckCircle2 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
@@ -135,6 +135,12 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
     [initialSchoolId],
   )
 
+  const handleValidationError = useCallback((errors: Record<string, string>) => {
+    const fields = Object.keys(errors)
+    const firstError = errors[fields[0]]
+    toast.error(fields.length === 1 ? firstError : `Please fix ${fields.length} field(s) to continue`)
+  }, [])
+
   const handleSubmit = async (data: Record<string, unknown>) => {
     const dto = transformWizardDataToStaffDto(data)
     const createAccount = data.createUserAccount === true
@@ -160,7 +166,7 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
           role: (assignment.role || (data.role as string)) as any,
           beginDate: assignment.beginDate,
           fullTimeEquivalency: assignment.fullTimeEquivalency,
-          department: assignment.department || undefined,
+          departmentId: assignment.departmentId || undefined,
           isPrimary: false,
         })
       } catch {
@@ -185,6 +191,7 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
       initialData={initialData}
       onSubmit={handleSubmit}
       onCancel={onCancel}
+      onValidationError={handleValidationError}
       header={<StaffWizardHeader onCancel={onCancel} />}
       footerVariant="inline"
       submitText="Create Staff Member"

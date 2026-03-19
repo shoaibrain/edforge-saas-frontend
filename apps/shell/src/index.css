@@ -5,6 +5,10 @@
 /* Import theme package */
 @import '@edforge/theme';
 
+/* Home V2 design tokens and animations */
+@import './styles/home-v2-tokens.css';
+@import './styles/home-v2-animations.css';
+
 /* Shell-specific utilities */
 
 /* Semantic color classes using CSS variables */

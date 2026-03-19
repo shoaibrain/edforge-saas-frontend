@@ -50,12 +50,39 @@ export {
   TableCell,
 } from './components/Table'
 export { Dropdown, type DropdownOption } from './components/Dropdown'
+
+// TanStack Data Table
 export {
   DataTable,
-  type Column,
+  DataTable as TanstackDataTable,
+  DataTableColumnHeader,
+  DataTablePagination,
+  DataTableToolbar,
+  DataTableFacetedFilter,
+  DataTableViewOptions,
+  DataTableRowActions,
+  DataTableSkeleton,
+  DataTableSkeleton as TanstackDataTableSkeleton,
+  DataTableEmpty,
+  useDataTable,
+  createColumnHelper,
+  createSelectColumn,
+  createExpandColumn,
+  createActionsColumn,
   type DataTableProps,
-  type DataTableEmptyState,
-} from './components/DataTable'
+  type DataTableProps as TanstackDataTableProps,
+  type DataTableEmptyStateConfig,
+  type DataTableColumnMeta,
+  type FacetedFilterOption,
+  type FacetedFilterConfig,
+  type BulkAction,
+  type RowAction,
+  type PaginationConfig,
+  type ColumnDef,
+  type Row,
+  type CellContext,
+  type HeaderContext,
+} from './components/data-table'
 export {
   Modal,
   ModalFooter,
@@ -68,4 +95,22 @@ export {
   type DrawerProps,
   type DrawerFooterProps,
 } from './components/Drawer'
+
+// i18n
+export { LanguageSwitcher } from './components/LanguageSwitcher'
+
+// Coming Soon
+export {
+  ComingSoonBadge,
+  ComingSoonBanner,
+  ComingSoonOverlay,
+  type ComingSoonBadgeProps,
+  type ComingSoonBannerProps,
+  type ComingSoonOverlayProps,
+} from './components/ComingSoon'
+
+// Date
+export { DateDisplay } from './components/DateDisplay'
+export { BsDatePicker, DateInput } from './components/BsDatePicker'
+export { SchoolDate } from './components/SchoolDate'
 

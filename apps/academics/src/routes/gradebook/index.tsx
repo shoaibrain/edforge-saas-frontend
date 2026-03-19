@@ -45,7 +45,8 @@ export function GradebookModule() {
                 gradebooks, assessments, and exams in one place.
               </p>
               <Link
-                to="/grades"
+                to="/classrooms"
+                search={{ tab: 'gradebook' }}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <span>Go to Grades & Assessments</span>

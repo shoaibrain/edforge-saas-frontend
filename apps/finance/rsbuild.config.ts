@@ -33,10 +33,6 @@ export default defineConfig({
           name: 'finance',
           filename: 'remoteEntry.js',
           exposes: {
-            './BillingModule': './src/routes/billing/index.tsx',
-            './PayrollModule': './src/routes/payroll/index.tsx',
-            './TuitionModule': './src/routes/tuition/index.tsx',
-            './ExpensesModule': './src/routes/expenses/index.tsx',
             './FinanceModule': './src/bootstrap.tsx',
           },
           shared: {
@@ -53,11 +49,13 @@ export default defineConfig({
             '@edforge/abac': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/types': { singleton: true, requiredVersion: '0.0.1', eager: true },
             '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/api-client': { singleton: true, requiredVersion: '0.0.1', eager: true },
+            '@edforge/finance-services': { singleton: true, requiredVersion: '0.0.1', eager: true },
             'react-hook-form': { singleton: true, eager: true },
             zod: { singleton: true, eager: true },
             '@hookform/resolvers': { singleton: true, eager: true },
             'framer-motion': { singleton: true, eager: true },
-            '@react-spring/web': { singleton: true, eager: true },
+            sonner: { singleton: true, eager: true },
           },
         }),
       ])

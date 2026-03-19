@@ -44,6 +44,33 @@ function useSchools() {
 }
 
 // ============================================================================
+// DEPARTMENT DATA HOOK
+// ============================================================================
+
+interface DepartmentOption {
+  id: string
+  name: string
+  code: string
+}
+
+export function useDepartments(schoolId: string | undefined) {
+  return useQuery<DepartmentOption[]>({
+    queryKey: ['departments', schoolId],
+    queryFn: async () => {
+      if (!schoolId) return []
+      const response = await apiGet<{ items: Array<{ departmentId: string; name: string; code: string; isActive: boolean }> }>(
+        `/schools/${schoolId}/departments`,
+      )
+      return (response.items || [])
+        .filter((d) => d.isActive)
+        .map((d) => ({ id: d.departmentId, name: d.name, code: d.code }))
+    },
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ============================================================================
 // ADDITIONAL ASSIGNMENT TYPE
 // ============================================================================
 
@@ -52,7 +79,7 @@ interface AdditionalAssignment {
   role: string
   beginDate: string
   fullTimeEquivalency: number
-  department: string
+  departmentId: string
 }
 
 function emptyAssignment(): AdditionalAssignment {
@@ -61,7 +88,7 @@ function emptyAssignment(): AdditionalAssignment {
     role: '',
     beginDate: new Date().toISOString().split('T')[0],
     fullTimeEquivalency: 0.5,
-    department: '',
+    departmentId: '',
   }
 }
 
@@ -103,8 +130,33 @@ function FteSlider({
 // STEP COMPONENT
 // ============================================================================
 
+function AdditionalAssignmentDepartmentSelect({
+  schoolId,
+  value,
+  onChange,
+}: {
+  schoolId: string
+  value: string
+  onChange: (val: string) => void
+}) {
+  const { data: departments = [], isLoading } = useDepartments(schoolId || undefined)
+  return (
+    <AnimatedSelect
+      label="Department"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      options={[
+        { value: '', label: isLoading ? 'Loading...' : 'Select department...' },
+        ...departments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` })),
+      ]}
+    />
+  )
+}
+
 export function AssignmentStep({ data, updateData, errors, clearError }: WizardStepProps) {
   const { data: schools = [], isLoading: loadingSchools } = useSchools()
+  const primarySchoolId = (data.primarySchoolId as string) || ''
+  const { data: primaryDepartments = [], isLoading: loadingPrimaryDepts } = useDepartments(primarySchoolId || undefined)
   const additionalAssignments = (data.additionalAssignments as AdditionalAssignment[]) || []
 
   const primaryFte = typeof data.primaryAssignmentFte === 'number' ? data.primaryAssignmentFte : 1.0
@@ -190,11 +242,21 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
             options={roleOptions}
             helpText="Defaults to employment role"
           />
-          <AnimatedInput
+          <AnimatedSelect
             label="Department"
-            placeholder="e.g., Science"
-            value={(data.primaryAssignmentDepartment as string) || ''}
-            onChange={handleChange('primaryAssignmentDepartment')}
+            value={(data.primaryAssignmentDepartmentId as string) || ''}
+            onChange={(e) => {
+              const deptId = e.target.value
+              const dept = primaryDepartments.find((d) => d.id === deptId)
+              updateData({
+                primaryAssignmentDepartmentId: deptId,
+                departmentName: dept?.name || '',
+              })
+            }}
+            options={[
+              { value: '', label: loadingPrimaryDepts ? 'Loading...' : 'Select department...' },
+              ...primaryDepartments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` })),
+            ]}
           />
           <AnimatedInput
             label="Begin Date"
@@ -260,11 +322,10 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
                   value={assignment.beginDate || ''}
                   onChange={(e) => updateAdditionalAssignment(index, 'beginDate', e.target.value)}
                 />
-                <AnimatedInput
-                  label="Department"
-                  placeholder="e.g., Math"
-                  value={assignment.department || ''}
-                  onChange={(e) => updateAdditionalAssignment(index, 'department', e.target.value)}
+                <AdditionalAssignmentDepartmentSelect
+                  schoolId={assignment.schoolId}
+                  value={assignment.departmentId || ''}
+                  onChange={(val) => updateAdditionalAssignment(index, 'departmentId', val)}
                 />
               </div>
 

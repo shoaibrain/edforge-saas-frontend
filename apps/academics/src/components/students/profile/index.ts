@@ -5,10 +5,11 @@
  *
  * Components:
  * - ProfileHeader: Student avatar, name, status, quick actions
- * - OverviewTab: Demographics, contact, academic info, medical
+ * - OverviewTab: Academic dashboard (attendance, classes, grades)
+ * - ProfileTab: Personal details with sensitive field masking
  * - EnrollmentTab: Enrollment history
  * - FamilyTab: Guardians & emergency contacts
- * - ScheduleTab: Class schedule & attendance summary
+ * - ScheduleTab: (deprecated) Class schedule & attendance summary
  */
 
 export {
@@ -22,6 +23,12 @@ export {
   OverviewTabSkeleton,
   type OverviewTabProps,
 } from './OverviewTab'
+
+export {
+  ProfileTab,
+  ProfileTabSkeleton,
+  type ProfileTabProps,
+} from './ProfileTab'
 
 export {
   EnrollmentTab,
