@@ -27,7 +27,7 @@ interface AvatarOptions {
   radius?: number
 }
 
-const DEFAULT_SIZE = 128
+const DEFAULT_SIZE = 64
 
 /**
  * Generate a DiceBear avatar URL

@@ -78,8 +78,10 @@ function StudentAvatar({ name, studentId }: { name: string; studentId: string })
     <img
       src={src}
       alt={name}
-      className="w-[30px] h-[30px] rounded-full flex-shrink-0 object-cover"
-      style={{ background: bg }}
+      width={30}
+      height={30}
+      className="w-[30px] h-[30px] rounded-full flex-shrink-0"
+      style={{ background: bg, maxWidth: 30, maxHeight: 30 }}
       onError={() => setImgError(true)}
     />
   )

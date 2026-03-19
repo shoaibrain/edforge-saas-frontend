@@ -67,8 +67,10 @@ function StaffAvatar({ staff }: { staff: any }) {
     <img
       src={src}
       alt={name}
-      className="w-8 h-8 rounded-full flex-shrink-0 object-cover"
-      style={{ background: bg }}
+      width={32}
+      height={32}
+      className="w-8 h-8 rounded-full flex-shrink-0"
+      style={{ background: bg, maxWidth: 32, maxHeight: 32 }}
       onError={() => setImgError(true)}
     />
   )

@@ -11,8 +11,9 @@
  * Each section has independent loading/error states.
  */
 
-import { useMemo } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { usePermission } from '@edforge/abac'
+import { getEnrollmentExportUrl } from '../services/academics.service'
 import {
   useAcademicsOverview,
   useActiveTeacherCount,
@@ -82,6 +83,23 @@ export interface AcademicsV2Data {
   calendar: AcademicCalendarContext
   // Permissions
   canViewEnrollment: boolean
+  // Filters
+  filters: {
+    from: string
+    to: string
+    academicYear: string
+    gradeLevel: string
+  }
+  setFromDate: (v: string) => void
+  setToDate: (v: string) => void
+  setFilterAcademicYear: (v: string) => void
+  setGradeLevelFilter: (v: string) => void
+  clearFilters: () => void
+  hasActiveFilters: boolean
+  gradeLevels: string[]
+  // Export
+  handleExportCSV: () => void
+  isExporting: boolean
 }
 
 // ============================================================================
@@ -95,6 +113,31 @@ export function useAcademicsOverviewV2(schoolId: string): AcademicsV2Data {
   // Academic year
   const yearQuery = useCurrentAcademicYear(schoolId)
   const academicYearId = yearQuery.data?.yearId
+
+  // ── Filter state ──
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [filterAcademicYear, setFilterAcademicYear] = useState('')
+  const [gradeLevelFilter, setGradeLevelFilter] = useState('')
+  const [isExporting, setIsExporting] = useState(false)
+
+  const hasActiveFilters = !!(fromDate || toDate || filterAcademicYear || gradeLevelFilter)
+
+  const clearFilters = useCallback(() => {
+    setFromDate('')
+    setToDate('')
+    setFilterAcademicYear('')
+    setGradeLevelFilter('')
+  }, [])
+
+  const handleExportCSV = useCallback(() => {
+    if (!schoolId || !academicYearId) return
+    setIsExporting(true)
+    const url = getEnrollmentExportUrl(schoolId, academicYearId)
+    window.open(`/api${url}`, '_blank')
+    // Reset after a short delay (download triggers immediately)
+    setTimeout(() => setIsExporting(false), 2000)
+  }, [schoolId, academicYearId])
 
   // Core overview data (enrollment, sections, attendance)
   const overview = useAcademicsOverview(schoolId, academicYearId)
@@ -126,6 +169,17 @@ export function useAcademicsOverviewV2(schoolId: string): AcademicsV2Data {
   // Calendar context
   const calendar = useAcademicCalendarContext(schoolId, academicYearId)
 
+  // Grade levels (for filter dropdown)
+  const gradeLevels = useMemo(() => {
+    return enrollment.data.map((d) => d.gradeLevel)
+  }, [enrollment.data])
+
+  // Filtered at-risk students by grade level
+  const filteredStudents = useMemo(() => {
+    if (!gradeLevelFilter) return alertsData.students
+    return alertsData.students.filter((s) => s.gradeLevel === gradeLevelFilter)
+  }, [alertsData.students, gradeLevelFilter])
+
   return {
     academicYear: {
       id: academicYearId,
@@ -140,8 +194,8 @@ export function useAcademicsOverviewV2(schoolId: string): AcademicsV2Data {
     enrollment,
     alerts: {
       items: alertsData.alerts,
-      students: alertsData.students,
-      totalCount: alertsData.totalCount,
+      students: filteredStudents,
+      totalCount: gradeLevelFilter ? filteredStudents.length : alertsData.totalCount,
       criticalCount: alertCounts.critical,
       warningCount: alertCounts.warning,
       isLoading: alertsData.isLoading,
@@ -157,5 +211,20 @@ export function useAcademicsOverviewV2(schoolId: string): AcademicsV2Data {
     },
     calendar,
     canViewEnrollment,
+    filters: {
+      from: fromDate,
+      to: toDate,
+      academicYear: filterAcademicYear,
+      gradeLevel: gradeLevelFilter,
+    },
+    setFromDate,
+    setToDate,
+    setFilterAcademicYear,
+    setGradeLevelFilter,
+    clearFilters,
+    hasActiveFilters,
+    gradeLevels,
+    handleExportCSV,
+    isExporting,
   }
 }
