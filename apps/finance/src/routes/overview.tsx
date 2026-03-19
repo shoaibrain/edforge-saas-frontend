@@ -322,13 +322,25 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         </motion.div>
       </motion.div>
 
-      {/* 2-col: Collection Performance + Billing Health (merged status + aging) */}
+      {/* 2-col: Billing Health (primary) + Collection Performance */}
       <motion.div
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="grid gap-4 grid-cols-1 md:grid-cols-[1.2fr_1fr]"
+        className="grid gap-4 grid-cols-1 md:grid-cols-[1fr_1.2fr]"
       >
+        <motion.div variants={fadeInUp}>
+          <WidgetErrorBoundaryV2>
+            <BillingHealthCard
+              invoicesByStatus={invoicesByStatus}
+              totalInvoiceCount={totalInvoiceCount}
+              paymentsByGateway={paymentsByGateway}
+              totalPaymentCount={totalPaymentCount}
+              agingReport={agingReport}
+              isLoading={isLoading}
+            />
+          </WidgetErrorBoundaryV2>
+        </motion.div>
         <motion.div variants={fadeInUp}>
           <WidgetErrorBoundaryV2>
             <CollectionPerformanceCard
@@ -338,18 +350,6 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
               overdue={kpi.overdue}
               collectionRate={kpi.collectionRate}
               byFeeType={byFeeType}
-              isLoading={isLoading}
-            />
-          </WidgetErrorBoundaryV2>
-        </motion.div>
-        <motion.div variants={fadeInUp}>
-          <WidgetErrorBoundaryV2>
-            <BillingHealthCard
-              invoicesByStatus={invoicesByStatus}
-              totalInvoiceCount={totalInvoiceCount}
-              paymentsByGateway={paymentsByGateway}
-              totalPaymentCount={totalPaymentCount}
-              agingReport={agingReport}
               isLoading={isLoading}
             />
           </WidgetErrorBoundaryV2>
