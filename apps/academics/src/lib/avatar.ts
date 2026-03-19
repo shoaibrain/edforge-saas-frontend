@@ -2,12 +2,13 @@
  * DiceBear Avatar Utility for Academics Module
  *
  * Generates consistent, beautiful avatars using DiceBear API.
- * Students use the 'avataaars' style, seeded by name for consistency.
+ * Students use the 'adventurer' style, seeded by name for consistency.
  *
  * @see https://www.dicebear.com/
  */
 
 export type AvatarStyle =
+  | 'adventurer'
   | 'avataaars'
   | 'bottts'
   | 'lorelei'
@@ -56,7 +57,7 @@ export function getAvatarUrl(options: AvatarOptions): string {
 
 /**
  * Get avatar URL for a student.
- * Uses 'avataaars' DiceBear style, seeded by student name or ID.
+ * Uses 'adventurer' DiceBear style, seeded by student name or ID.
  */
 export function getStudentAvatar(
   identifier: string,
@@ -64,7 +65,7 @@ export function getStudentAvatar(
 ): string {
   return getAvatarUrl({
     seed: identifier,
-    style: 'avataaars',
+    style: 'adventurer',
     ...options,
   })
 }

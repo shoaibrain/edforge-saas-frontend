@@ -1,0 +1,275 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;background:#0f1117;color:#e8eaf0}
+.pg{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+.sb{background:#161b27;border-right:1px solid rgba(255,255,255,0.06);padding:0;display:flex;flex-direction:column}
+.sb-top{padding:14px 12px 10px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.back{display:flex;align-items:center;gap:5px;font-size:11px;color:#5a6070;cursor:pointer;margin-bottom:8px}
+.back svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+.mod{display:flex;align-items:center;gap:7px}
+.mod-ic{width:22px;height:22px;background:rgba(29,158,117,0.12);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.mod-ic svg{width:12px;height:12px;fill:#1D9E75}
+.mod-name{font-size:12px;font-weight:500;color:#c8ccd8}
+.sb-nav{padding:8px 6px;flex:1}
+.ni{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;font-size:12px;color:#5a6070;cursor:pointer;margin-bottom:1px}
+.ni:hover{background:rgba(255,255,255,0.04);color:#c8ccd8}
+.ni.on{background:rgba(29,158,117,0.1);color:#1D9E75;font-weight:500}
+.ni svg{width:13px;height:13px;opacity:0.6}
+.ni.on svg{opacity:1}
+.main{background:#0f1117;display:flex;flex-direction:column}
+.topbar{height:44px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;background:#0f1117;position:sticky;top:0;z-index:10}
+.bc{display:flex;align-items:center;gap:5px;font-size:11px;color:#3a4055}
+.bc span{color:#5a6070}.bc .cur{color:#c8ccd8}
+.bc svg{width:9px;height:9px;fill:none;stroke:#3a4055;stroke-width:2}
+.body{padding:18px 20px;flex:1}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ph-left{display:flex;align-items:center;gap:10px}
+.ph-icon{width:32px;height:32px;background:rgba(29,158,117,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.ph-icon svg{width:16px;height:16px;fill:#1D9E75}
+.ph-title{font-size:18px;font-weight:600;color:#e8eaf0;letter-spacing:-0.3px}
+.ph-sub{font-size:11px;color:#4a5068;margin-top:1px}
+.ph-actions{display:flex;align-items:center;gap:7px}
+.btn-p{display:flex;align-items:center;gap:5px;background:#1D9E75;border:none;border-radius:7px;padding:6px 11px;font-size:11px;font-weight:500;color:white;cursor:pointer}
+.btn-p svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+.btn-s{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:7px;padding:6px 11px;font-size:11px;color:#9aa0b8;cursor:pointer}
+.btn-s svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+.context-bar{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:8px 14px;margin-bottom:14px;font-size:12px;color:#7a8099;display:flex;align-items:center;gap:6px}
+.context-bar span{color:#1D9E75;font-weight:500}
+.context-bar span.warn{color:#EF9F27}
+.context-bar span.crit{color:#E24B4A}
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.kpi{background:#161b27;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden}
+.kpi-label{font-size:9px;font-weight:500;color:#3a4055;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.kpi-val{font-size:20px;font-weight:600;color:#e8eaf0;letter-spacing:-0.5px;line-height:1}
+.kpi-sub{font-size:10px;color:#4a5068;margin-top:4px;display:flex;align-items:center;gap:4px}
+.kpi-tag{font-size:9px;font-weight:500;padding:1px 5px;border-radius:6px}
+.kpi-accent{position:absolute;bottom:0;left:0;right:0;height:2px}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.search-wrap{flex:1;position:relative}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;fill:none;stroke:#4a5068;stroke-width:2}
+.search-wrap input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:7px 12px 7px 32px;font-size:12px;color:#e8eaf0;outline:none}
+.search-wrap input::placeholder{color:#3a4055}
+.search-wrap input:focus{border-color:rgba(29,158,117,0.4)}
+.sel{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:6px 10px;font-size:11px;color:#7a8099;cursor:pointer}
+.filter-chips{display:flex;gap:5px}
+.fc{padding:5px 9px;border-radius:6px;font-size:11px;font-weight:500;border:1px solid rgba(255,255,255,0.07);color:#5a6070;cursor:pointer}
+.fc.on{background:rgba(29,158,117,0.1);border-color:rgba(29,158,117,0.25);color:#1D9E75}
+.table-wrap{background:#161b27;border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
+.t-head{display:grid;grid-template-columns:2.2fr 1fr 0.6fr 0.8fr 0.7fr 0.8fr 0.6fr;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)}
+.th{font-size:10px;font-weight:500;color:#3a4055;text-transform:uppercase;letter-spacing:0.4px;display:flex;align-items:center;gap:3px;cursor:pointer;user-select:none}
+.th svg{width:9px;height:9px;fill:none;stroke:currentColor;opacity:0.5}
+.t-row{display:grid;grid-template-columns:2.2fr 1fr 0.6fr 0.8fr 0.7fr 0.8fr 0.6fr;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;cursor:pointer}
+.t-row:hover{background:rgba(255,255,255,0.025)}
+.t-row:last-child{border-bottom:none}
+.s-cell{display:flex;align-items:center;gap:10px}
+.av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.s-info{}
+.s-name{font-size:12px;font-weight:500;color:#c8ccd8}
+.s-id{font-size:10px;color:#3a4055;margin-top:1px;font-family:monospace}
+.td{font-size:12px;color:#7a8099}
+.td.mono{font-family:monospace;font-size:11px;color:#5a6070;background:rgba(255,255,255,0.03);padding:2px 6px;border-radius:4px;display:inline-block}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:3px}
+.badge.active{background:rgba(29,158,117,0.12);color:#1D9E75}
+.badge.inactive{background:rgba(90,96,112,0.2);color:#5a6070}
+.badge.pending{background:rgba(239,159,39,0.12);color:#EF9F27}
+.att-bar{display:flex;align-items:center;gap:6px}
+.att-val{font-size:11px;font-weight:500;width:36px;text-align:right}
+.att-track{width:50px;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.att-fill{height:100%;border-radius:2px}
+.grade-chip{font-size:11px;font-weight:500;color:#e8eaf0;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:6px}
+.action-btn{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:transparent;cursor:pointer}
+.action-btn:hover{background:rgba(255,255,255,0.06)}
+.action-btn svg{width:13px;height:13px;fill:none;stroke:#4a5068;stroke-width:2}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.05)}
+.page-info{font-size:11px;color:#3a4055}
+.page-controls{display:flex;align-items:center;gap:6px}
+.page-btn{padding:4px 10px;border-radius:6px;font-size:11px;border:1px solid rgba(255,255,255,0.08);color:#5a6070;cursor:pointer;background:transparent}
+.page-btn.on{background:rgba(29,158,117,0.1);border-color:rgba(29,158,117,0.25);color:#1D9E75}
+.per-page{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:4px 8px;font-size:11px;color:#5a6070}
+</style>
+
+<div class="pg">
+  <div class="sb">
+    <div class="sb-top">
+      <div class="back"><svg viewBox="0 0 12 12"><path d="M8 2L4 6l4 4"/></svg>Back to home</div>
+      <div class="mod"><div class="mod-ic"><svg viewBox="0 0 16 16"><path d="M2 3h12v2H2zM2 7h12v2H2zM2 11h8v2H2z"/></svg></div><div class="mod-name">Academics</div></div>
+    </div>
+    <div class="sb-nav">
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Overview</div>
+      <div class="ni on"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a4 4 0 100 8A4 4 0 008 1zM2 14s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2z"/></svg>Students</div>
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Classrooms</div>
+      <div class="ni"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v12H2z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.4"/></svg>Curriculum</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="bc"><span>Home</span><svg viewBox="0 0 9 9"><path d="M2 1l5 3.5L2 8"/></svg><span>Academics</span><svg viewBox="0 0 9 9"><path d="M2 1l5 3.5L2 8"/></svg><span class="cur">Students</span></div>
+    </div>
+    <div class="body">
+      <div class="page-header">
+        <div class="ph-left">
+          <div class="ph-icon"><svg viewBox="0 0 16 16"><path d="M8 1a4 4 0 100 8A4 4 0 008 1zM2 14s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2z"/></svg></div>
+          <div><div class="ph-title">Students</div><div class="ph-sub">Enrollment, attendance, and academic records</div></div>
+        </div>
+        <div class="ph-actions">
+          <div class="btn-s"><svg viewBox="0 0 12 12"><path d="M6 2v6M3 6l3 3 3-3M2 10h8" stroke-linecap="round"/></svg>Export</div>
+          <div class="btn-s"><svg viewBox="0 0 12 12"><path d="M2 6h8M6 10V2"/></svg>Bulk enroll</div>
+          <div class="btn-p"><svg viewBox="0 0 12 12"><path d="M6 2v8M2 6h8"/></svg>Enroll student</div>
+        </div>
+      </div>
+
+      <div class="context-bar">
+        <span>22</span> students enrolled across <span>11</span> grade levels ·
+        <span class="warn">50%</span> attendance today ·
+        <span class="crit">15</span> at-risk students need attention
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Total enrolled</div>
+          <div class="kpi-val">22</div>
+          <div class="kpi-sub"><span class="kpi-tag" style="background:rgba(29,158,117,0.1);color:#1D9E75">+2 recent</span><span>active</span></div>
+          <div class="kpi-accent" style="background:#1D9E75"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">At-risk attendance</div>
+          <div class="kpi-val" style="color:#E24B4A">15</div>
+          <div class="kpi-sub"><span class="kpi-tag" style="background:rgba(226,75,74,0.1);color:#E24B4A">9 critical</span><span>below 80%</span></div>
+          <div class="kpi-accent" style="background:#E24B4A"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Today's attendance</div>
+          <div class="kpi-val" style="color:#EF9F27">50%</div>
+          <div class="kpi-sub"><span class="kpi-tag" style="background:rgba(239,159,39,0.1);color:#EF9F27">Partial</span><span>11 of 22</span></div>
+          <div class="kpi-accent" style="background:#EF9F27"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Grade levels</div>
+          <div class="kpi-val">11</div>
+          <div class="kpi-sub"><span style="color:#4a5068">PK through Grade 11</span></div>
+          <div class="kpi-accent" style="background:#378ADD"></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+          <input placeholder="Search by name, ID, or grade..." />
+        </div>
+        <div class="filter-chips">
+          <div class="fc on">All</div>
+          <div class="fc">Active</div>
+          <div class="fc">At-risk</div>
+          <div class="fc">Pending</div>
+        </div>
+        <select class="sel"><option>All Grades</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option></select>
+        <select class="sel"><option>All Status</option><option>Active</option><option>Inactive</option></select>
+      </div>
+
+      <div class="table-wrap">
+        <div class="t-head">
+          <div class="th">Student <svg viewBox="0 0 8 12"><path d="M4 1v10M1 4l3-3 3 3M1 8l3 3 3-3"/></svg></div>
+          <div class="th">Student ID <svg viewBox="0 0 8 12"><path d="M4 1v10M1 4l3-3 3 3"/></svg></div>
+          <div class="th">Grade <svg viewBox="0 0 8 12"><path d="M4 1v10M1 4l3-3 3 3"/></svg></div>
+          <div class="th">Attendance</div>
+          <div class="th">Status <svg viewBox="0 0 8 12"><path d="M4 1v10M1 4l3-3 3 3"/></svg></div>
+          <div class="th">Enrolled <svg viewBox="0 0 8 12"><path d="M4 1v10M1 4l3-3 3 3"/></svg></div>
+          <div class="th"></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#E24B4A,#A32D2D);color:white">MB</div><div class="s-info"><div class="s-name">Mei Wong</div><div class="s-id">#D5A-2026-00016</div></div></div>
+          <div class="td"><span class="mono">D5A-2026-00016</span></div>
+          <div class="td"><span class="grade-chip">10</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#E24B4A">70%</span><div class="att-track"><div class="att-fill" style="width:70%;background:#E24B4A"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Feb 13, 2026</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#E24B4A,#993C1D);color:white">TB</div><div class="s-info"><div class="s-name">Tyler Brooks</div><div class="s-id">#2026-D5A-0547</div></div></div>
+          <div class="td"><span class="mono">2026-D5A-0547</span></div>
+          <div class="td"><span class="grade-chip">9</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#E24B4A">70%</span><div class="att-track"><div class="att-fill" style="width:70%;background:#E24B4A"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Aug 18, 2025</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#378ADD,#185FA5);color:white">JC</div><div class="s-info"><div class="s-name">Jaylen Carter</div><div class="s-id">#2026-D5A-3181</div></div></div>
+          <div class="td"><span class="mono">2026-D5A-3181</span></div>
+          <div class="td"><span class="grade-chip">11</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#EF9F27">81.8%</span><div class="att-track"><div class="att-fill" style="width:82%;background:#EF9F27"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Aug 18, 2025</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#7F77DD,#534AB7);color:white">SB</div><div class="s-info"><div class="s-name">Steven Bergsten</div><div class="s-id">#D5A-2026-00021</div></div></div>
+          <div class="td"><span class="mono">D5A-2026-00021</span></div>
+          <div class="td"><span class="grade-chip">11</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#EF9F27">81.8%</span><div class="att-track"><div class="att-fill" style="width:82%;background:#EF9F27"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Feb 16, 2026</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#1D9E75,#0F6E56);color:white">LB</div><div class="s-info"><div class="s-name">Liam Brown</div><div class="s-id">#D5A-2026-00004</div></div></div>
+          <div class="td"><span class="mono">D5A-2026-00004</span></div>
+          <div class="td"><span class="grade-chip">2</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#EF9F27">81.8%</span><div class="att-track"><div class="att-fill" style="width:82%;background:#EF9F27"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Feb 13, 2026</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#D85A30,#993C1D);color:white">OC</div><div class="s-info"><div class="s-name">Olivia Chen</div><div class="s-id">#D5A-2026-00016</div></div></div>
+          <div class="td"><span class="mono">D5A-2026-00016</span></div>
+          <div class="td"><span class="grade-chip">7</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#EF9F27">75%</span><div class="att-track"><div class="att-fill" style="width:75%;background:#EF9F27"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Feb 13, 2026</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#1D9E75,#378ADD);color:white">JD</div><div class="s-info"><div class="s-name">Jane Doe</div><div class="s-id">#D5A-2026-00001</div></div></div>
+          <div class="td"><span class="mono">D5A-2026-00001</span></div>
+          <div class="td"><span class="grade-chip">5</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#1D9E75">95%</span><div class="att-track"><div class="att-fill" style="width:95%;background:#1D9E75"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Feb 13, 2026</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="t-row">
+          <div class="s-cell"><div class="av" style="background:linear-gradient(135deg,#7F77DD,#D85A30);color:white">AJ</div><div class="s-info"><div class="s-name">Aisha Johnson</div><div class="s-id">#D5A-2026-00008</div></div></div>
+          <div class="td"><span class="mono">D5A-2026-00008</span></div>
+          <div class="td"><span class="grade-chip">10</span></div>
+          <div class="att-bar"><span class="att-val" style="color:#1D9E75">85.7%</span><div class="att-track"><div class="att-fill" style="width:86%;background:#1D9E75"></div></div></div>
+          <div class="td"><span class="badge active">Active</span></div>
+          <div class="td">Feb 13, 2026</div>
+          <div class="td"><div class="action-btn"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12" r="1"/></svg></div></div>
+        </div>
+
+        <div class="pagination">
+          <div class="page-info">Showing 1–8 of 22 students</div>
+          <div class="page-controls">
+            <select class="per-page"><option>20 / page</option></select>
+            <div class="page-btn">Prev</div>
+            <div class="page-btn on">1</div>
+            <div class="page-btn">2</div>
+            <div class="page-btn">Next</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
