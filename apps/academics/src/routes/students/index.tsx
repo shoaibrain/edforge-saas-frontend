@@ -24,7 +24,7 @@ import {
 import { StatCard, WidgetErrorBoundaryV2, Card } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useResourcePermissions } from '@edforge/abac'
-import { StudentTable, StudentDrawer, StudentsFilterRow, CSVImport } from '../../components/students'
+import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport } from '../../components/students'
 import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
@@ -421,7 +421,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const showEmptyFilterState = !studentsLoading && filteredStudents.length === 0 && students.length > 0
 
   return (
-    <div data-v2 className="p-5 pb-10">
+    <div data-v2 className="relative overflow-hidden min-h-full p-5 pb-10">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -627,11 +627,12 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         )}
       </motion.div>
 
-      {/* Student Quick-Info Drawer */}
-      <StudentDrawer
+      {/* Student Quick-Info Drawer — V2 (content-pane-scoped) */}
+      <StudentQuickProfile
         open={drawerOpen}
         onClose={handleCloseDrawer}
         student={selectedStudent}
+        attendanceRate={selectedStudent ? alertsMap.get(selectedStudent.studentId) : undefined}
         onWithdraw={studentPerms.delete ? handleWithdrawFromDrawer : undefined}
       />
 

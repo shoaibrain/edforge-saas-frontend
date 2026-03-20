@@ -59,6 +59,13 @@
   --v2-accent-reports: rgba(127, 119, 221, 0.12);
   --v2-accent-settings: rgba(90, 96, 112, 0.15);
 
+  /* Subtle surface layers (for cards, tiles, inset backgrounds) */
+  --v2-surface-inset: rgba(255, 255, 255, 0.03);
+  --v2-surface-interactive: rgba(255, 255, 255, 0.04);
+  --v2-surface-interactive-hover: rgba(255, 255, 255, 0.08);
+  --v2-overlay-dim: rgba(0, 0, 0, 0.20);
+  --v2-scrollbar-thumb: rgba(255, 255, 255, 0.10);
+
   /* Chart grid */
   --v2-chart-grid: rgba(255, 255, 255, 0.04);
 
@@ -171,6 +178,13 @@
   --v2-warning-border: #fed7aa;
   --v2-success-border: #6ee7b7;
   --v2-info-border: #bfdbfe;
+
+  /* Subtle surface layers */
+  --v2-surface-inset: rgba(0, 0, 0, 0.02);
+  --v2-surface-interactive: rgba(0, 0, 0, 0.03);
+  --v2-surface-interactive-hover: rgba(0, 0, 0, 0.06);
+  --v2-overlay-dim: rgba(0, 0, 0, 0.12);
+  --v2-scrollbar-thumb: rgba(0, 0, 0, 0.12);
 
   /* Chart grid */
   --v2-chart-grid: rgba(0, 0, 0, 0.04);

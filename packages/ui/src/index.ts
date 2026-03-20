@@ -123,4 +123,22 @@ export { V2AlertItem, type V2AlertItemProps } from './components/V2AlertItem'
 // V2 Hooks
 export { useCountUp, parseFormattedValue, formatAnimatedValue } from './hooks/useCountUp'
 export { useV2ChartColors } from './hooks/useV2ChartColors'
+export { useMediaQuery } from './hooks/useMediaQuery'
+
+// V2 Shared Components
+export {
+  AttendanceDonutRing,
+  type AttendanceDonutRingProps,
+} from './components/AttendanceDonutRing'
+export {
+  QuickDrawer,
+  useQuickDrawer,
+  type QuickDrawerRootProps,
+  type QuickDrawerHeaderProps,
+  type QuickDrawerBodyProps,
+  type QuickDrawerFooterProps,
+} from './components/QuickDrawer'
+
+// Hooks
+export { useFocusTrap } from './hooks/useFocusTrap'
 

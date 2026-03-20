@@ -15,7 +15,7 @@
 
 import { useMemo, useState } from 'react'
 import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
-import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
+import { TanstackDataTable, AttendanceDonutRing, type ColumnDef } from '@edforge/ui'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
 import { UserAvatar } from '../common/UserAvatar'
@@ -187,29 +187,9 @@ export function StudentTable({
         cell: ({ row }) => {
           const rate = alertsMap.get(row.original.studentId) ?? 95
           const color = getAttendanceRateColor(rate)
-          const r = 9
-          const circumference = 2 * Math.PI * r
-          const offset = circumference * (1 - Math.min(rate, 100) / 100)
           return (
             <div className="flex items-center gap-2">
-              <svg width="24" height="24" viewBox="0 0 24 24" className="flex-shrink-0">
-                <circle
-                  cx="12" cy="12" r={r}
-                  fill="none"
-                  stroke="rgba(255, 255, 255, 0.08)"
-                  strokeWidth="3"
-                />
-                <circle
-                  cx="12" cy="12" r={r}
-                  fill="none"
-                  stroke={color}
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
-                  transform="rotate(-90 12 12)"
-                />
-              </svg>
+              <AttendanceDonutRing rate={rate} size={24} strokeWidth={3} />
               <span className="text-[12px] font-medium" style={{ color }}>
                 {rate.toFixed(1)}%
               </span>
