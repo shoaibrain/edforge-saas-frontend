@@ -364,11 +364,12 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
+  const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
 
   return (
     <header
-      className="sticky top-0 z-30 flex items-center px-4 gap-2"
+      className="fixed top-0 left-0 right-0 z-[45] flex items-center"
       style={{
         height: 'var(--shell-topbar-h)',
         background: 'var(--shell-page-bg)',
@@ -376,19 +377,28 @@ export function Header() {
       }}
       aria-label="Global header"
     >
-      {/* LEFT ZONE: Hamburger + School Switcher */}
-      <div className="flex items-center gap-1 flex-shrink-0">
+      {/* LEFT ZONE: width tracks sidebar for visual alignment */}
+      <div
+        className="flex items-center gap-1 flex-shrink-0 overflow-hidden"
+        style={{
+          width: collapsed
+            ? 'var(--shell-sidebar-w-collapsed)'
+            : 'var(--shell-sidebar-w)',
+          transition: 'width var(--shell-transition)',
+          paddingLeft: '16px',
+        }}
+      >
         <HamburgerButton />
-        <SchoolSwitcher />
+        {!collapsed && <SchoolSwitcher />}
       </div>
 
       {/* CENTER ZONE: Greeting (home) or Breadcrumbs (modules) — flex:1 */}
-      <div className="flex-1 flex items-center px-3 min-w-0">
+      <div className="flex-1 flex items-center px-4 min-w-0">
         {isHomeV2 ? <HomeTopbarCenter /> : <Breadcrumbs />}
       </div>
 
       {/* RIGHT ZONE: Theme pill + Notification + User avatar */}
-      <div className="flex items-center gap-[2px] flex-shrink-0">
+      <div className="flex items-center gap-[2px] flex-shrink-0 pr-4">
         <ThemePill />
         <NotificationBadge />
         <UserMenu />

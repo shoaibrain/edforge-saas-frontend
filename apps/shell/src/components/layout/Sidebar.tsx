@@ -123,16 +123,29 @@ function NavItemLink({
     >
       <div
         className={cn(
-          'relative flex items-center rounded-3xl transition-colors duration-150',
+          'relative flex items-center rounded-3xl',
           'mx-2 my-[1px]',
           collapsed ? 'justify-center h-[42px]' : 'gap-[11px] h-[42px] px-[14px] pl-[11px]',
         )}
-        style={{
-          background: isActive
-            ? isDanger ? 'rgba(226,75,74,0.10)' : pillBgVar
-            : isHovered ? 'var(--shell-ni-hover)' : 'transparent',
-        }}
       >
+        {/* Sliding pill indicator — shared layoutId for smooth animation */}
+        {isActive && !isDanger && (
+          <motion.div
+            layoutId="sidebar-nav-pill"
+            className="absolute inset-0 rounded-3xl"
+            style={{ background: pillBgVar }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          />
+        )}
+        {/* Danger active bg — no sliding animation */}
+        {isActive && isDanger && (
+          <div className="absolute inset-0 rounded-3xl" style={{ background: 'rgba(226,75,74,0.10)' }} />
+        )}
+        {/* Hover bg */}
+        {!isActive && isHovered && (
+          <div className="absolute inset-0 rounded-3xl transition-colors duration-150" style={{ background: 'var(--shell-ni-hover)' }} />
+        )}
+
         {/* Icon */}
         <AnimatedNavIcon
           icon={item.icon}
@@ -309,16 +322,25 @@ function HomeNavButton({
     >
       <div
         className={cn(
-          'relative flex items-center rounded-3xl transition-colors duration-150',
+          'relative flex items-center rounded-3xl',
           'mx-2 my-[1px]',
           collapsed ? 'justify-center h-[42px]' : 'gap-[11px] h-[42px] px-[14px] pl-[11px]',
         )}
-        style={{
-          background: isActive
-            ? pillBgVar
-            : isHovered ? 'var(--shell-ni-hover)' : 'transparent',
-        }}
       >
+        {/* Sliding pill indicator — shared layoutId for smooth animation */}
+        {isActive && (
+          <motion.div
+            layoutId="sidebar-nav-pill"
+            className="absolute inset-0 rounded-3xl"
+            style={{ background: pillBgVar }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          />
+        )}
+        {/* Hover bg */}
+        {!isActive && isHovered && (
+          <div className="absolute inset-0 rounded-3xl transition-colors duration-150" style={{ background: 'var(--shell-ni-hover)' }} />
+        )}
+
         {/* Icon */}
         <AnimatedNavIcon
           icon={CurrentIcon}

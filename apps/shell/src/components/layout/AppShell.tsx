@@ -42,26 +42,27 @@ export function AppShell({ children }: AppShellProps) {
       {/* Skip link for keyboard/screen reader users */}
       <SkipLink targetId="main-content" />
 
+      {/* Global Header — fixed full-width, z-45 above sidebar */}
+      <Header />
+
       {/* Sidebar — fixed position, handles its own width */}
       <Sidebar />
 
-      {/* Right column: topbar + content card */}
+      {/* Right column: content card (below fixed header) */}
       <div
         className="flex flex-col h-screen"
         style={{
           marginLeft: collapsed
             ? 'var(--shell-sidebar-w-collapsed)'
             : 'var(--shell-sidebar-w)',
+          paddingTop: 'var(--shell-topbar-h)',
           transition: 'margin-left var(--shell-transition)',
         }}
       >
-        {/* Global Header — seamless background, no border */}
-        <Header />
-
-        {/* Body wrap — padding creates the 3-sided inset gap */}
+        {/* Body wrap — padding creates the inset gap */}
         <div
           className="flex-1 min-h-0"
-          style={{ padding: '0 var(--shell-cp-gap) var(--shell-cp-gap) 0' }}
+          style={{ padding: '0 var(--shell-cp-gap) var(--shell-cp-gap) var(--shell-cp-gap)' }}
         >
           {/* Content card — the ONLY elevated surface */}
           <main
