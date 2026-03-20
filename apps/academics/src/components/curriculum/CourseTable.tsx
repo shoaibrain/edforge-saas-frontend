@@ -18,14 +18,10 @@ import {
 } from 'lucide-react'
 import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
-import {
-  getSubjectAreaLabel,
-  getCourseTypeLabel,
-  getCreditTypeLabel,
-  getDurationLabel,
-  SUBJECT_AREA_COLORS,
-  COURSE_TYPE_COLORS,
-} from '../../schemas/course.form'
+import { getDurationLabel } from '../../schemas/course.form'
+import { formatCourseType } from '../../utils/course-type'
+import { CourseTypeChip } from './CourseTypeChip'
+import { SubjectChip } from './SubjectChip'
 
 // ============================================================================
 // TYPES
@@ -158,45 +154,44 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
 // HELPER COMPONENTS
 // ============================================================================
 
-function SubjectBadge({ value }: { value: string }) {
-  const colors = SUBJECT_AREA_COLORS[value] ?? SUBJECT_AREA_COLORS.other
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${colors.bg} ${colors.text}`}
-    >
-      {getSubjectAreaLabel(value)}
-    </span>
-  )
-}
-
-function CourseTypeBadge({ value }: { value: string }) {
-  const colors = COURSE_TYPE_COLORS[value] ?? COURSE_TYPE_COLORS.required
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${colors.bg} ${colors.text}`}
-    >
-      {getCourseTypeLabel(value)}
-    </span>
-  )
-}
-
 function GradeLevelChips({ grades }: { grades: string[] }) {
   if (!grades || grades.length === 0) return <span className="text-text-tertiary">—</span>
 
-  const display = grades.length > 4
-    ? [...grades.slice(0, 3), `+${grades.length - 3}`]
-    : grades
+  const showAll = grades.length <= 4
+  const display = showAll ? grades : grades.slice(0, 3)
+  const remaining = grades.length - 3
 
   return (
-    <div className="flex items-center gap-1 flex-wrap">
+    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
       {display.map((g, i) => (
         <span
           key={i}
-          className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-surface-tertiary text-text-secondary"
+          style={{
+            fontSize: 10,
+            fontWeight: 500,
+            color: 'var(--text-secondary, #7a8099)',
+            background: 'rgba(255,255,255,0.05)',
+            padding: '1px 5px',
+            borderRadius: 5,
+          }}
         >
           {g}
         </span>
       ))}
+      {!showAll && remaining > 0 && (
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 500,
+            color: 'var(--text-hint, #5a6070)',
+            background: 'rgba(255,255,255,0.03)',
+            padding: '1px 5px',
+            borderRadius: 5,
+          }}
+        >
+          +{remaining} more
+        </span>
+      )}
     </div>
   )
 }
@@ -236,7 +231,20 @@ export function CourseTable({
         header: 'Code',
         size: 120,
         cell: ({ row }) => (
-          <span className="font-mono text-xs font-semibold text-text-primary bg-surface-tertiary px-2 py-0.5 rounded">
+          <span
+            style={{
+              fontFamily: 'var(--font-mono, monospace)',
+              fontSize: 10,
+              fontWeight: 500,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'var(--text-secondary, #9aa0b8)',
+              padding: '3px 7px',
+              borderRadius: 5,
+              letterSpacing: 0.3,
+              whiteSpace: 'nowrap',
+            }}
+          >
             {row.original.courseCode}
           </span>
         ),
@@ -262,7 +270,7 @@ export function CourseTable({
         accessorKey: 'subjectArea',
         header: 'Subject',
         size: 160,
-        cell: ({ row }) => <SubjectBadge value={row.original.subjectArea} />,
+        cell: ({ row }) => <SubjectChip subject={row.original.subjectArea} />,
       },
       {
         accessorKey: 'gradeLevels',
@@ -275,22 +283,31 @@ export function CourseTable({
         accessorKey: 'credits',
         header: 'Credits',
         size: 100,
-        cell: ({ row }) => (
-          <div className="text-right">
-            <span className="font-medium text-text-primary">{row.original.credits}</span>
-            {row.original.creditType && (
-              <span className="ml-1 text-xs text-text-tertiary">
-                {getCreditTypeLabel(row.original.creditType)}
+        cell: ({ row }) => {
+          const { style } = formatCourseType(row.original.courseType)
+          return (
+            <div className="text-right">
+              <span className="font-medium text-text-primary">
+                {row.original.credits}
               </span>
-            )}
-          </div>
-        ),
+              {style === 'ap' && (
+                <sup style={{ color: 'var(--color-danger, #E24B4A)', fontSize: 9, fontWeight: 700, marginLeft: 3 }}>AP</sup>
+              )}
+              {style === 'dual' && (
+                <sup style={{ color: 'var(--color-info, #378ADD)', fontSize: 9, fontWeight: 700, marginLeft: 3 }}>DE</sup>
+              )}
+              {style === 'honors' && (
+                <sup style={{ color: 'var(--color-warning, #EF9F27)', fontSize: 9, fontWeight: 700, marginLeft: 3 }}>H</sup>
+              )}
+            </div>
+          )
+        },
       },
       {
         accessorKey: 'courseType',
         header: 'Type',
         size: 110,
-        cell: ({ row }) => <CourseTypeBadge value={row.original.courseType} />,
+        cell: ({ row }) => <CourseTypeChip type={row.original.courseType} />,
       },
       {
         accessorKey: 'typicalDuration',

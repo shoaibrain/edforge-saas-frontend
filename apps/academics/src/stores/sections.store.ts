@@ -65,8 +65,11 @@ const defaultFilters: SectionFiltersState = {
 export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
   ...defaultFilters,
 
-  viewMode: 'grid' as const,
-  setViewMode: (mode: 'grid' | 'list') => set({ viewMode: mode }),
+  viewMode: (typeof window !== 'undefined' && localStorage.getItem('edforge.classrooms.viewMode') === 'list' ? 'list' : 'grid') as 'grid' | 'list',
+  setViewMode: (mode: 'grid' | 'list') => {
+    set({ viewMode: mode })
+    try { localStorage.setItem('edforge.classrooms.viewMode', mode) } catch {}
+  },
 
   setSearchTerm: (term: string) => {
     set({ searchTerm: term })

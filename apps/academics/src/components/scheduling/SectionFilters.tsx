@@ -99,31 +99,46 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
     return badges
   }, [filters, courses, teachers, academicYears, actions])
 
-  return (
-    <div className="space-y-3">
-      {/* Search — full width */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-        <input
-          type="text"
-          placeholder="Search sections..."
-          value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
-        />
-      </div>
+  const selectInactiveStyle = {
+    background: 'var(--v2-bg-surface)',
+    borderColor: 'var(--v2-border-default)',
+    color: 'var(--v2-text-secondary)',
+  }
+  const selectActiveStyle = {
+    background: 'rgba(55,138,221,0.10)',
+    borderColor: 'rgba(55,138,221,0.25)',
+    color: '#378ADD',
+  }
 
-      {/* Filter chips row */}
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Course chip */}
+  return (
+    <div className="space-y-2.5">
+      {/* Single-row: Search + Filters + Status chips */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Compact search */}
+        <div className="relative flex-1" style={{ minWidth: 180, maxWidth: 320 }}>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint)' }} />
+          <input
+            type="text"
+            placeholder="Search sections..."
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border transition-colors focus:outline-none focus:ring-2"
+            style={{
+              background: 'var(--v2-bg-surface)',
+              borderColor: 'var(--v2-border-default)',
+              color: 'var(--v2-text-primary)',
+              // @ts-ignore
+              '--tw-ring-color': 'rgba(55,138,221,0.20)',
+            }}
+          />
+        </div>
+
+        {/* Course dropdown */}
         <select
           value={filters.courseId || ''}
           onChange={(e) => actions.setCourseId(e.target.value || null)}
-          className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer ${
-            filters.courseId
-              ? 'bg-teal-500/10 border-teal-500/30 text-teal-700 dark:text-teal-400'
-              : 'bg-surface-primary border-border-primary text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
-          }`}
+          className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+          style={filters.courseId ? selectActiveStyle : selectInactiveStyle}
         >
           <option value="">Course</option>
           {courses.map((c) => (
@@ -133,15 +148,12 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
           ))}
         </select>
 
-        {/* Teacher chip */}
+        {/* Teacher dropdown */}
         <select
           value={filters.teacherId || ''}
           onChange={(e) => actions.setTeacherId(e.target.value || null)}
-          className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer ${
-            filters.teacherId
-              ? 'bg-teal-500/10 border-teal-500/30 text-teal-700 dark:text-teal-400'
-              : 'bg-surface-primary border-border-primary text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
-          }`}
+          className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+          style={filters.teacherId ? selectActiveStyle : selectInactiveStyle}
         >
           <option value="">Teacher</option>
           {teachers.map((t) => (
@@ -151,15 +163,12 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
           ))}
         </select>
 
-        {/* Academic Year chip */}
+        {/* Academic Year dropdown */}
         <select
           value={filters.academicYearId || ''}
           onChange={(e) => actions.setAcademicYearId(e.target.value || null)}
-          className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer ${
-            filters.academicYearId
-              ? 'bg-teal-500/10 border-teal-500/30 text-teal-700 dark:text-teal-400'
-              : 'bg-surface-primary border-border-primary text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
-          }`}
+          className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+          style={filters.academicYearId ? selectActiveStyle : selectInactiveStyle}
         >
           <option value="">Year</option>
           {(academicYears || []).map((y) => (
@@ -178,11 +187,8 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
               key={String(val)}
               type="button"
               onClick={() => actions.setIsActive(val)}
-              className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
-                isSelected
-                  ? 'bg-teal-500/10 border-teal-500/30 text-teal-700 dark:text-teal-400'
-                  : 'bg-surface-primary border-border-primary text-text-secondary hover:text-text-primary hover:bg-surface-secondary'
-              }`}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors"
+              style={isSelected ? selectActiveStyle : selectInactiveStyle}
             >
               {label}
             </button>
@@ -191,7 +197,7 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
 
         {/* Results count */}
         {totalResults !== undefined && (
-          <span className="text-xs text-text-tertiary ml-auto">
+          <span className="text-[11px] ml-auto" style={{ color: 'var(--v2-text-hint)' }}>
             {totalResults} section{totalResults !== 1 ? 's' : ''}
             {filterCount > 0 ? ' matched' : ''}
           </span>
@@ -200,17 +206,25 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
 
       {/* Active filter badges */}
       {activeFilterBadges.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-2">
           {activeFilterBadges.map((badge) => (
             <span
               key={badge.key}
-              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20"
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md"
+              style={{
+                background: 'rgba(55,138,221,0.10)',
+                color: '#378ADD',
+                border: '1px solid rgba(55,138,221,0.20)',
+              }}
             >
               {badge.label}
               <button
                 type="button"
                 onClick={badge.onClear}
-                className="ml-0.5 p-0.5 rounded hover:bg-teal-500/20 transition-colors"
+                className="ml-0.5 p-0.5 rounded transition-colors"
+                style={{ opacity: 0.7 }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
                 aria-label={`Remove ${badge.label} filter`}
               >
                 <X className="w-3 h-3" />
@@ -220,7 +234,10 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
           <button
             type="button"
             onClick={actions.resetFilters}
-            className="text-xs text-text-tertiary hover:text-text-primary transition-colors ml-1"
+            className="text-xs transition-colors ml-1"
+            style={{ color: 'var(--v2-text-hint)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--v2-text-primary)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--v2-text-hint)' }}
           >
             Clear all
           </button>

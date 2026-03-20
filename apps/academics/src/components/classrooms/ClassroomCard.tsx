@@ -8,9 +8,10 @@
 import { useState } from 'react'
 import { MoreHorizontal, Pencil, ToggleLeft, ToggleRight } from 'lucide-react'
 import type { SectionResponseDto } from '@aibrains/shared-types'
-import { getCapacityColor, getCapacityPercent } from '../../schemas/section.form'
+import { getCapacityPercent } from '../../schemas/section.form'
 import { getColorForSubjectArea } from '../../lib/classroom-colors'
 import { getCoverForSubjectArea } from '../../lib/classroom-covers'
+import { getSubjectIcon, getCapacityColorV2 } from '../../utils/subject-icon'
 
 interface ClassroomCardProps {
   section: SectionResponseDto
@@ -27,7 +28,8 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
   const color = getColorForSubjectArea(subjectArea)
   const cover = getCoverForSubjectArea(subjectArea)
   const percent = getCapacityPercent(section.currentEnrollment, section.maxEnrollment)
-  const barColor = getCapacityColor(section.currentEnrollment, section.maxEnrollment)
+  const capacityColor = getCapacityColorV2(section.currentEnrollment, section.maxEnrollment)
+  const SubjectIcon = getSubjectIcon(subjectArea)
 
   const sectionName = section.sectionName || `${section.courseName || section.courseCode || 'Section'} - ${section.sectionNumber}`
   const courseName = section.courseName || section.courseCode || ''
@@ -35,7 +37,13 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
 
   return (
     <article
-      className="group relative bg-surface-primary rounded-xl border border-border-primary overflow-hidden hover:shadow-md hover:border-teal-500/30 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+      className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#378ADD] focus-visible:ring-offset-2"
+      style={{
+        background: 'var(--v2-bg-surface)',
+        borderColor: 'var(--v2-border-default)',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--v2-border-hover)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--v2-border-default)' }}
       aria-label={`${sectionName} — ${courseName || 'No course'}, ${teacherName}, ${section.currentEnrollment} of ${section.maxEnrollment} students`}
       role="link"
       tabIndex={0}
@@ -47,6 +55,13 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         <img src={cover.src} alt={cover.alt} className="w-full h-full object-cover" loading="lazy" />
         <div className={`absolute inset-0 bg-gradient-to-t from-black/20 to-transparent`} />
         <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${color.gradient}`} />
+        {/* Subject icon overlay */}
+        <div
+          className="absolute top-2 right-2 w-6 h-6 rounded-[6px] flex items-center justify-center"
+          style={{ background: 'rgba(255,255,255,0.12)' }}
+        >
+          <SubjectIcon className="w-[13px] h-[13px]" style={{ color: 'rgba(255,255,255,0.65)' }} />
+        </div>
       </div>
 
       {/* Body */}
@@ -54,9 +69,9 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         {/* Title + actions row */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 overflow-hidden">
-            <h3 className="text-sm font-medium text-text-primary truncate" title={sectionName}>{sectionName}</h3>
+            <h3 className="text-[13px] font-medium truncate" style={{ color: 'var(--v2-text-primary)' }} title={sectionName}>{sectionName}</h3>
             {courseName && (
-              <p className="text-sm text-text-secondary truncate mt-0.5" title={courseName}>{courseName}</p>
+              <p className="text-[11px] truncate mt-0.5" style={{ color: 'var(--v2-text-hint)' }} title={courseName}>{courseName}</p>
             )}
           </div>
 
@@ -106,22 +121,34 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         </div>
 
         {/* Teacher */}
-        <p className="text-xs text-text-tertiary truncate" title={teacherName}>{teacherName}</p>
+        <p className="text-[11px] truncate" style={{ color: 'var(--v2-text-muted)' }} title={teacherName}>{teacherName}</p>
 
         {/* Enrollment progress bar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-text-tertiary">
+            <span className="text-[10px]" style={{ color: 'var(--v2-text-muted)' }}>
               {section.currentEnrollment}/{section.maxEnrollment} students
             </span>
             {/* Status dot + text */}
-            <div className="flex items-center gap-1.5 text-xs text-text-tertiary">
-              <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-              {section.isActive ? 'Active' : 'Inactive'}
+            <div className="flex items-center gap-1.5 text-[10px]">
+              <div
+                className="w-[5px] h-[5px] rounded-full"
+                style={{ background: section.isActive ? '#1D9E75' : 'var(--v2-text-ghost)' }}
+              />
+              <span style={{ color: section.isActive ? 'var(--v2-brand-primary)' : 'var(--v2-text-hint)' }}>
+                {section.isActive ? 'Active' : 'Inactive'}
+              </span>
             </div>
           </div>
-          <div className="h-1 bg-surface-secondary rounded-full overflow-hidden">
-            <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${percent}%` }} />
+          <div className="h-[3px] rounded-sm overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div
+              className="h-full rounded-sm"
+              style={{
+                width: `${percent}%`,
+                background: capacityColor,
+                transition: 'width 600ms ease-out',
+              }}
+            />
           </div>
         </div>
       </div>

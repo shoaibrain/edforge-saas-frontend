@@ -33,7 +33,7 @@ export function ClassroomCardGrid({
 }: ClassroomCardGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {Array.from({ length: 8 }).map((_, i) => (
           <ClassroomCardSkeleton key={i} />
         ))}
@@ -43,10 +43,13 @@ export function ClassroomCardGrid({
 
   if (sections.length === 0) {
     return (
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
-        <School className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">No classes yet</h4>
-        <p className="text-text-secondary max-w-md mx-auto">
+      <div
+        className="rounded-xl border p-12 text-center"
+        style={{ background: 'var(--v2-bg-surface)', borderColor: 'var(--v2-border-default)' }}
+      >
+        <School className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--v2-text-hint)' }} />
+        <h4 className="text-lg font-medium mb-2" style={{ color: 'var(--v2-text-primary)' }}>No classes yet</h4>
+        <p className="max-w-md mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
           Create your first class section to get started. Classes will appear here as cards.
         </p>
       </div>
@@ -55,7 +58,7 @@ export function ClassroomCardGrid({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {sections.map((section) => (
           <ClassroomCard
             key={section.sectionId}
@@ -74,7 +77,12 @@ export function ClassroomCardGrid({
             type="button"
             onClick={onLoadMore}
             disabled={isFetchingMore}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary border border-border-primary rounded-lg hover:bg-surface-secondary transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+            style={{
+              color: 'var(--v2-text-secondary)',
+              borderColor: 'var(--v2-border-default)',
+              border: '1px solid var(--v2-border-default)',
+            }}
           >
             {isFetchingMore ? (
               <>
