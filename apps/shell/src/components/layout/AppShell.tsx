@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
@@ -33,33 +32,58 @@ export function AppShell({ children }: AppShellProps) {
   }, [toggleSidebar])
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--surface-primary))]">
+    <div
+      className="h-screen overflow-hidden"
+      style={{
+        background: 'var(--shell-page-bg)',
+        transition: 'background 0.3s',
+      }}
+    >
       {/* Skip link for keyboard/screen reader users */}
       <SkipLink targetId="main-content" />
 
-      {/* Sidebar */}
+      {/* Sidebar — fixed position, handles its own width */}
       <Sidebar />
 
-      {/* Main content area - animated with sidebar using framer-motion */}
-      <motion.div
-        animate={{ marginLeft: collapsed ? 72 : 260 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 32 }}
-        className="flex flex-col min-h-screen"
+      {/* Right column: topbar + content card */}
+      <div
+        className="flex flex-col h-screen"
+        style={{
+          marginLeft: collapsed
+            ? 'var(--shell-sidebar-w-collapsed)'
+            : 'var(--shell-sidebar-w)',
+          transition: 'margin-left var(--shell-transition)',
+        }}
       >
-        {/* Global Header - includes SidebarTrigger + Breadcrumbs */}
+        {/* Global Header — seamless background, no border */}
         <Header />
 
-        {/* Page content */}
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="relative flex-1 overflow-x-clip outline-none"
-          aria-label="Main content"
+        {/* Body wrap — padding creates the 3-sided inset gap */}
+        <div
+          className="flex-1 min-h-0"
+          style={{ padding: '0 var(--shell-cp-gap) var(--shell-cp-gap) 0' }}
         >
-          {children}
-          <SchoolTransitionOverlay />
-        </main>
-      </motion.div>
+          {/* Content card — the ONLY elevated surface */}
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="h-full overflow-y-auto overflow-x-hidden outline-none"
+            style={{
+              background: 'var(--shell-cp-bg)',
+              borderRadius: 'var(--shell-cp-radius)',
+              boxShadow: 'var(--shell-cp-shadow)',
+              position: 'relative',  // LOAD-BEARING: drawer absolute positioning
+              transition: 'background 0.3s, box-shadow 0.3s',
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'var(--shell-scroll-thumb) transparent',
+            }}
+            aria-label="Main content"
+          >
+            {children}
+            <SchoolTransitionOverlay />
+          </main>
+        </div>
+      </div>
     </div>
   )
 }

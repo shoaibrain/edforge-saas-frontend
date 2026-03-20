@@ -5,21 +5,20 @@ import { motion } from 'framer-motion'
 import {
   User,
   Settings,
-  Moon,
-  Sun,
-  Monitor,
   LogOut,
-  Bell,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
-import { useThemeStore, type Theme } from '../../stores/theme.store'
+import { useThemeStore } from '../../stores/theme.store'
 import { useHomeStore } from '../../stores/home.store'
+import { useAppStore } from '../../stores/app.store'
 import { Avatar } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { getGreeting } from '../../lib/greeting'
 import { adToBS, formatBSLong } from '@edforge/date-utils'
+import { cn } from '../../lib/utils'
 
 import { Breadcrumbs } from './Breadcrumbs'
+import { SchoolSwitcher } from './SchoolSwitcher'
 
 // ============================================================================
 // LANGUAGE SLIDING TOGGLE
@@ -76,12 +75,88 @@ function LanguageToggle() {
 }
 
 // ============================================================================
-// V2 HOME TOPBAR LEFT — Greeting + Date
+// HAMBURGER BUTTON
 // ============================================================================
 
-function HomeTopbarLeft() {
+function HamburgerButton() {
+  const toggleSidebar = useAppStore((s) => s.toggleSidebar)
+  const collapsed = useAppStore((s) => s.sidebarCollapsed)
+
+  return (
+    <button
+      onClick={toggleSidebar}
+      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150"
+      style={{ cursor: 'pointer' }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--shell-ni-hover)' }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+      aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+    >
+      <div className="flex flex-col gap-1">
+        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+      </div>
+    </button>
+  )
+}
+
+// ============================================================================
+// THEME PILL — Light | Dark toggle in topbar
+// ============================================================================
+
+function ThemePill() {
+  const { resolvedTheme, setTheme } = useThemeStore()
+
+  return (
+    <div
+      className="flex items-center gap-0.5 rounded-2xl flex-shrink-0"
+      style={{
+        padding: '3px',
+        background: 'var(--shell-theme-pill-bg)',
+        border: '0.5px solid var(--shell-border-color)',
+        transition: 'background 0.3s',
+      }}
+    >
+      <button
+        className={cn(
+          'rounded-xl text-[10px] font-medium transition-all duration-150 border-none font-[inherit]',
+        )}
+        style={{
+          padding: '3px 10px',
+          background: resolvedTheme === 'light' ? 'var(--shell-cp-bg)' : 'transparent',
+          color: resolvedTheme === 'light' ? 'var(--shell-text-1)' : 'var(--shell-text-3)',
+          boxShadow: resolvedTheme === 'light' ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
+          cursor: 'pointer',
+        }}
+        onClick={() => setTheme('light')}
+      >
+        Light
+      </button>
+      <button
+        className={cn(
+          'rounded-xl text-[10px] font-medium transition-all duration-150 border-none font-[inherit]',
+        )}
+        style={{
+          padding: '3px 10px',
+          background: resolvedTheme === 'dark' ? 'var(--shell-cp-bg)' : 'transparent',
+          color: resolvedTheme === 'dark' ? 'var(--shell-text-1)' : 'var(--shell-text-3)',
+          boxShadow: resolvedTheme === 'dark' ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
+          cursor: 'pointer',
+        }}
+        onClick={() => setTheme('dark')}
+      >
+        Dark
+      </button>
+    </div>
+  )
+}
+
+// ============================================================================
+// V2 HOME TOPBAR CENTER — Greeting + Date
+// ============================================================================
+
+function HomeTopbarCenter() {
   const user = useAuthStore((s) => s.user)
-  const academicYear = useHomeStore((s) => s.activeAcademicYear)
   const { t } = useTranslation('dashboard')
 
   const firstName = user?.displayName || user?.name?.split(' ')[0]
@@ -107,33 +182,34 @@ function HomeTopbarLeft() {
       year: 'numeric',
     })
 
-    // Academic year
-    const yearPart = academicYear ? `Academic Year ${academicYear.name}` : ''
-
-    const parts = [bsPart, gregPart, yearPart].filter(Boolean)
-    return parts.join('  ·  ')
-  }, [academicYear])
+    const parts = [bsPart, gregPart].filter(Boolean)
+    return parts.join(' · ')
+  }, [])
 
   return (
-    <div className="min-w-0">
-      <div
-        className="text-sm font-medium tracking-tight"
-        style={{ color: 'var(--v2-text-primary, rgb(var(--text-primary)))' }}
+    <div className="flex items-center gap-0 min-w-0">
+      <span
+        className="text-[13.5px] font-medium"
+        style={{ color: 'var(--shell-text-1)', transition: 'color 0.3s' }}
       >
         {greeting}
-      </div>
-      <div
-        className="text-[11px] mt-0.5 truncate"
-        style={{ color: 'var(--v2-text-faint, rgb(var(--text-tertiary)))' }}
+      </span>
+      <span
+        className="text-[11px] ml-[10px] pl-[10px]"
+        style={{
+          color: 'var(--shell-text-4)',
+          borderLeft: '1px solid var(--shell-border-color)',
+          transition: 'color 0.3s, border-color 0.3s',
+        }}
       >
         {dateDisplay}
-      </div>
+      </span>
     </div>
   )
 }
 
 // ============================================================================
-// NOTIFICATION BADGE
+// NOTIFICATION BADGE — Always visible
 // ============================================================================
 
 function NotificationBadge() {
@@ -141,62 +217,57 @@ function NotificationBadge() {
 
   return (
     <button
-      className="relative flex items-center justify-center rounded-lg border transition-colors"
-      style={{
-        width: 30,
-        height: 30,
-        background: 'rgba(255, 255, 255, 0.04)',
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-      }}
-      aria-label={`Notifications: ${alertCount} alerts`}
+      className="relative w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150"
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--shell-ni-hover)' }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+      aria-label={`Notifications${alertCount > 0 ? `: ${alertCount} alerts` : ''}`}
     >
-      <Bell className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint, #7a8099)' }} />
+      <svg width="19" height="19" viewBox="0 0 20 20" fill="none" strokeWidth="1.6" style={{ stroke: 'var(--shell-icon-color)', transition: 'stroke 0.3s' }}>
+        <path d="M10 2a6 6 0 00-6 6v2L2 13h16l-2-3V8a6 6 0 00-6-6zM8 16a2 2 0 004 0" />
+      </svg>
       {alertCount > 0 && (
         <span
-          className="absolute -top-[3px] -right-[3px] flex items-center justify-center text-[9px] font-bold text-white rounded-full"
+          className="absolute flex items-center justify-center text-[9px] font-bold text-white rounded-full"
           style={{
-            width: 14,
-            height: 14,
+            top: 7,
+            right: 7,
+            width: 8,
+            height: 8,
             background: '#E24B4A',
-            border: '1.5px solid var(--v2-bg-app, #0f1117)',
+            border: '2px solid var(--shell-notif-border)',
+            transition: 'border-color 0.3s',
           }}
           aria-hidden="true"
-        >
-          {alertCount}
-        </span>
+        />
       )}
     </button>
   )
 }
 
 // ============================================================================
-// USER MENU WITH THEME PICKER
+// USER MENU — Avatar dropdown (theme picker removed, now in topbar pill)
 // ============================================================================
 
 function UserMenu() {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
-  const { theme, setTheme } = useThemeStore()
   const { t: tNav } = useTranslation('nav')
-  const { t: tSettings } = useTranslation('settings')
 
   if (!user) return null
 
-  const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: tSettings('preferences.themeLight') },
-    { value: 'dark', icon: Moon, label: tSettings('preferences.themeDark') },
-    { value: 'system', icon: Monitor, label: tSettings('preferences.themeSystem') },
-  ]
-
   return (
     <Menu as="div" className="relative">
-      <MenuButton className="flex items-center rounded-full ring-2 ring-[rgb(var(--border-primary))] ring-offset-2 ring-offset-[rgb(var(--surface-secondary))] hover:ring-teal-500/50 transition-all duration-200">
-        <Avatar
-          name={user.name}
-          size="sm"
-          shape="circle"
-        />
+      <MenuButton
+        className="flex items-center rounded-full hover:ring-teal-500/50 transition-all duration-200 ml-1 flex-shrink-0"
+      >
+        <div className="w-[30px] h-[30px] rounded-full overflow-hidden">
+          <Avatar
+            name={user.name}
+            size="sm"
+            shape="circle"
+          />
+        </div>
       </MenuButton>
 
       <Transition
@@ -225,28 +296,9 @@ function UserMenu() {
             </div>
           </div>
 
-          {/* Quick Preferences: Theme + Language */}
+          {/* Language Toggle */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]">
-                {themes.map(({ value, icon: Icon, label }) => (
-                  <button
-                    key={value}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setTheme(value)
-                    }}
-                    className={`p-2 rounded-md transition-all duration-200 ${theme === value
-                      ? 'bg-teal-500 dark:bg-cyan-500 text-white shadow-sm'
-                      : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]'
-                      }`}
-                    title={label}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center justify-end">
               <LanguageToggle />
             </div>
           </div>
@@ -308,29 +360,39 @@ function UserMenu() {
 }
 
 // ============================================================================
-// MAIN HEADER COMPONENT
+// MAIN HEADER COMPONENT — Shell V2 Three-Zone Layout
 // ============================================================================
 
 export function Header() {
   const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
 
   return (
-    <>
-      <header
-        className="sticky top-0 z-30 h-16 px-6 flex items-center justify-between border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
-        aria-label="Global header"
-      >
-        {/* Left Section */}
-        <div className="flex items-center min-w-0 flex-1">
-          {isHomeV2 ? <HomeTopbarLeft /> : <Breadcrumbs />}
-        </div>
+    <header
+      className="sticky top-0 z-30 flex items-center px-4 gap-2"
+      style={{
+        height: 'var(--shell-topbar-h)',
+        background: 'var(--shell-page-bg)',
+        transition: 'background 0.3s',
+      }}
+      aria-label="Global header"
+    >
+      {/* LEFT ZONE: Hamburger + School Switcher */}
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <HamburgerButton />
+        <SchoolSwitcher />
+      </div>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {isHomeV2 && <NotificationBadge />}
-          <UserMenu />
-        </div>
-      </header>
-    </>
+      {/* CENTER ZONE: Greeting (home) or Breadcrumbs (modules) — flex:1 */}
+      <div className="flex-1 flex items-center px-3 min-w-0">
+        {isHomeV2 ? <HomeTopbarCenter /> : <Breadcrumbs />}
+      </div>
+
+      {/* RIGHT ZONE: Theme pill + Notification + User avatar */}
+      <div className="flex items-center gap-[2px] flex-shrink-0">
+        <ThemePill />
+        <NotificationBadge />
+        <UserMenu />
+      </div>
+    </header>
   )
 }

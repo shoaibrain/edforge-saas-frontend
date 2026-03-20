@@ -24,3 +24,112 @@
 .border-border-primary { border-color: rgb(var(--border-primary)); }
 .border-border-secondary { border-color: rgb(var(--border-secondary)); }
 
+/* ============================================================================
+ * SHELL V2 LAYOUT TOKENS — Gmail-inspired inset card pattern
+ *
+ * These tokens control the shell chrome (topbar, sidebar, content-pane wrapper).
+ * They are shell-scoped — NOT in packages/theme/src/base.css — so remote apps
+ * (academics, finance, people) are unaffected.
+ * ============================================================================ */
+
+:root {
+  /* Seamless shell surface — topbar, sidebar, page bg ALL identical */
+  --shell-page-bg: #f0f4f9;
+
+  /* Content pane card */
+  --shell-cp-bg: #ffffff;
+  --shell-cp-shadow: 0 1px 3px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.07);
+  --shell-cp-radius: 16px;
+  --shell-cp-gap: 12px;
+
+  /* Sidebar dimensions */
+  --shell-sidebar-w: 240px;
+  --shell-sidebar-w-collapsed: 68px;
+  --shell-topbar-h: 56px;
+  --shell-transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Nav item hover */
+  --shell-ni-hover: rgba(0,0,0,0.06);
+
+  /* Nav pill active — teal (home, academics) */
+  --shell-pill-teal-bg: rgba(29,158,117,0.14);
+  --shell-pill-teal-text: #0d5c42;
+  --shell-pill-teal-icon: #0f6e56;
+
+  /* Nav pill active — amber (finance) */
+  --shell-pill-amber-bg: rgba(239,159,39,0.14);
+  --shell-pill-amber-text: #6b3d0a;
+  --shell-pill-amber-icon: #854f0b;
+
+  /* Nav pill active — coral (people) */
+  --shell-pill-coral-bg: rgba(216,90,48,0.13);
+  --shell-pill-coral-text: #5a1a05;
+  --shell-pill-coral-icon: #712b13;
+
+  /* Nav pill active — blue (settings) */
+  --shell-pill-blue-bg: rgba(55,138,221,0.13);
+  --shell-pill-blue-text: #0c447c;
+  --shell-pill-blue-icon: #185fa5;
+
+  /* Shell text stack */
+  --shell-text-1: #1f2328;
+  --shell-text-2: #444746;
+  --shell-text-3: #5f6368;
+  --shell-text-4: #9aa0b8;
+  --shell-icon-color: #5f6368;
+  --shell-sec-lbl: #5f6368;
+  --shell-divider: rgba(0,0,0,0.08);
+  --shell-border-color: rgba(0,0,0,0.08);
+
+  /* Topbar-specific */
+  --shell-hbg-line: #5f6368;
+  --shell-school-name: #1f2328;
+  --shell-school-code: #6e7680;
+  --shell-notif-border: #f0f4f9;
+  --shell-theme-pill-bg: rgba(0,0,0,0.04);
+
+  /* Scrollbar */
+  --shell-scroll-thumb: rgba(0,0,0,0.12);
+}
+
+.dark {
+  --shell-page-bg: #0a0d14;
+  --shell-cp-bg: #161b27;
+  --shell-cp-shadow: 0 1px 6px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.07);
+
+  --shell-ni-hover: rgba(255,255,255,0.06);
+
+  --shell-pill-teal-bg: rgba(29,158,117,0.17);
+  --shell-pill-teal-text: #1D9E75;
+  --shell-pill-teal-icon: #1D9E75;
+
+  --shell-pill-amber-bg: rgba(239,159,39,0.16);
+  --shell-pill-amber-text: #EF9F27;
+  --shell-pill-amber-icon: #EF9F27;
+
+  --shell-pill-coral-bg: rgba(216,90,48,0.15);
+  --shell-pill-coral-text: #D85A30;
+  --shell-pill-coral-icon: #D85A30;
+
+  --shell-pill-blue-bg: rgba(55,138,221,0.16);
+  --shell-pill-blue-text: #378ADD;
+  --shell-pill-blue-icon: #378ADD;
+
+  --shell-text-1: #e8eaf0;
+  --shell-text-2: #c8ccd8;
+  --shell-text-3: #9aa0b8;
+  --shell-text-4: #4a5068;
+  --shell-icon-color: #9aa0b8;
+  --shell-sec-lbl: #4a5068;
+  --shell-divider: rgba(255,255,255,0.07);
+  --shell-border-color: rgba(255,255,255,0.07);
+
+  --shell-hbg-line: #9aa0b8;
+  --shell-school-name: #e8eaf0;
+  --shell-school-code: #4a5068;
+  --shell-notif-border: #0a0d14;
+  --shell-theme-pill-bg: rgba(255,255,255,0.04);
+
+  --shell-scroll-thumb: rgba(255,255,255,0.10);
+}
+
