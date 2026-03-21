@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useSidebarStore } from '../../stores/sidebar.store'
-import { SIDEBAR_NAV_ICON_SIZE } from '../../config/ui-constants'
+import { SIDEBAR_NAV_ICON_SIZE, SIDEBAR_NAV_ICON_SIZE_COLLAPSED } from '../../config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '../../hooks/useSidebarModule'
 import { useSecureNavGroups } from '../../hooks/useSecureNavItems'
 import type { NavItem, NavItemGroup, SidebarModule } from '../../config/sidebar-modules'
@@ -55,35 +55,53 @@ function AnimatedNavIcon({
   isHovered,
   isDanger,
   accentKey,
+  collapsed,
 }: {
   icon: LucideIcon
   isActive: boolean
   isHovered: boolean
   isDanger?: boolean
   accentKey: AccentKey
+  collapsed: boolean
 }) {
+  const iconSize = collapsed ? SIDEBAR_NAV_ICON_SIZE_COLLAPSED : SIDEBAR_NAV_ICON_SIZE
+
   const iconColor = isActive && !isDanger
     ? `var(--shell-pill-${accentKey}-icon)`
     : isActive && isDanger
       ? undefined
       : 'var(--shell-icon-color)'
 
+  // In collapsed state, the icon container handles active/hover backgrounds
+  const containerBg = collapsed && isActive && !isDanger
+    ? `var(--shell-pill-${accentKey}-bg)`
+    : collapsed && isActive && isDanger
+      ? 'rgba(226,75,74,0.10)'
+      : collapsed && isHovered && !isActive
+        ? 'var(--shell-ni-hover)'
+        : 'transparent'
+
   return (
     <motion.div
       animate={{
-        scale: isHovered && !isActive ? 1.12 : 1,
-        rotate: isHovered && !isActive ? 5 : 0,
+        scale: isHovered && !isActive ? 1.08 : 1,
+        rotate: isHovered && !isActive ? 3 : 0,
       }}
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-      className="relative flex items-center justify-center flex-shrink-0"
+      className={cn(
+        'relative flex items-center justify-center flex-shrink-0 transition-colors duration-150',
+        collapsed ? 'w-10 h-10 rounded-xl' : 'w-9 h-9 rounded-[10px]',
+      )}
+      style={{ background: containerBg }}
     >
       <IconEl
-        size={SIDEBAR_NAV_ICON_SIZE}
+        size={iconSize}
         className={cn(
           'transition-colors duration-200 relative z-10',
           isActive && isDanger && 'text-rust-500',
         )}
         style={iconColor ? { color: iconColor } : undefined}
+        strokeWidth={collapsed ? 2 : 1.8}
       />
     </motion.div>
   )
@@ -125,11 +143,11 @@ function NavItemLink({
         className={cn(
           'relative flex items-center rounded-3xl',
           'mx-2 my-[1px]',
-          collapsed ? 'justify-center h-[42px]' : 'gap-[11px] h-[42px] px-[14px] pl-[11px]',
+          collapsed ? 'justify-center h-11' : 'gap-2.5 h-11 pl-1.5 pr-3.5',
         )}
       >
-        {/* Sliding pill indicator — shared layoutId for smooth animation */}
-        {isActive && !isDanger && (
+        {/* Sliding pill — EXPANDED ONLY (collapsed active handled by icon container) */}
+        {isActive && !isDanger && !collapsed && (
           <motion.div
             layoutId="sidebar-nav-pill"
             className="absolute inset-0 rounded-3xl"
@@ -137,22 +155,23 @@ function NavItemLink({
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
         )}
-        {/* Danger active bg — no sliding animation */}
-        {isActive && isDanger && (
+        {/* Danger active bg — expanded only */}
+        {isActive && isDanger && !collapsed && (
           <div className="absolute inset-0 rounded-3xl" style={{ background: 'rgba(226,75,74,0.10)' }} />
         )}
-        {/* Hover bg */}
-        {!isActive && isHovered && (
+        {/* Hover bg — expanded only (collapsed hover handled by icon container) */}
+        {!isActive && isHovered && !collapsed && (
           <div className="absolute inset-0 rounded-3xl transition-colors duration-150" style={{ background: 'var(--shell-ni-hover)' }} />
         )}
 
-        {/* Icon */}
+        {/* Icon with container */}
         <AnimatedNavIcon
           icon={item.icon}
           isActive={isActive}
           isHovered={isHovered}
           isDanger={isDanger}
           accentKey={accentKey}
+          collapsed={collapsed}
         />
 
         {/* Label — animated visibility on collapse */}
@@ -251,7 +270,7 @@ function NavGroup({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="px-5 pt-3 pb-1"
+          className="px-5 pt-4 pb-1.5"
           style={{
             fontSize: '10.5px',
             fontWeight: 500,
@@ -308,7 +327,7 @@ function HomeNavButton({
   const showBackMode = isSubModule
 
   const CurrentIcon = showBackMode ? ArrowLeft : Home
-  const label = showBackMode ? tNav('backToHome') : tNav('home')
+  const label = tNav('home')
 
   const pillBgVar = `var(--shell-pill-${accentKey}-bg)`
   const pillTextVar = `var(--shell-pill-${accentKey}-text)`
@@ -324,11 +343,11 @@ function HomeNavButton({
         className={cn(
           'relative flex items-center rounded-3xl',
           'mx-2 my-[1px]',
-          collapsed ? 'justify-center h-[42px]' : 'gap-[11px] h-[42px] px-[14px] pl-[11px]',
+          collapsed ? 'justify-center h-11' : 'gap-2.5 h-11 pl-1.5 pr-3.5',
         )}
       >
-        {/* Sliding pill indicator — shared layoutId for smooth animation */}
-        {isActive && (
+        {/* Sliding pill — EXPANDED ONLY (collapsed active handled by icon container) */}
+        {isActive && !collapsed && (
           <motion.div
             layoutId="sidebar-nav-pill"
             className="absolute inset-0 rounded-3xl"
@@ -336,17 +355,18 @@ function HomeNavButton({
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
         )}
-        {/* Hover bg */}
-        {!isActive && isHovered && (
+        {/* Hover bg — expanded only */}
+        {!isActive && isHovered && !collapsed && (
           <div className="absolute inset-0 rounded-3xl transition-colors duration-150" style={{ background: 'var(--shell-ni-hover)' }} />
         )}
 
-        {/* Icon */}
+        {/* Icon with container */}
         <AnimatedNavIcon
           icon={CurrentIcon}
           isActive={isActive}
           isHovered={isHovered}
           accentKey={accentKey}
+          collapsed={collapsed}
         />
 
         {/* Label */}
@@ -441,8 +461,9 @@ export function Sidebar() {
           className="space-y-1"
         >
           {/* Home / Back button */}
-          <div className="mb-1 pb-1" style={{ borderBottom: `1px solid var(--shell-divider)`, margin: '0 8px' }}>
+          <div className="mb-1">
             <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} accentKey={accentKey} />
+            <div className="mt-1" style={{ borderBottom: '1px solid var(--shell-divider)', margin: '0 12px' }} />
           </div>
 
           {/* Module navigation groups */}

@@ -284,13 +284,14 @@ export function SchoolSwitcher() {
         leaveTo="opacity-0 scale-95"
       >
         <MenuItems
+          anchor="bottom start"
           className={cn(
             'w-80 rounded-2xl z-50 overflow-hidden',
             'bg-[rgb(var(--surface-secondary))]/85 backdrop-blur-xl',
             'border border-white/10 dark:border-white/5',
             'shadow-xl shadow-black/10 dark:shadow-black/40',
             'ring-1 ring-inset ring-white/5',
-            'absolute left-0 top-full mt-2 origin-top'
+            '[--anchor-gap:8px]'
           )}
         >
           {dropdownContent}
