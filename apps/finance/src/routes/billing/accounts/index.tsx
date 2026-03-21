@@ -6,7 +6,7 @@
  * Route: /finance/billing/accounts
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2,
@@ -14,12 +14,17 @@ import {
   FileText,
   CreditCard,
   BookOpen,
+  TrendingUp,
+  Receipt,
+  AlertTriangle,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   TanstackDataTable,
   createExpandColumn,
   type ColumnDef,
+  StatCard,
+  WidgetErrorBoundaryV2,
 } from '@edforge/ui'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -27,9 +32,9 @@ import {
   useStudentLedger,
   useInvoices,
 } from '@edforge/finance-services'
-import { formatNPR } from '@edforge/types'
+import { formatNPR, formatNPRCompact } from '@edforge/types'
 import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
-import { StatusBadge } from '../../../components/StatusBadge'
+import { FinancePageHeader, FinanceStatusChip } from '../../../components/shared'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
@@ -55,11 +60,18 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-        active
-          ? 'bg-teal-600 text-white'
-          : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-primary))]'
-      }`}
+      style={{
+        fontSize: '12px',
+        fontWeight: 500,
+        padding: '6px 12px',
+        borderRadius: 6,
+        background: active ? 'var(--v2-brand-primary, #1D9E75)' : 'transparent',
+        color: active ? '#fff' : 'var(--v2-text-secondary, #c8ccd8)',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background 0.15s, color 0.15s',
+      }}
+      className="flex items-center gap-1.5"
     >
       <Icon className="w-3.5 h-3.5" />
       {label}
@@ -117,7 +129,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
               {formatDate(entry.date)}
             </td>
             <td className="px-2 py-1.5">
-              <StatusBadge status={entry.entryType} size="xs" />
+              <FinanceStatusChip status={entry.entryType} size="xs" />
             </td>
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-primary))]">
               {entry.description}
@@ -184,7 +196,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
             <td className="px-2 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400">
               {invoice.invoiceNumber}
             </td>
-            <td className="px-2 py-1.5"><StatusBadge status={invoice.status} size="xs" /></td>
+            <td className="px-2 py-1.5"><FinanceStatusChip status={invoice.status} size="xs" /></td>
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-primary))]">
               {formatNPR(invoice.grandTotal)}
             </td>
@@ -257,7 +269,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-secondary))]">
               {formatNPR(inv.grandTotal)}
             </td>
-            <td className="px-2 py-1.5"><StatusBadge status={inv.status} size="xs" /></td>
+            <td className="px-2 py-1.5"><FinanceStatusChip status={inv.status} size="xs" /></td>
           </tr>
         ))}
       </tbody>
@@ -438,6 +450,19 @@ export default function StudentAccountsPage() {
 
   const accountList: StudentAccount[] = accounts ?? []
 
+  const kpi = useMemo(() => {
+    const totalStudents = accountList.length
+    const totalOutstanding = accountList.reduce(
+      (sum, a) => sum + (a.balance > 0 ? a.balance : 0),
+      0,
+    )
+    const fullyPaidCount = accountList.filter(
+      (a) => a.balance <= 0 && a.totalPaid > 0,
+    ).length
+    const overdueCount = accountList.filter((a) => a.balance > 0).length
+    return { totalStudents, totalOutstanding, fullyPaidCount, overdueCount }
+  }, [accountList])
+
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
@@ -447,14 +472,62 @@ export default function StudentAccountsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div data-v2 className="p-6 space-y-5">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Student Accounts</h1>
-        <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-          View student billing accounts, invoices, payments, and ledger history.
-        </p>
-      </div>
+      <FinancePageHeader
+        icon={Users}
+        title="Student Accounts"
+        subtitle="View student billing accounts, invoices, payments, and ledger history."
+        accentColor="rgba(29, 158, 117, 0.12)"
+        iconColor="#1D9E75"
+      />
+
+      {/* KPI Tiles */}
+      <WidgetErrorBoundaryV2>
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Total Students"
+            value={String(kpi.totalStudents)}
+            icon={Users}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            tag={{ text: `${kpi.totalStudents} accounts`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Outstanding"
+            value={formatNPRCompact(kpi.totalOutstanding)}
+            icon={Receipt}
+            accentColor="rgba(239, 159, 39, 0.12)"
+            iconColor="#EF9F27"
+            barColor="#EF9F27"
+            tag={{ text: `${kpi.overdueCount} with balance`, color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            valueColor="#EF9F27"
+            loading={isLoading}
+          />
+          <StatCard
+            label="Fully Paid"
+            value={String(kpi.fullyPaidCount)}
+            icon={TrendingUp}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            tag={{ text: 'no balance', color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="With Balance"
+            value={String(kpi.overdueCount)}
+            icon={AlertTriangle}
+            accentColor="rgba(226, 75, 74, 0.12)"
+            iconColor="#E24B4A"
+            barColor="#E24B4A"
+            tag={{ text: `${kpi.overdueCount} with balance`, color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
+            loading={isLoading}
+          />
+        </div>
+      </WidgetErrorBoundaryV2>
 
       {/* Data Table */}
       <TanstackDataTable<StudentAccount>
@@ -474,7 +547,8 @@ export default function StudentAccountsPage() {
           title: 'No student accounts found',
           description: 'Student accounts are created automatically when invoices are generated.',
         }}
-        maxHeight="calc(100vh - 13rem)"
+        maxHeight="calc(100vh - 30rem)"
+        className="min-h-[400px]"
       />
     </div>
   )

@@ -14,10 +14,11 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { FeeStructure } from '@edforge/types'
+import { formatNPRCompact } from '@edforge/types'
 import { apiGet } from '@edforge/api-client'
 import type { AxiosError } from '@edforge/api-client'
-import { Button } from '@edforge/ui'
-import { Plus, AlertTriangle } from 'lucide-react'
+import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { Plus, AlertTriangle, DollarSign, Layers, Settings2, TrendingUp } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import {
   useFeeStructures,
@@ -28,6 +29,7 @@ import {
 import { FeeStructureList } from '../../components/configuration/FeeStructureList'
 import { FeeStructureForm } from '../../components/configuration/FeeStructureForm'
 import type { FeeStructureFormData, AcademicYearOption } from '../../components/configuration/FeeStructureForm'
+import { FinancePageHeader, FinanceInfoBanner, FinanceFilterChips } from '../../components/shared'
 
 /* ------------------------------------------------------------------ */
 /*  API response types                                                 */
@@ -84,11 +86,28 @@ export default function FeeStructuresPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingFee, setEditingFee] = useState<FeeStructure | null>(null)
   const [deletingFee, setDeletingFee] = useState<FeeStructure | null>(null)
+  const [activeFilter, setActiveFilter] = useState<'' | 'active' | 'inactive'>('')
 
   const { data: feeStructures, isLoading, isError } = useFeeStructures(schoolId ?? '')
   const createMutation = useCreateFeeStructure(schoolId ?? '')
   const updateMutation = useUpdateFeeStructure(schoolId ?? '')
   const deleteMutation = useDeleteFeeStructure(schoolId ?? '')
+
+  const filteredFeeStructures = useMemo(() => {
+    const list = feeStructures ?? []
+    if (activeFilter === 'active') return list.filter(f => f.isActive !== false)
+    if (activeFilter === 'inactive') return list.filter(f => f.isActive === false)
+    return list
+  }, [feeStructures, activeFilter])
+
+  const kpi = useMemo(() => {
+    const list = feeStructures ?? []
+    const totalStructures = list.length
+    const autoApplyCount = list.filter(f => f.autoApplyOnEnrollment).length
+    const feeTypes = new Set(list.map(f => f.feeType)).size
+    const maxFee = list.reduce((max, f) => Math.max(max, f.amount || 0), 0)
+    return { totalStructures, autoApplyCount, feeTypes, maxFee }
+  }, [feeStructures])
 
   // Fetch academic years for the school
   const { data: academicYearsRaw } = useQuery({
@@ -220,26 +239,94 @@ export default function FeeStructuresPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div data-v2 className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            Fee Structures
-          </h1>
-          <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-            Configure the fee types and amounts for your school.
-          </p>
+      <FinancePageHeader
+        icon={Settings2}
+        title="Fee Structures"
+        subtitle="Configure the fee types and amounts for your school."
+        accentColor="rgba(127, 119, 221, 0.12)"
+        iconColor="#7F77DD"
+        actions={
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
+            style={{
+              background: 'var(--v2-brand-primary)',
+              color: '#fff',
+            }}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Fee Structure
+          </button>
+        }
+      />
+
+      {/* Info Banner */}
+      <FinanceInfoBanner
+        variant="info"
+        message="Fee structures with auto-apply on enrollment will automatically generate obligations when a student is enrolled."
+      />
+
+      {/* KPI Grid */}
+      <WidgetErrorBoundaryV2>
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Total Structures"
+            value={String(kpi.totalStructures)}
+            icon={Layers}
+            accentColor="rgba(127, 119, 221, 0.12)"
+            iconColor="#7F77DD"
+            barColor="#7F77DD"
+            valueColor="#7F77DD"
+            loading={isLoading}
+          />
+          <StatCard
+            label="Auto-Apply"
+            value={String(kpi.autoApplyCount)}
+            icon={TrendingUp}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            loading={isLoading}
+          />
+          <StatCard
+            label="Fee Types"
+            value={String(kpi.feeTypes)}
+            icon={DollarSign}
+            accentColor="rgba(55, 138, 221, 0.12)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            loading={isLoading}
+          />
+          <StatCard
+            label="Max Fee"
+            value={formatNPRCompact(kpi.maxFee)}
+            icon={AlertTriangle}
+            accentColor="rgba(239, 159, 39, 0.12)"
+            iconColor="#EF9F27"
+            barColor="#EF9F27"
+            loading={isLoading}
+          />
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 mr-1.5" />
-          Add Fee Structure
-        </Button>
-      </div>
+      </WidgetErrorBoundaryV2>
+
+      {/* Filter Chips */}
+      <FinanceFilterChips
+        options={[
+          { label: 'All', value: '' },
+          { label: 'Active', value: 'active' },
+          { label: 'Inactive', value: 'inactive' },
+        ]}
+        value={activeFilter}
+        onChange={(v) => setActiveFilter(v as '' | 'active' | 'inactive')}
+        accentColor="#7F77DD"
+      />
 
       {/* List */}
       <FeeStructureList
-        feeStructures={feeStructures ?? []}
+        feeStructures={filteredFeeStructures}
         isLoading={isLoading}
         onEdit={(fee) => setEditingFee(fee)}
         onDelete={(fee) => setDeletingFee(fee)}

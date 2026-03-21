@@ -14,6 +14,8 @@ import {
   TanstackDataTable,
   createSelectColumn,
   createActionsColumn,
+  StatCard,
+  WidgetErrorBoundaryV2,
   type ColumnDef,
 } from '@edforge/ui'
 import {
@@ -27,6 +29,9 @@ import {
   Send,
   Clock,
   AlertTriangle,
+  DollarSign,
+  TrendingUp,
+  Receipt,
 } from 'lucide-react'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
@@ -40,10 +45,15 @@ import {
   useFeeStructures,
   useAcademicYears,
 } from '@edforge/finance-services'
-import { formatNPR, type Invoice } from '@edforge/types'
+import { formatNPR, formatNPRCompact, type Invoice } from '@edforge/types'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
-import { StatusBadge } from '../../../components/StatusBadge'
+import {
+  FinancePageHeader,
+  FinanceInfoBanner,
+  FinanceStatusChip,
+  FinanceFilterChips,
+} from '../../../components/shared'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 
@@ -78,6 +88,23 @@ export default function InvoicesPage() {
   const bulkIssueMutation = useBulkIssueInvoices(schoolId ?? '')
 
   const invoices = invoiceData?.items ?? []
+
+  // KPI values derived from invoice data
+  const kpi = useMemo(() => {
+    const totalInvoiced = invoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0)
+    const totalCollected = invoices.reduce((sum, inv) => sum + (inv.amountPaid || 0), 0)
+    const outstanding = invoices
+      .filter((inv) => inv.status !== 'cancelled' && inv.status !== 'paid')
+      .reduce((sum, inv) => sum + (inv.amountDue || 0), 0)
+    const overdue = invoices
+      .filter((inv) => inv.status === 'overdue')
+      .reduce((sum, inv) => sum + (inv.amountDue || 0), 0)
+    const overdueCount = invoices.filter((inv) => inv.status === 'overdue').length
+    const draftCount = invoices.filter((inv) => inv.status === 'draft').length
+    const paidCount = invoices.filter((inv) => inv.status === 'paid').length
+    const collectionRate = totalInvoiced > 0 ? (totalCollected / totalInvoiced) * 100 : 0
+    return { totalInvoiced, totalCollected, outstanding, overdue, overdueCount, draftCount, paidCount, collectionRate }
+  }, [invoices])
 
   // Selected draft invoice IDs for bulk issue
   const selectedDraftIds = useMemo(() => {
@@ -197,7 +224,7 @@ export default function InvoicesPage() {
       {
         accessorKey: 'status',
         header: 'Status',
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => <FinanceStatusChip status={row.original.status} />,
         meta: { align: 'center' as const },
         enableSorting: true,
       },
@@ -260,33 +287,125 @@ export default function InvoicesPage() {
     )
   }
 
+  const STATUS_FILTER_OPTIONS = [
+    { label: 'All', value: '' },
+    { label: 'Draft', value: 'draft' },
+    { label: 'Issued', value: 'issued' },
+    { label: 'Partial', value: 'partially_paid' },
+    { label: 'Paid', value: 'paid' },
+    { label: 'Overdue', value: 'overdue' },
+    { label: 'Cancelled', value: 'cancelled' },
+  ]
+
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Invoices</h1>
-          <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-            Generate, issue, and manage student invoices.
-          </p>
+    <div data-v2 className="p-6 space-y-5">
+      {/* V2 Page Header */}
+      <FinancePageHeader
+        icon={FileText}
+        title="Invoices"
+        subtitle="Generate, issue, and manage student invoices."
+        accentColor="rgba(239, 159, 39, 0.12)"
+        iconColor="#EF9F27"
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate({ to: '/invoices/bulk-generate' as string })}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80"
+              style={{
+                background: 'var(--v2-bg-elevated)',
+                borderColor: 'var(--v2-border-default)',
+                color: 'var(--v2-text-secondary)',
+              }}
+            >
+              <Users className="w-3.5 h-3.5" />
+              Bulk Generate
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowGenerateForm(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
+              style={{
+                background: 'var(--v2-brand-primary)',
+                color: '#fff',
+              }}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Generate Invoice
+            </button>
+          </div>
+        }
+      />
+
+      {/* Overdue Info Banner */}
+      {!isLoading && kpi.overdueCount > 0 && (
+        <FinanceInfoBanner
+          variant="danger"
+          message={`${kpi.overdueCount} invoice${kpi.overdueCount !== 1 ? 's' : ''} overdue — ${formatNPRCompact(kpi.overdue)} uncollected`}
+          subtitle={`Collection rate is ${kpi.collectionRate.toFixed(1)}%.${kpi.draftCount > 0 ? ` ${kpi.draftCount} drafts need to be issued.` : ''}`}
+        />
+      )}
+
+      {/* KPI Grid */}
+      <WidgetErrorBoundaryV2>
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Total Invoiced"
+            value={formatNPRCompact(kpi.totalInvoiced)}
+            icon={DollarSign}
+            accentColor="rgba(55, 138, 221, 0.12)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            tag={{ text: `${invoices.length} invoices`, color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Collected"
+            value={formatNPRCompact(kpi.totalCollected)}
+            icon={TrendingUp}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            tag={{ text: `${kpi.paidCount} paid`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            loading={isLoading}
+            valueColor="#1D9E75"
+          />
+          <StatCard
+            label="Outstanding"
+            value={formatNPRCompact(kpi.outstanding)}
+            icon={Receipt}
+            accentColor="rgba(239, 159, 39, 0.12)"
+            iconColor="#EF9F27"
+            barColor="#EF9F27"
+            tag={{ text: `${invoices.filter(i => i.status !== 'paid' && i.status !== 'cancelled').length} awaiting`, color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Overdue"
+            value={formatNPRCompact(kpi.overdue)}
+            icon={AlertTriangle}
+            accentColor="rgba(226, 75, 74, 0.12)"
+            iconColor="#E24B4A"
+            barColor="#E24B4A"
+            tag={{ text: `${kpi.overdueCount} invoices`, color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
+            loading={isLoading}
+          />
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: '/invoices/bulk-generate' as string })}
-          >
-            <Users className="w-4 h-4 mr-1.5" />
-            Bulk Generate
-          </Button>
-          <Button onClick={() => setShowGenerateForm(true)}>
-            <Plus className="w-4 h-4 mr-1.5" />
-            Generate Invoice
-          </Button>
-        </div>
+      </WidgetErrorBoundaryV2>
+
+      {/* Filter Chips */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <FinanceFilterChips
+          options={STATUS_FILTER_OPTIONS}
+          value={statusFilter}
+          onChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
+          accentColor="#EF9F27"
+        />
       </div>
 
       {/* DataTable */}
       <TanstackDataTable<Invoice>
+        className="min-h-[400px]"
         columns={columns}
         data={invoices}
         getRowId={(row) => row.id}
@@ -297,21 +416,6 @@ export default function InvoicesPage() {
         enableSorting={true}
         pagination={{ pageSize: 20 }}
         searchPlaceholder="Search by invoice # or student..."
-        toolbarExtra={
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as InvoiceStatusFilter)}
-            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-          >
-            <option value="">All Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="issued">Issued</option>
-            <option value="partially_paid">Partially Paid</option>
-            <option value="paid">Paid</option>
-            <option value="overdue">Overdue</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        }
         bulkActions={[
           {
             label: `Issue Selected (${selectedDraftIds.length})`,
@@ -330,7 +434,7 @@ export default function InvoicesPage() {
             onClick: () => setShowGenerateForm(true),
           },
         }}
-        maxHeight="calc(100vh - 15rem)"
+        maxHeight="calc(100vh - 32rem)"
       />
 
       {/* Generate Invoice Modal */}

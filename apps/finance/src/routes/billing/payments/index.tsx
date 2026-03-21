@@ -9,7 +9,13 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { Button, TanstackDataTable, createActionsColumn } from '@edforge/ui'
+import {
+  Button,
+  TanstackDataTable,
+  createActionsColumn,
+  StatCard,
+  WidgetErrorBoundaryV2,
+} from '@edforge/ui'
 import type { ColumnDef } from '@edforge/ui'
 import {
   Loader2,
@@ -19,9 +25,9 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
-  Download,
-  MoreVertical,
-  Banknote,
+  DollarSign,
+  TrendingUp,
+  Receipt,
 } from 'lucide-react'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -30,10 +36,14 @@ import {
   useCreateRefund,
   useExportPaymentsCsv,
 } from '@edforge/finance-services'
-import { formatNPR } from '@edforge/types'
+import { formatNPR, formatNPRCompact, formatGatewayLabel } from '@edforge/types'
 import type { Payment } from '@edforge/types'
-import { formatDate } from '../../../utils/format-date'
-import { StatusBadge } from '../../../components/StatusBadge'
+import { formatDate, formatDateDual } from '../../../utils/format-date'
+import {
+  FinancePageHeader,
+  FinanceStatusChip,
+  ExportCsvButton,
+} from '../../../components/shared'
 
 // ============================================================================
 // STYLED DIALOG COMPONENTS
@@ -450,8 +460,8 @@ function usePaymentColumns(
         accessorKey: 'gateway',
         header: 'Gateway',
         cell: ({ row }) => (
-          <span className="text-[rgb(var(--text-secondary))] capitalize">
-            {row.original.gateway.replace('_', ' ')}
+          <span className="text-[rgb(var(--text-secondary))]">
+            {formatGatewayLabel(row.original.gateway)}
           </span>
         ),
         enableSorting: false,
@@ -459,7 +469,7 @@ function usePaymentColumns(
       {
         accessorKey: 'status',
         header: 'Status',
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => <FinanceStatusChip status={row.original.status} />,
         meta: { align: 'center' as const },
         enableSorting: false,
       },
@@ -470,9 +480,9 @@ function usePaymentColumns(
         cell: ({ row }) => (
           <span className="text-[rgb(var(--text-secondary))]">
             {row.original.paidAt
-              ? formatDate(row.original.paidAt)
+              ? formatDateDual(row.original.paidAt)
               : row.original.createdAt
-                ? formatDate(row.original.createdAt)
+                ? formatDateDual(row.original.createdAt)
                 : '-'}
           </span>
         ),
@@ -527,6 +537,29 @@ function usePaymentColumns(
 }
 
 // ============================================================================
+// FILTER OPTIONS
+// ============================================================================
+
+const STATUS_OPTIONS = [
+  { label: 'All', value: '' },
+  { label: 'Completed', value: 'completed' },
+  { label: 'Failed', value: 'failed' },
+  { label: 'Cancelled', value: 'cancelled' },
+  { label: 'Refunded', value: 'refunded' },
+  { label: 'Pending', value: 'pending' },
+]
+
+const GATEWAY_OPTIONS = [
+  { label: 'All', value: '' },
+  { label: 'Cash', value: 'cash' },
+  { label: 'Bank Transfer', value: 'bank_transfer' },
+  { label: 'Cheque', value: 'cheque' },
+  { label: 'eSewa', value: 'esewa' },
+  { label: 'Khalti', value: 'khalti' },
+  { label: 'FonePay', value: 'fonepay' },
+]
+
+// ============================================================================
 // MAIN PAGE
 // ============================================================================
 
@@ -536,7 +569,6 @@ export default function PaymentsPage() {
 
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
-  const [actionsOpen, setActionsOpen] = useState(false)
 
   // Dialog state: which payment is being voided or refunded
   const [voidTarget, setVoidTarget] = useState<Payment | null>(null)
@@ -551,6 +583,17 @@ export default function PaymentsPage() {
   const exportCsvMutation = useExportPaymentsCsv()
 
   const paymentList = Array.isArray(payments) ? payments : []
+
+  // KPI computation
+  const kpi = useMemo(() => {
+    const totalCollected = paymentList
+      .filter((p) => p.status === 'completed')
+      .reduce((sum, p) => sum + p.amount, 0)
+    const completedCount = paymentList.filter((p) => p.status === 'completed').length
+    const partialRefundCount = paymentList.filter((p) => p.status === 'partially_refunded').length
+    const cancelledCount = paymentList.filter((p) => p.status === 'cancelled').length
+    return { totalCollected, completedCount, partialRefundCount, cancelledCount }
+  }, [paymentList])
 
   // Void handler: opens dialog instead of window.confirm()
   const handleVoidClick = useCallback((payment: Payment) => {
@@ -605,71 +648,104 @@ export default function PaymentsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div data-v2 className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Payments</h1>
-          <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-            View and manage all payment transactions.
-          </p>
-        </div>
-        <div className="relative">
+      <FinancePageHeader
+        icon={CreditCard}
+        title="Payments"
+        subtitle="View and manage all payment transactions."
+        accentColor="rgba(29, 158, 117, 0.12)"
+        iconColor="#1D9E75"
+        actions={
           <button
             type="button"
-            onClick={() => setActionsOpen(!actionsOpen)}
-            className="p-2 rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
-            aria-label="Actions"
+            onClick={() => navigate({ to: '/payments/record' as string })}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
+            style={{
+              background: 'var(--v2-brand-primary)',
+              color: '#fff',
+            }}
           >
-            <MoreVertical className="w-5 h-5" />
+            Record Payment
           </button>
+        }
+      />
 
-          {actionsOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setActionsOpen(false)}
-              />
-              <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActionsOpen(false)
-                    navigate({ to: '/payments/record' as string })
-                  }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
-                >
-                  <Banknote className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                  Record Payment
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActionsOpen(false)
-                    if (!schoolId) return
-                    exportCsvMutation.mutate(schoolId, {
-                      onSuccess: () => toast.success('Payments CSV exported'),
-                      onError: () => toast.error('Failed to export payments CSV'),
-                    })
-                  }}
-                  disabled={exportCsvMutation.isPending}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors disabled:opacity-50"
-                >
-                  {exportCsvMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 text-[rgb(var(--text-tertiary))] animate-spin" />
-                  ) : (
-                    <Download className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                  )}
-                  Export Data
-                </button>
-              </div>
-            </>
-          )}
+      {/* KPI Tiles */}
+      <WidgetErrorBoundaryV2>
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Total Collected"
+            value={formatNPRCompact(kpi.totalCollected)}
+            icon={DollarSign}
+            accentColor="rgba(29, 158, 117, 0.12)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            tag={{ text: `${paymentList.length} payments`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            loading={isLoading}
+            valueColor="#1D9E75"
+          />
+          <StatCard
+            label="Completed"
+            value={String(kpi.completedCount)}
+            icon={TrendingUp}
+            accentColor="rgba(55, 138, 221, 0.12)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            tag={{ text: 'processed', color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Partial Refunds"
+            value={String(kpi.partialRefundCount)}
+            icon={Receipt}
+            accentColor="rgba(239, 159, 39, 0.12)"
+            iconColor="#EF9F27"
+            barColor="#EF9F27"
+            tag={{ text: 'pending', color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Cancelled"
+            value={String(kpi.cancelledCount)}
+            icon={AlertTriangle}
+            accentColor="rgba(128, 128, 128, 0.12)"
+            iconColor="var(--v2-text-hint)"
+            barColor="var(--v2-text-hint)"
+            loading={isLoading}
+          />
         </div>
+      </WidgetErrorBoundaryV2>
+
+      {/* Filter Strip */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-3 flex-wrap">
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            {STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <select value={gatewayFilter} onChange={(e) => setGatewayFilter(e.target.value)}>
+            {GATEWAY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <ExportCsvButton
+          onClick={() => {
+            if (!schoolId) return
+            exportCsvMutation.mutate(schoolId, {
+              onSuccess: () => toast.success('Payments CSV exported'),
+              onError: () => toast.error('Failed to export payments CSV'),
+            })
+          }}
+          isExporting={exportCsvMutation.isPending}
+        />
       </div>
 
       {/* Data Table */}
       <TanstackDataTable<Payment>
+        className="min-h-[400px]"
         columns={columns}
         data={paymentList}
         getRowId={(row) => row.id}
@@ -677,36 +753,6 @@ export default function PaymentsPage() {
         enableSorting
         pagination={{ pageSize: 20 }}
         searchPlaceholder="Search by receipt #, invoice #, or student..."
-        toolbarExtra={
-          <div className="flex items-center gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-            >
-              <option value="">All Statuses</option>
-              <option value="completed">Completed</option>
-              <option value="failed">Failed</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="refunded">Refunded</option>
-              <option value="pending">Pending</option>
-            </select>
-            <select
-              value={gatewayFilter}
-              onChange={(e) => setGatewayFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
-            >
-              <option value="">All Gateways</option>
-              <option value="esewa">eSewa</option>
-              <option value="khalti">Khalti</option>
-              <option value="fonepay">FonePay</option>
-              <option value="connectips">ConnectIPS</option>
-              <option value="cash">Cash</option>
-              <option value="bank_transfer">Bank Transfer</option>
-              <option value="cheque">Cheque</option>
-            </select>
-          </div>
-        }
         emptyState={{
           icon: <CreditCard className="w-10 h-10" />,
           title: 'No payments found',
@@ -716,7 +762,7 @@ export default function PaymentsPage() {
             onClick: () => navigate({ to: '/payments/record' as string }),
           },
         }}
-        maxHeight="calc(100vh - 15rem)"
+        maxHeight="calc(100vh - 32rem)"
       />
 
       {/* Void Payment Dialog */}

@@ -92,6 +92,43 @@
 }
 
 /* ============================================================================
+ * V2 LEGACY TOKEN REMAPPING
+ *
+ * The shared DataTable component uses legacy theme tokens (--surface-secondary,
+ * --surface-tertiary, etc.) which resolve to teal-green in dark mode. Remap
+ * them to V2 neutrals when inside [data-v2] pages so tables match the V2
+ * design system without modifying the shared component.
+ * ============================================================================ */
+
+[data-v2] {
+  /* Surface tokens → V2 neutrals */
+  --surface-secondary: 22 27 39;     /* #161b27 = --v2-bg-surface */
+  --surface-tertiary: 30 36 54;      /* #1e2436 = --v2-bg-elevated */
+
+  /* Border tokens — DataTable uses these at reduced opacity (/0.3, /0.5, /0.7) */
+  --border-primary: 255 255 255;
+  --border-secondary: 255 255 255;
+
+  /* Brand token — DataTable uses for hover state */
+  --brand-primary: 29 158 117;       /* #1D9E75 */
+
+  /* Text tokens used by DataTable */
+  --text-primary: 232 234 240;       /* #e8eaf0 */
+  --text-secondary: 200 204 216;     /* #c8ccd8 */
+  --text-tertiary: 122 128 153;      /* #7a8099 */
+}
+
+/* V2 table row height — comfortable 52px rows */
+[data-v2] table td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+[data-v2] table th {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+/* ============================================================================
  * V2 FORM INPUT OVERRIDES (Task 3f — scoped under [data-v2])
  * ============================================================================ */
 
@@ -146,6 +183,18 @@
 /* ============================================================================
  * LIGHT THEME OVERRIDES
  * ============================================================================ */
+
+/* Light mode legacy token remapping */
+:root:not(.dark) [data-v2] {
+  --surface-secondary: 255 255 255;
+  --surface-tertiary: 240 242 245;
+  --border-primary: 224 228 236;
+  --border-secondary: 224 228 236;
+  --brand-primary: 29 158 117;
+  --text-primary: 26 31 46;
+  --text-secondary: 55 65 81;
+  --text-tertiary: 107 114 128;
+}
 
 :root:not(.dark) [data-page="home-v2"],
 :root:not(.dark) [data-v2] {

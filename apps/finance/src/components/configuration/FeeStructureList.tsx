@@ -6,29 +6,17 @@
  */
 
 import type { FeeStructure } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { formatNPRCompact, formatGradeLabel, gradeSort } from '@edforge/types'
 import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
-import { Pencil, Trash2, GraduationCap, DollarSign } from 'lucide-react'
+import { Pencil, Trash2, Layers } from 'lucide-react'
 import { useMemo } from 'react'
+import { FeeTypeChip } from '../shared'
 
 interface FeeStructureListProps {
   feeStructures: FeeStructure[]
   isLoading?: boolean
   onEdit: (fee: FeeStructure) => void
   onDelete: (fee: FeeStructure) => void
-}
-
-const FEE_TYPE_LABELS: Record<string, string> = {
-  tuition: 'Tuition',
-  admission: 'Admission',
-  exam: 'Exam',
-  transport: 'Transport',
-  library: 'Library',
-  lab: 'Lab',
-  hostel: 'Hostel',
-  uniform: 'Uniform',
-  miscellaneous: 'Miscellaneous',
-  custom: 'Custom',
 }
 
 const FREQUENCY_LABELS: Record<string, string> = {
@@ -54,18 +42,23 @@ export function FeeStructureList({
         cell: ({ row }) => {
           const fee = row.original
           return (
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-[rgb(var(--text-primary))]">{fee.name}</span>
-                {!fee.isActive && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-500/20 text-slate-500">
-                    Inactive
-                  </span>
-                )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: fee.isActive !== false ? '#1D9E75' : 'var(--v2-text-ghost, #2a3045)',
+                  flexShrink: 0, display: 'inline-block'
+                }} />
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--v2-text-primary, #e8eaf0)' }}>
+                  {fee.name}
+                </span>
               </div>
-              {fee.description && (
-                <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{fee.description}</p>
-              )}
+              <span style={{ fontSize: '10px', color: 'var(--v2-text-hint, #4a5068)' }}>
+                {fee.description}
+                {fee.autoApplyOnEnrollment && (
+                  <> · <span style={{ color: '#1D9E75' }}>Auto-apply on enrollment</span></>
+                )}
+              </span>
             </div>
           )
         },
@@ -74,9 +67,7 @@ export function FeeStructureList({
         accessorKey: 'feeType',
         header: 'Type',
         cell: ({ row }) => (
-          <span className="text-[rgb(var(--text-secondary))]">
-            {FEE_TYPE_LABELS[row.original.feeType] ?? row.original.feeType}
-          </span>
+          <FeeTypeChip type={row.original.feeType} />
         ),
       },
       {
@@ -86,14 +77,14 @@ export function FeeStructureList({
         cell: ({ row }) => {
           const fee = row.original
           return (
-            <span className="font-medium text-[rgb(var(--text-primary))]">
-              {formatNPR(fee.amount)}
-              {fee.taxRate > 0 && (
-                <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">
-                  +{fee.taxRate}% {fee.taxType}
-                </span>
-              )}
-            </span>
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--v2-text-primary, #e8eaf0)' }}>
+                {formatNPRCompact(fee.amount)}
+              </span>
+              <span style={{ fontSize: '9px', color: 'var(--v2-text-ghost, #2a3045)' }}>
+                NPR · {fee.frequency?.replace(/_/g, ' ').toLowerCase() ?? ''}
+              </span>
+            </div>
           )
         },
       },
@@ -114,19 +105,27 @@ export function FeeStructureList({
           const gradeLevels = row.original.gradeLevels ?? []
           if (gradeLevels.length === 0) {
             return (
-              <span className="text-xs text-[rgb(var(--text-tertiary))]">All Grades</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                <span style={{
+                  background: 'rgba(29,158,117,0.08)',
+                  color: '#1D9E75',
+                  border: '1px solid rgba(29,158,117,0.15)',
+                  fontSize: '10px', fontWeight: 500,
+                  padding: '1px 6px', borderRadius: 5
+                }}>All Grades</span>
+              </div>
             )
           }
           return (
-            <div className="flex flex-wrap gap-1">
-              {gradeLevels.map((grade) => (
-                <span
-                  key={grade}
-                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
-                >
-                  <GraduationCap className="w-2.5 h-2.5 mr-0.5" />
-                  {grade}
-                </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+              {[...gradeLevels].sort(gradeSort).map((g) => (
+                <span key={g} style={{
+                  background: 'rgba(55,138,221,0.08)',
+                  color: '#378ADD',
+                  border: '1px solid rgba(55,138,221,0.15)',
+                  fontSize: '10px', fontWeight: 500,
+                  padding: '1px 6px', borderRadius: 5
+                }}>{formatGradeLabel(g)}</span>
               ))}
             </div>
           )
@@ -165,12 +164,13 @@ export function FeeStructureList({
       isLoading={isLoading}
       enableSorting={true}
       pagination={{ pageSize: 10 }}
-      maxHeight="calc(100vh - 15rem)"
+      maxHeight="calc(100vh - 32rem)"
       emptyState={{
-        icon: <DollarSign className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
+        icon: <Layers className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
         title: 'No fee structures configured',
         description: 'Add fee structures to start generating invoices.',
       }}
+      className="min-h-[400px]"
     />
   )
 }
