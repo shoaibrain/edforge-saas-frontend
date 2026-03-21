@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EdForge — People & HR · Overview</title>
+<style>
+  :root {
+    --bg-app: #0f1117;
+    --bg-surface: #161b27;
+    --bg-elevated: #1e2436;
+    --text-primary: #e8eaf0;
+    --text-secondary: #c8ccd8;
+    --text-muted: #7a8099;
+    --text-hint: #4a5068;
+    --text-ghost: #2a3045;
+    --color-success: #1D9E75;
+    --color-info: #378ADD;
+    --color-warning: #EF9F27;
+    --color-danger: #E24B4A;
+    --border-default: rgba(255,255,255,0.06);
+    --border-secondary: rgba(255,255,255,0.09);
+    --font-mono: 'SF Mono', 'Fira Code', monospace;
+    --accent-people: #D85A30;
+    --accent-people-bg: rgba(216,90,48,0.10);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg-app); color: var(--text-primary); font-size: 13px;
+    min-height: 100vh; display: grid;
+    grid-template-columns: 210px 1fr; grid-template-rows: 48px 1fr;
+  }
+  /* TOPBAR */
+  .topbar { grid-column:1/-1; grid-row:1; background:var(--bg-surface); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 16px 0 0; z-index:50; }
+  .topbar-brand { width:210px; display:flex; align-items:center; gap:10px; padding:0 16px; border-right:1px solid var(--border-default); height:100%; }
+  .brand-avatar { width:28px; height:28px; background:linear-gradient(135deg,#1D9E75,#378ADD); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; }
+  .brand-info { display:flex; flex-direction:column; }
+  .brand-name { font-size:11px; font-weight:600; color:var(--text-primary); line-height:1.2; }
+  .brand-code { font-size:9px; color:var(--text-hint); font-family:var(--font-mono); }
+  .topbar-breadcrumb { flex:1; display:flex; align-items:center; gap:6px; padding:0 20px; font-size:12px; color:var(--text-hint); }
+  .topbar-breadcrumb a { color:var(--text-hint); text-decoration:none; }
+  .topbar-breadcrumb .sep { color:var(--text-ghost); }
+  .topbar-breadcrumb .current { color:var(--text-secondary); font-weight:500; }
+  .topbar-actions { display:flex; align-items:center; gap:10px; }
+  .theme-toggle { display:flex; background:rgba(255,255,255,0.04); border:1px solid var(--border-default); border-radius:7px; overflow:hidden; }
+  .theme-btn { padding:4px 10px; font-size:10px; font-weight:500; color:var(--text-hint); border:none; background:transparent; cursor:pointer; }
+  .theme-btn.active { background:rgba(255,255,255,0.07); color:var(--text-secondary); }
+  .topbar-icon-btn { width:30px; height:30px; background:transparent; border:1px solid var(--border-default); border-radius:7px; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .topbar-avatar { width:30px; height:30px; background:linear-gradient(135deg,#7F77DD,#378ADD); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:white; cursor:pointer; }
+  /* SIDEBAR */
+  .sidebar { grid-column:1; grid-row:2; background:var(--bg-surface); border-right:1px solid var(--border-default); padding:12px 8px; display:flex; flex-direction:column; gap:2px; z-index:40; overflow-y:auto; }
+  .nav-back { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:6px; color:var(--text-hint); font-size:11px; cursor:pointer; margin-bottom:8px; text-decoration:none; }
+  .nav-back:hover { background:rgba(255,255,255,0.04); }
+  .nav-section-label { font-size:9px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-ghost); padding:8px 10px 4px; }
+  .nav-item { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:7px; color:var(--text-hint); font-size:12px; font-weight:500; cursor:pointer; text-decoration:none; transition:all 0.12s; }
+  .nav-item:hover { background:rgba(255,255,255,0.04); color:var(--text-secondary); }
+  .nav-item.active { background:var(--accent-people-bg); color:var(--accent-people); }
+  /* CONTENT */
+  .content-pane { grid-column:2; grid-row:2; padding:24px 28px; overflow-y:auto; }
+  /* PAGE HEADER */
+  .page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .page-header-left { display:flex; align-items:center; gap:12px; }
+  .module-icon { width:32px; height:32px; background:var(--accent-people-bg); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .page-title-row { display:flex; align-items:baseline; gap:10px; }
+  .page-title { font-size:18px; font-weight:600; letter-spacing:-0.3px; }
+  .page-date-sep { width:1px; height:14px; background:var(--border-secondary); align-self:center; }
+  .page-date { font-size:12px; color:var(--text-muted); }
+  .header-actions { display:flex; align-items:center; gap:8px; }
+  .btn-primary { height:36px; background:#1D9E75; border:none; border-radius:8px; padding:0 14px; font-size:11px; font-weight:500; color:white; cursor:pointer; display:flex; align-items:center; gap:5px; transition:opacity 0.12s; }
+  .btn-primary:hover { opacity:0.88; }
+  .btn-secondary { height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:8px; padding:0 14px; font-size:11px; font-weight:500; color:#9aa0b8; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.12s; }
+  .btn-secondary:hover { background:rgba(255,255,255,0.07); }
+  /* CONTEXT BANNER */
+  .context-banner { font-size:11px; color:var(--text-muted); margin-bottom:18px; }
+  .context-banner em { font-style:normal; font-weight:500; color:var(--accent-people); }
+  .cb-teal { color:var(--color-success); font-style:normal; font-weight:500; }
+  .cb-blue { color:var(--color-info); font-style:normal; font-weight:500; }
+  /* KPI */
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+  .kpi-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:10px; padding:14px 16px; position:relative; overflow:hidden; transition:border-color 0.12s; }
+  .kpi-card:hover { border-color:rgba(255,255,255,0.12); }
+  .kpi-accent-bar { position:absolute; bottom:0; left:0; right:0; height:2px; }
+  .kpi-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .kpi-label { font-size:9px; font-weight:700; color:var(--text-ghost); text-transform:uppercase; letter-spacing:0.5px; }
+  .kpi-icon { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; }
+  .kpi-value { font-size:22px; font-weight:600; letter-spacing:-0.5px; line-height:1; margin-bottom:8px; }
+  .kpi-tag { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:500; padding:2px 6px; border-radius:5px; }
+  /* TWO-COL SECTION */
+  .section-two-col { display:grid; grid-template-columns:1.6fr 1fr; gap:12px; margin-bottom:12px; }
+  /* CARDS */
+  .data-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:10px; overflow:hidden; }
+  .data-card-header { padding:12px 14px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+  .data-card-title { font-size:12px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+  .data-card-icon { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; }
+  .data-card-link { font-size:11px; color:var(--accent-people); text-decoration:none; display:flex; align-items:center; gap:3px; font-weight:500; }
+  .data-card-link:hover { opacity:0.8; }
+  .data-card-body { padding:10px 14px; }
+  /* STAFF ROSTER ROWS */
+  .staff-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .staff-row:last-child { border-bottom:none; }
+  .staff-avatar { width:32px; height:32px; border-radius:50%; flex-shrink:0; overflow:hidden; }
+  .staff-avatar img { width:100%; height:100%; object-fit:cover; }
+  .staff-avatar-placeholder { width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; }
+  .staff-info { flex:1; min-width:0; }
+  .staff-name { font-size:12px; font-weight:500; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .staff-sub { font-size:10px; color:var(--text-ghost); }
+  .staff-meta { display:flex; align-items:center; gap:6px; }
+  .role-chip { font-size:10px; font-weight:500; padding:2px 8px; border-radius:7px; white-space:nowrap; }
+  .role-teacher { background:rgba(29,158,117,0.10); color:#1D9E75; }
+  .role-principal { background:rgba(127,119,221,0.10); color:#7F77DD; }
+  .role-admin { background:rgba(55,138,221,0.10); color:#378ADD; }
+  .role-support { background:rgba(216,90,48,0.10); color:#D85A30; }
+  .access-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .access-dot.active { background:#1D9E75; }
+  .access-dot.inactive { background:var(--text-hint); }
+  /* EMPLOYMENT BARS */
+  .bar-section { padding:10px 14px; }
+  .bar-section-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-ghost); margin-bottom:8px; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .bar-row:last-child { margin-bottom:0; }
+  .bar-label { font-size:11px; color:var(--text-muted); width:68px; flex-shrink:0; }
+  .bar-track { flex:1; height:5px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:3px; transition:width 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .bar-pct { font-size:10px; color:var(--text-hint); width:32px; text-align:right; }
+  .bar-divider { height:1px; background:rgba(255,255,255,0.05); margin:10px 0; }
+  /* THREE-COL SECTION */
+  .section-three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  /* ACTIVITY FEED */
+  .activity-item { display:flex; align-items:flex-start; gap:8px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .activity-item:last-child { border-bottom:none; }
+  .activity-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .activity-text { font-size:11px; color:var(--text-secondary); line-height:1.5; flex:1; }
+  .activity-time { font-size:9px; color:var(--text-ghost); white-space:nowrap; margin-top:2px; }
+  /* QUICK ACTION CARDS */
+  .quick-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px; cursor:pointer; transition:border-color 0.12s; }
+  .quick-card:hover { border-color:rgba(255,255,255,0.12); }
+  .quick-card-header { display:flex; align-items:center; justify-content:space-between; }
+  .quick-card-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+  .quick-card-arrow { color:var(--text-ghost); }
+  .quick-card-title { font-size:12px; font-weight:600; color:var(--text-primary); }
+  .quick-card-desc { font-size:10px; color:var(--text-muted); line-height:1.5; }
+  .quick-card-badge { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:500; padding:2px 6px; border-radius:4px; background:rgba(239,159,39,0.12); color:#EF9F27; width:fit-content; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-avatar">EF</div>
+    <div class="brand-info"><span class="brand-name">Westfield High</span><span class="brand-code">WHS-88201</span></div>
+  </div>
+  <div class="topbar-breadcrumb"><a href="#">Home</a><span class="sep">›</span><a href="#">People</a><span class="sep">›</span><span class="current">Overview</span></div>
+  <div class="topbar-actions">
+    <div class="theme-toggle"><button class="theme-btn">Light</button><button class="theme-btn active">Dark</button></div>
+    <button class="topbar-icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <div class="topbar-avatar">SR</div>
+  </div>
+</header>
+<aside class="sidebar">
+  <a class="nav-back" href="#"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Home</a>
+  <div class="nav-section-label">People</div>
+  <a class="nav-item active" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Overview
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Staff Directory
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>HR Admin
+  </a>
+</aside>
+<main class="content-pane">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="module-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div>
+        <div class="page-title-row">
+          <h1 class="page-title">People & HR</h1>
+          <div class="page-date-sep"></div>
+          <span class="page-date">Mar 20, 2026</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Staff Directory
+      </button>
+      <button class="btn-primary">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Add Staff Member
+      </button>
+    </div>
+  </div>
+  <!-- CONTEXT BANNER -->
+  <p class="context-banner">
+    <em>3 staff members</em> · <span class="cb-teal">2 teachers</span> · <span style="color:#7F77DD;font-style:normal;font-weight:500;">1 principal</span> · <span class="cb-blue">2 with system access enabled</span>
+  </p>
+  <!-- KPI TILES -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Total Staff</span>
+        <div class="kpi-icon" style="background:rgba(216,90,48,0.10)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      </div>
+      <div class="kpi-value" style="color:#D85A30">3</div>
+      <span class="kpi-tag" style="background:rgba(216,90,48,0.10);color:#D85A30">+1 this month</span>
+      <div class="kpi-accent-bar" style="background:#D85A30"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Active Teachers</span>
+        <div class="kpi-icon" style="background:rgba(29,158,117,0.10)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      </div>
+      <div class="kpi-value" style="color:#1D9E75">2</div>
+      <span class="kpi-tag" style="background:rgba(29,158,117,0.10);color:#1D9E75">full-time + contract</span>
+      <div class="kpi-accent-bar" style="background:#1D9E75"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Support Staff</span>
+        <div class="kpi-icon" style="background:rgba(255,255,255,0.06)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+      </div>
+      <div class="kpi-value" style="color:var(--text-hint)">0</div>
+      <span class="kpi-tag" style="background:rgba(255,255,255,0.05);color:var(--text-hint)">none onboarded</span>
+      <div class="kpi-accent-bar" style="background:var(--text-ghost)"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">System Access</span>
+        <div class="kpi-icon" style="background:rgba(55,138,221,0.10)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      </div>
+      <div class="kpi-value" style="color:#378ADD">2</div>
+      <span class="kpi-tag" style="background:rgba(55,138,221,0.10);color:#378ADD">1 no access</span>
+      <div class="kpi-accent-bar" style="background:#378ADD"></div>
+    </div>
+  </div>
+  <!-- TWO-COL: Staff Roster + Employment Breakdown -->
+  <div class="section-two-col">
+    <!-- STAFF ROSTER -->
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-title">
+          <div class="data-card-icon" style="background:rgba(216,90,48,0.10)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          Staff roster
+        </div>
+        <a class="data-card-link" href="#">View directory <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+      </div>
+      <div class="data-card-body" style="padding:4px 14px 10px;">
+        <div class="staff-row">
+          <img class="staff-avatar" src="https://api.dicebear.com/9.x/adventurer/svg?seed=JohnSmith&backgroundColor=b6e3f4" style="background:#b6e3f4;" />
+          <div class="staff-info">
+            <div class="staff-name">John Smith</div>
+            <div class="staff-sub">teacher · john@snow.com</div>
+          </div>
+          <div class="staff-meta">
+            <span class="role-chip role-teacher">Teacher</span>
+            <div class="access-dot active" title="System Access Active"></div>
+          </div>
+        </div>
+        <div class="staff-row">
+          <img class="staff-avatar" src="https://api.dicebear.com/9.x/adventurer/svg?seed=LeoneWolf&backgroundColor=d1d4f9" style="background:#d1d4f9;" />
+          <div class="staff-info">
+            <div class="staff-name">Leone Wolf</div>
+            <div class="staff-sub">teacher · leon@yahoo.com</div>
+          </div>
+          <div class="staff-meta">
+            <span class="role-chip role-teacher">Teacher</span>
+            <div class="access-dot inactive" title="No System Access"></div>
+          </div>
+        </div>
+        <div class="staff-row">
+          <img class="staff-avatar" src="https://api.dicebear.com/9.x/adventurer/svg?seed=CerciLanester&backgroundColor=ffd5dc" style="background:#ffd5dc;" />
+          <div class="staff-info">
+            <div class="staff-name">Cerci Lanester</div>
+            <div class="staff-sub">principal · cerci@school.edu</div>
+          </div>
+          <div class="staff-meta">
+            <span class="role-chip role-principal">Principal</span>
+            <div class="access-dot active" title="System Access Active"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- EMPLOYMENT BREAKDOWN -->
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-title">
+          <div class="data-card-icon" style="background:rgba(55,138,221,0.10)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          Employment breakdown
+        </div>
+      </div>
+      <div class="bar-section">
+        <div class="bar-section-label">Employment type</div>
+        <div class="bar-row">
+          <span class="bar-label">Full-time</span>
+          <div class="bar-track"><div class="bar-fill" style="width:67%;background:#D85A30;"></div></div>
+          <span class="bar-pct">67%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Contract</span>
+          <div class="bar-track"><div class="bar-fill" style="width:33%;background:#EF9F27;"></div></div>
+          <span class="bar-pct">33%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Part-time</span>
+          <div class="bar-track"><div class="bar-fill" style="width:0%;background:#378ADD;"></div></div>
+          <span class="bar-pct">0%</span>
+        </div>
+        <div class="bar-divider"></div>
+        <div class="bar-section-label">By department</div>
+        <div class="bar-row">
+          <span class="bar-label">Mathematics</span>
+          <div class="bar-track"><div class="bar-fill" style="width:67%;background:#7F77DD;"></div></div>
+          <span class="bar-pct">2</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Science</span>
+          <div class="bar-track"><div class="bar-fill" style="width:33%;background:#378ADD;"></div></div>
+          <span class="bar-pct">1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- THREE-COL: Activity + Dir shortcut + HR shortcut -->
+  <div class="section-three-col">
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-title">
+          <div class="data-card-icon" style="background:rgba(239,159,39,0.10)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF9F27" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          Recent activity
+        </div>
+      </div>
+      <div class="data-card-body" style="padding:4px 14px 10px;">
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#1D9E75"></div>
+          <div style="flex:1;">
+            <div class="activity-text">John Smith account created and system access enabled</div>
+            <div class="activity-time">Feb 10, 2026 · 9:14 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#1D9E75"></div>
+          <div style="flex:1;">
+            <div class="activity-text">Leone Wolf onboarded as Teacher — no system access</div>
+            <div class="activity-time">Feb 10, 2026 · 9:22 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background:#7F77DD"></div>
+          <div style="flex:1;">
+            <div class="activity-text">Cerci Lanester added as Principal with full system access</div>
+            <div class="activity-time">Mar 15, 2026 · 2:05 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quick-card">
+      <div class="quick-card-header">
+        <div class="quick-card-icon" style="background:rgba(29,158,117,0.10)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <svg class="quick-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="quick-card-title">Staff Directory</div>
+      <div class="quick-card-desc">View, search and manage all staff members, roles and system access.</div>
+    </div>
+    <div class="quick-card">
+      <div class="quick-card-header">
+        <div class="quick-card-icon" style="background:rgba(127,119,221,0.10)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <svg class="quick-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="quick-card-title">HR Administration</div>
+      <div class="quick-card-desc">Payroll, performance reviews, contracts and professional development.</div>
+      <span class="quick-card-badge">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Coming in v2.0
+      </span>
+    </div>
+  </div>
+</main>
+</body>
+</html>
