@@ -1,140 +1,83 @@
 # Nepal MVP Validation Checklist
 
-**Purpose:** Human-readable checklist for QA engineers or pilot school admins to verify that Workspace Settings drive formatting across all modules.
-
-**Prerequisites:**
-- Two schools configured: one Nepal school (e.g., Pragati Sishu Sadhan) and one US school (e.g., Westfield High School)
-- At least 3 invoices and 3 payments exist for each school
-- User has TenantAdmin role
+**Purpose:** Manual QA checklist for validating the Nepal pilot school onboarding flow.
+Each item describes what to do, what to look for, and pass/fail criteria.
 
 ---
 
-## 1. Workspace Settings — Nepal Configuration
+## 1. Tenant Creation (AdminWeb)
 
-- [ ] Navigate to **Settings → Workspace Settings**
-- [ ] Set **Default Currency** to `NPR`
-- [ ] Set **Calendar System** to `Bikram Sambat`
-- [ ] Set **Show Bikram Sambat Dates** toggle to ON
-- [ ] Set **Default Timezone** to `Asia/Kathmandu`
-- [ ] Set **Number Format** to `South Asian (1,00,000)`
-- [ ] Set **Date Format** to `YYYY-MM-DD`
-- [ ] Set **Time Format** to `12-hour`
-- [ ] Click **Save** on the Regional Settings section
-- [ ] Verify success toast appears
-- [ ] Reload the page — all values should persist as set
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 1.1 | Open AdminWeb → Create Tenant | Country/Region dropdown is visible | |
+| 1.2 | Select "Nepal (NPL)" from country dropdown | Info alert shows: "Currency: NPR, Calendar: Bikram Sambat, Timezone: Asia/Kathmandu" | |
+| 1.3 | Fill name, email, tier → Submit | Tenant created successfully. Detail page shows Regional Settings card | |
+| 1.4 | Check TenantDetail Regional Settings card | Shows: NPR, Bikram Sambat, Asia/Kathmandu, ne-NP, South Asian | |
 
----
+## 2. Workspace Settings (Auto-seeded)
 
-## 2. Finance Overview — Nepal School
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 2.1 | `GET /api/tenants/{id}/settings` | Returns `defaultCurrency: "NPR"`, `defaultCalendarSystem: "bikram_sambat"`, `defaultTimezone: "Asia/Kathmandu"` | |
+| 2.2 | Check `workspaceConfirmedAt` field | Should be `null` (not yet confirmed) | |
 
-- [ ] Switch to the Nepal school (e.g., Pragati Sishu Sadhan)
-- [ ] Navigate to **Finance → Overview**
-- [ ] **KPI Tiles:** Verify amounts show NPR with lakh formatting (e.g., "NPR 4.9L", "NPR 1.6L")
-- [ ] **Billing Health card:** Amounts show NPR with South Asian grouping (e.g., "NPR 1,50,000")
-- [ ] **Collection Performance card:** Amounts show NPR
-- [ ] **Recent Payments card:** Amounts show NPR
-- [ ] **Recent Invoices card:** Amounts show NPR
-- [ ] **Overdue Alert Banner:** If visible, amount shows NPR
-- [ ] **Aging Report:** Amounts show NPR
+## 3. First Login & WorkspaceSetupGate
 
----
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 3.1 | Log in as TenantAdmin for the Nepal tenant | WorkspaceSetupGate appears — NOT the dashboard | |
+| 3.2 | Verify displayed settings | Currency: NPR, Calendar: Bikram Sambat, Timezone: Asia/Kathmandu, Number Format: South Asian | |
+| 3.3 | Try navigating to another page (e.g., /finance) | Gate still shows — it is non-dismissible | |
+| 3.4 | Click "Confirm & Start Using EdForge" | Gate disappears, dashboard loads | |
+| 3.5 | Reload the page | Gate does NOT reappear (localStorage + server cache) | |
+| 3.6 | Click "These look wrong — edit settings" instead | Navigates to /settings/workspace (gate allows this route) | |
 
-## 3. Finance Payments — Nepal School (Dual Dates + Timezone)
+## 4. School Creation (Inherits Settings)
 
-- [ ] Navigate to **Finance → Payments**
-- [ ] **Amount column:** All amounts show NPR (e.g., "NPR 10,000")
-- [ ] **Date column:** Shows dual format — Gregorian date with BS date below (e.g., "18/03/2026" with "BS: 2082/12/05")
-- [ ] **Timestamps:** Recent payments show Nepal Standard Time (NST), NOT browser local time
-  - Verify: a payment recorded at 2:00 PM NST should show "2:00 PM", not a different timezone offset
-- [ ] **No "Yesterday 7:00 PM" bug:** Timestamps should show correct times, not all the same time
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 4.1 | Settings → Organization → Create New School | School wizard opens | |
+| 4.2 | Check Location & Contact step → Regional Settings | Timezone: "Asia/Kathmandu" (pre-selected), Calendar: "Bikram Sambat" shown | |
+| 4.3 | Check inheritance indicator | "Inherited from organization settings" text visible below timezone | |
+| 4.4 | Create the school without changing regional defaults | School created with BS calendar and NST timezone | |
 
----
+## 5. Academic Year (BS Dates)
 
-## 4. Finance Invoices — Nepal School
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 5.1 | Settings → School → Academic Years → Create | Create Academic Year modal opens | |
+| 5.2 | BS date input is shown | Year/Month/Day fields with BS month names (Baisakh, Jestha, etc.) | |
+| 5.3 | Enter BS 2082 / Baisakh (1) / 1 | Gregorian equivalent shows: "Apr 14, 2025" | |
+| 5.4 | Academic year name auto-populates | Shows "2082-2083" or similar BS year range | |
+| 5.5 | Submit and check list | Academic year list shows "BS 2082/2083" as primary label | |
 
-- [ ] Navigate to **Finance → Invoices**
-- [ ] **Amount column:** All amounts show NPR
-- [ ] **Due Date column:** Shows dual AD + BS format
-- [ ] Click into an invoice detail → amounts show NPR, due date shows dual format
-- [ ] **Invoice line items:** Amounts in NPR with South Asian grouping
+## 6. Finance Module
 
----
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 6.1 | Navigate to Finance → Overview | KPI tiles render. Currency shown as NPR | |
+| 6.2 | Navigate to Finance → Payments | Date column shows DD/MM/YYYY format with "(BS: YYYY/MM/DD)" | |
+| 6.3 | Check timestamps (e.g., invoice created at) | Time shows in Asia/Kathmandu (NST, UTC+5:45) | |
+| 6.4 | New tenant, no schools → navigate to Finance | Empty state: "No schools configured" with link to Settings | |
 
-## 5. Finance Student Accounts — Nepal School
+## 7. People Module
 
-- [ ] Navigate to **Finance → Student Accounts**
-- [ ] **Balance column:** Shows NPR with South Asian grouping
-- [ ] **All amount fields:** NPR formatting throughout
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 7.1 | New tenant, no schools → navigate to People | Empty state: "No schools configured" with link to Settings | |
+| 7.2 | After creating school → navigate to People | Module renders normally | |
 
----
+## 8. US Tenant (Regression)
 
-## 6. Finance — Record a New Payment
-
-- [ ] Navigate to **Finance → Payments → Record Payment**
-- [ ] Verify the currency shown is NPR (not hardcoded)
-- [ ] Record a test payment → confirm it saves with NPR currency
-- [ ] Verify the new payment appears in the payments list with NPR formatting
-
----
-
-## 7. Academics — Nepal School
-
-- [ ] Switch to the Nepal school
-- [ ] Navigate to **Academics → Students**
-- [ ] **Enrollment dates:** Should show in BS format (e.g., "2082/12/05")
-- [ ] **Attendance dates:** Should show in BS format
-- [ ] Navigate to **Academics → Overview** → date references should use BS format
+| # | Action | Expected | Pass/Fail |
+|---|--------|----------|-----------|
+| 8.1 | Create a US tenant (country: USA) | Settings auto-seeded with USD, gregorian, America/New_York | |
+| 8.2 | Log in → WorkspaceSetupGate | Shows USD, Gregorian, US timezone | |
+| 8.3 | Create school | Calendar defaults to Gregorian, Mon-Fri school days | |
+| 8.4 | Finance module | Dates show MM/DD/YYYY, no BS secondary date, USD currency | |
 
 ---
 
-## 8. Settings Change — Switch to USD
-
-- [ ] Navigate to **Settings → Workspace Settings**
-- [ ] Change **Default Currency** to `USD`
-- [ ] Change **Calendar System** to `Gregorian`
-- [ ] Disable **Show Bikram Sambat Dates**
-- [ ] Change **Number Format** to `International (100,000)`
-- [ ] Save
-- [ ] Navigate to **Finance → Overview** → amounts should now show USD (e.g., "$490,000")
-- [ ] Navigate to **Finance → Payments** → amounts in USD, dates in Gregorian only (no BS line)
-- [ ] Navigate to **Finance → Invoices** → amounts in USD, dates in Gregorian only
-- [ ] This confirms settings are live and not cached
-
----
-
-## 9. US School Verification
-
-- [ ] Switch to the US school (e.g., Westfield High School)
-- [ ] Set workspace settings to: USD, Gregorian, dual dates OFF, America/Chicago timezone, International number format
-- [ ] Navigate to **Finance → Overview** → all amounts in USD with international grouping
-- [ ] Navigate to **Finance → Payments** → dates in Gregorian only, no BS dates shown
-- [ ] Navigate to **Finance → Invoices** → dates in Gregorian only
-- [ ] Timestamps should show Central Time (CST/CDT), not NST
-- [ ] Navigate to **Academics** → all dates in Gregorian
-
----
-
-## 10. Edge Cases
-
-- [ ] **Zero amounts:** "NPR 0" or "$0.00" should display correctly (not blank or NaN)
-- [ ] **Large amounts:** Values in crores (e.g., NPR 1,00,00,000) should display as "NPR 1.0Cr" in compact view
-- [ ] **Missing dates:** Invoices with no due date should show "—" (dash), not error
-- [ ] **Page reload:** After any settings change and save, a full page reload should show the new settings everywhere
-- [ ] **School switch:** Switching between Nepal and US schools should update all formatting without page reload
-
----
-
-## Sign-Off
-
-| Section | Tester | Date | Pass/Fail | Notes |
-|---------|--------|------|-----------|-------|
-| 1. Workspace Settings | | | | |
-| 2. Finance Overview (Nepal) | | | | |
-| 3. Finance Payments (Nepal) | | | | |
-| 4. Finance Invoices (Nepal) | | | | |
-| 5. Finance Accounts (Nepal) | | | | |
-| 6. Record Payment | | | | |
-| 7. Academics (Nepal) | | | | |
-| 8. Settings Change to USD | | | | |
-| 9. US School Verification | | | | |
-| 10. Edge Cases | | | | |
+**Completed by:** _______________
+**Date:** _______________
+**Result:** PASS / FAIL (if fail, list failing items)
