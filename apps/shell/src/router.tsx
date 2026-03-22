@@ -28,6 +28,8 @@ import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
 import { useLocaleEffect, useTranslation } from '@edforge/i18n'
+import { useWorkspaceSetupRequired } from './hooks/useWorkspaceSetupRequired'
+import { WorkspaceSetupGate } from './components/onboarding/WorkspaceSetupGate'
 
 // Landing Pages (public)
 import { PublicLayout } from './components/landing/PublicLayout'
@@ -154,6 +156,23 @@ function RootLayout() {
 // ============================================================================
 
 function ProtectedLayout() {
+  const { setupRequired, isLoading: setupLoading } = useWorkspaceSetupRequired()
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
+
+  // Allow /settings/workspace even when gate is active (edit escape hatch)
+  const isSettingsWorkspace = pathname.startsWith('/settings/workspace')
+
+  if (setupRequired && !isSettingsWorkspace && !setupLoading) {
+    return (
+      <AppShell>
+        <WorkspaceSetupGate onComplete={() => {
+          // Gate will unmount naturally after query invalidation
+          // since setupRequired will become false
+        }} />
+      </AppShell>
+    )
+  }
+
   return (
     <AppShell>
       <Outlet />

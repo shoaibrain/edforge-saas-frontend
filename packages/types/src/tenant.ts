@@ -160,6 +160,8 @@ export interface WorkspaceSettings {
   /** Lock status - prevents changes when academic year is active */
   isLocked: boolean
   lockReason?: string
+  /** Timestamp when admin confirmed workspace settings — null if never confirmed */
+  workspaceConfirmedAt?: string
   createdAt: string
   updatedAt: string
 }
