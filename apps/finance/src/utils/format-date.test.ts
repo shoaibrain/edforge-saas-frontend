@@ -25,17 +25,12 @@ describe('formatDate', () => {
     expect(result).toBe('18/03/2026')
   })
 
-  it('backward compat: no settings uses en-GB DD/MM/YYYY', () => {
-    const result = formatDate('2026-03-18')
-    expect(result).toBe('18/03/2026')
-  })
-
   it('returns em-dash for null', () => {
-    expect(formatDate(null)).toBe('\u2014')
+    expect(formatDate(null, BASE_SETTINGS)).toBe('\u2014')
   })
 
   it('returns em-dash for invalid date', () => {
-    expect(formatDate('not-a-date')).toBe('\u2014')
+    expect(formatDate('not-a-date', BASE_SETTINGS)).toBe('\u2014')
   })
 })
 
@@ -71,11 +66,6 @@ describe('formatDateDual', () => {
     const result = formatDateDual('2026-03-18', settings)
     expect(result).not.toContain('(BS:')
   })
-
-  it('backward compat: no settings shows dual format', () => {
-    const result = formatDateDual('2026-03-18')
-    expect(result).toContain('(BS:')
-  })
 })
 
 describe('formatDateTime', () => {
@@ -98,14 +88,8 @@ describe('formatDateTime', () => {
       locale: 'en-US',
       timeFormat: '24h',
     }
-    // UTC midnight is 20:00 (or 19:00 EDT) previous day in New York (March = EDT)
+    // UTC midnight is 20:00 previous day in New York (March = EDT, UTC-4)
     const result = formatDateTime('2026-03-18T00:00:00Z', settings)
-    // March 18 is during EDT (UTC-4), so midnight UTC = 8:00 PM on March 17
     expect(result).toContain('20:00')
-  })
-
-  it('backward compat: no settings uses browser locale', () => {
-    const result = formatDateTime('2026-03-18T12:30:00Z')
-    expect(result).not.toBe('\u2014')
   })
 })

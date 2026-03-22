@@ -55,24 +55,20 @@ function isDateOnly(dateStr: string): boolean {
  */
 export function formatDate(
   dateStr: string | null | undefined,
-  settings?: ResolvedSettings,
+  settings: ResolvedSettings,
 ): string {
   if (!dateStr) return '\u2014'
   const date = parseDate(dateStr)
   if (isNaN(date.getTime())) return '\u2014'
 
-  if (settings) {
-    const options: Intl.DateTimeFormatOptions = {
-      ...dateFormatToIntlOptions(settings.dateFormat),
-      // For date-only strings, force UTC to prevent day shifting
-      ...(isDateOnly(dateStr) ? { timeZone: 'UTC' } : {}),
-    }
-    return new Intl.DateTimeFormat(settings.locale, options).format(
-      isDateOnly(dateStr) ? new Date(dateStr + 'T00:00:00Z') : date,
-    )
+  const options: Intl.DateTimeFormatOptions = {
+    ...dateFormatToIntlOptions(settings.dateFormat),
+    // For date-only strings, force UTC to prevent day shifting
+    ...(isDateOnly(dateStr) ? { timeZone: 'UTC' } : {}),
   }
-
-  return date.toLocaleDateString('en-GB') // DD/MM/YYYY
+  return new Intl.DateTimeFormat(settings.locale, options).format(
+    isDateOnly(dateStr) ? new Date(dateStr + 'T00:00:00Z') : date,
+  )
 }
 
 /**
@@ -83,25 +79,21 @@ export function formatDate(
  */
 export function formatDateTime(
   dateStr: string | null | undefined,
-  settings?: ResolvedSettings,
+  settings: ResolvedSettings,
 ): string {
   if (!dateStr) return '\u2014'
   const date = parseDate(dateStr)
   if (isNaN(date.getTime())) return '\u2014'
 
-  if (settings) {
-    const dateOptions = dateFormatToIntlOptions(settings.dateFormat)
-    const options: Intl.DateTimeFormatOptions = {
-      ...dateOptions,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: settings.timeFormat === '12h',
-      timeZone: settings.timezone,
-    }
-    return new Intl.DateTimeFormat(settings.locale, options).format(date)
+  const dateOptions = dateFormatToIntlOptions(settings.dateFormat)
+  const options: Intl.DateTimeFormatOptions = {
+    ...dateOptions,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: settings.timeFormat === '12h',
+    timeZone: settings.timezone,
   }
-
-  return `${date.toLocaleDateString('en-GB')} ${date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+  return new Intl.DateTimeFormat(settings.locale, options).format(date)
 }
 
 /**
@@ -113,7 +105,7 @@ export function formatDateTime(
  */
 export function formatDateDual(
   dateStr: string | null | undefined,
-  settings?: ResolvedSettings,
+  settings: ResolvedSettings,
 ): string {
   if (!dateStr) return '\u2014'
   const date = parseDate(dateStr)
@@ -121,11 +113,8 @@ export function formatDateDual(
 
   const adStr = formatDate(dateStr, settings)
 
-  // Determine whether to show dual format
-  const showDual = settings
-    ? settings.calendarSystem === 'bikram_sambat' && settings.enableDualDateDisplay
-    : true // backward compat: always show dual
-
+  // Only show dual format when BS calendar with dual display enabled
+  const showDual = settings.calendarSystem === 'bikram_sambat' && settings.enableDualDateDisplay
   if (!showDual) return adStr
 
   try {
