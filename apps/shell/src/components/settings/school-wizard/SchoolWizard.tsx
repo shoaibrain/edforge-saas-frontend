@@ -8,13 +8,14 @@
  */
 
 import { useMemo } from 'react'
-import { ArrowLeft, Building2, MapPin, Users, Tag, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Building2, MapPin, Users, Tag, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { WizardContainer } from '@edforge/wizard'
 import type { WizardStep } from '@edforge/wizard'
 import type { SchoolResponseDto } from '@aibrains/shared-types'
 import { useAuthStore } from '@/stores/auth.store'
+import { useShell } from '@/lib/shell-context'
 import { tenantService } from '@/services/tenant.service'
 import { transformWizardDataToDto, getDefaultGradeRange } from './school-wizard.utils'
 import { basicInfoSchema, locationContactSchema, edfiComplianceSchema } from './school-wizard.schemas'
@@ -161,6 +162,7 @@ interface SchoolWizardProps {
 
 export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: SchoolWizardProps) {
   const user = useAuthStore((s) => s.user)
+  const { resolvedSettings, workspaceConfirmedAt } = useShell()
   const queryClient = useQueryClient()
   const isEditMode = !!school
 
@@ -175,10 +177,14 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
         'gradeRange.start': defaultRange.start,
         'gradeRange.end': defaultRange.end,
         'address.country': 'USA',
+        timezone: resolvedSettings.timezone,
+        locale: resolvedSettings.locale,
+        calendarSystem: resolvedSettings.calendarSystem,
+        academicCalendarType: resolvedSettings.calendarSystem === 'bikram_sambat' ? 'annual' : 'semester',
         ...(initialLeaId ? { localEducationAgencyId: initialLeaId } : {}),
       }
     },
-    [initialLeaId, school],
+    [initialLeaId, school, resolvedSettings.timezone, resolvedSettings.locale, resolvedSettings.calendarSystem],
   )
 
   const handleSubmit = async (data: Record<string, unknown>) => {
@@ -205,14 +211,32 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
   }
 
   return (
-    <WizardContainer
-      steps={SCHOOL_WIZARD_STEPS}
-      initialData={initialData}
-      onSubmit={handleSubmit}
-      onCancel={onCancel}
-      header={<SchoolWizardHeader onCancel={onCancel} isEditMode={isEditMode} />}
-      footerVariant="inline"
-      submitText={isEditMode ? 'Save Changes' : 'Create School'}
-    />
+    <>
+      {!workspaceConfirmedAt && !isEditMode && (
+        <div className="max-w-4xl mx-auto px-6 pt-4">
+          <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-800 dark:text-amber-300">
+              Workspace settings have not been confirmed. School defaults may be incorrect.{' '}
+              <a
+                href="/settings/workspace"
+                className="font-medium underline hover:no-underline"
+              >
+                Configure workspace settings first →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+      <WizardContainer
+        steps={SCHOOL_WIZARD_STEPS}
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+        header={<SchoolWizardHeader onCancel={onCancel} isEditMode={isEditMode} />}
+        footerVariant="inline"
+        submitText={isEditMode ? 'Save Changes' : 'Create School'}
+      />
+    </>
   )
 }
