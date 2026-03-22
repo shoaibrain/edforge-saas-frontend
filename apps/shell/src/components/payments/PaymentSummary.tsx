@@ -6,8 +6,9 @@
  */
 
 import type { Invoice } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
+import { useSettings } from '../../lib/shell-context'
 
 interface PaymentSummaryProps {
   invoice: Invoice
@@ -15,9 +16,10 @@ interface PaymentSummaryProps {
 }
 
 export function PaymentSummary({ invoice, compact = false }: PaymentSummaryProps) {
-  const { t, i18n } = useTranslation('payments')
-  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
-  const fmt = (amount: number) => formatNPR(amount, { locale })
+  const { t } = useTranslation('payments')
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
+  const fmt = (amount: number) => format(amount)
 
   if (compact) {
     return (

@@ -4,7 +4,9 @@
  * Feed list of the most recent 5 invoices with status-coded icons.
  */
 
-import { formatNPR, formatInvoiceStatus, formatRelativeDate } from '@edforge/types'
+import { formatInvoiceStatus, formatRelativeDate } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 const STATUS_COLORS: Record<string, string> = {
   overdue: '#E24B4A',
@@ -50,6 +52,8 @@ function FeedSkeleton() {
 }
 
 export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardProps) {
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
   const top5 = invoices.slice(0, 5)
 
   return (
@@ -106,11 +110,11 @@ export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardPr
                 {/* Amount */}
                 <div className="text-right flex-shrink-0">
                   <div className="text-[11px] font-semibold" style={{ color: 'var(--v2-text-secondary)' }}>
-                    {formatNPR(invoice.grandTotal, { decimals: 0 })}
+                    {format(invoice.grandTotal, { decimals: 0 })}
                   </div>
                   {invoice.amountDue > 0 && invoice.status !== 'paid' && (
                     <div className="text-[9px]" style={{ color: '#E24B4A' }}>
-                      {formatNPR(invoice.amountDue, { decimals: 0 })} due
+                      {format(invoice.amountDue, { decimals: 0 })} due
                     </div>
                   )}
                 </div>

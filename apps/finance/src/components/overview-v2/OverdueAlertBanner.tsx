@@ -7,7 +7,8 @@
 import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle } from 'lucide-react'
 import { V2AlertItem } from '@edforge/ui'
-import { formatNPRShort } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 interface OverdueAlertBannerProps {
   overdue: number
@@ -24,6 +25,8 @@ export function OverdueAlertBanner({
   draftCount,
   agingReport,
 }: OverdueAlertBannerProps) {
+  const settings = useFinanceSettings()
+  const { formatShort } = useCurrency(settings)
   const navigate = useNavigate()
 
   if (overdue <= 0) return null
@@ -47,7 +50,7 @@ export function OverdueAlertBanner({
   return (
     <V2AlertItem
       severity="critical"
-      title={`${overdueCount} invoices overdue — ${formatNPRShort(overdue)} uncollected`}
+      title={`${overdueCount} invoices overdue — ${formatShort(overdue)} uncollected`}
       subtitle={subtitle}
       icon={<AlertTriangle className="w-3.5 h-3.5" />}
       cta={{

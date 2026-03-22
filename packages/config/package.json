@@ -10,7 +10,8 @@
     "./tsconfig-react": "./tsconfig-react.json",
     "./tailwind": "./tailwind.config.js",
     "./mf-shared": "./src/mf-shared.ts",
-    "./school-context-channel": "./src/school-context-channel.ts"
+    "./school-context-channel": "./src/school-context-channel.ts",
+    "./resolved-settings": "./src/resolved-settings.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

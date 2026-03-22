@@ -7,10 +7,11 @@
 
 import { useCallback, useRef, useState } from 'react'
 import type { Receipt } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
 import { CheckCircle2, Printer, ArrowLeft, Download, Loader2 } from 'lucide-react'
+import { useSettings } from '../../lib/shell-context'
 
 interface PaymentReceiptProps {
   receipt: Receipt
@@ -18,9 +19,10 @@ interface PaymentReceiptProps {
 }
 
 export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
-  const { t, i18n } = useTranslation('payments')
-  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
-  const fmt = (amount: number) => formatNPR(amount, { locale })
+  const { t } = useTranslation('payments')
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
+  const fmt = (amount: number) => format(amount)
   const receiptRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
 

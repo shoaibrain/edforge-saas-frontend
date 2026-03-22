@@ -14,6 +14,7 @@ import { useTranslation } from '@edforge/i18n'
 import { Button } from '@edforge/ui'
 import { Plus } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
+import { useSettings } from '../../lib/shell-context'
 import { tenantService } from '../../services/tenant.service'
 import {
   useFeeStructures,
@@ -27,6 +28,7 @@ import { FeeStructureForm } from '../../components/payments/FeeStructureForm'
 export default function FeeStructuresPage() {
   const { t } = useTranslation('payments')
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useSettings()
 
   const [showForm, setShowForm] = useState(false)
   const [editingFee, setEditingFee] = useState<FeeStructure | null>(null)
@@ -51,7 +53,7 @@ export default function FeeStructuresPage() {
         description: data.description as string,
         feeType: data.feeType as FeeStructure['feeType'],
         amount: data.amount as number,
-        currency: 'NPR',
+        currency: settings.currency,
         taxRate: (data.taxRate as number) || 0,
         taxType: (data.taxType as FeeStructure['taxType']) || 'none',
         frequency: data.frequency as FeeStructure['frequency'],

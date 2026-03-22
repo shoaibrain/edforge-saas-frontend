@@ -8,7 +8,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
-import { formatNPRShort, formatFeeType } from '@edforge/types'
+import { formatFeeType } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useSettings } from '../../lib/shell-context'
 
 interface FinanceSummaryCardProps {
   totalInvoiced: number
@@ -105,6 +107,8 @@ export function FinanceSummaryCard({
   isError,
   onRetry,
 }: FinanceSummaryCardProps) {
+  const settings = useSettings()
+  const { formatShort } = useCurrency(settings)
   const total = totalCollected + outstanding
   const collectedPct = total > 0 ? (totalCollected / total) * 100 : 0
   const outstandingPct = total > 0 ? (outstanding / total) * 100 : 0
@@ -170,13 +174,13 @@ export function FinanceSummaryCard({
                   className="text-xs font-medium"
                   style={{ color: 'var(--v2-brand-primary)' }}
                 >
-                  {formatNPRShort(totalCollected)}
+                  {formatShort(totalCollected)}
                 </span>
               </div>
               <AnimatedBar
                 percentage={collectedPct}
                 color="var(--v2-brand-primary)"
-                label={`Collected: ${formatNPRShort(totalCollected)}`}
+                label={`Collected: ${formatShort(totalCollected)}`}
               />
             </div>
 
@@ -190,13 +194,13 @@ export function FinanceSummaryCard({
                   className="text-xs font-medium"
                   style={{ color: 'var(--v2-warning)' }}
                 >
-                  {formatNPRShort(outstanding)}
+                  {formatShort(outstanding)}
                 </span>
               </div>
               <AnimatedBar
                 percentage={outstandingPct}
                 color="var(--v2-warning)"
-                label={`Outstanding: ${formatNPRShort(outstanding)}`}
+                label={`Outstanding: ${formatShort(outstanding)}`}
               />
             </div>
 
@@ -210,13 +214,13 @@ export function FinanceSummaryCard({
                   className="text-xs font-medium"
                   style={{ color: 'var(--v2-danger)' }}
                 >
-                  {formatNPRShort(overdue)}
+                  {formatShort(overdue)}
                 </span>
               </div>
               <AnimatedBar
                 percentage={overduePct}
                 color="var(--v2-danger)"
-                label={`Overdue: ${formatNPRShort(overdue)}`}
+                label={`Overdue: ${formatShort(overdue)}`}
               />
             </div>
 
@@ -232,7 +236,7 @@ export function FinanceSummaryCard({
                       {formatFeeType(type)}
                     </span>
                     <span className="text-[11px]" style={{ color: 'var(--v2-text-hint)' }}>
-                      {formatNPRShort(breakdown.totalAmount)} invoiced
+                      {formatShort(breakdown.totalAmount)} invoiced
                     </span>
                   </div>
                 ))}
@@ -251,7 +255,7 @@ export function FinanceSummaryCard({
                 className="text-[13px] font-semibold"
                 style={{ color: 'var(--v2-danger)' }}
               >
-                {formatNPRShort(totalInvoiced)}
+                {formatShort(totalInvoiced)}
               </span>
             </div>
           </div>

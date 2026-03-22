@@ -85,7 +85,7 @@ export interface Payment {
   studentAccountId: string
   schoolId: string
   amount: number // NPR
-  currency: 'NPR'
+  currency: string
   gateway: PaymentGateway
   gatewayTransactionId?: string // Gateway's own reference
   gatewaySessionId?: string // Session from initiate call
@@ -121,7 +121,7 @@ export interface InitiatePaymentRequest {
   invoiceId: string
   gateway: PaymentGateway
   amount: number // NPR — must match invoice amountDue (server validates)
-  currency: 'NPR'
+  currency: string
   returnUrl: string // Frontend callback URL for success/failure
   cancelUrl: string // Frontend cancel URL
 }
@@ -159,7 +159,7 @@ export interface RecordManualPaymentDto {
   invoiceId: string
   gateway: 'cash' | 'bank_transfer' | 'cheque'
   amount: number // NPR
-  currency: 'NPR'
+  currency: string
   referenceNumber?: string // Bank ref / cheque number
   notes?: string
   paidDate?: string // ISO date, defaults to today on server
@@ -271,7 +271,7 @@ export interface Receipt {
   schoolPhone?: string
   paidDate: string // ISO date
   amount: number
-  currency: 'NPR'
+  currency: string
   gateway: PaymentGateway
   gatewayDisplayName: string
   lineItems: Array<{
@@ -306,13 +306,12 @@ export interface CurrencyFormatOptions {
 }
 
 /**
+ * @deprecated Use `formatCurrency(amount, settings.currency, opts)` from `@aibrains/shared-types/utils/currency` instead.
+ *
  * Format an amount as NPR currency string.
  * Uses Nepal's number formatting (commas at lakh/crore positions).
  *
- * Examples:
- *   formatNPR(12500)      → "NPR 12,500.00"
- *   formatNPR(12500, { locale: 'ne', showSymbol: true }) → "रू १२,५००.००"
- *   formatNPR(150000)     → "NPR 1,50,000.00" (lakh grouping)
+ * @deprecated Use `useCurrency(settings).format(amount)` from `@edforge/types/use-currency` instead.
  */
 export function formatNPR(
   amount: number,
@@ -359,13 +358,7 @@ export function formatNPR(
  *   formatNPRShort(10000000)   → "NPR 1.0 crore"
  */
 /**
- * Compact NPR format for space-constrained KPI tiles.
- * Uses abbreviated lakh/crore with "L"/"Cr" suffix.
- *
- * Examples:
- *   formatNPRCompact(12500)      → "NPR 12,500"
- *   formatNPRCompact(457200)     → "NPR 4.6L"
- *   formatNPRCompact(10000000)   → "NPR 1.0Cr"
+ * @deprecated Use `formatCurrency(amount, settings.currency, { compact: true })` from `@aibrains/shared-types/utils/currency` instead.
  */
 export function formatNPRCompact(amount: number): string {
   if (amount >= 1_00_00_000) {
@@ -377,6 +370,7 @@ export function formatNPRCompact(amount: number): string {
   return formatNPR(amount, { decimals: 0 })
 }
 
+/** @deprecated Use `formatCurrency(amount, settings.currency, { short: true })` from `@aibrains/shared-types/utils/currency` instead. */
 export function formatNPRShort(amount: number): string {
   if (amount >= 1_00_00_000) {
     return `NPR ${(amount / 1_00_00_000).toFixed(1)} crore`

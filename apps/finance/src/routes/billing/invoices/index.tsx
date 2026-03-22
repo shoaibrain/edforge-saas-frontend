@@ -45,7 +45,9 @@ import {
   useFeeStructures,
   useAcademicYears,
 } from '@edforge/finance-services'
-import { formatNPR, formatNPRCompact, type Invoice } from '@edforge/types'
+import type { Invoice } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import {
@@ -69,6 +71,8 @@ function getOverdueDays(dueDate: string | undefined): number {
 export default function InvoicesPage() {
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useFinanceSettings()
+  const { format, formatCompact } = useCurrency(settings)
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('')
   const [showGenerateForm, setShowGenerateForm] = useState(false)
@@ -195,7 +199,7 @@ export default function InvoicesPage() {
         header: 'Amount',
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
-            {formatNPR(row.original.grandTotal)}
+            {format(row.original.grandTotal, { decimals: 0 })}
           </span>
         ),
         meta: { align: 'right' as const },
@@ -341,7 +345,7 @@ export default function InvoicesPage() {
       {!isLoading && kpi.overdueCount > 0 && (
         <FinanceInfoBanner
           variant="danger"
-          message={`${kpi.overdueCount} invoice${kpi.overdueCount !== 1 ? 's' : ''} overdue — ${formatNPRCompact(kpi.overdue)} uncollected`}
+          message={`${kpi.overdueCount} invoice${kpi.overdueCount !== 1 ? 's' : ''} overdue — ${formatCompact(kpi.overdue)} uncollected`}
           subtitle={`Collection rate is ${kpi.collectionRate.toFixed(1)}%.${kpi.draftCount > 0 ? ` ${kpi.draftCount} drafts need to be issued.` : ''}`}
         />
       )}
@@ -351,7 +355,7 @@ export default function InvoicesPage() {
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Total Invoiced"
-            value={formatNPRCompact(kpi.totalInvoiced)}
+            value={formatCompact(kpi.totalInvoiced)}
             icon={DollarSign}
             accentColor="rgba(55, 138, 221, 0.12)"
             iconColor="#378ADD"
@@ -361,7 +365,7 @@ export default function InvoicesPage() {
           />
           <StatCard
             label="Collected"
-            value={formatNPRCompact(kpi.totalCollected)}
+            value={formatCompact(kpi.totalCollected)}
             icon={TrendingUp}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
@@ -372,7 +376,7 @@ export default function InvoicesPage() {
           />
           <StatCard
             label="Outstanding"
-            value={formatNPRCompact(kpi.outstanding)}
+            value={formatCompact(kpi.outstanding)}
             icon={Receipt}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
@@ -382,7 +386,7 @@ export default function InvoicesPage() {
           />
           <StatCard
             label="Overdue"
-            value={formatNPRCompact(kpi.overdue)}
+            value={formatCompact(kpi.overdue)}
             icon={AlertTriangle}
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
@@ -627,6 +631,8 @@ function GenerateInvoiceModal({
   schoolId: string
   onClose: () => void
 }) {
+  const finSettings = useFinanceSettings()
+  const { format: formatCurr } = useCurrency(finSettings)
   const generateMutation = useGenerateInvoice(schoolId)
   const { data: feeStructureData } = useFeeStructures(schoolId)
   const { data: academicYearsData } = useAcademicYears(schoolId)
@@ -736,7 +742,7 @@ function GenerateInvoiceModal({
                     />
                     <span className="flex-1 text-sm text-[rgb(var(--text-primary))]">{fee.name}</span>
                     <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                      {formatNPR(fee.amount)}
+                      {formatCurr(fee.amount)}
                     </span>
                   </label>
                 ))
@@ -808,17 +814,17 @@ function GenerateInvoiceModal({
             <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 space-y-1">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                 <span>Subtotal</span>
-                <span>{formatNPR(subtotal)}</span>
+                <span>{formatCurr(subtotal)}</span>
               </div>
               {taxTotal > 0 && (
                 <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                   <span>Tax</span>
-                  <span>{formatNPR(taxTotal)}</span>
+                  <span>{formatCurr(taxTotal)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-1">
                 <span>Grand Total</span>
-                <span>{formatNPR(grandTotal)}</span>
+                <span>{formatCurr(grandTotal)}</span>
               </div>
             </div>
           )}

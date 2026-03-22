@@ -16,7 +16,8 @@ import {
   ClipboardCheck,
   Receipt,
 } from 'lucide-react'
-import { formatNPRShort } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useSettings } from '../../lib/shell-context'
 import { HomeStatCard } from './HomeStatCard'
 import { AlertsRow } from './AlertsRow'
 import { AttendanceTrendCard } from './AttendanceTrendCard'
@@ -63,6 +64,8 @@ interface AdminCommandCenterProps {
 }
 
 export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
+  const settings = useSettings()
+  const { formatShort } = useCurrency(settings)
   const setAlertCount = useHomeStore((s) => s.setAlertCount)
   const setActiveAcademicYear = useHomeStore((s) => s.setActiveAcademicYear)
 
@@ -234,7 +237,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
             label="Outstanding fees"
             value={
               financeSummary
-                ? formatNPRShort(financeSummary.outstanding)
+                ? formatShort(financeSummary.outstanding)
                 : '—'
             }
             icon={Receipt}
@@ -244,7 +247,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
             tag={
               financeSummary && financeSummary.overdue > 0
                 ? {
-                    text: `${formatNPRShort(financeSummary.overdue)} overdue`,
+                    text: `${formatShort(financeSummary.overdue)} overdue`,
                     color: '#E24B4A',
                     bg: 'var(--v2-accent-finance)',
                   }

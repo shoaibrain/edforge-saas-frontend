@@ -6,7 +6,9 @@
  */
 
 import type { FeeStructure } from '@edforge/types'
-import { formatNPRCompact, formatGradeLabel, gradeSort } from '@edforge/types'
+import { formatGradeLabel, gradeSort } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { Pencil, Trash2, Layers } from 'lucide-react'
 import { useMemo } from 'react'
@@ -32,6 +34,8 @@ export function FeeStructureList({
   onEdit,
   onDelete,
 }: FeeStructureListProps) {
+  const settings = useFinanceSettings()
+  const { formatCompact } = useCurrency(settings)
   const safeList = Array.isArray(feeStructures) ? feeStructures : []
 
   const columns = useMemo<ColumnDef<FeeStructure, unknown>[]>(
@@ -79,10 +83,10 @@ export function FeeStructureList({
           return (
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 3 }}>
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--v2-text-primary, #e8eaf0)' }}>
-                {formatNPRCompact(fee.amount)}
+                {formatCompact(fee.amount)}
               </span>
               <span style={{ fontSize: '9px', color: 'var(--v2-text-ghost, #2a3045)' }}>
-                NPR · {fee.frequency?.replace(/_/g, ' ').toLowerCase() ?? ''}
+                {settings.currency} · {fee.frequency?.replace(/_/g, ' ').toLowerCase() ?? ''}
               </span>
             </div>
           )

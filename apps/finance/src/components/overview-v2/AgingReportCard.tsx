@@ -5,7 +5,8 @@
  * Non-zero buckets are highlighted in red.
  */
 
-import { formatNPRShort } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 interface AgingBucket {
   label: string
@@ -48,6 +49,8 @@ const DEFAULT_BUCKETS: AgingBucket[] = [
 ]
 
 export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps) {
+  const settings = useFinanceSettings()
+  const { formatShort } = useCurrency(settings)
   const buckets = agingReport.length > 0 ? agingReport : DEFAULT_BUCKETS
   const hasAnyOverdue = buckets.some((b) => b.count > 0)
 
@@ -82,7 +85,7 @@ export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps
                 key={bucket.label}
                 className="rounded-lg p-3 text-center transition-colors"
                 role="group"
-                aria-label={`${bucket.label}: ${bucket.count} invoices, ${formatNPRShort(bucket.amount)}`}
+                aria-label={`${bucket.label}: ${bucket.count} invoices, ${formatShort(bucket.amount)}`}
                 style={{
                   background: isActive ? 'rgba(226, 75, 74, 0.08)' : 'var(--v2-bg-elevated)',
                   border: `1px solid ${isActive ? 'rgba(226, 75, 74, 0.25)' : 'var(--v2-border-default)'}`,
@@ -104,7 +107,7 @@ export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps
                   className="text-[10px] mt-1"
                   style={{ color: isActive ? 'rgba(226, 75, 74, 0.7)' : 'var(--v2-text-faint)' }}
                 >
-                  {formatNPRShort(bucket.amount)}
+                  {formatShort(bucket.amount)}
                 </div>
               </div>
             )

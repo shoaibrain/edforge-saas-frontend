@@ -38,6 +38,10 @@ interface WorkspaceSettings {
     defaultDateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
     defaultTimeFormat: '12h' | '24h'
     defaultWeekStartsOn: 'sunday' | 'monday'
+    defaultCurrency: string
+    defaultCalendarSystem: 'gregorian' | 'bikram_sambat'
+    enableDualDateDisplay: boolean
+    defaultNumberFormat: 'south_asian' | 'international'
   }
   branding: {
     organizationName: string
@@ -79,12 +83,14 @@ const TIMEZONE_OPTIONS = [
   { value: 'Europe/Paris', label: 'Paris (CET/CEST)', offset: 'UTC+1/+2' },
   { value: 'Asia/Tokyo', label: 'Tokyo (JST)', offset: 'UTC+9' },
   { value: 'Asia/Kolkata', label: 'India (IST)', offset: 'UTC+5:30' },
+  { value: 'Asia/Kathmandu', label: 'Nepal (NST)', offset: 'UTC+5:45' },
   { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)', offset: 'UTC+10/+11' },
 ]
 
 const LOCALE_OPTIONS = [
   { value: 'en-US', label: 'English (US)' },
   { value: 'en-GB', label: 'English (UK)' },
+  { value: 'ne-NP', label: 'Nepali (नेपाली)' },
   { value: 'es', label: 'Español' },
   { value: 'fr', label: 'Français' },
   { value: 'de', label: 'Deutsch' },
@@ -107,6 +113,24 @@ const TIME_FORMAT_OPTIONS = [
 const WEEK_START_OPTIONS = [
   { value: 'sunday', label: 'Sunday' },
   { value: 'monday', label: 'Monday' },
+]
+
+const CURRENCY_OPTIONS = [
+  { value: 'NPR', label: 'Nepali Rupee (NPR)' },
+  { value: 'USD', label: 'US Dollar (USD)' },
+  { value: 'EUR', label: 'Euro (EUR)' },
+  { value: 'GBP', label: 'British Pound (GBP)' },
+  { value: 'INR', label: 'Indian Rupee (INR)' },
+]
+
+const CALENDAR_SYSTEM_OPTIONS = [
+  { value: 'gregorian', label: 'Gregorian' },
+  { value: 'bikram_sambat', label: 'Bikram Sambat' },
+]
+
+const NUMBER_FORMAT_OPTIONS = [
+  { value: 'international', label: 'International (100,000)' },
+  { value: 'south_asian', label: 'South Asian (1,00,000)' },
 ]
 
 // COMING SOON — re-enable when Attendance Defaults section ships
@@ -132,6 +156,10 @@ const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'tenantId'> = {
     defaultDateFormat: 'MM/DD/YYYY',
     defaultTimeFormat: '12h',
     defaultWeekStartsOn: 'monday',
+    defaultCurrency: 'USD',
+    defaultCalendarSystem: 'gregorian',
+    enableDualDateDisplay: false,
+    defaultNumberFormat: 'international',
   },
   branding: {
     organizationName: 'My Organization',
@@ -431,6 +459,68 @@ export default function WorkspaceSettingsPage() {
               className={SELECT_CLASS}
             >
               {WEEK_START_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Default Currency" description="Currency used for invoices, payments, and financial reports" inline>
+            <select
+              value={displaySettings.regional.defaultCurrency}
+              onChange={(e) => updateField('regional', 'defaultCurrency', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {CURRENCY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Calendar System" description="Primary calendar system for date display" inline>
+            <select
+              value={displaySettings.regional.defaultCalendarSystem}
+              onChange={(e) => updateField('regional', 'defaultCalendarSystem', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {CALENDAR_SYSTEM_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          {displaySettings.regional.defaultCalendarSystem === 'bikram_sambat' && (
+            <SettingsFieldRow label="Show Bikram Sambat Dates" description="Display BS dates alongside Gregorian dates in finance and academic modules" inline>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={displaySettings.regional.enableDualDateDisplay}
+                onClick={() => updateField('regional', 'enableDualDateDisplay', !displaySettings.regional.enableDualDateDisplay)}
+                disabled={isLocked}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/40 ${
+                  displaySettings.regional.enableDualDateDisplay
+                    ? 'bg-teal-600'
+                    : 'bg-[rgb(var(--border-primary))]'
+                } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    displaySettings.regional.enableDualDateDisplay ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </SettingsFieldRow>
+          )}
+
+          <SettingsFieldRow label="Number Format" description="How numbers are grouped in financial displays" inline>
+            <select
+              value={displaySettings.regional.defaultNumberFormat}
+              onChange={(e) => updateField('regional', 'defaultNumberFormat', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {NUMBER_FORMAT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>

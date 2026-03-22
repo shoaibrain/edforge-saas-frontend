@@ -8,7 +8,9 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { AnimatedProgressBar } from '@edforge/ui'
-import { formatNPRShort, formatFeeType } from '@edforge/types'
+import { formatFeeType } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 const FEE_COLORS = ['#1D9E75', '#378ADD', '#7F77DD', '#EF9F27', '#D85A30']
 const MAX_VISIBLE_FEE_TYPES = 5
@@ -63,6 +65,8 @@ export function CollectionPerformanceCard({
   byFeeType,
   isLoading,
 }: CollectionPerformanceCardProps) {
+  const settings = useFinanceSettings()
+  const { formatShort } = useCurrency(settings)
   const [showAll, setShowAll] = useState(false)
 
   // Use totalInvoiced as denominator for accurate percentages
@@ -105,10 +109,10 @@ export function CollectionPerformanceCard({
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>Collected</span>
               <span className="text-xs font-medium" style={{ color: 'var(--v2-brand-primary)' }}>
-                {formatNPRShort(totalCollected)}
+                {formatShort(totalCollected)}
               </span>
             </div>
-            <AnimatedProgressBar percentage={collectedPct} color="var(--v2-brand-primary)" label={`Collected: ${formatNPRShort(totalCollected)}`} />
+            <AnimatedProgressBar percentage={collectedPct} color="var(--v2-brand-primary)" label={`Collected: ${formatShort(totalCollected)}`} />
           </div>
 
           {/* Outstanding (non-overdue) — hide when negligible */}
@@ -117,10 +121,10 @@ export function CollectionPerformanceCard({
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>Outstanding</span>
                 <span className="text-xs font-medium" style={{ color: 'var(--v2-warning)' }}>
-                  {formatNPRShort(nonOverdueOutstanding)}
+                  {formatShort(nonOverdueOutstanding)}
                 </span>
               </div>
-              <AnimatedProgressBar percentage={outstandingPct} color="var(--v2-warning)" label={`Outstanding: ${formatNPRShort(nonOverdueOutstanding)}`} />
+              <AnimatedProgressBar percentage={outstandingPct} color="var(--v2-warning)" label={`Outstanding: ${formatShort(nonOverdueOutstanding)}`} />
             </div>
           )}
 
@@ -130,10 +134,10 @@ export function CollectionPerformanceCard({
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>Overdue</span>
                 <span className="text-xs font-medium" style={{ color: 'var(--v2-danger)' }}>
-                  {formatNPRShort(overdue)}
+                  {formatShort(overdue)}
                 </span>
               </div>
-              <AnimatedProgressBar percentage={overduePct} color="var(--v2-danger)" label={`Overdue: ${formatNPRShort(overdue)}`} />
+              <AnimatedProgressBar percentage={overduePct} color="var(--v2-danger)" label={`Overdue: ${formatShort(overdue)}`} />
             </div>
           )}
 
@@ -168,11 +172,11 @@ export function CollectionPerformanceCard({
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <span className="text-[10px] tabular-nums" style={{ color }}>
-                            {formatNPRShort(fee.collectedAmount)}
+                            {formatShort(fee.collectedAmount)}
                           </span>
                           <span className="text-[10px]" style={{ color: 'var(--v2-text-ghost)' }}>/</span>
                           <span className="text-[10px] tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
-                            {formatNPRShort(fee.totalAmount)}
+                            {formatShort(fee.totalAmount)}
                           </span>
                           <span className="text-[9px] tabular-nums" style={{ color: 'var(--v2-text-ghost)' }}>
                             ({fee.invoiceCount})
@@ -214,7 +218,7 @@ export function CollectionPerformanceCard({
               Total invoiced this year
             </span>
             <span className="text-[13px] font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
-              {formatNPRShort(totalInvoiced)}
+              {formatShort(totalInvoiced)}
             </span>
           </div>
         </div>

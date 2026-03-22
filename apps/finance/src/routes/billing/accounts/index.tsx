@@ -32,8 +32,9 @@ import {
   useStudentLedger,
   useInvoices,
 } from '@edforge/finance-services'
-import { formatNPR, formatNPRCompact } from '@edforge/types'
 import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { FinancePageHeader, FinanceStatusChip } from '../../../components/shared'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 
@@ -91,6 +92,8 @@ function TabButton({
 // ============================================================================
 
 function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: string }) {
+  const ledgerSettings = useFinanceSettings()
+  const { format } = useCurrency(ledgerSettings)
   const { data: ledger, isLoading } = useStudentLedger(schoolId, accountId)
   const entries: StudentLedgerEntry[] = Array.isArray(ledger) ? ledger : []
 
@@ -135,13 +138,13 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
               {entry.description}
             </td>
             <td className="px-2 py-1.5 text-xs text-right text-red-600 dark:text-red-400">
-              {entry.debit > 0 ? formatNPR(entry.debit) : ''}
+              {entry.debit > 0 ? format(entry.debit) : ''}
             </td>
             <td className="px-2 py-1.5 text-xs text-right text-green-600 dark:text-green-400">
-              {entry.credit > 0 ? formatNPR(entry.credit) : ''}
+              {entry.credit > 0 ? format(entry.credit) : ''}
             </td>
             <td className="px-2 py-1.5 text-xs text-right font-medium text-[rgb(var(--text-primary))]">
-              {formatNPR(entry.balance)}
+              {format(entry.balance)}
             </td>
           </tr>
         ))}
@@ -156,6 +159,8 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
 
 function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: string }) {
   const navigate = useNavigate()
+  const invSettings = useFinanceSettings()
+  const { format } = useCurrency(invSettings)
   const { data, isLoading } = useInvoices(schoolId, { studentId })
   const invoices: Invoice[] = Array.isArray(data) ? data : (data?.items ?? [])
 
@@ -198,11 +203,11 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
             </td>
             <td className="px-2 py-1.5"><FinanceStatusChip status={invoice.status} size="xs" /></td>
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-primary))]">
-              {formatNPR(invoice.grandTotal)}
+              {format(invoice.grandTotal)}
             </td>
             <td className="px-2 py-1.5 text-xs text-right font-medium">
               <span className={invoice.amountDue > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
-                {formatNPR(invoice.amountDue)}
+                {format(invoice.amountDue)}
               </span>
             </td>
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))]">
@@ -226,6 +231,8 @@ function PaymentsTab({ schoolId, studentId }: { schoolId: string; studentId: str
 }
 
 function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; studentId: string }) {
+  const paySettings = useFinanceSettings()
+  const { format } = useCurrency(paySettings)
   const { data, isLoading } = useInvoices(schoolId, { studentId })
   const invoices: Invoice[] = Array.isArray(data) ? data : (data?.items ?? [])
 
@@ -264,10 +271,10 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
               {inv.invoiceNumber}
             </td>
             <td className="px-2 py-1.5 text-xs text-right text-green-600 dark:text-green-400">
-              {formatNPR(inv.amountPaid)}
+              {format(inv.amountPaid)}
             </td>
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-secondary))]">
-              {formatNPR(inv.grandTotal)}
+              {format(inv.grandTotal)}
             </td>
             <td className="px-2 py-1.5"><FinanceStatusChip status={inv.status} size="xs" /></td>
           </tr>
@@ -288,6 +295,8 @@ function AccountDetail({
   account: StudentAccount
   schoolId: string
 }) {
+  const detailSettings = useFinanceSettings()
+  const { format } = useCurrency(detailSettings)
   const [activeTab, setActiveTab] = useState<AccountTab>('ledger')
 
   return (
@@ -299,13 +308,13 @@ function AccountDetail({
           <p className={`text-sm font-semibold mt-0.5 ${
             account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
           }`}>
-            {formatNPR(account.balance)}
+            {format(account.balance)}
           </p>
         </div>
         <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
           <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
-            {formatNPR(account.totalPaid)}
+            {format(account.totalPaid)}
           </p>
         </div>
         <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
@@ -376,7 +385,8 @@ function getAvatarUrl(seed: string): string {
 // COLUMN DEFINITIONS
 // ============================================================================
 
-const columns: ColumnDef<StudentAccount, unknown>[] = [
+function buildColumns(format: (amount: number) => string): ColumnDef<StudentAccount, unknown>[] {
+  return [
   createExpandColumn<StudentAccount>(),
   {
     accessorKey: 'studentName',
@@ -413,7 +423,7 @@ const columns: ColumnDef<StudentAccount, unknown>[] = [
       const account = row.original
       return (
         <span className={account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
-          {formatNPR(account.balance)}
+          {format(account.balance)}
         </span>
       )
     },
@@ -424,7 +434,7 @@ const columns: ColumnDef<StudentAccount, unknown>[] = [
     meta: { align: 'right' as const },
     cell: ({ row }) => (
       <span className="text-[rgb(var(--text-secondary))]">
-        {formatNPR(row.original.totalPaid)}
+        {format(row.original.totalPaid)}
       </span>
     ),
   },
@@ -438,6 +448,7 @@ const columns: ColumnDef<StudentAccount, unknown>[] = [
     ),
   },
 ]
+}
 
 // ============================================================================
 // MAIN PAGE
@@ -445,6 +456,9 @@ const columns: ColumnDef<StudentAccount, unknown>[] = [
 
 export default function StudentAccountsPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useFinanceSettings()
+  const { format, formatCompact } = useCurrency(settings)
+  const columns = useMemo(() => buildColumns(format), [format])
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 
@@ -497,7 +511,7 @@ export default function StudentAccountsPage() {
           />
           <StatCard
             label="Outstanding"
-            value={formatNPRCompact(kpi.totalOutstanding)}
+            value={formatCompact(kpi.totalOutstanding)}
             icon={Receipt}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"

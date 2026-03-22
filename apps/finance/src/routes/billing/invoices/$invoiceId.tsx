@@ -18,7 +18,8 @@ import {
   useCancelInvoice,
   useInvoicePayments,
 } from '@edforge/finance-services'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate, formatDateTime, formatDateDual } from '../../../utils/format-date'
 import { StatusBadge } from '../../../components/StatusBadge'
 
@@ -26,6 +27,8 @@ export default function InvoiceDetailPage() {
   const navigate = useNavigate()
   const { invoiceId } = useParams({ strict: false }) as { invoiceId: string }
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
 
   const { data: invoice, isLoading } = useInvoice(schoolId ?? '', invoiceId)
   const { data: payments } = useInvoicePayments(schoolId ?? '', invoiceId)
@@ -147,10 +150,10 @@ export default function InvoiceDetailPage() {
               lineItems.map((item: any, idx: number) => (
                 <tr key={item.id || idx}>
                   <td className="px-4 py-2.5 text-sm text-[rgb(var(--text-primary))]">{item.description}</td>
-                  <td className="px-4 py-2.5 text-sm text-right text-[rgb(var(--text-secondary))]">{formatNPR(item.amount)}</td>
-                  <td className="px-4 py-2.5 text-sm text-right text-[rgb(var(--text-secondary))]">{formatNPR(item.taxAmount || 0)}</td>
-                  <td className="px-4 py-2.5 text-sm text-right text-[rgb(var(--text-secondary))]">{formatNPR(item.discount || 0)}</td>
-                  <td className="px-4 py-2.5 text-sm text-right font-medium text-[rgb(var(--text-primary))]">{formatNPR(item.total)}</td>
+                  <td className="px-4 py-2.5 text-sm text-right text-[rgb(var(--text-secondary))]">{format(item.amount)}</td>
+                  <td className="px-4 py-2.5 text-sm text-right text-[rgb(var(--text-secondary))]">{format(item.taxAmount || 0)}</td>
+                  <td className="px-4 py-2.5 text-sm text-right text-[rgb(var(--text-secondary))]">{format(item.discount || 0)}</td>
+                  <td className="px-4 py-2.5 text-sm text-right font-medium text-[rgb(var(--text-primary))]">{format(item.total)}</td>
                 </tr>
               ))
             )}
@@ -162,31 +165,31 @@ export default function InvoiceDetailPage() {
       <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-4 space-y-2">
         <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
           <span>Subtotal</span>
-          <span>{formatNPR(invoice.subtotal ?? 0)}</span>
+          <span>{format(invoice.subtotal ?? 0)}</span>
         </div>
         {(invoice.discountTotal ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
             <span>Discount</span>
-            <span>-{formatNPR(invoice.discountTotal)}</span>
+            <span>-{format(invoice.discountTotal)}</span>
           </div>
         )}
         {(invoice.taxTotal ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
             <span>Tax</span>
-            <span>{formatNPR(invoice.taxTotal)}</span>
+            <span>{format(invoice.taxTotal)}</span>
           </div>
         )}
         <div className="flex justify-between text-base font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2">
           <span>Grand Total</span>
-          <span>{formatNPR(invoice.grandTotal)}</span>
+          <span>{format(invoice.grandTotal)}</span>
         </div>
         <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
           <span>Amount Paid</span>
-          <span>{formatNPR(invoice.amountPaid ?? 0)}</span>
+          <span>{format(invoice.amountPaid ?? 0)}</span>
         </div>
         <div className="flex justify-between text-sm font-semibold text-amber-600 dark:text-amber-400">
           <span>Amount Due</span>
-          <span>{formatNPR(invoice.amountDue ?? invoice.grandTotal)}</span>
+          <span>{format(invoice.amountDue ?? invoice.grandTotal)}</span>
         </div>
       </div>
 
@@ -213,7 +216,7 @@ export default function InvoiceDetailPage() {
                   </p>
                 </div>
                 <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                  +{formatNPR(payment.amount)}
+                  +{format(payment.amount)}
                 </span>
               </div>
             ))}

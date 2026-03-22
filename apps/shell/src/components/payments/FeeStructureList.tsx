@@ -5,8 +5,9 @@
  */
 
 import type { FeeStructure } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
+import { useSettings } from '../../lib/shell-context'
 import { Pencil, Trash2, GraduationCap, DollarSign } from 'lucide-react'
 
 interface FeeStructureListProps {
@@ -22,8 +23,9 @@ export function FeeStructureList({
   onEdit,
   onDelete,
 }: FeeStructureListProps) {
-  const { t, i18n } = useTranslation('payments')
-  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
+  const { t } = useTranslation('payments')
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
 
   const safeList = Array.isArray(feeStructures) ? feeStructures : []
 
@@ -97,7 +99,7 @@ export function FeeStructureList({
                 {t(`feeStructure.types.${fee.feeType}`, { defaultValue: fee.feeType })}
               </td>
               <td className="px-4 py-3 text-right font-medium text-[rgb(var(--text-primary))]">
-                {formatNPR(fee.amount, { locale })}
+                {format(fee.amount)}
                 {fee.taxRate > 0 && (
                   <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">
                     +{fee.taxRate}% {fee.taxType}

@@ -47,7 +47,7 @@ export interface FeeStructure {
   academicYearId: string
   feeType: FeeType
   amount: number // NPR, 2 decimal precision
-  currency: 'NPR'
+  currency: string
   taxRate: number // Percentage (e.g. 13 for 13% VAT). 0 if exempt.
   taxType: TaxType
   frequency: FeeFrequency
@@ -69,7 +69,7 @@ export interface CreateFeeStructureDto {
   academicYearId: string
   feeType: FeeType
   amount: number
-  currency: 'NPR'
+  currency: string
   taxRate?: number
   taxType?: TaxType
   frequency: FeeFrequency
@@ -160,7 +160,7 @@ export interface Invoice {
   grandTotal: number // subtotal - discountTotal + taxTotal
   amountPaid: number // How much has been paid so far
   amountDue: number // grandTotal - amountPaid
-  currency: 'NPR'
+  currency: string
   dueDate: string // ISO date
   issuedDate: string // ISO date
   status: InvoiceStatus

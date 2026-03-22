@@ -141,6 +141,10 @@ export interface WorkspaceSettings {
     defaultDateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
     defaultTimeFormat: '12h' | '24h'
     defaultWeekStartsOn: 'sunday' | 'monday'
+    defaultCurrency: string
+    defaultCalendarSystem: 'gregorian' | 'bikram_sambat'
+    enableDualDateDisplay: boolean
+    defaultNumberFormat: 'south_asian' | 'international'
   }
   /** Organization branding */
   branding: {

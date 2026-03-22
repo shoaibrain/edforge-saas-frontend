@@ -17,7 +17,8 @@ import {
   Inbox,
 } from 'lucide-react'
 import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
-import { formatNPRCompact, formatNPRShort } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../layouts/FinanceLayout'
 
 // Helper to build tag pill props for StatCard
 function tagPill(text: string, hex: string): { text: string; color: string; bg: string } {
@@ -65,11 +66,13 @@ function InsightStrip({
   collectionRate,
   overdueCount,
   isLoading,
+  formatShort,
 }: {
   totalInvoiced: number
   collectionRate: number
   overdueCount: number
   isLoading: boolean
+  formatShort: (amount: number) => string
 }) {
   if (isLoading) {
     return (
@@ -83,7 +86,7 @@ function InsightStrip({
   if (totalInvoiced === 0) return null
 
   const parts: string[] = [
-    `${formatNPRShort(totalInvoiced)} invoiced`,
+    `${formatShort(totalInvoiced)} invoiced`,
     `${collectionRate.toFixed(1)}% collected`,
   ]
   if (overdueCount > 0) {
@@ -153,6 +156,8 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   const navigate = useNavigate()
   const data = useFinanceOverviewV2(schoolId)
   const { stagger, fadeInUp } = useMotionVariants()
+  const settings = useFinanceSettings()
+  const { formatCompact, formatShort } = useCurrency(settings)
 
   const {
     kpi,
@@ -234,6 +239,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
           collectionRate={kpi.collectionRate}
           overdueCount={overdueCount}
           isLoading={isLoading}
+          formatShort={formatShort}
         />
       </div>
 
@@ -273,7 +279,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp}>
           <StatCard
             label="Total Invoiced"
-            value={formatNPRCompact(kpi.totalInvoiced)}
+            value={formatCompact(kpi.totalInvoiced)}
             icon={DollarSign}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="var(--v2-brand-primary)"
@@ -285,7 +291,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp}>
           <StatCard
             label="Collected"
-            value={formatNPRCompact(kpi.totalCollected)}
+            value={formatCompact(kpi.totalCollected)}
             icon={TrendingUp}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
@@ -298,7 +304,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp}>
           <StatCard
             label="Outstanding"
-            value={formatNPRCompact(kpi.outstanding)}
+            value={formatCompact(kpi.outstanding)}
             icon={Receipt}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
@@ -310,7 +316,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp}>
           <StatCard
             label="Overdue"
-            value={formatNPRCompact(kpi.overdue)}
+            value={formatCompact(kpi.overdue)}
             icon={AlertTriangle}
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"

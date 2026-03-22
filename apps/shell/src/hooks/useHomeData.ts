@@ -8,7 +8,8 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDashboardSummary } from '@edforge/finance-services'
-import { formatNPRShort } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useSettings } from '../lib/shell-context'
 import {
   getAcademicsOverview,
   getAttendanceAlerts,
@@ -153,6 +154,8 @@ export function useHomeAlerts(
   trendAvg: number | null,
   enabled: boolean,
 ) {
+  const settings = useSettings()
+  const { formatShort } = useCurrency(settings)
   const today = useMemo(() => getTodayISO(), [])
   const startDate = useMemo(() => getDaysAgoISO(90), [])
 
@@ -171,7 +174,7 @@ export function useHomeAlerts(
 
     // Finance overdue alert (show first — critical if overdue > 0)
     if (financeSummary?.overdue != null && financeSummary.overdue > 0) {
-      const overdueAmount = formatNPRShort(financeSummary.overdue)
+      const overdueAmount = formatShort(financeSummary.overdue)
       const rate = financeSummary.collectionRate ?? 0
       items.push({
         id: 'finance-overdue',
@@ -205,7 +208,7 @@ export function useHomeAlerts(
     }
 
     return items
-  }, [attendanceQuery.data, financeSummary, todayAttendanceRate, trendAvg])
+  }, [attendanceQuery.data, financeSummary, todayAttendanceRate, trendAvg, formatShort])
 
   return {
     alerts,
@@ -396,6 +399,8 @@ export function useRecentActivityItems(
   financeSummary: FinanceSummaryData | null,
   financeLoading: boolean,
 ): { items: ActivityItem[]; isLoading: boolean } {
+  const settings = useSettings()
+  const { formatShort } = useCurrency(settings)
   const items = useMemo<ActivityItem[]>(() => {
     if (!financeSummary) return []
     const feed: ActivityItem[] = []
@@ -405,7 +410,7 @@ export function useRecentActivityItems(
       for (const p of financeSummary.recentPayments.slice(0, 5)) {
         feed.push({
           id: p.id,
-          text: `Payment received — ${formatNPRShort(p.amount)} ${p.gateway}`,
+          text: `Payment received — ${formatShort(p.amount)} ${p.gateway}`,
           timestamp: formatRelativeTime(p.paidAt || p.createdAt),
           type: 'payment',
         })
@@ -416,7 +421,7 @@ export function useRecentActivityItems(
     if (financeSummary.overdue > 0) {
       feed.push({
         id: 'overdue-auto',
-        text: `Outstanding overdue amount — ${formatNPRShort(financeSummary.overdue)}`,
+        text: `Outstanding overdue amount — ${formatShort(financeSummary.overdue)}`,
         timestamp: 'Auto-detected by system',
         type: 'overdue',
       })
@@ -424,7 +429,7 @@ export function useRecentActivityItems(
 
     // Sort by most recent first (payments have timestamps)
     return feed.slice(0, 5)
-  }, [financeSummary])
+  }, [financeSummary, formatShort])
 
   return { items, isLoading: financeLoading }
 }

@@ -14,7 +14,8 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { FeeStructure } from '@edforge/types'
-import { formatNPRCompact } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 import { apiGet } from '@edforge/api-client'
 import type { AxiosError } from '@edforge/api-client'
 import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
@@ -82,6 +83,8 @@ function gradeRangeToOptions(start: string, end: string): string[] {
 
 export default function FeeStructuresPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useFinanceSettings()
+  const { formatCompact } = useCurrency(settings)
 
   const [showForm, setShowForm] = useState(false)
   const [editingFee, setEditingFee] = useState<FeeStructure | null>(null)
@@ -159,7 +162,7 @@ export default function FeeStructuresPage() {
         description: data.description,
         feeType: data.feeType,
         amount: data.amount,
-        currency: 'NPR',
+        currency: settings.currency,
         taxRate: data.taxRate || 0,
         taxType: data.taxType || 'none',
         frequency: data.frequency,
@@ -302,7 +305,7 @@ export default function FeeStructuresPage() {
           />
           <StatCard
             label="Max Fee"
-            value={formatNPRCompact(kpi.maxFee)}
+            value={formatCompact(kpi.maxFee)}
             icon={AlertTriangle}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"

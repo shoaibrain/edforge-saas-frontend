@@ -7,10 +7,11 @@
 
 import { useState, useMemo } from 'react'
 import type { Invoice, InvoiceStatus } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
 import { FileText, Receipt } from 'lucide-react'
+import { useSettings } from '../../lib/shell-context'
 import { InvoiceStatusBadge } from './InvoiceStatusBadge'
 
 type StatusFilter = 'outstanding' | 'paid' | 'overdue' | 'all'
@@ -32,8 +33,9 @@ export function InvoiceList({
   onSelectInvoice,
   onPayInvoice,
 }: InvoiceListProps) {
-  const { t, i18n } = useTranslation('payments')
-  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
+  const { t } = useTranslation('payments')
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('outstanding')
 
   const safeInvoices = Array.isArray(invoices) ? invoices : []
@@ -115,7 +117,7 @@ export function InvoiceList({
             <InvoiceCard
               key={invoice.id}
               invoice={invoice}
-              locale={locale}
+              format={format}
               t={t}
               onView={() => onSelectInvoice(invoice)}
               onPay={() => onPayInvoice(invoice)}
@@ -129,13 +131,13 @@ export function InvoiceList({
 
 function InvoiceCard({
   invoice,
-  locale,
+  format,
   t,
   onView,
   onPay,
 }: {
   invoice: Invoice
-  locale: 'en' | 'ne'
+  format: (amount: number) => string
   t: (key: string, opts?: Record<string, unknown>) => string
   onView: () => void
   onPay: () => void
@@ -164,11 +166,11 @@ function InvoiceCard({
 
         <div className="text-right shrink-0">
           <p className="text-lg font-bold text-[rgb(var(--text-primary))]">
-            {formatNPR(invoice.amountDue, { locale })}
+            {format(invoice.amountDue)}
           </p>
           {invoice.amountPaid > 0 && invoice.amountDue > 0 && (
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              of {formatNPR(invoice.grandTotal, { locale })}
+              of {format(invoice.grandTotal)}
             </p>
           )}
         </div>

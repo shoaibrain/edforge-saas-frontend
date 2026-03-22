@@ -5,10 +5,11 @@
  */
 
 import type { Invoice } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
 import { ArrowLeft, FileText } from 'lucide-react'
+import { useSettings } from '../../lib/shell-context'
 import { InvoiceStatusBadge } from './InvoiceStatusBadge'
 import { PaymentSummary } from './PaymentSummary'
 
@@ -19,8 +20,9 @@ interface InvoiceDetailProps {
 }
 
 export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
-  const { t, i18n } = useTranslation('payments')
-  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
+  const { t } = useTranslation('payments')
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
   const canPay = ['issued', 'partially_paid', 'overdue'].includes(invoice.status)
 
   return (
@@ -102,20 +104,20 @@ export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
                   )}
                 </td>
                 <td className="px-4 py-3 text-right text-[rgb(var(--text-primary))]">
-                  {formatNPR(item.amount * item.quantity, { locale, showSymbol: false })}
+                  {format(item.amount * item.quantity)}
                 </td>
                 <td className="px-4 py-3 text-right text-[rgb(var(--text-tertiary))]">
                   {item.discount > 0
-                    ? `-${formatNPR(item.discount, { locale, showSymbol: false })}`
+                    ? `-${format(item.discount)}`
                     : '-'}
                 </td>
                 <td className="px-4 py-3 text-right text-[rgb(var(--text-tertiary))]">
                   {item.taxAmount > 0
-                    ? formatNPR(item.taxAmount, { locale, showSymbol: false })
+                    ? format(item.taxAmount)
                     : '-'}
                 </td>
                 <td className="px-4 py-3 text-right font-medium text-[rgb(var(--text-primary))]">
-                  {formatNPR(item.total, { locale, showSymbol: false })}
+                  {format(item.total)}
                 </td>
               </tr>
             ))}
@@ -145,7 +147,7 @@ export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
             className="w-full py-3 rounded-xl bg-teal-600 text-white font-semibold text-sm
               hover:bg-teal-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
           >
-            {t('actions.payNow')} — {formatNPR(invoice.amountDue, { locale })}
+            {t('actions.payNow')} — {format(invoice.amountDue)}
           </button>
         </div>
       )}

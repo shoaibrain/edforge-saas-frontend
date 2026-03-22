@@ -36,8 +36,10 @@ import {
   useCreateRefund,
   useExportPaymentsCsv,
 } from '@edforge/finance-services'
-import { formatNPR, formatNPRCompact, formatGatewayLabel } from '@edforge/types'
+import { formatGatewayLabel } from '@edforge/types'
 import type { Payment } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 import {
   FinancePageHeader,
@@ -66,6 +68,8 @@ function VoidPaymentDialog({
   onConfirm: (reason: string) => void
   onCancel: () => void
 }) {
+  const voidSettings = useFinanceSettings()
+  const { format: formatAmount } = useCurrency(voidSettings)
   const [reason, setReason] = useState('')
   const backdropRef = useRef<HTMLDivElement>(null)
 
@@ -121,7 +125,7 @@ function VoidPaymentDialog({
           <div className="flex justify-between text-sm">
             <span className="text-[rgb(var(--text-secondary))]">Amount</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
-              {formatNPR(payment.amount)}
+              {formatAmount(payment.amount)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -216,6 +220,8 @@ function RefundPaymentDialog({
   onConfirm: (amount: number, reason: string) => void
   onCancel: () => void
 }) {
+  const refundSettings = useFinanceSettings()
+  const { format: formatAmount } = useCurrency(refundSettings)
   const [amount, setAmount] = useState(String(payment.amount))
   const [reason, setReason] = useState('')
   const [amountError, setAmountError] = useState('')
@@ -255,7 +261,7 @@ function RefundPaymentDialog({
       setAmountError('Amount must be greater than 0')
     } else if (parsed > maxRefundable) {
       setAmountError(
-        `Exceeds refundable amount (${formatNPR(maxRefundable)})`,
+        `Exceeds refundable amount (${formatAmount(maxRefundable)})`,
       )
     } else {
       setAmountError('')
@@ -299,7 +305,7 @@ function RefundPaymentDialog({
           <div className="flex justify-between text-sm">
             <span className="text-[rgb(var(--text-secondary))]">Original amount</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
-              {formatNPR(payment.amount)}
+              {formatAmount(payment.amount)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -322,14 +328,14 @@ function RefundPaymentDialog({
             <div className="flex justify-between text-sm">
               <span className="text-[rgb(var(--text-secondary))]">Already refunded</span>
               <span className="font-medium text-orange-600 dark:text-orange-400">
-                {formatNPR(totalRefunded)}
+                {formatAmount(totalRefunded)}
               </span>
             </div>
           )}
           <div className="flex justify-between text-sm border-t border-[rgb(var(--border-primary))] pt-1.5 mt-1.5">
             <span className="text-[rgb(var(--text-secondary))]">Max refundable</span>
             <span className="font-semibold text-[rgb(var(--text-primary))]">
-              {formatNPR(maxRefundable)}
+              {formatAmount(maxRefundable)}
             </span>
           </div>
         </div>
@@ -338,7 +344,7 @@ function RefundPaymentDialog({
           {/* Amount input */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Refund Amount (NPR) *
+              Refund Amount ({refundSettings.currency}) *
             </label>
             <input
               type="number"
@@ -409,6 +415,7 @@ function usePaymentColumns(
   handleVoidClick: (payment: Payment) => void,
   handleRefundClick: (payment: Payment) => void,
   voidIsPending: boolean,
+  formatAmount: (amount: number, opts?: { decimals?: number }) => string,
 ): ColumnDef<Payment, unknown>[] {
   return useMemo(
     () => [
@@ -450,7 +457,7 @@ function usePaymentColumns(
         header: 'Amount',
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
-            {formatNPR(row.original.amount)}
+            {formatAmount(row.original.amount)}
           </span>
         ),
         meta: { align: 'right' as const },
@@ -532,7 +539,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount],
   )
 }
 
@@ -566,6 +573,8 @@ const GATEWAY_OPTIONS = [
 export default function PaymentsPage() {
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useFinanceSettings()
+  const { format, formatCompact } = useCurrency(settings)
 
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
@@ -637,6 +646,7 @@ export default function PaymentsPage() {
     handleVoidClick,
     handleRefundClick,
     voidMutation.isPending,
+    format,
   )
 
   if (!schoolId) {
@@ -676,7 +686,7 @@ export default function PaymentsPage() {
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Total Collected"
-            value={formatNPRCompact(kpi.totalCollected)}
+            value={formatCompact(kpi.totalCollected)}
             icon={DollarSign}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"

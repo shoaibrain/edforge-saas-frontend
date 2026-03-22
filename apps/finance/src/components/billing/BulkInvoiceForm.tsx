@@ -14,8 +14,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { formatNPR } from '@edforge/types'
 import type { FeeStructure } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 import { Button } from '@edforge/ui'
 import {
   Search,
@@ -118,6 +119,8 @@ function StepIndicator({ current }: { current: Step }) {
 // ============================================================================
 
 export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceFormProps) {
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
   // Data fetching
   const { data: studentsData, isLoading: studentsLoading } = useEnrolledStudents(schoolId)
   const { data: feeStructureData, isLoading: feesLoading } = useFeeStructures(schoolId)
@@ -498,7 +501,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                          {formatNPR(fee.amount)}
+                          {format(fee.amount)}
                         </span>
                         {fee.taxRate > 0 && (
                           <p className="text-xs text-[rgb(var(--text-tertiary))]">
@@ -515,17 +518,17 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3">
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Per-student subtotal</span>
-                    <span>{formatNPR(perStudentSubtotal)}</span>
+                    <span>{format(perStudentSubtotal)}</span>
                   </div>
                   {perStudentTax > 0 && (
                     <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                       <span>Per-student tax</span>
-                      <span>{formatNPR(perStudentTax)}</span>
+                      <span>{format(perStudentTax)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-1 mt-1">
                     <span>Per-student total</span>
-                    <span>{formatNPR(perStudentTotal)}</span>
+                    <span>{format(perStudentTotal)}</span>
                   </div>
                 </div>
               )}
@@ -638,7 +641,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                       <div key={fee.id} className="flex justify-between text-xs">
                         <span className="text-[rgb(var(--text-secondary))]">{fee.name}</span>
                         <span className="text-[rgb(var(--text-primary))] font-medium">
-                          {formatNPR(fee.amount)}
+                          {format(fee.amount)}
                         </span>
                       </div>
                     ))}
@@ -675,7 +678,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 <div className="px-4 py-3 bg-[rgb(var(--surface-secondary))]">
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Per-student total</span>
-                    <span>{formatNPR(perStudentTotal)}</span>
+                    <span>{format(perStudentTotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Number of students</span>
@@ -683,7 +686,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   </div>
                   <div className="flex justify-between text-base font-bold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2 mt-2">
                     <span>Grand Total</span>
-                    <span>{formatNPR(grandTotal)}</span>
+                    <span>{format(grandTotal)}</span>
                   </div>
                 </div>
               </div>

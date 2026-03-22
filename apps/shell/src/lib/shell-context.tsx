@@ -13,10 +13,13 @@
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useQuery, useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
-import type { UserIdentity, Tenant, School, SchoolYear } from '@edforge/types'
+import type { UserIdentity, Tenant, School, SchoolYear, WorkspaceSettings, SchoolConfiguration } from '@edforge/types'
+import type { ResolvedSettings } from '@edforge/config/resolved-settings'
 import { useAuthStore, type AuthStore } from '../stores/auth.store'
 import { useAppStore } from '../stores/app.store'
 import { tenantService } from '../services/tenant.service'
+import { useResolvedSettings } from '../hooks/useResolvedSettings'
+import { broadcastSchoolChange } from '@edforge/config/school-context-channel'
 
 // ============================================================================
 // SHELL CONTEXT TYPES
@@ -43,6 +46,11 @@ export interface ShellContextValue {
 
   // School Year
   activeSchoolYear: SchoolYear | null
+
+  // Workspace Settings
+  workspaceSettings: WorkspaceSettings['regional'] | null
+  schoolConfiguration: SchoolConfiguration | null
+  resolvedSettings: ResolvedSettings
 
   // Theme
   theme: 'light' | 'dark' | 'system'
@@ -168,6 +176,24 @@ export function ShellProvider({ children }: ShellProviderProps) {
     staleTime: 30 * 60 * 1000, // 30 minutes
   })
 
+  // Fetch workspace settings for the tenant
+  const { data: workspaceSettingsData } = useQuery({
+    queryKey: ['workspaceSettings', user?.tenantId],
+    queryFn: () => tenantService.getWorkspaceSettings(user!.tenantId),
+    enabled: isAuthenticated && !!user?.tenantId,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // Fetch school configuration when active school changes
+  const { data: schoolConfigurationData } = useQuery({
+    queryKey: ['schoolConfiguration', activeSchoolId],
+    queryFn: () => tenantService.getSchoolConfiguration(activeSchoolId!),
+    enabled: isAuthenticated && !!activeSchoolId,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
   // ============================================================================
   // COMPUTED VALUES — no mock fallbacks; null when API data is unavailable
   // ============================================================================
@@ -175,6 +201,8 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const effectiveTenant = tenant ?? null
   const effectiveSchools = schools ?? []
   const effectiveSchoolYear = schoolYear ?? null
+  const effectiveWorkspaceSettings = workspaceSettingsData?.regional ?? null
+  const effectiveSchoolConfiguration = (schoolConfigurationData as SchoolConfiguration) ?? null
 
   // Filter schools user has access to based on assignments
   const availableSchools = useMemo(() => {
@@ -196,6 +224,22 @@ export function ShellProvider({ children }: ShellProviderProps) {
     if (!activeSchoolId) return null
     return availableSchools.find((s) => s.id === activeSchoolId) ?? null
   }, [activeSchoolId, availableSchools])
+
+  // Compute resolved settings from the precedence chain
+  const resolvedSettings = useResolvedSettings({
+    workspaceSettings: effectiveWorkspaceSettings,
+    activeSchool,
+    schoolConfiguration: effectiveSchoolConfiguration,
+  })
+
+  // Broadcast resolved settings to MFEs whenever they change
+  useEffect(() => {
+    broadcastSchoolChange(
+      activeSchoolId,
+      activeSchool?.status ?? null,
+      resolvedSettings,
+    )
+  }, [activeSchoolId, activeSchool?.status, resolvedSettings])
 
   // Consolidated auto-select: restore from localStorage or pick first available
   useEffect(() => {
@@ -307,6 +351,9 @@ export function ShellProvider({ children }: ShellProviderProps) {
       setActiveSchool: setActiveSchoolId,
       availableSchools,
       activeSchoolYear: effectiveSchoolYear,
+      workspaceSettings: effectiveWorkspaceSettings,
+      schoolConfiguration: effectiveSchoolConfiguration,
+      resolvedSettings,
       theme,
       setTheme,
       sidebarCollapsed,
@@ -326,6 +373,9 @@ export function ShellProvider({ children }: ShellProviderProps) {
       setActiveSchoolId,
       availableSchools,
       effectiveSchoolYear,
+      effectiveWorkspaceSettings,
+      effectiveSchoolConfiguration,
+      resolvedSettings,
       theme,
       sidebarCollapsed,
       toggleSidebar,
@@ -375,4 +425,19 @@ export function useActiveSchool() {
 export function useSchoolYear() {
   const { activeSchoolYear } = useShell()
   return activeSchoolYear
+}
+
+export function useWorkspaceSettings() {
+  const { workspaceSettings } = useShell()
+  return workspaceSettings
+}
+
+export function useSchoolConfiguration() {
+  const { schoolConfiguration } = useShell()
+  return schoolConfiguration
+}
+
+export function useSettings() {
+  const { resolvedSettings } = useShell()
+  return resolvedSettings
 }

@@ -5,7 +5,9 @@
  */
 
 import { Banknote, FileText, Building2, Smartphone, CreditCard, type LucideIcon } from 'lucide-react'
-import { formatNPR, formatGatewayLabel, formatRelativeDate } from '@edforge/types'
+import { formatGatewayLabel, formatRelativeDate } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 const GATEWAY_ICONS: Record<string, LucideIcon> = {
   cash: Banknote,
@@ -62,6 +64,8 @@ function FeedSkeleton() {
 }
 
 export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardProps) {
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
   const top5 = payments.slice(0, 5)
 
   return (
@@ -124,7 +128,7 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
                   className="text-[11px] font-semibold flex-shrink-0"
                   style={{ color: 'var(--v2-brand-primary)' }}
                 >
-                  {formatNPR(payment.amount, { decimals: 0 })}
+                  {format(payment.amount, { decimals: 0 })}
                 </span>
               </div>
             )

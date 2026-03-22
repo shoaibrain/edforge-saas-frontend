@@ -19,8 +19,9 @@ import {
 import { useSearch } from '@tanstack/react-router'
 import { useAppStore } from '../../../stores/app.store'
 import { useRecordManualPayment, useInvoices } from '@edforge/finance-services'
-import { formatNPR } from '@edforge/types'
 import type { Invoice } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 
@@ -66,6 +67,8 @@ function StudentInvoiceList({
   selectedInvoiceId: string
   onSelect: (invoiceId: string, amountDue: number, label: string) => void
 }) {
+  const listSettings = useFinanceSettings()
+  const { format } = useCurrency(listSettings)
   const { data: invoiceData, isLoading } = useInvoices(schoolId, { studentId })
 
   const payableInvoices: Invoice[] = useMemo(() => {
@@ -129,7 +132,7 @@ function StudentInvoiceList({
                     {invoice.invoiceNumber}
                   </span>
                   <span className="text-sm font-semibold text-teal-600 dark:text-teal-400 flex-shrink-0">
-                    {formatNPR(invoice.amountDue)}
+                    {format(invoice.amountDue)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2 mt-0.5">
@@ -155,6 +158,8 @@ function StudentInvoiceList({
 
 export default function RecordPaymentPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  const settings = useFinanceSettings()
+  const { format: formatCurr } = useCurrency(settings)
   const searchParams = useSearch({ strict: false }) as {
     invoiceId?: string
     amount?: string
@@ -218,7 +223,7 @@ export default function RecordPaymentPage() {
         invoiceId: invoiceId.trim(),
         gateway: paymentMethod,
         amount: parsedAmount,
-        currency: 'NPR',
+        currency: settings.currency,
         referenceNumber: referenceNumber.trim() || undefined,
         notes: notes.trim() || undefined,
         paidDate: paidDate || undefined,
@@ -350,7 +355,7 @@ export default function RecordPaymentPage() {
           {/* Amount */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Amount (NPR) *
+              Amount ({settings.currency}) *
             </label>
             <input
               type="number"
@@ -440,7 +445,7 @@ export default function RecordPaymentPage() {
               </div>
               <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2 mt-2">
                 <span>Amount</span>
-                <span>{formatNPR(parsedAmount)}</span>
+                <span>{formatCurr(parsedAmount)}</span>
               </div>
             </div>
           </div>

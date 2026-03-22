@@ -8,6 +8,8 @@
  * No React dependency — pure DOM APIs.
  */
 
+import type { ResolvedSettings } from './resolved-settings'
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -15,6 +17,7 @@
 export interface SchoolContextPayload {
   schoolId: string | null
   schoolStatus: string | null
+  resolvedSettings?: ResolvedSettings
 }
 
 // ============================================================================
@@ -34,11 +37,12 @@ const EVENT_NAME = 'edforge:school-changed'
 export function broadcastSchoolChange(
   schoolId: string | null,
   schoolStatus: string | null,
+  resolvedSettings?: ResolvedSettings,
 ): void {
-  _lastPayload = { schoolId, schoolStatus }
+  _lastPayload = { schoolId, schoolStatus, resolvedSettings }
   window.dispatchEvent(
     new CustomEvent<SchoolContextPayload>(EVENT_NAME, {
-      detail: { schoolId, schoolStatus },
+      detail: { schoolId, schoolStatus, resolvedSettings },
     }),
   )
 }

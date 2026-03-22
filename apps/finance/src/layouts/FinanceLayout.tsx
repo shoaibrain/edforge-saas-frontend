@@ -9,12 +9,24 @@
  * MFE modules should only render their content.
  */
 
-import { Component, useEffect, useRef } from 'react'
+import { Component, createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle, RotateCw, Home } from 'lucide-react'
 import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
+import type { ResolvedSettings } from '@edforge/config/resolved-settings'
+import { SYSTEM_DEFAULTS } from '@edforge/config/resolved-settings'
 import { useAppStore } from '../stores/app.store'
+
+// ============================================================================
+// FINANCE SETTINGS CONTEXT
+// ============================================================================
+
+const FinanceSettingsContext = createContext<ResolvedSettings>(SYSTEM_DEFAULTS)
+
+export function useFinanceSettings(): ResolvedSettings {
+  return useContext(FinanceSettingsContext)
+}
 
 // ============================================================================
 // ERROR BOUNDARY (must be a class component)
@@ -108,10 +120,12 @@ class FinanceErrorBoundary extends Component<
 export function FinanceLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const prevSchoolRef = useRef<string | null>(null)
+  const [settings, setSettings] = useState<ResolvedSettings>(() => {
+    const initial = getSchoolContext()
+    return initial.resolvedSettings ?? SYSTEM_DEFAULTS
+  })
 
-  // Sync school context from Shell broadcasts.
-  // On mount, grab the current context synchronously in case the Shell
-  // already broadcast before this MFE mounted.
+  // Sync school context and resolved settings from Shell broadcasts.
   useEffect(() => {
     const { setActiveSchoolId } = useAppStore.getState()
     const initial = getSchoolContext()
@@ -119,11 +133,18 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
       setActiveSchoolId(initial.schoolId)
       prevSchoolRef.current = initial.schoolId
     }
-    return onSchoolChange(({ schoolId }) => {
+    if (initial.resolvedSettings) {
+      setSettings(initial.resolvedSettings)
+    }
+    return onSchoolChange(({ schoolId, resolvedSettings }) => {
       const prevId = prevSchoolRef.current
       prevSchoolRef.current = schoolId
 
       setActiveSchoolId(schoolId)
+
+      if (resolvedSettings) {
+        setSettings(resolvedSettings)
+      }
 
       // On school switch (not initial mount), redirect to module root
       if (prevId && prevId !== schoolId) {
@@ -135,8 +156,10 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
   // Shell's AppShell provides the layout (Header + Sidebar)
   // This module just renders its content, wrapped in an error boundary
   return (
-    <FinanceErrorBoundary>
-      {children}
-    </FinanceErrorBoundary>
+    <FinanceSettingsContext.Provider value={settings}>
+      <FinanceErrorBoundary>
+        {children}
+      </FinanceErrorBoundary>
+    </FinanceSettingsContext.Provider>
   )
 }

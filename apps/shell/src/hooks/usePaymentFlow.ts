@@ -14,6 +14,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react'
 import type { Invoice, PaymentGateway, Receipt } from '@edforge/types'
 import { initiatePayment } from '../services/payments.service'
+import { useSettings } from '../lib/shell-context'
 
 // ============================================================================
 // STATE TYPES
@@ -118,6 +119,7 @@ function paymentFlowReducer(
 const PAYMENT_TIMEOUT_MS = 30 * 60 * 1000
 
 export function usePaymentFlow(invoice: Invoice, schoolId: string) {
+  const settings = useSettings()
   const [state, dispatch] = useReducer(paymentFlowReducer, initialState)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -165,7 +167,7 @@ export function usePaymentFlow(invoice: Invoice, schoolId: string) {
         invoiceId: invoice.id,
         gateway: state.gateway,
         amount: invoice.amountDue,
-        currency: 'NPR',
+        currency: settings.currency,
         returnUrl: `${window.location.origin}/payments/callback`,
         cancelUrl: `${window.location.origin}/parent-portal/fees`,
       })

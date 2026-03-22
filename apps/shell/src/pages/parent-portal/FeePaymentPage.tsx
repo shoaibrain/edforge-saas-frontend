@@ -12,10 +12,11 @@
 
 import { useState, useMemo } from 'react'
 import type { Invoice } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { useNavigate } from '@tanstack/react-router'
 import { CreditCard, Loader2, AlertTriangle, ShieldX, CheckCircle2 } from 'lucide-react'
+import { useSettings } from '../../lib/shell-context'
 import { useAppStore } from '../../stores/app.store'
 import { useParentPortal } from './ParentPortalLayout'
 import { useInvoices } from '../../hooks/usePayments'
@@ -29,6 +30,8 @@ type PageView = 'list' | 'detail' | 'pay'
 export default function FeePaymentPage() {
   const { t } = useTranslation('payments')
   const navigate = useNavigate()
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const { activeChild } = useParentPortal()
 
@@ -160,7 +163,7 @@ export default function FeePaymentPage() {
                   All fees are paid
                 </p>
                 <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">
-                  Total paid: {formatNPR(feeSummary.totalPaid)}
+                  Total paid: {format(feeSummary.totalPaid)}
                 </p>
               </div>
             </div>
@@ -173,7 +176,7 @@ export default function FeePaymentPage() {
                   Total Fees
                 </p>
                 <p className="text-lg font-bold text-[rgb(var(--text-primary))]">
-                  {formatNPR(feeSummary.totalFees)}
+                  {format(feeSummary.totalFees)}
                 </p>
               </div>
 
@@ -183,7 +186,7 @@ export default function FeePaymentPage() {
                   Paid
                 </p>
                 <p className="text-lg font-bold text-green-700 dark:text-green-300">
-                  {formatNPR(feeSummary.totalPaid)}
+                  {format(feeSummary.totalPaid)}
                 </p>
               </div>
 
@@ -205,7 +208,7 @@ export default function FeePaymentPage() {
                     ? 'text-red-700 dark:text-red-300'
                     : 'text-amber-700 dark:text-amber-300'
                 }`}>
-                  {formatNPR(feeSummary.totalRemaining)}
+                  {format(feeSummary.totalRemaining)}
                 </p>
               </div>
             </div>

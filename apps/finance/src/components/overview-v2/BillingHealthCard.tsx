@@ -16,7 +16,9 @@ import {
 } from 'recharts'
 import { CheckCircle2 } from 'lucide-react'
 import { AnimatedProgressBar } from '@edforge/ui'
-import { formatNPRShort, formatInvoiceStatus, formatGatewayLabel } from '@edforge/types'
+import { formatInvoiceStatus, formatGatewayLabel } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 // ─── Colors ──────────────────────────────────────────────────────────────────
 
@@ -124,7 +126,7 @@ function DonutTooltip({ active, payload }: any) {
 
 // ─── Aging Insight Generator ─────────────────────────────────────────────────
 
-function getAgingInsight(buckets: AgingBucket[]): string | null {
+function getAgingInsight(buckets: AgingBucket[], fmtShort: (amount: number) => string): string | null {
   const activeBuckets = buckets.filter((b) => b.count > 0)
   if (activeBuckets.length === 0) return null
 
@@ -133,12 +135,12 @@ function getAgingInsight(buckets: AgingBucket[]): string | null {
 
   if (activeBuckets.length === 1) {
     const b = activeBuckets[0]
-    return `${b.count} invoice${b.count !== 1 ? 's' : ''} overdue (${formatNPRShort(b.amount)}), all within the ${b.label} window.`
+    return `${b.count} invoice${b.count !== 1 ? 's' : ''} overdue (${fmtShort(b.amount)}), all within the ${b.label} window.`
   }
 
   // Multiple buckets active — find the worst
   const worst = activeBuckets[activeBuckets.length - 1]
-  return `${total} invoices overdue totaling ${formatNPRShort(totalAmount)}. ${worst.count} invoice${worst.count !== 1 ? 's' : ''} in the ${worst.label} bucket need${worst.count === 1 ? 's' : ''} immediate attention.`
+  return `${total} invoices overdue totaling ${fmtShort(totalAmount)}. ${worst.count} invoice${worst.count !== 1 ? 's' : ''} in the ${worst.label} bucket need${worst.count === 1 ? 's' : ''} immediate attention.`
 }
 
 // ─── Default Buckets ─────────────────────────────────────────────────────────
@@ -161,6 +163,9 @@ export function BillingHealthCard({
   agingReport,
   isLoading,
 }: BillingHealthCardProps) {
+  const settings = useFinanceSettings()
+  const { formatShort } = useCurrency(settings)
+
   const sortedStatuses = useMemo(
     () =>
       Object.entries(invoicesByStatus)
@@ -190,7 +195,7 @@ export function BillingHealthCard({
 
   const buckets = agingReport.length > 0 ? agingReport : DEFAULT_BUCKETS
   const hasAnyOverdue = buckets.some((b) => b.count > 0)
-  const agingInsight = useMemo(() => getAgingInsight(buckets), [buckets])
+  const agingInsight = useMemo(() => getAgingInsight(buckets, formatShort), [buckets, formatShort])
 
   // Spectrum bar segment widths — proportional to count, minimum 6% for visibility
   const totalCount = buckets.reduce((s, b) => s + b.count, 0)
@@ -352,7 +357,7 @@ export function BillingHealthCard({
                           opacity: isActive ? 1 : 0.4,
                           borderRight: idx < buckets.length - 1 ? '1px solid var(--v2-bg-base)' : undefined,
                         }}
-                        title={`${bucket.label}: ${bucket.count} invoices (${formatNPRShort(bucket.amount)})`}
+                        title={`${bucket.label}: ${bucket.count} invoices (${formatShort(bucket.amount)})`}
                       >
                         {isActive && bucket.count > 0 && (
                           <span className="text-[10px] font-bold text-white drop-shadow-sm">
@@ -387,7 +392,7 @@ export function BillingHealthCard({
                         </div>
                         {isActive && (
                           <div className="text-[9px] tabular-nums" style={{ color: 'var(--v2-text-hint)' }}>
-                            {formatNPRShort(bucket.amount)}
+                            {formatShort(bucket.amount)}
                           </div>
                         )}
                       </div>

@@ -7,9 +7,10 @@
 
 import { useEffect, useState } from 'react'
 import type { Invoice, PaymentGatewayPublicConfig } from '@edforge/types'
-import { formatNPR } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { ArrowLeft, Loader2, ExternalLink, AlertTriangle, XCircle, CheckCircle2 } from 'lucide-react'
+import { useSettings } from '../../lib/shell-context'
 import { usePaymentFlow } from '../../hooks/usePaymentFlow'
 import { useVerifyPayment } from '../../hooks/usePayments'
 import { PaymentMethodSelector } from './PaymentMethodSelector'
@@ -30,8 +31,9 @@ export function PaymentForm({
   onBack,
   onComplete,
 }: PaymentFormProps) {
-  const { t, i18n } = useTranslation('payments')
-  const locale = (i18n.language === 'ne' ? 'ne' : 'en') as 'en' | 'ne'
+  const { t } = useTranslation('payments')
+  const settings = useSettings()
+  const { format } = useCurrency(settings)
 
   const {
     state,
@@ -90,7 +92,7 @@ export function PaymentForm({
         <div className="p-4 rounded-xl border-2 border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-500/5">
           <p className="text-sm text-[rgb(var(--text-primary))]">
             {t('flow.confirmDescription', {
-              amount: formatNPR(invoice.amountDue, { locale }),
+              amount: format(invoice.amountDue),
               gateway: gatewayLabel,
             })}
           </p>
