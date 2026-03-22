@@ -10,6 +10,7 @@ import { useEffect, useRef, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Phone, Mail, Globe } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
+import { useShell } from '@/lib/shell-context'
 import { AnimatedInput, AnimatedSelect } from './BasicInfoStep'
 import {
   COUNTRY_OPTIONS,
@@ -26,6 +27,8 @@ const CALENDAR_TYPE_OPTIONS = [
 ]
 
 export function LocationContactStep({ data, updateData, errors, clearError }: WizardStepProps) {
+  const { resolvedSettings } = useShell()
+
   const handleChange = (field: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -167,12 +170,19 @@ export function LocationContactStep({ data, updateData, errors, clearError }: Wi
           Regional Settings
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <AnimatedSelect
-            label="Timezone"
-            value={(data.timezone as string) || countryConfig.defaultTimezone}
-            onChange={handleChange('timezone')}
-            options={timezoneOptions}
-          />
+          <div>
+            <AnimatedSelect
+              label="Timezone"
+              value={(data.timezone as string) || countryConfig.defaultTimezone}
+              onChange={handleChange('timezone')}
+              options={timezoneOptions}
+            />
+            {(data.timezone as string) === resolvedSettings.timezone && (
+              <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
+                Inherited from organization settings — you can override this per school.
+              </p>
+            )}
+          </div>
           <AnimatedSelect
             label="Academic Calendar Type"
             value={(data.academicCalendarType as string) || (countryConfig.defaultCalendarSystem === 'bikram_sambat' ? 'annual' : 'semester')}
@@ -183,7 +193,11 @@ export function LocationContactStep({ data, updateData, errors, clearError }: Wi
         {countryConfig.defaultCalendarSystem !== 'gregorian' && (
           <div className="mt-3 px-3 py-2 rounded-md bg-[rgb(var(--bg-secondary))] text-sm text-[rgb(var(--text-secondary))]">
             Calendar System: <span className="font-medium capitalize">{countryConfig.defaultCalendarSystem.replace('_', ' ')}</span>
-            <span className="text-xs ml-2">(auto-set from country)</span>
+            {(data.calendarSystem as string) === resolvedSettings.calendarSystem ? (
+              <span className="text-xs ml-2">(inherited from organization settings)</span>
+            ) : (
+              <span className="text-xs ml-2">(auto-set from country)</span>
+            )}
           </div>
         )}
       </div>
