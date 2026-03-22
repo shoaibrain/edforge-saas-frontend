@@ -17,7 +17,7 @@ import type { SchoolResponseDto } from '@aibrains/shared-types'
 import { useAuthStore } from '@/stores/auth.store'
 import { useShell } from '@/lib/shell-context'
 import { tenantService } from '@/services/tenant.service'
-import { transformWizardDataToDto, getDefaultGradeRange } from './school-wizard.utils'
+import { transformWizardDataToDto, getDefaultGradeRange, getDefaultSchoolDays } from './school-wizard.utils'
 import { basicInfoSchema, locationContactSchema, edfiComplianceSchema } from './school-wizard.schemas'
 import { BasicInfoStep } from './steps/BasicInfoStep'
 import { LocationContactStep } from './steps/LocationContactStep'
@@ -181,6 +181,7 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
         locale: resolvedSettings.locale,
         calendarSystem: resolvedSettings.calendarSystem,
         academicCalendarType: resolvedSettings.calendarSystem === 'bikram_sambat' ? 'annual' : 'semester',
+        schoolDays: getDefaultSchoolDays(resolvedSettings.calendarSystem),
         ...(initialLeaId ? { localEducationAgencyId: initialLeaId } : {}),
       }
     },

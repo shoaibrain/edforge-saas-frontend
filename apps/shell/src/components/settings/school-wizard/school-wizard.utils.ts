@@ -44,6 +44,23 @@ export {
 export const US_TIMEZONE_OPTIONS = getTimezoneOptionsForCountry('USA')
 
 // ============================================================================
+// SCHOOL DAYS DEFAULTS
+// ============================================================================
+
+/**
+ * Returns default operating days for a school based on its calendar system.
+ * Bikram Sambat (Nepal): Sunday–Friday [0,1,2,3,4,5]
+ * Gregorian (default):   Monday–Friday [1,2,3,4,5]
+ * Day numbers follow JS convention: 0 = Sunday, 6 = Saturday.
+ */
+export function getDefaultSchoolDays(calendarSystem: string): number[] {
+  if (calendarSystem === 'bikram_sambat') {
+    return [0, 1, 2, 3, 4, 5] // Sun–Fri
+  }
+  return [1, 2, 3, 4, 5] // Mon–Fri
+}
+
+// ============================================================================
 // AUTO-GENERATION HELPERS
 // ============================================================================
 
