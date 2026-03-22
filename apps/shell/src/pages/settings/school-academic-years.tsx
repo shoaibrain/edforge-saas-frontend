@@ -151,12 +151,18 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-[rgb(var(--text-primary))]">{year.name}</h4>
+                      <h4 className="font-semibold text-[rgb(var(--text-primary))]">
+                        {year.startDateBS
+                          ? `BS ${year.startDateBS.split('/')[0]}/${(parseInt(year.startDateBS.split('/')[0], 10) + 1)}`
+                          : year.name}
+                      </h4>
                       <StatusBadge status={year.status} />
                       {year.isLocked && <Lock className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />}
                     </div>
                     <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                      {new Date(year.startDate).toLocaleDateString()} - {new Date(year.endDate).toLocaleDateString()}
+                      {year.startDateBS
+                        ? `(${new Date(year.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} – ${new Date(year.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})`
+                        : `${new Date(year.startDate).toLocaleDateString()} - ${new Date(year.endDate).toLocaleDateString()}`}
                     </p>
                   </div>
                   <CalendarDays className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
