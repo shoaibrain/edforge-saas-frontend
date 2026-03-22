@@ -129,7 +129,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
         {entries.map((entry) => (
           <tr key={entry.id}>
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))]">
-              {formatDate(entry.date)}
+              {formatDate(entry.date, ledgerSettings)}
             </td>
             <td className="px-2 py-1.5">
               <FinanceStatusChip status={entry.entryType} size="xs" />
@@ -211,7 +211,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
               </span>
             </td>
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-secondary))]">
-              {formatDateDual(invoice.dueDate)}
+              {formatDateDual(invoice.dueDate, invSettings)}
             </td>
           </tr>
         ))}
@@ -320,7 +320,7 @@ function AccountDetail({
         <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
           <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
-            {account.lastPaymentDate ? formatDate(account.lastPaymentDate) : 'Never'}
+            {account.lastPaymentDate ? formatDate(account.lastPaymentDate, detailSettings) : 'Never'}
           </p>
         </div>
       </div>
@@ -385,7 +385,7 @@ function getAvatarUrl(seed: string): string {
 // COLUMN DEFINITIONS
 // ============================================================================
 
-function buildColumns(format: (amount: number) => string): ColumnDef<StudentAccount, unknown>[] {
+function buildColumns(format: (amount: number) => string, settings: ReturnType<typeof useFinanceSettings>): ColumnDef<StudentAccount, unknown>[] {
   return [
   createExpandColumn<StudentAccount>(),
   {
@@ -443,7 +443,7 @@ function buildColumns(format: (amount: number) => string): ColumnDef<StudentAcco
     header: 'Last Payment',
     cell: ({ row }) => (
       <span className="text-[rgb(var(--text-secondary))]">
-        {row.original.lastPaymentDate ? formatDate(row.original.lastPaymentDate) : 'Never'}
+        {row.original.lastPaymentDate ? formatDate(row.original.lastPaymentDate, settings) : 'Never'}
       </span>
     ),
   },
@@ -458,7 +458,7 @@ export default function StudentAccountsPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format, formatCompact } = useCurrency(settings)
-  const columns = useMemo(() => buildColumns(format), [format])
+  const columns = useMemo(() => buildColumns(format, settings), [format, settings])
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 

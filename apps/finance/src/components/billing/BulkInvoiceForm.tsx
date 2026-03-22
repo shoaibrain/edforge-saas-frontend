@@ -668,7 +668,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     <div className="flex justify-between">
                       <span className="text-[rgb(var(--text-tertiary))]">Due Date</span>
                       <span className="text-[rgb(var(--text-primary))]">
-                        {formatDate(dueDate)}
+                        {formatDate(dueDate, settings)}
                       </span>
                     </div>
                   </div>

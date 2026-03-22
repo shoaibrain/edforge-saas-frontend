@@ -137,7 +137,7 @@ function StudentInvoiceList({
                 </div>
                 <div className="flex items-center justify-between gap-2 mt-0.5">
                   <span className="text-xs text-[rgb(var(--text-secondary))] truncate">
-                    {invoice.dueDate ? `Due ${formatDate(invoice.dueDate)}` : ''}
+                    {invoice.dueDate ? `Due ${formatDate(invoice.dueDate, listSettings)}` : ''}
                   </span>
                   <span className={`text-xs px-1.5 py-0.5 rounded-full ${statusBadgeClass(invoice.status)}`}>
                     {statusLabel(invoice.status)}
@@ -440,7 +440,7 @@ export default function RecordPaymentPage() {
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                 <span>Date</span>
                 <span className="font-medium text-[rgb(var(--text-primary))]">
-                  {paidDate ? formatDate(paidDate) : '--'}
+                  {paidDate ? formatDate(paidDate, settings) : '--'}
                 </span>
               </div>
               <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2 mt-2">

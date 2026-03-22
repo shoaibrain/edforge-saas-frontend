@@ -213,7 +213,7 @@ export default function InvoicesPage() {
           const overdueDays = invoice.status === 'overdue' ? getOverdueDays(invoice.dueDate) : 0
           return (
             <div className="flex items-center gap-1.5 text-[rgb(var(--text-secondary))]">
-              <span>{invoice.dueDate ? formatDateDual(invoice.dueDate) : '-'}</span>
+              <span>{invoice.dueDate ? formatDateDual(invoice.dueDate, settings) : '-'}</span>
               {invoice.status === 'overdue' && overdueDays > 0 && (
                 <span className="inline-flex items-center gap-0.5 text-xs text-red-600 dark:text-red-400">
                   <Clock className="w-3 h-3" />

@@ -89,7 +89,7 @@ export default function InvoiceDetailPage() {
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
             {invoice.studentName && `Student: ${invoice.studentName}`}
-            {invoice.dueDate && ` · Due: ${formatDateDual(invoice.dueDate)}`}
+            {invoice.dueDate && ` · Due: ${formatDateDual(invoice.dueDate, settings)}`}
           </p>
         </div>
 
@@ -212,7 +212,7 @@ export default function InvoiceDetailPage() {
                     )}
                   </p>
                   <p className="text-xs text-[rgb(var(--text-secondary))]">
-                    {payment.paidAt ? formatDate(payment.paidAt) : payment.createdAt ? formatDate(payment.createdAt) : ''}
+                    {payment.paidAt ? formatDate(payment.paidAt, settings) : payment.createdAt ? formatDate(payment.createdAt, settings) : ''}
                   </p>
                 </div>
                 <span className="text-sm font-medium text-green-600 dark:text-green-400">
@@ -226,8 +226,8 @@ export default function InvoiceDetailPage() {
 
       {/* Metadata */}
       <div className="text-xs text-[rgb(var(--text-tertiary))] space-y-0.5">
-        {invoice.createdAt && <p>Created: {formatDateTime(invoice.createdAt)}</p>}
-        {invoice.issuedDate && <p>Issued: {formatDateDual(invoice.issuedDate)}</p>}
+        {invoice.createdAt && <p>Created: {formatDateTime(invoice.createdAt, settings)}</p>}
+        {invoice.issuedDate && <p>Issued: {formatDateDual(invoice.issuedDate, settings)}</p>}
         {invoice.notes && <p>Notes: {invoice.notes}</p>}
       </div>
 

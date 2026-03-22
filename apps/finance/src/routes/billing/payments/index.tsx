@@ -138,9 +138,9 @@ function VoidPaymentDialog({
             <span className="text-[rgb(var(--text-secondary))]">Date</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
               {payment.paidAt
-                ? formatDate(payment.paidAt)
+                ? formatDate(payment.paidAt, voidSettings)
                 : payment.createdAt
-                  ? formatDate(payment.createdAt)
+                  ? formatDate(payment.createdAt, voidSettings)
                   : '-'}
             </span>
           </div>
@@ -318,9 +318,9 @@ function RefundPaymentDialog({
             <span className="text-[rgb(var(--text-secondary))]">Date</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
               {payment.paidAt
-                ? formatDate(payment.paidAt)
+                ? formatDate(payment.paidAt, refundSettings)
                 : payment.createdAt
-                  ? formatDate(payment.createdAt)
+                  ? formatDate(payment.createdAt, refundSettings)
                   : '-'}
             </span>
           </div>
@@ -417,6 +417,7 @@ function usePaymentColumns(
   voidIsPending: boolean,
   formatAmount: (amount: number, opts?: { decimals?: number }) => string,
 ): ColumnDef<Payment, unknown>[] {
+  const colSettings = useFinanceSettings()
   return useMemo(
     () => [
       {
@@ -487,9 +488,9 @@ function usePaymentColumns(
         cell: ({ row }) => (
           <span className="text-[rgb(var(--text-secondary))]">
             {row.original.paidAt
-              ? formatDateDual(row.original.paidAt)
+              ? formatDateDual(row.original.paidAt, colSettings)
               : row.original.createdAt
-                ? formatDateDual(row.original.createdAt)
+                ? formatDateDual(row.original.createdAt, colSettings)
                 : '-'}
           </span>
         ),
@@ -539,7 +540,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings],
   )
 }
 
