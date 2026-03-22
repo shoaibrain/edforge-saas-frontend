@@ -37,3 +37,7 @@ export {
 
 // React hooks
 export { useDateFormatter } from './hooks/useDateFormatter'
+
+// React components
+export { BSDateInput } from './components/BSDateInput'
+export type { BSDateInputProps } from './components/BSDateInput'
