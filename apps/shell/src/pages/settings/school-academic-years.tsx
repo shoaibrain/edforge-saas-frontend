@@ -35,6 +35,7 @@ import {
 } from '@/components/settings/SettingsShared'
 import { Button, DateInput } from '@edforge/ui'
 import { getAcademicYearLabel } from '@aibrains/shared-types'
+import { adToBS, formatBSDate } from '@edforge/date-utils'
 
 // ============================================================================
 // LOCAL TYPES
@@ -50,6 +51,8 @@ interface AcademicYear {
   name: string
   startDate: string
   endDate: string
+  startDateBS?: string
+  endDateBS?: string
   status: AcademicYearStatus
   terms: Term[]
   isLocked: boolean
@@ -238,14 +241,22 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({
+    const payload: CreateAcademicYearWithTerms = {
       schoolId,
       name,
       startDate,
       endDate,
       calendarType: termStructure,
       generatedTerms: generateGradingPeriods(),
-    })
+    }
+    // Include BS dates when using Bikram Sambat calendar
+    if (calendarSystem === 'bikram_sambat' && startDate && endDate) {
+      try {
+        payload.startDateBS = formatBSDate(adToBS(startDate))
+        payload.endDateBS = formatBSDate(adToBS(endDate))
+      } catch { /* ignore conversion errors */ }
+    }
+    onSubmit(payload)
   }
 
   if (!isOpen) return null

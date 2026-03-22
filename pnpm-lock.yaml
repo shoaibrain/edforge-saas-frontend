@@ -64,8 +64,8 @@ importers:
   apps/academics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.19.0
-        version: 0.19.0(zod@3.25.76)
+        specifier: ^0.20.0
+        version: 0.20.0(zod@3.25.76)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -444,8 +444,8 @@ importers:
   apps/people:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.19.0
-        version: 0.19.0(zod@3.25.76)
+        specifier: ^0.20.0
+        version: 0.20.0(zod@3.25.76)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -544,8 +544,8 @@ importers:
   apps/shell:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.19.0
-        version: 0.19.0(zod@3.25.76)
+        specifier: ^0.20.0
+        version: 0.20.0(zod@3.25.76)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -977,8 +977,8 @@ importers:
   packages/types:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.19.0
-        version: 0.19.0(zod@3.25.76)
+        specifier: ^0.20.0
+        version: 0.20.0(zod@3.25.76)
       '@edforge/config':
         specifier: workspace:*
         version: link:../config
@@ -1112,8 +1112,8 @@ packages:
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
 
-  '@aibrains/shared-types@0.19.0':
-    resolution: {integrity: sha512-eKx3JvoQ78n9fXSgTVrvkhisRvxWcsEtGiFE4iFAn2ppHyN8u+sNgc5S9n0Iz7wd8uDGZ0doGvXtOfp/v5WqbA==}
+  '@aibrains/shared-types@0.20.0':
+    resolution: {integrity: sha512-gVmRxIJBc6PdygmVYFXBT8zEoxinYofLyWM8r5f7FxOyyhdfbRGE+SrKQB9TzSVyCUYUCpF5qCTuSMbtyB8dTA==}
     peerDependencies:
       zod: '>=3.22.0'
 
@@ -4799,7 +4799,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@aibrains/shared-types@0.19.0(zod@3.25.76)':
+  '@aibrains/shared-types@0.20.0(zod@3.25.76)':
     dependencies:
       zod: 3.25.76
 
