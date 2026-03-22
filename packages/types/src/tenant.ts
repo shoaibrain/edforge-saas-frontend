@@ -318,6 +318,9 @@ export interface AcademicYear {
   /** Temporal boundaries */
   startDate: string
   endDate: string
+  /** BS date equivalents (YYYY/MM/DD format, present when calendarSystem is bikram_sambat) */
+  startDateBS?: string
+  endDateBS?: string
   /** Current status */
   status: AcademicYearStatus
   /** Terms/grading periods within this academic year */
@@ -340,6 +343,10 @@ export interface CreateAcademicYearDto {
   name: string
   startDate: string
   endDate: string
+  /** BS start date in YYYY/MM/DD format */
+  startDateBS?: string
+  /** BS end date in YYYY/MM/DD format */
+  endDateBS?: string
   terms?: Omit<Term, 'id'>[]
 }
 
