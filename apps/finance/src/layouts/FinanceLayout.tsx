@@ -12,7 +12,7 @@
 import { Component, createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { AlertTriangle, RotateCw, Home } from 'lucide-react'
+import { AlertTriangle, RotateCw, Home, Building2 } from 'lucide-react'
 import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
 import type { ResolvedSettings } from '@edforge/config/resolved-settings'
 import { SYSTEM_DEFAULTS } from '@edforge/config/resolved-settings'
@@ -152,6 +152,37 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
       }
     })
   }, [navigate])
+
+  // Check if a school is available — no school means tenant hasn't set up org yet
+  const { activeSchoolId } = useAppStore()
+  const schoolContext = getSchoolContext()
+  const hasSchool = activeSchoolId || schoolContext.schoolId
+
+  if (!hasSchool) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] p-6">
+        <div className="w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
+          <div className="mx-auto w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+            <Building2 className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+              No schools configured
+            </h2>
+            <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
+              Set up your organization in Settings → Organization before using Finance.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate({ to: '/settings' })}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          >
+            Go to Settings
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   // Shell's AppShell provides the layout (Header + Sidebar)
   // This module just renders its content, wrapped in an error boundary
