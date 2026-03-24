@@ -1,4 +1,7 @@
 /**
+ * @deprecated Replaced by useOnboardingRequired hook (Sprint 1).
+ * Kept for rollback safety — do not use in new code.
+ *
  * useWorkspaceSetupRequired — determines if the workspace setup gate should be shown.
  *
  * Logic:

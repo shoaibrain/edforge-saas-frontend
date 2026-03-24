@@ -1,4 +1,7 @@
 /**
+ * @deprecated Replaced by onboarding flow at /onboarding (Sprint 1).
+ * Kept for rollback safety — do not use in new code.
+ *
  * WorkspaceSetupGate — Non-dismissible workspace settings confirmation gate.
  *
  * Rendered INSTEAD of the main content (not as a fixed overlay).

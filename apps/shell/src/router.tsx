@@ -28,8 +28,7 @@ import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
 import { useLocaleEffect, useTranslation } from '@edforge/i18n'
-import { useWorkspaceSetupRequired } from './hooks/useWorkspaceSetupRequired'
-import { WorkspaceSetupGate } from './components/onboarding/WorkspaceSetupGate'
+import { useOnboardingRequired } from './hooks/useOnboardingRequired'
 
 // Landing Pages (public)
 import { PublicLayout } from './components/landing/PublicLayout'
@@ -75,7 +74,7 @@ import {
   // [MVP-PARKED] DangerZonePage,
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
-import React from 'react'
+import React, { lazy } from 'react'
 
 const AcademicsModule = React.lazy(async () => {
   const module = await loadRemote<{ default: React.ComponentType }>('academics/AcademicsModule')
@@ -156,21 +155,17 @@ function RootLayout() {
 // ============================================================================
 
 function ProtectedLayout() {
-  const { setupRequired, isLoading: setupLoading } = useWorkspaceSetupRequired()
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
+  const { onboardingRequired, isLoading: onboardingLoading } = useOnboardingRequired()
+  const navigate = useNavigate()
 
-  // Allow /settings/workspace even when gate is active (edit escape hatch)
-  const isSettingsWorkspace = pathname.startsWith('/settings/workspace')
+  useEffect(() => {
+    if (!onboardingLoading && onboardingRequired) {
+      navigate({ to: '/onboarding', replace: true })
+    }
+  }, [onboardingRequired, onboardingLoading, navigate])
 
-  if (setupRequired && !isSettingsWorkspace && !setupLoading) {
-    return (
-      <AppShell>
-        <WorkspaceSetupGate onComplete={() => {
-          // Gate will unmount naturally after query invalidation
-          // since setupRequired will become false
-        }} />
-      </AppShell>
-    )
+  if (onboardingLoading || onboardingRequired) {
+    return <LoadingScreen message="Loading..." />
   }
 
   return (
@@ -362,6 +357,46 @@ const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/callback',
   component: OAuthCallbackHandler,
+})
+
+// ============================================================================
+// ONBOARDING ROUTE — child of rootRoute (no AppShell wrapper)
+// ============================================================================
+
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'))
+
+const onboardingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/onboarding',
+  beforeLoad: async () => {
+    // Same auth guard as protectedRoute
+    const initialState = useAuthStore.getState()
+
+    if (initialState.isLoading) {
+      await new Promise<void>((resolve) => {
+        const unsubscribe = useAuthStore.subscribe((currentState: { isLoading: boolean }) => {
+          if (!currentState.isLoading) {
+            unsubscribe()
+            resolve()
+          }
+        })
+        setTimeout(() => {
+          unsubscribe()
+          resolve()
+        }, 10000)
+      })
+    }
+
+    const state = useAuthStore.getState()
+    if (!state.isAuthenticated || !state.user) {
+      throw redirect({ to: '/login' })
+    }
+  },
+  component: () => (
+    <Suspense fallback={<LoadingScreen />}>
+      <OnboardingPage />
+    </Suspense>
+  ),
 })
 
 // ============================================================================
@@ -854,6 +889,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   authCallbackRoute,
+  onboardingRoute,
   publicRoute.addChildren([
     aboutRoute,
     contactRoute,

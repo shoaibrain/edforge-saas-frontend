@@ -252,6 +252,32 @@ export async function updateWorkspaceSettings(
   )
 }
 
+/**
+ * Confirm workspace settings
+ * PATCH /tenants/{tenantId}/settings/confirm
+ */
+export async function confirmWorkspaceSettings(
+  tenantId: string
+): Promise<{ confirmed: true; workspaceConfirmedAt: string }> {
+  return apiPatch<{ confirmed: true; workspaceConfirmedAt: string }>(
+    `/tenants/${tenantId}/settings/confirm`,
+    {}
+  )
+}
+
+/**
+ * Complete onboarding flow
+ * POST /tenants/{tenantId}/onboarding/complete
+ */
+export async function completeOnboarding(
+  tenantId: string
+): Promise<{ completed: true; onboardingCompletedAt: string }> {
+  return apiPost<{ completed: true; onboardingCompletedAt: string }>(
+    `/tenants/${tenantId}/onboarding/complete`,
+    {}
+  )
+}
+
 // ============================================================================
 // SCHOOL CONFIGURATION API
 // ============================================================================
@@ -717,6 +743,8 @@ export const tenantService = {
   // Workspace Settings
   getWorkspaceSettings,
   updateWorkspaceSettings,
+  confirmWorkspaceSettings,
+  completeOnboarding,
 
   // Schools
   getSchools,

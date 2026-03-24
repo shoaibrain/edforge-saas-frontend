@@ -50,6 +50,7 @@ export interface ShellContextValue {
   // Workspace Settings
   workspaceSettings: WorkspaceSettings['regional'] | null
   workspaceConfirmedAt: string | null
+  onboardingCompletedAt: string | null
   schoolConfiguration: SchoolConfiguration | null
   resolvedSettings: ResolvedSettings
 
@@ -354,6 +355,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
       activeSchoolYear: effectiveSchoolYear,
       workspaceSettings: effectiveWorkspaceSettings,
       workspaceConfirmedAt: workspaceSettingsData?.workspaceConfirmedAt ?? null,
+      onboardingCompletedAt: workspaceSettingsData?.onboardingCompletedAt ?? null,
       schoolConfiguration: effectiveSchoolConfiguration,
       resolvedSettings,
       theme,
@@ -377,6 +379,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
       effectiveSchoolYear,
       effectiveWorkspaceSettings,
       workspaceSettingsData?.workspaceConfirmedAt,
+      workspaceSettingsData?.onboardingCompletedAt,
       effectiveSchoolConfiguration,
       resolvedSettings,
       theme,

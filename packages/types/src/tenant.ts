@@ -162,6 +162,8 @@ export interface WorkspaceSettings {
   lockReason?: string
   /** Timestamp when admin confirmed workspace settings — null if never confirmed */
   workspaceConfirmedAt?: string
+  /** Timestamp when admin completed the onboarding flow — null if never completed */
+  onboardingCompletedAt?: string
   createdAt: string
   updatedAt: string
 }
