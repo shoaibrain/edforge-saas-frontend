@@ -12,6 +12,7 @@ export { configureAmplify, getAuthConfig, isAmplifyConfigured } from './config'
 export {
   login,
   signInDirect,
+  completeNewPassword,
   logout,
   getSession,
   getIdToken,

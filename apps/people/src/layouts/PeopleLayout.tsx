@@ -62,7 +62,7 @@ export function PeopleLayout({ children }: { children: ReactNode }) {
               </p>
             </div>
             <button
-              onClick={() => navigate({ to: '/settings' })}
+              onClick={() => { window.location.href = '/settings' }}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
             >
               Go to Settings

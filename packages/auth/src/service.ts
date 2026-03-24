@@ -7,6 +7,7 @@
 
 import {
   signIn,
+  confirmSignIn,
   signInWithRedirect,
   signOut,
   fetchAuthSession,
@@ -29,6 +30,15 @@ export async function login(): Promise<void> {
  */
 export async function signInDirect(username: string, password: string) {
   return await signIn({ username, password })
+}
+
+/**
+ * Completes the NEW_PASSWORD_REQUIRED challenge.
+ * Must be called after signInDirect returns the challenge step.
+ * Amplify v6 tracks the pending sign-in session internally.
+ */
+export async function completeNewPassword(newPassword: string) {
+  return await confirmSignIn({ challengeResponse: newPassword })
 }
 
 /**
