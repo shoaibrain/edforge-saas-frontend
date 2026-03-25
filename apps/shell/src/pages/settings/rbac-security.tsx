@@ -253,10 +253,10 @@ export default function RBACSecurityPage() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
   const [matrixRole, setMatrixRole] = useState<SchoolRole>('Principal')
 
-  // Fetch Users
+  // Fetch Users — query key matches AssignUserModal for cache sharing
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
-    queryKey: ['users', 'list', searchQuery],
-    queryFn: () => usersService.listUsers({ limit: 50 }),
+    queryKey: ['users', 'list'],
+    queryFn: () => usersService.listUsers({ limit: 100 }),
     staleTime: 5 * 60 * 1000,
   })
 

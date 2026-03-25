@@ -14,7 +14,7 @@
  *  - academicYearId (UUID) sent alongside academicYear display name
  */
 
-import { useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -122,6 +122,9 @@ interface FeeStructureFormProps {
   onSubmit: (data: FeeStructureFormData) => void
   onClose: () => void
   isSubmitting?: boolean
+  currency?: string
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
+  enableDualDateDisplay?: boolean
 }
 
 export function FeeStructureForm({
@@ -131,6 +134,9 @@ export function FeeStructureForm({
   onSubmit,
   onClose,
   isSubmitting,
+  currency = 'USD',
+  calendarSystem = 'gregorian',
+  enableDualDateDisplay = false,
 }: FeeStructureFormProps) {
   const defaultAcademicYearId = feeStructure?.academicYearId
     ?? academicYears.find((y) => y.isCurrent)?.id
@@ -142,6 +148,7 @@ export function FeeStructureForm({
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors, isValid },
   } = useForm<FeeStructureFormData>({
     resolver: zodResolver(feeStructureSchema),
@@ -178,6 +185,8 @@ export function FeeStructureForm({
           proRateOnMidTermEntry: true,
         },
   })
+
+  const watchedTaxType = watch('taxType')
 
   /* --- Escape key handler --- */
   const handleKeyDown = useCallback(
@@ -218,8 +227,11 @@ export function FeeStructureForm({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-4 overflow-y-auto flex-1">
-          {/* Name */}
+        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-5 overflow-y-auto flex-1">
+
+          {/* ── Basic Info ── */}
+          <SectionHeader title="Basic Info" />
+
           <Field label="Name" error={errors.name?.message}>
             <input
               {...register('name')}
@@ -228,7 +240,6 @@ export function FeeStructureForm({
             />
           </Field>
 
-          {/* Description */}
           <Field label="Description" error={errors.description?.message}>
             <input
               {...register('description')}
@@ -237,24 +248,6 @@ export function FeeStructureForm({
             />
           </Field>
 
-          {/* Academic Year */}
-          <Field label="Academic Year" error={errors.academicYearId?.message}>
-            {academicYears.length > 0 ? (
-              <select {...register('academicYearId')} className="input">
-                {academicYears.map((ay) => (
-                  <option key={ay.id} value={ay.id}>
-                    {ay.name}{ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <p className="text-xs text-[rgb(var(--text-tertiary))] py-2">
-                No academic years configured. Please create one in School Settings first.
-              </p>
-            )}
-          </Field>
-
-          {/* Type + Frequency */}
           <div className="grid grid-cols-2 gap-4">
             <Field label="Type" error={errors.feeType?.message}>
               <select {...register('feeType')} className="input">
@@ -264,6 +257,43 @@ export function FeeStructureForm({
                   </option>
                 ))}
               </select>
+            </Field>
+            <Field label="Academic Year" error={errors.academicYearId?.message}>
+              {academicYears.length > 0 ? (
+                <select {...register('academicYearId')} className="input">
+                  {academicYears.map((ay) => (
+                    <option key={ay.id} value={ay.id}>
+                      {ay.name}{ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-xs text-[rgb(var(--text-tertiary))] py-2">
+                  No academic years configured.
+                </p>
+              )}
+            </Field>
+          </div>
+
+          {/* ── Pricing ── */}
+          <SectionHeader title="Pricing" />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Amount" error={errors.amount?.message}>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium text-[rgb(var(--text-tertiary))] pointer-events-none select-none">
+                  {currency}
+                </span>
+                <input
+                  {...register('amount', { valueAsNumber: true })}
+                  type="number"
+                  min="0"
+                  max="10000000"
+                  step={currency === 'NPR' ? '1' : '0.01'}
+                  className="input pl-12"
+                  placeholder={currency === 'NPR' ? '0' : '0.00'}
+                />
+              </div>
             </Field>
             <Field label="Frequency" error={errors.frequency?.message}>
               <select {...register('frequency')} className="input">
@@ -276,19 +306,7 @@ export function FeeStructureForm({
             </Field>
           </div>
 
-          {/* Amount + Tax */}
-          <div className="grid grid-cols-3 gap-4">
-            <Field label="Amount" error={errors.amount?.message}>
-              <input
-                {...register('amount', { valueAsNumber: true })}
-                type="number"
-                min="0"
-                max="10000000"
-                step="0.01"
-                className="input"
-                placeholder="0.00"
-              />
-            </Field>
+          <div className="grid grid-cols-2 gap-4">
             <Field label="Tax Type" error={errors.taxType?.message}>
               <select {...register('taxType')} className="input">
                 {TAX_TYPES.map((tt) => (
@@ -296,25 +314,30 @@ export function FeeStructureForm({
                 ))}
               </select>
             </Field>
-            <Field label="Tax Rate (%)" error={errors.taxRate?.message}>
-              <input
-                {...register('taxRate', { valueAsNumber: true })}
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-                className="input"
-                placeholder="0"
-              />
-            </Field>
+            {watchedTaxType !== 'none' && (
+              <Field label="Tax Rate (%)" error={errors.taxRate?.message}>
+                <input
+                  {...register('taxRate', { valueAsNumber: true })}
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  className="input"
+                  placeholder="0"
+                />
+              </Field>
+            )}
           </div>
 
-          {/* Grade Levels — chip multi-select */}
+          {/* ── Scope ── */}
+          <SectionHeader title="Scope" />
+
+          {/* Grade Levels — multi-select dropdown */}
           <Controller
             name="gradeLevels"
             control={control}
             render={({ field }) => (
-              <GradeLevelChips
+              <GradeLevelSelect
                 value={field.value}
                 onChange={field.onChange}
                 gradeOptions={gradeOptions}
@@ -323,9 +346,10 @@ export function FeeStructureForm({
             )}
           />
 
-          {/* Enrollment & Pro-Rate Settings */}
+          {/* ── Enrollment Rules ── */}
+          <SectionHeader title="Enrollment Rules" />
+
           <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-            <p className="text-xs font-medium text-[rgb(var(--text-secondary))]">Enrollment Settings</p>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -347,7 +371,9 @@ export function FeeStructureForm({
             </p>
           </div>
 
-          {/* Effective dates */}
+          {/* ── Effective Period ── */}
+          <SectionHeader title="Effective Period" />
+
           <div className="grid grid-cols-2 gap-4">
             <Field label="Effective From" error={errors.effectiveFrom?.message}>
               <input {...register('effectiveFrom')} type="date" className="input" />
@@ -356,6 +382,12 @@ export function FeeStructureForm({
               <input {...register('effectiveTo')} type="date" className="input" />
             </Field>
           </div>
+          {calendarSystem === 'bikram_sambat' && (
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
+              Dates are displayed in Gregorian (AD). The system stores all dates in AD format.
+              {enableDualDateDisplay && ' Bikram Sambat equivalents are shown where applicable.'}
+            </p>
+          )}
         </form>
 
         {/* Footer */}
@@ -377,10 +409,10 @@ export function FeeStructureForm({
 }
 
 /* ------------------------------------------------------------------ */
-/*  GradeLevelChips                                                    */
+/*  GradeLevelSelect — multi-select dropdown                           */
 /* ------------------------------------------------------------------ */
 
-function GradeLevelChips({
+function GradeLevelSelect({
   value,
   onChange,
   gradeOptions,
@@ -391,7 +423,10 @@ function GradeLevelChips({
   gradeOptions: string[]
   error?: string
 }) {
-  const allSelected = value.length === 0
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const allSelected = value.length === gradeOptions.length && gradeOptions.length > 0
 
   const toggleGrade = (grade: string) => {
     if (value.includes(grade)) {
@@ -402,51 +437,118 @@ function GradeLevelChips({
   }
 
   const toggleAll = () => {
-    onChange([])
+    if (allSelected) {
+      onChange([])
+    } else {
+      onChange([...gradeOptions])
+    }
   }
+
+  // Close on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
+  const displayText = value.length === 0
+    ? 'Select grade levels...'
+    : allSelected
+      ? 'All Grades'
+      : `${value.length} grade${value.length !== 1 ? 's' : ''} selected`
 
   return (
     <Field label="Grade Levels" error={error}>
-      <div className="flex flex-wrap gap-2">
-        {/* All Grades toggle */}
+      <div className="relative" ref={dropdownRef}>
+        {/* Trigger button */}
         <button
           type="button"
-          onClick={toggleAll}
-          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-            allSelected
-              ? 'bg-teal-600 text-white border-teal-600'
-              : 'bg-transparent text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))] hover:border-teal-400'
-          }`}
+          onClick={() => setIsOpen(!isOpen)}
+          className="input w-full text-left flex items-center justify-between"
         >
-          All Grades
+          <span className={value.length === 0 ? 'text-[rgb(var(--text-tertiary))]' : ''}>
+            {displayText}
+          </span>
+          <svg className={`w-4 h-4 text-[rgb(var(--text-tertiary))] transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </button>
 
-        {gradeOptions.map((grade) => {
-          const isSelected = !allSelected && value.includes(grade)
-          return (
-            <button
-              key={grade}
-              type="button"
-              onClick={() => {
-                if (allSelected) {
-                  // Switching from "All" to specific: select all EXCEPT this one
-                  onChange(gradeOptions.filter((g) => g !== grade))
-                } else {
-                  toggleGrade(grade)
-                }
-              }}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                isSelected
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-transparent text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))] hover:border-blue-400'
-              }`}
-            >
-              {grade}
-            </button>
-          )
-        })}
+        {/* Dropdown */}
+        {isOpen && (
+          <div className="absolute z-20 mt-1 w-full bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            {/* All Grades option */}
+            <label className="flex items-center gap-2 px-3 py-2 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer border-b border-[rgb(var(--border-primary))]">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+              />
+              <span className="text-sm font-medium text-[rgb(var(--text-primary))]">All Grades</span>
+            </label>
+
+            {/* Individual grades */}
+            {gradeOptions.map((grade) => (
+              <label
+                key={grade}
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={value.includes(grade)}
+                  onChange={() => toggleGrade(grade)}
+                  className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-[rgb(var(--text-primary))]">Grade {grade}</span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* Selected tags */}
+        {value.length > 0 && !allSelected && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {value.map((grade) => (
+              <span
+                key={grade}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-600/10 text-blue-400 border border-blue-600/20"
+              >
+                {grade}
+                <button
+                  type="button"
+                  onClick={() => toggleGrade(grade)}
+                  className="hover:text-blue-200"
+                >
+                  &times;
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </Field>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Section Header helper                                              */
+/* ------------------------------------------------------------------ */
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-2 pt-1">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+        {title}
+      </span>
+      <div className="flex-1 h-px bg-[rgb(var(--border-primary))]" />
+    </div>
   )
 }
 

@@ -343,6 +343,9 @@ export default function FeeStructuresPage() {
           onSubmit={handleCreate}
           onClose={() => setShowForm(false)}
           isSubmitting={createMutation.isPending}
+          currency={settings.currency}
+          calendarSystem={settings.calendarSystem}
+          enableDualDateDisplay={settings.enableDualDateDisplay}
         />
       )}
 
@@ -355,6 +358,9 @@ export default function FeeStructuresPage() {
           onSubmit={handleUpdate}
           onClose={() => setEditingFee(null)}
           isSubmitting={updateMutation.isPending}
+          currency={settings.currency}
+          calendarSystem={settings.calendarSystem}
+          enableDualDateDisplay={settings.enableDualDateDisplay}
         />
       )}
 

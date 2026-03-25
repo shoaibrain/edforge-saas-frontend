@@ -235,13 +235,15 @@ export function ShellProvider({ children }: ShellProviderProps) {
   })
 
   // Broadcast resolved settings to MFEs whenever they change
+  const tenantId = user?.tenantId ?? effectiveTenant?.id ?? null
   useEffect(() => {
     broadcastSchoolChange(
       activeSchoolId,
       activeSchool?.status ?? null,
       resolvedSettings,
+      tenantId,
     )
-  }, [activeSchoolId, activeSchool?.status, resolvedSettings])
+  }, [activeSchoolId, activeSchool?.status, resolvedSettings, tenantId])
 
   // Consolidated auto-select: restore from localStorage or pick first available
   useEffect(() => {

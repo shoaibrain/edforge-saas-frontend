@@ -16,6 +16,7 @@ import { AlertTriangle, RotateCw, Home, Building2 } from 'lucide-react'
 import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
 import type { ResolvedSettings } from '@edforge/config/resolved-settings'
 import { SYSTEM_DEFAULTS } from '@edforge/config/resolved-settings'
+import { apiGet } from '@edforge/api-client'
 import { useAppStore } from '../stores/app.store'
 
 // ============================================================================
@@ -120,23 +121,72 @@ class FinanceErrorBoundary extends Component<
 export function FinanceLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const prevSchoolRef = useRef<string | null>(null)
+  const [settingsResolved, setSettingsResolved] = useState(false)
   const [settings, setSettings] = useState<ResolvedSettings>(() => {
     const initial = getSchoolContext()
-    return initial.resolvedSettings ?? SYSTEM_DEFAULTS
+    if (initial.resolvedSettings) {
+      return initial.resolvedSettings
+    }
+    return SYSTEM_DEFAULTS
   })
 
   // Sync school context and resolved settings from Shell broadcasts.
+  // Falls back to direct API fetch if broadcast hasn't arrived within 500ms.
   useEffect(() => {
     const { setActiveSchoolId } = useAppStore.getState()
     const initial = getSchoolContext()
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null
+
     if (initial.schoolId) {
       setActiveSchoolId(initial.schoolId)
       prevSchoolRef.current = initial.schoolId
     }
     if (initial.resolvedSettings) {
       setSettings(initial.resolvedSettings)
+      setSettingsResolved(true)
+    } else {
+      // Shell broadcast hasn't arrived yet. After 500ms, fetch workspace
+      // settings directly via the read-only /tenants/my/settings endpoint
+      // (no tenantId needed in URL — derived from JWT by the backend).
+      fallbackTimer = setTimeout(async () => {
+        try {
+          const ws = await apiGet<{
+            regional?: {
+              defaultCurrency?: string
+              defaultTimezone?: string
+              defaultDateFormat?: string
+              defaultTimeFormat?: '12h' | '24h'
+              defaultCalendarSystem?: 'gregorian' | 'bikram_sambat'
+              enableDualDateDisplay?: boolean
+              defaultNumberFormat?: 'south_asian' | 'international'
+              defaultLocale?: string
+              defaultWeekStartsOn?: 'sunday' | 'monday'
+            }
+          }>('/tenants/my/settings')
+          if (ws?.regional) {
+            const r = ws.regional
+            const resolved: ResolvedSettings = {
+              currency: r.defaultCurrency || SYSTEM_DEFAULTS.currency,
+              timezone: r.defaultTimezone || SYSTEM_DEFAULTS.timezone,
+              dateFormat: r.defaultDateFormat || SYSTEM_DEFAULTS.dateFormat,
+              timeFormat: r.defaultTimeFormat || SYSTEM_DEFAULTS.timeFormat,
+              calendarSystem: r.defaultCalendarSystem || SYSTEM_DEFAULTS.calendarSystem,
+              enableDualDateDisplay: r.enableDualDateDisplay ?? SYSTEM_DEFAULTS.enableDualDateDisplay,
+              numberFormat: r.defaultNumberFormat || SYSTEM_DEFAULTS.numberFormat,
+              locale: r.defaultLocale || SYSTEM_DEFAULTS.locale,
+              weekStartsOn: r.defaultWeekStartsOn || SYSTEM_DEFAULTS.weekStartsOn,
+            }
+            setSettings(resolved)
+          }
+        } catch {
+          // Fallback silently to SYSTEM_DEFAULTS
+        } finally {
+          setSettingsResolved(true)
+        }
+      }, 500)
     }
-    return onSchoolChange(({ schoolId, resolvedSettings }) => {
+
+    const unsubscribe = onSchoolChange(({ schoolId, resolvedSettings }) => {
       const prevId = prevSchoolRef.current
       prevSchoolRef.current = schoolId
 
@@ -144,6 +194,11 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
 
       if (resolvedSettings) {
         setSettings(resolvedSettings)
+        setSettingsResolved(true)
+        if (fallbackTimer) {
+          clearTimeout(fallbackTimer)
+          fallbackTimer = null
+        }
       }
 
       // On school switch (not initial mount), redirect to module root
@@ -151,6 +206,11 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
         navigate({ to: '/' })
       }
     })
+
+    return () => {
+      unsubscribe()
+      if (fallbackTimer) clearTimeout(fallbackTimer)
+    }
   }, [navigate])
 
   // Check if a school is available — no school means tenant hasn't set up org yet

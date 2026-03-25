@@ -17,6 +17,7 @@ import type { ResolvedSettings } from './resolved-settings'
 export interface SchoolContextPayload {
   schoolId: string | null
   schoolStatus: string | null
+  tenantId?: string | null
   resolvedSettings?: ResolvedSettings
 }
 
@@ -38,11 +39,12 @@ export function broadcastSchoolChange(
   schoolId: string | null,
   schoolStatus: string | null,
   resolvedSettings?: ResolvedSettings,
+  tenantId?: string | null,
 ): void {
-  _lastPayload = { schoolId, schoolStatus, resolvedSettings }
+  _lastPayload = { schoolId, schoolStatus, tenantId, resolvedSettings }
   window.dispatchEvent(
     new CustomEvent<SchoolContextPayload>(EVENT_NAME, {
-      detail: { schoolId, schoolStatus, resolvedSettings },
+      detail: { schoolId, schoolStatus, tenantId, resolvedSettings },
     }),
   )
 }

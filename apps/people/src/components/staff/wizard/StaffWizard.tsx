@@ -142,46 +142,55 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
   }, [])
 
   const handleSubmit = async (data: Record<string, unknown>) => {
-    const dto = transformWizardDataToStaffDto(data)
-    const createAccount = data.createUserAccount === true
+    try {
+      const dto = transformWizardDataToStaffDto(data)
+      const createAccount = data.createUserAccount === true
 
-    let staffId: string
+      let staffId: string
 
-    if (createAccount) {
-      const result = await staffService.createStaffWithUser(dto as any)
-      staffId = result.staff.staffId
-      toast.success('Staff member and user account created successfully')
-    } else {
-      const result = await staffService.createStaff(dto as any)
-      staffId = result.staffId
-      toast.success('Staff member created successfully')
-    }
-
-    // Create additional school assignments
-    const additionalAssignments = getAdditionalAssignments(data)
-    for (const assignment of additionalAssignments) {
-      try {
-        await staffService.createAssignment(staffId, {
-          schoolId: assignment.schoolId,
-          role: (assignment.role || (data.role as string)) as any,
-          beginDate: assignment.beginDate,
-          fullTimeEquivalency: assignment.fullTimeEquivalency,
-          departmentId: assignment.departmentId || undefined,
-          isPrimary: false,
-        })
-      } catch {
-        toast.warning(`Could not create additional assignment. You can add it from the staff profile.`)
+      if (createAccount) {
+        const result = await staffService.createStaffWithUser(dto as any)
+        staffId = result.staff.staffId
+        toast.success('Staff member and user account created successfully')
+      } else {
+        const result = await staffService.createStaff(dto as any)
+        staffId = result.staffId
+        toast.success('Staff member created successfully')
       }
-    }
 
-    // Invalidate queries
-    queryClient.invalidateQueries({ queryKey: staffKeys.lists() })
-    queryClient.invalidateQueries({ queryKey: ['users'] })
+      // Create additional school assignments
+      const additionalAssignments = getAdditionalAssignments(data)
+      for (const assignment of additionalAssignments) {
+        try {
+          await staffService.createAssignment(staffId, {
+            schoolId: assignment.schoolId,
+            role: (assignment.role || (data.role as string)) as any,
+            beginDate: assignment.beginDate,
+            fullTimeEquivalency: assignment.fullTimeEquivalency,
+            departmentId: assignment.departmentId || undefined,
+            isPrimary: false,
+          })
+        } catch {
+          toast.warning(`Could not create additional assignment. You can add it from the staff profile.`)
+        }
+      }
 
-    if (onSuccess) {
-      onSuccess(staffId)
-    } else {
-      navigate({ to: '/staff/$staffId', params: { staffId } })
+      // Invalidate queries
+      queryClient.invalidateQueries({ queryKey: staffKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+
+      if (onSuccess) {
+        onSuccess(staffId)
+      } else {
+        navigate({ to: '/staff/$staffId', params: { staffId } })
+      }
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to create staff member'
+      toast.error(message)
+      throw error // re-throw so WizardContext.finally resets isSubmitting
     }
   }
 

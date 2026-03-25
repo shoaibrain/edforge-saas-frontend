@@ -8,6 +8,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import {
   Users,
@@ -65,6 +66,7 @@ interface StaffFilters {
 export default function StaffPage() {
   const { t } = useTranslation('people')
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
 
   // ABAC permission checks
@@ -316,7 +318,7 @@ export default function StaffPage() {
             <div style={{ display: 'flex', alignItems: 'center', height: 36 }}>
               <button
                 type="button"
-                onClick={() => modal.openCreate()}
+                onClick={() => navigate({ to: '/staff/new' })}
                 style={{
                   height: 36,
                   background: '#1D9E75',
@@ -371,6 +373,25 @@ export default function StaffPage() {
                   boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                 }}
               >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddDropdownOpen(false)
+                    modal.openCreate()
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 11,
+                    color: 'var(--v2-text-secondary, #c8ccd8)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  Quick add user account
+                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -616,7 +637,7 @@ export default function StaffPage() {
       <StaffTable
         staff={staffMembers}
         isLoading={isLoading}
-        onAddStaff={canCreate ? () => modal.openCreate() : undefined}
+        onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
         onViewStaff={handleViewStaff}
       />
 
