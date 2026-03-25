@@ -20,8 +20,6 @@ import {
   WifiOff,
   Check,
   CloudOff,
-  Calendar,
-  RefreshCw,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -118,7 +116,7 @@ function TabBar({
   onTabChange: (tab: TabId) => void
 }) {
   return (
-    <nav className="flex gap-1" aria-label="Attendance tabs">
+    <nav style={{ display: 'flex', gap: 4 }} aria-label="Attendance tabs">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id
         return (
@@ -126,26 +124,23 @@ function TabBar({
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-              isActive
-                ? 'text-text-primary'
-                : 'text-text-tertiary hover:text-text-secondary'
-            }`}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 6,
+              fontSize: 11,
+              fontWeight: 500,
+              color: isActive ? '#378ADD' : 'var(--v2-text-hint, #4a5068)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              border: isActive ? '1px solid rgba(55,138,221,0.20)' : '1px solid transparent',
+              background: isActive ? 'rgba(55,138,221,0.10)' : 'transparent',
+              transition: 'all 0.12s',
+            }}
           >
-            <tab.icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : ''}`} />
+            <tab.icon style={{ width: 11, height: 11 }} />
             {tab.label}
-            {isActive && (
-              <motion.div
-                layoutId="attendanceTab"
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
-                initial={false}
-                transition={{
-                  type: 'spring',
-                  stiffness: 500,
-                  damping: 30,
-                }}
-              />
-            )}
           </button>
         )
       })}
@@ -395,72 +390,61 @@ export function AttendanceModule() {
   )
 
   return (
-    <div className="min-h-full">
-      {/* Page Header */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 pt-6 pb-0">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-                <ClipboardCheck className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">Attendance</h1>
-                <p className="text-text-secondary mt-0.5">
-                  Record and review attendance by class section
-                </p>
-              </div>
+    <div style={{ minHeight: '100%' }}>
+      {/* V2 Attendance Sub-Header + Sub-Tabs */}
+      <div style={{ padding: '0 24px' }}>
+        {/* Sub-Header Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 32, height: 32, background: 'rgba(239,159,39,0.10)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ClipboardCheck style={{ width: 16, height: 16, color: '#EF9F27' }} />
             </div>
-            {/* Task 2.1: Academic Year Context Bar + Export portal */}
-            <div className="flex items-center gap-4">
-              {currentYear && (
-                <div className="flex items-center gap-4 text-xs text-text-tertiary">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{currentYear.name || 'Academic Year'}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                </div>
-              )}
-              {/* Portal target for dashboard Export button */}
-              <div ref={exportPortalRef} />
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px', color: 'var(--v2-text-primary, #e8eaf0)' }}>Attendance</div>
+              <div style={{ fontSize: 10, color: 'var(--v2-text-hint, #4a5068)' }}>
+                Record and review attendance by class section{currentYear ? ` · ${currentYear.name || 'Academic Year'}` : ''}
+              </div>
             </div>
           </div>
-
-          {/* Controls Row (only for daily entry) */}
-          {activeTab === 'daily-entry' && (
-            <div className="flex items-center gap-6 flex-wrap mb-4">
-              <SectionSelector
-                sections={sections}
-                selectedId={selectedSectionId}
-                onSelect={setSelectedSectionId}
-                isLoading={sectionsLoading}
-                completedSectionIds={completedSectionIds}
-              />
-              <DateSelector
-                selectedDate={selectedDate}
-                onDateChange={dateActions.setSelectedDate}
-                onPrevious={dateActions.goToPreviousDay}
-                onNext={dateActions.goToNextDay}
-                onToday={dateActions.goToToday}
-              />
-              <SaveStatusIndicator
-                status={offlineState.saveStatus}
-                isOnline={offlineState.isOnline}
-              />
-            </div>
-          )}
-
-          {/* Tab Navigation */}
-          <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 10, color: 'var(--v2-text-ghost, #2a3045)' }}>
+              Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+            {/* Portal target for dashboard Export button */}
+            <div ref={exportPortalRef} />
+          </div>
         </div>
+
+        {/* Sub-Tabs */}
+        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Controls Row (only for daily entry) */}
+        {activeTab === 'daily-entry' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', marginTop: 12, marginBottom: 4 }}>
+            <SectionSelector
+              sections={sections}
+              selectedId={selectedSectionId}
+              onSelect={setSelectedSectionId}
+              isLoading={sectionsLoading}
+              completedSectionIds={completedSectionIds}
+            />
+            <DateSelector
+              selectedDate={selectedDate}
+              onDateChange={dateActions.setSelectedDate}
+              onPrevious={dateActions.goToPreviousDay}
+              onNext={dateActions.goToNextDay}
+              onToday={dateActions.goToToday}
+            />
+            <SaveStatusIndicator
+              status={offlineState.saveStatus}
+              isOnline={offlineState.isOnline}
+            />
+          </div>
+        )}
       </div>
 
       {/* Tab Content */}
-      <div className="p-6">
+      <div style={{ padding: '16px 24px 24px' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

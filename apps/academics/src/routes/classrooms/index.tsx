@@ -57,7 +57,7 @@ import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid
 // --- Grades imports ---
 import { useGradesStore } from '../../stores/grades.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
-import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
+import { useSectionGrades, useGradingPolicies, useGradeOverview } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
 import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
@@ -68,6 +68,7 @@ import { GradeOverview } from '../grades/overview'
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { useAttendanceOverview } from '../../hooks/useAttendance'
 
 // ============================================================================
 // TYPES
@@ -556,6 +557,121 @@ function GradebookTab() {
 import { AttendanceModule } from '../attendance/index'
 
 // ============================================================================
+// CONTEXT BANNER (CLS-003)
+// ============================================================================
+
+function ContextBanner({
+  activeTab,
+  schoolId,
+}: {
+  activeTab: ClassroomTabId
+  schoolId: string
+}) {
+  // Overview data — from sections
+  const { data: sectionsPages } = useSections({
+    schoolId,
+    filters: { isActive: true },
+    enabled: !!schoolId && activeTab === 'overview',
+  })
+  const overviewSections = useMemo(() => flattenSectionPages(sectionsPages), [sectionsPages])
+  const overviewStats = useMemo(() => {
+    const total = overviewSections.length
+    const students = overviewSections.reduce((s, sec) => s + sec.currentEnrollment, 0)
+    const capacity = overviewSections.reduce((s, sec) => s + sec.maxEnrollment, 0)
+    const utilization = capacity > 0 ? Math.round((students / capacity) * 100) : 0
+    const courses = new Set(overviewSections.map((s) => s.courseId)).size
+    return { total, students, utilization, courses }
+  }, [overviewSections])
+
+  // Gradebook data
+  const { data: currentYear } = useCurrentAcademicYear(schoolId)
+  const { data: gradeData } = useGradeOverview(
+    schoolId,
+    currentYear?.yearId || '',
+    !!schoolId && !!currentYear?.yearId && activeTab === 'gradebook'
+  )
+
+  // Attendance data
+  const today = new Date().toISOString().split('T')[0]
+  const { data: attendanceData } = useAttendanceOverview({
+    schoolId,
+    academicYearId: currentYear?.yearId || '',
+    date: today,
+    enabled: !!schoolId && !!currentYear?.yearId && activeTab === 'attendance',
+  })
+
+  const bannerContent = useMemo(() => {
+    if (activeTab === 'overview') {
+      return (
+        <>
+          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{overviewStats.total} active sections</em>
+          {' '}across{' '}
+          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{overviewStats.courses} courses</em>
+          {' '}&mdash;{' '}
+          <em style={{ color: '#1D9E75', fontStyle: 'normal' }}>{overviewStats.students} students enrolled</em>
+          , avg utilization{' '}
+          <em style={{ color: '#EF9F27', fontStyle: 'normal' }}>{overviewStats.utilization}%</em>
+          .
+        </>
+      )
+    }
+
+    if (activeTab === 'gradebook' && gradeData) {
+      const worstCourse = gradeData.coursePerformance.length > 0
+        ? [...gradeData.coursePerformance].sort((a, b) => a.avgGrade - b.avgGrade)[0]?.courseName
+        : null
+      const passingCourses = gradeData.coursePerformance.filter((c) => c.passRate === 100).length
+      const completionPct = gradeData.gradingProgress?.completionRate?.toFixed(0) ?? '—'
+      return (
+        <>
+          <em style={{ color: '#E24B4A', fontStyle: 'normal' }}>{gradeData.atRiskCount} students</em>
+          {' '}at risk (below 60%){worstCourse && (
+            <> &mdash; concentrated in <em style={{ color: '#E24B4A', fontStyle: 'normal' }}>{worstCourse}</em></>
+          )}.{' '}
+          <em style={{ color: '#1D9E75', fontStyle: 'normal' }}>{passingCourses} at 100% pass rate</em>
+          . Grading{' '}
+          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{completionPct}% complete</em>
+          .
+        </>
+      )
+    }
+
+    if (activeTab === 'attendance' && attendanceData) {
+      const recorded = attendanceData.todaySummary?.totalRecorded ?? 0
+      const totalStudents = attendanceData.todaySummary?.totalStudents ?? 0
+      const avg7 = attendanceData.periodAverages?.last7Days?.toFixed(1) ?? '—'
+      const avg30 = attendanceData.periodAverages?.last30Days?.toFixed(1) ?? '—'
+      const atRiskCount = attendanceData.atRiskStudents?.length ?? 0
+      return (
+        <>
+          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{recorded} of {totalStudents} students</em>
+          {' '}recorded today. 7-day average{' '}
+          <em style={{ color: '#1D9E75', fontStyle: 'normal' }}>{avg7}%</em>
+          {' '}vs 30-day{' '}
+          <em style={{ color: '#EF9F27', fontStyle: 'normal' }}>{avg30}%</em>
+          .{atRiskCount > 0 && (
+            <>{' '}<em style={{ color: '#E24B4A', fontStyle: 'normal' }}>{atRiskCount} students</em> flagged below 90% attendance.</>
+          )}
+        </>
+      )
+    }
+
+    return null
+  }, [activeTab, overviewStats, gradeData, attendanceData])
+
+  if (!bannerContent) return null
+
+  return (
+    <p
+      className="px-6 pb-3"
+      style={{ fontSize: 11, color: 'var(--v2-text-muted)', lineHeight: 1.5 }}
+    >
+      {bannerContent}
+    </p>
+  )
+}
+
+// ============================================================================
 // CLASSROOMS MODULE (main export)
 // ============================================================================
 
@@ -639,6 +755,9 @@ export function ClassroomsModule() {
             )}
           </div>
         </div>
+
+        {/* Context Banner (CLS-003) */}
+        <ContextBanner activeTab={activeTab} schoolId={schoolId} />
 
         {/* Tab Navigation */}
         <div className="px-6">

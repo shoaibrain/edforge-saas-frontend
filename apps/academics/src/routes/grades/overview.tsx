@@ -1,47 +1,33 @@
 /**
- * Grade Overview
+ * Grade Overview — V2 Redesign
  *
- * School-wide grade analytics dashboard showing:
- * - Academic year context bar with 3-dot actions menu
- * - Summary stat cards (avg GPA, pass rate, at-risk count, total graded)
- * - Grading completion donut chart
- * - Assessment type performance with ring indicators
- * - Grade distribution bar chart
- * - Category & course performance tables
- * - At-risk students table (below 60%)
+ * School-wide grade analytics dashboard with EdForge V2 design tokens.
+ * All cards use V2 card chrome, inline SVG charts, and proper color system.
  *
- * Data is fetched from a single backend aggregation endpoint.
+ * Sections (top to bottom):
+ *  - Grade Analytics sub-header
+ *  - KPI row (4 StatCards from @edforge/ui)
+ *  - Two-col: Grading Completion donut + Assessment Performance gauges
+ *  - Full-width: Grade Distribution bar chart
+ *  - Two-col: Category Performance + Course Performance
+ *  - Full-width: At-Risk Students with avatar chips
+ *
+ * Data source: single useGradeOverview aggregate endpoint.
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   GraduationCap,
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
   Download,
   Users,
-  Award,
-  BookOpen,
-  ClipboardList,
-  Layers,
   MoreHorizontal,
 } from 'lucide-react'
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Cell,
-  PieChart,
-  Pie,
-  LabelList,
-} from 'recharts'
 import { useResourcePermissions } from '@edforge/abac'
+import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useGradeOverview } from '../../hooks/useGrades'
+import { getStudentGradient } from '../../utils/student-gradient'
 import type { GradeOverviewResponse } from '../../services/academics.service'
 
 // ============================================================================
@@ -63,67 +49,160 @@ interface GradeOverviewProps {
 type AtRiskStudent = GradeOverviewResponse['atRiskStudents'][number]
 
 // ============================================================================
-// STAT CARD
+// V2 DESIGN TOKENS (inline)
 // ============================================================================
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  subValue,
-  accent,
-  bg,
+const V2 = {
+  bgSurface: 'var(--v2-bg-surface, #161b27)',
+  borderDefault: 'var(--v2-border-default, rgba(255,255,255,0.06))',
+  borderSeparator: 'rgba(255,255,255,0.05)',
+  borderRow: 'rgba(255,255,255,0.04)',
+  textPrimary: 'var(--v2-text-primary, #e8eaf0)',
+  textSecondary: 'var(--v2-text-secondary, #c8ccd8)',
+  textMuted: 'var(--v2-text-muted, #7a8099)',
+  textHint: 'var(--v2-text-hint, #4a5068)',
+  textGhost: 'var(--v2-text-ghost, #2a3045)',
+  success: '#1D9E75',
+  info: '#378ADD',
+  warning: '#EF9F27',
+  danger: '#E24B4A',
+  purple: '#7F77DD',
+  orange: '#D85A30',
+}
+
+const cardStyle: React.CSSProperties = {
+  background: V2.bgSurface,
+  border: `1px solid ${V2.borderDefault}`,
+  borderRadius: 10,
+  overflow: 'hidden',
+}
+
+const cardHeaderStyle: React.CSSProperties = {
+  padding: '12px 16px',
+  borderBottom: `1px solid ${V2.borderSeparator}`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}
+
+const cardBodyStyle: React.CSSProperties = {
+  padding: 16,
+}
+
+// ============================================================================
+// V2 GRADE COLOR HELPER (inline hex, not Tailwind)
+// ============================================================================
+
+function getGradeColorHex(pct: number): string {
+  if (pct >= 80) return V2.success
+  if (pct >= 70) return V2.info
+  if (pct >= 60) return V2.warning
+  return V2.danger
+}
+
+function getPassColorHex(pct: number): string {
+  if (pct >= 100) return V2.success
+  if (pct >= 80) return V2.warning
+  return V2.danger
+}
+
+// ============================================================================
+// V2 CARD HEADER COMPONENT
+// ============================================================================
+
+function CardHeader({
+  iconBg,
+  title,
+  subtitle,
+  right,
+  icon,
 }: {
-  icon: typeof GraduationCap
-  label: string
-  value: string | number
-  subValue?: string
-  accent: string
-  bg: string
+  iconBg: string
+  title: string
+  subtitle: string
+  right?: React.ReactNode
+  icon: React.ReactNode
 }) {
   return (
-    <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-      <div className="flex items-center gap-3">
-        <div className={`p-2.5 rounded-lg ${bg}`}>
-          <Icon className={`w-5 h-5 ${accent}`} />
+    <div style={cardHeaderStyle}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: 5,
+            background: iconBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {icon}
         </div>
         <div>
-          <p className="text-xs text-text-tertiary uppercase tracking-wide">{label}</p>
-          <p className="text-2xl font-bold text-text-primary">{value}</p>
-          {subValue && <p className="text-xs text-text-secondary mt-0.5">{subValue}</p>}
+          <div style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>{title}</div>
+          <div style={{ fontSize: 10, color: V2.textGhost, marginTop: 1 }}>{subtitle}</div>
         </div>
       </div>
+      {right}
     </div>
   )
 }
 
 // ============================================================================
-// SKELETON LOADERS
+// V2 SVG ICON HELPERS
 // ============================================================================
 
-function SkeletonCards() {
+function CheckboxIcon({ color, size = 11 }: { color: string; size?: number }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-surface-primary rounded-xl border border-border-secondary p-5 animate-pulse"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-surface-hover rounded-lg" />
-            <div className="space-y-2">
-              <div className="h-3 w-16 bg-surface-hover rounded" />
-              <div className="h-6 w-12 bg-surface-hover rounded" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+      <polyline points="9 11 12 14 22 4" />
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+    </svg>
+  )
+}
+
+function BookIcon({ color, size = 11 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </svg>
+  )
+}
+
+function BarChartIcon({ color, size = 11 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  )
+}
+
+function CircleArrowIcon({ color, size = 11 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="8 12 12 16 16 12" />
+      <line x1="12" y1="8" x2="12" y2="16" />
+    </svg>
+  )
+}
+
+function WarningIcon({ color, size = 11 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
   )
 }
 
 // ============================================================================
-// ACTIONS DROPDOWN (3-dot menu)
+// ACTIONS DROPDOWN
 // ============================================================================
 
 function ActionsDropdown({
@@ -153,243 +232,82 @@ function ActionsDropdown({
   }, [open])
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} style={{ position: 'relative' }}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
+        style={{
+          padding: 6,
+          borderRadius: 6,
+          background: 'transparent',
+          border: 'none',
+          color: V2.textHint,
+          cursor: 'pointer',
+        }}
         aria-label="More actions"
       >
-        <MoreHorizontal className="w-4 h-4" />
+        <MoreHorizontal style={{ width: 14, height: 14 }} />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-52 bg-surface-primary border border-border-secondary rounded-xl shadow-lg z-20 py-1 overflow-hidden">
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: '100%',
+            marginTop: 4,
+            width: 200,
+            background: V2.bgSurface,
+            border: `1px solid ${V2.borderDefault}`,
+            borderRadius: 10,
+            zIndex: 20,
+            padding: '4px 0',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          }}
+        >
           <button
             type="button"
             onClick={() => { onExportGradebook(); setOpen(false) }}
             disabled={gradebookDisabled}
-            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              width: '100%',
+              padding: '8px 14px',
+              fontSize: 11,
+              color: V2.textMuted,
+              background: 'transparent',
+              border: 'none',
+              cursor: gradebookDisabled ? 'not-allowed' : 'pointer',
+              opacity: gradebookDisabled ? 0.4 : 1,
+            }}
           >
-            <Download className="w-4 h-4" />
+            <Download style={{ width: 12, height: 12 }} />
             Export Gradebook CSV
           </button>
           <button
             type="button"
             onClick={() => { onExportAtRisk(); setOpen(false) }}
             disabled={atRiskDisabled}
-            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              width: '100%',
+              padding: '8px 14px',
+              fontSize: 11,
+              color: V2.textMuted,
+              background: 'transparent',
+              border: 'none',
+              cursor: atRiskDisabled ? 'not-allowed' : 'pointer',
+              opacity: atRiskDisabled ? 0.4 : 1,
+            }}
           >
-            <Download className="w-4 h-4" />
+            <Download style={{ width: 12, height: 12 }} />
             Export At-Risk CSV
           </button>
         </div>
       )}
-    </div>
-  )
-}
-
-// ============================================================================
-// ASSESSMENT RING (SVG circular progress)
-// ============================================================================
-
-function AssessmentRing({
-  percentage,
-  size = 80,
-  strokeWidth = 6,
-  color,
-  label,
-  count,
-}: {
-  percentage: number
-  size?: number
-  strokeWidth?: number
-  color: string
-  label?: string
-  count?: number
-}) {
-  const [hovered, setHovered] = useState(false)
-  const radius = (size - strokeWidth) / 2
-  const circumference = 2 * Math.PI * radius
-  const offset = circumference - (percentage / 100) * circumference
-
-  return (
-    <div
-      className="relative inline-block"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <svg width={size} height={size} className="transform -rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="var(--color-border-secondary, #e5e7eb)"
-          strokeWidth={strokeWidth}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={hovered ? strokeWidth + 1 : strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          className="transition-all duration-700 ease-out"
-        />
-      </svg>
-      {hovered && label && (
-        <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-2.5 py-1.5 whitespace-nowrap z-10">
-          <p className="text-xs font-medium text-text-primary">{label}: {count} assessments</p>
-          <p className="text-[11px] text-text-tertiary">Avg score: {percentage.toFixed(1)}%</p>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ============================================================================
-// SORTABLE COURSE PERFORMANCE TABLE
-// ============================================================================
-
-type CourseSortKey = 'courseName' | 'studentCount' | 'avgGrade' | 'avgGpa' | 'passRate'
-
-function CoursePerformanceTable({
-  courses,
-}: {
-  courses: GradeOverviewResponse['coursePerformance']
-}) {
-  const [sortKey, setSortKey] = useState<CourseSortKey>('avgGrade')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
-
-  const toggleSort = (key: CourseSortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))
-    } else {
-      setSortKey(key)
-      setSortDir('desc')
-    }
-  }
-
-  const sorted = useMemo(() => {
-    return [...courses].sort((a, b) => {
-      const aVal = sortKey === 'courseName' ? a.courseName.toLowerCase() : a[sortKey]
-      const bVal = sortKey === 'courseName' ? b.courseName.toLowerCase() : b[sortKey]
-      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1
-      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [courses, sortKey, sortDir])
-
-  const arrow = (key: CourseSortKey) =>
-    sortKey === key ? (sortDir === 'desc' ? ' \u2193' : ' \u2191') : ''
-
-  const thClass = 'py-2 text-text-tertiary font-medium cursor-pointer select-none hover:text-text-primary transition-colors'
-
-  return (
-    <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-      <h3 className="text-sm font-semibold text-text-primary mb-1">
-        Course Performance
-      </h3>
-      <p className="text-xs text-text-tertiary mb-3">
-        Aggregated grade metrics for each course across all its sections
-      </p>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border-secondary">
-              <th className={`text-left pr-4 ${thClass}`} onClick={() => toggleSort('courseName')}>
-                Course{arrow('courseName')}
-              </th>
-              <th className={`text-right px-4 ${thClass}`}>Sections</th>
-              <th className={`text-right px-4 ${thClass}`} onClick={() => toggleSort('studentCount')}>
-                Students{arrow('studentCount')}
-              </th>
-              <th className={`text-right px-4 ${thClass}`} onClick={() => toggleSort('avgGrade')}>
-                Avg Grade{arrow('avgGrade')}
-              </th>
-              <th className={`text-right px-4 ${thClass}`} onClick={() => toggleSort('avgGpa')}>
-                Avg GPA{arrow('avgGpa')}
-              </th>
-              <th className={`text-right pl-4 ${thClass}`} onClick={() => toggleSort('passRate')}>
-                Pass Rate{arrow('passRate')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((course) => (
-              <tr key={course.courseId} className="border-b border-border-secondary last:border-b-0">
-                <td className="py-2.5 pr-4 text-text-primary font-medium">
-                  {course.courseName}
-                </td>
-                <td className="py-2.5 px-4 text-right text-text-secondary">
-                  {course.sectionCount}
-                </td>
-                <td className="py-2.5 px-4 text-right text-text-secondary">
-                  {course.studentCount}
-                </td>
-                <td className={`py-2.5 px-4 text-right font-medium ${getGradeColor(course.avgGrade)}`}>
-                  {course.avgGrade.toFixed(1)}%
-                </td>
-                <td className="py-2.5 px-4 text-right text-text-secondary">
-                  {course.avgGpa.toFixed(2)}
-                </td>
-                <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(course.passRate)}`}>
-                  {course.passRate.toFixed(1)}%
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// GRADE COLOR HELPERS
-// ============================================================================
-
-function getGradeColor(percentage: number): string {
-  if (percentage >= 90) return 'text-emerald-600 dark:text-emerald-400'
-  if (percentage >= 80) return 'text-blue-600 dark:text-blue-400'
-  if (percentage >= 70) return 'text-amber-600 dark:text-amber-400'
-  if (percentage >= 60) return 'text-orange-600 dark:text-orange-400'
-  return 'text-red-600 dark:text-red-400'
-}
-
-const DISTRIBUTION_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444']
-
-// ============================================================================
-// CHART TOOLTIP
-// ============================================================================
-
-function DistributionTooltip({ active, payload, label, totalStudents }: any) {
-  if (!active || !payload?.length) return null
-  const count = payload[0].value
-  const pct = totalStudents > 0 ? ((count / totalStudents) * 100).toFixed(0) : '0'
-  return (
-    <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
-      <p className="text-xs font-medium text-text-primary mb-0.5">{label}</p>
-      <p className="text-sm font-bold text-text-primary">
-        {count} student{count !== 1 ? 's' : ''}
-      </p>
-      <p className="text-xs text-text-tertiary">{pct}% of graded students</p>
-    </div>
-  )
-}
-
-function CompletionTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const { name, value } = payload[0]
-  return (
-    <div className="bg-surface-primary border border-border-secondary rounded-lg shadow-lg px-3 py-2">
-      <p className="text-xs font-medium text-text-primary">{name}</p>
-      <p className="text-sm font-bold text-text-primary">
-        {value} {value === 1 ? 'entry' : 'entries'}
-      </p>
     </div>
   )
 }
@@ -401,27 +319,17 @@ function CompletionTooltip({ active, payload }: any) {
 function exportAtRiskCsv(students: AtRiskStudent[], schoolId: string) {
   const header = 'Student Name,Course,Numeric Grade,Letter Grade\n'
   const rows = students
-    .map(
-      (s) =>
-        `"${s.studentName}","${s.courseName}",${s.numericGrade.toFixed(1)},${s.letterGrade ?? ''}`
-    )
+    .map((s) => `"${s.studentName}","${s.courseName}",${s.numericGrade.toFixed(1)},${s.letterGrade ?? ''}`)
     .join('\n')
-
-  const csv = header + rows
-  downloadCsv(csv, `at-risk-students-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`)
+  downloadCsv(header + rows, `at-risk-students-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`)
 }
 
 function exportFullGradebookCsv(data: GradeOverviewResponse, schoolId: string) {
   const header = 'Course,Students,Avg Grade,Avg GPA,Pass Rate\n'
   const rows = data.coursePerformance
-    .map(
-      (c) =>
-        `"${c.courseName}",${c.studentCount},${c.avgGrade.toFixed(1)}%,${c.avgGpa.toFixed(2)},${c.passRate.toFixed(1)}%`
-    )
+    .map((c) => `"${c.courseName}",${c.studentCount},${c.avgGrade.toFixed(1)}%,${c.avgGpa.toFixed(2)},${c.passRate.toFixed(1)}%`)
     .join('\n')
-
-  const csv = header + rows
-  downloadCsv(csv, `gradebook-overview-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`)
+  downloadCsv(header + rows, `gradebook-overview-${schoolId}-${new Date().toISOString().split('T')[0]}.csv`)
 }
 
 function downloadCsv(csv: string, filename: string) {
@@ -434,6 +342,42 @@ function downloadCsv(csv: string, filename: string) {
   link.click()
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
+}
+
+// ============================================================================
+// V2 DISTRIBUTION BAR COLORS
+// ============================================================================
+
+const DIST_COLORS: Record<string, string> = {
+  A: V2.success,
+  B: V2.info,
+  C: V2.warning,
+  D: 'rgba(255,255,255,0.15)',
+  F: V2.danger,
+}
+
+const DIST_LABELS: Record<string, string> = {
+  A: 'A (90\u2013100)',
+  B: 'B (80\u201389)',
+  C: 'C (70\u201379)',
+  D: 'D (60\u201369)',
+  F: 'F (0\u201359)',
+}
+
+// ============================================================================
+// CATEGORY BAR COLORS (cycle by index)
+// ============================================================================
+
+const CATEGORY_COLORS = [V2.success, V2.info, V2.purple, V2.warning, V2.orange]
+
+// ============================================================================
+// STUDENT INITIALS HELPER
+// ============================================================================
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.substring(0, 2).toUpperCase()
 }
 
 // ============================================================================
@@ -460,420 +404,505 @@ export function GradeOverview({
     }
   }, [data, schoolId])
 
+  // Grade distribution with letter keys for color lookup
+  const distBars = useMemo(() => {
+    if (!data?.gradeDistribution) return []
+    const letters = ['A', 'B', 'C', 'D', 'F']
+    const maxCount = Math.max(...data.gradeDistribution.map((d) => d.count), 1)
+    return data.gradeDistribution.map((d, i) => ({
+      letter: letters[i] || 'F',
+      count: d.count,
+      heightPct: maxCount > 0 ? Math.max((d.count / maxCount) * 100, 2) : 2,
+    }))
+  }, [data])
+
+  // Sorted course performance
+  const [courseSortKey, setCourseSortKey] = useState<'avgGrade' | 'courseName' | 'passRate'>('avgGrade')
+  const [courseSortDir, setCourseSortDir] = useState<'asc' | 'desc'>('desc')
+  const sortedCourses = useMemo(() => {
+    if (!data?.coursePerformance) return []
+    return [...data.coursePerformance].sort((a, b) => {
+      const aVal = courseSortKey === 'courseName' ? a.courseName.toLowerCase() : a[courseSortKey]
+      const bVal = courseSortKey === 'courseName' ? b.courseName.toLowerCase() : b[courseSortKey]
+      if (aVal < bVal) return courseSortDir === 'asc' ? -1 : 1
+      if (aVal > bVal) return courseSortDir === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [data?.coursePerformance, courseSortKey, courseSortDir])
+
   if (isError) {
     return (
-      <div className="rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-6 text-sm text-red-700 dark:text-red-400 text-center">
+      <div
+        style={{
+          borderRadius: 10,
+          border: `1px solid rgba(226,75,74,0.2)`,
+          background: 'rgba(226,75,74,0.06)',
+          padding: 24,
+          fontSize: 12,
+          color: V2.danger,
+          textAlign: 'center',
+        }}
+      >
         Failed to load grade data. Please try refreshing.
       </div>
     )
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Summary Stat Cards */}
-      {isLoading ? (
-        <SkeletonCards />
-      ) : !data || data.totalStudentsGraded === 0 ? (
-        <div className="py-12 text-center">
-          <GraduationCap className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-          <p className="text-sm text-text-secondary">No grades recorded yet across sections.</p>
+  if (isLoading) {
+    return (
+      <WidgetErrorBoundaryV2 fallbackMessage="Failed to load grade statistics">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <StatCard key={i} label="" value="" icon={Users} accentColor="rgba(55,138,221,0.10)" iconColor={V2.info} barColor={V2.info} loading />
+          ))}
         </div>
-      ) : (
-        <>
-          {/* Actions — only show export for users with view permission */}
+      </WidgetErrorBoundaryV2>
+    )
+  }
+
+  if (!data || data.totalStudentsGraded === 0) {
+    return (
+      <div style={{ padding: 48, textAlign: 'center' }}>
+        <GraduationCap style={{ width: 40, height: 40, margin: '0 auto 12px', color: V2.textHint }} />
+        <p style={{ fontSize: 13, color: V2.textMuted }}>No grades recorded yet across sections.</p>
+      </div>
+    )
+  }
+
+  const completionRate = data.gradingProgress?.completionRate ?? 0
+  const gradedEntries = data.gradingProgress?.gradedEntries ?? 0
+  const ungradedStubs = data.gradingProgress?.ungradedStubs ?? 0
+  const totalEntries = data.gradingProgress?.totalAssignmentEntries ?? 0
+
+  // SVG donut math for grading completion (80px, r=30, strokeWidth=10)
+  const donutR = 30
+  const donutC = 2 * Math.PI * donutR // ~188.5
+  const donutOffset = donutC * (1 - completionRate / 100)
+
+  // Assessment gauge math (68px, r=26, strokeWidth=8)
+  const gaugeR = 26
+  const gaugeC = 2 * Math.PI * gaugeR // ~163.4
+  const formScore = data.assessmentBreakdown?.formative?.avgScore ?? 0
+  const summScore = data.assessmentBreakdown?.summative?.avgScore ?? 0
+  const formOffset = gaugeC * (1 - formScore / 100)
+  const summOffset = gaugeC * (1 - summScore / 100)
+  const scoreDiff = Math.abs(formScore - summScore).toFixed(1)
+
+  return (
+    <div>
+      {/* ---- GRADE ANALYTICS SUB-HEADER ---- */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 22, height: 22, borderRadius: 5, background: 'rgba(55,138,221,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BookIcon color={V2.info} />
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>Grade Analytics</div>
+            <div style={{ fontSize: 10, color: V2.textGhost }}>School-wide academic performance &middot; 2025&ndash;2026</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 10, color: V2.textHint }}>
+            {data.sectionsWithGrades} of {data.totalSections} sections graded
+          </span>
           {gradePerms.view && (
-            <div className="flex justify-end">
-              <ActionsDropdown
-                onExportGradebook={handleExportGradebook}
-                onExportAtRisk={handleExportAtRisk}
-                gradebookDisabled={!data.coursePerformance?.length}
-                atRiskDisabled={!data.atRiskStudents?.length}
-              />
-            </div>
+            <ActionsDropdown
+              onExportGradebook={handleExportGradebook}
+              onExportAtRisk={handleExportAtRisk}
+              gradebookDisabled={!data.coursePerformance?.length}
+              atRiskDisabled={!data.atRiskStudents?.length}
+            />
           )}
+        </div>
+      </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard
-              icon={Users}
-              label="Students Graded"
-              value={data.totalStudentsGraded}
-              subValue={`${data.sectionsWithGrades} of ${data.totalSections} section${data.totalSections !== 1 ? 's' : ''} graded`}
-              accent="text-blue-600 dark:text-blue-400"
-              bg="bg-blue-500/10"
-            />
-            <StatCard
-              icon={Award}
-              label="Average GPA"
-              value={data.averageGpa.toFixed(2)}
-              subValue={`Avg grade: ${data.averageGrade.toFixed(1)}%`}
-              accent="text-emerald-600 dark:text-emerald-400"
-              bg="bg-emerald-500/10"
-            />
-            <StatCard
-              icon={TrendingUp}
-              label="Pass Rate"
-              value={`${data.passRate.toFixed(1)}%`}
-              subValue="Students scoring 60%+"
-              accent="text-teal-600 dark:text-teal-400"
-              bg="bg-teal-500/10"
-            />
-            <StatCard
-              icon={AlertTriangle}
-              label="At Risk"
-              value={data.atRiskCount}
-              subValue="Below 60% threshold"
-              accent="text-red-600 dark:text-red-400"
-              bg="bg-red-500/10"
-            />
-          </div>
+      {/* ---- KPI ROW (CLS-005) ---- */}
+      <WidgetErrorBoundaryV2 fallbackMessage="Failed to load grade statistics">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 14 }}>
+          <StatCard
+            label="STUDENTS GRADED"
+            value={String(data.totalStudentsGraded)}
+            icon={Users}
+            accentColor="rgba(55,138,221,0.10)"
+            iconColor={V2.info}
+            barColor={V2.info}
+            hint={`${data.sectionsWithGrades} of ${data.totalSections} sections graded`}
+          />
+          <StatCard
+            label="AVERAGE GPA"
+            value={data.averageGpa.toFixed(2)}
+            icon={Users}
+            accentColor="rgba(29,158,117,0.10)"
+            iconColor={V2.success}
+            barColor={V2.success}
+            hint={`Avg grade: ${data.averageGrade.toFixed(1)}%`}
+          />
+          <StatCard
+            label="PASS RATE"
+            value={`${data.passRate.toFixed(1)}%`}
+            icon={CheckCircle}
+            accentColor="rgba(29,158,117,0.10)"
+            iconColor={V2.success}
+            barColor={V2.success}
+            hint="Students scoring 60%+"
+          />
+          <StatCard
+            label="AT RISK"
+            value={String(data.atRiskCount)}
+            icon={AlertTriangle}
+            accentColor="rgba(226,75,74,0.10)"
+            iconColor={V2.danger}
+            barColor={V2.danger}
+            hint="Below 60% threshold"
+          />
+        </div>
+      </WidgetErrorBoundaryV2>
 
-          {/* Grading Completion + Assessment Performance — side by side on lg */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ---- ROW 1: Grading Completion + Assessment Performance (CLS-006, CLS-007) ---- */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
 
-            {/* Grading Completion — Donut Chart */}
-            {data.gradingProgress && data.gradingProgress.totalAssignmentEntries > 0 && (
-              <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-                <div className="flex items-center gap-2 mb-1">
-                  <ClipboardList className="w-4 h-4 text-violet-500" />
-                  <h3 className="text-sm font-semibold text-text-primary">
-                    Grading Completion
-                  </h3>
-                </div>
-                <p className="text-xs text-text-tertiary mb-5">
-                  Assignment entries graded across all active sections
-                </p>
-
-                <div className="flex items-center gap-8">
-                  {/* Donut */}
-                  <div className="relative flex-shrink-0">
-                    <ResponsiveContainer width={150} height={150}>
-                      <PieChart>
-                        <Pie
-                          data={[
-                            { name: 'Graded', value: data.gradingProgress.gradedEntries },
-                            { name: 'Remaining', value: data.gradingProgress.ungradedStubs },
-                          ]}
-                          innerRadius={50}
-                          outerRadius={68}
-                          paddingAngle={data.gradingProgress.ungradedStubs > 0 ? 3 : 0}
-                          dataKey="value"
-                          startAngle={90}
-                          endAngle={-270}
-                          stroke="none"
-                          isAnimationActive={true}
-                          animationDuration={800}
-                          animationEasing="ease-out"
-                        >
-                          <Cell fill="#8b5cf6" />
-                          <Cell fill="var(--color-surface-hover, #e5e7eb)" />
-                        </Pie>
-                        <Tooltip content={<CompletionTooltip />} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xl font-bold text-text-primary">
-                        {data.gradingProgress.completionRate.toFixed(0)}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="w-2.5 h-2.5 rounded-full bg-violet-500 flex-shrink-0" />
-                      <span className="text-sm text-text-secondary">Graded</span>
-                      <span className="text-sm font-semibold text-text-primary ml-auto">
-                        {data.gradingProgress.gradedEntries}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
-                      <span className="text-sm text-text-secondary">Remaining</span>
-                      <span className="text-sm font-semibold text-text-primary ml-auto">
-                        {data.gradingProgress.ungradedStubs}
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t border-border-secondary">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-text-tertiary">Assignment entries</span>
-                        <span className="text-xs font-semibold text-text-primary ml-auto">
-                          {data.gradingProgress.totalAssignmentEntries}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+        {/* Grading Completion */}
+        <div style={cardStyle}>
+          <CardHeader
+            iconBg="rgba(127,119,221,0.10)"
+            title="Grading Completion"
+            subtitle="Assignment entries across active sections"
+            icon={<CheckboxIcon color={V2.purple} />}
+          />
+          <div style={cardBodyStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              {/* SVG Donut */}
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <svg width={80} height={80} viewBox="0 0 80 80">
+                  <circle cx={40} cy={40} r={donutR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={10} />
+                  <circle
+                    cx={40} cy={40} r={donutR} fill="none"
+                    stroke={V2.purple} strokeWidth={10}
+                    strokeDasharray={donutC} strokeDashoffset={donutOffset}
+                    strokeLinecap="round" transform="rotate(-90 40 40)"
+                  />
+                </svg>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: V2.textPrimary, lineHeight: 1 }}>{completionRate.toFixed(0)}%</span>
+                  <span style={{ fontSize: 9, color: V2.textHint, marginTop: 2 }}>graded</span>
                 </div>
               </div>
-            )}
-
-            {/* Assessment Type Performance — Ring Indicators */}
-            {data.assessmentBreakdown && (data.assessmentBreakdown.formative.count > 0 || data.assessmentBreakdown.summative.count > 0) && (
-              <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-                <div className="flex items-center gap-2 mb-1">
-                  <BookOpen className="w-4 h-4 text-indigo-500" />
-                  <h3 className="text-sm font-semibold text-text-primary">
-                    Assessment Performance
-                  </h3>
+              {/* Stats */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: V2.textMuted }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: V2.purple }} />
+                    Graded
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>{gradedEntries}</span>
                 </div>
-                <p className="text-xs text-text-tertiary mb-5">
-                  Average scores by assessment type
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: V2.textMuted }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.12)' }} />
+                    Remaining
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: V2.textMuted }}>{ungradedStubs}</span>
+                </div>
+                <div style={{ fontSize: 10, color: V2.textGhost, marginTop: 4, paddingTop: 8, borderTop: `1px solid ${V2.borderSeparator}` }}>
+                  {totalEntries} total assignment entries
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="grid grid-cols-2 gap-6">
-                  {/* Formative */}
-                  <div className="flex flex-col items-center text-center">
-                    <div className="relative mb-3">
-                      <AssessmentRing
-                        percentage={data.assessmentBreakdown.formative.count > 0 ? data.assessmentBreakdown.formative.avgScore : 0}
-                        size={88}
-                        strokeWidth={7}
-                        color={data.assessmentBreakdown.formative.count > 0 ? '#6366f1' : '#d1d5db'}
-                        label="Formative"
-                        count={data.assessmentBreakdown.formative.count}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className={`text-base font-bold ${data.assessmentBreakdown.formative.count > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-tertiary'}`}>
-                          {data.assessmentBreakdown.formative.count > 0
-                            ? `${data.assessmentBreakdown.formative.avgScore.toFixed(0)}%`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <h4 className="text-sm font-semibold text-text-primary">Formative</h4>
-                      <span className="px-1.5 py-0.5 text-[10px] font-medium leading-none bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full">
-                        {data.assessmentBreakdown.formative.count}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-text-tertiary leading-tight">
-                      Quizzes, homework, participation
-                    </p>
-                  </div>
-
-                  {/* Summative */}
-                  <div className="flex flex-col items-center text-center">
-                    <div className="relative mb-3">
-                      <AssessmentRing
-                        percentage={data.assessmentBreakdown.summative.count > 0 ? data.assessmentBreakdown.summative.avgScore : 0}
-                        size={88}
-                        strokeWidth={7}
-                        color={data.assessmentBreakdown.summative.count > 0 ? '#0d9488' : '#d1d5db'}
-                        label="Summative"
-                        count={data.assessmentBreakdown.summative.count}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className={`text-base font-bold ${data.assessmentBreakdown.summative.count > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-text-tertiary'}`}>
-                          {data.assessmentBreakdown.summative.count > 0
-                            ? `${data.assessmentBreakdown.summative.avgScore.toFixed(0)}%`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <h4 className="text-sm font-semibold text-text-primary">Summative</h4>
-                      <span className="px-1.5 py-0.5 text-[10px] font-medium leading-none bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full">
-                        {data.assessmentBreakdown.summative.count}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-text-tertiary leading-tight">
-                      Tests, exams, projects
-                    </p>
+        {/* Assessment Performance */}
+        <div style={cardStyle}>
+          <CardHeader
+            iconBg="rgba(55,138,221,0.10)"
+            title="Assessment Performance"
+            subtitle="Average scores by assessment type"
+            icon={<BookIcon color={V2.info} />}
+          />
+          <div style={cardBodyStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              {/* Formative gauge */}
+              <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                <div style={{ position: 'relative' }}>
+                  <svg width={68} height={68} viewBox="0 0 68 68">
+                    <circle cx={34} cy={34} r={gaugeR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
+                    <circle cx={34} cy={34} r={gaugeR} fill="none" stroke={V2.success} strokeWidth={8}
+                      strokeDasharray={gaugeC} strokeDashoffset={formOffset}
+                      strokeLinecap="round" transform="rotate(-90 34 34)" />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: V2.success }}>{formScore.toFixed(0)}%</span>
                   </div>
                 </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V2.textSecondary, marginTop: 4 }}>Formative</div>
+                <div style={{ fontSize: 9, color: V2.textGhost }}>Quizzes, homework, participation</div>
+              </div>
 
-                {/* Comparison insight */}
-                {data.assessmentBreakdown.formative.count > 0 && data.assessmentBreakdown.summative.count > 0 && (
-                  <p className="text-xs text-text-secondary mt-4 pt-3 border-t border-border-secondary text-center">
-                    {data.assessmentBreakdown.formative.avgScore > data.assessmentBreakdown.summative.avgScore
-                      ? `Students score ${(data.assessmentBreakdown.formative.avgScore - data.assessmentBreakdown.summative.avgScore).toFixed(1)}% higher on formative than summative`
-                      : data.assessmentBreakdown.summative.avgScore > data.assessmentBreakdown.formative.avgScore
-                        ? `Students score ${(data.assessmentBreakdown.summative.avgScore - data.assessmentBreakdown.formative.avgScore).toFixed(1)}% higher on summative than formative`
-                        : 'Formative and summative scores are equal'}
-                  </p>
-                )}
-                {data.assessmentBreakdown.unclassified.count > 0 && (
-                  <p className="text-[11px] text-text-tertiary mt-2 text-center">
+              <div style={{ width: 1, height: 50, background: 'rgba(255,255,255,0.06)' }} />
+
+              {/* Summative gauge */}
+              <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                <div style={{ position: 'relative' }}>
+                  <svg width={68} height={68} viewBox="0 0 68 68">
+                    <circle cx={34} cy={34} r={gaugeR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
+                    <circle cx={34} cy={34} r={gaugeR} fill="none" stroke={V2.info} strokeWidth={8}
+                      strokeDasharray={gaugeC} strokeDashoffset={summOffset}
+                      strokeLinecap="round" transform="rotate(-90 34 34)" />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: V2.info }}>{summScore.toFixed(0)}%</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V2.textSecondary, marginTop: 4 }}>Summative</div>
+                <div style={{ fontSize: 9, color: V2.textGhost }}>Tests, exams, projects</div>
+              </div>
+
+              <div style={{ width: 1, height: 50, background: 'rgba(255,255,255,0.06)' }} />
+
+              {/* Insight */}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, color: V2.textHint, lineHeight: 1.5 }}>
+                  {formScore > summScore ? (
+                    <><em style={{ fontStyle: 'normal', color: V2.success }}>Formative {scoreDiff}% higher</em> than summative &mdash; well balanced.</>
+                  ) : summScore > formScore ? (
+                    <><em style={{ fontStyle: 'normal', color: V2.info }}>Summative {scoreDiff}% higher</em> than formative.</>
+                  ) : (
+                    <>Formative and summative scores are equal &mdash; well balanced.</>
+                  )}
+                </div>
+                {data.assessmentBreakdown?.unclassified && data.assessmentBreakdown.unclassified.count > 0 && (
+                  <div style={{ fontSize: 9, color: V2.textGhost, marginTop: 8 }}>
                     +{data.assessmentBreakdown.unclassified.count} unclassified (avg {data.assessmentBreakdown.unclassified.avgScore.toFixed(1)}%)
-                  </p>
+                  </div>
                 )}
               </div>
-            )}
-          </div>
-
-          {/* Grade Distribution Chart */}
-          <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-            <div className="flex items-center gap-2 mb-1">
-              <GraduationCap className="w-4 h-4 text-teal-500" />
-              <h3 className="text-sm font-semibold text-text-primary">
-                Grade Distribution
-              </h3>
             </div>
-            <p className="text-xs text-text-tertiary mb-4">
-              Number of students in each grade range based on their overall course averages
-            </p>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart
-                data={data.gradeDistribution}
-                margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="var(--color-border-secondary, #e5e7eb)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="range"
-                  tick={{ fontSize: 11, fill: 'var(--color-text-tertiary, #9ca3af)' }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: 'var(--color-text-tertiary, #9ca3af)' }}
-                  tickLine={false}
-                  axisLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip content={<DistributionTooltip totalStudents={data.totalStudentsGraded} />} />
-                <Bar
-                  dataKey="count"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={60}
-                  isAnimationActive={true}
-                  animationDuration={800}
-                  animationEasing="ease-out"
-                >
-                  {data.gradeDistribution.map((_, index) => (
-                    <Cell key={index} fill={DISTRIBUTION_COLORS[index]} />
-                  ))}
-                  <LabelList dataKey="count" position="top" fontSize={11} fill="var(--color-text-tertiary, #9ca3af)" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
           </div>
+        </div>
+      </div>
 
-          {/* Category Performance */}
-          {data.categoryPerformance && data.categoryPerformance.length > 0 && (
-            <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-              <div className="flex items-center gap-2 mb-1">
-                <Layers className="w-4 h-4 text-amber-500" />
-                <h3 className="text-sm font-semibold text-text-primary">
-                  Category Performance
-                </h3>
+      {/* ---- ROW 2: Grade Distribution (CLS-008) ---- */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={cardStyle}>
+          <CardHeader
+            iconBg="rgba(239,159,39,0.10)"
+            title="Grade Distribution"
+            subtitle="Number of students in each grade range based on overall course averages"
+            icon={<BarChartIcon color={V2.warning} />}
+          />
+          <div style={cardBodyStyle}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 110, padding: '16px 0 0' }}>
+              {distBars.map((bar) => {
+                const barColor = DIST_COLORS[bar.letter] || V2.textGhost
+                const labelColor = bar.letter === 'D' ? V2.textGhost : barColor
+                return (
+                  <div key={bar.letter} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, height: '100%', justifyContent: 'flex-end' }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: labelColor, marginBottom: 4 }}>{bar.count}</span>
+                    <div style={{ width: '100%', borderRadius: '4px 4px 0 0', background: barColor, height: `${bar.heightPct}%`, minHeight: 2 }} />
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: `1px solid ${V2.borderSeparator}`, marginTop: 12 }}>
+              {distBars.map((bar) => (
+                <div key={bar.letter} style={{ flex: 1, textAlign: 'center', fontSize: 9, color: V2.textGhost }}>
+                  {DIST_LABELS[bar.letter]}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ---- ROW 3: Category Performance + Course Performance (CLS-009, CLS-010) ---- */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+
+        {/* Category Performance */}
+        {data.categoryPerformance && data.categoryPerformance.length > 0 && (
+          <div style={cardStyle}>
+            <CardHeader
+              iconBg="rgba(29,158,117,0.10)"
+              title="Category Performance"
+              subtitle="Average scores by grading policy category"
+              icon={<CircleArrowIcon color={V2.success} />}
+            />
+            <div style={cardBodyStyle}>
+              {/* Column headers */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${V2.borderSeparator}` }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 110 }}>Category</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 36, textAlign: 'center' }}>Wt.</span>
+                <span style={{ flex: 1, fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5 }}>Score</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 50, textAlign: 'right' }}>#</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 50, textAlign: 'right' }}>Avg</span>
               </div>
-              <p className="text-xs text-text-tertiary mb-3">
-                Average scores by grading policy category (e.g. homework, exams, projects)
-              </p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border-secondary">
-                      <th className="text-left py-2 pr-4 text-text-tertiary font-medium">Category</th>
-                      {policyWeights && policyWeights.length > 0 && (
-                        <th className="text-right py-2 px-4 text-text-tertiary font-medium">Weight</th>
-                      )}
-                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Assignments</th>
-                      <th className="text-right py-2 pl-4 text-text-tertiary font-medium">Avg Score</th>
+              {data.categoryPerformance.map((cat, idx) => {
+                const barColor = CATEGORY_COLORS[idx % CATEGORY_COLORS.length]
+                const matchedWeight = policyWeights?.find((w) => w.categoryId === cat.categoryId)
+                const catName = matchedWeight?.categoryName || cat.categoryName.charAt(0).toUpperCase() + cat.categoryName.slice(1)
+                const weight = matchedWeight ? `${matchedWeight.weight}%` : '\u2014'
+                return (
+                  <div key={cat.categoryId} style={{ display: 'flex', alignItems: 'center', padding: '9px 0', borderBottom: `1px solid ${V2.borderRow}`, gap: 12 }}>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: V2.textPrimary, width: 110, flexShrink: 0 }}>{catName}</span>
+                    <span style={{ fontSize: 10, color: V2.textHint, width: 36, flexShrink: 0, textAlign: 'center' }}>{weight}</span>
+                    <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 2, background: barColor, width: `${cat.avgScore}%` }} />
+                    </div>
+                    <span style={{ fontSize: 10, color: V2.textHint, width: 50, textAlign: 'right', flexShrink: 0 }}>{cat.assignmentCount}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, width: 50, textAlign: 'right', flexShrink: 0, color: barColor }}>{cat.avgScore.toFixed(1)}%</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Course Performance */}
+        {data.coursePerformance.length > 0 && (
+          <div style={cardStyle}>
+            <CardHeader
+              iconBg="rgba(55,138,221,0.10)"
+              title="Course Performance"
+              subtitle="Aggregated grade metrics per course across sections"
+              icon={<BookIcon color={V2.info} />}
+            />
+            <div style={cardBodyStyle}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    {['Course', 'Sec.', 'Std.', 'Avg Grade \u2193', 'GPA', 'Pass %'].map((h, i) => (
+                      <th
+                        key={h}
+                        style={{
+                          textAlign: i === 0 ? 'left' : 'right',
+                          fontSize: 9,
+                          fontWeight: 700,
+                          color: V2.textGhost,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          padding: '0 0 8px',
+                          cursor: ['courseName', '', '', 'avgGrade', '', 'passRate'][i] ? 'pointer' : 'default',
+                        }}
+                        onClick={() => {
+                          const key = ['courseName', '', '', 'avgGrade', '', 'passRate'][i] as 'avgGrade' | 'courseName' | 'passRate'
+                          if (!key) return
+                          if (courseSortKey === key) setCourseSortDir((d) => d === 'desc' ? 'asc' : 'desc')
+                          else { setCourseSortKey(key); setCourseSortDir('desc') }
+                        }}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedCourses.map((course) => (
+                    <tr key={course.courseId}>
+                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, fontSize: 12, fontWeight: 500, color: V2.textPrimary }}>{course.courseName}</td>
+                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', color: V2.textHint, fontSize: 11 }}>{course.sectionCount}</td>
+                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', color: V2.textHint, fontSize: 11 }}>{course.studentCount}</td>
+                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', fontSize: 12, fontWeight: 600, color: getGradeColorHex(course.avgGrade) }}>
+                        {course.avgGrade.toFixed(1)}%
+                      </td>
+                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', fontSize: 11, color: V2.textMuted }}>{course.avgGpa.toFixed(2)}</td>
+                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', fontSize: 12, fontWeight: 600, color: getPassColorHex(course.passRate) }}>
+                        {course.passRate.toFixed(1)}%
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {data.categoryPerformance.map((cat) => {
-                      const matchedWeight = policyWeights?.find(
-                        (w) => w.categoryId === cat.categoryId
-                      )
-                      return (
-                        <tr key={cat.categoryId} className="border-b border-border-secondary last:border-b-0">
-                          <td className="py-2.5 pr-4 text-text-primary font-medium">
-                            {matchedWeight?.categoryName || cat.categoryName.charAt(0).toUpperCase() + cat.categoryName.slice(1)}
-                          </td>
-                          {policyWeights && policyWeights.length > 0 && (
-                            <td className="py-2.5 px-4 text-right text-text-tertiary">
-                              {matchedWeight ? `${matchedWeight.weight}%` : '\u2014'}
-                            </td>
-                          )}
-                          <td className="py-2.5 px-4 text-right text-text-secondary">
-                            {cat.assignmentCount}
-                          </td>
-                          <td className={`py-2.5 pl-4 text-right font-medium ${getGradeColor(cat.avgScore)}`}>
-                            {cat.avgScore.toFixed(1)}%
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
+        )}
+      </div>
 
-          {/* Course Performance Table */}
-          {data.coursePerformance.length > 0 && (
-            <CoursePerformanceTable courses={data.coursePerformance} />
-          )}
-
-          {/* At-Risk Students */}
-          <div className="bg-surface-primary rounded-xl border border-border-secondary p-5">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
-                <h3 className="text-sm font-semibold text-text-primary">
-                  At-Risk Students
-                </h3>
-              </div>
-              {data.atRiskStudents.length > 0 && (
-                <span className="text-xs text-text-tertiary">
-                  {data.atRiskStudents.length} student{data.atRiskStudents.length !== 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-text-tertiary mb-4">
-              Students scoring below 60% in any course
-            </p>
-
+      {/* ---- ROW 4: At-Risk Students (CLS-011) ---- */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={cardStyle}>
+          <CardHeader
+            iconBg="rgba(226,75,74,0.10)"
+            title="At-Risk Students"
+            subtitle="Students scoring below 60% in any course"
+            right={
+              data.atRiskStudents.length > 0 ? (
+                <span style={{ fontSize: 10, color: V2.textHint }}>{data.atRiskStudents.length} students</span>
+              ) : undefined
+            }
+            icon={<WarningIcon color={V2.danger} />}
+          />
+          <div style={cardBodyStyle}>
             {data.atRiskStudents.length === 0 ? (
-              <div className="py-8 text-center">
-                <CheckCircle className="w-10 h-10 mx-auto text-emerald-500 mb-3" />
-                <p className="text-sm text-text-secondary">
-                  No students below the grade threshold
-                </p>
+              <div style={{ padding: 32, textAlign: 'center' }}>
+                <CheckCircle style={{ width: 40, height: 40, margin: '0 auto 12px', color: V2.success }} />
+                <p style={{ fontSize: 12, color: V2.textMuted }}>No students below the grade threshold</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border-secondary">
-                      <th className="text-left py-2 pr-4 text-text-tertiary font-medium">Student</th>
-                      <th className="text-left py-2 px-4 text-text-tertiary font-medium">Course</th>
-                      <th className="text-right py-2 px-4 text-text-tertiary font-medium">Grade</th>
-                      <th className="text-right py-2 pl-4 text-text-tertiary font-medium">Letter</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.atRiskStudents.map((student, i) => (
-                      <tr key={`${student.studentId}-${student.courseId}-${i}`} className="border-b border-border-secondary last:border-b-0">
-                        <td className="py-2.5 pr-4 text-text-primary font-medium">
-                          {student.studentName}
-                        </td>
-                        <td className="py-2.5 px-4 text-text-secondary">
-                          {student.courseName}
-                        </td>
-                        <td className="py-2.5 px-4 text-right">
-                          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">
-                            {student.numericGrade.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="py-2.5 pl-4 text-right font-bold text-red-600 dark:text-red-400">
-                          {student.letterGrade}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                {/* Column headers */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${V2.borderSeparator}` }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 }}>Student</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 }}>Course</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 80, textAlign: 'right' }}>Grade</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 50, textAlign: 'right' }}>Letter</span>
+                </div>
+                {data.atRiskStudents.map((student, i) => {
+                  const gradeColor = student.numericGrade < 60 ? V2.danger : V2.warning
+                  const letterBg = student.numericGrade < 60 ? 'rgba(226,75,74,0.10)' : 'rgba(239,159,39,0.10)'
+                  const letterColor = student.numericGrade < 60 ? V2.danger : V2.warning
+                  return (
+                    <div
+                      key={`${student.studentId}-${student.courseId}-${i}`}
+                      style={{ display: 'flex', alignItems: 'center', padding: '9px 0', borderBottom: `1px solid ${V2.borderRow}`, gap: 12 }}
+                    >
+                      {/* Avatar chip */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: '50%',
+                            background: getStudentGradient(student.studentName),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: 'white',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {getInitials(student.studentName)}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: V2.textPrimary }}>{student.studentName}</div>
+                        </div>
+                      </div>
+                      <div style={{ flex: 1, fontSize: 10, color: V2.textHint }}>{student.courseName}</div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: gradeColor, width: 80, textAlign: 'right' }}>
+                        {student.numericGrade.toFixed(1)}%
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 600,
+                          background: letterBg,
+                          color: letterColor,
+                          padding: '1px 6px',
+                          borderRadius: 4,
+                          width: 50,
+                          textAlign: 'center',
+                        }}
+                      >
+                        {student.letterGrade}
+                      </span>
+                    </div>
+                  )
+                })}
+              </>
             )}
           </div>
-
-        </>
-      )}
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EdForge — Academics · Classrooms</title>
+<style>
+  :root {
+    --bg-app: #0f1117;
+    --bg-surface: #161b27;
+    --bg-elevated: #1e2436;
+    --text-primary: #e8eaf0;
+    --text-secondary: #c8ccd8;
+    --text-muted: #7a8099;
+    --text-hint: #4a5068;
+    --text-ghost: #2a3045;
+    --color-success: #1D9E75;
+    --color-info: #378ADD;
+    --color-warning: #EF9F27;
+    --color-danger: #E24B4A;
+    --border-default: rgba(255,255,255,0.06);
+    --border-secondary: rgba(255,255,255,0.09);
+    --border-hover: rgba(255,255,255,0.12);
+    --font-mono: 'SF Mono', 'Fira Code', monospace;
+    --accent: #1D9E75;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg-app); color: var(--text-primary); font-size: 13px;
+    min-height: 100vh; display: grid;
+    grid-template-columns: 210px 1fr; grid-template-rows: 48px 1fr;
+  }
+
+  /* TOPBAR */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: var(--bg-surface); border-bottom: 1px solid var(--border-default); display: flex; align-items: center; padding: 0 16px 0 0; z-index: 50; }
+  .topbar-brand { width: 210px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-right: 1px solid var(--border-default); height: 100%; flex-shrink: 0; }
+  .brand-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, #1D9E75, #378ADD); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
+  .brand-name { font-size: 11px; font-weight: 600; }
+  .brand-code { font-size: 9px; color: var(--text-hint); font-family: var(--font-mono); }
+  .topbar-breadcrumb { flex: 1; display: flex; align-items: center; gap: 6px; padding: 0 20px; font-size: 12px; color: var(--text-hint); }
+  .topbar-breadcrumb a { color: var(--text-hint); text-decoration: none; }
+  .topbar-breadcrumb .sep { color: var(--text-ghost); }
+  .topbar-breadcrumb .current { color: var(--text-secondary); font-weight: 500; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .theme-toggle { display: flex; background: rgba(255,255,255,0.04); border: 1px solid var(--border-default); border-radius: 7px; overflow: hidden; }
+  .theme-btn { padding: 4px 10px; font-size: 10px; font-weight: 500; color: var(--text-hint); border: none; background: transparent; cursor: pointer; }
+  .theme-btn.active { background: rgba(255,255,255,0.07); color: var(--text-secondary); }
+  .topbar-avatar { width: 30px; height: 30px; background: linear-gradient(135deg, #7F77DD, #378ADD); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; cursor: pointer; }
+
+  /* SIDEBAR */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--bg-surface); border-right: 1px solid var(--border-default); padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; z-index: 40; overflow-y: auto; }
+  .nav-back { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px; color: var(--text-hint); font-size: 11px; cursor: pointer; margin-bottom: 8px; text-decoration: none; }
+  .nav-back:hover { background: rgba(255,255,255,0.04); }
+  .nav-section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-ghost); padding: 8px 10px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; color: var(--text-hint); font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.12s; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text-secondary); }
+  .nav-item.active { background: rgba(29,158,117,0.10); color: #1D9E75; }
+
+  /* CONTENT PANE */
+  .content-pane { grid-column: 2; grid-row: 2; overflow-y: auto; position: relative; }
+  .content-inner { padding: 24px 28px; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .page-header-left { display: flex; align-items: center; gap: 12px; }
+  .module-icon { width: 32px; height: 32px; background: rgba(55,138,221,0.10); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .page-title-row { display: flex; align-items: baseline; gap: 10px; }
+  .page-title { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  .page-date-sep { width: 1px; height: 14px; background: var(--border-secondary); align-self: center; }
+  .page-date { font-size: 12px; color: var(--text-muted); }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .btn-primary { height: 36px; background: #1D9E75; border: none; border-radius: 8px; padding: 0 14px; font-size: 11px; font-weight: 500; color: white; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: opacity 0.12s; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-secondary { height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 8px; padding: 0 14px; font-size: 11px; font-weight: 500; color: #9aa0b8; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+  /* CONTEXT BANNER */
+  .context-banner { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+  .cb-info { color: var(--color-info); font-style: normal; }
+  .cb-success { color: var(--color-success); font-style: normal; }
+  .cb-warning { color: var(--color-warning); font-style: normal; }
+  .cb-danger { color: var(--color-danger); font-style: normal; }
+
+  /* TAB BAR */
+  .tab-bar { border-bottom: 1px solid var(--border-default); display: flex; margin-bottom: 20px; }
+  .tab-item { padding: 8px 14px; font-size: 12px; font-weight: 500; color: var(--text-hint); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.12s; }
+  .tab-item:hover { color: var(--text-muted); }
+  .tab-item.active { color: #378ADD; border-bottom-color: #378ADD; }
+
+  /* BUTTONS */
+  .btn-export { height: 32px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 12px; font-size: 11px; color: var(--text-hint); cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; margin-left: auto; transition: all 0.12s; }
+  .btn-export:hover { border-color: rgba(255,255,255,0.12); color: var(--text-muted); }
+
+  /* KPI TILES */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; transition: border-color 0.12s; }
+  .kpi-card:hover { border-color: rgba(255,255,255,0.12); }
+  .kpi-accent-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+  .kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .kpi-label { font-size: 9px; font-weight: 700; color: var(--text-ghost); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-icon { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+  .kpi-value { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; line-height: 1; margin-bottom: 8px; }
+  .kpi-sub { font-size: 10px; color: var(--text-hint); }
+  .kpi-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 500; padding: 2px 6px; border-radius: 5px; }
+
+  /* FILTER STRIP */
+  .filter-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; display: flex; align-items: center; }
+  .search-wrap svg { position: absolute; left: 10px; color: var(--text-hint); pointer-events: none; }
+  .search-input { width: 100%; height: 32px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 11px 0 32px; font-size: 12px; color: var(--text-primary); outline: none; color-scheme: dark; }
+  .search-input::placeholder { color: var(--text-hint); }
+  .search-input:focus { border-color: rgba(55,138,221,0.35); }
+  .filter-select { height: 32px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 10px; font-size: 11px; color: var(--text-muted); outline: none; cursor: pointer; color-scheme: dark; }
+  .filter-chip { height: 28px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 0 12px; font-size: 11px; font-weight: 500; color: var(--text-hint); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.12s; }
+  .filter-chip.active { background: rgba(55,138,221,0.10); border-color: rgba(55,138,221,0.25); color: #378ADD; }
+  .chip-divider { width: 1px; height: 20px; background: var(--border-default); }
+
+  /* TABLE */
+  .table-wrap { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 10px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-default); height: 34px; }
+  th { text-align: left; padding: 0 14px; font-size: 9px; font-weight: 700; color: var(--text-ghost); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: var(--text-hint); }
+  th.right, td.right { text-align: right; }
+  tbody tr { height: 52px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.12s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  td { padding: 0 14px; vertical-align: middle; }
+  .pagination { padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+  .pagination-info { font-size: 11px; color: var(--text-hint); }
+  .pagination-controls { display: flex; align-items: center; gap: 6px; }
+  .per-page-select { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 5px; padding: 3px 7px; font-size: 11px; color: var(--text-muted); outline: none; color-scheme: dark; cursor: pointer; }
+  .page-btn { padding: 3px 9px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08); background: transparent; font-size: 11px; color: var(--text-hint); cursor: pointer; transition: all 0.12s; }
+  .page-btn.active { background: rgba(55,138,221,0.10); border-color: rgba(55,138,221,0.20); color: #378ADD; }
+  .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* STATUS CHIP */
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 8px; white-space: nowrap; }
+  .chip-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .chip-active { background: rgba(29,158,117,0.10); color: #1D9E75; }
+  .chip-active .chip-dot { background: #1D9E75; }
+  .chip-inactive { background: rgba(255,255,255,0.05); color: var(--text-hint); }
+  .chip-inactive .chip-dot { background: var(--text-hint); }
+
+  /* ENROLLMENT BAR */
+  .enroll-wrap { display: flex; align-items: center; gap: 8px; }
+  .enroll-bar-bg { height: 4px; width: 80px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  .enroll-bar-fill { height: 100%; border-radius: 2px; background: #1D9E75; }
+  .enroll-bar-fill.warn { background: #EF9F27; }
+  .enroll-bar-fill.danger { background: #E24B4A; }
+  .enroll-count { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+
+  /* SECTION NAME */
+  .section-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .section-num { font-size: 10px; color: var(--text-hint); font-family: var(--font-mono); }
+  .course-name { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+  .course-code { font-size: 10px; color: var(--text-hint); font-family: var(--font-mono); }
+  .teacher-name { font-size: 12px; color: var(--text-muted); }
+
+  /* ACTION BTN */
+  .action-btn { width: 26px; height: 26px; border-radius: 6px; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.12s; color: var(--text-hint); }
+  .action-btn:hover { background: rgba(255,255,255,0.07); color: var(--text-secondary); }
+
+  /* VIEW TOGGLE */
+  .view-toggle { display: flex; background: rgba(255,255,255,0.04); border: 1px solid var(--border-default); border-radius: 7px; overflow: hidden; }
+  .view-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-hint); border: none; background: transparent; transition: all 0.12s; }
+  .view-btn.active { background: rgba(255,255,255,0.07); color: var(--text-secondary); }
+
+  /* TAB PANELS */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ======================== OVERVIEW TAB — KPI STATS ======================== */
+  .overview-kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
+
+  /* ======================== GRADEBOOK TAB ======================== */
+
+  /* Sub-section header */
+  .section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-hdr-left { display: flex; align-items: center; gap: 8px; }
+  .section-icon { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+  .section-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .section-sub { font-size: 10px; color: var(--text-ghost); margin-top: 1px; }
+  .section-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+
+  /* Two-col layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .full-col { margin-bottom: 12px; }
+
+  /* Card container */
+  .card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 10px; overflow: hidden; }
+  .card-body { padding: 16px; }
+  .card-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+
+  /* Grading completion */
+  .gc-layout { display: flex; align-items: center; gap: 20px; }
+  .gc-donut { position: relative; flex-shrink: 0; }
+  .gc-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .gc-pct-num { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+  .gc-pct-lbl { font-size: 9px; color: var(--text-hint); margin-top: 2px; }
+  .gc-stats { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .gc-row { display: flex; align-items: center; justify-content: space-between; }
+  .gc-row-label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+  .gc-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .gc-val { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .gc-total { font-size: 10px; color: var(--text-ghost); margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+
+  /* Assessment performance */
+  .ap-layout { display: flex; align-items: center; gap: 16px; }
+  .ap-gauge { position: relative; flex-shrink: 0; text-align: center; }
+  .ap-pct { font-size: 16px; font-weight: 700; }
+  .ap-lbl { font-size: 9px; color: var(--text-hint); }
+  .ap-type-lbl { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-top: 4px; }
+  .ap-sub { font-size: 9px; color: var(--text-ghost); }
+  .ap-divider { width: 1px; height: 50px; background: rgba(255,255,255,0.06); }
+  .ap-insight { font-size: 10px; color: var(--text-hint); line-height: 1.5; }
+  .ap-insight em { font-style: normal; color: var(--color-success); }
+  .ap-unclass { font-size: 9px; color: var(--text-ghost); margin-top: 4px; }
+
+  /* Grade distribution chart */
+  .gd-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 0 4px; }
+  .gd-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .gd-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; transition: opacity 0.12s; position: relative; }
+  .gd-bar:hover { opacity: 0.8; }
+  .gd-bar-count { position: absolute; top: -16px; left: 0; right: 0; text-align: center; font-size: 9px; font-weight: 700; color: var(--text-muted); }
+  .gd-label { font-size: 9px; color: var(--text-ghost); white-space: nowrap; margin-top: 6px; }
+  .gd-labels { display: flex; gap: 6px; padding: 0 4px; }
+  .gd-l { flex: 1; text-align: center; font-size: 9px; color: var(--text-ghost); }
+
+  /* Category performance table */
+  .cat-table { width: 100%; }
+  .cat-row { display: flex; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 12px; }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-name { font-size: 12px; font-weight: 500; color: var(--text-primary); width: 110px; flex-shrink: 0; }
+  .cat-weight { font-size: 10px; color: var(--text-hint); width: 36px; flex-shrink: 0; text-align: center; }
+  .cat-bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .cat-bar { height: 100%; border-radius: 2px; background: #378ADD; }
+  .cat-count { font-size: 10px; color: var(--text-hint); width: 50px; text-align: right; flex-shrink: 0; }
+  .cat-score { font-size: 12px; font-weight: 600; width: 50px; text-align: right; flex-shrink: 0; }
+
+  /* Course performance table */
+  .cp-table { width: 100%; border-collapse: collapse; }
+  .cp-table th { text-align: left; font-size: 9px; font-weight: 700; color: var(--text-ghost); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 0 8px; }
+  .cp-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; vertical-align: middle; }
+  .cp-table tbody tr:last-child td { border-bottom: none; }
+  .cp-table .right { text-align: right; }
+  .grade-badge { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; }
+  .grade-high { color: #1D9E75; }
+  .grade-mid { color: #378ADD; }
+  .grade-warn { color: #EF9F27; }
+  .grade-low { color: #E24B4A; }
+  .pass-high { color: #1D9E75; }
+  .pass-warn { color: #EF9F27; }
+  .pass-low { color: #E24B4A; }
+  .gpa-val { font-size: 11px; color: var(--text-muted); }
+
+  /* At-risk */
+  .at-risk-row { display: flex; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 12px; }
+  .at-risk-row:last-child { border-bottom: none; }
+  .at-risk-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; }
+  .at-risk-info { flex: 1; }
+  .at-risk-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .at-risk-course { font-size: 10px; color: var(--text-hint); }
+  .at-risk-grade { font-size: 12px; font-weight: 700; color: #E24B4A; }
+  .at-risk-letter { font-size: 9px; background: rgba(226,75,74,0.10); color: #E24B4A; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+
+  /* Section gradebook selector */
+  .section-selector { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 12px; height: 36px; font-size: 12px; color: var(--text-secondary); outline: none; cursor: pointer; color-scheme: dark; min-width: 220px; }
+  .section-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px; }
+  .section-placeholder-icon { width: 40px; height: 40px; background: rgba(55,138,221,0.08); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .section-placeholder-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .section-placeholder-sub { font-size: 11px; color: var(--text-hint); text-align: center; }
+
+  /* ======================== ATTENDANCE TAB ======================== */
+
+  /* Attendance sub-tabs */
+  .att-subtab-bar { display: flex; gap: 4px; margin-bottom: 16px; }
+  .att-subtab { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 500; color: var(--text-hint); cursor: pointer; display: flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: all 0.12s; }
+  .att-subtab.active { background: rgba(55,138,221,0.10); border-color: rgba(55,138,221,0.20); color: #378ADD; }
+  .att-subtab:hover:not(.active) { background: rgba(255,255,255,0.04); }
+
+  /* Today snapshot strip */
+  .today-strip { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 0; }
+  .today-stat { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 2px; }
+  .today-stat + .today-stat { border-left: 1px solid rgba(255,255,255,0.06); }
+  .today-stat-val { font-size: 20px; font-weight: 700; line-height: 1; }
+  .today-stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-ghost); }
+  .today-stat-sub { font-size: 9px; color: var(--text-ghost); }
+  .today-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+  .today-school-avg { display: flex; flex-direction: column; align-items: center; flex: 1.5; gap: 2px; }
+  .today-avg-val { font-size: 20px; font-weight: 700; color: #1D9E75; line-height: 1; }
+  .today-avg-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-ghost); }
+  .today-trend-badges { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .trend-badge { font-size: 9px; font-weight: 500; padding: 1px 5px; border-radius: 4px; }
+  .trend-up { background: rgba(29,158,117,0.10); color: #1D9E75; }
+  .trend-down { background: rgba(226,75,74,0.10); color: #E24B4A; }
+
+  /* DOW pattern */
+  .dow-grid { display: flex; gap: 6px; }
+  .dow-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dow-bar-bg { height: 36px; width: 100%; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; display: flex; align-items: flex-end; }
+  .dow-bar-fill { width: 100%; border-radius: 3px; transition: all 0.3s; }
+  .dow-day { font-size: 9px; color: var(--text-ghost); }
+  .dow-pct { font-size: 9px; font-weight: 600; color: var(--text-muted); }
+
+  /* Section completion ring + list */
+  .sc-layout { display: flex; gap: 20px; align-items: flex-start; }
+  .sc-ring { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .sc-ring-label { font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+  .sc-ring-sub { font-size: 9px; color: var(--text-hint); }
+  .sc-list { flex: 1; }
+  .sc-item { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 10px; }
+  .sc-item:last-child { border-bottom: none; }
+  .sc-course { font-size: 11px; font-weight: 500; color: var(--text-secondary); flex: 1; }
+  .sc-num { font-size: 9px; color: var(--text-hint); font-family: var(--font-mono); display: block; }
+  .sc-enrolled { font-size: 10px; color: var(--text-hint); width: 28px; text-align: center; }
+  .sc-recorded { font-size: 10px; color: var(--text-hint); width: 36px; text-align: center; }
+  .sc-status { font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+  .sc-not-started { background: rgba(255,255,255,0.05); color: var(--text-hint); }
+  .sc-complete { background: rgba(29,158,117,0.10); color: #1D9E75; }
+  .sc-partial { background: rgba(239,159,39,0.10); color: #EF9F27; }
+
+  /* Trend chart */
+  .trend-chart-wrap { width: 100%; height: 100px; position: relative; }
+  .trend-svg { width: 100%; height: 100%; }
+
+  /* At-risk alerts table */
+  .alert-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 12px; }
+  .alert-row:last-child { border-bottom: none; }
+  .alert-name { font-size: 12px; font-weight: 500; color: var(--text-primary); flex: 1; }
+  .alert-grade { font-size: 9px; color: var(--text-hint); display: block; }
+  .alert-rate { font-size: 12px; font-weight: 700; width: 60px; text-align: right; }
+  .alert-absent { font-size: 11px; color: var(--text-muted); width: 50px; text-align: center; }
+  .alert-total { font-size: 11px; color: var(--text-hint); width: 50px; text-align: center; }
+  .alert-trend { font-size: 10px; color: var(--text-hint); width: 60px; text-align: right; }
+  .rate-critical { color: #E24B4A; }
+  .rate-warn { color: #EF9F27; }
+  .rate-ok { color: var(--text-muted); }
+
+  /* Abs breakdown */
+  .abs-row { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 8px; }
+  .abs-row:last-child { border-bottom: none; }
+  .abs-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .abs-label { font-size: 11px; color: var(--text-secondary); flex: 1; }
+  .abs-val { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+
+  /* info/warning banners */
+  .info-banner { background: rgba(55,138,221,0.06); border: 1px solid rgba(55,138,221,0.12); border-radius: 8px; padding: 9px 12px; font-size: 11px; color: #378ADD; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-avatar">EF</div>
+    <div>
+      <div class="brand-name">Westfield High</div>
+      <div class="brand-code">WHS-88201</div>
+    </div>
+  </div>
+  <div class="topbar-breadcrumb">
+    <a href="#">Home</a><span class="sep">›</span>
+    <a href="#">Academics</a><span class="sep">›</span>
+    <span class="current">Classrooms</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="theme-toggle"><button class="theme-btn">Light</button><button class="theme-btn active">Dark</button></div>
+    <div class="topbar-avatar">SR</div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a class="nav-back" href="#">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Home
+  </a>
+  <div class="nav-section-label">Academics</div>
+  <a class="nav-item" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Overview
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Students
+  </a>
+  <a class="nav-item active" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    Classrooms
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Curriculum
+  </a>
+</aside>
+
+<!-- CONTENT PANE -->
+<main class="content-pane">
+  <div class="content-inner">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="module-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div>
+          <div class="page-title-row">
+            <h1 class="page-title">Classrooms</h1>
+            <div class="page-date-sep"></div>
+            <span class="page-date">Mar 25, 2026</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-secondary">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Import Sections
+        </button>
+        <button class="btn-primary">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Classroom
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTEXT BANNER -->
+    <p class="context-banner" id="ctx-banner">
+      <em class="cb-info">10 active sections</em> across <em class="cb-info">4 courses</em> — <em class="cb-success">70 students enrolled</em>, avg utilization <em class="cb-warning">25%</em>. Biology I has <em class="cb-danger">7 at-risk students</em> requiring attention.
+    </p>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchTab('overview', this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="tab-item" onclick="switchTab('gradebook', this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Gradebook
+      </div>
+      <div class="tab-item" onclick="switchTab('grading-policies', this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Grading Policies
+      </div>
+      <div class="tab-item" onclick="switchTab('attendance', this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Attendance
+      </div>
+    </div>
+
+    <!-- =================== OVERVIEW TAB =================== -->
+    <div class="tab-panel active" id="tab-overview">
+
+      <!-- KPI TILES -->
+      <div class="overview-kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Total Sections</span>
+            <div class="kpi-icon" style="background:rgba(55,138,221,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#378ADD">10</div>
+          <span class="kpi-tag" style="background:rgba(55,138,221,0.10);color:#378ADD">active classrooms</span>
+          <div class="kpi-accent-bar" style="background:#378ADD"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Total Students</span>
+            <div class="kpi-icon" style="background:rgba(29,158,117,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#1D9E75">70</div>
+          <span class="kpi-tag" style="background:rgba(29,158,117,0.10);color:#1D9E75">across all sections</span>
+          <div class="kpi-accent-bar" style="background:#1D9E75"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Avg Utilization</span>
+            <div class="kpi-icon" style="background:rgba(239,159,39,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF9F27" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#EF9F27">25%</div>
+          <span class="kpi-tag" style="background:rgba(239,159,39,0.10);color:#EF9F27">of seat capacity</span>
+          <div class="kpi-accent-bar" style="background:#EF9F27"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Active Teachers</span>
+            <div class="kpi-icon" style="background:rgba(127,119,221,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#7F77DD">3</div>
+          <span class="kpi-tag" style="background:rgba(127,119,221,0.10);color:#7F77DD">assigned sections</span>
+          <div class="kpi-accent-bar" style="background:#7F77DD"></div>
+        </div>
+      </div>
+
+      <!-- FILTER STRIP -->
+      <div class="filter-strip">
+        <div class="search-wrap">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" placeholder="Search sections..." />
+        </div>
+        <select class="filter-select">
+          <option>Course</option>
+          <option>Honors Chemistry</option>
+          <option>Biology I</option>
+          <option>Studio Art I</option>
+          <option>Dual Enrollment Calculus</option>
+          <option>Algebra I</option>
+        </select>
+        <select class="filter-select">
+          <option>Teacher</option>
+          <option>Cerci Lanester</option>
+          <option>Leone Wolf</option>
+          <option>John Smith</option>
+        </select>
+        <select class="filter-select">
+          <option>Year</option>
+          <option>2025–2026</option>
+        </select>
+        <div class="chip-divider"></div>
+        <div class="filter-chip active">All</div>
+        <div class="filter-chip">Active</div>
+        <div class="filter-chip">Inactive</div>
+        <div class="view-toggle" style="margin-left: 4px;">
+          <button class="view-btn active" title="Grid">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="view-btn" title="List">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+        <button class="btn-export">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+
+      <!-- SECTIONS TABLE -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable">Section ↕</th>
+              <th class="sortable">Course ↕</th>
+              <th class="sortable">Teacher ↕</th>
+              <th>Period</th>
+              <th>Room</th>
+              <th class="right">Enrollment</th>
+              <th>Status</th>
+              <th class="right"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="section-name">Honors Chemistry Grade 8</div><div class="section-num">#9800</div></td>
+              <td><div class="course-name">Honors Chemistry</div><div class="course-code">HCHEM-SLUZ</div></td>
+              <td><span class="teacher-name">Cerci Lanester</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="font-size:11px;color:var(--text-muted)">BLDR110</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:0%"></div></div>
+                  <span class="enroll-count">0 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Honors Chemistry Grade 9</div><div class="section-num">#HNC201</div></td>
+              <td><div class="course-name">Honors Chemistry</div><div class="course-code">HCHEM-SLUZ</div></td>
+              <td><span class="teacher-name">Leone Wolf</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:67%"></div></div>
+                  <span class="enroll-count" style="color:#1D9E75">6 / 9</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Test Classroom 321</div><div class="section-num">#3252</div></td>
+              <td><div class="course-name">Biology I</div><div class="course-code">BIO-OF42</div></td>
+              <td><span class="teacher-name">Leone Wolf</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="font-size:11px;color:var(--text-muted)">BLDR112</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:27%"></div></div>
+                  <span class="enroll-count">8 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">8th Grade Biology Section 1</div><div class="section-num">#BI001</div></td>
+              <td><div class="course-name">Biology I</div><div class="course-code">BIO-OF42</div></td>
+              <td><span class="teacher-name">Cerci Lanester</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="font-size:11px;color:var(--text-muted)">BLDR321</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:17%"></div></div>
+                  <span class="enroll-count">5 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Biology Section 2</div><div class="section-num">#BI002</div></td>
+              <td><div class="course-name">Biology I</div><div class="course-code">BIO-OF42</div></td>
+              <td><span class="teacher-name">Leone Wolf</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="font-size:11px;color:var(--text-muted)">BLDR321</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill warn" style="width:40%"></div></div>
+                  <span class="enroll-count" style="color:#EF9F27">12 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Studio Arts Grade 8</div><div class="section-num">#21344</div></td>
+              <td><div class="course-name">Studio Art I</div><div class="course-code">SART-XLHF</div></td>
+              <td><span class="teacher-name">Cerci Lanester</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="font-size:11px;color:var(--text-muted)">GMN120</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:20%"></div></div>
+                  <span class="enroll-count">6 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Studio Arts Grade 7</div><div class="section-num">#23345</div></td>
+              <td><div class="course-name">Studio Art I</div><div class="course-code">SART-XLHF</div></td>
+              <td><span class="teacher-name">Leone Wolf</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:27%"></div></div>
+                  <span class="enroll-count">8 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Calculus – Period 3</div><div class="section-num">#002</div></td>
+              <td><div class="course-name">Dual Enrollment Calculus</div><div class="course-code">DECL-U3SK</div></td>
+              <td><span class="teacher-name">Leone Wolf</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:23%"></div></div>
+                  <span class="enroll-count">7 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><div class="section-name">Fifth Grade Algebra 0</div><div class="section-num">#4322</div></td>
+              <td><div class="course-name">Algebra I</div><div class="course-code">ALG1-DC0S</div></td>
+              <td><span class="teacher-name">John Smith</span></td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td style="color:var(--text-ghost)">—</td>
+              <td class="right">
+                <div class="enroll-wrap" style="justify-content:flex-end">
+                  <div class="enroll-bar-bg"><div class="enroll-bar-fill" style="width:23%"></div></div>
+                  <span class="enroll-count">7 / 30</span>
+                </div>
+              </td>
+              <td><span class="chip chip-active"><span class="chip-dot"></span>Active</span></td>
+              <td class="right"><button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span class="pagination-info">Showing 1–10 of 10 results</span>
+          <div class="pagination-controls">
+            <select class="per-page-select"><option>20 / page</option><option>50 / page</option></select>
+            <button class="page-btn" disabled>Prev</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== GRADEBOOK TAB =================== -->
+    <div class="tab-panel" id="tab-gradebook">
+
+      <!-- GRADE ANALYTICS HEADER -->
+      <div class="section-hdr" style="margin-bottom:16px">
+        <div class="section-hdr-left">
+          <div class="section-icon" style="background:rgba(55,138,221,0.10)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div>
+            <div class="section-title">Grade Analytics</div>
+            <div class="section-sub">School-wide academic performance · 2025–2026</div>
+          </div>
+        </div>
+        <span style="font-size:10px;color:var(--text-hint)">5 of 10 sections graded</span>
+      </div>
+
+      <!-- KPI TILES -->
+      <div class="kpi-grid" style="margin-bottom:14px">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Students Graded</span>
+            <div class="kpi-icon" style="background:rgba(55,138,221,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#378ADD">33</div>
+          <div class="kpi-sub">5 of 10 sections graded</div>
+          <div class="kpi-accent-bar" style="background:#378ADD"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Average GPA</span>
+            <div class="kpi-icon" style="background:rgba(29,158,117,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#1D9E75">2.86</div>
+          <div class="kpi-sub">Avg grade: 70.5%</div>
+          <div class="kpi-accent-bar" style="background:#1D9E75"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Pass Rate</span>
+            <div class="kpi-icon" style="background:rgba(29,158,117,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#1D9E75">78.8%</div>
+          <div class="kpi-sub">Students scoring 60%+</div>
+          <div class="kpi-accent-bar" style="background:#1D9E75"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">At Risk</span>
+            <div class="kpi-icon" style="background:rgba(226,75,74,0.10)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E24B4A" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" style="color:#E24B4A">7</div>
+          <div class="kpi-sub">Below 60% threshold</div>
+          <div class="kpi-accent-bar" style="background:#E24B4A"></div>
+        </div>
+      </div>
+
+      <!-- ROW 1: Grading Completion + Assessment Performance -->
+      <div class="two-col">
+        <!-- Grading Completion -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(127,119,221,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Grading Completion</div>
+                <div class="section-sub">Assignment entries across active sections</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="gc-layout">
+              <!-- SVG donut -->
+              <div class="gc-donut">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                  <circle cx="40" cy="40" r="30" fill="none" stroke="#7F77DD" stroke-width="10"
+                    stroke-dasharray="188.5" stroke-dashoffset="28.3"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                </svg>
+                <div class="gc-pct">
+                  <span class="gc-pct-num">85%</span>
+                  <span class="gc-pct-lbl">graded</span>
+                </div>
+              </div>
+              <div class="gc-stats">
+                <div class="gc-row">
+                  <span class="gc-row-label"><span class="gc-dot" style="background:#7F77DD"></span>Graded</span>
+                  <span class="gc-val">154</span>
+                </div>
+                <div class="gc-row">
+                  <span class="gc-row-label"><span class="gc-dot" style="background:rgba(255,255,255,0.12)"></span>Remaining</span>
+                  <span class="gc-val" style="color:var(--text-muted)">28</span>
+                </div>
+                <div class="gc-total">182 total assignment entries</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assessment Performance -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(55,138,221,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Assessment Performance</div>
+                <div class="section-sub">Average scores by assessment type</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="ap-layout">
+              <!-- Formative gauge -->
+              <div class="ap-gauge">
+                <svg width="68" height="68" viewBox="0 0 68 68">
+                  <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                  <circle cx="34" cy="34" r="26" fill="none" stroke="#1D9E75" stroke-width="8"
+                    stroke-dasharray="163.4" stroke-dashoffset="28.5"
+                    stroke-linecap="round" transform="rotate(-90 34 34)"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column">
+                  <span class="ap-pct" style="color:#1D9E75">83%</span>
+                </div>
+                <div class="ap-type-lbl">Formative</div>
+                <div class="ap-sub">Quizzes, homework, participation</div>
+              </div>
+
+              <div class="ap-divider"></div>
+
+              <!-- Summative gauge -->
+              <div class="ap-gauge">
+                <svg width="68" height="68" viewBox="0 0 68 68">
+                  <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                  <circle cx="34" cy="34" r="26" fill="none" stroke="#378ADD" stroke-width="8"
+                    stroke-dasharray="163.4" stroke-dashoffset="29.4"
+                    stroke-linecap="round" transform="rotate(-90 34 34)"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column">
+                  <span class="ap-pct" style="color:#378ADD">82%</span>
+                </div>
+                <div class="ap-type-lbl">Summative</div>
+                <div class="ap-sub">Tests, exams, projects</div>
+              </div>
+
+              <div class="ap-divider"></div>
+
+              <div style="flex:1">
+                <div class="ap-insight"><em>Formative 0.6% higher</em> than summative — well balanced.</div>
+                <div class="ap-unclass" style="margin-top:8px">+51 unclassified (avg 86.2%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Grade Distribution (full width) -->
+      <div class="full-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(239,159,39,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF9F27" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Grade Distribution</div>
+                <div class="section-sub">Number of students in each grade range based on overall course averages</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:110px;padding:16px 0 0">
+              <!-- A -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                <span style="font-size:11px;font-weight:700;color:#1D9E75;margin-bottom:4px">8</span>
+                <div style="width:100%;border-radius:4px 4px 0 0;background:#1D9E75;height:67%"></div>
+              </div>
+              <!-- B -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                <span style="font-size:11px;font-weight:700;color:#378ADD;margin-bottom:4px">12</span>
+                <div style="width:100%;border-radius:4px 4px 0 0;background:#378ADD;height:100%"></div>
+              </div>
+              <!-- C -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                <span style="font-size:11px;font-weight:700;color:#EF9F27;margin-bottom:4px">6</span>
+                <div style="width:100%;border-radius:4px 4px 0 0;background:#EF9F27;height:50%"></div>
+              </div>
+              <!-- D -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                <span style="font-size:11px;font-weight:700;color:var(--text-ghost);margin-bottom:4px">0</span>
+                <div style="width:100%;border-radius:4px 4px 0 0;background:rgba(255,255,255,0.08);height:2px"></div>
+              </div>
+              <!-- F -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                <span style="font-size:11px;font-weight:700;color:#E24B4A;margin-bottom:4px">7</span>
+                <div style="width:100%;border-radius:4px 4px 0 0;background:#E24B4A;height:58%"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);margin-top:12px">
+              <div style="flex:1;text-align:center;font-size:9px;color:var(--text-ghost)">A (90–100)</div>
+              <div style="flex:1;text-align:center;font-size:9px;color:var(--text-ghost)">B (80–89)</div>
+              <div style="flex:1;text-align:center;font-size:9px;color:var(--text-ghost)">C (70–79)</div>
+              <div style="flex:1;text-align:center;font-size:9px;color:var(--text-ghost)">D (60–69)</div>
+              <div style="flex:1;text-align:center;font-size:9px;color:var(--text-ghost)">F (0–59)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3: Category Performance + Course Performance -->
+      <div class="two-col">
+        <!-- Category Performance -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(29,158,117,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Category Performance</div>
+                <div class="section-sub">Average scores by grading policy category</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- header row -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:110px">Category</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:36px;text-align:center">Wt.</span>
+              <span style="flex:1;font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px">Score</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:50px;text-align:right">#</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:50px;text-align:right">Avg</span>
+            </div>
+            <div class="cat-row">
+              <span class="cat-name">Participation</span>
+              <span class="cat-weight">10%</span>
+              <div class="cat-bar-wrap"><div class="cat-bar" style="width:87.5%;background:#1D9E75"></div></div>
+              <span class="cat-count">21</span>
+              <span class="cat-score" style="color:#1D9E75">87.5%</span>
+            </div>
+            <div class="cat-row">
+              <span class="cat-name">Homework</span>
+              <span class="cat-weight">20%</span>
+              <div class="cat-bar-wrap"><div class="cat-bar" style="width:85.5%;background:#378ADD"></div></div>
+              <span class="cat-count">31</span>
+              <span class="cat-score" style="color:#378ADD">85.5%</span>
+            </div>
+            <div class="cat-row">
+              <span class="cat-name">Projects</span>
+              <span class="cat-weight">20%</span>
+              <div class="cat-bar-wrap"><div class="cat-bar" style="width:83.4%;background:#7F77DD"></div></div>
+              <span class="cat-count">20</span>
+              <span class="cat-score" style="color:#7F77DD">83.4%</span>
+            </div>
+            <div class="cat-row">
+              <span class="cat-name">Tests</span>
+              <span class="cat-weight">30%</span>
+              <div class="cat-bar-wrap"><div class="cat-bar" style="width:82.8%;background:#EF9F27"></div></div>
+              <span class="cat-count">51</span>
+              <span class="cat-score" style="color:#EF9F27">82.8%</span>
+            </div>
+            <div class="cat-row">
+              <span class="cat-name">Quizzes</span>
+              <span class="cat-weight">20%</span>
+              <div class="cat-bar-wrap"><div class="cat-bar" style="width:80.7%;background:#D85A30"></div></div>
+              <span class="cat-count">31</span>
+              <span class="cat-score" style="color:#D85A30">80.7%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Performance -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(55,138,221,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Course Performance</div>
+                <div class="section-sub">Aggregated grade metrics per course across sections</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="cp-table">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th class="right">Sec.</th>
+                  <th class="right">Std.</th>
+                  <th class="right">Avg Grade ↓</th>
+                  <th class="right">GPA</th>
+                  <th class="right">Pass %</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-size:12px;font-weight:500;color:var(--text-primary)">Honors Chemistry</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">1</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">6</td>
+                  <td class="right"><span class="grade-badge grade-high">87.8%</span></td>
+                  <td class="right"><span class="gpa-val">3.33</span></td>
+                  <td class="right"><span class="pass-high" style="font-size:12px;font-weight:600">100%</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:500;color:var(--text-primary)">Algebra I</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">1</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">7</td>
+                  <td class="right"><span class="grade-badge grade-high">87.6%</span></td>
+                  <td class="right"><span class="gpa-val">3.14</span></td>
+                  <td class="right"><span class="pass-high" style="font-size:12px;font-weight:600">100%</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:500;color:var(--text-primary)">Dual Enrollment Calc</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">1</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">7</td>
+                  <td class="right"><span class="grade-badge grade-mid">80.3%</span></td>
+                  <td class="right"><span class="gpa-val">2.57</span></td>
+                  <td class="right"><span class="pass-warn" style="font-size:12px;font-weight:600">85.7%</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;font-weight:500;color:var(--text-primary)">Biology I</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">2</td>
+                  <td class="right" style="color:var(--text-hint);font-size:11px">13</td>
+                  <td class="right"><span class="grade-badge grade-low">48.1%</span></td>
+                  <td class="right"><span class="gpa-val" style="color:#E24B4A">1.54</span></td>
+                  <td class="right"><span class="pass-low" style="font-size:12px;font-weight:600">53.8%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 4: At-Risk Students -->
+      <div class="full-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(226,75,74,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#E24B4A" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div>
+                <div class="section-title">At-Risk Students</div>
+                <div class="section-sub">Students scoring below 60% in any course</div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text-hint)">7 students</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;flex:1">Student</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;flex:1">Course</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:80px;text-align:right">Grade</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:50px;text-align:right">Letter</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#E24B4A,#EF9F27)">NK</div>
+              <div class="at-risk-info"><div class="at-risk-name">Noah Kim</div><div class="at-risk-course">Biology I</div></div>
+              <span class="at-risk-grade">0.0%</span>
+              <span class="at-risk-letter">F</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#7F77DD,#E24B4A)">LI</div>
+              <div class="at-risk-info"><div class="at-risk-name">Lilia Ivey</div><div class="at-risk-course">Biology I</div></div>
+              <span class="at-risk-grade">0.0%</span>
+              <span class="at-risk-letter">F</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#378ADD,#7F77DD)">OG</div>
+              <div class="at-risk-info"><div class="at-risk-name">Olivia Garcia</div><div class="at-risk-course">Biology I</div></div>
+              <span class="at-risk-grade">0.0%</span>
+              <span class="at-risk-letter">F</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#D85A30,#EF9F27)">MW</div>
+              <div class="at-risk-info"><div class="at-risk-name">Marcus Williams</div><div class="at-risk-course">Biology I</div></div>
+              <span class="at-risk-grade">0.0%</span>
+              <span class="at-risk-letter">F</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#1D9E75,#378ADD)">SR</div>
+              <div class="at-risk-info"><div class="at-risk-name">Sofia Rodriguez</div><div class="at-risk-course">Biology I</div></div>
+              <span class="at-risk-grade">0.0%</span>
+              <span class="at-risk-letter">F</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#EF9F27,#E24B4A)">TB</div>
+              <div class="at-risk-info"><div class="at-risk-name">Tyler Brooks</div><div class="at-risk-course">Biology I</div></div>
+              <span class="at-risk-grade" style="color:#EF9F27">43.5%</span>
+              <span class="at-risk-letter" style="background:rgba(239,159,39,0.10);color:#EF9F27">F</span>
+            </div>
+            <div class="at-risk-row">
+              <div class="at-risk-avatar" style="background:linear-gradient(135deg,#7F77DD,#378ADD)">MW</div>
+              <div class="at-risk-info"><div class="at-risk-name">Mei Wong</div><div class="at-risk-course">Dual Enrollment Calculus</div></div>
+              <span class="at-risk-grade" style="color:#EF9F27">56.6%</span>
+              <span class="at-risk-letter" style="background:rgba(239,159,39,0.10);color:#EF9F27">F</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 5: Section Gradebook selector -->
+      <div class="full-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(55,138,221,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Section Gradebook</div>
+                <div class="section-sub">View and manage individual student grades per section</div>
+              </div>
+            </div>
+            <select class="section-selector">
+              <option value="">Select a section…</option>
+              <option>Honors Chemistry Grade 9 (#HNC201)</option>
+              <option>Test Classroom 321 (#3252)</option>
+              <option>8th Grade Biology Section 1 (#BI001)</option>
+              <option>Biology Section 2 (#BI002)</option>
+              <option>Calculus – Period 3 (#002)</option>
+              <option>Fifth Grade Algebra 0 (#4322)</option>
+            </select>
+          </div>
+          <div class="section-placeholder">
+            <div class="section-placeholder-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#378ADD" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div class="section-placeholder-title">Select a Class Section</div>
+            <div class="section-placeholder-sub">Choose a section from the dropdown above to view and manage student grades</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =================== GRADING POLICIES TAB =================== -->
+    <div class="tab-panel" id="tab-grading-policies">
+      <div class="info-banner">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Grading Policies tab is implemented and stable. No V2 redesign required in this sprint.
+      </div>
+    </div>
+
+    <!-- =================== ATTENDANCE TAB =================== -->
+    <div class="tab-panel" id="tab-attendance">
+
+      <!-- ATTENDANCE SUB-HEADER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:32px;height:32px;background:rgba(239,159,39,0.10);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF9F27" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:600;letter-spacing:-0.2px;">Attendance</div>
+            <div style="font-size:10px;color:var(--text-hint)">Record and review attendance by class section · 2025–2026</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:10px;color:var(--text-ghost)">Last updated: 10:05 AM</span>
+          <button class="btn-secondary" style="height:32px;font-size:10px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-TABS -->
+      <div class="att-subtab-bar">
+        <div class="att-subtab active">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Overview
+        </div>
+        <div class="att-subtab">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Daily Entry
+        </div>
+      </div>
+
+      <!-- TODAY STATS STRIP -->
+      <div class="today-strip">
+        <div class="today-stat">
+          <span class="today-stat-val" style="color:#1D9E75">0</span>
+          <span class="today-stat-lbl">Present</span>
+          <span class="today-stat-sub">0 of 25 recorded</span>
+        </div>
+        <div class="today-stat">
+          <span class="today-stat-val" style="color:#E24B4A">0</span>
+          <span class="today-stat-lbl">Absent</span>
+          <span class="today-stat-sub">0.0% of 25</span>
+        </div>
+        <div class="today-stat">
+          <span class="today-stat-val" style="color:#EF9F27">0</span>
+          <span class="today-stat-lbl">Late / Tardy</span>
+          <span class="today-stat-sub">0.0% of 25</span>
+        </div>
+        <div class="today-stat">
+          <span class="today-stat-val" style="color:#378ADD">0</span>
+          <span class="today-stat-lbl">Excused</span>
+          <span class="today-stat-sub">0.0% of 25</span>
+        </div>
+        <div style="width:1px;height:48px;background:rgba(255,255,255,0.06);flex-shrink:0;margin:0 16px;"></div>
+        <div class="today-school-avg">
+          <span class="today-avg-val">32.5%</span>
+          <span class="today-avg-lbl">School Average</span>
+          <div class="today-trend-badges">
+            <span class="trend-badge trend-up">7-day: 48.6%</span>
+            <span class="trend-badge trend-down">30-day: 32.5%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 1: Today's Breakdown + DOW Pattern -->
+      <div class="two-col">
+
+        <!-- Today's Absence Breakdown -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(226,75,74,0.08)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#E24B4A" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Today's Absence Breakdown</div>
+                <div class="section-sub">Mar 25, 2026 — no absences recorded yet</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="abs-row">
+              <div class="abs-dot" style="background:#E24B4A"></div>
+              <span class="abs-label">Unexcused</span>
+              <span class="abs-val">0</span>
+            </div>
+            <div class="abs-row">
+              <div class="abs-dot" style="background:#378ADD"></div>
+              <span class="abs-label">Excused</span>
+              <span class="abs-val">0</span>
+            </div>
+            <div class="abs-row">
+              <div class="abs-dot" style="background:#EF9F27"></div>
+              <span class="abs-label">Late / Tardy</span>
+              <span class="abs-val">0</span>
+            </div>
+            <div class="abs-row">
+              <div class="abs-dot" style="background:#7F77DD"></div>
+              <span class="abs-label">Half Day</span>
+              <span class="abs-val">0</span>
+            </div>
+            <div class="abs-row">
+              <div class="abs-dot" style="background:#1D9E75"></div>
+              <span class="abs-label">Remote</span>
+              <span class="abs-val">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DOW Pattern -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(239,159,39,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF9F27" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Day-of-Week Pattern</div>
+                <div class="section-sub">Average attendance rate by weekday</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="dow-grid">
+              <div class="dow-col">
+                <div class="dow-bar-bg"><div class="dow-bar-fill" style="height:44%;background:rgba(29,158,117,0.6)"></div></div>
+                <div class="dow-day">Sun</div>
+                <div class="dow-pct">44%</div>
+              </div>
+              <div class="dow-col">
+                <div class="dow-bar-bg"><div class="dow-bar-fill" style="height:18%;background:rgba(226,75,74,0.7)"></div></div>
+                <div class="dow-day" style="color:#E24B4A">Mon</div>
+                <div class="dow-pct" style="color:#E24B4A">18%</div>
+              </div>
+              <div class="dow-col">
+                <div class="dow-bar-bg"><div class="dow-bar-fill" style="height:31%;background:rgba(55,138,221,0.5)"></div></div>
+                <div class="dow-day">Tue</div>
+                <div class="dow-pct">31%</div>
+              </div>
+              <div class="dow-col">
+                <div class="dow-bar-bg"><div class="dow-bar-fill" style="height:29%;background:rgba(55,138,221,0.5)"></div></div>
+                <div class="dow-day">Wed</div>
+                <div class="dow-pct">29%</div>
+              </div>
+              <div class="dow-col">
+                <div class="dow-bar-bg"><div class="dow-bar-fill" style="height:37%;background:rgba(29,158,117,0.5)"></div></div>
+                <div class="dow-day">Thu</div>
+                <div class="dow-pct">37%</div>
+              </div>
+              <div class="dow-col">
+                <div class="dow-bar-bg"><div class="dow-bar-fill" style="height:45%;background:rgba(29,158,117,0.6)"></div></div>
+                <div class="dow-day">Fri</div>
+                <div class="dow-pct">45%</div>
+              </div>
+            </div>
+            <div style="font-size:9px;color:var(--text-ghost);margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05)">Monday has the lowest avg attendance (18%). Friday and Sunday are highest.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: 30-Day Trend (full width) -->
+      <div class="full-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(29,158,117,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div>
+                <div class="section-title">30-Day Attendance Rate</div>
+                <div class="section-sub">Daily recorded attendance rate trend — Feb 23 to Mar 25, 2026</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;font-size:10px;">
+              <span style="color:var(--text-hint)">7-day avg: <strong style="color:#1D9E75">48.6%</strong></span>
+              <span style="color:var(--text-hint)">30-day avg: <strong style="color:var(--text-muted)">32.5%</strong></span>
+            </div>
+          </div>
+          <div class="card-body" style="padding-top:8px;">
+            <!-- SVG trend chart -->
+            <svg viewBox="0 0 760 100" width="100%" height="100" style="overflow:visible">
+              <defs>
+                <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1D9E75" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#1D9E75" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- gridlines -->
+              <line x1="0" y1="0" x2="760" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="25" x2="760" y2="25" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="50" x2="760" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="75" x2="760" y2="75" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="100" x2="760" y2="100" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <!-- % labels -->
+              <text x="762" y="3" font-size="8" fill="rgba(255,255,255,0.2)">100%</text>
+              <text x="762" y="53" font-size="8" fill="rgba(255,255,255,0.2)">50%</text>
+              <text x="762" y="103" font-size="8" fill="rgba(255,255,255,0.2)">0%</text>
+              <!-- area fill: data points scaled 0-100 to svg 100-0 (inverted y) -->
+              <!-- data: 8,4,8,8,28,16,28,44,52,40,44,24,24,32,52,24,32,40,56,60,76 mapped to x spacing ~36px each -->
+              <path d="M0,92 L36,96 L72,92 L108,92 L144,72 L180,84 L216,72 L252,56 L288,48 L324,60 L360,56 L396,76 L432,76 L468,68 L504,48 L540,76 L576,68 L612,60 L648,44 L684,40 L720,24 L720,100 L0,100 Z" fill="url(#trendGrad)"/>
+              <path d="M0,92 L36,96 L72,92 L108,92 L144,72 L180,84 L216,72 L252,56 L288,48 L324,60 L360,56 L396,76 L432,76 L468,68 L504,48 L540,76 L576,68 L612,60 L648,44 L684,40 L720,24" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linejoin="round"/>
+              <!-- dots at key points -->
+              <circle cx="684" cy="40" r="3" fill="#1D9E75"/>
+              <circle cx="720" cy="24" r="3" fill="#1D9E75"/>
+            </svg>
+            <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:var(--text-ghost)">
+              <span>Feb 23</span>
+              <span>Mar 2</span>
+              <span>Mar 9</span>
+              <span>Mar 16</span>
+              <span>Mar 24</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3: Section Completion + Attendance by Grade (side by side) -->
+      <div class="two-col">
+
+        <!-- Section Completion -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(127,119,221,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Section Completion</div>
+                <div class="section-sub">Today's recording status per section</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="sc-layout">
+              <!-- Ring -->
+              <div class="sc-ring">
+                <svg width="72" height="72" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                  <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="10" stroke-dasharray="1" stroke-linecap="round"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;top:0;left:0;width:72px;height:72px">
+                  <span style="font-size:16px;font-weight:700;color:var(--text-hint)">0%</span>
+                </div>
+                <div class="sc-ring-sub">0 / 10</div>
+              </div>
+              <!-- List -->
+              <div class="sc-list">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)">
+                  <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;flex:1">Section</span>
+                  <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:28px;text-align:center">Enr.</span>
+                  <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:36px;text-align:center">Rec.</span>
+                  <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:70px;text-align:right">Status</span>
+                </div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Algebra I</div><span class="sc-num">#4322</span></div><span class="sc-enrolled">7</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Biology I</div><span class="sc-num">#3252</span></div><span class="sc-enrolled">8</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Biology I</div><span class="sc-num">#BI001</span></div><span class="sc-enrolled">5</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Biology I</div><span class="sc-num">#BI002</span></div><span class="sc-enrolled">12</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Dual Enr. Calculus</div><span class="sc-num">#002</span></div><span class="sc-enrolled">7</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Honors Chemistry</div><span class="sc-num">#HNC201</span></div><span class="sc-enrolled">6</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+                <div class="sc-item"><div style="flex:1"><div class="sc-course">Studio Art I</div><span class="sc-num">#21344</span></div><span class="sc-enrolled">6</span><span class="sc-recorded">0</span><span class="sc-status sc-not-started">Not Started</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Period Averages -->
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(29,158,117,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Period Averages</div>
+                <div class="section-sub">Attendance rates across different time windows</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Period avg mini KPI -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+              <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-ghost);margin-bottom:6px">7-Day</div>
+                <div style="font-size:20px;font-weight:700;color:#1D9E75">48.6%</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-ghost);margin-bottom:6px">30-Day</div>
+                <div style="font-size:20px;font-weight:700;color:var(--text-muted)">32.5%</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-ghost);margin-bottom:6px">Yearly</div>
+                <div style="font-size:20px;font-weight:700;color:var(--text-muted)">32.5%</div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text-ghost);font-style:italic;text-align:center;margin-top:4px">Attendance is trending upward over the last 7 days vs. 30-day baseline.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 4: Attendance Alerts (At-Risk Students) -->
+      <div class="full-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="section-hdr-left">
+              <div class="section-icon" style="background:rgba(239,159,39,0.10)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF9F27" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div>
+                <div class="section-title">Attendance Alerts</div>
+                <div class="section-sub">Students below 90% attendance rate · sorted by severity</div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text-hint)">Showing 16 of 16 at-risk students</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;flex:1">Student</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:70px;text-align:right">Rate</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:60px;text-align:center">Absent</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:50px;text-align:center">Total</span>
+              <span style="font-size:9px;font-weight:700;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.5px;width:60px;text-align:right">Trend</span>
+            </div>
+            <!-- At-risk rows -->
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Priya Patel</div><span class="alert-grade">Grade 11</span></div>
+              <span class="alert-rate rate-critical">25.0%</span>
+              <span class="alert-absent">3</span>
+              <span class="alert-total">4</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Sofia Rodriguez</div><span class="alert-grade">Grade 6</span></div>
+              <span class="alert-rate rate-critical">50.0%</span>
+              <span class="alert-absent">2</span>
+              <span class="alert-total">4</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Mei Wong</div><span class="alert-grade">Grade 10</span></div>
+              <span class="alert-rate rate-warn">71.4%</span>
+              <span class="alert-absent">4</span>
+              <span class="alert-total">14</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Tyler Brooks</div><span class="alert-grade">Grade 9</span></div>
+              <span class="alert-rate rate-warn">71.4%</span>
+              <span class="alert-absent">3</span>
+              <span class="alert-total">14</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Olivia Garcia</div><span class="alert-grade">Grade 1</span></div>
+              <span class="alert-rate rate-warn">72.2%</span>
+              <span class="alert-absent">4</span>
+              <span class="alert-total">18</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Olivia Chen</div><span class="alert-grade">Grade 7</span></div>
+              <span class="alert-rate rate-warn">72.2%</span>
+              <span class="alert-absent">5</span>
+              <span class="alert-total">18</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Marco Rivera</div><span class="alert-grade">Grade 10</span></div>
+              <span class="alert-rate rate-warn">75.0%</span>
+              <span class="alert-absent">1</span>
+              <span class="alert-total">4</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Cool Mint</div><span class="alert-grade">PK</span></div>
+              <span class="alert-rate rate-warn">78.6%</span>
+              <span class="alert-absent">2</span>
+              <span class="alert-total">14</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Steven Bergsten</div><span class="alert-grade">Grade 11</span></div>
+              <span class="alert-rate rate-ok">80.0%</span>
+              <span class="alert-absent">3</span>
+              <span class="alert-total">15</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+            <div class="alert-row">
+              <div style="flex:1"><div class="alert-name">Jaylen Carter</div><span class="alert-grade">Grade 11</span></div>
+              <span class="alert-rate rate-ok">80.0%</span>
+              <span class="alert-absent">3</span>
+              <span class="alert-total">15</span>
+              <span class="alert-trend">— Stable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-inner -->
+</main>
+
+<script>
+  function switchTab(tabId, el) {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+
+    // Update context banner
+    const banners = {
+      'overview': '<em class="cb-info">10 active sections</em> across <em class="cb-info">4 courses</em> — <em class="cb-success">70 students enrolled</em>, avg utilization <em class="cb-warning">25%</em>. Biology I has <em class="cb-danger">7 at-risk students</em> requiring attention.',
+      'gradebook': '<em class="cb-danger">7 students</em> at risk (below 60%) — concentrated in <em class="cb-danger">Biology I</em>. <em class="cb-success">Honors Chemistry & Algebra I</em> at 100% pass rate. Grading <em class="cb-info">85% complete</em> across 5 sections.',
+      'grading-policies': 'Managing <em class="cb-info">4 grading policies</em> — <em class="cb-success">2 default policies</em> active. Standard A-F scale with weighted categories.',
+      'attendance': '<em class="cb-info">0 of 25 students</em> recorded today. 7-day average <em class="cb-success">48.6%</em> vs 30-day <em class="cb-warning">32.5%</em>. <em class="cb-danger">16 students</em> flagged below 90% attendance threshold.',
+    };
+    document.getElementById('ctx-banner').innerHTML = banners[tabId] || banners['overview'];
+  }
+</script>
+
+</body>
+</html>
