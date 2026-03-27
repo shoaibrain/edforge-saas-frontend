@@ -349,7 +349,7 @@ export default function OrganizationSettingsPage() {
       switch (action) {
         case 'view-details':
           if (node.type === 'school') {
-            navigate({ to: '/settings/organization/schools/$schoolId', params: { schoolId: node.id } })
+            navigate({ to: '/settings/organization/schools/$schoolId', params: { schoolId: node.id }, search: { tab: undefined } })
           } else {
             const orgType = node.type === 'stateEducationAgency'
               ? 'sea'

@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EdForge V2 — School Details</title>
+<style>
+  :root {
+    --bg-app: #0f1117;
+    --bg-surface: #161b27;
+    --bg-elevated: #1e2436;
+    --bg-hover: rgba(255,255,255,0.025);
+    --text-primary: #e8eaf0;
+    --text-secondary: #c8ccd8;
+    --text-muted: #7a8099;
+    --text-hint: #4a5068;
+    --text-ghost: #2a3045;
+    --border-default: rgba(255,255,255,0.06);
+    --border-secondary: rgba(255,255,255,0.09);
+    --border-hover: rgba(255,255,255,0.12);
+    --color-success: #1D9E75;
+    --color-info: #378ADD;
+    --color-warning: #EF9F27;
+    --color-danger: #E24B4A;
+    --accent: #378ADD;
+    --accent-bg: rgba(55,138,221,0.10);
+    --font: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    --radius-card: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg-app);
+    color: var(--text-primary);
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    grid-template-rows: 48px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    grid-column: 1/-1;
+    grid-row: 1;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 50;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .brand-logo { width: 26px; height: 26px; background: linear-gradient(135deg, #1D9E75, #378ADD); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; }
+  .tenant-chip { font-size: 10px; color: var(--text-hint); background: rgba(255,255,255,0.04); border: 1px solid var(--border-default); border-radius: 5px; padding: 2px 7px; }
+  .topbar-breadcrumb { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-hint); }
+  .topbar-breadcrumb span { color: var(--text-muted); }
+  .topbar-breadcrumb .active { color: var(--text-secondary); font-weight: 500; }
+  .topbar-breadcrumb .sep { color: var(--text-ghost); }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .theme-toggle { display: flex; background: rgba(255,255,255,0.04); border: 1px solid var(--border-default); border-radius: 6px; overflow: hidden; }
+  .theme-btn { padding: 4px 9px; font-size: 10px; font-weight: 500; color: var(--text-hint); border: none; background: transparent; cursor: pointer; }
+  .theme-btn.active { background: rgba(255,255,255,0.07); color: var(--text-secondary); }
+  .topbar-icon-btn { width: 28px; height: 28px; background: transparent; border: 1px solid var(--border-default); border-radius: 6px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .topbar-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, #1D9E75, #378ADD); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; cursor: pointer; }
+
+  /* SIDEBAR */
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-default);
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 40;
+    overflow-y: auto;
+  }
+  .nav-back { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px; color: var(--text-hint); font-size: 11px; cursor: pointer; margin-bottom: 8px; }
+  .nav-back:hover { background: rgba(255,255,255,0.04); }
+  .nav-section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-ghost); padding: 8px 10px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; color: var(--text-hint); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text-secondary); }
+  .nav-item.active { background: var(--accent-bg); color: var(--accent); }
+  .nav-item svg { flex-shrink: 0; }
+
+  /* CONTENT PANE */
+  .content-pane {
+    grid-column: 2;
+    grid-row: 2;
+    overflow-y: auto;
+    background: var(--bg-app);
+    position: relative;
+  }
+  .content-inner { padding: 20px 24px 40px; max-width: 1200px; }
+
+  /* SCHOOL HEADER */
+  .school-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .school-header-left { display: flex; align-items: center; gap: 14px; }
+  .school-avatar {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, #1a3a5c, #378ADD);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: white;
+    border: 1px solid rgba(55,138,221,0.2);
+    flex-shrink: 0;
+  }
+  .school-name { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .school-meta { display: flex; align-items: center; gap: 6px; }
+  .meta-chip {
+    font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: 6px;
+    border: 1px solid var(--border-secondary);
+    color: var(--text-muted);
+  }
+  .status-chip {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 9px; border-radius: 20px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .status-setup { background: rgba(239,159,39,0.1); color: var(--color-warning); border: 1px solid rgba(239,159,39,0.2); }
+  .status-active { background: rgba(29,158,117,0.1); color: var(--color-success); border: 1px solid rgba(29,158,117,0.2); }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .school-header-right { display: flex; gap: 8px; }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: var(--color-success); border: none; border-radius: 8px;
+    padding: 7px 14px; font-size: 12px; font-weight: 500; color: white;
+    cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-secondary {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border-secondary);
+    border-radius: 8px; padding: 7px 12px; font-size: 11px; font-weight: 500;
+    color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 5px;
+    transition: all 0.12s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+  .btn-ghost {
+    background: transparent; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 7px 12px; font-size: 11px; font-weight: 500;
+    color: var(--text-hint); cursor: pointer; display: flex; align-items: center; gap: 5px;
+    transition: all 0.12s;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text-muted); }
+  .btn-icon {
+    width: 32px; height: 32px; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-default); border-radius: 7px;
+    color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s; font-size: 14px;
+  }
+  .btn-icon:hover { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+
+  /* SETUP PROGRESS BANNER */
+  .setup-banner {
+    background: rgba(239,159,39,0.05);
+    border: 1px solid rgba(239,159,39,0.14);
+    border-radius: var(--radius-card);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .setup-banner-icon {
+    width: 32px; height: 32px; flex-shrink: 0;
+    background: rgba(239,159,39,0.12); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .setup-banner-content { flex: 1; }
+  .setup-banner-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .setup-banner-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+  .setup-progress-steps { display: flex; gap: 6px; flex-wrap: wrap; }
+  .setup-step {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 500;
+    border: 1px solid var(--border-default);
+    cursor: pointer; transition: all 0.12s;
+  }
+  .setup-step.done { background: rgba(29,158,117,0.08); color: var(--color-success); border-color: rgba(29,158,117,0.2); }
+  .setup-step.todo { background: rgba(255,255,255,0.03); color: var(--text-muted); }
+  .setup-step.todo:hover { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+  .step-icon { font-size: 10px; }
+  .setup-banner-cta { flex-shrink: 0; align-self: center; }
+
+  /* PROGRESS BAR */
+  .setup-progress-bar { margin-bottom: 10px; }
+  .progress-track { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-bottom: 4px; }
+  .progress-fill { height: 100%; background: var(--color-warning); border-radius: 2px; width: 20%; transition: width 0.5s ease; }
+  .progress-label { font-size: 10px; color: var(--text-hint); }
+
+  /* TAB BAR */
+  .tab-bar {
+    border-bottom: 1px solid var(--border-default);
+    display: flex;
+    gap: 2px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-item {
+    padding: 10px 16px; font-size: 12px; font-weight: 500;
+    color: var(--text-hint); border-bottom: 2px solid transparent;
+    margin-bottom: -1px; cursor: pointer; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.12s;
+  }
+  .tab-item:hover { color: var(--text-muted); }
+  .tab-item.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-badge {
+    font-size: 9px; font-weight: 600;
+    background: rgba(239,159,39,0.12); color: var(--color-warning);
+    border: 1px solid rgba(239,159,39,0.2);
+    padding: 1px 5px; border-radius: 10px;
+  }
+  .tab-badge.green {
+    background: rgba(29,158,117,0.1); color: var(--color-success);
+    border-color: rgba(29,158,117,0.2);
+  }
+
+  /* TAB CONTENT PANELS */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* SECTION CARD (Settings pattern) */
+  .section-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .section-card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-card-header-left { display: flex; align-items: center; gap: 10px; }
+  .section-icon {
+    width: 26px; height: 26px;
+    background: var(--accent-bg);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .section-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .section-sub { font-size: 10px; color: var(--text-ghost); margin-top: 1px; }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row-left .row-label { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .settings-row-left .row-desc { font-size: 10px; color: var(--text-ghost); margin-top: 2px; }
+  .save-row {
+    padding: 10px 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+
+  /* FORM ELEMENTS */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 16px; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 14px 16px; }
+  .form-grid-full { padding: 14px 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label {
+    font-size: 11px; font-weight: 500; color: var(--text-muted);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .form-label .req { color: var(--color-danger); }
+  .form-input, .form-select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 8px 11px;
+    font-size: 12px; color: var(--text-primary);
+    outline: none; color-scheme: dark; font-family: var(--font);
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: rgba(55,138,221,0.45);
+  }
+  .form-input::placeholder { color: var(--text-ghost); }
+  .form-hint { font-size: 10px; color: var(--text-ghost); margin-top: 2px; }
+
+  /* DAYS PICKER */
+  .days-picker { display: flex; gap: 5px; }
+  .day-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    font-size: 11px; font-weight: 600;
+    color: var(--text-hint); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+  }
+  .day-btn.active { background: rgba(55,138,221,0.15); border-color: rgba(55,138,221,0.3); color: var(--accent); }
+
+  /* ACADEMIC SETUP TAB */
+  .setup-wizard {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+  }
+  .wizard-nav {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-card);
+    padding: 12px 8px;
+    height: fit-content;
+    position: sticky; top: 0;
+  }
+  .wizard-nav-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--text-ghost);
+    padding: 4px 10px 8px;
+  }
+  .wizard-step {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    color: var(--text-hint); cursor: pointer;
+    transition: all 0.12s; margin-bottom: 2px;
+  }
+  .wizard-step:hover { background: rgba(255,255,255,0.04); color: var(--text-secondary); }
+  .wizard-step.active { background: var(--accent-bg); color: var(--accent); }
+  .wizard-step.done { color: var(--color-success); }
+  .wizard-step-icon {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; flex-shrink: 0;
+  }
+  .wizard-step.done .wizard-step-icon { background: rgba(29,158,117,0.12); border-color: var(--color-success); }
+  .wizard-step.active .wizard-step-icon { background: var(--accent-bg); border-color: var(--accent); }
+  .wizard-content-area { }
+
+  /* ACADEMIC YEAR CARD */
+  .year-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-card);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .year-card-header {
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .year-card-left { display: flex; align-items: center; gap: 10px; }
+  .year-icon {
+    width: 32px; height: 32px; background: var(--accent-bg);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .year-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .year-dates { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .year-actions { display: flex; gap: 6px; }
+
+  /* SESSIONS */
+  .sessions-grid { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .session-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+  }
+  .session-row-left { display: flex; align-items: center; gap: 8px; }
+  .session-color { width: 8px; height: 8px; border-radius: 50%; }
+  .session-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .session-dates { font-size: 10px; color: var(--text-muted); }
+  .session-term { font-size: 10px; color: var(--text-hint); background: rgba(255,255,255,0.04); border: 1px solid var(--border-default); border-radius: 4px; padding: 1px 6px; }
+
+  /* CALENDAR SECTION */
+  .cal-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 16px; }
+  .cal-stat-card {
+    padding: 10px 12px; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;
+  }
+  .cal-stat-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-ghost); margin-bottom: 4px; }
+  .cal-stat-value { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  .cal-stat-value.info { color: var(--accent); }
+  .cal-stat-value.warning { color: var(--color-warning); }
+  .cal-stat-value.success { color: var(--color-success); }
+
+  .cal-generate-block {
+    margin: 0 16px 16px;
+    background: rgba(55,138,221,0.04);
+    border: 1px solid rgba(55,138,221,0.12);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .cal-gen-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .cal-gen-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+  .cal-locale-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+  /* WEEKEND CONFIG */
+  .weekend-config { }
+  .weekend-config-label { font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+  .locale-info-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; color: var(--color-info);
+    background: rgba(55,138,221,0.08); border: 1px solid rgba(55,138,221,0.15);
+    border-radius: 6px; padding: 3px 8px; margin-bottom: 10px;
+  }
+
+  /* BELL SCHEDULE */
+  .schedule-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .schedule-card-header {
+    padding: 10px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .schedule-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .schedule-meta { font-size: 10px; color: var(--text-muted); }
+  .period-list { padding: 6px 0; }
+  .period-row {
+    display: flex; align-items: center;
+    padding: 5px 12px;
+    gap: 10px;
+  }
+  .period-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .period-name { font-size: 11px; color: var(--text-secondary); min-width: 80px; }
+  .period-time { font-size: 11px; color: var(--text-muted); font-feature-settings: 'tnum'; }
+  .period-type {
+    font-size: 9px; font-weight: 500; padding: 1px 6px;
+    border-radius: 4px; margin-left: auto;
+  }
+  .period-type.academic { background: rgba(55,138,221,0.1); color: var(--accent); }
+  .period-type.break { background: rgba(239,159,39,0.08); color: var(--color-warning); }
+  .period-type.lunch { background: rgba(29,158,117,0.08); color: var(--color-success); }
+
+  /* STRUCTURE TAB */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* DEPARTMENTS */
+  .dept-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .dept-row:last-child { border-bottom: none; }
+  .dept-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .dept-scope {
+    font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 5px;
+  }
+  .dept-scope.school { background: rgba(55,138,221,0.1); color: var(--accent); }
+  .dept-scope.org { background: rgba(127,119,221,0.1); color: #7F77DD; }
+  .dept-count { font-size: 10px; color: var(--text-ghost); }
+
+  /* ROOMS */
+  .rooms-grid { padding: 14px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .room-card {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .room-number { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .room-name { font-size: 11px; color: var(--text-muted); }
+  .room-cap { font-size: 10px; color: var(--text-ghost); margin-top: 4px; }
+
+  /* AUDIT LOG */
+  .audit-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .audit-row:last-child { border-bottom: none; }
+  .audit-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+  }
+  .audit-icon.create { background: rgba(29,158,117,0.1); }
+  .audit-icon.update { background: rgba(55,138,221,0.1); }
+  .audit-action { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .audit-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .audit-time { font-size: 10px; color: var(--text-ghost); margin-left: auto; white-space: nowrap; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    padding: 40px 20px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .empty-icon { font-size: 32px; opacity: 0.4; margin-bottom: 4px; }
+  .empty-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .empty-desc { font-size: 11px; color: var(--text-muted); max-width: 280px; line-height: 1.6; }
+
+  /* INFO BANNER */
+  .info-banner {
+    background: rgba(55,138,221,0.05);
+    border: 1px solid rgba(55,138,221,0.12);
+    border-radius: 8px; padding: 9px 12px;
+    font-size: 11px; color: var(--accent);
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .warning-banner {
+    background: rgba(239,159,39,0.05);
+    border: 1px solid rgba(239,159,39,0.14);
+    border-radius: 8px; padding: 9px 12px;
+    font-size: 11px; color: var(--color-warning);
+    display: flex; align-items: flex-start; gap: 8px;
+    margin: 0 16px 12px;
+  }
+
+  /* INLINE FORM PANEL */
+  .inline-form {
+    background: rgba(55,138,221,0.03);
+    border: 1px solid rgba(55,138,221,0.1);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 0 16px 16px;
+  }
+  .inline-form-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+
+  /* TOGGLE */
+  .toggle {
+    width: 32px; height: 18px; border-radius: 9px;
+    background: rgba(255,255,255,0.1); cursor: pointer;
+    position: relative; transition: background 0.2s;
+    border: none; outline: none; flex-shrink: 0;
+  }
+  .toggle.on { background: var(--color-success); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: white; top: 3px; left: 3px;
+    transition: left 0.18s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .toggle.on::after { left: 17px; }
+
+  /* TIMELINE */
+  .timeline { padding: 14px 16px; }
+  .timeline-item { display: flex; gap: 12px; margin-bottom: 14px; }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0;
+    border: 2px solid;
+  }
+  .timeline-dot.planning { border-color: rgba(239,159,39,0.4); background: rgba(239,159,39,0.08); color: var(--color-warning); }
+  .timeline-dot.active { border-color: rgba(29,158,117,0.5); background: rgba(29,158,117,0.1); color: var(--color-success); }
+  .timeline-line { width: 1px; background: rgba(255,255,255,0.06); margin-left: 13px; margin-bottom: 2px; height: 100%; }
+  .timeline-content { padding-top: 4px; flex: 1; }
+  .timeline-year { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .timeline-dates { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .timeline-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  /* SECTION DIVIDER */
+  .section-divider { height: 1px; background: var(--border-default); margin: 8px 0; }
+
+  /* DEPT BUG NOTE */
+  .bug-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 5px;
+    background: rgba(226,75,74,0.1); color: var(--color-danger);
+    border: 1px solid rgba(226,75,74,0.2);
+  }
+
+  /* SMALL CHIP */
+  .chip-sm {
+    font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 5px;
+    background: rgba(255,255,255,0.05); color: var(--text-muted);
+    border: 1px solid var(--border-default);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="brand">
+      <div class="brand-logo">E</div>
+      EdForge
+    </div>
+    <div class="tenant-chip">CS</div>
+    <div style="width:1px;height:16px;background:var(--border-default);margin:0 4px;"></div>
+    <div class="topbar-breadcrumb">
+      <span>Home</span><span class="sep">›</span>
+      <span>Settings</span><span class="sep">›</span>
+      <span>Organization</span><span class="sep">›</span>
+      <span>Schools</span><span class="sep">›</span>
+      <span class="active">School Details</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="theme-toggle">
+      <button class="theme-btn">Light</button>
+      <button class="theme-btn active">Dark</button>
+    </div>
+    <button class="topbar-icon-btn">🔔</button>
+    <div class="topbar-avatar">S</div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-back">← Home</div>
+  <div class="nav-item">📊 Overview</div>
+
+  <div class="nav-section-label">Account</div>
+  <div class="nav-item">👤 My Account</div>
+  <div class="nav-item">⚙️ Preferences & Notifications</div>
+  <div class="nav-item">🔒 Security</div>
+
+  <div class="nav-section-label">Workspace</div>
+  <div class="nav-item">🏢 Workspace Settings</div>
+  <div class="nav-item active">🏫 Organization</div>
+  <div class="nav-item">🛡️ RBAC Security</div>
+</nav>
+
+<!-- CONTENT PANE -->
+<main class="content-pane">
+  <div class="content-inner">
+
+    <!-- SCHOOL HEADER -->
+    <div class="school-header">
+      <div class="school-header-left">
+        <div class="school-avatar">C</div>
+        <div>
+          <div class="school-name">Coffee School</div>
+          <div class="school-meta">
+            <div class="meta-chip">CS</div>
+            <div class="meta-chip">K-12</div>
+            <div class="status-chip status-setup">
+              <span class="status-dot"></span> Setup Mode
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="school-header-right">
+        <button class="btn-icon">⋯</button>
+        <button class="btn-primary">✓ Activate School →</button>
+      </div>
+    </div>
+
+    <!-- SETUP PROGRESS BANNER -->
+    <div class="setup-banner">
+      <div class="setup-banner-icon">⚙️</div>
+      <div class="setup-banner-content">
+        <div class="setup-banner-title">Complete school setup before activating</div>
+        <div class="setup-banner-sub">Configure your school's academic structure so EdForge can track attendance, grades, and scheduling correctly.</div>
+        <div class="setup-progress-bar">
+          <div class="progress-track"><div class="progress-fill"></div></div>
+          <div class="progress-label">1 of 5 setup tasks complete</div>
+        </div>
+        <div class="setup-progress-steps">
+          <div class="setup-step done" onclick="switchTab('config')">✓ School Identity</div>
+          <div class="setup-step todo" onclick="switchTab('academic')">○ Academic Year</div>
+          <div class="setup-step todo" onclick="switchTab('academic')">○ Calendar</div>
+          <div class="setup-step todo" onclick="switchTab('academic')">○ Bell Schedule</div>
+          <div class="setup-step todo" onclick="switchTab('structure')">○ Departments</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <div class="tab-item active" id="tab-config" onclick="switchTab('config')">
+        ⚙️ Configuration
+      </div>
+      <div class="tab-item" id="tab-academic" onclick="switchTab('academic')">
+        📅 Academic Setup
+        <span class="tab-badge">3 pending</span>
+      </div>
+      <div class="tab-item" id="tab-structure" onclick="switchTab('structure')">
+        🏛️ Structure
+        <span class="tab-badge">1 pending</span>
+      </div>
+      <div class="tab-item" id="tab-audit" onclick="switchTab('audit')">
+        🛡️ Audit Log
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         TAB 1: CONFIGURATION
+    ═══════════════════════════════════════════════════════ -->
+    <div class="tab-panel active" id="panel-config">
+
+      <!-- School Identity -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-header-left">
+            <div class="section-icon">🏫</div>
+            <div>
+              <div class="section-title">School Identity</div>
+              <div class="section-sub">Basic school information and classification</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Display Name <span class="req">*</span></label>
+            <input class="form-input" type="text" value="Coffee School" placeholder="Full name of the school">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Short Code</label>
+            <input class="form-input" type="text" value="CS" placeholder="2-4 letter abbreviation">
+          </div>
+          <div class="form-group">
+            <label class="form-label">School Type <span class="req">*</span></label>
+            <select class="form-select">
+              <option>K-12 School</option>
+              <option>Elementary</option>
+              <option>High School</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input class="form-input" type="text" placeholder="https://www.school.edu">
+          </div>
+        </div>
+        <div class="save-row">
+          <button class="btn-ghost">Cancel</button>
+          <button class="btn-primary">Save Identity</button>
+        </div>
+      </div>
+
+      <!-- Location & Contact -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-header-left">
+            <div class="section-icon" style="background:rgba(29,158,117,0.1)">📍</div>
+            <div>
+              <div class="section-title">Location & Contact</div>
+              <div class="section-sub">Physical address and contact information</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">Street / Tole</label>
+            <input class="form-input" type="text" value="Main Garrand Street" placeholder="Street address">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Municipality / VDC</label>
+            <input class="form-input" type="text" value="Kathmandu" placeholder="Municipality">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ward No.</label>
+            <input class="form-input" type="text" value="3474" placeholder="Ward number">
+          </div>
+          <div class="form-group">
+            <label class="form-label">District</label>
+            <select class="form-select">
+              <option>Dhanusha</option>
+              <option>Kathmandu</option>
+              <option>Lalitpur</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Province</label>
+            <select class="form-select">
+              <option>Bagmati Province</option>
+              <option>Madhesh Province</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" type="tel" placeholder="+977-">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" placeholder="school@email.com">
+          </div>
+        </div>
+        <div class="save-row">
+          <button class="btn-ghost">Cancel</button>
+          <button class="btn-primary">Save Location</button>
+        </div>
+      </div>
+
+      <!-- Schedule & Operations -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-header-left">
+            <div class="section-icon" style="background:rgba(239,159,39,0.1)">🕐</div>
+            <div>
+              <div class="section-title">Schedule & Operations</div>
+              <div class="section-sub">School days, hours, and class period duration</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group full">
+            <label class="form-label">School Days <span class="form-hint" style="font-size:10px;margin-left:4px;color:var(--text-ghost)">— tap to toggle</span></label>
+            <div class="days-picker">
+              <button class="day-btn">S</button>
+              <button class="day-btn active">M</button>
+              <button class="day-btn active">T</button>
+              <button class="day-btn active">W</button>
+              <button class="day-btn active">T</button>
+              <button class="day-btn active">F</button>
+              <button class="day-btn active">S</button>
+            </div>
+            <div class="form-hint">Nepal: Sunday–Friday typical. Saturday = weekend.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">School Start Time</label>
+            <input class="form-input" type="time" value="10:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">School End Time</label>
+            <input class="form-input" type="time" value="16:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Period Duration (minutes)</label>
+            <input class="form-input" type="number" value="45">
+          </div>
+        </div>
+        <div class="save-row">
+          <button class="btn-ghost">Cancel</button>
+          <button class="btn-primary">Save Schedule</button>
+        </div>
+      </div>
+
+      <!-- Inheriting note -->
+      <div class="info-banner">
+        ℹ️ <span><strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings. Changes here will override the workspace defaults for this school only.</span>
+      </div>
+
+    </div><!-- /panel-config -->
+
+
+    <!-- ═══════════════════════════════════════════════════════
+         TAB 2: ACADEMIC SETUP
+    ═══════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-academic">
+
+      <div class="setup-wizard">
+
+        <!-- WIZARD NAV -->
+        <div class="wizard-nav">
+          <div class="wizard-nav-label">Setup Steps</div>
+
+          <div class="wizard-step done" onclick="showWizardSection('years')">
+            <div class="wizard-step-icon">✓</div>
+            Academic Years
+          </div>
+          <div class="wizard-step active" onclick="showWizardSection('sessions')">
+            <div class="wizard-step-icon">2</div>
+            Sessions & Terms
+          </div>
+          <div class="wizard-step" onclick="showWizardSection('calendar')">
+            <div class="wizard-step-icon">3</div>
+            Calendar
+          </div>
+          <div class="wizard-step" onclick="showWizardSection('bell')">
+            <div class="wizard-step-icon">4</div>
+            Bell Schedule
+          </div>
+
+          <div style="height:1px;background:var(--border-default);margin:10px 0;"></div>
+          <div style="padding:8px 10px;font-size:10px;color:var(--text-ghost);line-height:1.6;">
+            Complete these steps in order. Each builds on the previous — you need an academic year before setting up sessions, and sessions before generating a calendar.
+          </div>
+        </div>
+
+        <!-- WIZARD CONTENT -->
+        <div class="wizard-content-area">
+
+          <!-- STEP 1: Academic Years -->
+          <div id="ws-years" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Academic Years</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Define the temporal boundaries for all academic data.</div>
+              </div>
+              <button class="btn-primary">+ New Academic Year</button>
+            </div>
+
+            <!-- Active Year Card -->
+            <div class="year-card">
+              <div class="year-card-header">
+                <div class="year-card-left">
+                  <div class="year-icon">📅</div>
+                  <div>
+                    <div class="year-title">2082–2083 BS <span style="font-size:10px;color:var(--text-ghost);font-weight:400;margin-left:6px;">2026–2027 AD</span></div>
+                    <div class="year-dates">Ashad 1, 2082 – Jestha 31, 2083 &nbsp;·&nbsp; Apr 14, 2026 – Mar 31, 2027</div>
+                  </div>
+                </div>
+                <div class="year-actions">
+                  <div class="status-chip status-setup"><span class="status-dot"></span> Planning</div>
+                  <button class="btn-ghost" style="font-size:10px;padding:5px 10px;">✏️ Edit</button>
+                  <button class="btn-primary" style="font-size:10px;padding:5px 10px;">▶ Activate</button>
+                </div>
+              </div>
+              <div class="sessions-grid" style="padding:10px 16px;">
+                <div class="info-banner" style="margin-bottom:0;">
+                  📌 Next step: Add sessions (semesters/trimesters) to this academic year to define grading periods.
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <div class="section-card-header-left">
+                  <div class="section-icon">📆</div>
+                  <div><div class="section-title">Academic Year Timeline</div><div class="section-sub">Visual history of all academic years</div></div>
+                </div>
+              </div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div class="timeline-dot planning">○</div>
+                    <div class="timeline-line" style="height:30px;"></div>
+                  </div>
+                  <div class="timeline-content">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <div class="timeline-year">2082–2083</div>
+                      <div class="status-chip status-setup" style="font-size:9px;padding:2px 7px;"><span class="status-dot"></span> Planning</div>
+                    </div>
+                    <div class="timeline-dates">Apr 13, 2026 – Mar 31, 2027</div>
+                    <div class="timeline-dates" style="color:var(--text-ghost);">Baishakh 1, 2082 – Chaitra 31, 2083</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-banner">
+              ℹ️ Academic years cannot be deleted once created. This preserves historical data integrity. Mark completed years as archived to hide them from active views.
+            </div>
+          </div>
+
+          <!-- STEP 2: Sessions & Terms (default active) -->
+          <div id="ws-sessions">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Sessions & Terms</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Define semesters, trimesters, or quarters within <strong style="color:var(--accent);">2082–2083</strong></div>
+              </div>
+              <button class="btn-primary">+ Add Session</button>
+            </div>
+
+            <div class="info-banner">
+              ℹ️ <span>Sessions define grading periods (e.g., "First Semester", "Q1"). Each session maps to Ed-Fi <strong>GradingPeriodDescriptor</strong>. Students receive report cards per session.</span>
+            </div>
+
+            <!-- Empty state with guided inline form -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <div class="section-card-header-left">
+                  <div class="section-icon">📋</div>
+                  <div>
+                    <div class="section-title">2082–2083 Sessions</div>
+                    <div class="section-sub">0 sessions configured</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <button class="btn-ghost" style="font-size:10px;padding:5px 10px;">Use Template</button>
+                  <button class="btn-secondary" style="font-size:11px;padding:5px 10px;">+ Add Session</button>
+                </div>
+              </div>
+
+              <!-- Inline create form -->
+              <div class="inline-form">
+                <div class="inline-form-title">New Session</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                  <div class="form-group">
+                    <label class="form-label">Session Name <span class="req">*</span></label>
+                    <input class="form-input" placeholder="e.g., First Semester">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Term Type <span class="req">*</span></label>
+                    <select class="form-select">
+                      <option value="">Select term type…</option>
+                      <option>Semester</option>
+                      <option>Trimester</option>
+                      <option>Quarter</option>
+                      <option>Annual</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Begin Date <span class="req">*</span></label>
+                    <input class="form-input" type="date" placeholder="mm/dd/yyyy">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">End Date <span class="req">*</span></label>
+                    <input class="form-input" type="date" placeholder="mm/dd/yyyy">
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:8px;">
+                  <button class="btn-ghost">Cancel</button>
+                  <button class="btn-primary">Create Session</button>
+                </div>
+              </div>
+
+              <div class="empty-state" style="padding:24px 20px;">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">No sessions yet</div>
+                <div class="empty-desc">Create your first session above — e.g., "First Semester" covering April through September. Sessions define when report cards are generated.</div>
+              </div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-default);border-radius:8px;padding:12px 14px;margin-top:6px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">Suggested for Nepal schools (Semester system):</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(55,138,221,0.04);border:1px solid rgba(55,138,221,0.1);border-radius:7px;">
+                  <div>
+                    <span style="font-size:12px;font-weight:500;color:var(--text-primary);">First Semester</span>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:8px;">Baishakh – Ashwin  (Apr – Oct)</span>
+                  </div>
+                  <button class="btn-ghost" style="font-size:10px;padding:4px 9px;">+ Use</button>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(55,138,221,0.04);border:1px solid rgba(55,138,221,0.1);border-radius:7px;">
+                  <div>
+                    <span style="font-size:12px;font-weight:500;color:var(--text-primary);">Second Semester</span>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:8px;">Kartik – Chaitra  (Oct – Mar)</span>
+                  </div>
+                  <button class="btn-ghost" style="font-size:10px;padding:4px 9px;">+ Use</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Calendar -->
+          <div id="ws-calendar" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">School Calendar</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">2082–2083 Calendar Management</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-secondary">📋 Sessions</button>
+                <button class="btn-primary">✨ Generate Calendar</button>
+              </div>
+            </div>
+
+            <!-- Calendar Stats -->
+            <div class="section-card" style="margin-bottom:12px;">
+              <div class="cal-stats">
+                <div class="cal-stat-card">
+                  <div class="cal-stat-label">Academic Year</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary);">2082–2083</div>
+                  <div style="font-size:10px;color:var(--text-ghost);margin-top:2px;">0 of 0 days elapsed</div>
+                </div>
+                <div class="cal-stat-card">
+                  <div class="cal-stat-label">Instructional Days</div>
+                  <div class="cal-stat-value info">0</div>
+                  <div style="font-size:10px;color:var(--text-ghost);margin-top:2px;">0 completed · 0 remaining</div>
+                </div>
+                <div class="cal-stat-card">
+                  <div class="cal-stat-label">Holidays</div>
+                  <div class="cal-stat-value warning">0</div>
+                  <div style="font-size:10px;color:var(--text-ghost);margin-top:2px;">No holidays scheduled</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Generate Calendar -->
+            <div class="cal-generate-block">
+              <div class="cal-gen-title">✨ Generate Calendar</div>
+              <div class="cal-gen-sub">Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.</div>
+
+              <div class="locale-info-chip">
+                🌏 Detected locale: Nepal (NP) &nbsp;·&nbsp; Bikram Sambat calendar
+              </div>
+
+              <div class="cal-locale-row">
+                <div class="form-group">
+                  <label class="form-label">Country / Locale</label>
+                  <select class="form-select">
+                    <option selected>Nepal (NP)</option>
+                    <option>United States (US)</option>
+                    <option>India (IN)</option>
+                    <option>Custom</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Weekends</label>
+                  <select class="form-select" id="weekend-select">
+                    <option value="sat" selected>Saturday only (Nepal default)</option>
+                    <option value="sat-sun">Saturday & Sunday</option>
+                    <option value="fri-sat">Friday & Saturday</option>
+                    <option value="sun">Sunday only</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label">School Days</label>
+                <div class="days-picker">
+                  <button class="day-btn active">S</button>
+                  <button class="day-btn active">M</button>
+                  <button class="day-btn active">T</button>
+                  <button class="day-btn active">W</button>
+                  <button class="day-btn active">T</button>
+                  <button class="day-btn active">F</button>
+                  <button class="day-btn">S</button>
+                </div>
+                <div class="form-hint" style="margin-top:5px;">Sun–Fri instructional · Sat non-instructional weekend</div>
+              </div>
+
+              <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+                <strong style="color:var(--text-primary);">Preview:</strong> Will generate dates from <strong style="color:var(--accent);">Apr 14, 2026</strong> to <strong style="color:var(--accent);">Mar 31, 2027</strong><br>
+                ✔ Sunday–Friday → Instructional days<br>
+                ✔ Saturday → Non-instructional (weekend)<br>
+                ✔ National holidays from Nepal public holiday calendar will be imported<br>
+                ⚠ Existing dates for this year will be replaced
+              </div>
+
+              <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button class="btn-ghost">Cancel</button>
+                <button class="btn-primary">✨ Generate Calendar</button>
+              </div>
+            </div>
+
+            <!-- Day type legend -->
+            <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;">
+              <div style="font-size:10px;color:var(--text-ghost);padding:3px 0;margin-right:4px;">Day types:</div>
+              <span class="chip-sm" style="background:rgba(29,158,117,0.08);color:var(--color-success);border-color:rgba(29,158,117,0.2);">● Instructional</span>
+              <span class="chip-sm" style="background:rgba(226,75,74,0.08);color:var(--color-danger);border-color:rgba(226,75,74,0.2);">● Holiday</span>
+              <span class="chip-sm" style="background:rgba(239,159,39,0.08);color:var(--color-warning);border-color:rgba(239,159,39,0.2);">● Teacher Only</span>
+              <span class="chip-sm">● Break</span>
+              <span class="chip-sm">● Non-Instructional</span>
+              <span class="chip-sm">● Student Holiday</span>
+              <span class="chip-sm" style="background:rgba(55,138,221,0.08);color:var(--accent);border-color:rgba(55,138,221,0.2);">● Early Release</span>
+              <span class="chip-sm">● In-Service</span>
+            </div>
+          </div>
+
+          <!-- STEP 4: Bell Schedule -->
+          <div id="ws-bell" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Bell Schedule</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Define class periods and time slots for each type of school day.</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-secondary">Use Template</button>
+                <button class="btn-primary">+ New Schedule</button>
+              </div>
+            </div>
+
+            <!-- How it works -->
+            <div class="section-card" style="margin-bottom:12px;">
+              <div class="section-card-header">
+                <div class="section-card-header-left">
+                  <div class="section-icon" style="background:rgba(239,159,39,0.1)">💡</div>
+                  <div><div class="section-title">How bell schedules work</div></div>
+                </div>
+                <button class="btn-ghost" style="font-size:10px;padding:4px 9px;">▲ Collapse</button>
+              </div>
+              <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-default);border-radius:8px;padding:10px 12px;text-align:center;">
+                  <div style="font-size:18px;margin-bottom:6px;">1️⃣</div>
+                  <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:3px;">Create a schedule</div>
+                  <div style="font-size:10px;color:var(--text-muted);">"Regular Day", "Early Release"</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-default);border-radius:8px;padding:10px 12px;text-align:center;">
+                  <div style="font-size:18px;margin-bottom:6px;">2️⃣</div>
+                  <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:3px;">Add periods to it</div>
+                  <div style="font-size:10px;color:var(--text-muted);">Class times, lunch, homeroom</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-default);border-radius:8px;padding:10px 12px;text-align:center;">
+                  <div style="font-size:18px;margin-bottom:6px;">3️⃣</div>
+                  <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:3px;">Assign to calendar</div>
+                  <div style="font-size:10px;color:var(--text-muted);">Which days use which schedule</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Template picker -->
+            <div class="section-card" style="margin-bottom:12px;">
+              <div class="section-card-header">
+                <div class="section-card-header-left">
+                  <div class="section-icon">📄</div>
+                  <div><div class="section-title">Start from Template</div><div class="section-sub">Pre-built schedules — edit after applying</div></div>
+                </div>
+              </div>
+              <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(55,138,221,0.04);border:1px solid rgba(55,138,221,0.1);border-radius:8px;">
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary);">Nepal Standard (Sun–Fri)</div>
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">7 periods · 10:00 AM – 4:00 PM · Includes assembly, lunch, recess</div>
+                  </div>
+                  <button class="btn-primary" style="font-size:11px;padding:5px 12px;">Apply</button>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border-default);border-radius:8px;">
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary);">Elementary Schedule (US)</div>
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">9 periods · 8:00 AM – 2:00 PM · Includes homeroom, recess, lunch</div>
+                  </div>
+                  <button class="btn-ghost" style="font-size:11px;padding:5px 12px;">Apply</button>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border-default);border-radius:8px;">
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary);">High School Schedule (US)</div>
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">9 periods · 7:30 AM – 3:05 PM · Includes advisory and lunch</div>
+                  </div>
+                  <button class="btn-ghost" style="font-size:11px;padding:5px 12px;">Apply</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="section-card">
+              <div class="empty-state">
+                <div class="empty-icon">🕐</div>
+                <div class="empty-title">No bell schedules yet</div>
+                <div class="empty-desc">Apply a template above or create your first schedule to define how each type of school day is structured.</div>
+                <button class="btn-primary">+ Create First Schedule</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /wizard-content-area -->
+      </div><!-- /setup-wizard -->
+
+    </div><!-- /panel-academic -->
+
+
+    <!-- ═══════════════════════════════════════════════════════
+         TAB 3: STRUCTURE (Departments + Rooms)
+    ═══════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-structure">
+
+      <div class="two-col">
+
+        <!-- DEPARTMENTS -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Departments</div>
+            <button class="btn-primary" style="font-size:11px;padding:5px 11px;">+ Add Department</button>
+          </div>
+
+          <div class="warning-banner" style="margin:0 0 10px;">
+            ⚠️ <span><strong>Known issue:</strong> Organization-level departments are not creating correctly — only school-level departments work. Detailed code review in progress.</span>
+          </div>
+
+          <div class="section-card">
+            <div class="section-card-header">
+              <div class="section-card-header-left">
+                <div class="section-icon" style="background:rgba(127,119,221,0.1)">🏛️</div>
+                <div>
+                  <div class="section-title">Departments</div>
+                  <div class="section-sub">Academic and administrative departments</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <select class="form-select" style="width:120px;font-size:10px;padding:4px 8px;height:auto;">
+                  <option>All Scopes</option>
+                  <option>School Only</option>
+                  <option>Organization</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="empty-state">
+              <div class="empty-icon">👥</div>
+              <div class="empty-title">No departments found</div>
+              <div class="empty-desc">Create your first department to organize your school's academic structure.</div>
+              <button class="btn-primary">Create Department</button>
+            </div>
+          </div>
+
+          <!-- Dept scope explainer -->
+          <div style="background:rgba(127,119,221,0.04);border:1px solid rgba(127,119,221,0.1);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text-muted);line-height:1.6;">
+            <strong style="color:#7F77DD;">Scope explained:</strong><br>
+            <strong style="color:var(--text-secondary);">School-level</strong> departments belong to this school only.<br>
+            <strong style="color:var(--text-secondary);">Organization-level</strong> departments are shared across all schools in your organization.
+          </div>
+        </div>
+
+        <!-- ROOMS -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Rooms & Locations</div>
+            <button class="btn-primary" style="font-size:11px;padding:5px 11px;">+ Add Room</button>
+          </div>
+
+          <div class="section-card">
+            <div class="section-card-header">
+              <div class="section-card-header-left">
+                <div class="section-icon" style="background:rgba(29,158,117,0.1)">📍</div>
+                <div>
+                  <div class="section-title">Rooms & Locations</div>
+                  <div class="section-sub">0 rooms · 0 active</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-state">
+              <div class="empty-icon">📍</div>
+              <div class="empty-title">No rooms configured</div>
+              <div class="empty-desc">Add physical rooms and locations for scheduling. Rooms are assigned to class sections.</div>
+              <button class="btn-primary">+ Add Room</button>
+            </div>
+          </div>
+
+          <!-- Room fields hint -->
+          <div style="background:rgba(29,158,117,0.04);border:1px solid rgba(29,158,117,0.1);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+            <strong style="color:var(--color-success);">Room fields:</strong> Room number, name, type (classroom / lab / hall / gym), capacity, building/floor location, and active status.
+          </div>
+        </div>
+
+      </div><!-- /two-col -->
+    </div><!-- /panel-structure -->
+
+
+    <!-- ═══════════════════════════════════════════════════════
+         TAB 4: AUDIT LOG
+    ═══════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-audit">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Audit Log</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">All configuration changes for this school</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <select class="form-select" style="width:130px;font-size:11px;padding:6px 10px;height:auto;">
+            <option>All Actions</option>
+            <option>Create</option>
+            <option>Update</option>
+            <option>Delete</option>
+            <option>Status Change</option>
+            <option>Version Change</option>
+          </select>
+          <button class="btn-secondary">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="empty-state">
+          <div class="empty-icon">🛡️</div>
+          <div class="empty-title">No audit entries yet</div>
+          <div class="empty-desc">Changes to this school's configuration will appear here with actor, timestamp, and before/after values.</div>
+        </div>
+      </div>
+
+    </div><!-- /panel-audit -->
+
+  </div><!-- /content-inner -->
+</main>
+
+<script>
+  function switchTab(name) {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  function showWizardSection(name) {
+    // Update nav
+    document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    // Show correct section
+    document.querySelectorAll('#panel-academic .wizard-content-area > div').forEach(d => d.style.display = 'none');
+    document.getElementById('ws-' + name).style.display = 'block';
+  }
+
+  // Day button toggle
+  document.querySelectorAll('.day-btn').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('active'));
+  });
+
+  // Toggle buttons
+  document.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+
+  // Weekend select → update school days
+  const weekendSelect = document.getElementById('weekend-select');
+  if (weekendSelect) {
+    weekendSelect.addEventListener('change', function() {
+      const val = this.value;
+      // Could update day pickers reactively here
+    });
+  }
+</script>
+
+</body>
+</html>

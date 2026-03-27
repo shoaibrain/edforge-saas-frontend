@@ -1,0 +1,1788 @@
+/**
+ * Academic Setup Tab — V2
+ *
+ * Wizard-style 4-step layout:
+ * 1. Academic Years
+ * 2. Sessions & Terms
+ * 3. Calendar
+ * 4. Bell Schedule
+ */
+
+import { useState, useEffect, useMemo } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Plus, AlertCircle, Lock } from 'lucide-react'
+import type { School } from '@edforge/types'
+import type { CreateAcademicYearDto, UpdateAcademicYearDto } from '@aibrains/shared-types'
+import { tenantService, type CreateGradingPeriodDto } from '@/services/tenant.service'
+import { DateInput } from '@edforge/ui'
+import {
+  useAcademicSessions,
+  useCalendarStats,
+  useCalendarDates,
+  useUpdateCalendarDate,
+  useGenerateCalendar,
+  useCreateAcademicSession,
+} from '@/hooks/useCalendar'
+import { useBellSchedules, useCreateBellSchedule } from '@/hooks/useBellSchedules'
+import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
+import { type DayOfWeek, dayToIndex } from '@/utils/localeDefaults'
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type WizardStep = 'years' | 'sessions' | 'calendar' | 'bell-schedule'
+
+interface WizardStepConfig {
+  id: WizardStep
+  label: string
+  completed: boolean
+}
+
+// ============================================================================
+// NEPAL BELL SCHEDULE PRESET
+// ============================================================================
+
+const NEPAL_PRESET = [
+  { name: 'Assembly', startTime: '10:00', endTime: '10:15', periodType: 'assembly', sortOrder: 0, isAcademic: false },
+  { name: 'Period 1', startTime: '10:15', endTime: '11:00', periodType: 'instructional', sortOrder: 1, isAcademic: true },
+  { name: 'Period 2', startTime: '11:00', endTime: '11:45', periodType: 'instructional', sortOrder: 2, isAcademic: true },
+  { name: 'Recess', startTime: '11:45', endTime: '12:00', periodType: 'recess', sortOrder: 3, isAcademic: false },
+  { name: 'Period 3', startTime: '12:00', endTime: '12:45', periodType: 'instructional', sortOrder: 4, isAcademic: true },
+  { name: 'Lunch', startTime: '12:45', endTime: '13:30', periodType: 'lunch', sortOrder: 5, isAcademic: false },
+  { name: 'Period 4', startTime: '13:30', endTime: '14:15', periodType: 'instructional', sortOrder: 6, isAcademic: true },
+  { name: 'Period 5', startTime: '14:15', endTime: '15:00', periodType: 'instructional', sortOrder: 7, isAcademic: true },
+  { name: 'Period 6', startTime: '15:00', endTime: '15:45', periodType: 'instructional', sortOrder: 8, isAcademic: true },
+  { name: 'Period 7', startTime: '15:45', endTime: '16:00', periodType: 'instructional', sortOrder: 9, isAcademic: true },
+] as const
+
+const ELEMENTARY_PRESET = [
+  { name: 'Homeroom', startTime: '08:00', endTime: '08:15', periodType: 'homeroom', sortOrder: 0, isAcademic: false },
+  { name: 'Period 1', startTime: '08:15', endTime: '09:00', periodType: 'instructional', sortOrder: 1, isAcademic: true },
+  { name: 'Period 2', startTime: '09:05', endTime: '09:50', periodType: 'instructional', sortOrder: 2, isAcademic: true },
+  { name: 'Recess', startTime: '09:50', endTime: '10:10', periodType: 'recess', sortOrder: 3, isAcademic: false },
+  { name: 'Period 3', startTime: '10:10', endTime: '10:55', periodType: 'instructional', sortOrder: 4, isAcademic: true },
+  { name: 'Lunch', startTime: '10:55', endTime: '11:35', periodType: 'lunch', sortOrder: 5, isAcademic: false },
+  { name: 'Period 4', startTime: '11:35', endTime: '12:20', periodType: 'instructional', sortOrder: 6, isAcademic: true },
+  { name: 'Period 5', startTime: '12:25', endTime: '13:10', periodType: 'instructional', sortOrder: 7, isAcademic: true },
+  { name: 'Period 6', startTime: '13:15', endTime: '14:00', periodType: 'instructional', sortOrder: 8, isAcademic: true },
+] as const
+
+const HIGH_SCHOOL_PRESET = [
+  { name: 'Period 1', startTime: '07:30', endTime: '08:20', periodType: 'instructional', sortOrder: 0, isAcademic: true },
+  { name: 'Period 2', startTime: '08:25', endTime: '09:15', periodType: 'instructional', sortOrder: 1, isAcademic: true },
+  { name: 'Period 3', startTime: '09:20', endTime: '10:10', periodType: 'instructional', sortOrder: 2, isAcademic: true },
+  { name: 'Advisory', startTime: '10:15', endTime: '10:45', periodType: 'advisory', sortOrder: 3, isAcademic: false },
+  { name: 'Period 4', startTime: '10:50', endTime: '11:40', periodType: 'instructional', sortOrder: 4, isAcademic: true },
+  { name: 'Lunch', startTime: '11:40', endTime: '12:20', periodType: 'lunch', sortOrder: 5, isAcademic: false },
+  { name: 'Period 5', startTime: '12:25', endTime: '13:15', periodType: 'instructional', sortOrder: 6, isAcademic: true },
+  { name: 'Period 6', startTime: '13:20', endTime: '14:10', periodType: 'instructional', sortOrder: 7, isAcademic: true },
+  { name: 'Period 7', startTime: '14:15', endTime: '15:05', periodType: 'instructional', sortOrder: 8, isAcademic: true },
+] as const
+
+// ============================================================================
+// SHARED UI
+// ============================================================================
+
+const inputClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 text-xs text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgba(55,138,221,0.45)] transition-colors font-[inherit]"
+
+const DAY_LABELS: { key: DayOfWeek; short: string }[] = [
+  { key: 'sunday', short: 'S' },
+  { key: 'monday', short: 'M' },
+  { key: 'tuesday', short: 'T' },
+  { key: 'wednesday', short: 'W' },
+  { key: 'thursday', short: 'T' },
+  { key: 'friday', short: 'F' },
+  { key: 'saturday', short: 'S' },
+]
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+interface AcademicSetupTabProps {
+  schoolId: string
+  school?: School
+}
+
+// Extended type for create with grading periods
+interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
+  schoolId: string
+  generatedTerms?: CreateGradingPeriodDto[]
+}
+
+export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
+  const localeDefaults = useLocaleDefaults()
+  const queryClient = useQueryClient()
+
+  // Academic year modal state
+  const [isCreateYearOpen, setIsCreateYearOpen] = useState(false)
+  const [yearToEdit, setYearToEdit] = useState<any>(null)
+  const [yearToActivate, setYearToActivate] = useState<any>(null)
+
+  // Fetch academic years
+  const { data: academicYears = [], isLoading: yearsLoading } = useQuery({
+    queryKey: ['academicYears', schoolId],
+    queryFn: () => tenantService.getAcademicYears(schoolId),
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const years = Array.isArray(academicYears) ? academicYears : (academicYears as any)?.data ?? []
+  const activeYear = years.find((y: any) => y.status === 'active') || years[0]
+  const activeYearId = activeYear?.yearId || activeYear?.id || ''
+
+  // Academic year mutations
+  const createYearMutation = useMutation({
+    mutationFn: async (data: CreateAcademicYearWithTerms) => {
+      const { generatedTerms, schoolId: _sid, ...yearData } = data
+      const createdYear = await tenantService.createAcademicYear(schoolId, yearData)
+      if (generatedTerms?.length && (createdYear as any).id) {
+        try {
+          await tenantService.createGradingPeriods(schoolId, (createdYear as any).id, generatedTerms)
+        } catch { /* year was created, grading periods are optional */ }
+      }
+      return createdYear
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      setIsCreateYearOpen(false)
+    },
+    onError: () => { /* handled in modal */ },
+  })
+
+  const updateYearMutation = useMutation({
+    mutationFn: ({ yearId, data }: { yearId: string; data: UpdateAcademicYearDto }) =>
+      tenantService.updateAcademicYear(schoolId, yearId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      setYearToEdit(null)
+    },
+  })
+
+  const activateYearMutation = useMutation({
+    mutationFn: (yearId: string) =>
+      tenantService.updateAcademicYearStatus(schoolId, yearId, { status: 'active' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      setYearToActivate(null)
+    },
+  })
+
+  // Fetch sessions for active year
+  const { data: sessionsData } = useAcademicSessions(schoolId, activeYearId, !!activeYearId)
+  const sessions = (sessionsData as any)?.items || (sessionsData as any)?.data || (Array.isArray(sessionsData) ? sessionsData : [])
+
+  // Fetch calendar stats
+  const { data: calendarStats } = useCalendarStats(schoolId, activeYearId, !!activeYearId)
+
+  // Fetch bell schedules
+  const { data: bellSchedulesData } = useBellSchedules(schoolId)
+  const bellSchedules = (bellSchedulesData as any)?.items || (bellSchedulesData as any)?.data || (Array.isArray(bellSchedulesData) ? bellSchedulesData : [])
+
+  // Wizard step completion
+  const steps: WizardStepConfig[] = useMemo(() => [
+    { id: 'years', label: 'Academic Years', completed: years.length > 0 },
+    { id: 'sessions', label: 'Sessions & Terms', completed: sessions.length > 0 },
+    { id: 'calendar', label: 'Calendar', completed: (calendarStats as any)?.totalDays > 0 },
+    { id: 'bell-schedule', label: 'Bell Schedule', completed: bellSchedules.length > 0 },
+  ], [years, sessions, calendarStats, bellSchedules])
+
+  // Default to first incomplete step
+  const firstIncomplete = steps.find(s => !s.completed)?.id || 'years'
+  const [activeStep, setActiveStep] = useState<WizardStep>(firstIncomplete)
+
+  return (
+    <div className="grid gap-5" style={{ gridTemplateColumns: '260px 1fr' }}>
+      {/* ── Wizard Navigation ── */}
+      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-3 h-fit sticky top-0">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] px-2.5 pb-2">
+          Setup Steps
+        </p>
+        {steps.map((step, i) => {
+          const isActive = activeStep === step.id
+          const isDone = step.completed
+          return (
+            <button
+              key={step.id}
+              onClick={() => setActiveStep(step.id)}
+              className={`
+                w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium
+                mb-0.5 transition-all
+                ${isActive
+                  ? 'bg-[rgba(55,138,221,0.1)] text-[#378ADD]'
+                  : isDone
+                    ? 'text-[#1D9E75] hover:bg-[rgba(255,255,255,0.04)]'
+                    : 'text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] hover:text-[rgb(var(--text-secondary))]'
+                }
+              `}
+            >
+              <span className={`
+                w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center text-[9px] flex-shrink-0
+                ${isActive
+                  ? 'bg-[rgba(55,138,221,0.1)] border-[#378ADD]'
+                  : isDone
+                    ? 'bg-[rgba(29,158,117,0.12)] border-[#1D9E75]'
+                    : 'border-current'
+                }
+              `}>
+                {isDone ? '✓' : i + 1}
+              </span>
+              {step.label}
+            </button>
+          )
+        })}
+
+        <div className="h-px bg-[rgba(255,255,255,0.06)] my-2.5" />
+        <p className="px-2.5 text-[10px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+          Complete these steps in order. Each builds on the previous — you need an academic year before setting up sessions, and sessions before generating a calendar.
+        </p>
+      </div>
+
+      {/* ── Wizard Content Area ── */}
+      <div>
+        {activeStep === 'years' && (
+          <YearsStep
+            years={years}
+            isLoading={yearsLoading}
+            calendarSystem={localeDefaults.calendarSystem}
+            onCreateYear={() => setIsCreateYearOpen(true)}
+            onEditYear={(year: any) => setYearToEdit(year)}
+            onActivateYear={(year: any) => setYearToActivate(year)}
+          />
+        )}
+        {activeStep === 'sessions' && (
+          <SessionsStep
+            schoolId={schoolId}
+            activeYear={activeYear}
+            sessions={sessions}
+            isNepal={localeDefaults.isNepal}
+          />
+        )}
+        {activeStep === 'calendar' && (
+          <CalendarStep
+            schoolId={schoolId}
+            activeYear={activeYear}
+            calendarStats={calendarStats}
+            localeDefaults={localeDefaults}
+          />
+        )}
+        {activeStep === 'bell-schedule' && (
+          <BellScheduleStep
+            schoolId={schoolId}
+            bellSchedules={bellSchedules}
+            isNepal={localeDefaults.isNepal}
+            activeYear={activeYear}
+          />
+        )}
+      </div>
+
+      {/* Academic Year Modals */}
+      <CreateAcademicYearModal
+        isOpen={isCreateYearOpen}
+        onClose={() => setIsCreateYearOpen(false)}
+        onSubmit={(data) => createYearMutation.mutate(data)}
+        isLoading={createYearMutation.isPending}
+        schoolId={schoolId}
+        calendarSystem={localeDefaults.calendarSystem}
+      />
+      <EditAcademicYearModal
+        isOpen={!!yearToEdit}
+        year={yearToEdit}
+        onClose={() => setYearToEdit(null)}
+        onSubmit={(data) => {
+          const yid = yearToEdit?.yearId || yearToEdit?.id
+          if (yid) updateYearMutation.mutate({ yearId: yid, data })
+        }}
+        isLoading={updateYearMutation.isPending}
+        calendarSystem={localeDefaults.calendarSystem}
+      />
+      <ActivateConfirmModal
+        isOpen={!!yearToActivate}
+        year={yearToActivate}
+        onClose={() => setYearToActivate(null)}
+        onConfirm={() => {
+          const yid = yearToActivate?.yearId || yearToActivate?.id
+          if (yid) activateYearMutation.mutate(yid)
+        }}
+        isLoading={activateYearMutation.isPending}
+      />
+    </div>
+  )
+}
+
+// ============================================================================
+// CREATE ACADEMIC YEAR MODAL
+// ============================================================================
+
+function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolId, calendarSystem = 'gregorian' }: {
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (data: CreateAcademicYearWithTerms) => void
+  isLoading: boolean
+  schoolId: string
+  calendarSystem?: string
+}) {
+  const [name, setName] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [termStructure, setTermStructure] = useState<'semester' | 'trimester' | 'quarter'>('semester')
+
+  const generateGradingPeriods = (): CreateGradingPeriodDto[] => {
+    if (!startDate || !endDate) return []
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const totalDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+    const termConfigs = {
+      semester: { count: 2, names: ['Fall Semester', 'Spring Semester'], shortNames: ['Fall', 'Spring'] },
+      trimester: { count: 3, names: ['Fall Trimester', 'Winter Trimester', 'Spring Trimester'], shortNames: ['T1', 'T2', 'T3'] },
+      quarter: { count: 4, names: ['Q1', 'Q2', 'Q3', 'Q4'], shortNames: ['Q1', 'Q2', 'Q3', 'Q4'] },
+    }
+    const config = termConfigs[termStructure]
+    const daysPerTerm = Math.floor(totalDays / config.count)
+    return config.names.map((periodName, index) => {
+      const termStart = new Date(start)
+      termStart.setDate(termStart.getDate() + (index * daysPerTerm))
+      const termEnd = new Date(termStart)
+      termEnd.setDate(termEnd.getDate() + daysPerTerm - 1)
+      if (index === config.count - 1) termEnd.setTime(end.getTime())
+      return {
+        name: periodName,
+        shortName: config.shortNames[index],
+        termType: termStructure,
+        sequence: index + 1,
+        startDate: termStart.toISOString().split('T')[0],
+        endDate: termEnd.toISOString().split('T')[0],
+      }
+    })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit({
+      schoolId,
+      name,
+      startDate,
+      endDate,
+      calendarType: termStructure,
+      generatedTerms: generateGradingPeriods(),
+    })
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+        <h2 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-3">Create Academic Year</h2>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <DateInput
+                label="Start Date"
+                value={startDate}
+                onChange={(iso: string) => {
+                  setStartDate(iso)
+                  if (iso && endDate) {
+                    try {
+                      const sy = new Date(iso).getFullYear()
+                      const ey = new Date(endDate).getFullYear()
+                      setName(sy === ey ? `${sy}` : `${sy}-${ey}`)
+                    } catch { /* ignore */ }
+                  }
+                }}
+                calendarSystem={calendarSystem}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <DateInput
+                label="End Date"
+                value={endDate}
+                onChange={(iso: string) => {
+                  setEndDate(iso)
+                  if (startDate && iso) {
+                    try {
+                      const sy = new Date(startDate).getFullYear()
+                      const ey = new Date(iso).getFullYear()
+                      setName(sy === ey ? `${sy}` : `${sy}-${ey}`)
+                    } catch { /* ignore */ }
+                  }
+                }}
+                calendarSystem={calendarSystem}
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder={calendarSystem === 'bikram_sambat' ? 'e.g., 2082-2083' : 'e.g., 2025-2026'}
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1.5">Term Structure</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'semester' as const, label: 'Semester', count: 2 },
+                { value: 'trimester' as const, label: 'Trimester', count: 3 },
+                { value: 'quarter' as const, label: 'Quarter', count: 4 },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setTermStructure(option.value)}
+                  className={`p-2.5 rounded-lg border text-center transition-all ${
+                    termStructure === option.value
+                      ? 'border-[rgba(55,138,221,0.4)] bg-[rgba(55,138,221,0.08)]'
+                      : 'border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)]'
+                  }`}
+                >
+                  <p className={`text-xs font-medium ${termStructure === option.value ? 'text-[#378ADD]' : 'text-[rgb(var(--text-primary))]'}`}>
+                    {option.label}
+                  </p>
+                  <p className="text-[10px] text-[rgb(var(--text-tertiary))]">{option.count} terms</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
+            <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
+            <p className="text-[10px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+              The academic year will be created in "Planning" status. You can activate it when ready. Once active, dates cannot be changed.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-1">
+            <button type="button" onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || !name || !startDate || !endDate}
+              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {isLoading ? 'Creating...' : 'Create Academic Year'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// EDIT ACADEMIC YEAR MODAL
+// ============================================================================
+
+function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, calendarSystem = 'gregorian' }: {
+  isOpen: boolean
+  year: any
+  onClose: () => void
+  onSubmit: (data: UpdateAcademicYearDto) => void
+  isLoading: boolean
+  calendarSystem?: string
+}) {
+  const [name, setName] = useState(year?.name || '')
+  const [startDate, setStartDate] = useState(year?.startDate || '')
+  const [endDate, setEndDate] = useState(year?.endDate || '')
+
+  useEffect(() => {
+    if (year) {
+      setName(year.name || '')
+      setStartDate(year.startDate || '')
+      setEndDate(year.endDate || '')
+    }
+  }, [year])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit({ name, startDate, endDate })
+  }
+
+  if (!isOpen || !year) return null
+  const canEdit = year.status === 'planning'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-[rgb(var(--text-primary))]">
+            {canEdit ? 'Edit Academic Year' : 'View Academic Year'}
+          </h2>
+          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+            year.status === 'planning' ? 'bg-[rgba(239,159,39,0.1)] text-[#EF9F27]'
+              : year.status === 'active' ? 'bg-[rgba(29,158,117,0.1)] text-[#1D9E75]'
+              : 'bg-[rgba(255,255,255,0.06)] text-[rgb(var(--text-tertiary))]'
+          }`}>
+            {year.status?.charAt(0).toUpperCase() + year.status?.slice(1)}
+          </span>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={!canEdit}
+              className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <DateInput
+                label="Start Date"
+                value={startDate}
+                onChange={(iso: string) => setStartDate(iso)}
+                calendarSystem={calendarSystem}
+                disabled={!canEdit}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <DateInput
+                label="End Date"
+                value={endDate}
+                onChange={(iso: string) => setEndDate(iso)}
+                calendarSystem={calendarSystem}
+                disabled={!canEdit}
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          {!canEdit && (
+            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
+              <Lock className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
+              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+                This academic year is {year.status} and cannot be modified. Dates are locked to maintain data integrity.
+              </p>
+            </div>
+          )}
+
+          {canEdit && (
+            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
+              <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
+              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+                Once this year is activated, dates will be locked and cannot be changed.
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-1">
+            <button type="button" onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+              {canEdit ? 'Cancel' : 'Close'}
+            </button>
+            {canEdit && (
+              <button
+                type="submit"
+                disabled={isLoading || !name || !startDate || !endDate}
+                className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {isLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// ACTIVATE CONFIRMATION MODAL
+// ============================================================================
+
+function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: {
+  isOpen: boolean
+  year: any
+  onClose: () => void
+  onConfirm: () => void
+  isLoading: boolean
+}) {
+  if (!isOpen || !year) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+        <h2 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">Activate Academic Year</h2>
+        <p className="text-xs text-[rgb(var(--text-secondary))] mb-3">
+          You are about to activate <strong>{year.name}</strong>. This action:
+        </p>
+
+        <ul className="space-y-2 text-xs text-[rgb(var(--text-secondary))] mb-4">
+          <li className="flex items-start gap-2">
+            <Lock className="w-3.5 h-3.5 text-[#EF9F27] mt-0.5 flex-shrink-0" />
+            <span>Will lock the start and end dates permanently</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <AlertCircle className="w-3.5 h-3.5 text-[#EF9F27] mt-0.5 flex-shrink-0" />
+            <span>Will deactivate any currently active academic year</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <AlertCircle className="w-3.5 h-3.5 text-[#E24B4A] mt-0.5 flex-shrink-0" />
+            <span className="text-[#E24B4A]">Cannot be reversed back to "Planning"</span>
+          </li>
+        </ul>
+
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {isLoading ? 'Activating...' : 'Activate Year'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// STEP 1: ACADEMIC YEARS
+// ============================================================================
+
+function YearsStep({ years, isLoading, calendarSystem, onCreateYear, onEditYear, onActivateYear }: {
+  years: any[]
+  isLoading: boolean
+  calendarSystem: string
+  onCreateYear: () => void
+  onEditYear: (year: any) => void
+  onActivateYear: (year: any) => void
+}) {
+  const isBikramSambat = calendarSystem === 'bikram_sambat'
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold text-[rgb(var(--text-primary))]">Academic Years</h2>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">Define the temporal boundaries for all academic data.</p>
+        </div>
+        <button onClick={onCreateYear} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+          <Plus className="w-3.5 h-3.5" /> New Academic Year
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3 animate-pulse">
+          <div className="h-24 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+        </div>
+      ) : years.length === 0 ? (
+        <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-10 text-center">
+          <div className="text-3xl opacity-40 mb-3">📅</div>
+          <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No academic years yet</h3>
+          <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
+            Create your first academic year to begin setting up your school's academic structure.
+          </p>
+          <button onClick={onCreateYear} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+            + Create Academic Year
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {years.map((year: any) => {
+            const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+              planning: { bg: 'bg-[rgba(239,159,39,0.1)]', text: 'text-[#EF9F27]', label: 'Planning' },
+              active: { bg: 'bg-[rgba(29,158,117,0.1)]', text: 'text-[#1D9E75]', label: 'Active' },
+              completed: { bg: 'bg-[rgba(255,255,255,0.06)]', text: 'text-[rgb(var(--text-tertiary))]', label: 'Archived' },
+            }
+            const status = statusConfig[year.status] || statusConfig.planning
+
+            return (
+              <div key={year.id} className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+                <div className="px-4 py-3 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📅</div>
+                    <div>
+                      <div className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                        {isBikramSambat && year.nameBS ? (
+                          <>
+                            {year.nameBS}
+                            <span className="text-[10px] text-[rgb(var(--text-tertiary))] font-normal ml-1.5">{year.name}</span>
+                          </>
+                        ) : year.name}
+                      </div>
+                      <div className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+                        {year.startDate && year.endDate ? (
+                          `${new Date(year.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} – ${new Date(year.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                        ) : 'Dates not set'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${status.bg} ${status.text}`}>
+                      <span className="w-[5px] h-[5px] rounded-full bg-current" />
+                      {status.label}
+                    </span>
+                    <button onClick={() => onEditYear(year)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] transition-all">
+                      Edit
+                    </button>
+                    {year.status === 'planning' && (
+                      <button onClick={() => onActivateYear(year)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 transition-opacity">
+                        Activate
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="px-4 py-2.5">
+                  <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2 text-[11px] text-[#378ADD]">
+                    <span>📌</span>
+                    <span>Next step: Add sessions (semesters/trimesters) to this academic year to define grading periods.</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Info banner */}
+          <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-[11px] text-[#378ADD]">
+            <span>ℹ️</span>
+            <span>Academic years cannot be deleted once created. This preserves historical data integrity. Mark completed years as archived to hide them from active views.</span>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// STEP 2: SESSIONS & TERMS
+// ============================================================================
+
+function SessionsStep({ schoolId, activeYear, sessions, isNepal }: {
+  schoolId: string
+  activeYear: any
+  sessions: any[]
+  isNepal: boolean
+}) {
+  const [showForm, setShowForm] = useState(sessions.length === 0)
+  const [sessionName, setSessionName] = useState('')
+  const [termType, setTermType] = useState('')
+  const [beginDate, setBeginDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const createSession = useCreateAcademicSession(schoolId)
+
+  const handleCreate = () => {
+    if (!sessionName || !termType || !beginDate || !endDate || !activeYear?.id) return
+    setFormError(null)
+    createSession.mutate(
+      {
+        sessionName,
+        termDescriptor: termType as any,
+        beginDate,
+        endDate,
+        academicYearId: activeYear.id,
+      },
+      {
+        onSuccess: () => {
+          setSessionName('')
+          setTermType('')
+          setBeginDate('')
+          setEndDate('')
+          setShowForm(false)
+          setFormError(null)
+        },
+        onError: (error: any) => {
+          const msg = error?.response?.data?.message || error?.message || 'Failed to create session'
+          setFormError(msg)
+        },
+      }
+    )
+  }
+
+  const prefillNepalSemester = (semester: 'first' | 'second') => {
+    if (semester === 'first') {
+      setSessionName('First Semester')
+      setTermType('fall_semester')
+      // Approximate: Baishakh–Ashwin (Apr–Oct)
+      if (activeYear?.startDate) setBeginDate(activeYear.startDate.split('T')[0])
+    } else {
+      setSessionName('Second Semester')
+      setTermType('spring_semester')
+      // Approximate: Kartik–Chaitra (Oct–Mar)
+      if (activeYear?.endDate) setEndDate(activeYear.endDate.split('T')[0])
+    }
+    setShowForm(true)
+  }
+
+  const yearLabel = activeYear?.name || 'Academic Year'
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold text-[rgb(var(--text-primary))]">Sessions & Terms</h2>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+            Define semesters, trimesters, or quarters within <strong className="text-[#378ADD]">{yearLabel}</strong>
+          </p>
+        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+        >
+          <Plus className="w-3.5 h-3.5" /> Add Session
+        </button>
+      </div>
+
+      {/* Ed-Fi annotation */}
+      <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-[11px] text-[#378ADD] mb-3">
+        <span>ℹ️</span>
+        <span>Sessions define grading periods (e.g., "First Semester", "Q1"). Each session maps to Ed-Fi <strong>GradingPeriodDescriptor</strong>. Students receive report cards per session.</span>
+      </div>
+
+      {/* Sessions card */}
+      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+        <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-[13px]">📋</div>
+            <div>
+              <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{yearLabel} Sessions</h3>
+              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">{sessions.length} sessions configured</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Inline create form */}
+        {showForm && (
+          <div className="mx-4 my-3 bg-[rgba(55,138,221,0.03)] border border-[rgba(55,138,221,0.1)] rounded-lg p-3.5">
+            <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Session</h4>
+            <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Session Name <span className="text-red-500">*</span></label>
+                <input className={inputClass} value={sessionName} onChange={e => setSessionName(e.target.value)} placeholder="e.g., First Semester" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Term Descriptor <span className="text-red-500">*</span></label>
+                <select className={inputClass} value={termType} onChange={e => setTermType(e.target.value)}>
+                  <option value="">Select term descriptor...</option>
+                  <option value="fall_semester">Fall Semester</option>
+                  <option value="spring_semester">Spring Semester</option>
+                  <option value="year_round">Year Round</option>
+                  <option value="summer">Summer</option>
+                  <option value="first_quarter">First Quarter</option>
+                  <option value="second_quarter">Second Quarter</option>
+                  <option value="third_quarter">Third Quarter</option>
+                  <option value="fourth_quarter">Fourth Quarter</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Begin Date <span className="text-red-500">*</span></label>
+                <input className={inputClass} type="date" value={beginDate} onChange={e => { setBeginDate(e.target.value); setFormError(null) }} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">End Date <span className="text-red-500">*</span></label>
+                <input className={inputClass} type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setFormError(null) }} />
+              </div>
+            </div>
+            {formError && (
+              <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-1">
+                {formError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <button onClick={() => { setShowForm(false); setFormError(null) }} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
+              <button onClick={handleCreate} disabled={createSession.isPending} className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50">{createSession.isPending ? 'Creating...' : 'Create Session'}</button>
+            </div>
+          </div>
+        )}
+
+        {/* Session list or empty state */}
+        {sessions.length > 0 ? (
+          <div className="px-4 py-3 space-y-2">
+            {sessions.map((session: any) => (
+              <div key={session.id} className="flex items-center justify-between px-3 py-2.5 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#378ADD]" />
+                  <span className="text-xs font-medium text-[rgb(var(--text-primary))]">{session.sessionName || session.name}</span>
+                  <span className="text-[10px] text-[rgb(var(--text-tertiary))]">
+                    {session.beginDate && session.endDate ? `${new Date(session.beginDate).toLocaleDateString()} – ${new Date(session.endDate).toLocaleDateString()}` : ''}
+                  </span>
+                </div>
+                <span className="text-[10px] px-1.5 py-px rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.04)] text-[rgb(var(--text-tertiary))]">
+                  {session.termDescriptor || session.termType || 'Session'}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-6 text-center">
+            <div className="text-2xl opacity-40 mb-2">📋</div>
+            <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1">No sessions yet</h3>
+            <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
+              Create your first session above — e.g., "First Semester" covering April through September. Sessions define when report cards are generated.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Nepal suggestions panel */}
+      {isNepal && sessions.length === 0 && (
+        <div className="mt-2 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-lg p-3">
+          <p className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] mb-2">Suggested for Nepal schools (Semester system):</p>
+          <div className="space-y-1.5">
+            {[
+              { label: 'First Semester', detail: 'Baishakh – Ashwin  (Apr – Oct)', type: 'first' as const },
+              { label: 'Second Semester', detail: 'Kartik – Chaitra  (Oct – Mar)', type: 'second' as const },
+            ].map(s => (
+              <div key={s.type} className="flex items-center justify-between px-3 py-2 bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.1)] rounded-lg">
+                <div>
+                  <span className="text-xs font-medium text-[rgb(var(--text-primary))]">{s.label}</span>
+                  <span className="text-[10px] text-[rgb(var(--text-tertiary))] ml-2">{s.detail}</span>
+                </div>
+                <button onClick={() => prefillNepalSemester(s.type)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+                  + Use
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// CALENDAR MONTH GRID (lightweight inline view)
+// ============================================================================
+
+const EVENT_TYPE_COLORS: Record<string, { bg: string; dot: string; label: string }> = {
+  instructional_day: { bg: 'rgba(29,158,117,0.12)', dot: '#1D9E75', label: 'Instructional' },
+  holiday: { bg: 'rgba(226,75,74,0.12)', dot: '#E24B4A', label: 'Holiday' },
+  teacher_only: { bg: 'rgba(239,159,39,0.12)', dot: '#EF9F27', label: 'Teacher Only' },
+  student_holiday: { bg: 'rgba(239,159,39,0.08)', dot: '#EF9F27', label: 'Student Holiday' },
+  break: { bg: 'rgba(127,119,221,0.1)', dot: '#7F77DD', label: 'Break' },
+  non_instructional_day: { bg: 'rgba(255,255,255,0.04)', dot: 'rgb(var(--text-tertiary))', label: 'Non-Instructional' },
+  early_release: { bg: 'rgba(55,138,221,0.1)', dot: '#378ADD', label: 'Early Release' },
+  late_start: { bg: 'rgba(55,138,221,0.08)', dot: '#378ADD', label: 'Late Start' },
+  testing_day: { bg: 'rgba(127,119,221,0.08)', dot: '#7F77DD', label: 'Testing' },
+  in_service: { bg: 'rgba(239,159,39,0.08)', dot: '#EF9F27', label: 'In-Service' },
+  weather_day: { bg: 'rgba(255,255,255,0.06)', dot: 'rgb(var(--text-tertiary))', label: 'Weather Day' },
+  make_up_day: { bg: 'rgba(29,158,117,0.08)', dot: '#1D9E75', label: 'Make-up Day' },
+  conference_day: { bg: 'rgba(127,119,221,0.08)', dot: '#7F77DD', label: 'Conference' },
+  graduation: { bg: 'rgba(239,159,39,0.1)', dot: '#EF9F27', label: 'Graduation' },
+  other: { bg: 'rgba(255,255,255,0.04)', dot: 'rgb(var(--text-tertiary))', label: 'Other' },
+}
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate, onSelectDate, startDate, endDate }: {
+  currentMonth: Date
+  onMonthChange: (d: Date) => void
+  dateMap: Map<string, any>
+  selectedDate: string | null
+  onSelectDate: (d: string | null) => void
+  startDate?: string
+  endDate?: string
+}) {
+  const year = currentMonth.getFullYear()
+  const month = currentMonth.getMonth()
+
+  // Build grid cells for the month
+  const firstDay = new Date(year, month, 1).getDay() // 0=Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  const prevMonth = () => onMonthChange(new Date(year, month - 1, 1))
+  const nextMonth = () => onMonthChange(new Date(year, month + 1, 1))
+
+  // Determine if month is within academic year range
+  const yearStart = startDate ? new Date(startDate) : null
+  const yearEnd = endDate ? new Date(endDate) : null
+
+  const cells: { day: number; dateStr: string; entry: any; inRange: boolean }[] = []
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(year, month, d)
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    const entry = dateMap.get(dateStr) || null
+    const inRange = (!yearStart || dt >= yearStart) && (!yearEnd || dt <= yearEnd)
+    cells.push({ day: d, dateStr, entry, inRange })
+  }
+
+  return (
+    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
+      {/* Month navigation */}
+      <div className="px-4 py-2.5 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
+        <button onClick={prevMonth} className="px-2 py-1 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+          ← Prev
+        </button>
+        <h3 className="text-xs font-bold text-[rgb(var(--text-primary))]">
+          {MONTH_NAMES[month]} {year}
+        </h3>
+        <button onClick={nextMonth} className="px-2 py-1 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+          Next →
+        </button>
+      </div>
+
+      {/* Day of week headers */}
+      <div className="grid grid-cols-7 px-3 pt-2 pb-1">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+          <div key={d} className="text-[9px] font-bold uppercase text-center text-[rgb(var(--text-tertiary))] py-1">
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 px-3 pb-3 gap-px">
+        {/* Empty cells for days before month start */}
+        {Array.from({ length: firstDay }, (_, i) => (
+          <div key={`empty-${i}`} className="h-8" />
+        ))}
+
+        {/* Day cells */}
+        {cells.map(({ day, dateStr, entry, inRange }) => {
+          const eventType = entry?.calendarEvents?.[0]?.eventType || (entry?.isWeekend ? 'weekend' : null)
+          const isWeekend = entry?.isWeekend
+          const isSelected = selectedDate === dateStr
+          const colorCfg = eventType ? EVENT_TYPE_COLORS[eventType] : null
+
+          return (
+            <button
+              key={dateStr}
+              onClick={() => inRange && entry ? onSelectDate(isSelected ? null : dateStr) : undefined}
+              disabled={!inRange || !entry}
+              className={`h-8 rounded-md text-[11px] font-medium relative flex items-center justify-center transition-all ${
+                !inRange ? 'opacity-20 cursor-default'
+                  : isSelected ? 'ring-1 ring-[#378ADD] bg-[rgba(55,138,221,0.15)] text-[#378ADD]'
+                  : isWeekend ? 'text-[rgb(var(--text-tertiary))] opacity-50'
+                  : entry ? 'hover:bg-[rgba(255,255,255,0.06)] cursor-pointer text-[rgb(var(--text-secondary))]'
+                  : 'text-[rgb(var(--text-tertiary))] opacity-30 cursor-default'
+              }`}
+              style={colorCfg && !isSelected ? { background: colorCfg.bg } : undefined}
+            >
+              {day}
+              {colorCfg && (
+                <span
+                  className="absolute bottom-0.5 w-1 h-1 rounded-full"
+                  style={{ background: colorCfg.dot }}
+                />
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Quick stats for this month */}
+      <div className="px-4 py-2 border-t border-[rgba(255,255,255,0.04)] flex gap-3 text-[10px] text-[rgb(var(--text-tertiary))]">
+        <span>{cells.filter(c => c.entry?.isInstructionalDay).length} instructional</span>
+        <span>{cells.filter(c => c.entry?.isHoliday).length} holidays</span>
+        <span>{cells.filter(c => c.entry?.isWeekend).length} weekends</span>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// DATE EDIT PANEL (inline, below calendar grid)
+// ============================================================================
+
+const CALENDAR_EVENT_TYPES = [
+  'instructional_day', 'non_instructional_day', 'holiday', 'teacher_only',
+  'student_holiday', 'weather_day', 'testing_day', 'early_release',
+  'late_start', 'conference_day', 'graduation', 'break', 'in_service',
+  'make_up_day', 'other',
+] as const
+
+function DateEditPanel({ dateEntry, onClose, onSave, isSaving }: {
+  dateEntry: any
+  onClose: () => void
+  onSave: (eventType: string, isInstructional: boolean) => void
+  isSaving: boolean
+}) {
+  const currentEventType = dateEntry?.calendarEvents?.[0]?.eventType || 'instructional_day'
+  const [eventType, setEventType] = useState(currentEventType)
+  const [isInstructional, setIsInstructional] = useState(dateEntry?.isInstructionalDay ?? true)
+
+  // Reset when dateEntry changes
+  useEffect(() => {
+    setEventType(dateEntry?.calendarEvents?.[0]?.eventType || 'instructional_day')
+    setIsInstructional(dateEntry?.isInstructionalDay ?? true)
+  }, [dateEntry?.date])
+
+  const dateLabel = dateEntry?.date
+    ? new Date(dateEntry.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+    : ''
+
+  const colorCfg = EVENT_TYPE_COLORS[eventType] || EVENT_TYPE_COLORS.other
+
+  return (
+    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl mb-3 p-3.5">
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: colorCfg.dot }} />
+          <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{dateLabel}</h4>
+          <span className="text-[9px] font-medium px-1.5 py-0.5 rounded" style={{ background: colorCfg.bg, color: colorCfg.dot }}>
+            {colorCfg.label}
+          </span>
+        </div>
+        <button onClick={onClose} className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] text-sm">✕</button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Event Type</label>
+          <select
+            className={inputClass}
+            value={eventType}
+            onChange={e => {
+              setEventType(e.target.value)
+              // Auto-set instructional based on event type
+              const instructionalTypes = ['instructional_day', 'testing_day', 'make_up_day']
+              setIsInstructional(instructionalTypes.includes(e.target.value))
+            }}
+          >
+            {CALENDAR_EVENT_TYPES.map(t => (
+              <option key={t} value={t}>{EVENT_TYPE_COLORS[t]?.label || t}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Instructional Day</label>
+          <label className="flex items-center gap-2 py-1.5">
+            <input
+              type="checkbox"
+              checked={isInstructional}
+              onChange={e => setIsInstructional(e.target.checked)}
+              className="w-3.5 h-3.5 rounded"
+            />
+            <span className="text-[11px] text-[rgb(var(--text-secondary))]">
+              {isInstructional ? 'Yes — counts toward instruction hours' : 'No — non-instructional'}
+            </span>
+          </label>
+        </div>
+      </div>
+
+      {dateEntry?.dayOfWeek && (
+        <p className="text-[10px] text-[rgb(var(--text-tertiary))] mb-2">
+          {dateEntry.dayOfWeek.charAt(0).toUpperCase() + dateEntry.dayOfWeek.slice(1)}
+          {dateEntry.isWeekend ? ' (Weekend)' : ''}
+          {dateEntry.gradingPeriodName ? ` · ${dateEntry.gradingPeriodName}` : ''}
+        </p>
+      )}
+
+      <div className="flex justify-end gap-2">
+        <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+          Cancel
+        </button>
+        <button
+          onClick={() => onSave(eventType, isInstructional)}
+          disabled={isSaving || (eventType === currentEventType && isInstructional === dateEntry?.isInstructionalDay)}
+          className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+        >
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// STEP 3: CALENDAR
+// ============================================================================
+
+function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
+  schoolId: string
+  activeYear: any
+  calendarStats: any
+  localeDefaults: ReturnType<typeof useLocaleDefaults>
+}) {
+  const [weekendOption, setWeekendOption] = useState(
+    localeDefaults.weekendDays.length === 1 ? 'sat' : 'sat-sun'
+  )
+  const [calSchoolDays, setCalSchoolDays] = useState<number[]>(localeDefaults.schoolDayIndices)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    if (activeYear?.startDate) return new Date(activeYear.startDate)
+    return new Date()
+  })
+  const generateCalendar = useGenerateCalendar(schoolId)
+
+  const yearLabel = activeYear?.name || 'Academic Year'
+  const totalDays = (calendarStats as any)?.totalDays || 0
+  const instructionalDays = (calendarStats as any)?.instructionalDays || 0
+  const holidays = (calendarStats as any)?.holidays || 0
+
+  const yearId = activeYear?.yearId || activeYear?.id
+  const startDate = activeYear?.startDate?.split('T')[0]
+  const endDate = activeYear?.endDate?.split('T')[0]
+
+  // Fetch calendar dates when calendar has been generated
+  const { data: calendarDatesData } = useCalendarDates(schoolId, {
+    academicYearId: yearId || '',
+    limit: 400,
+  }, totalDays > 0 && !!yearId)
+
+  const calendarDates = useMemo(() => {
+    if (!calendarDatesData) return []
+    const items = (calendarDatesData as any)?.items || (calendarDatesData as any)?.data || []
+    return Array.isArray(items) ? items : Array.isArray(calendarDatesData) ? calendarDatesData : []
+  }, [calendarDatesData])
+
+  // Build lookup map: date string -> calendar date entry
+  const dateMap = useMemo(() => {
+    const map = new Map<string, any>()
+    calendarDates.forEach((d: any) => {
+      const key = d.date?.split('T')[0]
+      if (key) map.set(key, d)
+    })
+    return map
+  }, [calendarDates])
+
+  const updateCalendarDate = useUpdateCalendarDate(schoolId)
+
+  const handleGenerate = () => {
+    if (!yearId || !startDate || !endDate) return
+    const schoolDays = calSchoolDays.map(i => {
+      const days: DayOfWeek[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+      return days[i]
+    })
+    generateCalendar.mutate(
+      {
+        yearId,
+        data: {
+          academicYearId: yearId,
+          startDate,
+          endDate,
+          includeWeekends: false,
+          schoolDays,
+        },
+      },
+      {
+        onSuccess: () => setShowConfirm(false),
+      }
+    )
+  }
+
+  const toggleCalDay = (idx: number) => {
+    setCalSchoolDays(prev =>
+      prev.includes(idx) ? prev.filter(d => d !== idx) : [...prev, idx].sort()
+    )
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold text-[rgb(var(--text-primary))]">School Calendar</h2>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{yearLabel} Calendar Management</p>
+        </div>
+        <div className="flex gap-2">
+          <button className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
+            📋 Sessions
+          </button>
+          <button
+            onClick={() => setShowConfirm(true)}
+            disabled={!yearId || generateCalendar.isPending}
+            className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
+          >
+            ✨ Generate Calendar
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Stats */}
+      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3">
+        <div className="grid grid-cols-3 gap-2 p-3.5">
+          <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Academic Year</p>
+            <p className="text-[13px] font-semibold text-[rgb(var(--text-primary))]">{yearLabel}</p>
+            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">0 of {totalDays} days elapsed</p>
+          </div>
+          <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Instructional Days</p>
+            <p className="text-xl font-semibold text-[#378ADD]">{instructionalDays}</p>
+            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">0 completed · {instructionalDays} remaining</p>
+          </div>
+          <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Holidays</p>
+            <p className="text-xl font-semibold text-[#EF9F27]">{holidays}</p>
+            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">{holidays === 0 ? 'No holidays scheduled' : `${holidays} scheduled`}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Calendar Month Grid — visible when calendar has been generated */}
+      {totalDays > 0 && calendarDates.length > 0 && (
+        <CalendarMonthGrid
+          currentMonth={currentMonth}
+          onMonthChange={setCurrentMonth}
+          dateMap={dateMap}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      )}
+
+      {/* Inline Date Edit Panel */}
+      {selectedDate && dateMap.has(selectedDate) && (
+        <DateEditPanel
+          dateEntry={dateMap.get(selectedDate)}
+          onClose={() => setSelectedDate(null)}
+          onSave={(eventType, isInstructional) => {
+            updateCalendarDate.mutate(
+              {
+                date: selectedDate,
+                data: {
+                  calendarEvents: [{ eventType: eventType as any, isAllDay: true }],
+                  isInstructionalDay: isInstructional,
+                },
+              },
+              { onSuccess: () => setSelectedDate(null) }
+            )
+          }}
+          isSaving={updateCalendarDate.isPending}
+        />
+      )}
+
+      {/* Generate Calendar Panel */}
+      <div className="bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.12)] rounded-xl p-3.5 mb-3">
+        <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-1">✨ Generate Calendar</h3>
+        <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
+          Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.
+        </p>
+
+        {/* Locale chip */}
+        <div className="inline-flex items-center gap-1.5 text-[10px] text-[#378ADD] bg-[rgba(55,138,221,0.08)] border border-[rgba(55,138,221,0.15)] rounded-md px-2 py-1 mb-3">
+          {localeDefaults.isNepal ? '🌏' : '🌐'} Detected locale: {localeDefaults.isNepal ? 'Nepal (NP) · Bikram Sambat calendar' : 'International · Gregorian calendar'}
+        </div>
+
+        {/* Locale row */}
+        <div className="grid grid-cols-2 gap-2.5 mb-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Country / Locale</label>
+            <select className={inputClass} defaultValue={localeDefaults.isNepal ? 'NP' : 'US'}>
+              <option value="NP">Nepal (NP)</option>
+              <option value="US">United States (US)</option>
+              <option value="IN">India (IN)</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Weekends</label>
+            <select
+              className={inputClass}
+              value={weekendOption}
+              onChange={e => {
+                setWeekendOption(e.target.value)
+                const weekendMap: Record<string, number[]> = {
+                  'sat': [6],
+                  'sat-sun': [0, 6],
+                  'fri-sat': [5, 6],
+                  'sun': [0],
+                }
+                const weekends = weekendMap[e.target.value] || [0, 6]
+                setCalSchoolDays([0,1,2,3,4,5,6].filter(d => !weekends.includes(d)))
+              }}
+            >
+              <option value="sat">Saturday only (Nepal default)</option>
+              <option value="sat-sun">Saturday & Sunday</option>
+              <option value="fri-sat">Friday & Saturday</option>
+              <option value="sun">Sunday only</option>
+            </select>
+          </div>
+        </div>
+
+        {/* School days picker */}
+        <div className="mb-3">
+          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1.5 block">School Days</label>
+          <div className="flex gap-1.5">
+            {DAY_LABELS.map((day, i) => {
+              const dayIndex = dayToIndex(day.key)
+              const isActive = calSchoolDays.includes(dayIndex)
+              return (
+                <button
+                  key={`cal-${day.key}-${i}`}
+                  onClick={() => toggleCalDay(dayIndex)}
+                  className={`w-8 h-8 rounded-lg border text-[11px] font-semibold flex items-center justify-center transition-all ${
+                    isActive
+                      ? 'bg-[rgba(55,138,221,0.15)] border-[rgba(55,138,221,0.3)] text-[#378ADD]'
+                      : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]'
+                  }`}
+                >
+                  {day.short}
+                </button>
+              )
+            })}
+          </div>
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1.5">{localeDefaults.weekendHint}</p>
+        </div>
+
+        {/* Preview */}
+        {activeYear && (
+          <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)] rounded-lg p-3 mb-3 text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+            <strong className="text-[rgb(var(--text-primary))]">Preview:</strong>{' '}
+            Will generate dates from{' '}
+            <strong className="text-[#378ADD]">{activeYear.startDate ? new Date(activeYear.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>{' '}
+            to{' '}
+            <strong className="text-[#378ADD]">{activeYear.endDate ? new Date(activeYear.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>
+            <br />
+            ✔ Active days → Instructional days<br />
+            ✔ Weekend days → Non-instructional (weekend)<br />
+            ✔ National holidays from locale public holiday calendar will be imported<br />
+            ⚠ Existing dates for this year will be replaced
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2">
+          <button className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
+          <button
+            onClick={() => setShowConfirm(true)}
+            disabled={!yearId || generateCalendar.isPending}
+            className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+          >
+            ✨ Generate Calendar
+          </button>
+        </div>
+      </div>
+
+      {/* Confirmation dialog */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
+          <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+            <h3 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">Generate Calendar</h3>
+            <p className="text-xs text-[rgb(var(--text-secondary))] mb-3 leading-relaxed">
+              This will generate calendar dates for <strong>{yearLabel}</strong> from{' '}
+              <strong className="text-[#378ADD]">
+                {startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
+              </strong>{' '}to{' '}
+              <strong className="text-[#378ADD]">
+                {endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
+              </strong>.
+            </p>
+            <div className="space-y-1.5 text-[11px] text-[rgb(var(--text-tertiary))] mb-4">
+              <p>✔ Active days will be marked as instructional</p>
+              <p>✔ Weekend days will be marked as non-instructional</p>
+              <p className="text-amber-400">⚠ Existing calendar dates for this year will be replaced</p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleGenerate}
+                disabled={generateCalendar.isPending}
+                className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {generateCalendar.isPending ? 'Generating...' : 'Confirm & Generate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Day type legend */}
+      <div className="flex flex-wrap gap-1.5 items-center">
+        <span className="text-[10px] text-[rgb(var(--text-tertiary))] mr-1">Day types:</span>
+        {[
+          { label: 'Instructional', color: 'rgba(29,158,117,0.08)', text: '#1D9E75', border: 'rgba(29,158,117,0.2)' },
+          { label: 'Holiday', color: 'rgba(226,75,74,0.08)', text: '#E24B4A', border: 'rgba(226,75,74,0.2)' },
+          { label: 'Teacher Only', color: 'rgba(239,159,39,0.08)', text: '#EF9F27', border: 'rgba(239,159,39,0.2)' },
+          { label: 'Break', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
+          { label: 'Non-Instructional', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
+          { label: 'Early Release', color: 'rgba(55,138,221,0.08)', text: '#378ADD', border: 'rgba(55,138,221,0.2)' },
+          { label: 'In-Service', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
+        ].map(dt => (
+          <span
+            key={dt.label}
+            className="text-[9px] font-medium px-1.5 py-0.5 rounded"
+            style={{ background: dt.color, color: dt.text, border: `1px solid ${dt.border}` }}
+          >
+            ● {dt.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// STEP 4: BELL SCHEDULE
+// ============================================================================
+
+function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
+  schoolId: string
+  bellSchedules: any[]
+  isNepal: boolean
+  activeYear: any
+}) {
+  const [showHowItWorks, setShowHowItWorks] = useState(bellSchedules.length === 0)
+  const [showTemplates, setShowTemplates] = useState(true)
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [newName, setNewName] = useState('')
+  const createBellSchedule = useCreateBellSchedule(schoolId)
+
+  const applyTemplate = (name: string, preset: readonly any[]) => {
+    createBellSchedule.mutate({
+      bellScheduleName: name,
+      dayType: 'regular',
+      effectiveDate: new Date().toISOString().split('T')[0],
+      isDefault: bellSchedules.length === 0,
+      isActive: true,
+      classPeriods: preset.map((p, i) => {
+        const [sh, sm] = p.startTime.split(':').map(Number)
+        const [eh, em] = p.endTime.split(':').map(Number)
+        return {
+          classPeriodName: p.name,
+          periodNumber: i,
+          periodType: p.periodType,
+          startTime: p.startTime,
+          endTime: p.endTime,
+          durationMinutes: (eh * 60 + em) - (sh * 60 + sm),
+          isAcademic: p.isAcademic,
+        }
+      }),
+    })
+  }
+
+  // Order templates: Nepal first if isNepal
+  const templates = [
+    ...(isNepal ? [{
+      key: 'nepal',
+      name: 'Nepal Standard (Sun–Fri)',
+      desc: '7 periods · 10:00 AM – 4:00 PM · Includes assembly, lunch, recess',
+      preset: NEPAL_PRESET,
+      primary: true,
+    }] : []),
+    {
+      key: 'elementary',
+      name: 'Elementary Schedule (US)',
+      desc: '9 periods · 8:00 AM – 2:00 PM · Includes homeroom, recess, lunch',
+      preset: ELEMENTARY_PRESET,
+      primary: false,
+    },
+    {
+      key: 'highschool',
+      name: 'High School Schedule (US)',
+      desc: '9 periods · 7:30 AM – 3:05 PM · Includes advisory and lunch',
+      preset: HIGH_SCHOOL_PRESET,
+      primary: false,
+    },
+    ...(!isNepal ? [{
+      key: 'nepal',
+      name: 'Nepal Standard (Sun–Fri)',
+      desc: '7 periods · 10:00 AM – 4:00 PM · Includes assembly, lunch, recess',
+      preset: NEPAL_PRESET,
+      primary: false,
+    }] : []),
+  ]
+
+  const periodTypeColors: Record<string, { bg: string; text: string }> = {
+    instructional: { bg: 'rgba(55,138,221,0.1)', text: '#378ADD' },
+    homeroom: { bg: 'rgba(127,119,221,0.1)', text: '#7F77DD' },
+    assembly: { bg: 'rgba(239,159,39,0.08)', text: '#EF9F27' },
+    lunch: { bg: 'rgba(29,158,117,0.08)', text: '#1D9E75' },
+    recess: { bg: 'rgba(239,159,39,0.08)', text: '#EF9F27' },
+    break: { bg: 'rgba(239,159,39,0.08)', text: '#EF9F27' },
+    advisory: { bg: 'rgba(127,119,221,0.1)', text: '#7F77DD' },
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold text-[rgb(var(--text-primary))]">Bell Schedule</h2>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">Define class periods and time slots for each type of school day.</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => setShowTemplates(v => !v)} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
+            Use Template
+          </button>
+          <button onClick={() => setShowCreateForm(true)} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+            <Plus className="w-3.5 h-3.5" /> New Schedule
+          </button>
+        </div>
+      </div>
+
+      {/* How it works — collapsible */}
+      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
+        <div className="px-4 py-3 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-[13px]">💡</div>
+            <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">How bell schedules work</h3>
+          </div>
+          <button onClick={() => setShowHowItWorks(!showHowItWorks)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]">
+            {showHowItWorks ? '▲ Collapse' : '▼ Expand'}
+          </button>
+        </div>
+        {showHowItWorks && (
+          <div className="p-4 grid grid-cols-3 gap-2.5">
+            {[
+              { step: '1️⃣', title: 'Create a schedule', desc: '"Regular Day", "Early Release"' },
+              { step: '2️⃣', title: 'Add periods to it', desc: 'Class times, lunch, homeroom' },
+              { step: '3️⃣', title: 'Assign to calendar', desc: 'Which days use which schedule' },
+            ].map(s => (
+              <div key={s.step} className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-lg p-3 text-center">
+                <div className="text-lg mb-1.5">{s.step}</div>
+                <div className="text-[11px] font-semibold text-[rgb(var(--text-primary))] mb-0.5">{s.title}</div>
+                <div className="text-[10px] text-[rgb(var(--text-tertiary))]">{s.desc}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Inline Create Form */}
+      {showCreateForm && (
+        <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 p-4">
+          <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Bell Schedule</h4>
+          <div className="flex flex-col gap-1 mb-2.5">
+            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Schedule Name <span className="text-red-500">*</span></label>
+            <input className={inputClass} value={newName} onChange={e => setNewName(e.target.value)} placeholder='e.g., "Regular Day", "Early Release"' />
+          </div>
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mb-2.5">
+            Create an empty schedule, then add periods to it. Or use a template above to start with pre-built periods.
+          </p>
+          <div className="flex justify-end gap-2">
+            <button onClick={() => { setShowCreateForm(false); setNewName('') }} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
+            <button
+              onClick={() => {
+                if (!newName.trim()) return
+                createBellSchedule.mutate({
+                  bellScheduleName: newName.trim(),
+                  dayType: 'regular',
+                  effectiveDate: activeYear?.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+                  isDefault: bellSchedules.length === 0,
+                  isActive: true,
+                  classPeriods: [{
+                    classPeriodName: 'Period 1',
+                    periodNumber: 0,
+                    periodType: 'instructional',
+                    startTime: '08:00',
+                    endTime: '08:45',
+                    durationMinutes: 45,
+                    isAcademic: true,
+                  }],
+                }, {
+                  onSuccess: () => { setShowCreateForm(false); setNewName('') },
+                })
+              }}
+              disabled={!newName.trim() || createBellSchedule.isPending}
+              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {createBellSchedule.isPending ? 'Creating...' : 'Create Schedule'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Template Picker */}
+      {showTemplates && (
+      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
+        <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-[13px]">📄</div>
+            <div>
+              <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">Start from Template</h3>
+              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">Pre-built schedules — edit after applying</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 space-y-2">
+          {templates.map(t => (
+            <div key={t.key} className={`flex items-center justify-between px-3 py-2.5 rounded-lg border ${
+              t.primary
+                ? 'bg-[rgba(55,138,221,0.04)] border-[rgba(55,138,221,0.1)]'
+                : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.06)]'
+            }`}>
+              <div>
+                <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{t.name}</div>
+                <div className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">{t.desc}</div>
+              </div>
+              <button
+                onClick={() => applyTemplate(t.name, t.preset)}
+                disabled={createBellSchedule.isPending}
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg transition-all ${
+                  t.primary
+                    ? 'bg-[#1D9E75] text-white hover:opacity-90'
+                    : 'border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]'
+                } disabled:opacity-50`}
+              >
+                Apply
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      )}
+
+      {/* Bell Schedule list or empty state */}
+      {bellSchedules.length > 0 ? (
+        <div className="space-y-2">
+          {bellSchedules.map((sched: any) => (
+            <div key={sched.bellScheduleId || sched.id} className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg overflow-hidden">
+              <div className="px-3 py-2.5 flex items-center justify-between border-b border-[rgba(255,255,255,0.04)]">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">{sched.bellScheduleName || sched.name}</span>
+                  {sched.isDefault && (
+                    <span className="text-[9px] font-medium px-1.5 py-px rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.2)]">Default</span>
+                  )}
+                </div>
+                <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
+              </div>
+              {(sched.classPeriods || sched.periods)?.length > 0 && (
+                <div className="py-1.5">
+                  {(sched.classPeriods || sched.periods).map((period: any, idx: number) => {
+                    const colors = periodTypeColors[period.periodType] || periodTypeColors.instructional
+                    return (
+                      <div key={idx} className="flex items-center gap-2.5 px-3 py-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: colors.text }} />
+                        <span className="text-[11px] text-[rgb(var(--text-secondary))] min-w-[80px]">{period.classPeriodName || period.name}</span>
+                        <span className="text-[11px] text-[rgb(var(--text-tertiary))] tabular-nums">{period.startTime} – {period.endTime}</span>
+                        <span
+                          className="text-[9px] font-medium px-1.5 py-px rounded ml-auto"
+                          style={{ background: colors.bg, color: colors.text }}
+                        >
+                          {period.periodType}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
+          <div className="p-10 text-center">
+            <div className="text-3xl opacity-40 mb-3">🕐</div>
+            <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No bell schedules yet</h3>
+            <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
+              Apply a template above or create your first schedule to define how each type of school day is structured.
+            </p>
+            <button className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+              + Create First Schedule
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

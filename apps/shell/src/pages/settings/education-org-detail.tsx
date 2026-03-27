@@ -309,7 +309,7 @@ export default function EducationOrgDetailPage() {
 
   const handleChildNavigate = (node: HierarchyNode) => {
     if (node.type === 'school') {
-      navigate({ to: '/settings/organization/schools/$schoolId', params: { schoolId: node.id } })
+      navigate({ to: '/settings/organization/schools/$schoolId', params: { schoolId: node.id }, search: { tab: undefined } })
     } else {
       const childType = node.type === 'localEducationAgency' ? 'lea' : node.type === 'educationServiceCenter' ? 'esc' : 'sea'
       navigate({ to: `/settings/organization/${childType}/${node.id}` as string })

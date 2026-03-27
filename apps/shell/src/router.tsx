@@ -546,6 +546,9 @@ const settingsOrgSchoolDetailRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/organization/schools/$schoolId',
   component: SchoolDetailPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as string | undefined),
+  }),
 })
 
 // New: School creation under organization hierarchy

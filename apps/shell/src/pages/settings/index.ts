@@ -14,9 +14,10 @@ export { default as PreferencesPage } from './preferences'
 export { default as WorkspaceSettingsPage } from './workspace'
 export { default as SchoolDetailPage } from './school-detail'
 export { default as SchoolCreatePage } from './school-create'
-export { default as SchoolConfigurationPage } from './school-configuration'
-export { default as SchoolDepartmentsPage } from './school-departments'
-export { default as SchoolAcademicYearsPage } from './school-academic-years'
+// [V2-REPLACED] Tab components now live in ./tabs/ and are imported by school-detail.tsx directly
+// export { default as SchoolConfigurationPage } from './school-configuration'
+// export { default as SchoolDepartmentsPage } from './school-departments'
+// export { default as SchoolAcademicYearsPage } from './school-academic-years'
 export { default as RBACSecurityPage } from './rbac-security'
 
 // Organization
