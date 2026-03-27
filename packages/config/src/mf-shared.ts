@@ -58,5 +58,8 @@ export function getMFSharedConfig(_role: 'host' | 'remote'): MFSharedConfig {
     // Animation — aligned version across all apps
     'framer-motion': { singleton: true, requiredVersion: '^11.15.0', eager: true },
     '@react-spring/web': { singleton: true, requiredVersion: '^10.0.3', eager: true },
+
+    // Toast notifications — singleton so toasts from MFEs render in shell's <Toaster>
+    sonner: { singleton: true, eager: true },
   }
 }
