@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import {
   getLocations,
   getLocation,
@@ -69,7 +70,7 @@ export function useCreateLocation(schoolId: string) {
       toast.success('Location created')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create location')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -85,7 +86,7 @@ export function useUpdateLocation(schoolId: string) {
       toast.success('Location updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update location')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -100,7 +101,7 @@ export function useDeleteLocation(schoolId: string) {
       toast.success('Location deleted')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete location')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }

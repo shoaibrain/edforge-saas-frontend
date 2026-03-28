@@ -46,6 +46,21 @@ export interface ApiError {
   details?: Record<string, string[]>
 }
 
+/**
+ * Extract a human-readable error message from an Axios error response.
+ * Falls back to the generic Axios message if the response body has no message.
+ */
+export function extractApiErrorMessage(error: unknown): string {
+  const axiosErr = error as AxiosError<{ message?: string; errors?: Array<{ message?: string }> }>
+  const data = axiosErr?.response?.data
+  if (data?.message) return data.message
+  if (data?.errors?.length) {
+    return data.errors.map(e => e.message).filter(Boolean).join('; ')
+  }
+  if (axiosErr?.message) return axiosErr.message
+  return 'An unexpected error occurred'
+}
+
 /** Optional extra config forwarded to Axios (e.g. meta overrides). */
 export type ExtraConfig = AxiosRequestConfig & { meta?: ApiRequestMeta }
 

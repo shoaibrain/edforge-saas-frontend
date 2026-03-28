@@ -53,7 +53,6 @@ const NEPAL_PRESET = [
   { name: 'Period 4', startTime: '13:30', endTime: '14:15', periodType: 'instructional', sortOrder: 6, isAcademic: true },
   { name: 'Period 5', startTime: '14:15', endTime: '15:00', periodType: 'instructional', sortOrder: 7, isAcademic: true },
   { name: 'Period 6', startTime: '15:00', endTime: '15:45', periodType: 'instructional', sortOrder: 8, isAcademic: true },
-  { name: 'Period 7', startTime: '15:45', endTime: '16:00', periodType: 'instructional', sortOrder: 9, isAcademic: true },
 ] as const
 
 const ELEMENTARY_PRESET = [
@@ -1538,6 +1537,16 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
   const [newName, setNewName] = useState('')
   const createBellSchedule = useCreateBellSchedule(schoolId)
 
+  // Fetch school config for default period times
+  const { data: schoolConfig } = useQuery<any>({
+    queryKey: ['schoolConfiguration', schoolId],
+    queryFn: () => tenantService.getSchoolConfiguration(schoolId),
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
+  })
+  const defaultStartTime = schoolConfig?.startTime || '08:00'
+  const defaultPeriodDuration = schoolConfig?.periodDuration || 45
+
   const applyTemplate = (name: string, preset: readonly any[]) => {
     createBellSchedule.mutate({
       bellScheduleName: name,
@@ -1566,7 +1575,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
     ...(isNepal ? [{
       key: 'nepal',
       name: 'Nepal Standard (Sun–Fri)',
-      desc: '7 periods · 10:00 AM – 4:00 PM · Includes assembly, lunch, recess',
+      desc: '9 periods · 10:00 AM – 3:45 PM · Includes assembly, lunch, recess',
       preset: NEPAL_PRESET,
       primary: true,
     }] : []),
@@ -1587,7 +1596,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
     ...(!isNepal ? [{
       key: 'nepal',
       name: 'Nepal Standard (Sun–Fri)',
-      desc: '7 periods · 10:00 AM – 4:00 PM · Includes assembly, lunch, recess',
+      desc: '9 periods · 10:00 AM – 3:45 PM · Includes assembly, lunch, recess',
       preset: NEPAL_PRESET,
       primary: false,
     }] : []),
@@ -1674,9 +1683,13 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                     classPeriodName: 'Period 1',
                     periodNumber: 0,
                     periodType: 'instructional',
-                    startTime: '08:00',
-                    endTime: '08:45',
-                    durationMinutes: 45,
+                    startTime: defaultStartTime,
+                    endTime: (() => {
+                      const [h, m] = defaultStartTime.split(':').map(Number)
+                      const total = h * 60 + m + defaultPeriodDuration
+                      return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+                    })(),
+                    durationMinutes: defaultPeriodDuration,
                     isAcademic: true,
                   }],
                 }, {
@@ -1705,16 +1718,23 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
           </div>
         </div>
         <div className="p-4 space-y-2">
-          {templates.map(t => (
+          {templates.map(t => {
+            const alreadyApplied = bellSchedules.some((s: any) => s.bellScheduleName === t.name)
+            return (
             <div key={t.key} className={`flex items-center justify-between px-3 py-2.5 rounded-lg border ${
-              t.primary
-                ? 'bg-[rgba(55,138,221,0.04)] border-[rgba(55,138,221,0.1)]'
-                : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.06)]'
+              alreadyApplied
+                ? 'bg-[rgba(29,158,117,0.04)] border-[rgba(29,158,117,0.15)]'
+                : t.primary
+                  ? 'bg-[rgba(55,138,221,0.04)] border-[rgba(55,138,221,0.1)]'
+                  : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.06)]'
             }`}>
               <div>
                 <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{t.name}</div>
                 <div className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">{t.desc}</div>
               </div>
+              {alreadyApplied ? (
+                <span className="px-3 py-1.5 text-[11px] font-medium text-[#1D9E75]">✓ Applied</span>
+              ) : (
               <button
                 onClick={() => applyTemplate(t.name, t.preset)}
                 disabled={createBellSchedule.isPending}
@@ -1726,8 +1746,10 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
               >
                 Apply
               </button>
+              )}
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
       )}

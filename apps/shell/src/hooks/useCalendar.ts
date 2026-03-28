@@ -7,6 +7,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import type {
   CalendarResponseDto,
   CalendarListResponseDto,
@@ -153,7 +154,7 @@ export function useCreateCalendar(schoolId: string) {
       queryClient.invalidateQueries({ queryKey: calendarKeys.calendars(schoolId) })
       toast.success('Calendar created')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to create calendar') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -166,7 +167,7 @@ export function useUpdateCalendar(schoolId: string) {
       queryClient.setQueryData(calendarKeys.calendar(schoolId, variables.calendarId), result)
       toast.success('Calendar updated')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to update calendar') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -188,7 +189,7 @@ export function useGenerateCalendar(schoolId: string) {
       queryClient.invalidateQueries({ queryKey: calendarKeys.all })
       toast.success('Calendar generated successfully')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to generate calendar') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -205,7 +206,7 @@ export function useUpdateCalendarDate(schoolId: string) {
       queryClient.setQueryData(calendarKeys.date(schoolId, variables.date), result)
       queryClient.invalidateQueries({ queryKey: calendarKeys.all })
     },
-    onError: (error) => { toast.error(error.message || 'Failed to update calendar date') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -218,7 +219,7 @@ export function useBulkUpdateCalendarDates(schoolId: string) {
       queryClient.invalidateQueries({ queryKey: calendarKeys.all })
       toast.success('Dates updated')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to bulk update dates') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -234,7 +235,7 @@ export function useCreateAcademicSession(schoolId: string) {
       queryClient.invalidateQueries({ queryKey: calendarKeys.sessions(schoolId) })
       toast.success('Session created')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to create session') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -247,7 +248,7 @@ export function useUpdateAcademicSession(schoolId: string) {
       queryClient.setQueryData(calendarKeys.session(schoolId, variables.sessionId), result)
       toast.success('Session updated')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to update session') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }
 
@@ -260,6 +261,6 @@ export function useDeleteAcademicSession(schoolId: string) {
       queryClient.removeQueries({ queryKey: calendarKeys.session(schoolId, sessionId) })
       toast.success('Session deleted')
     },
-    onError: (error) => { toast.error(error.message || 'Failed to delete session') },
+    onError: (error) => { toast.error(extractApiErrorMessage(error)) },
   })
 }

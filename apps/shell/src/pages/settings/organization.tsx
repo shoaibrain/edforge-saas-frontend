@@ -21,6 +21,7 @@ import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import { apiPatch } from '@/lib/api'
 import {
   useOrganizationHierarchy,
@@ -339,7 +340,7 @@ export default function OrganizationSettingsPage() {
       toast.success('School unassigned from district')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to unassign school')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 

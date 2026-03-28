@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import {
   getBellSchedules,
   getBellSchedule,
@@ -70,7 +71,7 @@ export function useCreateBellSchedule(schoolId: string) {
       toast.success('Bell schedule created')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create bell schedule')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -86,7 +87,7 @@ export function useUpdateBellSchedule(schoolId: string) {
       toast.success('Bell schedule updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update bell schedule')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -101,7 +102,7 @@ export function useDeleteBellSchedule(schoolId: string) {
       toast.success('Bell schedule deleted')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete bell schedule')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -116,7 +117,7 @@ export function useSetDefaultBellSchedule(schoolId: string) {
       toast.success('Default bell schedule updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to set default bell schedule')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }

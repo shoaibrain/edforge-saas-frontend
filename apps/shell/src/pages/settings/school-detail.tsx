@@ -31,6 +31,7 @@ import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
 import { edOrgKeys } from '@/hooks/useEducationOrgs'
 import { useBellSchedules } from '@/hooks/useBellSchedules'
+import { useAcademicSessions, useCalendarStats } from '@/hooks/useCalendar'
 import type { School as SchoolType, SchoolStatus } from '@edforge/types'
 import { Button } from '@edforge/ui'
 
@@ -163,10 +164,22 @@ function useSetupTasks(school: SchoolType | undefined, schoolId: string) {
 
   const { data: bellSchedules } = useBellSchedules(schoolId)
 
+  // Derive active year ID for dependent queries
+  const years = useMemo(() => {
+    return Array.isArray(academicYears) ? academicYears : (academicYears as any)?.data ?? []
+  }, [academicYears])
+  const activeYearId = useMemo(() => {
+    const active = years.find((y: any) => y.isCurrent || y.isActive)
+    return active?.academicYearId || active?.id || (years.length > 0 ? (years[0] as any).academicYearId || (years[0] as any).id : '')
+  }, [years])
+
+  const { data: sessionsData } = useAcademicSessions(schoolId, activeYearId, !!activeYearId)
+  const { data: calendarStats } = useCalendarStats(schoolId, activeYearId, !!activeYearId)
+
   return useMemo(() => {
-    const years = Array.isArray(academicYears) ? academicYears : (academicYears as any)?.data ?? []
     const depts = Array.isArray(departments) ? departments : (departments as any)?.data ?? []
     const schedules = Array.isArray(bellSchedules) ? bellSchedules : (bellSchedules as any)?.data ?? []
+    const sessions = (sessionsData as any)?.items || (sessionsData as any)?.data || (Array.isArray(sessionsData) ? sessionsData : [])
 
     const tasks: SetupTask[] = [
       {
@@ -182,10 +195,16 @@ function useSetupTasks(school: SchoolType | undefined, schoolId: string) {
         completed: years.length > 0,
       },
       {
+        id: 'sessions',
+        label: 'Sessions & Terms',
+        tab: 'academic-setup',
+        completed: sessions.length > 0,
+      },
+      {
         id: 'calendar',
         label: 'Calendar',
         tab: 'academic-setup',
-        completed: false, // Will be refined when calendar data is available
+        completed: (calendarStats as any)?.totalDays > 0,
       },
       {
         id: 'bell-schedule',
@@ -203,7 +222,7 @@ function useSetupTasks(school: SchoolType | undefined, schoolId: string) {
 
     const completedCount = tasks.filter(t => t.completed).length
     return { tasks, completedCount, totalCount: tasks.length }
-  }, [school, academicYears, departments, bellSchedules])
+  }, [school, years, departments, bellSchedules, sessionsData, calendarStats])
 }
 
 // ============================================================================
