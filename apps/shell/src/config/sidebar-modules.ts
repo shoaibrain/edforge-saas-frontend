@@ -394,7 +394,7 @@ const settingsModule: ModuleConfig = {
         },
         {
           id: 'preferences',
-          label: 'Preferences & Notifications',
+          label: 'Preferences',
           icon: Layers,
           href: '/settings/preferences',
           permission: { action: 'view', resource: 'settings' },

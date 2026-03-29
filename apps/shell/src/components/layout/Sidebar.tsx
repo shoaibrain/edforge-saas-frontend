@@ -90,7 +90,7 @@ function AnimatedNavIcon({
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className={cn(
         'relative flex items-center justify-center flex-shrink-0 transition-colors duration-150',
-        collapsed ? 'w-10 h-10 rounded-xl' : 'w-9 h-9 rounded-[10px]',
+        collapsed ? 'w-[46px] h-[46px] rounded-xl' : 'w-9 h-9 rounded-[10px]',
       )}
       style={{ background: containerBg }}
     >
@@ -101,7 +101,7 @@ function AnimatedNavIcon({
           isActive && isDanger && 'text-rust-500',
         )}
         style={iconColor ? { color: iconColor } : undefined}
-        strokeWidth={collapsed ? 2 : 1.8}
+        strokeWidth={1.75}
       />
     </motion.div>
   )
@@ -143,7 +143,7 @@ function NavItemLink({
         className={cn(
           'relative flex items-center rounded-3xl',
           'mx-2 my-[1px]',
-          collapsed ? 'justify-center h-11' : 'gap-2.5 h-11 pl-1.5 pr-3.5',
+          collapsed ? 'justify-center h-[52px]' : 'gap-3 h-11 pl-[7px] pr-[14px]',
         )}
       >
         {/* Sliding pill — EXPANDED ONLY (collapsed active handled by icon container) */}
@@ -183,7 +183,7 @@ function NavItemLink({
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
               className={cn(
-                'text-[13.5px] whitespace-nowrap overflow-hidden relative z-10',
+                'text-[15px] whitespace-nowrap overflow-hidden relative z-10',
                 isActive && isDanger && 'text-rust-600 dark:text-rust-400 font-semibold',
                 !isActive && !isDanger && 'font-normal',
                 !isActive && isDanger && 'text-rust-500/80 font-normal',
@@ -343,7 +343,7 @@ function HomeNavButton({
         className={cn(
           'relative flex items-center rounded-3xl',
           'mx-2 my-[1px]',
-          collapsed ? 'justify-center h-11' : 'gap-2.5 h-11 pl-1.5 pr-3.5',
+          collapsed ? 'justify-center h-[52px]' : 'gap-3 h-11 pl-[7px] pr-[14px]',
         )}
       >
         {/* Sliding pill — EXPANDED ONLY (collapsed active handled by icon container) */}
@@ -377,7 +377,7 @@ function HomeNavButton({
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
-              className="text-[13.5px] whitespace-nowrap overflow-hidden relative z-10"
+              className="text-[15px] whitespace-nowrap overflow-hidden relative z-10"
               style={{
                 color: isActive
                   ? pillTextVar
