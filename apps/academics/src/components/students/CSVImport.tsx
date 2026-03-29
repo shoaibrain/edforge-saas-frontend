@@ -48,6 +48,9 @@ const CSV_TEMPLATE_HEADERS = [
 const REQUIRED_COLUMNS = ['firstName', 'lastName', 'birthDate', 'gender', 'gradeLevel']
 const OPTIONAL_COLUMNS = ['guardianName', 'guardianPhone', 'guardianEmail']
 
+const MAX_ROWS = 200
+const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 // 2MB
+
 const CSV_TEMPLATE_EXAMPLE = [
   'Jane',
   'Doe',
@@ -140,39 +143,55 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
   })
   const [importResult, setImportResult] = useState<CsvImportResult | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [fileError, setFileError] = useState<string | null>(null)
+  const [rowLimitError, setRowLimitError] = useState<string | null>(null)
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (!file.name.endsWith('.csv')) return
+  const processFile = useCallback((file: File) => {
+    setFileError(null)
+    setRowLimitError(null)
+
+    if (!file.name.endsWith('.csv')) {
+      setFileError('Only .csv files are supported.')
+      return
+    }
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      setFileError(`File size exceeds 2MB limit (${sizeMB}MB). Please reduce the file.`)
+      return
+    }
 
     setFileName(file.name)
     const reader = new FileReader()
     reader.onload = (event) => {
       const text = event.target?.result as string
       const parsed = parseCSV(text)
+      if (parsed.rows.length > MAX_ROWS) {
+        setRowLimitError(
+          `Maximum ${MAX_ROWS} students per import. Your file has ${parsed.rows.length} rows. Please split into smaller files.`
+        )
+      } else {
+        setRowLimitError(null)
+      }
       setParsedData(parsed)
       setPhase('preview')
     }
     reader.readAsText(file)
   }, [])
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    processFile(file)
+  }, [processFile])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
     const file = e.dataTransfer.files[0]
-    if (!file || !file.name.endsWith('.csv')) return
-
-    setFileName(file.name)
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      const text = event.target?.result as string
-      const parsed = parseCSV(text)
-      setParsedData(parsed)
-      setPhase('preview')
-    }
-    reader.readAsText(file)
-  }, [])
+    if (!file) return
+    processFile(file)
+  }, [processFile])
 
   const handleImport = useCallback(async () => {
     if (!schoolId) return
@@ -199,6 +218,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
     setFileName('')
     setParsedData({ headers: [], rows: [] })
     setImportResult(null)
+    setFileError(null)
+    setRowLimitError(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [])
 
@@ -253,7 +274,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center justify-center transition-colors hover:opacity-80"
+            disabled={phase === 'importing'}
+            className="flex items-center justify-center transition-colors hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
               width: 26,
               height: 26,
@@ -314,6 +336,20 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   className="hidden"
                 />
               </div>
+
+              {/* File error */}
+              {fileError && (
+                <div
+                  className="flex items-center gap-2 p-3 rounded-lg"
+                  style={{
+                    background: 'var(--v2-danger-bg)',
+                    border: '1px solid var(--v2-danger-border)',
+                  }}
+                >
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#E24B4A' }} />
+                  <span style={{ fontSize: 11, color: '#E24B4A' }}>{fileError}</span>
+                </div>
+              )}
 
               {/* Template Card */}
               <div
@@ -451,6 +487,20 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   Remove
                 </button>
               </div>
+
+              {/* Row limit exceeded */}
+              {rowLimitError && (
+                <div
+                  className="flex items-center gap-2 p-3 rounded-lg"
+                  style={{
+                    background: 'var(--v2-danger-bg)',
+                    border: '1px solid var(--v2-danger-border)',
+                  }}
+                >
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#E24B4A' }} />
+                  <span style={{ fontSize: 11, color: '#E24B4A' }}>{rowLimitError}</span>
+                </div>
+              )}
 
               {/* Invalid rows warning */}
               {invalidRows.length > 0 && (
@@ -604,6 +654,22 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 </div>
               </div>
 
+              {/* Pending notice */}
+              {importResult.imported > 0 && (
+                <div
+                  className="flex items-center gap-2 p-3 rounded-lg"
+                  style={{
+                    background: 'var(--v2-success-bg)',
+                    border: '1px solid var(--v2-success-border)',
+                  }}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#1D9E75' }} />
+                  <span style={{ fontSize: 11, color: '#1D9E75' }}>
+                    {importResult.imported} student{importResult.imported !== 1 ? 's' : ''} imported as <strong>Pending</strong>. Visit the Pending tab to review and enroll them.
+                  </span>
+                </div>
+              )}
+
               {/* Duplicates */}
               {importResult.duplicates.length > 0 && (
                 <div
@@ -674,19 +740,24 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
               <>
                 <Info className="w-3 h-3" style={{ color: '#3a4055' }} />
                 <span style={{ fontSize: 10, color: '#3a4055' }}>
-                  Supports .csv files up to 500 rows
+                  .csv only · Max 200 rows · Max 2MB
                 </span>
               </>
             )}
             {phase === 'preview' && (
-              <button
-                type="button"
-                onClick={handleReset}
-                className="transition-colors hover:opacity-80"
-                style={{ fontSize: 11, color: 'var(--v2-text-hint)' }}
-              >
-                Upload different file
-              </button>
+              <div className="flex flex-col gap-1">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="transition-colors hover:opacity-80 text-left"
+                  style={{ fontSize: 11, color: 'var(--v2-text-hint)' }}
+                >
+                  Upload different file
+                </button>
+                <span style={{ fontSize: 9, color: '#3a4055' }}>
+                  Imports create <strong>Pending</strong> enrollments
+                </span>
+              </div>
             )}
           </div>
 
@@ -705,7 +776,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   fontWeight: 500,
                 }}
               >
-                Done
+                Go to Pending
+                <ArrowRight className="w-3 h-3" />
               </button>
             ) : (
               <>
@@ -729,7 +801,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   <button
                     type="button"
                     onClick={handleImport}
-                    disabled={validRows.length === 0}
+                    disabled={validRows.length === 0 || !!rowLimitError}
                     className="flex items-center gap-1.5 text-white transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{
                       background: '#1D9E75',
@@ -740,7 +812,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                     }}
                   >
                     <Upload className="w-3 h-3" />
-                    Import {validRows.length} Student{validRows.length !== 1 ? 's' : ''}
+                    Import as Pending ({validRows.length})
                   </button>
                 )}
               </>

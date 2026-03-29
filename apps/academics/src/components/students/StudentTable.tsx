@@ -185,7 +185,18 @@ export function StudentTable({
         size: 140,
         enableSorting: false,
         cell: ({ row }) => {
-          const rate = alertsMap.get(row.original.studentId) ?? 95
+          const rate = alertsMap.get(row.original.studentId) ?? null
+          if (rate === null || rate === undefined) {
+            return (
+              <span
+                className="text-[12px]"
+                style={{ color: 'var(--v2-text-hint)' }}
+                title="No attendance recorded yet"
+              >
+                —
+              </span>
+            )
+          }
           const color = getAttendanceRateColor(rate)
           return (
             <div className="flex items-center gap-2">
