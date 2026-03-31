@@ -20,11 +20,6 @@ const statusConfig: Record<
     bg: 'rgba(29, 158, 117, 0.12)',
     color: '#1D9E75',
   },
-  pending: {
-    label: 'Pending',
-    bg: 'rgba(239, 159, 39, 0.12)',
-    color: '#EF9F27',
-  },
   inactive: {
     label: 'Inactive',
     bg: 'rgba(154, 160, 184, 0.12)',

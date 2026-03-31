@@ -17,7 +17,9 @@ import {
   Receipt,
 } from 'lucide-react'
 import { useCurrency } from '@edforge/types/use-currency'
-import { useSettings } from '../../lib/shell-context'
+import { useSettings, useShell } from '../../lib/shell-context'
+import { useGettingStarted } from '../../hooks/useGettingStarted'
+import { GettingStartedGuide } from './GettingStartedGuide'
 import { HomeStatCard } from './HomeStatCard'
 import { AlertsRow } from './AlertsRow'
 import { AttendanceTrendCard } from './AttendanceTrendCard'
@@ -65,9 +67,11 @@ interface AdminCommandCenterProps {
 
 export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
   const settings = useSettings()
+  const { availableSchools } = useShell()
   const { formatShort } = useCurrency(settings)
   const setAlertCount = useHomeStore((s) => s.setAlertCount)
   const setActiveAcademicYear = useHomeStore((s) => s.setActiveAcademicYear)
+  const gettingStarted = useGettingStarted()
 
   // ── Data fetching (parallel) ────────────────────────────────────────────
   const { data: academicYear } = useHomeAcademicYear(schoolId)
@@ -139,6 +143,33 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
 
   // ── Guard ───────────────────────────────────────────────────────────────
   if (!schoolId) {
+    // Fresh tenant with no schools — show the getting-started guide
+    if (availableSchools.length === 0 && gettingStarted.show) {
+      return (
+        <motion.div
+          data-page="home-v2"
+          className="flex flex-col"
+          style={{
+            gap: 'var(--v2-section-gap, 16px)',
+            padding: 'var(--v2-content-padding-y, 20px) var(--v2-content-padding-x, 28px)',
+            background: 'var(--v2-bg-app)',
+            minHeight: '100%',
+          }}
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
+            <GettingStartedGuide
+              items={gettingStarted.items}
+              completedCount={gettingStarted.completedCount}
+              totalCount={gettingStarted.totalCount}
+              onDismiss={gettingStarted.dismiss}
+            />
+          </motion.div>
+        </motion.div>
+      )
+    }
     return (
       <div className="py-16 text-center">
         <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
@@ -162,6 +193,20 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
       initial="hidden"
       animate="visible"
     >
+      {/* ================================================================ */}
+      {/* SECTION 0: Getting Started Guide (for new tenants) */}
+      {/* ================================================================ */}
+      {gettingStarted.show && (
+        <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
+          <GettingStartedGuide
+            items={gettingStarted.items}
+            completedCount={gettingStarted.completedCount}
+            totalCount={gettingStarted.totalCount}
+            onDismiss={gettingStarted.dismiss}
+          />
+        </motion.div>
+      )}
+
       {/* ================================================================ */}
       {/* SECTION 1: Critical Alerts (conditional) */}
       {/* ================================================================ */}

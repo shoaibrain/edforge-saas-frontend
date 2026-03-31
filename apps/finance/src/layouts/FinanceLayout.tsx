@@ -121,7 +121,6 @@ class FinanceErrorBoundary extends Component<
 export function FinanceLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const prevSchoolRef = useRef<string | null>(null)
-  const [settingsResolved, setSettingsResolved] = useState(false)
   const [settings, setSettings] = useState<ResolvedSettings>(() => {
     const initial = getSchoolContext()
     if (initial.resolvedSettings) {
@@ -143,7 +142,6 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
     }
     if (initial.resolvedSettings) {
       setSettings(initial.resolvedSettings)
-      setSettingsResolved(true)
     } else {
       // Shell broadcast hasn't arrived yet. After 500ms, fetch workspace
       // settings directly via the read-only /tenants/my/settings endpoint
@@ -181,7 +179,7 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
         } catch {
           // Fallback silently to SYSTEM_DEFAULTS
         } finally {
-          setSettingsResolved(true)
+          // settings state updated or kept at SYSTEM_DEFAULTS
         }
       }, 500)
     }
@@ -194,7 +192,6 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
 
       if (resolvedSettings) {
         setSettings(resolvedSettings)
-        setSettingsResolved(true)
         if (fallbackTimer) {
           clearTimeout(fallbackTimer)
           fallbackTimer = null

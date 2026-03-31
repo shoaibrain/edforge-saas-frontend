@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import { useShell } from '../../../lib/shell-context'
 import { tenantService } from '../../../services/tenant.service'
 import type { OnboardingStepProps } from '../onboarding.types'
@@ -62,7 +63,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
       }))
       onNext()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create school')
+      setError(extractApiErrorMessage(err))
     } finally {
       setSaving(false)
     }

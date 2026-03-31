@@ -3,9 +3,17 @@
  */
 
 import { useState } from 'react'
+import { extractApiErrorMessage } from '@edforge/api-client'
+import type { AxiosError } from '@edforge/api-client'
 import { useShell } from '../../../lib/shell-context'
 import { usersService } from '../../../services/users.service'
 import type { OnboardingStepProps } from '../onboarding.types'
+
+interface ValidationError {
+  path: string[]
+  message: string
+  code?: string
+}
 
 export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepProps) {
   const { user } = useShell()
@@ -14,17 +22,38 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
   const [lastName, setLastName] = useState(data.lastName || nameParts.slice(1).join(' ') || '')
   const [displayName, setDisplayName] = useState(data.displayName || user?.displayName || '')
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [generalError, setGeneralError] = useState<string | null>(null)
 
   const initials = [firstName, lastName]
     .map((n) => n.charAt(0).toUpperCase())
     .filter(Boolean)
     .join('')
 
+  const clearFieldError = (field: string) => {
+    setFieldErrors((prev) => {
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
+  }
+
   const handleContinue = async () => {
     if (!user?.id) return
+
+    // Client-side validation
+    const errors: Record<string, string> = {}
+    if (firstName.trim().length < 1) errors.firstName = 'First name is required'
+    if (lastName.trim().length < 2) errors.lastName = 'Last name must be at least 2 characters'
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      setGeneralError(null)
+      return
+    }
+
     setSaving(true)
-    setError(null)
+    setFieldErrors({})
+    setGeneralError(null)
     try {
       await usersService.updateUser(user.id, {
         firstName: firstName.trim(),
@@ -39,11 +68,30 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
       }))
       onNext()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save profile')
+      const axiosErr = err as AxiosError<{ errors?: ValidationError[] }>
+      const apiErrors = axiosErr?.response?.data?.errors
+      if (apiErrors?.length) {
+        const mapped: Record<string, string> = {}
+        for (const e of apiErrors) {
+          const field = e.path?.[0]
+          if (field) mapped[field] = e.message
+        }
+        if (Object.keys(mapped).length > 0) {
+          setFieldErrors(mapped)
+        } else {
+          setGeneralError(extractApiErrorMessage(err))
+        }
+      } else {
+        setGeneralError(extractApiErrorMessage(err))
+      }
     } finally {
       setSaving(false)
     }
   }
+
+  const inputBase = 'w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-colors'
+  const inputNormal = `${inputBase} border-[rgb(var(--border-primary))] focus:ring-teal-500/40`
+  const inputError = `${inputBase} border-red-400/60 ring-2 ring-red-400/30 focus:ring-red-400/50`
 
   return (
     <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
@@ -72,10 +120,13 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
             <input
               type="text"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+              onChange={(e) => { setFirstName(e.target.value); clearFieldError('firstName') }}
+              className={fieldErrors.firstName ? inputError : inputNormal}
               placeholder="First name"
             />
+            {fieldErrors.firstName && (
+              <p className="text-[11px] text-red-500 mt-1.5">{fieldErrors.firstName}</p>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
@@ -84,10 +135,13 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
             <input
               type="text"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+              onChange={(e) => { setLastName(e.target.value); clearFieldError('lastName') }}
+              className={fieldErrors.lastName ? inputError : inputNormal}
               placeholder="Last name"
             />
+            {fieldErrors.lastName && (
+              <p className="text-[11px] text-red-500 mt-1.5">{fieldErrors.lastName}</p>
+            )}
           </div>
         </div>
         <div>
@@ -98,14 +152,14 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className={inputNormal}
             placeholder="e.g. Dr. Smith"
           />
         </div>
       </div>
 
-      {error && (
-        <p className="text-xs text-red-500 mb-4">{error}</p>
+      {generalError && (
+        <p className="text-xs text-red-500 mb-4">{generalError}</p>
       )}
 
       {/* Actions */}

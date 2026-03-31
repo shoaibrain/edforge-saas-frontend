@@ -278,9 +278,10 @@ export function getUserRoleCategory(
   user: UserIdentity | null,
   schoolId: string | null
 ): RoleCategory | null {
-  if (!user || !schoolId) return null
-  // TenantAdmin has implicit administrator access to all schools
+  if (!user) return null
+  // TenantAdmin has implicit administrator access to all schools (even before any school is created)
   if (user.globalRole === 'TenantAdmin') return 'administrator'
+  if (!schoolId) return null
   const role = user.assignments[schoolId]
   if (!role) return null
   return getRoleCategory(role)
