@@ -64,12 +64,20 @@ function formatDateStr(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-function getBSTitle(date: Date, locale: string): string {
+function getBSDualTitle(startDate: Date, endDate: Date, locale: string): string {
   try {
-    const bs = adToBS(date)
+    const start = new Date(startDate.getTime() + 7 * 86400000)
+    const end = new Date(endDate.getTime() - 7 * 86400000)
+    const startBS = adToBS(start)
+    const endBS = adToBS(end)
     const monthNames = locale === 'ne' ? BS_MONTH_NAMES_NE : BS_MONTH_NAMES_EN
-    const monthName = monthNames[bs.month - 1] || ''
-    return `${monthName} ${bs.year}`
+    if (startBS.month === endBS.month && startBS.year === endBS.year) {
+      return `${monthNames[startBS.month - 1]} ${startBS.year}`
+    }
+    if (startBS.year === endBS.year) {
+      return `${monthNames[startBS.month - 1]} – ${monthNames[endBS.month - 1]} ${startBS.year}`
+    }
+    return `${monthNames[startBS.month - 1]} ${startBS.year} – ${monthNames[endBS.month - 1]} ${endBS.year}`
   } catch {
     return ''
   }
@@ -97,6 +105,7 @@ export function SchoolFullCalendar({
   const calendarRef = useRef<FullCalendar>(null)
   const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null)
   const [bsTitle, setBsTitle] = useState('')
+  const [adTitle, setAdTitle] = useState('')
 
   const { events, bgEvents, rawDates, isLoading, isEmpty } = useFullCalendarEvents(
     schoolId,
@@ -129,9 +138,10 @@ export function SchoolFullCalendar({
     })
 
     if (calendarSystem === 'bikram_sambat') {
+      setBsTitle(getBSDualTitle(arg.start, arg.end, i18n.language))
       const mid = new Date(arg.start)
       mid.setDate(mid.getDate() + 15)
-      setBsTitle(getBSTitle(mid, i18n.language))
+      setAdTitle(mid.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }))
     }
   }, [calendarSystem, i18n.language])
 
@@ -217,12 +227,11 @@ export function SchoolFullCalendar({
 
   return (
     <div className="relative">
-      {/* BS dual title for Nepal schools */}
+      {/* BS dual-title header for Nepal schools — primary BS title, secondary AD */}
       {calendarSystem === 'bikram_sambat' && bsTitle && (
-        <div className="text-center mb-1">
-          <span className="text-xs font-medium text-teal-600 bg-teal-500/10 px-2.5 py-1 rounded-full">
-            {bsTitle} BS
-          </span>
+        <div className="fc-bs-title-header">
+          <h3 className="text-base font-bold text-[rgb(var(--text-primary))]">{bsTitle}</h3>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">{adTitle}</p>
         </div>
       )}
 
@@ -232,7 +241,7 @@ export function SchoolFullCalendar({
         initialView="dayGridMonth"
         headerToolbar={{
           left: 'prev,next today',
-          center: 'title',
+          center: calendarSystem === 'bikram_sambat' ? '' : 'title',
           right: 'dayGridMonth,listMonth',
         }}
         events={allEvents}

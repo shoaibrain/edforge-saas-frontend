@@ -167,6 +167,21 @@
   opacity: 0.7;
 }
 
+/* BS dual-title header — shown above FullCalendar for bikram_sambat schools */
+.fc-bs-title-header {
+  text-align: center;
+  padding: 0.625rem 0 0.5rem;
+  border: 1px solid rgb(var(--border-primary));
+  border-bottom: none;
+  background: rgb(var(--surface-secondary));
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.fc-bs-title-header + .fc {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 /* Weekend cells */
 .fc .fc-day-sat,
 .fc .fc-day-sun {

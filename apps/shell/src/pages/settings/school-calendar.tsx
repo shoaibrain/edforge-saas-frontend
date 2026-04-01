@@ -33,7 +33,7 @@ import {
 import { useBellSchedules } from '@/hooks/useBellSchedules'
 import { SchoolFullCalendar } from '@/components/calendar/SchoolFullCalendar'
 import { SessionManager } from '@/components/calendar/SessionManager'
-import { LEGEND_ITEMS, ALL_EVENT_TYPES } from '@/components/calendar/fullcalendar-utils'
+import { LEGEND_ITEMS, ALL_EVENT_TYPES, getEventTypeLabel } from '@/components/calendar/fullcalendar-utils'
 import { adToBS, BS_MONTH_NAMES_EN, BS_MONTH_NAMES_NE, DAY_NAMES_NE } from '@edforge/date-utils'
 import {
   SettingsAlert,
@@ -65,6 +65,18 @@ const EVENT_TYPE_OPTIONS = [
 // ============================================================================
 
 const DAY_NAMES_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+function getDrawerTitle(cd: CalendarDateResponseDto | null): string {
+  if (!cd) return 'Calendar Date'
+  if (cd.isWeekend) return 'Weekend'
+  const evt = cd.calendarEvents?.[0]
+  if (evt?.description) return evt.description
+  if (cd.isHoliday) return 'Holiday'
+  if (cd.isInstructionalDay) return 'Instructional Day'
+  const evtType = evt?.eventType
+  if (evtType) return getEventTypeLabel(evtType)
+  return 'Calendar Date'
+}
 
 function formatDrawerDate(dateStr: string, calendarSystem: string, locale: string): string {
   const date = new Date(dateStr + 'T00:00:00')
@@ -391,25 +403,99 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
       <Drawer
         open={!!selectedDate}
         onClose={() => setSelectedDate(null)}
-        title="Edit Calendar Date"
+        title={getDrawerTitle(editCalendarDate)}
         description={selectedDate ? formatDrawerDate(selectedDate, calendarSystem, i18n.language) : ''}
         size="sm"
       >
         <div className="space-y-5">
-          {/* Date context info */}
-          {selectedDate && editCalendarDate && (
-            <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-secondary))] rounded-xl px-3 py-2.5">
-              {editCalendarDate.dayNumber && (
-                <span>Day {editCalendarDate.dayNumber}</span>
-              )}
-              {editCalendarDate.instructionalDayNumber && (
-                <span>Instructional Day #{editCalendarDate.instructionalDayNumber}</span>
-              )}
-              {editCalendarDate.bellScheduleName && (
-                <span>Bell: {editCalendarDate.bellScheduleName}</span>
-              )}
+          {/* Date Info Card */}
+          {selectedDate && editCalendarDate && (() => {
+            const evt = editCalendarDate.calendarEvents?.[0]
+            const holidayName = evt?.description
+            const isWeekendWithHoliday = editCalendarDate.isWeekend && evt?.eventType === 'holiday'
+
+            return (
+              <div className={`rounded-xl px-4 py-3 border ${
+                isWeekendWithHoliday
+                  ? 'bg-slate-500/5 border-slate-400/30'
+                  : editCalendarDate.isWeekend
+                    ? 'bg-slate-500/5 border-slate-400/30'
+                    : editCalendarDate.isHoliday || evt?.eventType === 'holiday'
+                      ? 'bg-red-500/5 border-red-400/30'
+                      : editCalendarDate.isInstructionalDay
+                        ? 'bg-emerald-500/5 border-emerald-400/30'
+                        : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]'
+              }`}>
+                {/* Primary badge */}
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    isWeekendWithHoliday
+                      ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
+                      : editCalendarDate.isWeekend
+                        ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
+                        : editCalendarDate.isHoliday || evt?.eventType === 'holiday'
+                          ? 'bg-red-500/10 text-red-700 dark:text-red-400'
+                          : editCalendarDate.isInstructionalDay
+                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-secondary))]'
+                  }`}>
+                    {isWeekendWithHoliday
+                      ? 'Weekend'
+                      : editCalendarDate.isWeekend
+                        ? 'Weekend'
+                        : evt?.eventType
+                          ? getEventTypeLabel(evt.eventType)
+                          : editCalendarDate.isInstructionalDay
+                            ? 'Instructional Day'
+                            : 'Non-Instructional'}
+                  </span>
+                </div>
+
+                {/* Holiday name (when it's a proper holiday, not weekend-override) */}
+                {!editCalendarDate.isWeekend && holidayName && evt?.eventType === 'holiday' && (
+                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{holidayName}</p>
+                )}
+
+                {/* Weekend + Holiday overlap explanation */}
+                {isWeekendWithHoliday && holidayName && (
+                  <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+                    {holidayName} falls on this {editCalendarDate.dayOfWeek} — counted as weekend, not holiday
+                  </p>
+                )}
+
+                {/* Day numbers for instructional days */}
+                {editCalendarDate.isInstructionalDay && !editCalendarDate.isWeekend && (
+                  <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))] mt-1.5">
+                    {editCalendarDate.dayNumber != null && (
+                      <span>Day {editCalendarDate.dayNumber}</span>
+                    )}
+                    {editCalendarDate.instructionalDayNumber != null && (
+                      <span>Instructional Day #{editCalendarDate.instructionalDayNumber}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Bell schedule */}
+                {editCalendarDate.bellScheduleName && (
+                  <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
+                    Bell Schedule: {editCalendarDate.bellScheduleName}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[rgb(var(--border-primary))]" />
             </div>
-          )}
+            <div className="relative flex justify-center">
+              <span className="px-2 text-[10px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-primary))]">
+                Edit
+              </span>
+            </div>
+          </div>
 
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Event Type</label>

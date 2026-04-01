@@ -66,6 +66,27 @@ export function getPrimaryEventType(calendarDate: CalendarDateResponseDto): stri
   return 'non_instructional_day'
 }
 
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  instructional_day: 'Instructional Day',
+  holiday: 'Holiday',
+  teacher_only: 'Teacher Only',
+  break: 'Break',
+  non_instructional_day: 'Non-Instructional',
+  student_holiday: 'Student Holiday',
+  early_release: 'Early Release',
+  late_start: 'Late Start',
+  make_up_day: 'Make-up Day',
+  weather_day: 'Weather Day',
+  testing_day: 'Testing Day',
+  conference_day: 'Conference',
+  graduation: 'Graduation',
+  in_service: 'In-Service',
+}
+
+export function getEventTypeLabel(eventType: string): string {
+  return EVENT_TYPE_LABELS[eventType] || eventType.replace(/_/g, ' ')
+}
+
 export function getEventLabel(calendarDate: CalendarDateResponseDto): string | null {
   if (calendarDate.calendarEvents?.length > 0) {
     const evt = calendarDate.calendarEvents[0]

@@ -27,6 +27,7 @@ import {
 import { useBellSchedules, useCreateBellSchedule } from '@/hooks/useBellSchedules'
 import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
 import { type DayOfWeek, dayToIndex } from '@/utils/localeDefaults'
+import { adToBS, BS_MONTH_NAMES_EN } from '@edforge/date-utils'
 
 // ============================================================================
 // TYPES
@@ -987,7 +988,7 @@ const EVENT_TYPE_COLORS: Record<string, { bg: string; dot: string; label: string
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate, onSelectDate, startDate, endDate }: {
+function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate, onSelectDate, startDate, endDate, calendarSystem }: {
   currentMonth: Date
   onMonthChange: (d: Date) => void
   dateMap: Map<string, any>
@@ -995,9 +996,11 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
   onSelectDate: (d: string | null) => void
   startDate?: string
   endDate?: string
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
 }) {
   const year = currentMonth.getFullYear()
   const month = currentMonth.getMonth()
+  const isBSCalendar = calendarSystem === 'bikram_sambat'
 
   // Build grid cells for the month
   const firstDay = new Date(year, month, 1).getDay() // 0=Sun
@@ -1010,13 +1013,34 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
   const yearStart = startDate ? new Date(startDate) : null
   const yearEnd = endDate ? new Date(endDate) : null
 
-  const cells: { day: number; dateStr: string; entry: any; inRange: boolean }[] = []
+  // Compute BS title for Nepal schools
+  let bsTitle = ''
+  if (isBSCalendar) {
+    try {
+      const startBS = adToBS(new Date(year, month, 8))
+      const endBS = adToBS(new Date(year, month, daysInMonth - 7 > 0 ? daysInMonth - 7 : daysInMonth))
+      const monthNames = BS_MONTH_NAMES_EN
+      if (startBS.month === endBS.month && startBS.year === endBS.year) {
+        bsTitle = `${monthNames[startBS.month - 1]} ${startBS.year}`
+      } else if (startBS.year === endBS.year) {
+        bsTitle = `${monthNames[startBS.month - 1]} – ${monthNames[endBS.month - 1]} ${startBS.year}`
+      } else {
+        bsTitle = `${monthNames[startBS.month - 1]} ${startBS.year} – ${monthNames[endBS.month - 1]} ${endBS.year}`
+      }
+    } catch { /* ignore */ }
+  }
+
+  const cells: { day: number; dateStr: string; entry: any; inRange: boolean; bsDay?: number }[] = []
   for (let d = 1; d <= daysInMonth; d++) {
     const dt = new Date(year, month, d)
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
     const entry = dateMap.get(dateStr) || null
     const inRange = (!yearStart || dt >= yearStart) && (!yearEnd || dt <= yearEnd)
-    cells.push({ day: d, dateStr, entry, inRange })
+    let bsDay: number | undefined
+    if (isBSCalendar) {
+      try { bsDay = adToBS(dt).day } catch { /* ignore */ }
+    }
+    cells.push({ day: d, dateStr, entry, inRange, bsDay })
   }
 
   return (
@@ -1026,9 +1050,14 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
         <button onClick={prevMonth} className="px-2 py-1 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
           ← Prev
         </button>
-        <h3 className="text-xs font-bold text-[rgb(var(--text-primary))]">
-          {MONTH_NAMES[month]} {year}
-        </h3>
+        <div className="text-center">
+          {isBSCalendar && bsTitle && (
+            <h3 className="text-xs font-bold text-[rgb(var(--text-primary))]">{bsTitle}</h3>
+          )}
+          <h3 className={`font-bold text-[rgb(var(--text-${isBSCalendar ? 'tertiary' : 'primary'}))] ${isBSCalendar ? 'text-[10px]' : 'text-xs'}`}>
+            {MONTH_NAMES[month]} {year}
+          </h3>
+        </div>
         <button onClick={nextMonth} className="px-2 py-1 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
           Next →
         </button>
@@ -1051,7 +1080,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
         ))}
 
         {/* Day cells */}
-        {cells.map(({ day, dateStr, entry, inRange }) => {
+        {cells.map(({ day, dateStr, entry, inRange, bsDay }) => {
           const eventType = entry?.calendarEvents?.[0]?.eventType || (entry?.isWeekend ? 'weekend' : null)
           const isWeekend = entry?.isWeekend
           const isSelected = selectedDate === dateStr
@@ -1062,7 +1091,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
               key={dateStr}
               onClick={() => inRange && entry ? onSelectDate(isSelected ? null : dateStr) : undefined}
               disabled={!inRange || !entry}
-              className={`h-8 rounded-md text-[11px] font-medium relative flex items-center justify-center transition-all ${
+              className={`${isBSCalendar ? 'h-10' : 'h-8'} rounded-md text-[11px] font-medium relative flex ${isBSCalendar ? 'flex-col' : ''} items-center justify-center transition-all ${
                 !inRange ? 'opacity-20 cursor-default'
                   : isSelected ? 'ring-1 ring-[#378ADD] bg-[rgba(55,138,221,0.15)] text-[#378ADD]'
                   : isWeekend ? 'text-[rgb(var(--text-tertiary))] opacity-50'
@@ -1071,7 +1100,14 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
               }`}
               style={colorCfg && !isSelected ? { background: colorCfg.bg } : undefined}
             >
-              {day}
+              {isBSCalendar && bsDay != null ? (
+                <>
+                  <span className="text-[11px] font-semibold leading-none">{bsDay}</span>
+                  <span className="text-[8px] opacity-50 leading-none">{day}</span>
+                </>
+              ) : (
+                day
+              )}
               {colorCfg && (
                 <span
                   className="absolute bottom-0.5 w-1 h-1 rounded-full"
@@ -1104,11 +1140,12 @@ const CALENDAR_EVENT_TYPES = [
   'make_up_day', 'other',
 ] as const
 
-function DateEditPanel({ dateEntry, onClose, onSave, isSaving }: {
+function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }: {
   dateEntry: any
   onClose: () => void
   onSave: (eventType: string, isInstructional: boolean) => void
   isSaving: boolean
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
 }) {
   const currentEventType = dateEntry?.calendarEvents?.[0]?.eventType || 'instructional_day'
   const [eventType, setEventType] = useState(currentEventType)
@@ -1120,23 +1157,99 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving }: {
     setIsInstructional(dateEntry?.isInstructionalDay ?? true)
   }, [dateEntry?.date])
 
-  const dateLabel = dateEntry?.date
-    ? new Date(dateEntry.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+  const dateObj = dateEntry?.date ? new Date(dateEntry.date + 'T12:00:00') : null
+  const dateLabel = dateObj
+    ? dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
     : ''
+
+  // BS date for Nepal schools
+  let bsDateLabel = ''
+  if (calendarSystem === 'bikram_sambat' && dateObj) {
+    try {
+      const bs = adToBS(dateObj)
+      const monthName = BS_MONTH_NAMES_EN[bs.month - 1] || ''
+      bsDateLabel = `${monthName} ${bs.day}, ${bs.year} BS`
+    } catch { /* ignore */ }
+  }
 
   const colorCfg = EVENT_TYPE_COLORS[eventType] || EVENT_TYPE_COLORS.other
 
+  // Holiday name from calendarEvents description
+  const holidayName = dateEntry?.calendarEvents?.[0]?.description || ''
+  const isWeekend = dateEntry?.isWeekend
+  const isWeekendWithHoliday = isWeekend && dateEntry?.calendarEvents?.[0]?.eventType === 'holiday'
+
+  // Determine the display title
+  const displayTitle = isWeekendWithHoliday
+    ? 'Weekend'
+    : holidayName || colorCfg.label
+
+  // Info card border color
+  const infoBorderColor = isWeekendWithHoliday || isWeekend
+    ? 'rgba(148,163,184,0.2)'
+    : currentEventType === 'holiday'
+      ? 'rgba(226,75,74,0.2)'
+      : currentEventType === 'instructional_day'
+        ? 'rgba(29,158,117,0.2)'
+        : 'rgba(55,138,221,0.15)'
+
   return (
     <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl mb-3 p-3.5">
-      <div className="flex items-center justify-between mb-2.5">
+      {/* Header with close button */}
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: colorCfg.dot }} />
-          <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{dateLabel}</h4>
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: isWeekendWithHoliday ? 'rgb(var(--text-tertiary))' : colorCfg.dot }} />
+          <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{displayTitle}</h4>
+        </div>
+        <button onClick={onClose} className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] text-sm">✕</button>
+      </div>
+
+      {/* Date Info Card */}
+      <div className="rounded-lg px-3 py-2 mb-2.5" style={{ background: isWeekendWithHoliday || isWeekend ? 'rgba(148,163,184,0.06)' : colorCfg.bg, border: `1px solid ${infoBorderColor}` }}>
+        {/* Date display */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[11px] font-medium text-[rgb(var(--text-secondary))]">{dateLabel}</span>
           <span className="text-[9px] font-medium px-1.5 py-0.5 rounded" style={{ background: colorCfg.bg, color: colorCfg.dot }}>
             {colorCfg.label}
           </span>
         </div>
-        <button onClick={onClose} className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] text-sm">✕</button>
+
+        {/* BS date for Nepal schools */}
+        {bsDateLabel && (
+          <p className="text-[11px] font-medium text-teal-600 dark:text-teal-400 mb-1">{bsDateLabel}</p>
+        )}
+
+        {/* Holiday name — shown prominently for proper holidays */}
+        {!isWeekend && holidayName && currentEventType === 'holiday' && (
+          <p className="text-[11px] font-medium text-[rgb(var(--text-primary))]">{holidayName}</p>
+        )}
+
+        {/* Weekend + Holiday overlap explanation */}
+        {isWeekendWithHoliday && holidayName && (
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+            {holidayName} falls on this {dateEntry.dayOfWeek} — counted as weekend, not holiday
+          </p>
+        )}
+
+        {/* Day metadata */}
+        <div className="flex items-center gap-2 text-[10px] text-[rgb(var(--text-tertiary))] mt-1">
+          {dateEntry?.dayOfWeek && (
+            <span>{dateEntry.dayOfWeek.charAt(0).toUpperCase() + dateEntry.dayOfWeek.slice(1)}{isWeekend ? ' (Weekend)' : ''}</span>
+          )}
+          {dateEntry?.dayNumber != null && <span>Day {dateEntry.dayNumber}</span>}
+          {dateEntry?.instructionalDayNumber != null && <span>Instructional #{dateEntry.instructionalDayNumber}</span>}
+          {dateEntry?.gradingPeriodName && <span>{dateEntry.gradingPeriodName}</span>}
+        </div>
+      </div>
+
+      {/* Edit section divider */}
+      <div className="relative mb-2.5">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[rgba(255,255,255,0.06)]" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-2 text-[9px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-primary))]">Edit</span>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2.5 mb-2.5">
@@ -1172,14 +1285,6 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving }: {
           </label>
         </div>
       </div>
-
-      {dateEntry?.dayOfWeek && (
-        <p className="text-[10px] text-[rgb(var(--text-tertiary))] mb-2">
-          {dateEntry.dayOfWeek.charAt(0).toUpperCase() + dateEntry.dayOfWeek.slice(1)}
-          {dateEntry.isWeekend ? ' (Weekend)' : ''}
-          {dateEntry.gradingPeriodName ? ` · ${dateEntry.gradingPeriodName}` : ''}
-        </p>
-      )}
 
       <div className="flex justify-end gap-2">
         <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
@@ -1382,6 +1487,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           onSelectDate={setSelectedDate}
           startDate={startDate}
           endDate={endDate}
+          calendarSystem={localeDefaults.calendarSystem}
         />
       )}
 
@@ -1403,6 +1509,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
             )
           }}
           isSaving={updateCalendarDate.isPending}
+          calendarSystem={localeDefaults.calendarSystem}
         />
       )}
 
