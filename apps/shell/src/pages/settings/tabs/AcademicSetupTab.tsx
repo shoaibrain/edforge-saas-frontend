@@ -21,6 +21,7 @@ import {
   useCalendarDates,
   useUpdateCalendarDate,
   useGenerateCalendar,
+  useLocaleHolidays,
   useCreateAcademicSession,
 } from '@/hooks/useCalendar'
 import { useBellSchedules, useCreateBellSchedule } from '@/hooks/useBellSchedules'
@@ -1216,22 +1217,42 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
     if (activeYear?.startDate) return new Date(activeYear.startDate)
     return new Date()
   })
+  const [showGenPanel, setShowGenPanel] = useState(false)
+  const [generationWarnings, setGenerationWarnings] = useState<string[]>([])
+
   const generateCalendar = useGenerateCalendar(schoolId)
 
   const yearLabel = activeYear?.name || 'Academic Year'
   const totalDays = (calendarStats as any)?.totalDays || 0
   const instructionalDays = (calendarStats as any)?.instructionalDays || 0
   const holidays = (calendarStats as any)?.holidays || 0
+  const calendarExists = totalDays > 0
 
   const yearId = activeYear?.yearId || activeYear?.id
   const startDate = activeYear?.startDate?.split('T')[0]
   const endDate = activeYear?.endDate?.split('T')[0]
 
+  // Fetch locale holidays from backend for calendar generation
+  const localeCode = localeDefaults.isNepal ? 'np' : ''
+  const { data: localeHolidayData } = useLocaleHolidays(
+    schoolId,
+    localeCode,
+    startDate || '',
+    endDate || '',
+    !!localeCode && !!startDate && !!endDate,
+  )
+  const localeHolidays = localeHolidayData?.holidays || []
+
+  // Show gen panel by default when no calendar exists
+  useEffect(() => {
+    if (!calendarExists) setShowGenPanel(true)
+  }, [calendarExists])
+
   // Fetch calendar dates when calendar has been generated
   const { data: calendarDatesData } = useCalendarDates(schoolId, {
     academicYearId: yearId || '',
     limit: 400,
-  }, totalDays > 0 && !!yearId)
+  }, calendarExists && !!yearId)
 
   const calendarDates = useMemo(() => {
     if (!calendarDatesData) return []
@@ -1266,10 +1287,17 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           endDate,
           includeWeekends: false,
           schoolDays,
+          holidays: localeHolidays.length > 0
+            ? localeHolidays.map(h => ({ date: h.date, name: h.name, eventType: h.eventType as any }))
+            : undefined,
         },
       },
       {
-        onSuccess: () => setShowConfirm(false),
+        onSuccess: (result) => {
+          setShowConfirm(false)
+          setShowGenPanel(false)
+          setGenerationWarnings(result.warnings || [])
+        },
       }
     )
   }
@@ -1289,15 +1317,25 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         </div>
         <div className="flex gap-2">
           <button className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
-            📋 Sessions
+            Sessions
           </button>
-          <button
-            onClick={() => setShowConfirm(true)}
-            disabled={!yearId || generateCalendar.isPending}
-            className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
-          >
-            ✨ Generate Calendar
-          </button>
+          {calendarExists ? (
+            <button
+              onClick={() => setShowGenPanel(p => !p)}
+              disabled={generateCalendar.isPending}
+              className="bg-[#D97706] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
+            >
+              Regenerate Calendar
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowGenPanel(true)}
+              disabled={!yearId || generateCalendar.isPending}
+              className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
+            >
+              Generate Calendar
+            </button>
+          )}
         </div>
       </div>
 
@@ -1322,8 +1360,20 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         </div>
       </div>
 
+      {/* Generation Warnings */}
+      {generationWarnings.length > 0 && (
+        <div className="mb-3 space-y-1.5">
+          {generationWarnings.map((w, i) => (
+            <div key={i} className="flex items-start gap-2 bg-[rgba(217,119,6,0.06)] border border-[rgba(217,119,6,0.15)] rounded-lg p-2.5 text-[11px] text-[#D97706] leading-relaxed">
+              <span className="shrink-0 mt-0.5">&#9888;</span>
+              <span>{w}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Calendar Month Grid — visible when calendar has been generated */}
-      {totalDays > 0 && calendarDates.length > 0 && (
+      {calendarExists && calendarDates.length > 0 && (
         <CalendarMonthGrid
           currentMonth={currentMonth}
           onMonthChange={setCurrentMonth}
@@ -1356,126 +1406,157 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         />
       )}
 
-      {/* Generate Calendar Panel */}
-      <div className="bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.12)] rounded-xl p-3.5 mb-3">
-        <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-1">✨ Generate Calendar</h3>
-        <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
-          Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.
-        </p>
+      {/* Generate Calendar Panel — collapsible after first generation */}
+      {showGenPanel && (
+        <div className="bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.12)] rounded-xl p-3.5 mb-3">
+          <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-1">
+            {calendarExists ? 'Regenerate Calendar' : 'Generate Calendar'}
+          </h3>
+          <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
+            Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.
+          </p>
 
-        {/* Locale chip */}
-        <div className="inline-flex items-center gap-1.5 text-[10px] text-[#378ADD] bg-[rgba(55,138,221,0.08)] border border-[rgba(55,138,221,0.15)] rounded-md px-2 py-1 mb-3">
-          {localeDefaults.isNepal ? '🌏' : '🌐'} Detected locale: {localeDefaults.isNepal ? 'Nepal (NP) · Bikram Sambat calendar' : 'International · Gregorian calendar'}
-        </div>
-
-        {/* Locale row */}
-        <div className="grid grid-cols-2 gap-2.5 mb-3">
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Country / Locale</label>
-            <select className={inputClass} defaultValue={localeDefaults.isNepal ? 'NP' : 'US'}>
-              <option value="NP">Nepal (NP)</option>
-              <option value="US">United States (US)</option>
-              <option value="IN">India (IN)</option>
-              <option value="custom">Custom</option>
-            </select>
+          {/* Locale chip — accurate description, no false BS claim */}
+          <div className="inline-flex items-center gap-1.5 text-[10px] text-[#378ADD] bg-[rgba(55,138,221,0.08)] border border-[rgba(55,138,221,0.15)] rounded-md px-2 py-1 mb-3">
+            {localeDefaults.isNepal
+              ? `Detected locale: Nepal (NP) · Saturday weekend · ${localeHolidays.length} public holidays loaded`
+              : 'Detected locale: International · Gregorian calendar'}
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Weekends</label>
-            <select
-              className={inputClass}
-              value={weekendOption}
-              onChange={e => {
-                setWeekendOption(e.target.value)
-                const weekendMap: Record<string, number[]> = {
-                  'sat': [6],
-                  'sat-sun': [0, 6],
-                  'fri-sat': [5, 6],
-                  'sun': [0],
-                }
-                const weekends = weekendMap[e.target.value] || [0, 6]
-                setCalSchoolDays([0,1,2,3,4,5,6].filter(d => !weekends.includes(d)))
-              }}
+
+          {/* Locale row */}
+          <div className="grid grid-cols-2 gap-2.5 mb-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Country / Locale</label>
+              <select className={inputClass} defaultValue={localeDefaults.isNepal ? 'NP' : 'US'}>
+                <option value="NP">Nepal (NP)</option>
+                <option value="US">United States (US)</option>
+                <option value="IN">India (IN)</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Weekends</label>
+              <select
+                className={inputClass}
+                value={weekendOption}
+                onChange={e => {
+                  setWeekendOption(e.target.value)
+                  const weekendMap: Record<string, number[]> = {
+                    'sat': [6],
+                    'sat-sun': [0, 6],
+                    'fri-sat': [5, 6],
+                    'sun': [0],
+                  }
+                  const weekends = weekendMap[e.target.value] || [0, 6]
+                  setCalSchoolDays([0,1,2,3,4,5,6].filter(d => !weekends.includes(d)))
+                }}
+              >
+                <option value="sat">Saturday only (Nepal default)</option>
+                <option value="sat-sun">Saturday & Sunday</option>
+                <option value="fri-sat">Friday & Saturday</option>
+                <option value="sun">Sunday only</option>
+              </select>
+            </div>
+          </div>
+
+          {/* School days picker */}
+          <div className="mb-3">
+            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1.5 block">School Days</label>
+            <div className="flex gap-1.5">
+              {DAY_LABELS.map((day, i) => {
+                const dayIndex = dayToIndex(day.key)
+                const isActive = calSchoolDays.includes(dayIndex)
+                return (
+                  <button
+                    key={`cal-${day.key}-${i}`}
+                    onClick={() => toggleCalDay(dayIndex)}
+                    className={`w-8 h-8 rounded-lg border text-[11px] font-semibold flex items-center justify-center transition-all ${
+                      isActive
+                        ? 'bg-[rgba(55,138,221,0.15)] border-[rgba(55,138,221,0.3)] text-[#378ADD]'
+                        : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]'
+                    }`}
+                  >
+                    {day.short}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1.5">{localeDefaults.weekendHint}</p>
+          </div>
+
+          {/* Preview */}
+          {activeYear && (
+            <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)] rounded-lg p-3 mb-3 text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+              <strong className="text-[rgb(var(--text-primary))]">Preview:</strong>{' '}
+              Will generate dates from{' '}
+              <strong className="text-[#378ADD]">{activeYear.startDate ? new Date(activeYear.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>{' '}
+              to{' '}
+              <strong className="text-[#378ADD]">{activeYear.endDate ? new Date(activeYear.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>
+              <br />
+              ✔ Active days → Instructional days<br />
+              ✔ Weekend days → Non-instructional (weekend)<br />
+              {localeHolidays.length > 0
+                ? <>✔ {localeHolidays.length} national holidays from {localeDefaults.isNepal ? 'Nepal' : 'locale'} public holiday calendar will be applied<br /></>
+                : <>&#9888; No locale holiday calendar available — holidays can be added manually after generation<br /></>
+              }
+              ⚠ Existing dates for this year will be replaced
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => setShowGenPanel(false)}
+              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
             >
-              <option value="sat">Saturday only (Nepal default)</option>
-              <option value="sat-sun">Saturday & Sunday</option>
-              <option value="fri-sat">Friday & Saturday</option>
-              <option value="sun">Sunday only</option>
-            </select>
+              Cancel
+            </button>
+            <button
+              onClick={() => setShowConfirm(true)}
+              disabled={!yearId || generateCalendar.isPending}
+              className={`px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 ${
+                calendarExists ? 'bg-[#D97706]' : 'bg-[#1D9E75]'
+              }`}
+            >
+              {calendarExists ? 'Regenerate Calendar' : 'Generate Calendar'}
+            </button>
           </div>
         </div>
+      )}
 
-        {/* School days picker */}
-        <div className="mb-3">
-          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1.5 block">School Days</label>
-          <div className="flex gap-1.5">
-            {DAY_LABELS.map((day, i) => {
-              const dayIndex = dayToIndex(day.key)
-              const isActive = calSchoolDays.includes(dayIndex)
-              return (
-                <button
-                  key={`cal-${day.key}-${i}`}
-                  onClick={() => toggleCalDay(dayIndex)}
-                  className={`w-8 h-8 rounded-lg border text-[11px] font-semibold flex items-center justify-center transition-all ${
-                    isActive
-                      ? 'bg-[rgba(55,138,221,0.15)] border-[rgba(55,138,221,0.3)] text-[#378ADD]'
-                      : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]'
-                  }`}
-                >
-                  {day.short}
-                </button>
-              )
-            })}
-          </div>
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1.5">{localeDefaults.weekendHint}</p>
-        </div>
-
-        {/* Preview */}
-        {activeYear && (
-          <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)] rounded-lg p-3 mb-3 text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
-            <strong className="text-[rgb(var(--text-primary))]">Preview:</strong>{' '}
-            Will generate dates from{' '}
-            <strong className="text-[#378ADD]">{activeYear.startDate ? new Date(activeYear.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>{' '}
-            to{' '}
-            <strong className="text-[#378ADD]">{activeYear.endDate ? new Date(activeYear.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>
-            <br />
-            ✔ Active days → Instructional days<br />
-            ✔ Weekend days → Non-instructional (weekend)<br />
-            ✔ National holidays from locale public holiday calendar will be imported<br />
-            ⚠ Existing dates for this year will be replaced
-          </div>
-        )}
-
-        <div className="flex justify-end gap-2">
-          <button className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
-          <button
-            onClick={() => setShowConfirm(true)}
-            disabled={!yearId || generateCalendar.isPending}
-            className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
-          >
-            ✨ Generate Calendar
-          </button>
-        </div>
-      </div>
-
-      {/* Confirmation dialog */}
+      {/* Confirmation dialog — stronger warning for regeneration */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
           <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
-            <h3 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">Generate Calendar</h3>
-            <p className="text-xs text-[rgb(var(--text-secondary))] mb-3 leading-relaxed">
-              This will generate calendar dates for <strong>{yearLabel}</strong> from{' '}
-              <strong className="text-[#378ADD]">
-                {startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
-              </strong>{' '}to{' '}
-              <strong className="text-[#378ADD]">
-                {endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
-              </strong>.
-            </p>
+            <h3 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">
+              {calendarExists ? 'Regenerate Calendar' : 'Generate Calendar'}
+            </h3>
+            {calendarExists ? (
+              <div className="bg-[rgba(239,68,68,0.06)] border border-[rgba(239,68,68,0.15)] rounded-lg p-3 mb-3">
+                <p className="text-xs text-[#EF4444] font-medium mb-1">This is a destructive action</p>
+                <p className="text-[11px] text-[rgb(var(--text-secondary))] leading-relaxed">
+                  This will <strong>delete all {totalDays} existing calendar dates</strong> for {yearLabel} and regenerate.
+                  Any manual edits (teacher in-service days, early releases, holiday overrides) will be permanently lost.
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-[rgb(var(--text-secondary))] mb-3 leading-relaxed">
+                This will generate calendar dates for <strong>{yearLabel}</strong> from{' '}
+                <strong className="text-[#378ADD]">
+                  {startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
+                </strong>{' '}to{' '}
+                <strong className="text-[#378ADD]">
+                  {endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
+                </strong>.
+              </p>
+            )}
             <div className="space-y-1.5 text-[11px] text-[rgb(var(--text-tertiary))] mb-4">
               <p>✔ Active days will be marked as instructional</p>
               <p>✔ Weekend days will be marked as non-instructional</p>
-              <p className="text-amber-400">⚠ Existing calendar dates for this year will be replaced</p>
+              {localeHolidays.length > 0 && (
+                <p>✔ {localeHolidays.length} public holidays will be applied</p>
+              )}
+              <p>✔ Session instructional day counts will be updated automatically</p>
             </div>
             <div className="flex justify-end gap-2">
               <button
@@ -1487,9 +1568,16 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
               <button
                 onClick={handleGenerate}
                 disabled={generateCalendar.isPending}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 ${
+                  calendarExists ? 'bg-[#EF4444]' : 'bg-[#1D9E75]'
+                }`}
               >
-                {generateCalendar.isPending ? 'Generating...' : 'Confirm & Generate'}
+                {generateCalendar.isPending
+                  ? 'Generating...'
+                  : calendarExists
+                    ? 'Delete & Regenerate'
+                    : 'Confirm & Generate'
+                }
               </button>
             </div>
           </div>
@@ -1513,7 +1601,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
             className="text-[9px] font-medium px-1.5 py-0.5 rounded"
             style={{ background: dt.color, color: dt.text, border: `1px solid ${dt.border}` }}
           >
-            ● {dt.label}
+            {dt.label}
           </span>
         ))}
       </div>

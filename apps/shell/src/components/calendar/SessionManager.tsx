@@ -27,6 +27,7 @@ import {
   useDeleteAcademicSession,
 } from '@/hooks/useCalendar'
 import type { AcademicSessionResponseDto, CreateAcademicSessionDto } from '@aibrains/shared-types'
+import { detectSessionGaps } from '@aibrains/shared-types'
 
 // ============================================================================
 // CONSTANTS
@@ -308,6 +309,28 @@ export function SessionManager({
         />
       )}
 
+      {/* Session Gap Warnings */}
+      {sessions.length >= 2 && (() => {
+        const gaps = detectSessionGaps(sessions)
+        if (gaps.length === 0) return null
+        return (
+          <div className="space-y-1.5 mb-3">
+            {gaps.map((gap, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-2 bg-[rgba(217,119,6,0.06)] border border-[rgba(217,119,6,0.15)] rounded-lg p-2.5 text-[11px] text-[#D97706] leading-relaxed"
+              >
+                <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                <span>
+                  <strong>{gap.dayCount}-day gap</strong> between &ldquo;{gap.beforeSession}&rdquo; (ends {gap.gapStart}) and &ldquo;{gap.afterSession}&rdquo; (starts {gap.gapEnd}).
+                  Calendar dates in this range are not assigned to any session.
+                </span>
+              </div>
+            ))}
+          </div>
+        )
+      })()}
+
       {/* Content */}
       <div className="space-y-3">
         {/* Loading */}
@@ -423,9 +446,15 @@ export function SessionManager({
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 text-xs text-[rgb(var(--text-tertiary))]">
                         <span>{session.beginDate} &mdash; {session.endDate}</span>
-                        <span className="text-emerald-600 font-medium">
-                          {session.totalInstructionalDays} instructional days
-                        </span>
+                        {session.totalInstructionalDays > 0 ? (
+                          <span className="text-emerald-600 font-medium bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                            {session.totalInstructionalDays} instructional days
+                          </span>
+                        ) : (
+                          <span className="text-amber-500 font-medium bg-amber-500/10 px-1.5 py-0.5 rounded">
+                            0 instructional days — generate calendar to sync
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -116,15 +116,48 @@ export async function getCalendarStats(
 // CALENDAR GENERATION
 // ============================================================================
 
+export interface GenerateCalendarResult {
+  calendarId: string
+  totalDays: number
+  instructionalDays: number
+  holidays: number
+  weekends: number
+  warnings: string[]
+  sessions: Array<{ sessionId: string; sessionName: string; instructionalDays: number }>
+}
+
 export async function generateCalendar(
   schoolId: string,
   yearId: string,
   data: GenerateCalendarDto
-): Promise<{ calendarId: string; totalDays: number; instructionalDays: number; holidays: number; weekends: number }> {
-  return apiPost<
-    { calendarId: string; totalDays: number; instructionalDays: number; holidays: number; weekends: number },
-    GenerateCalendarDto
-  >(`/schools/${schoolId}/academic-years/${yearId}/generate-calendar`, data)
+): Promise<GenerateCalendarResult> {
+  return apiPost<GenerateCalendarResult, GenerateCalendarDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/generate-calendar`,
+    data
+  )
+}
+
+// ============================================================================
+// LOCALE HOLIDAYS
+// ============================================================================
+
+export interface LocaleHolidayResponse {
+  locale: string
+  supported: boolean
+  holidays: Array<{ date: string; name: string; eventType: string }>
+  supportedLocales: string[]
+}
+
+export async function getLocaleHolidays(
+  schoolId: string,
+  locale: string,
+  startDate: string,
+  endDate: string,
+): Promise<LocaleHolidayResponse> {
+  return apiGet<LocaleHolidayResponse>(
+    `/schools/${schoolId}/holidays`,
+    { locale, startDate, endDate }
+  )
 }
 
 // ============================================================================
@@ -177,6 +210,6 @@ export const calendarService = {
   getCalendars, getCalendar, createCalendar, updateCalendar,
   getCalendarDates, getCalendarDate, createCalendarDate, updateCalendarDate,
   bulkUpdateCalendarDates, getCalendarStats,
-  generateCalendar,
+  generateCalendar, getLocaleHolidays,
   getAcademicSessions, getAcademicSession, createAcademicSession, updateAcademicSession, deleteAcademicSession,
 }
