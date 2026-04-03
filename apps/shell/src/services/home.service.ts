@@ -86,6 +86,35 @@ export async function getAcademicsOverview(
   })
 }
 
+// ── Fallback endpoints (used when unified /dashboard/overview fails) ──────
+
+export interface EnrollmentSummaryResponse {
+  totalEnrolled: number
+  byGradeLevel: Record<string, number>
+  byStatus: Record<string, number>
+}
+
+export async function getEnrollmentSummary(
+  schoolId: string,
+  academicYearId: string,
+): Promise<EnrollmentSummaryResponse> {
+  return apiGet<EnrollmentSummaryResponse>(
+    `/academics/schools/${schoolId}/years/${academicYearId}/enrollments/summary`,
+  )
+}
+
+export async function getAttendanceSummaryForDate(
+  schoolId: string,
+  date: string,
+): Promise<DailyAttendanceSummary> {
+  return apiGet<DailyAttendanceSummary>('/academics/attendance/summary', {
+    schoolId,
+    date,
+  })
+}
+
+// ── Alert & Trend endpoints ─────────────────────────────────────────────
+
 export async function getAttendanceAlerts(
   schoolId: string,
   academicYearId: string,
@@ -122,11 +151,47 @@ export async function getCurrentAcademicYear(
 ): Promise<AcademicYearResponse | null> {
   try {
     return await apiGet<AcademicYearResponse>(
-      `/academics/schools/${schoolId}/academic-years/current`,
+      `/schools/${schoolId}/academic-years/current`,
     )
   } catch {
     return null
   }
+}
+
+// ── Section-level attendance overview ──────────────────────────────────
+
+export interface SectionCompletionItem {
+  sectionId: string
+  sectionNumber: string
+  courseName: string
+  studentCount: number
+  recordedCount: number
+  isComplete: boolean
+}
+
+export interface AttendanceOverviewResponse {
+  schoolId: string
+  date: string
+  totalStudents: number
+  totalRecorded: number
+  attendanceRate: number
+  sectionCompletion: {
+    totalSections: number
+    sectionsWithAttendance: number
+    sections: SectionCompletionItem[]
+  }
+}
+
+export async function getAttendanceOverview(
+  schoolId: string,
+  academicYearId: string,
+  date: string,
+): Promise<AttendanceOverviewResponse> {
+  return apiGet<AttendanceOverviewResponse>('/academics/attendance/overview', {
+    schoolId,
+    academicYearId,
+    date,
+  })
 }
 
 export async function getTeacherSections(

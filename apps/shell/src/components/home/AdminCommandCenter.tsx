@@ -5,7 +5,7 @@
  * Surfaces real-time school data: alerts, KPIs, attendance trend,
  * financial overview, quick actions, section attendance, and activity feed.
  *
- * Layout: alerts → KPI grid (4-col) → mid row (1.6fr 1fr) → bottom row (1fr 1fr 1.3fr)
+ * Layout: alerts → KPI grid (4-col) → mid row (1.6fr 1fr) → bottom row (1.6fr 1fr)
  */
 
 import { useEffect, useMemo } from 'react'
@@ -24,7 +24,6 @@ import { HomeStatCard } from './HomeStatCard'
 import { AlertsRow } from './AlertsRow'
 import { AttendanceTrendCard } from './AttendanceTrendCard'
 import { FinanceSummaryCard } from './FinanceSummaryCard'
-import { QuickActionsGridV2 } from './QuickActionsGridV2'
 import { AttendanceBySectionCard } from './AttendanceBySectionCard'
 import { RecentActivityFeed } from './RecentActivityFeed'
 import { SectionErrorBoundary } from './SectionErrorBoundary'
@@ -340,16 +339,15 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
       </SectionErrorBoundary>
 
       {/* ================================================================ */}
-      {/* SECTION 4: Bottom Row (1fr 1fr 1.3fr) */}
+      {/* SECTION 4: Bottom Row (1.6fr 1fr) — Classroom attendance + Activity */}
       {/* ================================================================ */}
       <SectionErrorBoundary fallbackMessage="Unable to load details">
         <motion.div
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1.3fr]"
+          className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]"
           style={{ gap: 'var(--v2-grid-gap, 12px)' }}
         >
-          <QuickActionsGridV2 />
           <AttendanceBySectionCard
             sections={sectionAttendance.sections}
             todayRate={snapshot.todayAttendanceRate}

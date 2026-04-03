@@ -36,6 +36,9 @@ export interface UserProfile {
   id: string
   email: string
   name?: string
+  firstName?: string
+  lastName?: string
+  displayName?: string
   tenantId: string
   tenantName: string
   globalRole: 'TenantAdmin' | 'StandardUser'

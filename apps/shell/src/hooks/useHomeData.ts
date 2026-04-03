@@ -12,12 +12,17 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useSettings } from '../lib/shell-context'
 import {
   getAcademicsOverview,
+  getEnrollmentSummary,
+  getAttendanceSummaryForDate,
   getAttendanceAlerts,
   getAttendanceTrend,
+  getAttendanceOverview,
   getCurrentAcademicYear,
   getTeacherSections,
   type AcademicsOverviewResponse,
+  type EnrollmentSummaryResponse,
   type AttendanceAlertItem,
+  type AttendanceOverviewResponse,
   type DailyAttendanceSummary,
   type TeacherSectionItem,
 } from '../services/home.service'
@@ -75,12 +80,20 @@ export const homeKeys = {
     [...homeKeys.all, 'academic-year', schoolId] as const,
   overview: (schoolId: string, yearId: string, date: string) =>
     [...homeKeys.all, 'overview', schoolId, yearId, date] as const,
+  enrollmentFallback: (schoolId: string, yearId: string) =>
+    [...homeKeys.all, 'enrollment-fallback', schoolId, yearId] as const,
+  attendanceFallback: (schoolId: string, date: string) =>
+    [...homeKeys.all, 'attendance-fallback', schoolId, date] as const,
+  sectionsFallback: (schoolId: string) =>
+    [...homeKeys.all, 'sections-fallback', schoolId] as const,
   alerts: (schoolId: string, yearId: string) =>
     [...homeKeys.all, 'alerts', schoolId, yearId] as const,
   trend: (schoolId: string) =>
     [...homeKeys.all, 'trend', schoolId] as const,
   teacherSections: (schoolId: string) =>
     [...homeKeys.all, 'teacher-sections', schoolId] as const,
+  attendanceOverview: (schoolId: string, yearId: string, date: string) =>
+    [...homeKeys.all, 'attendance-overview', schoolId, yearId, date] as const,
 }
 
 // ============================================================================
@@ -107,24 +120,73 @@ export function useAcademicsSnapshot(
   academicYearId: string | undefined,
 ) {
   const today = useMemo(() => getTodayISO(), [])
+  const enabled = !!schoolId && !!academicYearId
 
-  const query = useQuery<AcademicsOverviewResponse, Error>({
+  // Primary: unified dashboard overview endpoint
+  const dashboard = useQuery<AcademicsOverviewResponse, Error>({
     queryKey: homeKeys.overview(schoolId!, academicYearId!, today),
     queryFn: () => getAcademicsOverview(schoolId!, academicYearId!, today),
-    enabled: !!schoolId && !!academicYearId,
+    enabled,
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
     retry: 2,
   })
 
+  // Fallback: individual queries when unified endpoint fails (e.g. 404)
+  const unifiedFailed = dashboard.isError
+  const fallbackEnabled = enabled && unifiedFailed
+
+  const enrollment = useQuery<EnrollmentSummaryResponse, Error>({
+    queryKey: homeKeys.enrollmentFallback(schoolId!, academicYearId!),
+    queryFn: () => getEnrollmentSummary(schoolId!, academicYearId!),
+    enabled: fallbackEnabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+  })
+
+  const attendance = useQuery<DailyAttendanceSummary, Error>({
+    queryKey: homeKeys.attendanceFallback(schoolId!, today),
+    queryFn: () => getAttendanceSummaryForDate(schoolId!, today),
+    enabled: fallbackEnabled,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+  })
+
+  const sections = useQuery<{ items: TeacherSectionItem[] }, Error>({
+    queryKey: homeKeys.sectionsFallback(schoolId!),
+    queryFn: () => getTeacherSections(schoolId!, academicYearId),
+    enabled: fallbackEnabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+  })
+
+  // Prefer unified data; fall back to individual queries
+  if (dashboard.isSuccess && dashboard.data) {
+    return {
+      totalEnrolled: dashboard.data.enrollment?.totalEnrolled ?? null,
+      activeSections: dashboard.data.activeSectionsCount ?? null,
+      todayAttendanceRate: dashboard.data.attendance?.attendanceRate ?? null,
+      isLoading: false,
+      isError: false,
+      refetch: dashboard.refetch,
+    }
+  }
+
+  const isLoading = unifiedFailed
+    ? enrollment.isLoading || attendance.isLoading || sections.isLoading
+    : dashboard.isLoading
+
   return {
-    totalEnrolled: query.data?.enrollment?.totalEnrolled ?? null,
-    activeSections: query.data?.activeSectionsCount ?? null,
-    todayAttendanceRate: query.data?.attendance?.attendanceRate ?? null,
-    isLoading: query.isLoading,
-    isError: query.isError,
-    refetch: query.refetch,
+    totalEnrolled: enrollment.data?.totalEnrolled ?? null,
+    activeSections: sections.data ? sections.data.items.length : null,
+    todayAttendanceRate: attendance.data?.attendanceRate ?? null,
+    isLoading,
+    isError: unifiedFailed && enrollment.isError && attendance.isError && sections.isError,
+    refetch: dashboard.refetch,
   }
 }
 
@@ -367,28 +429,59 @@ export function useHomeTeacherSections(
 }
 
 // ============================================================================
-// HOOK: useSectionAttendanceItems — Derive section attendance from teacher sections
+// HOOK: useSectionAttendanceItems — Real section attendance from overview API
 // ============================================================================
 
 export function useSectionAttendanceItems(
   schoolId: string | null,
   academicYearId: string | undefined,
 ): { sections: SectionAttendanceItem[]; isLoading: boolean } {
-  const { sections, isLoading } = useHomeTeacherSections(schoolId, academicYearId)
+  const today = useMemo(() => getTodayISO(), [])
+  const enabled = !!schoolId && !!academicYearId
+
+  const overview = useQuery<AttendanceOverviewResponse, Error>({
+    queryKey: homeKeys.attendanceOverview(schoolId!, academicYearId!, today),
+    queryFn: () => getAttendanceOverview(schoolId!, academicYearId!, today),
+    enabled,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 2,
+  })
+
+  // Fallback to teacher sections list if overview endpoint not available
+  const { sections: teacherSections, isLoading: sectionsLoading } =
+    useHomeTeacherSections(schoolId, academicYearId)
 
   const items = useMemo<SectionAttendanceItem[]>(() => {
-    return sections.slice(0, 6).map((s, i) => ({
+    // Prefer real attendance overview data
+    if (overview.data?.sectionCompletion?.sections) {
+      return overview.data.sectionCompletion.sections.map((s) => ({
+        sectionId: s.sectionId,
+        name: s.courseName
+          ? `${s.sectionNumber} — ${s.courseName}`
+          : s.sectionNumber,
+        status: s.isComplete ? 'taken' as const : 'pending' as const,
+        studentCount: s.studentCount,
+        recordedCount: s.recordedCount,
+      }))
+    }
+
+    // Fallback: use teacher sections without real attendance status
+    return teacherSections.slice(0, 8).map((s) => ({
       sectionId: s.sectionId,
       name: s.courseName
         ? `${s.sectionNumber} — ${s.courseName}`
         : s.sectionNumber,
-      // Derive status: even-indexed sections as "taken" for now
-      // This is a best-effort derivation — proper API would provide real status
-      status: i % 2 === 0 ? 'taken' as const : 'pending' as const,
+      status: 'pending' as const,
+      studentCount: s.currentEnrollment,
+      recordedCount: 0,
     }))
-  }, [sections])
+  }, [overview.data, teacherSections])
 
-  return { sections: items, isLoading }
+  return {
+    sections: items,
+    isLoading: enabled ? overview.isLoading : sectionsLoading,
+  }
 }
 
 // ============================================================================

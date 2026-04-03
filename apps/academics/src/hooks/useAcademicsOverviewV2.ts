@@ -12,8 +12,10 @@
  */
 
 import { useMemo, useState, useCallback } from 'react'
+import { toast } from 'sonner'
 import { usePermission } from '@edforge/abac'
 import { getEnrollmentExportUrl } from '../services/academics.service'
+import { downloadAuthenticatedFile } from '../lib/download'
 import {
   useAcademicsOverview,
   useActiveTeacherCount,
@@ -130,13 +132,20 @@ export function useAcademicsOverviewV2(schoolId: string): AcademicsV2Data {
     setGradeLevelFilter('')
   }, [])
 
-  const handleExportCSV = useCallback(() => {
+  const handleExportCSV = useCallback(async () => {
     if (!schoolId || !academicYearId) return
     setIsExporting(true)
-    const url = getEnrollmentExportUrl(schoolId, academicYearId)
-    window.open(`/api${url}`, '_blank')
-    // Reset after a short delay (download triggers immediately)
-    setTimeout(() => setIsExporting(false), 2000)
+    try {
+      const url = getEnrollmentExportUrl(schoolId, academicYearId)
+      await downloadAuthenticatedFile(url, `enrollments-${academicYearId}.csv`)
+    } catch (error) {
+      console.error('[Export] CSV export failed:', error)
+      toast.error('Export Failed', {
+        description: error instanceof Error ? error.message : 'Could not download the file.',
+      })
+    } finally {
+      setIsExporting(false)
+    }
   }, [schoolId, academicYearId])
 
   // Core overview data (enrollment, sections, attendance)

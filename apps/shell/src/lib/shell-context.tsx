@@ -123,10 +123,11 @@ export function ShellProvider({ children }: ShellProviderProps) {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // Track if we've already synced assignments for this userProfile
+  // Track if we've already synced profile data for this userProfile
   const lastSyncedAssignmentsRef = useRef<string | null>(null)
+  const lastSyncedNameRef = useRef<string | null>(null)
 
-  // Update user with fetched assignments — only when assignments actually change
+  // Update user with fetched profile — merges name fields + assignments
   useEffect(() => {
     if (!userProfile || !user) return
 
@@ -134,9 +135,33 @@ export function ShellProvider({ children }: ShellProviderProps) {
       ? JSON.stringify(userProfile.assignments.map(a => `${a.schoolId}:${a.role}`).sort())
       : null
 
-    if (assignmentsKey && assignmentsKey !== lastSyncedAssignmentsRef.current) {
+    // Derive proper name from API profile (API returns firstName, lastName, displayName)
+    const profileName = userProfile.displayName
+      || (userProfile.firstName && userProfile.lastName
+          ? `${userProfile.firstName} ${userProfile.lastName}`
+          : undefined)
+      || userProfile.name
+
+    const profileDisplayName = userProfile.displayName
+      || userProfile.firstName
+      || undefined
+
+    const nameKey = `${profileName ?? ''}:${profileDisplayName ?? ''}`
+    const assignmentsChanged = assignmentsKey && assignmentsKey !== lastSyncedAssignmentsRef.current
+    const nameChanged = nameKey !== lastSyncedNameRef.current && (profileName || profileDisplayName)
+
+    if (assignmentsChanged || nameChanged) {
       lastSyncedAssignmentsRef.current = assignmentsKey
-      setUser(user, userProfile.assignments)
+      lastSyncedNameRef.current = nameKey
+
+      // Merge API profile name data into user identity
+      const mergedUser = {
+        ...user,
+        ...(profileName ? { name: profileName } : {}),
+        ...(profileDisplayName ? { displayName: profileDisplayName } : {}),
+      }
+
+      setUser(mergedUser, userProfile.assignments)
     }
   }, [userProfile, setUser]) // Intentionally exclude 'user' to prevent infinite loop
 

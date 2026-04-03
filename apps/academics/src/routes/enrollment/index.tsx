@@ -40,6 +40,8 @@ import {
   useCloseAcademicYear,
 } from '../../hooks/useEnrollments'
 import { getEnrollmentExportUrl } from '../../services/academics.service'
+import { downloadAuthenticatedFile } from '../../lib/download'
+import { toast } from 'sonner'
 import { RegistrationWizard } from '../../components/students/registration'
 import { EnrollmentDashboard } from '../../components/enrollment/EnrollmentDashboard'
 import { EnrollmentTable } from '../../components/enrollment/EnrollmentTable'
@@ -176,10 +178,17 @@ export function EnrollmentModule() {
     })
   }, [schoolId, activeYearId, markNoShowMutation])
 
-  const handleExportCSV = useCallback(() => {
+  const handleExportCSV = useCallback(async () => {
     if (!schoolId || !activeYearId) return
-    const url = getEnrollmentExportUrl(schoolId, activeYearId)
-    window.open(`/api${url}`, '_blank')
+    try {
+      const url = getEnrollmentExportUrl(schoolId, activeYearId)
+      await downloadAuthenticatedFile(url, `enrollments-${activeYearId}.csv`)
+    } catch (error) {
+      console.error('[Export] CSV export failed:', error)
+      toast.error('Export Failed', {
+        description: error instanceof Error ? error.message : 'Could not download the file.',
+      })
+    }
   }, [schoolId, activeYearId])
 
   const handleCloseYear = useCallback(() => {
