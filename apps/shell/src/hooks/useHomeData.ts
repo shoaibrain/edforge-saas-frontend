@@ -3,12 +3,16 @@
  *
  * React Query hooks for the home page command center.
  * Orchestrates parallel data fetching from academics and finance APIs.
+ *
+ * Debug mode: set `localStorage.setItem('edforge-debug', 'true')` to enable
+ * console logging for query strategies, fallback states, and data consistency.
  */
 
-import { useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useDashboardSummary } from '@edforge/finance-services'
 import { useCurrency } from '@edforge/types/use-currency'
+import type { DashboardSummary } from '@edforge/types'
 import { useSettings } from '../lib/shell-context'
 import {
   getAcademicsOverview,
@@ -34,6 +38,24 @@ import type { SectionAttendanceItem } from '../components/home/AttendanceBySecti
 // ============================================================================
 
 export const ATTENDANCE_THRESHOLD = 80
+
+// ============================================================================
+// DEBUG LOGGING (Ticket 1.2)
+// ============================================================================
+
+const DEBUG =
+  typeof window !== 'undefined' &&
+  localStorage.getItem('edforge-debug') === 'true'
+
+function debugLog(tag: string, ...args: unknown[]) {
+  if (DEBUG) console.log(`[Home:${tag}]`, ...args)
+}
+
+// ============================================================================
+// RETRY DELAY — Exponential backoff (Ticket 1.2)
+// ============================================================================
+
+const retryDelay = (attempt: number) => Math.min(1000 * 2 ** attempt, 10000)
 
 // ============================================================================
 // HELPERS
@@ -90,8 +112,9 @@ export const homeKeys = {
     [...homeKeys.all, 'alerts', schoolId, yearId] as const,
   trend: (schoolId: string) =>
     [...homeKeys.all, 'trend', schoolId] as const,
-  teacherSections: (schoolId: string) =>
-    [...homeKeys.all, 'teacher-sections', schoolId] as const,
+  // Ticket 1.4: include academicYearId in teacher sections key
+  teacherSections: (schoolId: string, academicYearId?: string) =>
+    [...homeKeys.all, 'teacher-sections', schoolId, academicYearId ?? 'none'] as const,
   attendanceOverview: (schoolId: string, yearId: string, date: string) =>
     [...homeKeys.all, 'attendance-overview', schoolId, yearId, date] as const,
 }
@@ -108,11 +131,15 @@ export function useHomeAcademicYear(schoolId: string | null) {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
+    retryDelay,
   })
 }
 
 // ============================================================================
 // HOOK: useAcademicsSnapshot — Core KPI data for admin
+// Ticket 1.3a: per-field availability flags
+// Ticket 1.3b: conditional fallback queries for partial responses
+// Ticket 1.2: debug logging + exponential backoff
 // ============================================================================
 
 export function useAcademicsSnapshot(
@@ -131,61 +158,115 @@ export function useAcademicsSnapshot(
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
     retry: 2,
+    retryDelay,
   })
 
-  // Fallback: individual queries when unified endpoint fails (e.g. 404)
+  // Ticket 1.3a: derive per-field availability flags
+  const hasEnrollment = dashboard.isSuccess && dashboard.data?.enrollment != null
+  const hasAttendance = dashboard.isSuccess && dashboard.data?.attendance != null
+  const hasSections = dashboard.isSuccess && dashboard.data?.activeSectionsCount != null
+
+  // Ticket 1.3b: individual fallback queries — enabled when unified fails
+  // OR when unified succeeds but a specific field is null
   const unifiedFailed = dashboard.isError
-  const fallbackEnabled = enabled && unifiedFailed
 
   const enrollment = useQuery<EnrollmentSummaryResponse, Error>({
     queryKey: homeKeys.enrollmentFallback(schoolId!, academicYearId!),
     queryFn: () => getEnrollmentSummary(schoolId!, academicYearId!),
-    enabled: fallbackEnabled,
+    enabled: enabled && (unifiedFailed || (dashboard.isSuccess && !hasEnrollment)),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 2,
+    retryDelay,
   })
 
   const attendance = useQuery<DailyAttendanceSummary, Error>({
     queryKey: homeKeys.attendanceFallback(schoolId!, today),
     queryFn: () => getAttendanceSummaryForDate(schoolId!, today),
-    enabled: fallbackEnabled,
+    enabled: enabled && (unifiedFailed || (dashboard.isSuccess && !hasAttendance)),
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 2,
+    retryDelay,
   })
 
   const sections = useQuery<{ items: TeacherSectionItem[] }, Error>({
     queryKey: homeKeys.sectionsFallback(schoolId!),
     queryFn: () => getTeacherSections(schoolId!, academicYearId),
-    enabled: fallbackEnabled,
+    enabled: enabled && (unifiedFailed || (dashboard.isSuccess && !hasSections)),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 2,
+    retryDelay,
   })
 
-  // Prefer unified data; fall back to individual queries
-  if (dashboard.isSuccess && dashboard.data) {
-    return {
-      totalEnrolled: dashboard.data.enrollment?.totalEnrolled ?? null,
-      activeSections: dashboard.data.activeSectionsCount ?? null,
-      todayAttendanceRate: dashboard.data.attendance?.attendanceRate ?? null,
-      isLoading: false,
-      isError: false,
-      refetch: dashboard.refetch,
+  // Ticket 1.2: debug logging for query strategy changes
+  const prevStrategyRef = useRef<string>('')
+  useEffect(() => {
+    const strategy = unifiedFailed
+      ? 'fallback-all'
+      : dashboard.isSuccess
+        ? (!hasEnrollment || !hasAttendance || !hasSections)
+          ? 'partial-fallback'
+          : 'unified'
+        : 'loading'
+
+    if (strategy !== prevStrategyRef.current) {
+      prevStrategyRef.current = strategy
+      debugLog('snapshot', `Strategy: ${strategy}`, {
+        hasEnrollment,
+        hasAttendance,
+        hasSections,
+        unifiedFailed,
+      })
     }
-  }
+
+    if (unifiedFailed) {
+      debugLog('snapshot', 'Fallback states:', {
+        enrollment: enrollment.status,
+        attendance: attendance.status,
+        sections: sections.status,
+      })
+    }
+
+    // Log data consistency warnings
+    if (dashboard.isSuccess && dashboard.data) {
+      if (!hasEnrollment) debugLog('snapshot', 'WARN: unified response has null enrollment')
+      if (!hasAttendance) debugLog('snapshot', 'WARN: unified response has null attendance')
+      if (!hasSections) debugLog('snapshot', 'WARN: unified response has null activeSectionsCount')
+    }
+  }, [
+    unifiedFailed, dashboard.isSuccess, dashboard.data,
+    hasEnrollment, hasAttendance, hasSections,
+    enrollment.status, attendance.status, sections.status,
+  ])
+
+  // Ticket 1.3b: merge — prefer unified data per field, then fallback per field
+  const totalEnrolled = hasEnrollment
+    ? dashboard.data!.enrollment!.totalEnrolled
+    : enrollment.data?.totalEnrolled ?? null
+
+  const activeSections = hasSections
+    ? dashboard.data!.activeSectionsCount!
+    : sections.data ? sections.data.items.length : null
+
+  const todayAttendanceRate = hasAttendance
+    ? dashboard.data!.attendance!.attendanceRate
+    : attendance.data?.attendanceRate ?? null
 
   const isLoading = unifiedFailed
     ? enrollment.isLoading || attendance.isLoading || sections.isLoading
     : dashboard.isLoading
 
+  const isError = unifiedFailed
+    && enrollment.isError && attendance.isError && sections.isError
+
   return {
-    totalEnrolled: enrollment.data?.totalEnrolled ?? null,
-    activeSections: sections.data ? sections.data.items.length : null,
-    todayAttendanceRate: attendance.data?.attendanceRate ?? null,
+    totalEnrolled,
+    activeSections,
+    todayAttendanceRate,
     isLoading,
-    isError: unifiedFailed && enrollment.isError && attendance.isError && sections.isError,
+    isError,
     refetch: dashboard.refetch,
   }
 }
@@ -229,6 +310,7 @@ export function useHomeAlerts(
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
+    retryDelay,
   })
 
   const alerts = useMemo<HomeAlert[]>(() => {
@@ -306,6 +388,7 @@ export function useHomeAttendanceTrend(
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
+    retryDelay,
   })
 
   const chartData = useMemo<TrendPoint[]>(() => {
@@ -338,6 +421,7 @@ export function useHomeAttendanceTrend(
 
 // ============================================================================
 // HOOK: useFinanceSummary — Extended for V2
+// Ticket 1.9: Removed `as any` — uses proper DashboardSummary type
 // ============================================================================
 
 export interface FeeTypeBreakdown {
@@ -369,7 +453,7 @@ export function useFinanceSummary(schoolId: string | null) {
 
   const data = useMemo<FinanceSummaryData | null>(() => {
     if (!query.data) return null
-    const d = query.data as any
+    const d: DashboardSummary = query.data
     return {
       totalInvoiced: d.totalInvoiced ?? 0,
       totalCollected: d.totalCollected ?? 0,
@@ -378,7 +462,7 @@ export function useFinanceSummary(schoolId: string | null) {
       collectionRate: d.collectionRate ?? 0,
       byFeeType: Array.isArray(d.byFeeType)
         ? Object.fromEntries(
-            d.byFeeType.map((f: any) => [
+            d.byFeeType.map((f) => [
               f.feeType,
               {
                 totalAmount: f.totalAmount ?? 0,
@@ -387,7 +471,7 @@ export function useFinanceSummary(schoolId: string | null) {
               },
             ])
           )
-        : d.byFeeType,
+        : undefined,
       recentPayments: d.recentPayments,
     }
   }, [query.data])
@@ -402,6 +486,7 @@ export function useFinanceSummary(schoolId: string | null) {
 
 // ============================================================================
 // HOOK: useHomeTeacherSections — Teacher's assigned sections
+// Ticket 1.4: query key now includes academicYearId
 // ============================================================================
 
 export function useHomeTeacherSections(
@@ -409,11 +494,12 @@ export function useHomeTeacherSections(
   academicYearId: string | undefined,
 ) {
   const query = useQuery({
-    queryKey: homeKeys.teacherSections(schoolId!),
+    queryKey: homeKeys.teacherSections(schoolId!, academicYearId),
     queryFn: () => getTeacherSections(schoolId!, academicYearId),
     enabled: !!schoolId,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retryDelay,
   })
 
   const sections = useMemo<TeacherSectionItem[]>(
@@ -446,6 +532,7 @@ export function useSectionAttendanceItems(
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 2,
+    retryDelay,
   })
 
   // Fallback to teacher sections list if overview endpoint not available
@@ -460,9 +547,14 @@ export function useSectionAttendanceItems(
         name: s.courseName
           ? `${s.sectionNumber} — ${s.courseName}`
           : s.sectionNumber,
-        status: s.isComplete ? 'taken' as const : 'pending' as const,
+        status: s.recordedCount > 0
+          ? (s.recordedCount >= s.studentCount ? 'taken' as const : 'partial' as const)
+          : 'pending' as const,
         studentCount: s.studentCount,
         recordedCount: s.recordedCount,
+        attendanceRate: s.studentCount > 0 && s.recordedCount > 0
+          ? undefined // Will be added from backend when available
+          : undefined,
       }))
     }
 
@@ -482,6 +574,29 @@ export function useSectionAttendanceItems(
     sections: items,
     isLoading: enabled ? overview.isLoading : sectionsLoading,
   }
+}
+
+// ============================================================================
+// HOOK: useHomeCacheInvalidation — Ticket 1.5
+// Invalidates all home queries when activeSchoolId changes
+// ============================================================================
+
+export function useHomeCacheInvalidation(activeSchoolId: string | null) {
+  const queryClient = useQueryClient()
+  const prevSchoolIdRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    const prev = prevSchoolIdRef.current
+    prevSchoolIdRef.current = activeSchoolId
+
+    // Skip on initial mount
+    if (prev === null) return
+    // Skip if school hasn't changed
+    if (prev === activeSchoolId) return
+
+    debugLog('cache', `School changed: ${prev} → ${activeSchoolId}`)
+    queryClient.removeQueries({ queryKey: homeKeys.all })
+  }, [activeSchoolId, queryClient])
 }
 
 // ============================================================================
@@ -525,4 +640,52 @@ export function useRecentActivityItems(
   }, [financeSummary, formatShort])
 
   return { items, isLoading: financeLoading }
+}
+
+// ============================================================================
+// HOOK: useOnlineStatus — Ticket 4.2
+// Tracks browser online/offline state for stale data banner
+// ============================================================================
+
+export function useOnlineStatus() {
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true,
+  )
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  return isOnline
+}
+
+// ============================================================================
+// HOOK: useDayChangeDetection — Ticket 4.4
+// Detects when the day rolls over and invalidates stale date-based queries
+// ============================================================================
+
+export function useDayChangeDetection() {
+  const queryClient = useQueryClient()
+  const cachedDateRef = useRef(getTodayISO())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const current = getTodayISO()
+      if (current !== cachedDateRef.current) {
+        debugLog('day-change', `Day changed: ${cachedDateRef.current} → ${current}`)
+        cachedDateRef.current = current
+        // Invalidate all home queries since many are date-dependent
+        queryClient.invalidateQueries({ queryKey: homeKeys.all })
+      }
+    }, 60_000) // Check every 60 seconds
+
+    return () => clearInterval(interval)
+  }, [queryClient])
 }

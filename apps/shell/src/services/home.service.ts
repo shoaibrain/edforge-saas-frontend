@@ -146,6 +146,10 @@ export async function getAttendanceTrend(
   })
 }
 
+/**
+ * Ticket 1.6: Only catch 404 (no academic year configured) → return null.
+ * Re-throw all other errors so React Query can properly show loading/error states.
+ */
 export async function getCurrentAcademicYear(
   schoolId: string,
 ): Promise<AcademicYearResponse | null> {
@@ -153,8 +157,10 @@ export async function getCurrentAcademicYear(
     return await apiGet<AcademicYearResponse>(
       `/schools/${schoolId}/academic-years/current`,
     )
-  } catch {
-    return null
+  } catch (error: unknown) {
+    const status = (error as { response?: { status?: number } })?.response?.status
+    if (status === 404) return null
+    throw error
   }
 }
 

@@ -11,6 +11,7 @@ import { ArrowRight } from 'lucide-react'
 import { formatFeeType } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useSettings } from '../../lib/shell-context'
+import { useTranslation } from '@edforge/i18n'
 
 interface FinanceSummaryCardProps {
   totalInvoiced: number
@@ -107,6 +108,7 @@ export function FinanceSummaryCard({
   isError,
   onRetry,
 }: FinanceSummaryCardProps) {
+  const { t } = useTranslation('dashboard')
   const settings = useSettings()
   const { formatShort } = useCurrency(settings)
   const total = totalCollected + outstanding
@@ -129,7 +131,7 @@ export function FinanceSummaryCard({
           className="text-[13px] font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
-          Financial overview
+          {t('homeV2.finance.financialOverview')}
         </h3>
         {!isLoading && !isError && (
           <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
@@ -147,7 +149,7 @@ export function FinanceSummaryCard({
             className="flex flex-col items-center justify-center gap-2 py-8"
             style={{ color: 'var(--v2-text-hint)' }}
           >
-            <p className="text-sm">Unable to load financial data</p>
+            <p className="text-sm">{t('homeV2.finance.unableToLoad')}</p>
             {onRetry && (
               <button
                 onClick={onRetry}
@@ -158,7 +160,7 @@ export function FinanceSummaryCard({
                   border: '1px solid var(--v2-warning-border)',
                 }}
               >
-                Retry
+                {t('homeV2.finance.retry')}
               </button>
             )}
           </div>
@@ -168,7 +170,7 @@ export function FinanceSummaryCard({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
-                  Collected
+                  {t('homeV2.finance.collected')}
                 </span>
                 <span
                   className="text-xs font-medium"
@@ -188,7 +190,7 @@ export function FinanceSummaryCard({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
-                  Outstanding
+                  {t('homeV2.finance.outstanding')}
                 </span>
                 <span
                   className="text-xs font-medium"
@@ -208,7 +210,7 @@ export function FinanceSummaryCard({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
-                  Overdue
+                  {t('homeV2.finance.overdue')}
                 </span>
                 <span
                   className="text-xs font-medium"
@@ -249,7 +251,7 @@ export function FinanceSummaryCard({
             {/* Total invoiced */}
             <div className="flex items-baseline justify-between pt-1">
               <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
-                Total invoiced this year
+                {t('homeV2.finance.totalInvoiced')}
               </span>
               <span
                 className="text-[13px] font-semibold"
@@ -273,7 +275,7 @@ export function FinanceSummaryCard({
           className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
-          View Finance
+          {t('homeV2.finance.viewFinance')}
           <ArrowRight className="w-3 h-3" />
         </Link>
       </div>

@@ -3,9 +3,9 @@
  *
  * Renders a data-driven dashboard that adapts to the user's role:
  * - Administrators see alerts, KPIs, charts, and quick actions (V2 layout)
- * - Teachers see their assigned sections and classroom quick actions
- * - Students see academic quick actions
- * - Parents see family-oriented quick actions
+ * - Teachers see V2-styled section cards with KPI tiles and attendance (Sprint 3)
+ * - Students see V2-styled welcome card with relevant links (Sprint 3)
+ * - Parents see V2-styled welcome card (Sprint 3.6 — deferred to future sprint)
  *
  * All data is fetched from existing APIs (academics, finance, identity).
  * Greeting and date info are rendered in the Header topbar for admin V2.
@@ -43,22 +43,35 @@ export default function HomePage() {
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const firstName = user?.displayName || user?.name?.split(' ')[0]
   const greeting = getGreeting(firstName, t)
-  const isAdmin = roleCategory === 'administrator'
+  const isV2Role = roleCategory === 'administrator' || roleCategory === 'educator' || roleCategory === 'student'
 
-  // Signal to Header that V2 home page is active
+  // Signal to Header that V2 home page is active (all V2 roles)
   useEffect(() => {
-    if (isAdmin) {
+    if (isV2Role) {
       setHomeV2Active(true)
       return () => setHomeV2Active(false)
     }
-  }, [isAdmin, setHomeV2Active])
+  }, [isV2Role, setHomeV2Active])
 
   // Admin V2 — renders its own layout with data-page="home-v2"
-  if (isAdmin) {
+  if (roleCategory === 'administrator') {
     return <AdminCommandCenter schoolId={activeSchoolId} />
   }
 
-  // Non-admin roles keep the existing DynamicPageLayout
+  // Teacher V2 — renders V2 layout directly (no DynamicPageLayout wrapper)
+  if (roleCategory === 'educator') {
+    return <TeacherDashboard schoolId={activeSchoolId} />
+  }
+
+  // Student V2 — renders V2 layout directly
+  if (roleCategory === 'student') {
+    return <StudentDashboard schoolId={activeSchoolId} />
+  }
+
+  // Parent + unknown roles — keep DynamicPageLayout for now
+  // Ticket 3.6: Parent dashboard V2 — DEFERRED to future sprint.
+  // Rationale: No parent-specific APIs exist yet. Parents need child-specific
+  // attendance/grades endpoints before a meaningful V2 dashboard can be built.
   return (
     <DynamicPageLayout
       pageId="home"
@@ -66,18 +79,7 @@ export default function HomePage() {
       header={<GreetingHeader greeting={greeting} />}
       showVisibilityMenu={true}
     >
-      {roleCategory === 'educator' && (
-        <TeacherDashboard schoolId={activeSchoolId} />
-      )}
-      {roleCategory === 'student' && (
-        <StudentDashboard schoolId={activeSchoolId} />
-      )}
-      {roleCategory === 'parent' && (
-        <QuickActionsWidget />
-      )}
-      {roleCategory == null && (
-        <QuickActionsWidget />
-      )}
+      <QuickActionsWidget />
     </DynamicPageLayout>
   )
 }

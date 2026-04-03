@@ -13,6 +13,7 @@ import {
   DollarSign,
 } from 'lucide-react'
 import type { HomeAlert } from '../../hooks/useHomeData'
+import { useTranslation } from '@edforge/i18n'
 
 const SEVERITY_CONFIG = {
   critical: {
@@ -20,10 +21,10 @@ const SEVERITY_CONFIG = {
     border: 'var(--v2-danger-border)',
     ctaBorder: 'rgba(226, 75, 74, 0.30)',
     ctaBg: 'var(--v2-danger-bg)',
-    titleColor: '#f09595',
+    titleColor: 'var(--v2-danger)',
     ctaColor: 'var(--v2-danger)',
     icon: AlertTriangle,
-    iconBg: 'rgba(226, 75, 74, 0.15)',
+    iconBg: 'var(--v2-danger-bg)',
     iconColor: 'var(--v2-danger)',
   },
   warning: {
@@ -31,10 +32,10 @@ const SEVERITY_CONFIG = {
     border: 'var(--v2-warning-border)',
     ctaBorder: 'rgba(239, 159, 39, 0.30)',
     ctaBg: 'var(--v2-warning-bg)',
-    titleColor: '#FAC775',
+    titleColor: 'var(--v2-warning)',
     ctaColor: 'var(--v2-warning)',
     icon: AlertTriangle,
-    iconBg: 'rgba(239, 159, 39, 0.15)',
+    iconBg: 'var(--v2-warning-bg)',
     iconColor: 'var(--v2-warning)',
   },
 }
@@ -82,6 +83,7 @@ function AlertSkeleton() {
 }
 
 export function AlertsRow({ alerts, loading }: AlertsRowProps) {
+  const { t } = useTranslation('dashboard')
   if (loading) {
     return (
       <div className="flex flex-col gap-1.5">
@@ -166,7 +168,7 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                       background: config.ctaBg,
                     }}
                   >
-                    {alert.module === 'finance' ? 'Review billing' : 'View students'}
+                    {alert.module === 'finance' ? t('homeV2.alerts.reviewBilling') : t('homeV2.alerts.viewStudents')}
                   </Link>
                 </div>
               </motion.li>

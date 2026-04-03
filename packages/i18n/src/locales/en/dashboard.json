@@ -81,5 +81,107 @@
       "description": "Manage staff, teachers, parents, and guardians. Track assignments, permissions, and communication preferences.",
       "action": "Manage people"
     }
+  },
+  "homeV2": {
+    "selectSchool": "Select a school from the sidebar to view the dashboard.",
+    "selectSchoolTeacher": "Select a school from the sidebar to view your dashboard.",
+    "offline": "You are offline. Viewing cached data.",
+    "refresh": "Refresh",
+    "kpi": {
+      "studentsEnrolled": "Students enrolled",
+      "activeSections": "Active sections",
+      "todaysAttendance": "Today's attendance",
+      "outstandingFees": "Outstanding fees",
+      "thisAcademicYear": "this academic year",
+      "activeClasses": "active classes",
+      "overdue": "{{amount}} overdue",
+      "collected": "{{rate}}% collected",
+      "aboveTarget": "+{{diff}}% above target",
+      "belowThreshold": "Below threshold",
+      "critical": "Critical",
+      "dayAvg": "30-day avg {{avg}}%"
+    },
+    "alerts": {
+      "unableToLoad": "Unable to load alerts",
+      "reviewBilling": "Review billing",
+      "viewStudents": "View students"
+    },
+    "attendance": {
+      "classroomAttendance": "Classroom attendance",
+      "todayRate": "{{rate}}% today",
+      "sectionsTotal": "{{count}} section total",
+      "sectionsTotal_plural": "{{count}} sections total",
+      "recorded": "{{taken}}/{{total}} recorded",
+      "overallRate": "{{rate}}% overall",
+      "section": "Section",
+      "students": "Students",
+      "recordedCol": "Recorded",
+      "rate": "Rate",
+      "status": "Status",
+      "taken": "Taken",
+      "partial": "Partial",
+      "pending": "Pending",
+      "noSectionsToday": "No sections scheduled today",
+      "noAcademicYear": "No active academic year.",
+      "setupAcademicYear": "Set up an academic year in Settings",
+      "captionPrefix": "Today's classroom attendance status by section."
+    },
+    "trend": {
+      "attendanceTrend": "Attendance trend",
+      "rollingAverage": "30-day rolling average",
+      "actual": "Actual",
+      "target": "{{threshold}}% target",
+      "avg": "Avg {{avg}}%",
+      "noData": "No attendance data recorded yet",
+      "viewAttendance": "View Attendance"
+    },
+    "finance": {
+      "financialOverview": "Financial overview",
+      "collected": "Collected",
+      "outstanding": "Outstanding",
+      "overdue": "Overdue",
+      "totalInvoiced": "Total invoiced this year",
+      "unableToLoad": "Unable to load financial data",
+      "retry": "Retry",
+      "viewFinance": "View Finance"
+    },
+    "activity": {
+      "recentActivity": "Recent activity",
+      "viewAll": "View all",
+      "noActivity": "No recent activity"
+    },
+    "teacher": {
+      "mySections": "My Sections",
+      "totalStudents": "Total Students",
+      "assignedClasses": "assigned classes",
+      "acrossAllSections": "across all sections",
+      "completionRate": "completion rate",
+      "viewAll": "View all",
+      "noSectionsAssigned": "No sections assigned",
+      "contactAdmin": "Contact your administrator to be assigned to class sections.",
+      "takeAttendance": "Take Attendance",
+      "enterGrades": "Enter Grades"
+    },
+    "student": {
+      "welcomeTitle": "Welcome to your portal",
+      "welcomeDescription": "Track your academic progress, view assignments, and stay up to date.",
+      "grades": "Grades",
+      "gradesDesc": "View your academic performance",
+      "attendanceLink": "Attendance",
+      "attendanceDesc": "Check your attendance record",
+      "schedule": "Schedule",
+      "scheduleDesc": "View your class schedule",
+      "assignments": "Assignments",
+      "assignmentsDesc": "View pending assignments"
+    },
+    "errors": {
+      "unableToLoadKpi": "Unable to load KPI data",
+      "unableToLoadInsights": "Unable to load insights",
+      "unableToLoadDetails": "Unable to load details",
+      "unableToLoadSections": "Unable to load sections",
+      "unableToLoadAttendance": "Unable to load attendance data",
+      "unableToLoadDashboard": "Unable to load dashboard",
+      "somethingWentWrong": "Something went wrong"
+    }
   }
 }

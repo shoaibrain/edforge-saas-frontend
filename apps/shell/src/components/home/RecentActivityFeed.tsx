@@ -6,6 +6,7 @@
  */
 
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 
 export interface ActivityItem {
   id: string
@@ -34,7 +35,7 @@ function FeedSkeleton() {
         <div
           key={i}
           className="flex items-start gap-2.5 py-[9px]"
-          style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default, rgba(255,255,255,0.06))' : 'none' }}
+          style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}
         >
           <div
             className="w-[7px] h-[7px] rounded-full flex-shrink-0 mt-1 v2-skeleton-pulse"
@@ -60,6 +61,8 @@ function FeedSkeleton() {
 }
 
 export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps) {
+  const { t } = useTranslation('dashboard')
+
   return (
     <div
       className="rounded-xl border"
@@ -75,7 +78,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
           className="text-[13px] font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
-          Recent activity
+          {t('homeV2.activity.recentActivity')}
         </span>
         <Link
           to="/finance/$"
@@ -83,7 +86,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
           className="text-[11px] cursor-pointer transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
-          View all
+          {t('homeV2.activity.viewAll')}
         </Link>
       </div>
 
@@ -92,7 +95,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
         <FeedSkeleton />
       ) : items.length === 0 ? (
         <p className="text-sm py-6 text-center" style={{ color: 'var(--v2-text-hint)' }}>
-          No recent activity
+          {t('homeV2.activity.noActivity')}
         </p>
       ) : (
         <div className="flex flex-col">

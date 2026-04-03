@@ -81,5 +81,107 @@
       "description": "कर्मचारी, शिक्षक, अभिभावक, र संरक्षकहरू व्यवस्थापन गर्नुहोस्। कार्य, अनुमति, र सम्पर्क प्राथमिकताहरू ट्र्याक गर्नुहोस्।",
       "action": "कर्मचारी व्यवस्थापन गर्नुहोस्"
     }
+  },
+  "homeV2": {
+    "selectSchool": "ड्यासबोर्ड हेर्न साइडबारबाट विद्यालय छान्नुहोस्।",
+    "selectSchoolTeacher": "तपाईंको ड्यासबोर्ड हेर्न साइडबारबाट विद्यालय छान्नुहोस्।",
+    "offline": "तपाईं अफलाइन हुनुहुन्छ। क्यास गरिएको डाटा देखाउँदै।",
+    "refresh": "रिफ्रेस",
+    "kpi": {
+      "studentsEnrolled": "भर्ना भएका विद्यार्थीहरू",
+      "activeSections": "सक्रिय खण्डहरू",
+      "todaysAttendance": "आजको उपस्थिति",
+      "outstandingFees": "बाँकी शुल्कहरू",
+      "thisAcademicYear": "यो शैक्षिक वर्ष",
+      "activeClasses": "सक्रिय कक्षाहरू",
+      "overdue": "{{amount}} म्याद सकिएको",
+      "collected": "{{rate}}% सङ्कलित",
+      "aboveTarget": "+{{diff}}% लक्ष्यभन्दा माथि",
+      "belowThreshold": "सीमाभन्दा तल",
+      "critical": "गम्भीर",
+      "dayAvg": "३०-दिन औसत {{avg}}%"
+    },
+    "alerts": {
+      "unableToLoad": "अलर्टहरू लोड गर्न असमर्थ",
+      "reviewBilling": "बिलिङ समीक्षा गर्नुहोस्",
+      "viewStudents": "विद्यार्थीहरू हेर्नुहोस्"
+    },
+    "attendance": {
+      "classroomAttendance": "कक्षा उपस्थिति",
+      "todayRate": "{{rate}}% आज",
+      "sectionsTotal": "{{count}} खण्ड जम्मा",
+      "sectionsTotal_plural": "{{count}} खण्डहरू जम्मा",
+      "recorded": "{{taken}}/{{total}} रेकर्ड गरिएको",
+      "overallRate": "{{rate}}% समग्र",
+      "section": "खण्ड",
+      "students": "विद्यार्थीहरू",
+      "recordedCol": "रेकर्ड",
+      "rate": "दर",
+      "status": "स्थिति",
+      "taken": "लिइयो",
+      "partial": "आंशिक",
+      "pending": "बाँकी",
+      "noSectionsToday": "आज कुनै खण्ड तालिकामा छैन",
+      "noAcademicYear": "कुनै सक्रिय शैक्षिक वर्ष छैन।",
+      "setupAcademicYear": "सेटिङमा शैक्षिक वर्ष सेटअप गर्नुहोस्",
+      "captionPrefix": "आजको खण्डअनुसार कक्षा उपस्थिति स्थिति।"
+    },
+    "trend": {
+      "attendanceTrend": "उपस्थिति प्रवृत्ति",
+      "rollingAverage": "३०-दिन चलायमान औसत",
+      "actual": "वास्तविक",
+      "target": "{{threshold}}% लक्ष्य",
+      "avg": "औसत {{avg}}%",
+      "noData": "अहिलेसम्म कुनै उपस्थिति डाटा रेकर्ड गरिएको छैन",
+      "viewAttendance": "उपस्थिति हेर्नुहोस्"
+    },
+    "finance": {
+      "financialOverview": "आर्थिक अवलोकन",
+      "collected": "सङ्कलित",
+      "outstanding": "बाँकी",
+      "overdue": "म्याद सकिएको",
+      "totalInvoiced": "यो वर्ष कुल बिल गरिएको",
+      "unableToLoad": "आर्थिक डाटा लोड गर्न असमर्थ",
+      "retry": "पुन: प्रयास",
+      "viewFinance": "वित्त हेर्नुहोस्"
+    },
+    "activity": {
+      "recentActivity": "भर्खरको गतिविधि",
+      "viewAll": "सबै हेर्नुहोस्",
+      "noActivity": "कुनै भर्खरको गतिविधि छैन"
+    },
+    "teacher": {
+      "mySections": "मेरा खण्डहरू",
+      "totalStudents": "कुल विद्यार्थीहरू",
+      "assignedClasses": "तोकिएका कक्षाहरू",
+      "acrossAllSections": "सबै खण्डहरूमा",
+      "completionRate": "पूर्णता दर",
+      "viewAll": "सबै हेर्नुहोस्",
+      "noSectionsAssigned": "कुनै खण्ड तोकिएको छैन",
+      "contactAdmin": "कक्षा खण्डमा तोकिनको लागि आफ्नो प्रशासकलाई सम्पर्क गर्नुहोस्।",
+      "takeAttendance": "उपस्थिति लिनुहोस्",
+      "enterGrades": "ग्रेड प्रविष्ट गर्नुहोस्"
+    },
+    "student": {
+      "welcomeTitle": "तपाईंको पोर्टलमा स्वागत छ",
+      "welcomeDescription": "आफ्नो शैक्षिक प्रगति ट्र्याक गर्नुहोस्, असाइनमेन्टहरू हेर्नुहोस्, र अद्यावधिक रहनुहोस्।",
+      "grades": "ग्रेडहरू",
+      "gradesDesc": "आफ्नो शैक्षिक प्रदर्शन हेर्नुहोस्",
+      "attendanceLink": "उपस्थिति",
+      "attendanceDesc": "आफ्नो उपस्थिति रेकर्ड जाँच गर्नुहोस्",
+      "schedule": "तालिका",
+      "scheduleDesc": "आफ्नो कक्षा तालिका हेर्नुहोस्",
+      "assignments": "असाइनमेन्टहरू",
+      "assignmentsDesc": "बाँकी असाइनमेन्टहरू हेर्नुहोस्"
+    },
+    "errors": {
+      "unableToLoadKpi": "KPI डाटा लोड गर्न असमर्थ",
+      "unableToLoadInsights": "अन्तर्दृष्टि लोड गर्न असमर्थ",
+      "unableToLoadDetails": "विवरणहरू लोड गर्न असमर्थ",
+      "unableToLoadSections": "खण्डहरू लोड गर्न असमर्थ",
+      "unableToLoadAttendance": "उपस्थिति डाटा लोड गर्न असमर्थ",
+      "unableToLoadDashboard": "ड्यासबोर्ड लोड गर्न असमर्थ",
+      "somethingWentWrong": "केही गलत भयो"
+    }
   }
 }

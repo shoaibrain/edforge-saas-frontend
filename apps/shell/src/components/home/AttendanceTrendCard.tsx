@@ -21,6 +21,7 @@ import { ArrowRight } from 'lucide-react'
 import { useThemeStore } from '../../stores/theme.store'
 import type { TrendPoint } from '../../hooks/useHomeData'
 import { ATTENDANCE_THRESHOLD } from '../../hooks/useHomeData'
+import { useTranslation } from '@edforge/i18n'
 
 // ============================================================================
 // CHART COLORS HOOK
@@ -34,7 +35,7 @@ function useV2ChartColors() {
       fill: 'rgba(29, 158, 117, 0.08)',
       threshold: 'rgba(239, 159, 39, 0.35)',
       grid: resolvedTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-      tick: '#3a4055',
+      tick: resolvedTheme === 'dark' ? '#4a5068' : '#6b7280',
       tooltipBg: resolvedTheme === 'dark' ? '#1e2436' : '#ffffff',
       tooltipBorder: resolvedTheme === 'dark' ? 'rgba(255,255,255,0.08)' : '#e0e4ec',
       pointBorder: resolvedTheme === 'dark' ? '#161b27' : '#ffffff',
@@ -114,6 +115,7 @@ export function AttendanceTrendCard({
   isLoading,
 }: AttendanceTrendCardProps) {
   const colors = useV2ChartColors()
+  const { t } = useTranslation('dashboard')
 
   const srSummary = useMemo(() => {
     if (!summary || chartData.length === 0)
@@ -137,10 +139,10 @@ export function AttendanceTrendCard({
             className="text-[13px] font-medium"
             style={{ color: 'var(--v2-text-secondary)' }}
           >
-            Attendance trend
+            {t('homeV2.trend.attendanceTrend')}
           </h3>
           <p className="text-[11px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
-            30-day rolling average
+            {t('homeV2.trend.rollingAverage')}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -151,7 +153,7 @@ export function AttendanceTrendCard({
               style={{ width: 8, height: 2, background: '#1D9E75' }}
             />
             <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
-              Actual
+              {t('homeV2.trend.actual')}
             </span>
           </div>
           {/* Target swatch */}
@@ -164,13 +166,13 @@ export function AttendanceTrendCard({
               }}
             />
             <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
-              {ATTENDANCE_THRESHOLD}% target
+              {t('homeV2.trend.target', { threshold: ATTENDANCE_THRESHOLD })}
             </span>
           </div>
           {/* Average */}
           {summary && (
             <span className="text-[11px] font-semibold" style={{ color: '#1D9E75' }}>
-              Avg {summary.avg.toFixed(1)}%
+              {t('homeV2.trend.avg', { avg: summary.avg.toFixed(1) })}
             </span>
           )}
         </div>
@@ -185,7 +187,7 @@ export function AttendanceTrendCard({
             className="flex items-center justify-center text-sm"
             style={{ height: 148, color: 'var(--v2-text-hint)' }}
           >
-            No attendance data recorded yet
+            {t('homeV2.trend.noData')}
           </div>
         ) : (
           <figure
@@ -269,7 +271,7 @@ export function AttendanceTrendCard({
           className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
-          View Attendance
+          {t('homeV2.trend.viewAttendance')}
           <ArrowRight className="w-3 h-3" />
         </Link>
       </div>

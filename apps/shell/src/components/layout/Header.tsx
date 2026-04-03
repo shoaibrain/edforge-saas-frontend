@@ -209,42 +209,6 @@ function HomeTopbarCenter() {
 }
 
 // ============================================================================
-// NOTIFICATION BADGE — Always visible
-// ============================================================================
-
-function NotificationBadge() {
-  const alertCount = useHomeStore((s) => s.alertCount)
-
-  return (
-    <button
-      className="relative w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150"
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--shell-ni-hover)' }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-      aria-label={`Notifications${alertCount > 0 ? `: ${alertCount} alerts` : ''}`}
-    >
-      <svg width="19" height="19" viewBox="0 0 20 20" fill="none" strokeWidth="1.6" style={{ stroke: 'var(--shell-icon-color)', transition: 'stroke 0.3s' }}>
-        <path d="M10 2a6 6 0 00-6 6v2L2 13h16l-2-3V8a6 6 0 00-6-6zM8 16a2 2 0 004 0" />
-      </svg>
-      {alertCount > 0 && (
-        <span
-          className="absolute flex items-center justify-center text-[9px] font-bold text-white rounded-full"
-          style={{
-            top: 7,
-            right: 7,
-            width: 8,
-            height: 8,
-            background: '#E24B4A',
-            border: '2px solid var(--shell-notif-border)',
-            transition: 'border-color 0.3s',
-          }}
-          aria-hidden="true"
-        />
-      )}
-    </button>
-  )
-}
-
-// ============================================================================
 // USER MENU — Avatar dropdown (theme picker removed, now in topbar pill)
 // ============================================================================
 
@@ -397,10 +361,9 @@ export function Header() {
         {isHomeV2 ? <HomeTopbarCenter /> : <Breadcrumbs />}
       </div>
 
-      {/* RIGHT ZONE: Theme pill + Notification + User avatar */}
+      {/* RIGHT ZONE: Theme pill + User avatar */}
       <div className="flex items-center gap-[2px] flex-shrink-0 pr-4">
         <ThemePill />
-        <NotificationBadge />
         <UserMenu />
       </div>
     </header>
