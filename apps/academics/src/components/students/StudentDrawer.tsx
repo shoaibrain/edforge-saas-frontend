@@ -2,12 +2,12 @@
  * StudentDrawer Component
  *
  * Quick-info slide-over drawer for student records:
- * - DiceBear avatar + full name + student number
+ * - Student name as drawer title with avatar, number, and status in header
  * - Three-dot dropdown: View Full Profile, Edit, Export
  * - Demographics, contact, academic summary in card sections
- * - "View Full Profile" CTA at bottom
+ * - "View Details" CTA at bottom
  *
- * Follows the same pattern as CourseDrawer.tsx.
+ * Follows the same pattern as CourseDrawer.tsx and SectionDrawer.tsx.
  */
 
 import { useState, useEffect, useRef } from 'react'
@@ -273,10 +273,12 @@ export function StudentDrawer({
     if (e.target === e.currentTarget) onClose()
   }
 
-  const handleViewFullProfile = () => {
+  // Navigate to Student Profile with race-condition-safe timing
+  const handleViewDetails = () => {
     if (!student) return
+    const target = `/students/${student.studentId}`
     onClose()
-    navigate({ to: `/students/${student.studentId}` })
+    queueMicrotask(() => navigate({ to: target }))
   }
 
   const addressStr = student?.contactInfo?.address
@@ -294,7 +296,7 @@ export function StudentDrawer({
   return (
     <AnimatePresence>
       {open && student && (
-        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="student-drawer-title">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -317,17 +319,40 @@ export function StudentDrawer({
               className="w-screen max-w-2xl h-full"
             >
               <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
-                {/* Header */}
+                {/* Header — student identity */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20">
-                      <User className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Avatar (48px compromise per Amendment 15) */}
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-surface-tertiary shadow-sm ring-1 ring-white/10">
+                      <img
+                        src={getAvatarUrl(student.studentId, 64)}
+                        alt={getInitials(student.firstName, student.lastName)}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <h2 className="text-lg font-semibold text-text-primary">
-                      Student Details
-                    </h2>
+                    <div className="min-w-0">
+                      <h2
+                        id="student-drawer-title"
+                        className="text-lg font-semibold text-text-primary truncate"
+                      >
+                        {student.fullName}
+                        {student.preferredName && (
+                          <span className="text-sm font-normal text-text-tertiary ml-1.5">
+                            &ldquo;{student.preferredName}&rdquo;
+                          </span>
+                        )}
+                      </h2>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {student.studentNumber && (
+                          <span className="font-mono text-[11px] text-text-tertiary">
+                            #{student.studentNumber}
+                          </span>
+                        )}
+                        <StudentStatusBadge status={student.status} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     <ActionsDropdown
                       student={student}
                       onClose={onClose}
@@ -346,38 +371,10 @@ export function StudentDrawer({
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto">
-                  {/* Hero identity section */}
-                  <div className="px-6 py-5 bg-surface-secondary/40 border-b border-border-secondary">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-surface-tertiary shadow-md ring-1 ring-white/10">
-                        <img
-                          src={getAvatarUrl(student.studentId, 80)}
-                          alt={getInitials(student.firstName, student.lastName)}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-text-primary truncate">
-                          {student.fullName}
-                        </h3>
-                        {student.preferredName && (
-                          <p className="text-xs text-text-tertiary mt-0.5">
-                            Goes by &ldquo;{student.preferredName}&rdquo;
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          {student.studentNumber && (
-                            <span className="font-mono text-[11px] text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-md border border-border-secondary truncate max-w-[200px]">
-                              #{student.studentNumber}
-                            </span>
-                          )}
-                          <StudentStatusBadge status={student.status} />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quick Stats - inside hero */}
-                    <div className="grid grid-cols-3 gap-3 mt-5">
+                  {/* Section cards */}
+                  <div className="px-6 py-5 space-y-4">
+                    {/* Quick Stats */}
+                    <div className="grid grid-cols-3 gap-3">
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <GraduationCap className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
                         <p className="text-lg font-bold text-text-primary">
@@ -400,10 +397,7 @@ export function StudentDrawer({
                         <p className="text-[11px] text-text-tertiary">Attendance</p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Section cards */}
-                  <div className="px-6 py-5 space-y-4">
                     {/* Demographics */}
                     <SectionCard icon={User} title="Demographics">
                       <div className="grid grid-cols-2 gap-x-8 gap-y-3">
@@ -548,14 +542,15 @@ export function StudentDrawer({
                 </div>
 
                 {/* Footer CTA */}
-                <div className="px-6 py-4 border-t border-border-secondary bg-surface-secondary/30">
+                <div className="shrink-0 px-6 py-4 border-t border-border-secondary bg-surface-secondary/30">
                   <button
                     type="button"
-                    onClick={handleViewFullProfile}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium text-sm transition-colors shadow-sm"
+                    onClick={handleViewDetails}
+                    aria-label={`View details for ${student.fullName}`}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/50"
                   >
-                    View Full Profile
-                    <ArrowRight className="w-4 h-4" />
+                    View Details
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>

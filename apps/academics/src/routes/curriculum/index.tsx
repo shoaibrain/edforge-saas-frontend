@@ -1,26 +1,28 @@
 /**
- * Curriculum Management Module
+ * Curriculum Management Module — V2
  *
  * Unified curriculum interface for the Academics domain.
- * - Courses tab: Live data from API with filters, table, and drawer
- * - Grade Levels tab: Grade cards with course counts
- * - Standards tab: Placeholder for future sprint
+ * - Courses tab: Live data from API with V2 chips, filters, table, and drawer
+ * - Grade Levels tab: Collapsible grade sections with enrollment bars
+ * - Standards tab: Purposeful empty state with import CTA
  *
- * Sprint 4 — Course Catalog & Curriculum Management
+ * V2 redesign — matches Academics Overview header pattern.
  */
 
 import { useState, useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { useResourcePermissions } from '@edforge/abac'
+import { StatCard } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
   Layers,
-  Target,
-  CheckCircle,
   Plus,
-  MoreHorizontal,
-  Download,
+  Upload,
+  ShieldCheck,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolGradeRange } from '../../hooks/useSchool'
 import { useCourseFilters } from '../../stores/courses.store'
 import {
   useCourses,
@@ -40,163 +42,150 @@ import type { CourseResponseDto } from '@aibrains/shared-types'
 
 type CurriculumTab = 'courses' | 'grade-levels' | 'standards'
 
-const TABS = [
-  {
-    id: 'courses' as const,
-    label: 'Courses',
-    icon: BookOpen,
-  },
-  {
-    id: 'grade-levels' as const,
-    label: 'Grade Levels',
-    icon: Layers,
-  },
-  {
-    id: 'standards' as const,
-    label: 'Standards',
-    icon: Target,
-  },
-]
-
 // ============================================================================
-// STAT CARD
+// TAB SVG ICONS (inline to match prototype exactly)
 // ============================================================================
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
-}: {
-  icon: typeof BookOpen
-  label: string
-  value: string | number
-  accent: string
-  bg: string
-}) {
+function CoursesIcon({ active }: { active: boolean }) {
   return (
-    <div className="bg-surface-primary rounded-xl border border-border-primary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
-        </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
-        </div>
-      </div>
-    </div>
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M2 2h12v12H2z"
+        stroke={active ? '#7F77DD' : 'currentColor'}
+        strokeWidth="1.4"
+        fill="none"
+      />
+      <path
+        d="M5 6h6M5 9h4"
+        stroke={active ? '#7F77DD' : 'currentColor'}
+        strokeWidth="1.4"
+      />
+    </svg>
+  )
+}
+
+function GradeLevelsIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M2 4h4v4H2zM10 4h4v4h-4zM6 8h4v4H6zM2 12h4M10 12h4"
+        stroke={active ? '#7F77DD' : 'currentColor'}
+        strokeWidth="1.3"
+        fill="none"
+      />
+    </svg>
+  )
+}
+
+function StandardsIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+      <circle
+        cx="8"
+        cy="8"
+        r="6.5"
+        stroke={active ? '#7F77DD' : 'currentColor'}
+        strokeWidth="1.4"
+        fill="none"
+      />
+      <path
+        d="M5 8l2 2 4-3"
+        stroke={active ? '#7F77DD' : 'currentColor'}
+        strokeWidth="1.4"
+        fill="none"
+      />
+    </svg>
   )
 }
 
 // ============================================================================
-// STANDARDS PLACEHOLDER
+// STANDARDS EMPTY STATE (V2)
 // ============================================================================
 
 function StandardsContent() {
-  return (
-    <div className="space-y-6">
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-purple-500/10">
-            <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-text-primary mb-2">
-              Learning Standards
-            </h3>
-            <p className="text-text-secondary leading-relaxed mb-4">
-              Align instructional content with state and district frameworks. Import
-              Common Core, Next Generation Science Standards, or state-specific standards.
-              Link standards to courses and assessments for competency-based reporting.
-            </p>
-            <ul className="text-sm text-text-secondary space-y-1">
-              <li>• Import from CASE-compliant standards repositories</li>
-              <li>• Hierarchical organization (domains, clusters, standards)</li>
-              <li>• Cross-walk between different frameworks</li>
-              <li>• Standards mastery tracking by student</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-lg bg-blue-500/10">
-              <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h4 className="font-medium text-text-primary">Common Core State Standards</h4>
-              <p className="text-xs text-text-secondary">ELA & Mathematics</p>
-            </div>
-          </div>
-          <div className="text-sm text-text-tertiary">Coming in a future release</div>
-        </div>
-
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-lg bg-emerald-500/10">
-              <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div>
-              <h4 className="font-medium text-text-primary">Next Generation Science Standards</h4>
-              <p className="text-xs text-text-secondary">Science & Engineering</p>
-            </div>
-          </div>
-          <div className="text-sm text-text-tertiary">Coming in a future release</div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// PAGE ACTIONS DROPDOWN
-// ============================================================================
-
-function PageActionsDropdown({ onAddCourse }: { onAddCourse: () => void }) {
-  const [isOpen, setIsOpen] = useState(false)
+  const handleImport = () => {
+    // Toast: coming soon
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('edforge:toast', {
+        detail: { message: 'Standards import coming soon', type: 'info' },
+      })
+      window.dispatchEvent(event)
+    }
+  }
 
   return (
-    <div className="relative">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 340,
+        textAlign: 'center',
+      }}
+    >
+      {/* Icon */}
+      <div
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: 12,
+          background: 'rgba(127,119,221,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 12,
+        }}
+      >
+        <ShieldCheck style={{ width: 24, height: 24, color: '#7F77DD' }} />
+      </div>
+
+      {/* Heading */}
+      <h3
+        style={{
+          fontSize: 14,
+          fontWeight: 500,
+          color: 'var(--v2-text-primary, var(--text-primary, #e8eaf0))',
+          marginBottom: 6,
+        }}
+      >
+        Standards alignment
+      </h3>
+
+      {/* Body */}
+      <p
+        style={{
+          fontSize: 12,
+          color: 'var(--v2-text-faint, var(--text-muted, #5a6070))',
+          maxWidth: 320,
+          lineHeight: 1.5,
+          marginBottom: 16,
+        }}
+      >
+        Map courses to academic standards to track curriculum coverage and EdFi
+        compliance. Standards can be imported or configured per course.
+      </p>
+
+      {/* Import button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Actions"
-        aria-expanded={isOpen}
+        onClick={handleImport}
+        className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
+        style={{
+          height: 36,
+          padding: '0 14px',
+          fontSize: 12,
+          fontWeight: 500,
+          borderRadius: 8,
+          background: 'var(--v2-bg-elevated, rgba(255,255,255,0.05))',
+          border: '1px solid var(--v2-border-default, rgba(255,255,255,0.09))',
+          color: 'var(--v2-text-secondary, #9aa0b8)',
+          cursor: 'pointer',
+        }}
       >
-        <MoreHorizontal className="w-5 h-5" />
+        <Upload style={{ width: 12, height: 12 }} />
+        Import standards
       </button>
-
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1">
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false)
-                onAddCourse()
-              }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Course
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              Export Catalog
-            </button>
-          </div>
-        </>
-      )}
     </div>
   )
 }
@@ -207,7 +196,12 @@ function PageActionsDropdown({ onAddCourse }: { onAddCourse: () => void }) {
 
 export function CurriculumModule() {
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
+  const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+  const { gradeRange } = useSchoolGradeRange(schoolId)
+
+  // ABAC: check course/curriculum permissions
+  const coursePerms = useResourcePermissions('courses')
   const filters = useCourseFilters()
 
   // Drawer state
@@ -230,13 +224,7 @@ export function CurriculumModule() {
   }, [filters])
 
   // Fetch courses
-  const {
-    data: coursesData,
-    isLoading,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useCourses({
+  const { data: coursesData, isLoading } = useCourses({
     schoolId: schoolId || '',
     filters: queryFilters,
     enabled: !!schoolId,
@@ -247,11 +235,23 @@ export function CurriculumModule() {
 
   // Computed stats
   const stats = useMemo(() => {
+    const total = totalCount ?? courses.length
     const active = courses.filter((c) => c.isActive).length
     const elective = courses.filter((c) => c.courseType === 'elective').length
     const subjects = new Set(courses.map((c) => c.subjectArea)).size
-    return { total: courses.length, active, elective, subjects }
-  }, [courses])
+    const specializedTypes = new Set(
+      courses
+        .filter((c) =>
+          ['honors', 'ap', 'dual_enrollment'].includes(c.courseType)
+        )
+        .map((c) => c.courseType)
+    ).size
+    const electiveName =
+      elective === 1
+        ? courses.find((c) => c.courseType === 'elective')?.courseName
+        : undefined
+    return { total, active, elective, subjects, specializedTypes, electiveName }
+  }, [courses, totalCount])
 
   // Drawer handlers
   const openCreateDrawer = () => {
@@ -284,159 +284,337 @@ export function CurriculumModule() {
     }
   }
 
+  const navigateToCourse = (course: CourseResponseDto) => {
+    navigate({ to: `/curriculum/${course.courseId}` })
+  }
+
   const closeDrawer = () => {
     setDrawerOpen(false)
     setSelectedCourse(null)
   }
 
-  return (
-    <div className="min-h-full">
-      {/* Page Header */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20">
-                <BookOpen className="w-6 h-6 text-rose-600 dark:text-rose-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">
-                  Curriculum Management
-                </h1>
-                <p className="text-text-secondary mt-0.5 text-sm">
-                  Define courses, map learning standards, and organize curriculum
-                  by grade level
-                </p>
-              </div>
-            </div>
+  const today = new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 
-            {activeTab === 'courses' && (
-              <PageActionsDropdown onAddCourse={openCreateDrawer} />
-            )}
+  return (
+    <div data-v2 className="min-h-full" style={{ padding: '18px 20px' }}>
+      {/* ---- V2 Page Header ---- */}
+      <div className="flex items-center justify-between" style={{ height: 44, marginBottom: 4 }}>
+        <div className="flex items-center gap-2.5">
+          {/* Icon */}
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'rgba(127,119,221,0.10)',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M2 2h12v12H2z"
+                stroke="#7F77DD"
+                strokeWidth="1.5"
+                fill="none"
+              />
+              <path d="M5 6h6M5 9h4" stroke="#7F77DD" strokeWidth="1.5" />
+            </svg>
           </div>
+
+          {/* Title */}
+          <h1
+            className="text-[18px] font-semibold"
+            style={{ color: 'var(--v2-text-primary, var(--text-primary, #e8eaf0))', letterSpacing: -0.3 }}
+          >
+            Curriculum
+          </h1>
+
+          {/* Separator + Date */}
+          <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13 }}>|</span>
+          <span
+            className="text-[13px]"
+            style={{ color: 'var(--v2-text-faint, var(--text-muted, #4a5068))' }}
+          >
+            {today}
+          </span>
         </div>
 
-        {/* Tab Navigation — Framer Motion animated, consistent with Student Profile */}
-        <div className="px-6">
-          <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id
-              const Icon = tab.icon
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
-                    ${
-                      isActive
-                        ? 'text-text-primary'
-                        : 'text-text-tertiary hover:text-text-secondary'
-                    }
-                  `}
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <Icon
-                      className={`w-4 h-4 ${
-                        isActive ? 'text-teal-500' : 'opacity-70'
-                      }`}
-                    />
-                    {tab.label}
-                  </span>
-
-                  {isActive && (
-                    <motion.div
-                      layoutId="curriculumTab"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
-                      initial={false}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 500,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </div>
+        {/* Right-side action buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
+            style={{
+              height: 36,
+              padding: '0 14px',
+              fontSize: 12,
+              fontWeight: 500,
+              borderRadius: 8,
+              background: 'var(--v2-bg-elevated, rgba(255,255,255,0.05))',
+              border: '1px solid var(--v2-border-default, rgba(255,255,255,0.09))',
+              color: 'var(--v2-text-secondary, #9aa0b8)',
+              cursor: 'pointer',
+            }}
+          >
+            <Upload style={{ width: 12, height: 12 }} />
+            Import courses
+          </button>
+          {coursePerms.create && (
+            <button
+              type="button"
+              onClick={openCreateDrawer}
+              className="inline-flex items-center gap-1.5 transition-colors hover:opacity-90"
+              style={{
+                height: 36,
+                padding: '0 14px',
+                fontSize: 12,
+                fontWeight: 500,
+                borderRadius: 8,
+                background: 'var(--v2-brand-primary, #1D9E75)',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <Plus style={{ width: 12, height: 12 }} />
+              Add course
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Tab Content with AnimatePresence */}
-      <div className="p-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+      {/* ---- Context Banner ---- */}
+      <p
+        className="text-[12px]"
+        style={{
+          color: 'var(--v2-text-faint, var(--text-muted, #4a5068))',
+          marginBottom: 14,
+        }}
+      >
+        <span style={{ color: 'var(--color-info, #378ADD)', fontWeight: 500 }}>
+          {stats.total}
+        </span>{' '}
+        courses across{' '}
+        <span style={{ color: 'var(--color-info, #378ADD)', fontWeight: 500 }}>
+          {stats.subjects}
+        </span>{' '}
+        subject areas · {stats.elective} elective ·{' '}
+        <span style={{ color: 'var(--color-info, #378ADD)', fontWeight: 500 }}>
+          {stats.specializedTypes}
+        </span>{' '}
+        specialized course types (Honors, AP, Dual Enrollment)
+      </p>
+
+      {/* ---- KPI Tiles ---- */}
+      <div
+        className="grid gap-2"
+        style={{
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+          marginBottom: 14,
+        }}
+      >
+        <StatCard
+          label="Total Courses"
+          value={String(stats.total)}
+          icon={BookOpen}
+          accentColor="rgba(127,119,221,0.10)"
+          iconColor="#7F77DD"
+          barColor="#7F77DD"
+          tag={{
+            text: `${stats.active} active`,
+            color: '#1D9E75',
+            bg: 'rgba(29,158,117,0.1)',
+          }}
+          loading={isLoading}
+        />
+        <StatCard
+          label="Subject Areas"
+          value={String(stats.subjects)}
+          icon={Layers}
+          accentColor="rgba(55,138,221,0.10)"
+          iconColor="#378ADD"
+          barColor="#378ADD"
+          hint="Math · Science · ELA · SS · Arts · Voc."
+          loading={isLoading}
+        />
+        <StatCard
+          label="Electives"
+          value={String(stats.elective)}
+          icon={BookOpen}
+          accentColor="rgba(216,90,48,0.10)"
+          iconColor="#D85A30"
+          barColor="#D85A30"
+          tag={
+            stats.electiveName
+              ? {
+                  text: stats.electiveName,
+                  color: '#7F77DD',
+                  bg: 'rgba(127,119,221,0.1)',
+                }
+              : undefined
+          }
+          loading={isLoading}
+        />
+        <StatCard
+          label="Specialized Types"
+          value={String(stats.specializedTypes)}
+          icon={BookOpen}
+          accentColor="rgba(239,159,39,0.10)"
+          iconColor="#EF9F27"
+          barColor="#EF9F27"
+          tag={{
+            text: 'Honors · AP · Dual Enroll.',
+            color: '#EF9F27',
+            bg: 'rgba(239,159,39,0.1)',
+          }}
+          loading={isLoading}
+        />
+      </div>
+
+      {/* ---- Tab Bar ---- */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0,
+          marginBottom: 14,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        {/* Courses tab */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('courses')}
+          style={{
+            padding: '8px 14px',
+            fontSize: 12,
+            fontWeight: activeTab === 'courses' ? 500 : 400,
+            color: activeTab === 'courses' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
+            cursor: 'pointer',
+            borderBottom: `2px solid ${activeTab === 'courses' ? '#7F77DD' : 'transparent'}`,
+            marginBottom: -1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            background: 'none',
+            border: 'none',
+            borderBottomStyle: 'solid',
+            borderBottomWidth: 2,
+            borderBottomColor: activeTab === 'courses' ? '#7F77DD' : 'transparent',
+          }}
+        >
+          <CoursesIcon active={activeTab === 'courses'} />
+          Courses
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              padding: '1px 5px',
+              borderRadius: 8,
+              background: activeTab === 'courses' ? 'rgba(127,119,221,0.12)' : 'rgba(255,255,255,0.06)',
+              color: activeTab === 'courses' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
+            }}
           >
-            {activeTab === 'courses' && (
-              <div className="space-y-6">
-                {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <StatCard
-                    icon={BookOpen}
-                    label="Total Courses"
-                    value={totalCount ?? stats.total}
-                    accent="text-rose-600 dark:text-rose-400"
-                    bg="bg-rose-500/10"
-                  />
-                  <StatCard
-                    icon={CheckCircle}
-                    label="Active Courses"
-                    value={stats.active}
-                    accent="text-emerald-600 dark:text-emerald-400"
-                    bg="bg-emerald-500/10"
-                  />
-                  <StatCard
-                    icon={BookOpen}
-                    label="Electives"
-                    value={stats.elective}
-                    accent="text-blue-600 dark:text-blue-400"
-                    bg="bg-blue-500/10"
-                  />
-                  <StatCard
-                    icon={Layers}
-                    label="Subject Areas"
-                    value={stats.subjects}
-                    accent="text-amber-600 dark:text-amber-400"
-                    bg="bg-amber-500/10"
-                  />
-                </div>
+            {stats.total}
+          </span>
+        </button>
 
-                {/* Filters */}
-                <CourseFilters totalCount={totalCount} />
+        {/* Grade Levels tab */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('grade-levels')}
+          style={{
+            padding: '8px 14px',
+            fontSize: 12,
+            fontWeight: activeTab === 'grade-levels' ? 500 : 400,
+            color: activeTab === 'grade-levels' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
+            cursor: 'pointer',
+            marginBottom: -1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            background: 'none',
+            border: 'none',
+            borderBottomStyle: 'solid',
+            borderBottomWidth: 2,
+            borderBottomColor: activeTab === 'grade-levels' ? '#7F77DD' : 'transparent',
+          }}
+        >
+          <GradeLevelsIcon active={activeTab === 'grade-levels'} />
+          Grade levels
+        </button>
 
-                {/* Course Table */}
+        {/* Standards tab */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('standards')}
+          style={{
+            padding: '8px 14px',
+            fontSize: 12,
+            fontWeight: activeTab === 'standards' ? 500 : 400,
+            color: activeTab === 'standards' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
+            cursor: 'pointer',
+            marginBottom: -1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            background: 'none',
+            border: 'none',
+            borderBottomStyle: 'solid',
+            borderBottomWidth: 2,
+            borderBottomColor: activeTab === 'standards' ? '#7F77DD' : 'transparent',
+          }}
+        >
+          <StandardsIcon active={activeTab === 'standards'} />
+          Standards
+        </button>
+      </div>
+
+      {/* ---- Tab Content ---- */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+        >
+          {activeTab === 'courses' && (
+            <div>
+              {/* Filter strip */}
+              <CourseFilters totalCount={totalCount} />
+
+              {/* Course Table */}
+              <div style={{ marginTop: 12 }}>
                 <CourseTable
                   courses={courses}
                   isLoading={isLoading}
-                  hasMore={!!hasNextPage}
-                  isFetchingMore={isFetchingNextPage}
-                  onLoadMore={() => fetchNextPage()}
-                  onAddCourse={openCreateDrawer}
+                  onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
                   onViewCourse={openViewDrawer}
-                  onEditCourse={openEditDrawer}
-                  onToggleActive={handleToggleActive}
+                  onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
+                  onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
+                  onNavigateToCourse={navigateToCourse}
                 />
               </div>
-            )}
+            </div>
+          )}
 
-            {activeTab === 'grade-levels' && (
-              <GradeLevelsTab
-                courses={courses}
-                isLoading={isLoading}
-                onViewCourse={openViewDrawer}
-              />
-            )}
+          {activeTab === 'grade-levels' && (
+            <GradeLevelsTab
+              courses={courses}
+              isLoading={isLoading}
+              onViewCourse={openViewDrawer}
+              schoolGradeRange={gradeRange ?? undefined}
+            />
+          )}
 
-            {activeTab === 'standards' && <StandardsContent />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          {activeTab === 'standards' && <StandardsContent />}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Course Drawer */}
       <CourseDrawer
@@ -445,6 +623,7 @@ export function CurriculumModule() {
         mode={drawerMode}
         course={selectedCourse}
         onModeChange={setDrawerMode}
+        schoolGradeRange={gradeRange}
       />
     </div>
   )

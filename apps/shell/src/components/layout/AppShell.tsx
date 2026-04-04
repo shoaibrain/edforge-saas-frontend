@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
+import { SchoolTransitionOverlay } from './SchoolTransitionOverlay'
 import { useAppStore } from '../../stores/app.store'
 import { useRouteFocus, useRouteAnnouncement } from '../../hooks/useFocusManagement'
 
@@ -19,11 +19,6 @@ export function AppShell({ children }: AppShellProps) {
   useRouteFocus()
   useRouteAnnouncement()
 
-  // NOTE: School auto-selection is handled by the SidebarSchoolSelector
-  // which fetches real schools from the API. Do NOT auto-select from
-  // user.assignments keys here — those are role-mapping keys that may
-  // not match actual school UUIDs from the Identity service.
-
   // Keyboard shortcut: Cmd+B / Ctrl+B to toggle sidebar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -37,32 +32,59 @@ export function AppShell({ children }: AppShellProps) {
   }, [toggleSidebar])
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--surface-primary))]">
+    <div
+      className="h-screen overflow-hidden"
+      style={{
+        background: 'var(--shell-page-bg)',
+        transition: 'background 0.3s',
+      }}
+    >
       {/* Skip link for keyboard/screen reader users */}
       <SkipLink targetId="main-content" />
 
-      {/* Sidebar */}
+      {/* Global Header — fixed full-width, z-45 above sidebar */}
+      <Header />
+
+      {/* Sidebar — fixed position, handles its own width */}
       <Sidebar />
 
-      {/* Main content area - animated with sidebar using framer-motion */}
-      <motion.div
-        animate={{ marginLeft: collapsed ? 72 : 260 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 32 }}
-        className="flex flex-col min-h-screen"
+      {/* Right column: content card (below fixed header) */}
+      <div
+        className="flex flex-col h-screen"
+        style={{
+          marginLeft: collapsed
+            ? 'var(--shell-sidebar-w-collapsed)'
+            : 'var(--shell-sidebar-w)',
+          paddingTop: 'var(--shell-topbar-h)',
+          transition: 'margin-left var(--shell-transition)',
+        }}
       >
-        {/* Global Header - includes SidebarTrigger + Breadcrumbs */}
-        <Header />
-
-        {/* Page content */}
-        <main 
-          id="main-content"
-          tabIndex={-1}
-          className="flex-1 p-6 overflow-x-hidden outline-none"
-          aria-label="Main content"
+        {/* Body wrap — padding creates the inset gap */}
+        <div
+          className="flex-1 min-h-0"
+          style={{ padding: '0 var(--shell-cp-gap) var(--shell-cp-gap) var(--shell-cp-gap)' }}
         >
-          {children}
-        </main>
-      </motion.div>
+          {/* Content card — the ONLY elevated surface */}
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="h-full overflow-y-auto overflow-x-hidden outline-none"
+            style={{
+              background: 'var(--shell-cp-bg)',
+              borderRadius: 'var(--shell-cp-radius)',
+              boxShadow: 'var(--shell-cp-shadow)',
+              position: 'relative',  // LOAD-BEARING: drawer absolute positioning
+              transition: 'background 0.3s, box-shadow 0.3s',
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'var(--shell-scroll-thumb) transparent',
+            }}
+            aria-label="Main content"
+          >
+            {children}
+            <SchoolTransitionOverlay />
+          </main>
+        </div>
+      </div>
     </div>
   )
 }

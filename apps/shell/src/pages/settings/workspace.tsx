@@ -6,9 +6,8 @@
  *
  * Sections:
  * - Regional (timezone, locale, date/time format)
- * - Calendar (academic year defaults)
  * - Branding (organization identity)
- * - Policies (grading, attendance defaults)
+ * - Policies (attendance defaults)
  */
 
 import { useState, useEffect, useRef } from 'react'
@@ -18,18 +17,19 @@ import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Globe,
-  Calendar,
-  Palette,
   Shield,
   Lock,
   AlertTriangle,
   Building2,
+  RefreshCw,
 } from 'lucide-react'
+import { Button } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
-// Local type for WorkspaceSettings (until @edforge/types is rebuilt)
+
+// Local type matching backend WorkspaceSettingsResponseDto
 interface WorkspaceSettings {
   tenantId: string
   regional: {
@@ -38,11 +38,10 @@ interface WorkspaceSettings {
     defaultDateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
     defaultTimeFormat: '12h' | '24h'
     defaultWeekStartsOn: 'sunday' | 'monday'
-  }
-  calendar: {
-    defaultAcademicYearStart: string
-    defaultAcademicYearEnd: string
-    defaultTermStructure: 'semester' | 'trimester' | 'quarter'
+    defaultCurrency: string
+    defaultCalendarSystem: 'gregorian' | 'bikram_sambat'
+    enableDualDateDisplay: boolean
+    defaultNumberFormat: 'south_asian' | 'international'
   }
   branding: {
     organizationName: string
@@ -51,7 +50,6 @@ interface WorkspaceSettings {
     accentColor?: string
   }
   policies: {
-    defaultGradingScale: 'letter' | 'percentage' | 'points' | 'custom'
     defaultAttendancePolicy: 'daily' | 'period' | 'both'
   }
   isLocked: boolean
@@ -85,12 +83,14 @@ const TIMEZONE_OPTIONS = [
   { value: 'Europe/Paris', label: 'Paris (CET/CEST)', offset: 'UTC+1/+2' },
   { value: 'Asia/Tokyo', label: 'Tokyo (JST)', offset: 'UTC+9' },
   { value: 'Asia/Kolkata', label: 'India (IST)', offset: 'UTC+5:30' },
+  { value: 'Asia/Kathmandu', label: 'Nepal (NST)', offset: 'UTC+5:45' },
   { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)', offset: 'UTC+10/+11' },
 ]
 
 const LOCALE_OPTIONS = [
   { value: 'en-US', label: 'English (US)' },
   { value: 'en-GB', label: 'English (UK)' },
+  { value: 'ne-NP', label: 'Nepali (नेपाली)' },
   { value: 'es', label: 'Español' },
   { value: 'fr', label: 'Français' },
   { value: 'de', label: 'Deutsch' },
@@ -115,26 +115,33 @@ const WEEK_START_OPTIONS = [
   { value: 'monday', label: 'Monday' },
 ]
 
-const TERM_STRUCTURE_OPTIONS = [
-  { value: 'semester', label: 'Semester (2 terms)' },
-  { value: 'trimester', label: 'Trimester (3 terms)' },
-  { value: 'quarter', label: 'Quarter (4 terms)' },
+const CURRENCY_OPTIONS = [
+  { value: 'NPR', label: 'Nepali Rupee (NPR)' },
+  { value: 'USD', label: 'US Dollar (USD)' },
+  { value: 'EUR', label: 'Euro (EUR)' },
+  { value: 'GBP', label: 'British Pound (GBP)' },
+  { value: 'INR', label: 'Indian Rupee (INR)' },
 ]
 
-const GRADING_SCALE_OPTIONS = [
-  { value: 'letter', label: 'Letter Grades (A-F)' },
-  { value: 'percentage', label: 'Percentage (0-100%)' },
-  { value: 'points', label: 'Points-based' },
-  { value: 'custom', label: 'Custom Scale' },
+const CALENDAR_SYSTEM_OPTIONS = [
+  { value: 'gregorian', label: 'Gregorian' },
+  { value: 'bikram_sambat', label: 'Bikram Sambat' },
 ]
 
-const ATTENDANCE_POLICY_OPTIONS = [
-  { value: 'daily', label: 'Daily Attendance' },
-  { value: 'period', label: 'Period-by-Period' },
-  { value: 'both', label: 'Both Daily & Period' },
+const NUMBER_FORMAT_OPTIONS = [
+  { value: 'international', label: 'International (100,000)' },
+  { value: 'south_asian', label: 'South Asian (1,00,000)' },
 ]
 
-const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+// COMING SOON — re-enable when Attendance Defaults section ships
+// const ATTENDANCE_POLICY_OPTIONS = [
+//   { value: 'daily', label: 'Daily Attendance' },
+//   { value: 'period', label: 'Period-by-Period' },
+//   { value: 'both', label: 'Both Daily & Period' },
+// ]
+
+// COMING SOON — re-enable when Organization Branding section ships
+// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
 const SELECT_CLASS = 'min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
@@ -149,20 +156,18 @@ const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'tenantId'> = {
     defaultDateFormat: 'MM/DD/YYYY',
     defaultTimeFormat: '12h',
     defaultWeekStartsOn: 'monday',
-  },
-  calendar: {
-    defaultAcademicYearStart: '08-15',
-    defaultAcademicYearEnd: '06-15',
-    defaultTermStructure: 'semester',
+    defaultCurrency: 'USD',
+    defaultCalendarSystem: 'gregorian',
+    enableDualDateDisplay: false,
+    defaultNumberFormat: 'international',
   },
   branding: {
-    organizationName: 'Demo School District',
+    organizationName: 'My Organization',
     logoUrl: undefined,
     primaryColor: '#0D9488',
     accentColor: '#F59E0B',
   },
   policies: {
-    defaultGradingScale: 'letter',
     defaultAttendancePolicy: 'daily',
   },
   isLocked: false,
@@ -225,6 +230,9 @@ export default function WorkspaceSettingsPage() {
   const {
     data: settings,
     isLoading,
+    isError,
+    error,
+    refetch,
   } = useQuery<WorkspaceSettings>({
     queryKey: ['workspaceSettings', user?.tenantId],
     queryFn: () => tenantService.getWorkspaceSettings(user!.tenantId),
@@ -261,7 +269,7 @@ export default function WorkspaceSettingsPage() {
     && JSON.stringify(formState) !== JSON.stringify(originalStateRef.current)
 
   // Update a nested section field in local form state (no API call)
-  const updateField = <S extends 'regional' | 'calendar' | 'branding' | 'policies'>(
+  const updateField = <S extends 'regional' | 'branding' | 'policies'>(
     section: S,
     key: string,
     value: unknown
@@ -280,11 +288,12 @@ export default function WorkspaceSettingsPage() {
   }
 
   // Save all pending changes
+  // Note: branding and policies are still sent (round-tripping server data)
+  // even though their UI sections are currently hidden for pilot release.
   const handleSave = () => {
     if (!formState) return
     updateMutation.mutate({
       regional: formState.regional,
-      calendar: formState.calendar,
       branding: formState.branding,
       policies: formState.policies,
     })
@@ -317,6 +326,34 @@ export default function WorkspaceSettingsPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
         <SettingsSkeleton rows={6} showHeader />
+      </div>
+    )
+  }
+
+  // Error state
+  if (isError && !formState) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-8">
+        <SettingsPageHeader
+          title="Workspace Settings"
+          description="Organization-wide configuration that applies to all schools"
+          icon={Building2}
+        />
+        <div className="mt-8 flex flex-col items-center justify-center py-12">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
+            Failed to Load Settings
+          </h2>
+          <p className="text-sm text-[rgb(var(--text-tertiary))] text-center mb-6 max-w-sm">
+            {error instanceof Error ? error.message : 'Unable to load workspace settings. Please try again.'}
+          </p>
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Retry
+          </Button>
+        </div>
       </div>
     )
   }
@@ -426,143 +463,73 @@ export default function WorkspaceSettingsPage() {
               ))}
             </select>
           </SettingsFieldRow>
-        </SettingsSection>
 
-        {/* Calendar Settings */}
-        <SettingsSection
-          title="Academic Calendar"
-          icon={Calendar}
-          description="Default academic year structure and schedule"
-          collapsible
-          defaultOpen={false}
-        >
-          <SettingsFieldRow label="Academic Year Start" description="Default start date (month-day)" inline>
-            <input
-              type="text"
-              value={displaySettings.calendar.defaultAcademicYearStart}
-              onChange={(e) => updateField('calendar', 'defaultAcademicYearStart', e.target.value)}
-              placeholder="MM-DD (e.g., 08-15)"
-              disabled={isLocked}
-              className={INPUT_CLASS + ' max-w-[200px]'}
-            />
-          </SettingsFieldRow>
-
-          <SettingsFieldRow label="Academic Year End" description="Default end date (month-day)" inline>
-            <input
-              type="text"
-              value={displaySettings.calendar.defaultAcademicYearEnd}
-              onChange={(e) => updateField('calendar', 'defaultAcademicYearEnd', e.target.value)}
-              placeholder="MM-DD (e.g., 06-15)"
-              disabled={isLocked}
-              className={INPUT_CLASS + ' max-w-[200px]'}
-            />
-          </SettingsFieldRow>
-
-          <SettingsFieldRow label="Default Term Structure" description="How academic years are divided into grading periods" inline>
+          <SettingsFieldRow label="Default Currency" description="Currency used for invoices, payments, and financial reports" inline>
             <select
-              value={displaySettings.calendar.defaultTermStructure}
-              onChange={(e) => updateField('calendar', 'defaultTermStructure', e.target.value)}
+              value={displaySettings.regional.defaultCurrency}
+              onChange={(e) => updateField('regional', 'defaultCurrency', e.target.value)}
               disabled={isLocked}
               className={SELECT_CLASS}
             >
-              {TERM_STRUCTURE_OPTIONS.map((opt) => (
+              {CURRENCY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          <SettingsFieldRow label="Calendar System" description="Primary calendar system for date display" inline>
+            <select
+              value={displaySettings.regional.defaultCalendarSystem}
+              onChange={(e) => updateField('regional', 'defaultCalendarSystem', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {CALENDAR_SYSTEM_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </SettingsFieldRow>
+
+          {displaySettings.regional.defaultCalendarSystem === 'bikram_sambat' && (
+            <SettingsFieldRow label="Show Bikram Sambat Dates" description="Display BS dates alongside Gregorian dates in finance and academic modules" inline>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={displaySettings.regional.enableDualDateDisplay}
+                onClick={() => updateField('regional', 'enableDualDateDisplay', !displaySettings.regional.enableDualDateDisplay)}
+                disabled={isLocked}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/40 ${
+                  displaySettings.regional.enableDualDateDisplay
+                    ? 'bg-teal-600'
+                    : 'bg-[rgb(var(--border-primary))]'
+                } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    displaySettings.regional.enableDualDateDisplay ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </SettingsFieldRow>
+          )}
+
+          <SettingsFieldRow label="Number Format" description="How numbers are grouped in financial displays" inline>
+            <select
+              value={displaySettings.regional.defaultNumberFormat}
+              onChange={(e) => updateField('regional', 'defaultNumberFormat', e.target.value)}
+              disabled={isLocked}
+              className={SELECT_CLASS}
+            >
+              {NUMBER_FORMAT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
           </SettingsFieldRow>
         </SettingsSection>
 
-        {/* Branding */}
-        <SettingsSection
-          title="Organization Branding"
-          icon={Palette}
-          description="Visual identity across the platform"
-          collapsible
-          defaultOpen={false}
-        >
-          <SettingsFieldRow label="Organization Name" description="Display name for your organization">
-            <input
-              type="text"
-              value={displaySettings.branding.organizationName}
-              onChange={(e) => updateField('branding', 'organizationName', e.target.value)}
-              disabled={isLocked}
-              className={INPUT_CLASS}
-            />
-          </SettingsFieldRow>
+        {/* COMING SOON — Organization Branding section (re-enable when branding customization ships) */}
 
-          <SettingsFieldRow label="Primary Color" description="Main brand color" inline>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={displaySettings.branding.primaryColor || '#0D9488'}
-                onChange={(e) => updateField('branding', 'primaryColor', e.target.value)}
-                disabled={isLocked}
-                className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))] disabled:opacity-50"
-              />
-              <input
-                type="text"
-                value={displaySettings.branding.primaryColor || '#0D9488'}
-                onChange={(e) => updateField('branding', 'primaryColor', e.target.value)}
-                disabled={isLocked}
-                className={INPUT_CLASS + ' max-w-[140px]'}
-              />
-            </div>
-          </SettingsFieldRow>
-
-          <SettingsFieldRow label="Accent Color" description="Secondary highlight color" inline>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={displaySettings.branding.accentColor || '#F59E0B'}
-                onChange={(e) => updateField('branding', 'accentColor', e.target.value)}
-                disabled={isLocked}
-                className="w-10 h-10 rounded-lg cursor-pointer border border-[rgb(var(--border-primary))] disabled:opacity-50"
-              />
-              <input
-                type="text"
-                value={displaySettings.branding.accentColor || '#F59E0B'}
-                onChange={(e) => updateField('branding', 'accentColor', e.target.value)}
-                disabled={isLocked}
-                className={INPUT_CLASS + ' max-w-[140px]'}
-              />
-            </div>
-          </SettingsFieldRow>
-        </SettingsSection>
-
-        {/* Policy Defaults */}
-        <SettingsSection
-          title="Policy Defaults"
-          icon={Shield}
-          description="Default grading and attendance policies for new schools"
-          collapsible
-          defaultOpen={false}
-        >
-          <SettingsFieldRow label="Default Grading Scale" description="Standard grading system for schools" inline>
-            <select
-              value={displaySettings.policies.defaultGradingScale}
-              onChange={(e) => updateField('policies', 'defaultGradingScale', e.target.value)}
-              disabled={isLocked}
-              className={SELECT_CLASS}
-            >
-              {GRADING_SCALE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </SettingsFieldRow>
-
-          <SettingsFieldRow label="Default Attendance Policy" description="How attendance is tracked by default" inline>
-            <select
-              value={displaySettings.policies.defaultAttendancePolicy}
-              onChange={(e) => updateField('policies', 'defaultAttendancePolicy', e.target.value)}
-              disabled={isLocked}
-              className={SELECT_CLASS}
-            >
-              {ATTENDANCE_POLICY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </SettingsFieldRow>
-        </SettingsSection>
+        {/* COMING SOON — Attendance Defaults section (re-enable when attendance policy config ships) */}
 
         {/* Info Note */}
         <motion.div variants={fadeInUp}>

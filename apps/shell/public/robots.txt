@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Allow: /security
+Disallow: /login
+Disallow: /portal
+
+Sitemap: https://www.edforge.app/sitemap.xml

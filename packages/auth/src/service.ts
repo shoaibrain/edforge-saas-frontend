@@ -6,6 +6,8 @@
  */
 
 import {
+  signIn,
+  confirmSignIn,
   signInWithRedirect,
   signOut,
   fetchAuthSession,
@@ -13,12 +15,30 @@ import {
 } from 'aws-amplify/auth'
 import { Hub } from 'aws-amplify/utils'
 import type { CognitoIdTokenPayload, AuthSession, AuthState } from './types'
+import { getAuthConfig } from './config'
 
 /**
  * Initiates OAuth login flow by redirecting to Cognito Hosted UI
  */
 export async function login(): Promise<void> {
   await signInWithRedirect()
+}
+
+/**
+ * Signs in directly with username/password via Cognito's InitiateAuth API.
+ * No redirect — tokens are returned inline.
+ */
+export async function signInDirect(username: string, password: string) {
+  return await signIn({ username, password })
+}
+
+/**
+ * Completes the NEW_PASSWORD_REQUIRED challenge.
+ * Must be called after signInDirect returns the challenge step.
+ * Amplify v6 tracks the pending sign-in session internally.
+ */
+export async function completeNewPassword(newPassword: string) {
+  return await confirmSignIn({ challengeResponse: newPassword })
 }
 
 /**
@@ -202,6 +222,17 @@ export function subscribeToAuthChanges(
   })
 
   return hubListener
+}
+
+/**
+ * Returns the Cognito Hosted UI forgot-password URL.
+ * Returns null if Cognito is not configured.
+ */
+export function getForgotPasswordUrl(): string | null {
+  const config = getAuthConfig()
+  if (!config) return null
+  const redirectUri = encodeURIComponent(config.redirectSignIn)
+  return `https://${config.domain}/forgotPassword?client_id=${config.userPoolClientId}&redirect_uri=${redirectUri}&response_type=code&scope=${encodeURIComponent(config.scopes.join(' '))}`
 }
 
 /**

@@ -1,9 +1,9 @@
 /**
  * Breadcrumbs Component
- * 
+ *
  * Path-aware breadcrumb navigation using TanStack Router's useMatches().
  * Provides visual wayfinding for deep navigation within modules.
- * 
+ *
  * Features:
  * - Route-aware breadcrumb generation using TanStack Router matches
  * - Support for dynamic route parameters (e.g., $studentId -> actual name)
@@ -12,35 +12,29 @@
  * - Responsive design with truncation for long paths
  * - Smooth animations on route changes
  * - Accessible with proper ARIA attributes
+ * - i18n localized via @edforge/i18n nav namespace
  */
 
 import { useMemo } from 'react'
 import { Link, useMatches } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from '@edforge/i18n'
 import { cn } from '../../lib/utils'
 
 // ============================================================================
-// ROUTE LABEL MAPPING
+// ROUTE LABEL FALLBACKS
+// Used when no i18n key is found for a segment.
 // ============================================================================
 
-/**
- * Maps URL path segments to human-readable labels.
- * Add new mappings as routes are created.
- */
 const ROUTE_LABELS: Record<string, string> = {
   // Top-level modules
   home: 'Home',
   academics: 'Academics',
-  finance: 'Finance & Billing',
   people: 'People & HR',
-  messages: 'Messages',
-  analytics: 'Analytics',
   settings: 'Settings',
   'student-portal': 'Student Portal',
   'parent-portal': 'Family Portal',
-  'special-programs': 'Special Programs',
-  edfi: 'State Reporting',
 
   // Academics sub-routes
   students: 'Students',
@@ -56,7 +50,7 @@ const ROUTE_LABELS: Record<string, string> = {
   assessments: 'Assessments',
   exams: 'Exams',
   calendar: 'Academic Calendar',
-  attendance: 'Student Attendance',
+  attendance: 'My Attendance',
 
   // Finance sub-routes
   accounting: 'Accounting',
@@ -82,7 +76,6 @@ const ROUTE_LABELS: Record<string, string> = {
   'performance-reviews': 'Performance Reviews',
   department: 'Departments',
   tasks: 'Staff Tasks',
-  assignments: 'Duty Assignments',
   parents: 'Parent Directory',
   '504-plans': '504 Plans',
 
@@ -97,6 +90,10 @@ const ROUTE_LABELS: Record<string, string> = {
   financial: 'Financial Analytics',
 
   // Settings sub-routes
+  organization: 'Organization',
+  sea: 'State Education Agency',
+  lea: 'District',
+  esc: 'Service Center',
   account: 'My Account',
   preferences: 'Preferences',
   notifications: 'Notifications',
@@ -109,15 +106,16 @@ const ROUTE_LABELS: Record<string, string> = {
   danger: 'Danger Zone',
 
   // Student Portal
-  grades: 'Grades',
-  schedule: 'Schedule',
+  grades: 'My Grades',
+  schedule: 'My Schedule',
+  assignments: 'Assignments',
 
   // Parent Portal
   fees: 'Fee Payments',
+  overview: 'Overview',
 
   // Special Programs sub-routes
   ieps: 'IEPs',
-
   goals: 'Goals & Objectives',
   accommodations: 'Accommodations',
   accessibility: 'Accessibility Services',
@@ -129,72 +127,55 @@ const ROUTE_LABELS: Record<string, string> = {
 }
 
 /**
- * Maps route parameter names to friendly display labels.
- * Used when displaying dynamic segments like $studentId.
+ * Maps route parameter names to i18n breadcrumb keys.
  */
-const PARAM_LABELS: Record<string, string> = {
+const PARAM_KEYS: Record<string, string> = {
+  studentId: 'breadcrumb.studentDetails',
+  teacherId: 'breadcrumb.teacherDetails',
+  staffId: 'breadcrumb.staffDetails',
+  parentId: 'breadcrumb.parentDetails',
+  classId: 'breadcrumb.classDetails',
+  classroomId: 'breadcrumb.classroomDetails',
+  schoolId: 'breadcrumb.schoolDetails',
+}
+
+const PARAM_FALLBACKS: Record<string, string> = {
   studentId: 'Student Details',
   teacherId: 'Teacher Details',
   staffId: 'Staff Details',
   parentId: 'Parent Details',
   classId: 'Class Details',
   classroomId: 'Classroom Details',
-}
-
-/**
- * Convert a path segment to a human-readable label.
- * Falls back to title-casing the segment if no mapping exists.
- */
-function getSegmentLabel(segment: string): string {
-  // Check if it's a dynamic segment (starts with $)
-  if (segment.startsWith('$')) {
-    const paramName = segment.slice(1)
-    return PARAM_LABELS[paramName] ||
-      paramName.charAt(0).toUpperCase() + paramName.slice(1).replace(/Id$/, ' Details')
-  }
-
-  // Check static mapping
-  if (ROUTE_LABELS[segment]) {
-    return ROUTE_LABELS[segment]
-  }
-
-  // Fallback: title case the segment
-  return segment
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+  schoolId: 'School Details',
 }
 
 /**
  * Check if a string looks like a dynamic ID (UUID, numeric ID, etc.)
  */
 function isDynamicSegment(segment: string): boolean {
-  // UUID pattern (with or without dashes)
   const uuidPattern = /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i
-  // Short UUID or numeric ID
   const shortIdPattern = /^[a-f0-9-]{8,}$/i
-  // Pure numeric ID
   const numericPattern = /^\d+$/
 
   return uuidPattern.test(segment) || shortIdPattern.test(segment) || numericPattern.test(segment)
 }
+
+/**
+ * Segments that are route parameters (not standalone routes).
+ */
+const NON_NAVIGABLE_SEGMENTS = new Set(['sea', 'lea', 'esc'])
 
 // ============================================================================
 // BREADCRUMB TYPES
 // ============================================================================
 
 interface BreadcrumbItem {
-  /** Unique identifier for this breadcrumb */
   id: string
-  /** Display label */
   label: string
-  /** Navigation path */
   path: string
-  /** Whether this is the current page */
   isCurrentPage: boolean
-  /** Whether this segment represents a dynamic parameter */
   isDynamic: boolean
-  /** Route ID from TanStack Router (for debugging) */
+  isNonNavigable: boolean
   routeId?: string
 }
 
@@ -203,26 +184,54 @@ interface BreadcrumbItem {
 // ============================================================================
 
 export function Breadcrumbs() {
-  // Get all matched routes from TanStack Router
   const matches = useMatches()
+  const { t: tNav } = useTranslation('nav')
 
-  // Build breadcrumb items from route matches
+  /**
+   * Translate a URL segment to a localized label.
+   * Priority: breadcrumb.{segment} → top-level nav key → ROUTE_LABELS fallback → title-case
+   */
+  const getSegmentLabel = (segment: string): string => {
+    // Try breadcrumb-specific key first (handles hyphenated segments like "grade-levels")
+    const breadcrumbKey = `breadcrumb.${segment}`
+    const breadcrumbResult = tNav(breadcrumbKey, { defaultValue: '' })
+    if (breadcrumbResult) return breadcrumbResult
+
+    // Try top-level nav key (handles simple segments like "students", "settings")
+    const topLevelResult = tNav(segment, { defaultValue: '' })
+    if (topLevelResult) return topLevelResult
+
+    // Fallback to static map
+    if (ROUTE_LABELS[segment]) return ROUTE_LABELS[segment]
+
+    // Last resort: title-case
+    return segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
+  const getParamLabel = (paramKey: string): string => {
+    const i18nKey = PARAM_KEYS[paramKey]
+    if (i18nKey) {
+      return tNav(i18nKey, { defaultValue: PARAM_FALLBACKS[paramKey] || 'Details' })
+    }
+    return PARAM_FALLBACKS[paramKey] ||
+      paramKey.charAt(0).toUpperCase() + paramKey.slice(1).replace(/Id$/, ' Details')
+  }
+
   const breadcrumbs = useMemo<BreadcrumbItem[]>(() => {
     if (!matches || matches.length === 0) return []
 
-    // Get the current pathname from the last match
     const currentMatch = matches[matches.length - 1]
     const pathname = currentMatch?.pathname || '/'
 
-    // Don't show breadcrumbs on home page
     if (pathname === '/' || pathname === '/home') {
       return []
     }
 
-    // Build breadcrumbs from path segments
     const segments = pathname.split('/').filter(Boolean)
 
-    // Extract any dynamic params from route matches for display
     const params: Record<string, string> = {}
     matches.forEach(match => {
       if (match.params) {
@@ -234,17 +243,13 @@ export function Breadcrumbs() {
       const path = '/' + segments.slice(0, index + 1).join('/')
       const isCurrentPage = index === segments.length - 1
       const isDynamic = isDynamicSegment(segment)
-
-      // Find the corresponding route match for this path level
+      const isNonNavigable = NON_NAVIGABLE_SEGMENTS.has(segment)
       const matchingRoute = matches.find(m => m.pathname === path)
 
-      // Determine the label
       let label: string
       if (isDynamic) {
-        // For dynamic segments, try to get a meaningful label from params
-        // or fall back to "Details"
         const paramKey = Object.keys(params).find(key => params[key] === segment)
-        label = paramKey ? PARAM_LABELS[paramKey] || 'Details' : 'Details'
+        label = paramKey ? getParamLabel(paramKey) : tNav('breadcrumb.details', { defaultValue: 'Details' })
       } else {
         label = getSegmentLabel(segment)
       }
@@ -255,6 +260,7 @@ export function Breadcrumbs() {
         path,
         isCurrentPage,
         isDynamic,
+        isNonNavigable,
         routeId: matchingRoute?.routeId,
       }
     })
@@ -263,16 +269,17 @@ export function Breadcrumbs() {
     return [
       {
         id: 'crumb-home',
-        label: 'Home',
+        label: tNav('home'),
         path: '/home',
         isCurrentPage: false,
         isDynamic: false,
+        isNonNavigable: false,
       },
       ...items,
     ]
-  }, [matches])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matches, tNav])
 
-  // Don't render if no breadcrumbs (home page)
   if (breadcrumbs.length === 0) {
     return null
   }
@@ -302,14 +309,16 @@ export function Breadcrumbs() {
               )}
 
               {/* Breadcrumb item */}
-              {crumb.isCurrentPage ? (
+              {crumb.isCurrentPage || crumb.isNonNavigable ? (
                 <span
                   className={cn(
-                    'font-medium text-[rgb(var(--text-primary))]',
+                    crumb.isCurrentPage
+                      ? 'font-medium text-[rgb(var(--text-primary))]'
+                      : 'text-[rgb(var(--text-tertiary))]',
                     'max-w-[200px] truncate',
                     crumb.isDynamic && 'italic'
                   )}
-                  aria-current="page"
+                  aria-current={crumb.isCurrentPage ? 'page' : undefined}
                   title={crumb.label}
                 >
                   {crumb.label}
@@ -338,4 +347,3 @@ export function Breadcrumbs() {
     </nav>
   )
 }
-

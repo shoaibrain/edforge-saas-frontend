@@ -49,7 +49,7 @@ export function WithdrawalModal({
   const [notes, setNotes] = useState('')
 
   const handleSubmit = async () => {
-    if (!reason) return
+    if (!reason || !exitWithdrawType) return
     await withdrawMutation.mutateAsync({
       schoolId,
       yearId,
@@ -58,7 +58,7 @@ export function WithdrawalModal({
         withdrawalDate,
         reason,
         notes: notes || undefined,
-        exitWithdrawTypeDescriptor: exitWithdrawType || undefined,
+        exitWithdrawTypeDescriptor: exitWithdrawType,
       },
     })
     onClose()
@@ -102,14 +102,14 @@ export function WithdrawalModal({
           {/* Ed-Fi Exit/Withdraw Type Descriptor */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1">
-              Exit Type
+              Exit Type *
             </label>
             <select
               value={exitWithdrawType}
               onChange={(e) => setExitWithdrawType(e.target.value)}
               className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             >
-              <option value="">Select exit type (optional)...</option>
+              <option value="">Select exit type...</option>
               {EXIT_WITHDRAW_TYPE_OPTIONS.map((r) => (
                 <option key={r.value} value={r.value}>{r.label}</option>
               ))}
@@ -156,7 +156,7 @@ export function WithdrawalModal({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={withdrawMutation.isPending || !reason}
+            disabled={withdrawMutation.isPending || !reason || !exitWithdrawType}
             className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {withdrawMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}

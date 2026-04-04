@@ -1,12 +1,12 @@
 {
   "buildCommand": "bash scripts/build-deploy.sh",
   "outputDirectory": "output",
-  "installCommand": "pnpm install",
+  "installCommand": "npm i -g pnpm@9.15.0 && pnpm install",
   "framework": null,
   "rewrites": [
     { "source": "/remotes/:path*", "destination": "/remotes/:path*" },
     { "source": "/static/:path*", "destination": "/static/:path*" },
-    { "source": "/api/:path*", "destination": "https://udmx0atz53.execute-api.us-east-2.amazonaws.com/prod/:path*" },
+    { "source": "/api/:path*", "destination": "https://tw8pfmqsdi.execute-api.us-east-2.amazonaws.com/prod/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

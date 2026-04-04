@@ -15,9 +15,12 @@ export type GlobalRole = 'TenantAdmin' | 'StandardUser'
  */
 export type SchoolRole =
   | 'Principal'
+  | 'VicePrincipal'
   | 'Teacher'
   | 'Accountant'
   | 'Staff'
+  | 'Counselor'
+  | 'Nurse'
   | 'Student'
   | 'Parent'
 
@@ -33,8 +36,11 @@ export type RoleCategory = 'administrator' | 'educator' | 'student' | 'parent'
 export function getRoleCategory(role: SchoolRole): RoleCategory {
   switch (role) {
     case 'Principal':
+    case 'VicePrincipal':
       return 'administrator'
     case 'Teacher':
+    case 'Counselor':
+    case 'Nurse':
       return 'educator'
     case 'Accountant':
     case 'Staff':
@@ -83,8 +89,6 @@ export interface AuthState {
 export interface LoginCredentials {
   email: string
   password?: string
-  /** For demo/mock mode */
-  mockUserId?: string
 }
 
 /**

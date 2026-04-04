@@ -2,12 +2,13 @@
  * DiceBear Avatar Utility for Academics Module
  *
  * Generates consistent, beautiful avatars using DiceBear API.
- * Students use the 'avataaars' style, seeded by name for consistency.
+ * Students use the 'adventurer' style, seeded by name for consistency.
  *
  * @see https://www.dicebear.com/
  */
 
 export type AvatarStyle =
+  | 'adventurer'
   | 'avataaars'
   | 'bottts'
   | 'lorelei'
@@ -27,7 +28,7 @@ interface AvatarOptions {
   radius?: number
 }
 
-const DEFAULT_SIZE = 128
+const DEFAULT_SIZE = 64
 
 /**
  * Generate a DiceBear avatar URL
@@ -56,7 +57,7 @@ export function getAvatarUrl(options: AvatarOptions): string {
 
 /**
  * Get avatar URL for a student.
- * Uses 'avataaars' DiceBear style, seeded by student name or ID.
+ * Uses 'adventurer' DiceBear style, seeded by student name or ID.
  */
 export function getStudentAvatar(
   identifier: string,
@@ -64,7 +65,22 @@ export function getStudentAvatar(
 ): string {
   return getAvatarUrl({
     seed: identifier,
-    style: 'avataaars',
+    style: 'adventurer',
+    ...options,
+  })
+}
+
+/**
+ * Get avatar URL for a staff member / instructor.
+ * Uses 'lorelei' DiceBear style, seeded by staff name or ID.
+ */
+export function getStaffAvatar(
+  identifier: string,
+  options?: Partial<Omit<AvatarOptions, 'seed'>>
+): string {
+  return getAvatarUrl({
+    seed: identifier,
+    style: 'lorelei',
     ...options,
   })
 }

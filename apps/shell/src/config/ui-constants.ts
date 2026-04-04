@@ -10,7 +10,10 @@
 // ============================================================================
 
 /** Main navigation item icons in the sidebar */
-export const SIDEBAR_NAV_ICON_SIZE = 20
+export const SIDEBAR_NAV_ICON_SIZE = 22
+
+/** Nav icons in collapsed sidebar — slightly larger for visibility */
+export const SIDEBAR_NAV_ICON_SIZE_COLLAPSED = 22
 
 /** Header/logo icons in the sidebar */
 export const SIDEBAR_HEADER_ICON_SIZE = 20

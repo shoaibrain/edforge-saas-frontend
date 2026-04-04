@@ -273,7 +273,6 @@ export const userAddressSchema = z.object({
 export const userProfileSchema = z.object({
   firstName: nameSchema,
   lastName: nameSchema,
-  middleName: z.string().max(50).optional().or(z.literal('')),
   displayName: z.string().max(100).optional().or(z.literal('')),
   email: emailSchema,
   phone: z.string().max(30).optional().or(z.literal('')), // Include country code (e.g., "+1 555-123-4567")

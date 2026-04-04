@@ -1,25 +1,21 @@
 /**
  * ModuleOverviewPage - Local Implementation for Academics MFE
- * 
+ *
  * Provides a Notion-inspired module landing page with:
  * - Header with module title + "Overview" label
- * - Stats carousel
+ * - Optional calendar bar slot (rendered between header and stats)
+ * - Stats carousel with loading skeleton support
+ * - Custom widget children slot (rendered between stats and quick access)
  * - Quick action cards linking to sub-routes
- * 
- * Note: This is a simplified local implementation.
- * Full widget customization will be available when @edforge/shell-components is created.
+ * - Widget visibility persisted via Zustand store
  */
 
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { useSpring, animated } from '@react-spring/web'
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { 
-    ArrowRight, 
-    ChartNoAxesColumnDecreasing, 
-    CloudLightning, 
+import {
+    ChartNoAxesColumnDecreasing,
     GalleryVerticalEnd,
     ChevronLeft,
     ChevronRight,
@@ -30,8 +26,10 @@ import {
     Eye,
     RotateCcw,
     Check,
+    BarChart3,
+    RefreshCw,
 } from 'lucide-react'
-import { Card } from '@edforge/ui'
+import { useOverviewWidgetStore } from '../stores/overview-widgets.store'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -45,16 +43,9 @@ export interface ModuleStat {
     icon: LucideIcon
     iconBg: string
     iconColor: string
-}
-
-export interface ModuleActionCard {
-    id: string
-    title: string
-    description: string
-    icon: LucideIcon
-    href: string
-    iconBg: string
-    iconColor: string
+    loading?: boolean
+    error?: boolean
+    onRetry?: () => void
 }
 
 export interface ModuleOverviewPageProps {
@@ -63,12 +54,14 @@ export interface ModuleOverviewPageProps {
     description: string
     icon: LucideIcon
     stats: ModuleStat[]
-    actionCards: ModuleActionCard[]
+    calendarLabel?: ReactNode
     children?: ReactNode
+    lastUpdated?: Date | null
+    onRefresh?: () => void
 }
 
 // ============================================================================
-// WIDGET VISIBILITY MENU (Simplified)
+// WIDGET VISIBILITY MENU
 // ============================================================================
 
 interface WidgetVisibilityMenuProps {
@@ -89,8 +82,18 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 setShowWidgets(false)
             }
         }
+        function handleEscape(event: KeyboardEvent) {
+            if (event.key === 'Escape') {
+                setIsOpen(false)
+                setShowWidgets(false)
+            }
+        }
         document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
+        document.addEventListener('keydown', handleEscape)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+            document.removeEventListener('keydown', handleEscape)
+        }
     }, [])
 
     return (
@@ -105,6 +108,8 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     ${isOpen ? 'bg-[rgb(var(--surface-tertiary))]' : ''}
                 `}
                 title="Page options"
+                aria-expanded={isOpen}
+                aria-haspopup="true"
             >
                 <MoreHorizontal className="w-5 h-5" />
             </button>
@@ -114,10 +119,12 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    role="menu"
                 >
                     <button
                         onClick={() => setShowWidgets(true)}
                         className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--interactive-hover))] text-left text-sm text-[rgb(var(--text-primary))]"
+                        role="menuitem"
                     >
                         <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>Show/hide widgets</span>
@@ -127,6 +134,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     <button
                         onClick={() => { onReset(); setIsOpen(false) }}
                         className="w-full px-3 py-2 flex items-center gap-3 text-left text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))]"
+                        role="menuitem"
                     >
                         <RotateCcw className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>Reset to default</span>
@@ -139,10 +147,12 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    role="menu"
                 >
                     <button
                         onClick={() => setShowWidgets(false)}
                         className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--interactive-hover))] text-left text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
+                        role="menuitem"
                     >
                         <span>‹</span>
                         <span>Back</span>
@@ -152,6 +162,8 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                             key={widget.id}
                             onClick={() => onToggle(widget.id)}
                             className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--interactive-hover))] text-left text-sm"
+                            role="menuitemcheckbox"
+                            aria-checked={widget.visible}
                         >
                             <div className="w-4 h-4 flex items-center justify-center">
                                 {widget.visible && <Check className="w-4 h-4 text-[rgb(var(--text-primary))]" />}
@@ -166,7 +178,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
 }
 
 // ============================================================================
-// STAT CARD COMPONENT
+// STAT CARD COMPONENT (with loading skeleton)
 // ============================================================================
 
 interface StatCardProps {
@@ -186,26 +198,47 @@ function StatCard({ stat, index }: StatCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+            <div className="group relative flex flex-col w-[200px] h-[148px] p-5 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm transition-all duration-200 overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
-                    <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.iconBg}`}>
+                    <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
                 </div>
                 <div className="mt-auto relative z-10">
-                    <p className="text-xs text-[rgb(var(--text-tertiary))] mb-0.5 truncate">{stat.label}</p>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-bold text-[rgb(var(--text-primary))]">{stat.value}</span>
-                        {stat.change && (
-                            <div className={`flex items-center gap-0.5 text-xs ${
-                                stat.changeType === 'positive' ? 'text-emerald-600' :
-                                stat.changeType === 'negative' ? 'text-rose-600' :
-                                'text-[rgb(var(--text-tertiary))]'
-                            }`}>
-                                <TrendIcon className="w-3 h-3" />
-                                <span>{stat.change}</span>
-                            </div>
-                        )}
-                    </div>
+                    <p className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide mb-1 truncate">{stat.label}</p>
+                    {stat.loading ? (
+                        <div className="space-y-1.5">
+                            <div className="h-8 w-16 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
+                            <div className="h-3.5 w-12 bg-[rgb(var(--surface-tertiary))] rounded motion-safe:animate-pulse" />
+                        </div>
+                    ) : stat.error ? (
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-3xl font-semibold text-[rgb(var(--text-tertiary))]">—</span>
+                            {stat.onRetry && (
+                                <button
+                                    onClick={stat.onRetry}
+                                    className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+                                    title="Retry loading"
+                                >
+                                    <RotateCcw className="w-2.5 h-2.5" />
+                                    Retry
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-3xl font-semibold text-[rgb(var(--text-primary))]">{stat.value}</span>
+                            {stat.change && (
+                                <div className={`flex items-center gap-0.5 text-xs ${
+                                    stat.changeType === 'positive' ? 'text-emerald-600' :
+                                    stat.changeType === 'negative' ? 'text-rose-600' :
+                                    'text-[rgb(var(--text-tertiary))]'
+                                }`}>
+                                    <TrendIcon className="w-3 h-3" />
+                                    <span>{stat.change}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </motion.div>
@@ -213,7 +246,7 @@ function StatCard({ stat, index }: StatCardProps) {
 }
 
 // ============================================================================
-// STATS CAROUSEL
+// STATS CAROUSEL (keyboard-navigable)
 // ============================================================================
 
 interface StatsCarouselProps {
@@ -243,28 +276,41 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
         scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
     }, [])
 
+    // Keyboard navigation
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault()
+            smoothScroll('left')
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault()
+            smoothScroll('right')
+        }
+    }, [smoothScroll])
+
     return (
         <div
             className="relative group/carousel px-4"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {isHovered && canScrollLeft && (
+            {(isHovered) && canScrollLeft && (
                 <motion.button
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => smoothScroll('left')}
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
+                    aria-label="Scroll stats left"
                 >
                     <ChevronLeft className="w-5 h-5" />
                 </motion.button>
             )}
-            {isHovered && canScrollRight && (
+            {(isHovered) && canScrollRight && (
                 <motion.button
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => smoothScroll('right')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
+                    aria-label="Scroll stats right"
                 >
                     <ChevronRight className="w-5 h-5" />
                 </motion.button>
@@ -272,7 +318,11 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
             <div
                 ref={scrollRef}
                 onScroll={checkScrollPosition}
-                className="flex gap-3 overflow-x-auto scrollbar-none scroll-smooth py-2 -my-2"
+                onKeyDown={handleKeyDown}
+                tabIndex={0}
+                role="region"
+                aria-label="Key performance indicators"
+                className="flex gap-3 overflow-x-auto scrollbar-none scroll-smooth py-2 -my-2 focus:outline-none focus:ring-2 focus:ring-teal-500/30 rounded-xl"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {stats.map((stat, index) => (
@@ -280,66 +330,6 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                 ))}
             </div>
         </div>
-    )
-}
-
-// ============================================================================
-// ACTION CARD COMPONENT
-// ============================================================================
-
-function ActionCard({ card, delay = 0 }: { card: ModuleActionCard; delay?: number }) {
-    const [hovered, setHovered] = useState(false)
-
-    const springProps = useSpring({
-        scale: hovered ? 1.02 : 1,
-        y: hovered ? -6 : 0,
-        config: { tension: 300, friction: 20 },
-    })
-
-    const arrowSpring = useSpring({
-        x: hovered ? 4 : 0,
-        opacity: hovered ? 1 : 0.6,
-        config: { tension: 400, friction: 25 },
-    })
-
-    return (
-        <animated.div
-            style={{
-                transform: springProps.scale.to(s => `scale(${s}) translateY(${springProps.y.get()}px)`),
-            }}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-        >
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay }}
-            >
-                <Link to={card.href}>
-                    <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-teal-500/30 dark:hover:border-cyan-500/30">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
-                                <card.icon className={`w-6 h-6 ${card.iconColor}`} />
-                            </div>
-                            <animated.div
-                                style={{
-                                    transform: arrowSpring.x.to(x => `translateX(${x}px)`),
-                                    opacity: arrowSpring.opacity,
-                                }}
-                            >
-                                <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
-                            </animated.div>
-                        </div>
-                        <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-teal-600 dark:group-hover:text-cyan-400 transition-colors">
-                            {card.title}
-                        </h3>
-                        <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                            {card.description}
-                        </p>
-                    </Card>
-                </Link>
-            </motion.div>
-        </animated.div>
     )
 }
 
@@ -379,6 +369,31 @@ function WidgetSection({ label, icon: Icon, visible, children }: WidgetSectionPr
 }
 
 // ============================================================================
+// LAST UPDATED INDICATOR
+// ============================================================================
+
+function LastUpdatedIndicator({ date, onRefresh }: { date: Date | null; onRefresh?: () => void }) {
+    if (!date) return null
+
+    const diffMs = Date.now() - date.getTime()
+    const diffMin = Math.floor(diffMs / 60000)
+    let label = 'Updated just now'
+    if (diffMin >= 1 && diffMin < 60) label = `Updated ${diffMin}m ago`
+    else if (diffMin >= 60) label = `Updated ${Math.floor(diffMin / 60)}h ago`
+
+    return (
+        <button
+            onClick={onRefresh}
+            className="flex items-center gap-1.5 text-xs text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+            title="Click to refresh"
+        >
+            <RefreshCw className="w-3 h-3" />
+            {label}
+        </button>
+    )
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -386,41 +401,40 @@ export function ModuleOverviewPage({
     title,
     description,
     stats,
-    actionCards,
+    calendarLabel,
     children,
+    lastUpdated,
+    onRefresh,
 }: ModuleOverviewPageProps) {
-    // Local widget visibility state
-    const [widgetVisibility, setWidgetVisibility] = useState({
-        'quick-stats': true,
-        'quick-access': true,
-    })
+    // Widget visibility from Zustand store (persisted in localStorage)
+    const { visibleWidgets, toggleWidget, resetToDefaults } = useOverviewWidgetStore()
 
     const widgets = [
-        { id: 'quick-stats', label: 'Quick stats', visible: widgetVisibility['quick-stats'] },
-        { id: 'quick-access', label: 'Quick access', visible: widgetVisibility['quick-access'] },
+        { id: 'quick-stats', label: 'Quick stats', visible: visibleWidgets['quick-stats'] ?? true },
+        { id: 'insights', label: 'Insights & Charts', visible: visibleWidgets['insights'] ?? true },
+        { id: 'activity-alerts', label: 'Activity & Alerts', visible: visibleWidgets['activity-alerts'] ?? true },
     ]
 
-    const toggleWidget = (id: string) => {
-        setWidgetVisibility(prev => ({ ...prev, [id]: !prev[id as keyof typeof prev] }))
-    }
-
-    const resetWidgets = () => {
-        setWidgetVisibility({ 'quick-stats': true, 'quick-access': true })
-    }
+    const isWidgetVisible = (id: string) => visibleWidgets[id] ?? true
 
     return (
         <div className="space-y-10 max-w-6xl mx-auto pb-12 relative">
-            {/* Three-dot menu in top right corner */}
+            {/* Top-right controls: calendar label, last updated, menu */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="absolute top-4 right-0 z-10"
+                className="absolute top-4 right-0 z-10 flex items-center gap-3"
             >
+                {calendarLabel}
+                {calendarLabel && (
+                    <span className="w-px h-3 bg-[rgb(var(--border-secondary))]" />
+                )}
+                <LastUpdatedIndicator date={lastUpdated ?? null} onRefresh={onRefresh} />
                 <WidgetVisibilityMenu
                     widgets={widgets}
                     onToggle={toggleWidget}
-                    onReset={resetWidgets}
+                    onReset={resetToDefaults}
                 />
             </motion.div>
 
@@ -455,42 +469,23 @@ export function ModuleOverviewPage({
                 <WidgetSection
                     label="Quick stats"
                     icon={ChartNoAxesColumnDecreasing}
-                    visible={widgetVisibility['quick-stats']}
+                    visible={isWidgetVisible('quick-stats')}
                 >
                     <StatsCarousel stats={stats} />
                 </WidgetSection>
             )}
 
-            {/* Quick Access Cards */}
-            {actionCards.length > 0 && (
+            {/* Insights / Charts children slot */}
+            {children && isWidgetVisible('insights') && (
                 <WidgetSection
-                    label="Quick access"
-                    icon={CloudLightning}
-                    visible={widgetVisibility['quick-access']}
+                    label="Insights"
+                    icon={BarChart3}
+                    visible={isWidgetVisible('insights')}
                 >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {actionCards.map((card, index) => (
-                            <ActionCard
-                                key={card.id}
-                                card={card}
-                                delay={0.35 + index * 0.05}
-                            />
-                        ))}
-                    </div>
+                    {children}
                 </WidgetSection>
             )}
 
-            {/* Additional content slot */}
-            {children && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                >
-                    {children}
-                </motion.div>
-            )}
         </div>
     )
 }
-

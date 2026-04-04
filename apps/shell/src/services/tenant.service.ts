@@ -36,6 +36,9 @@ export interface UserProfile {
   id: string
   email: string
   name?: string
+  firstName?: string
+  lastName?: string
+  displayName?: string
   tenantId: string
   tenantName: string
   globalRole: 'TenantAdmin' | 'StandardUser'
@@ -96,17 +99,24 @@ function mapApiSchool(apiSchool: any, tenantId?: string): School {
     name: apiSchool.name,
     code: apiSchool.schoolCode || apiSchool.code,
     type: apiSchool.schoolType || apiSchool.type,
-    isActive: apiSchool.status === 'active' || apiSchool.status === 'setup',
+    status: apiSchool.status || 'setup',
+    isActive: apiSchool.status === 'active',
     address: apiSchool.address ? {
       street1: apiSchool.address.street1,
       street2: apiSchool.address.street2,
       city: apiSchool.address.city,
       state: apiSchool.address.state,
       postalCode: apiSchool.address.zipCode || apiSchool.address.postalCode,
-      country: apiSchool.address.country
+      country: apiSchool.address.country,
+      wardNumber: apiSchool.address.wardNumber,
+      municipality: apiSchool.address.municipality,
+      district: apiSchool.address.district,
+      province: apiSchool.address.province,
     } : undefined,
     phone: apiSchool.phone,
-    email: apiSchool.email
+    email: apiSchool.email,
+    calendarSystem: apiSchool.calendarSystem,
+    currentAcademicYearId: apiSchool.currentAcademicYearId,
   }
 }
 
@@ -181,7 +191,18 @@ export async function updateSchool(schoolId: string, data: UpdateSchoolDto): Pro
 }
 
 /**
- * Delete a school (soft delete - sets isActive to false)
+ * Transition school status via the state machine endpoint
+ * PATCH /schools/{schoolId}/status
+ */
+export async function transitionSchoolStatus(schoolId: string, status: string): Promise<School> {
+  const data = await apiPatch<any>(`/schools/${schoolId}/status`, { status })
+  return mapApiSchool(data)
+}
+
+/**
+ * Delete a school
+ * - Setup schools: permanently removed (hard-delete)
+ * - Active/suspended schools: transitioned to inactive (soft-delete)
  */
 export async function deleteSchool(schoolId: string): Promise<void> {
   return apiDelete<void>(`/schools/${schoolId}`)
@@ -231,6 +252,32 @@ export async function updateWorkspaceSettings(
   return apiPatch<WorkspaceSettings, Partial<WorkspaceSettings>>(
     `/tenants/${tenantId}/settings`,
     data
+  )
+}
+
+/**
+ * Confirm workspace settings
+ * PATCH /tenants/{tenantId}/settings/confirm
+ */
+export async function confirmWorkspaceSettings(
+  tenantId: string
+): Promise<{ confirmed: true; workspaceConfirmedAt: string }> {
+  return apiPatch<{ confirmed: true; workspaceConfirmedAt: string }>(
+    `/tenants/${tenantId}/settings/confirm`,
+    {}
+  )
+}
+
+/**
+ * Complete onboarding flow
+ * POST /tenants/{tenantId}/onboarding/complete
+ */
+export async function completeOnboarding(
+  tenantId: string
+): Promise<{ completed: true; onboardingCompletedAt: string }> {
+  return apiPost<{ completed: true; onboardingCompletedAt: string }>(
+    `/tenants/${tenantId}/onboarding/complete`,
+    {}
   )
 }
 
@@ -647,6 +694,43 @@ export async function deleteHoliday(
 }
 
 // ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+export interface AuditLogEntry {
+  auditId: string
+  schoolId: string
+  targetEntity: string
+  targetEntityId: string
+  action: string
+  changes: { field: string; oldValue: any; newValue: any }[]
+  changedBy: string
+  changedByName?: string
+  changedAt: string
+  reason?: string
+  severity?: 'normal' | 'high'
+}
+
+/**
+ * Get audit log for a school
+ * GET /schools/{schoolId}/audit-log
+ */
+export async function getAuditLog(
+  schoolId: string,
+  options: { limit?: number; startDate?: string; endDate?: string; action?: string } = {}
+): Promise<{ items: AuditLogEntry[]; hasMore: boolean }> {
+  const params: Record<string, string> = {}
+  if (options.limit) params.limit = String(options.limit)
+  if (options.startDate) params.startDate = options.startDate
+  if (options.endDate) params.endDate = options.endDate
+  if (options.action) params.action = options.action
+  const query = new URLSearchParams(params).toString()
+  return apiGet<{ items: AuditLogEntry[]; hasMore: boolean }>(
+    `/schools/${schoolId}/audit-log${query ? `?${query}` : ''}`
+  )
+}
+
+// ============================================================================
 // CONVENIENCE EXPORTS
 // ============================================================================
 
@@ -662,6 +746,8 @@ export const tenantService = {
   // Workspace Settings
   getWorkspaceSettings,
   updateWorkspaceSettings,
+  confirmWorkspaceSettings,
+  completeOnboarding,
 
   // Schools
   getSchools,
@@ -669,6 +755,7 @@ export const tenantService = {
   getSchool,
   createSchool,
   updateSchool,
+  transitionSchoolStatus,
   deleteSchool,
 
   // School Configuration
@@ -704,6 +791,9 @@ export const tenantService = {
   // School Years (Legacy)
   getSchoolYears,
   getCurrentSchoolYear,
+
+  // Audit Log
+  getAuditLog,
 }
 
 // Export types for use in components

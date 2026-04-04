@@ -12,22 +12,8 @@ import { z } from 'zod'
 // CONSTANTS
 // ============================================================================
 
-export const GRADE_LEVEL_OPTIONS = [
-  { value: 'PK', label: 'Pre-Kindergarten' },
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1', label: 'Grade 1' },
-  { value: '2', label: 'Grade 2' },
-  { value: '3', label: 'Grade 3' },
-  { value: '4', label: 'Grade 4' },
-  { value: '5', label: 'Grade 5' },
-  { value: '6', label: 'Grade 6' },
-  { value: '7', label: 'Grade 7' },
-  { value: '8', label: 'Grade 8' },
-  { value: '9', label: 'Grade 9' },
-  { value: '10', label: 'Grade 10' },
-  { value: '11', label: 'Grade 11' },
-  { value: '12', label: 'Grade 12' },
-]
+// Re-exported from shared-types (canonical source of truth)
+export { GRADE_LEVEL_OPTIONS } from '@aibrains/shared-types'
 
 export const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
@@ -107,7 +93,13 @@ const addressSchema = z.object({
   state: z.string().max(100).optional().or(z.literal('')),
   zipCode: z.string().max(20).optional().or(z.literal('')),
   country: z.string().max(100).optional().or(z.literal('')),
-}).optional()
+}).refine(
+  (data) => {
+    const hasAnyField = data.street2 || data.city || data.state || data.zipCode || data.country
+    return !hasAnyField || (data.street1 && data.street1.length > 0)
+  },
+  { message: 'Street address is required when providing address details', path: ['street1'] }
+).optional()
 
 export const contactInfoStepSchema = z.object({
   contactInfo: z.object({
@@ -147,7 +139,10 @@ const guardianFormSchema = z.object({
   canPickup: z.boolean().default(true),
   employer: z.string().max(100).optional().or(z.literal('')),
   occupation: z.string().max(100).optional().or(z.literal('')),
-})
+}).refine(
+  (data) => !data.hasPortalAccess || (data.email && data.email.length > 0),
+  { message: 'Email is required when Portal Access is enabled', path: ['email'] }
+)
 
 export const guardiansStepSchema = z.object({
   guardians: z.array(guardianFormSchema).max(10).optional(),
@@ -172,11 +167,7 @@ export const medicalStepSchema = z.object({
     physicianPhone: z.string().max(20).optional().or(z.literal('')),
     insuranceProvider: z.string().max(100).optional().or(z.literal('')),
     insurancePolicyNumber: z.string().max(50).optional().or(z.literal('')),
-    hasIEP: z.boolean().optional(),
-    has504Plan: z.boolean().optional(),
   }).optional(),
-  specialPrograms: z.array(z.string()).optional(),
-  accommodations: z.array(z.string()).optional(),
   ethnicity: z.string().max(50).optional().or(z.literal('')),
   primaryLanguage: z.string().max(50).optional().or(z.literal('')),
   homeLanguage: z.string().max(50).optional().or(z.literal('')),
@@ -204,7 +195,10 @@ export const enrollmentStepSchema = z.object({
     primarySchool: z.boolean().default(true),
     fullTimeEquivalency: z.coerce.number().min(0).max(1).default(1.0),
     repeatGradeIndicator: z.boolean().default(false),
-  }),
+  }).refine(
+    (data) => data.enrollmentType !== 'transfer' || (data.previousSchoolName && data.previousSchoolName.length > 0),
+    { message: 'Previous school name is required for transfers', path: ['previousSchoolName'] }
+  ),
 })
 
 export type EnrollmentStepData = z.infer<typeof enrollmentStepSchema>
@@ -266,11 +260,7 @@ export const defaultStudentFormData: Record<string, unknown> = {
     physicianPhone: '',
     insuranceProvider: '',
     insurancePolicyNumber: '',
-    hasIEP: false,
-    has504Plan: false,
   },
-  specialPrograms: [],
-  accommodations: [],
   ethnicity: '',
   primaryLanguage: '',
   homeLanguage: '',

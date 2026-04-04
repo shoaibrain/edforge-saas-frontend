@@ -5,7 +5,7 @@
  * Used by section forms and scheduling page to populate selectors.
  */
 
-import { apiGet } from '../lib/api'
+import { apiGet, apiPut } from '../lib/api'
 
 // ============================================================================
 // TYPES
@@ -39,6 +39,8 @@ export interface GradingPeriodResponseDto {
   endDate: string
   sequence: number
   isCurrent: boolean
+  gradesDueDate?: string
+  reportCardDate?: string
   createdAt: string
   updatedAt: string
 }
@@ -92,11 +94,75 @@ export async function getGradingPeriods(
 }
 
 // ============================================================================
+// ACADEMIC YEAR MUTATIONS
+// ============================================================================
+
+/**
+ * Set an academic year as the current year for a school.
+ * Backend clears `isCurrent` from any previously-current year atomically.
+ * PUT /schools/:schoolId/academic-years/:yearId/set-current
+ */
+export async function setCurrentAcademicYear(
+  schoolId: string,
+  yearId: string
+): Promise<AcademicYearResponseDto> {
+  return apiPut<AcademicYearResponseDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/set-current`
+  )
+}
+
+/**
+ * Update the status of an academic year
+ * PUT /schools/:schoolId/academic-years/:yearId/status
+ */
+export async function updateAcademicYearStatus(
+  schoolId: string,
+  yearId: string,
+  status: AcademicYearResponseDto['status']
+): Promise<AcademicYearResponseDto> {
+  return apiPut<AcademicYearResponseDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/status`,
+    { status }
+  )
+}
+
+// ============================================================================
+// SCHOOL PROFILE
+// ============================================================================
+
+/**
+ * Minimal school profile for grade-range filtering.
+ * The Shell's mapApiSchool() strips gradeRange, so the Academics MFE
+ * fetches directly to get the full response including gradeRange.
+ */
+export interface SchoolProfileDto {
+  schoolId: string
+  name: string
+  schoolCode: string
+  schoolType: string
+  gradeRange?: { start: string; end: string }
+  status: string
+}
+
+/**
+ * Get a school's profile including gradeRange.
+ * GET /schools/:schoolId
+ */
+export async function getSchoolProfile(
+  schoolId: string
+): Promise<SchoolProfileDto> {
+  return apiGet<SchoolProfileDto>(`/schools/${schoolId}`)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
 export const schoolService = {
+  getSchoolProfile,
   getAcademicYears,
   getCurrentAcademicYear,
   getGradingPeriods,
+  setCurrentAcademicYear,
+  updateAcademicYearStatus,
 }

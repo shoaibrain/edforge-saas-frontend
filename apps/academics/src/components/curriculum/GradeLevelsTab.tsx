@@ -15,7 +15,7 @@ import {
   BarChart3,
   GraduationCap,
 } from 'lucide-react'
-import { DataTable, type Column } from '@edforge/ui'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
@@ -31,6 +31,8 @@ interface GradeLevelsTabProps {
   isLoading?: boolean
   /** Callback when a course is clicked inside the drawer */
   onViewCourse?: (course: CourseResponseDto) => void
+  /** Optional school grade range to filter displayed grades (e.g., { start: '9', end: '12' }) */
+  schoolGradeRange?: { start: string; end: string }
 }
 
 // ============================================================================
@@ -120,17 +122,28 @@ export function GradeLevelsTab({
   courses,
   isLoading,
   onViewCourse,
+  schoolGradeRange,
 }: GradeLevelsTabProps) {
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedGrade, setSelectedGrade] = useState<GradeLevelData | null>(null)
 
+  // Filter grade options to the school's grade range if provided
+  const filteredGradeOptions = useMemo(() => {
+    if (!schoolGradeRange) return GRADE_LEVEL_OPTIONS
+    const allValues: string[] = GRADE_LEVEL_OPTIONS.map((o) => o.value)
+    const startIdx = allValues.indexOf(schoolGradeRange.start)
+    const endIdx = allValues.indexOf(schoolGradeRange.end)
+    if (startIdx === -1 || endIdx === -1 || startIdx > endIdx) return GRADE_LEVEL_OPTIONS
+    return GRADE_LEVEL_OPTIONS.slice(startIdx, endIdx + 1)
+  }, [schoolGradeRange])
+
   // Derive enriched grade level data with associated courses
   const gradeData: GradeLevelData[] = useMemo(() => {
     const courseMap = new Map<string, CourseResponseDto[]>()
 
-    // Initialize all known grades
-    for (const opt of GRADE_LEVEL_OPTIONS) {
+    // Initialize only the relevant grades
+    for (const opt of filteredGradeOptions) {
       courseMap.set(opt.value, [])
     }
 
@@ -138,14 +151,15 @@ export function GradeLevelsTab({
     for (const course of courses) {
       if (course.gradeLevels) {
         for (const grade of course.gradeLevels) {
-          const existing = courseMap.get(grade) ?? []
-          existing.push(course)
-          courseMap.set(grade, existing)
+          const existing = courseMap.get(grade)
+          if (existing !== undefined) {
+            existing.push(course)
+          }
         }
       }
     }
 
-    return GRADE_LEVEL_OPTIONS.map((opt) => {
+    return filteredGradeOptions.map((opt) => {
       const gradeCourses = courseMap.get(opt.value) ?? []
       return {
         value: opt.value,
@@ -154,11 +168,11 @@ export function GradeLevelsTab({
         courses: gradeCourses,
       }
     })
-  }, [courses])
+  }, [courses, filteredGradeOptions])
 
   // Summary stats
   const stats = useMemo(() => {
-    const totalGrades = GRADE_LEVEL_OPTIONS.length
+    const totalGrades = filteredGradeOptions.length
     const totalAssignments = gradeData.reduce((sum, g) => sum + g.courseCount, 0)
     const avgPerGrade =
       totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
@@ -186,47 +200,45 @@ export function GradeLevelsTab({
     [handleCloseDrawer, onViewCourse]
   )
 
-  // DataTable columns
-  const columns: Column<GradeLevelData>[] = useMemo(
+  // TanstackDataTable columns
+  const columns: ColumnDef<GradeLevelData, unknown>[] = useMemo(
     () => [
       {
-        key: 'value',
+        accessorKey: 'value',
         header: 'Grade Level',
-        sortable: true,
-        width: '200px',
-        render: (grade) => (
-          <GradeBadge value={grade.value} label={grade.label} />
+        size: 200,
+        cell: ({ row }) => (
+          <GradeBadge value={row.original.value} label={row.original.label} />
         ),
       },
       {
-        key: 'courseCount',
+        accessorKey: 'courseCount',
         header: 'Course Count',
-        sortable: true,
-        width: '130px',
-        render: (grade) => (
+        size: 130,
+        cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-text-primary">
-              {grade.courseCount}
+              {row.original.courseCount}
             </span>
-            {grade.courseCount > 0 && (
+            {row.original.courseCount > 0 && (
               <span className="text-xs text-text-tertiary">
-                course{grade.courseCount !== 1 ? 's' : ''}
+                course{row.original.courseCount !== 1 ? 's' : ''}
               </span>
             )}
           </div>
         ),
       },
       {
-        key: 'courses' as any,
+        accessorKey: 'courses',
         header: 'Courses',
-        width: '320px',
-        render: (grade) => <CourseChips courses={grade.courses} />,
+        size: 320,
+        cell: ({ row }) => <CourseChips courses={row.original.courses} />,
       },
       {
-        key: 'students' as any,
+        accessorKey: 'students',
         header: 'Students',
-        width: '120px',
-        render: () => (
+        size: 120,
+        cell: () => (
           <span className="text-sm text-text-tertiary">&mdash;</span>
         ),
       },
@@ -269,18 +281,20 @@ export function GradeLevelsTab({
       </div>
 
       {/* Grade Levels DataTable */}
-      <DataTable
+      <TanstackDataTable
         columns={columns}
         data={gradeData}
-        keyExtractor={(grade) => grade.value}
+        getRowId={(grade) => grade.value}
         isLoading={isLoading}
-        skeletonRows={8}
+        enableSorting={true}
+        pagination={{ pageSize: 20 }}
         emptyState={{
           icon: <Layers className="w-12 h-12" />,
           title: 'No grade levels found',
           description: 'Grade levels will appear once courses are configured.',
         }}
         onRowClick={handleRowClick}
+        maxHeight="calc(100vh - 13rem)"
       />
 
       {/* Grade Level Drawer */}

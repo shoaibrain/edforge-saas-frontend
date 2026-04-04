@@ -1,39 +1,34 @@
 /**
- * Staff Directory Page
+ * Staff Directory Page — V2
  *
- * Complete employee roster for the People domain.
- * Features:
- * - DataTable with skeleton loading, empty state, sorting
- * - Search with debouncing
- * - Full CRUD (Create, Edit, Delete) with modals
- * - Optimistic updates for delete
- * - ABAC permission checks for actions
- * - Cursor-based pagination with "Load More"
+ * Complete employee roster with V2 design system.
+ * Features: V2 header, KPI tiles, filter strip with chips,
+ * restyled TanStack table, split button, empty states.
  */
 
 import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import {
-  UsersRound,
-  Search,
   Users,
-  GraduationCap,
+  Search,
+  BookOpen,
   Briefcase,
-  Award,
+  Lock,
   ChevronDown,
   UserPlus,
-  Zap,
-  Filter,
-  X,
+  Download,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
+import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
 import { usePermission } from '@edforge/abac'
+import { getRoleI18nKey } from '../components/staff/StaffRoleBadge'
 
 import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'
-import { Button } from '../components/ui'
+import { useActiveSchoolId } from '../stores/app.store'
 import {
   CreateUserModal,
   EditStaffModal,
@@ -48,79 +43,12 @@ import { parseApiError } from '../services/people.service'
 // CONSTANTS
 // ============================================================================
 
-const ROLE_FILTER_OPTIONS: { value: StaffRole; label: string }[] = [
-  { value: 'teacher', label: 'Teacher' },
-  { value: 'principal', label: 'Principal' },
-  { value: 'vice_principal', label: 'Vice Principal' },
-  { value: 'counselor', label: 'Counselor' },
-  { value: 'librarian', label: 'Librarian' },
-  { value: 'nurse', label: 'Nurse' },
-  { value: 'admin_staff', label: 'Admin Staff' },
-  { value: 'support_staff', label: 'Support Staff' },
-  { value: 'it_staff', label: 'IT Staff' },
-  { value: 'substitute', label: 'Substitute' },
-  { value: 'contractor', label: 'Contractor' },
+const ROLE_FILTER_VALUES: StaffRole[] = [
+  'teacher', 'principal', 'vice_principal', 'counselor', 'librarian',
+  'nurse', 'admin_staff', 'support_staff', 'it_staff', 'substitute', 'contractor',
 ]
 
-const STATUS_FILTER_OPTIONS: { value: EmploymentStatus; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'on_leave', label: 'On Leave' },
-  { value: 'suspended', label: 'Suspended' },
-  { value: 'terminated', label: 'Terminated' },
-  { value: 'retired', label: 'Retired' },
-  { value: 'resigned', label: 'Resigned' },
-]
-
-// ============================================================================
-// HELPER COMPONENTS
-// ============================================================================
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
-}: {
-  icon: typeof Users
-  label: string
-  value: string
-  accent: string
-  bg: string
-}) {
-  return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
-        </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// FILTER CHIP
-// ============================================================================
-
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
-      {label}
-      <button
-        type="button"
-        onClick={onRemove}
-        className="ml-0.5 hover:text-teal-900 dark:hover:text-teal-100 transition-colors"
-      >
-        <X className="w-3 h-3" />
-      </button>
-    </span>
-  )
-}
+type QuickFilter = 'all' | 'teacher' | 'principal' | 'support'
 
 // ============================================================================
 // FILTER STATE
@@ -129,7 +57,6 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 interface StaffFilters {
   role?: StaffRole
   employmentStatus?: EmploymentStatus
-  department?: string
 }
 
 // ============================================================================
@@ -137,10 +64,12 @@ interface StaffFilters {
 // ============================================================================
 
 export default function StaffPage() {
+  const { t } = useTranslation('people')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const schoolId = useActiveSchoolId()
 
-  // ABAC permission checks for staff management
+  // ABAC permission checks
   const canCreate = usePermission('create', 'staff')
   const canEdit = usePermission('edit', 'staff')
   const canDelete = usePermission('delete', 'staff')
@@ -151,8 +80,7 @@ export default function StaffPage() {
 
   // Filter state
   const [filters, setFilters] = useState<StaffFilters>({})
-  const [showFilters, setShowFilters] = useState(false)
-  const activeFilterCount = Object.values(filters).filter(Boolean).length
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all')
 
   const updateFilter = <K extends keyof StaffFilters>(key: K, value: StaffFilters[K]) => {
     setFilters((prev) => {
@@ -166,13 +94,24 @@ export default function StaffPage() {
     })
   }
 
-  const clearAllFilters = () => setFilters({})
+  // Quick filter chip handler
+  const handleQuickFilter = (chip: QuickFilter) => {
+    setQuickFilter(chip)
+    if (chip === 'all') {
+      updateFilter('role', undefined)
+    } else if (chip === 'teacher') {
+      updateFilter('role', 'teacher')
+    } else if (chip === 'principal') {
+      updateFilter('role', 'principal')
+    } else if (chip === 'support') {
+      updateFilter('role', 'support_staff')
+    }
+  }
 
   // Split button dropdown state
   const [addDropdownOpen, setAddDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -188,30 +127,27 @@ export default function StaffPage() {
   // Modal state management
   const modal = useModalState<StaffResponseDto>()
 
-  // Paginated data fetching from Staff API
+  // Paginated data fetching
   const {
     items: staffMembers,
     isLoading,
-    hasMore,
-    loadMore,
-    isFetchingNextPage,
     error,
     refetch,
     totalLoaded,
   } = usePaginatedQuery<StaffResponseDto>({
-    queryKey: ['staff', debouncedSearch, filters],
+    queryKey: ['staff', schoolId, debouncedSearch, filters],
     queryFn: ({ limit, cursor }) =>
       staffService.listStaff({
         limit,
         cursor,
         search: debouncedSearch || undefined,
+        schoolId: schoolId || undefined,
         ...filters,
       }),
     limit: 20,
   })
 
-  // Query key for cache operations
-  const staffQueryKey = ['staff', debouncedSearch, filters]
+  const staffQueryKey = ['staff', schoolId, debouncedSearch, filters]
 
   // Optimistic delete mutation
   const deleteMutation = useMutation({
@@ -219,7 +155,6 @@ export default function StaffPage() {
     onMutate: async (staffId) => {
       await queryClient.cancelQueries({ queryKey: ['staff'] })
       const previousData = queryClient.getQueryData(staffQueryKey)
-
       queryClient.setQueryData(staffQueryKey, (old: any) => {
         if (!old?.pages) return old
         return {
@@ -230,7 +165,6 @@ export default function StaffPage() {
           })),
         }
       })
-
       return { previousData }
     },
     onError: (error, _staffId, context) => {
@@ -241,7 +175,7 @@ export default function StaffPage() {
       toast.error(message)
     },
     onSuccess: () => {
-      toast.success('Staff member deleted successfully')
+      toast.success(t('toast.deleteSuccess'))
       modal.close()
     },
     onSettled: () => {
@@ -249,7 +183,6 @@ export default function StaffPage() {
     },
   })
 
-  // Handle delete confirmation
   const handleDelete = async () => {
     if (!modal.data) return
     await deleteMutation.mutateAsync(modal.data.staffId)
@@ -257,10 +190,38 @@ export default function StaffPage() {
 
   // Quick stats derived from loaded data
   const teacherCount = staffMembers.filter((s) => s.role === 'teacher').length
-  const supportCount = staffMembers.filter((s) => s.role === 'support_staff').length
-  const adminCount = staffMembers.filter((s) =>
-    s.role === 'principal' || s.role === 'vice_principal' || s.role === 'admin_staff',
+  const principalCount = staffMembers.filter(
+    (s) => s.role === 'principal' || s.role === 'vice_principal',
   ).length
+  const supportCount = staffMembers.filter(
+    (s) => s.role === 'support_staff' || s.role === 'admin_staff' || s.role === 'it_staff',
+  ).length
+  const accessCount = staffMembers.filter((s) => !!s.userId).length
+  const noAccessCount = staffMembers.length - accessCount
+
+  // CSV export
+  const handleExportCsv = () => {
+    if (staffMembers.length === 0) return
+    const headers = ['Name', 'Email', 'Role', 'Status', 'Phone', 'Hire Date']
+    const rows = staffMembers.map((s) => [
+      `${s.firstName} ${s.lastSurname}`,
+      s.email || '',
+      s.role || '',
+      s.employmentStatus || '',
+      s.phone || '',
+      s.hireDate ? new Date(s.hireDate).toLocaleDateString() : '',
+    ])
+    const csvContent = [headers, ...rows]
+      .map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(','))
+      .join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `staff-directory-${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
 
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -276,21 +237,35 @@ export default function StaffPage() {
     setSelectedStaff(null)
   }
 
-  // Show error state
+  // Error state
   if (error && !isLoading) {
     const { message, isRetryable } = parseApiError(error)
     return (
-      <div className="min-h-full flex items-center justify-center p-6">
-        <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-            <UsersRound className="w-6 h-6 text-red-600 dark:text-red-400" />
-          </div>
-          <h3 className="text-lg font-medium text-text-primary mb-2">
-            Failed to load staff
+      <div data-v2 style={{ padding: '24px 28px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px', textAlign: 'center' }}>
+          <Users style={{ width: 48, height: 48, color: 'var(--v2-text-hint)', marginBottom: 12 }} />
+          <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--v2-text-primary)', marginBottom: 8 }}>
+            {t('error.failedToLoad')}
           </h3>
-          <p className="text-text-secondary mb-4">{message}</p>
+          <p style={{ fontSize: 12, color: 'var(--v2-text-muted)', marginBottom: 16 }}>{message}</p>
           {isRetryable && (
-            <Button onClick={() => refetch()}>Try Again</Button>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              style={{
+                height: 34,
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: 7,
+                padding: '0 14px',
+                fontSize: 12,
+                fontWeight: 500,
+                color: '#9aa0b8',
+                cursor: 'pointer',
+              }}
+            >
+              {t('error.tryAgain')}
+            </button>
           )}
         </div>
       </div>
@@ -298,216 +273,375 @@ export default function StaffPage() {
   }
 
   return (
-    <div className="min-h-full">
-      {/* Page Header */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
-                <UsersRound className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-text-primary">Staff Directory</h1>
-                <p className="text-text-secondary mt-1">
-                  Manage your organization's staff members and their access
-                </p>
-              </div>
+    <div data-v2 style={{ padding: '24px 28px', overflow: 'auto' }}>
+      {/* PAGE HEADER */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              background: 'rgba(216,90,48,0.10)',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Users style={{ width: 16, height: 16, color: '#D85A30' }} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+              <h1
+                style={{
+                  fontSize: 18,
+                  fontWeight: 600,
+                  letterSpacing: '-0.3px',
+                  color: 'var(--v2-text-primary, #e8eaf0)',
+                  margin: 0,
+                }}
+              >
+                Staff Directory
+              </h1>
+              <div style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.10)', alignSelf: 'center' }} />
+              <span style={{ fontSize: 12, color: 'var(--v2-text-muted, #7a8099)' }}>
+                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
             </div>
-            {canCreate && (
-              <div className="relative" ref={dropdownRef}>
-                <div className="flex">
-                  <Button onClick={() => navigate({ to: '/staff/new' })}>
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Add Staff Member
-                  </Button>
-                  <button
-                    type="button"
-                    onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-                    className="ml-px px-2 rounded-r-lg bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors border-l border-white/20"
-                    aria-label="More options"
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                </div>
-                {addDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] shadow-lg z-30">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAddDropdownOpen(false)
-                        modal.openCreate()
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors rounded-xl"
-                    >
-                      <Zap className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                      <div className="text-left">
-                        <div className="font-medium">Quick Add User</div>
-                        <div className="text-xs text-[rgb(var(--text-tertiary))]">Create user account only</div>
-                      </div>
-                    </button>
-                  </div>
-                )}
+          </div>
+        </div>
+
+        {/* Split button */}
+        {canCreate && (
+          <div className="relative" ref={dropdownRef}>
+            <div style={{ display: 'flex', alignItems: 'center', height: 36 }}>
+              <button
+                type="button"
+                onClick={() => navigate({ to: '/staff/new' })}
+                style={{
+                  height: 36,
+                  background: '#1D9E75',
+                  border: 'none',
+                  borderRadius: '8px 0 0 8px',
+                  padding: '0 14px',
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  borderRight: '1px solid rgba(255,255,255,0.15)',
+                }}
+              >
+                <UserPlus style={{ width: 12, height: 12 }} />
+                Add Staff Member
+              </button>
+              <button
+                type="button"
+                onClick={() => setAddDropdownOpen(!addDropdownOpen)}
+                style={{
+                  height: 36,
+                  width: 32,
+                  background: '#1D9E75',
+                  border: 'none',
+                  borderRadius: '0 8px 8px 0',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                aria-label="More add options"
+              >
+                <ChevronDown style={{ width: 11, height: 11 }} />
+              </button>
+            </div>
+            {addDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  marginTop: 4,
+                  width: 180,
+                  background: 'var(--v2-bg-elevated, #1e2436)',
+                  border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+                  borderRadius: 8,
+                  padding: '4px 0',
+                  zIndex: 30,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddDropdownOpen(false)
+                    modal.openCreate()
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 11,
+                    color: 'var(--v2-text-secondary, #c8ccd8)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  Quick add user account
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddDropdownOpen(false)
+                    toast.info('Import from CSV coming soon')
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 11,
+                    color: 'var(--v2-text-secondary, #c8ccd8)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  Import from CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddDropdownOpen(false)
+                    toast.info('Bulk add coming soon')
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 11,
+                    color: 'var(--v2-text-secondary, #c8ccd8)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  Bulk add
+                </button>
               </div>
             )}
           </div>
-        </div>
+        )}
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* CONTEXT BANNER */}
+      <p style={{ fontSize: 11, color: 'var(--v2-text-muted, #7a8099)', marginBottom: 18 }}>
+        <em style={{ fontStyle: 'normal', fontWeight: 500, color: '#D85A30' }}>
+          {totalLoaded} active staff member{totalLoaded !== 1 ? 's' : ''}
+        </em>
+        {' · '}
+        <span style={{ color: '#1D9E75', fontStyle: 'normal', fontWeight: 500 }}>
+          {teacherCount} teacher{teacherCount !== 1 ? 's' : ''}
+        </span>
+        {' · '}
+        <span style={{ color: '#7F77DD', fontStyle: 'normal', fontWeight: 500 }}>
+          {principalCount} principal{principalCount !== 1 ? 's' : ''}
+        </span>
+        {' · '}
+        <span style={{ color: '#378ADD', fontStyle: 'normal', fontWeight: 500 }}>
+          {accessCount} with system access enabled
+        </span>
+      </p>
+
+      {/* KPI TILES */}
+      <WidgetErrorBoundaryV2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10, marginBottom: 18 }}>
           <StatCard
-            icon={Users}
             label="Total Staff"
-            value={isLoading ? '-' : totalLoaded.toString()}
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            value={isLoading ? '—' : totalLoaded.toString()}
+            icon={Users}
+            accentColor="rgba(216,90,48,0.10)"
+            iconColor="#D85A30"
+            barColor="#D85A30"
+            valueColor="#D85A30"
+            tag={{ text: 'all active', color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
+            loading={isLoading}
           />
           <StatCard
-            icon={GraduationCap}
             label="Teachers"
-            value={isLoading ? '-' : teacherCount.toString()}
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            value={isLoading ? '—' : teacherCount.toString()}
+            icon={BookOpen}
+            accentColor="rgba(29,158,117,0.10)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            valueColor="#1D9E75"
+            tag={{ text: 'active', color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            loading={isLoading}
           />
           <StatCard
-            icon={Briefcase}
             label="Support Staff"
-            value={isLoading ? '-' : supportCount.toString()}
-            accent="text-purple-600 dark:text-purple-400"
-            bg="bg-purple-500/10"
+            value={isLoading ? '—' : supportCount.toString()}
+            icon={Briefcase}
+            accentColor={supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
+            iconColor={supportCount > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
+            barColor={supportCount > 0 ? '#378ADD' : 'var(--v2-text-ghost, #2a3045)'}
+            valueColor={supportCount > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
+            tag={{
+              text: supportCount > 0 ? 'active' : 'none yet',
+              color: supportCount > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)',
+              bg: supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
+            }}
+            loading={isLoading}
           />
           <StatCard
-            icon={Award}
-            label="Administrators"
-            value={isLoading ? '-' : adminCount.toString()}
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
+            label="System Access"
+            value={isLoading ? '—' : accessCount.toString()}
+            icon={Lock}
+            accentColor="rgba(55,138,221,0.10)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            valueColor="#378ADD"
+            tag={{ text: `${noAccessCount} no access`, color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            loading={isLoading}
+          />
+        </div>
+      </WidgetErrorBoundaryV2>
+
+      {/* FILTER STRIP */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        {(['all', 'teacher', 'principal', 'support'] as QuickFilter[]).map((chip) => (
+          <button
+            key={chip}
+            type="button"
+            onClick={() => handleQuickFilter(chip)}
+            style={{
+              height: 30,
+              padding: '0 10px',
+              background: quickFilter === chip ? 'rgba(216,90,48,0.10)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${quickFilter === chip ? 'rgba(216,90,48,0.25)' : 'rgba(255,255,255,0.08)'}`,
+              borderRadius: 7,
+              fontSize: 11,
+              fontWeight: 500,
+              color: quickFilter === chip ? '#D85A30' : 'var(--v2-text-hint, #4a5068)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.12s',
+            }}
+          >
+            {chip === 'all' ? 'All' : chip === 'teacher' ? 'Teachers' : chip === 'principal' ? 'Principal' : 'Support'}
+          </button>
+        ))}
+
+        {/* Search input */}
+        <div style={{ flex: 1, minWidth: 200, position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search style={{ position: 'absolute', left: 10, width: 12, height: 12, color: 'var(--v2-text-hint, #4a5068)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or email..."
+            style={{
+              width: '100%',
+              height: 32,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 8,
+              padding: '0 11px 0 32px',
+              fontSize: 12,
+              color: 'var(--v2-text-primary, #e8eaf0)',
+              outline: 'none',
+              colorScheme: 'dark',
+            }}
           />
         </div>
 
-        {/* Search & Filter Bar */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or email..."
-                className="w-full pl-10 pr-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-colors"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-colors text-sm font-medium ${
-                showFilters || activeFilterCount > 0
-                  ? 'bg-teal-50 border-teal-200 text-teal-700 dark:bg-teal-900/20 dark:border-teal-800 dark:text-teal-300'
-                  : 'bg-surface-secondary border-border-secondary text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              Filters
-              {activeFilterCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-teal-500 text-white">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-          </div>
+        {/* Role dropdown */}
+        <select
+          value={filters.role || ''}
+          onChange={(e) => {
+            updateFilter('role', (e.target.value as StaffRole) || undefined)
+            setQuickFilter('all')
+          }}
+          style={{
+            height: 32,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 8,
+            padding: '0 10px',
+            fontSize: 11,
+            color: 'var(--v2-text-muted, #7a8099)',
+            outline: 'none',
+            cursor: 'pointer',
+            colorScheme: 'dark',
+          }}
+        >
+          <option value="">All Roles</option>
+          {ROLE_FILTER_VALUES.map((role) => (
+            <option key={role} value={role}>
+              {t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })}
+            </option>
+          ))}
+        </select>
 
-          {/* Collapsible Filter Panel */}
-          {showFilters && (
-            <div className="bg-surface-secondary border border-border-secondary rounded-xl p-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">Role</label>
-                  <select
-                    value={filters.role || ''}
-                    onChange={(e) => updateFilter('role', e.target.value as StaffRole || undefined)}
-                    className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
-                  >
-                    <option value="">All Roles</option>
-                    {ROLE_FILTER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">Employment Status</label>
-                  <select
-                    value={filters.employmentStatus || ''}
-                    onChange={(e) => updateFilter('employmentStatus', e.target.value as EmploymentStatus || undefined)}
-                    className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
-                  >
-                    <option value="">All Statuses</option>
-                    {STATUS_FILTER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-medium text-text-secondary">Department</label>
-                  <input
-                    type="text"
-                    value={filters.department || ''}
-                    onChange={(e) => updateFilter('department', e.target.value || undefined)}
-                    placeholder="Filter by department..."
-                    className="w-full px-3 py-2 bg-surface-primary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+        {/* Department dropdown */}
+        <select
+          style={{
+            height: 32,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 8,
+            padding: '0 10px',
+            fontSize: 11,
+            color: 'var(--v2-text-muted, #7a8099)',
+            outline: 'none',
+            cursor: 'pointer',
+            colorScheme: 'dark',
+          }}
+        >
+          <option value="">All Departments</option>
+        </select>
 
-          {/* Active Filter Chips */}
-          {activeFilterCount > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              {filters.role && (
-                <FilterChip
-                  label={`Role: ${ROLE_FILTER_OPTIONS.find((o) => o.value === filters.role)?.label || filters.role}`}
-                  onRemove={() => updateFilter('role', undefined)}
-                />
-              )}
-              {filters.employmentStatus && (
-                <FilterChip
-                  label={`Status: ${STATUS_FILTER_OPTIONS.find((o) => o.value === filters.employmentStatus)?.label || filters.employmentStatus}`}
-                  onRemove={() => updateFilter('employmentStatus', undefined)}
-                />
-              )}
-              {filters.department && (
-                <FilterChip
-                  label={`Dept: ${filters.department}`}
-                  onRemove={() => updateFilter('department', undefined)}
-                />
-              )}
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="text-xs text-text-tertiary hover:text-text-primary transition-colors"
-              >
-                Clear all
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Staff Table */}
-        <StaffTable
-          staff={staffMembers}
-          isLoading={isLoading}
-          hasMore={hasMore}
-          isFetchingMore={isFetchingNextPage}
-          onLoadMore={loadMore}
-          onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
-          onViewStaff={handleViewStaff}
-        />
+        {/* Export CSV */}
+        <button
+          type="button"
+          onClick={handleExportCsv}
+          disabled={staffMembers.length === 0}
+          style={{
+            height: 32,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 8,
+            padding: '0 12px',
+            fontSize: 11,
+            color: 'var(--v2-text-hint, #4a5068)',
+            cursor: staffMembers.length === 0 ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            whiteSpace: 'nowrap',
+            marginLeft: 'auto',
+            opacity: staffMembers.length === 0 ? 0.5 : 1,
+            transition: 'all 0.12s',
+          }}
+        >
+          <Download style={{ width: 12, height: 12 }} />
+          Export CSV
+        </button>
       </div>
 
-      {/* Staff Drawer */}
+      {/* STAFF TABLE */}
+      <StaffTable
+        staff={staffMembers}
+        isLoading={isLoading}
+        onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
+        onViewStaff={handleViewStaff}
+      />
+
+      {/* STAFF DRAWER */}
       <StaffDrawer
         open={drawerOpen}
         onClose={handleCloseDrawer}
@@ -516,20 +650,20 @@ export default function StaffPage() {
         onDelete={canDelete ? (s: StaffResponseDto) => modal.openDelete(s) : undefined}
       />
 
-      {/* Create User Modal */}
+      {/* CREATE USER MODAL */}
       <CreateUserModal
         open={modal.mode === 'create'}
         onClose={modal.close}
       />
 
-      {/* Edit Staff Modal */}
+      {/* EDIT STAFF MODAL */}
       <EditStaffModal
         open={modal.mode === 'edit'}
         onClose={modal.close}
         staff={modal.data}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* DELETE CONFIRMATION */}
       <DeleteConfirmDialog
         open={modal.mode === 'delete'}
         onClose={modal.close}

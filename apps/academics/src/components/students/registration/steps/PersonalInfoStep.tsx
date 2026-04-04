@@ -1,18 +1,22 @@
 /**
- * Personal Information Step
+ * Personal Information Step — V2
  *
  * First step of the student registration wizard.
  * Collects name, DOB, gender, and grade level.
+ *
+ * V2: Collapsible sections with icons, titles, and completion indicators.
  */
 
 import { FormProvider } from 'react-hook-form'
+import { User, CalendarDays } from 'lucide-react'
 import { TextField, SelectField, DateField } from '@edforge/forms'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
-import {
-  GENDER_OPTIONS,
-  GRADE_LEVEL_OPTIONS,
-} from '../../../../schemas/student.form'
+import { GENDER_OPTIONS } from '../../../../schemas/student.form'
+import { useActiveSchoolId } from '../../../../stores/app.store'
+import { useSchoolGradeRange } from '../../../../hooks/useSchool'
+import { useFilteredGradeOptions } from '../../../../hooks/useGradeOptions'
+import { CollapsibleSection } from '../CollapsibleSection'
 
 // Age bounds for date field (3–22 years)
 const today = new Date()
@@ -30,15 +34,22 @@ export function PersonalInfoStep({
   clearError,
 }: WizardStepProps) {
   const form = useWizardForm({ data, updateData, errors, clearError })
+  const schoolId = useActiveSchoolId()
+  const { gradeRange } = useSchoolGradeRange(schoolId)
+  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
 
   return (
     <FormProvider {...form}>
-      <div className="space-y-8">
+      <div className="space-y-4">
         {/* Name Section */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Name
-          </h3>
+        <CollapsibleSection
+          id="personal-name"
+          icon={User}
+          title="Student Name"
+          description="Legal name as it appears on official documents"
+          fields={['firstName', 'lastName', 'middleName', 'preferredName', 'suffix']}
+          defaultExpanded
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <TextField
               name="firstName"
@@ -69,13 +80,17 @@ export function PersonalInfoStep({
               className="md:col-span-1"
             />
           </div>
-        </div>
+        </CollapsibleSection>
 
         {/* Details Section */}
-        <div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-4">
-            Details
-          </h3>
+        <CollapsibleSection
+          id="personal-details"
+          icon={CalendarDays}
+          title="Basic Details"
+          description="Date of birth, gender, and grade level"
+          fields={['dateOfBirth', 'gender', 'currentGradeLevel']}
+          defaultExpanded
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <DateField
               name="dateOfBirth"
@@ -95,12 +110,12 @@ export function PersonalInfoStep({
             <SelectField
               name="currentGradeLevel"
               label="Grade Level"
-              options={GRADE_LEVEL_OPTIONS}
+              options={[...filteredGradeOptions]}
               placeholder="Select grade level"
               required
             />
           </div>
-        </div>
+        </CollapsibleSection>
       </div>
     </FormProvider>
   )

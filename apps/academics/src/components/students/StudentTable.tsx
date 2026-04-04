@@ -1,45 +1,42 @@
 /**
- * StudentTable Component
+ * StudentTable Component — V2
  *
  * Displays a paginated table of students with sorting.
  * Row click opens a quick-info drawer (managed by parent).
- * Withdrawal flow managed by parent via onWithdraw callback.
+ *
+ * V2 changes:
+ * - Gradient initials avatar instead of DiceBear
+ * - Attendance column with semantic color + progress bar
+ * - Contact column removed
+ * - StudentNumber standalone column removed (shown under name)
+ * - Three-dot action column
+ * - V2 StatusBadge styling
  */
 
-import { useMemo } from 'react'
-import { User } from 'lucide-react'
-import { DataTable, type Column } from '@edforge/ui'
+import { useMemo, useState } from 'react'
+import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
+import { TanstackDataTable, AttendanceDonutRing, type ColumnDef } from '@edforge/ui'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
+import { UserAvatar } from '../common/UserAvatar'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 interface StudentTableProps {
-  /** Student data to display */
   students: StudentResponseDto[]
-  /** Whether data is loading */
+  alertsMap: Map<string, number>
   isLoading?: boolean
-  /** Whether there are more items to load */
-  hasMore?: boolean
-  /** Whether currently fetching more items */
-  isFetchingMore?: boolean
-  /** Callback when "Load More" is clicked */
-  onLoadMore?: () => void
-  /** Callback when "Add Student" is clicked (empty state) */
   onAddStudent?: () => void
-  /** Callback when a student row is clicked (opens drawer) */
   onViewStudent?: (student: StudentResponseDto) => void
+  onWithdraw?: (student: StudentResponseDto) => void
 }
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 
-/**
- * Format date for display
- */
 function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return '-'
   try {
@@ -53,18 +50,72 @@ function formatDate(dateStr: string | undefined): string {
   }
 }
 
-/**
- * Get initials from name
- */
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+function getAttendanceRateColor(rate: number): string {
+  if (rate < 80) return '#E24B4A'
+  if (rate < 90) return '#EF9F27'
+  return '#1D9E75'
 }
 
-/**
- * Generate DiceBear Adventurer avatar URL
- */
-function getAvatarUrl(seed: string): string {
-  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+// ============================================================================
+// ROW ACTION MENU
+// ============================================================================
+
+function RowActionMenu({
+  student,
+  onView,
+  onWithdraw,
+}: {
+  student: StudentResponseDto
+  onView?: (student: StudentResponseDto) => void
+  onWithdraw?: (student: StudentResponseDto) => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="relative" onClick={(e) => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="p-1 rounded-md transition-colors hover:opacity-80"
+        style={{ color: 'var(--v2-text-hint)' }}
+        aria-label="Student actions"
+      >
+        <MoreVertical className="w-3.5 h-3.5" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div
+            className="absolute right-0 z-20 mt-1 w-40 rounded-lg border overflow-hidden shadow-lg"
+            style={{
+              background: 'var(--v2-bg-elevated)',
+              borderColor: 'var(--v2-border-default)',
+            }}
+          >
+            {onView && (
+              <button
+                onClick={() => { onView(student); setOpen(false) }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                style={{ color: 'var(--v2-text-secondary)' }}
+              >
+                <ExternalLink className="w-3 h-3" />
+                View Profile
+              </button>
+            )}
+            {onWithdraw && (
+              <button
+                onClick={() => { onWithdraw(student); setOpen(false) }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                style={{ color: '#E24B4A' }}
+              >
+                <UserMinus className="w-3 h-3" />
+                Withdraw
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 // ============================================================================
@@ -73,108 +124,135 @@ function getAvatarUrl(seed: string): string {
 
 export function StudentTable({
   students,
+  alertsMap,
   isLoading = false,
-  hasMore = false,
-  isFetchingMore = false,
-  onLoadMore,
   onAddStudent,
   onViewStudent,
+  onWithdraw,
 }: StudentTableProps) {
-  // Define columns
-  const columns: Column<StudentResponseDto>[] = useMemo(
+  const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(
     () => [
       {
-        key: 'fullName',
+        accessorKey: 'fullName',
         header: 'Student',
-        sortable: true,
-        width: '280px',
-        render: (student) => (
-          <div className="flex items-center gap-3">
-            {/* DiceBear Adventurer Avatar */}
-            <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
-              <img
-                src={getAvatarUrl(student.studentId)}
-                alt={getInitials(student.firstName, student.lastName)}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-            {/* Name and student number */}
-            <div className="min-w-0">
-              <p className="font-medium text-text-primary truncate">
-                {student.fullName}
-              </p>
-              {student.studentNumber && (
-                <p className="text-xs text-text-tertiary truncate">
-                  #{student.studentNumber}
-                </p>
-              )}
-            </div>
-          </div>
-        ),
-      },
-      {
-        key: 'currentGradeLevel',
-        header: 'Grade',
-        sortable: true,
-        width: '100px',
-        render: (student) => (
-          <span className="font-medium text-text-primary">
-            {student.currentGradeLevel}
-          </span>
-        ),
-      },
-      {
-        key: 'status',
-        header: 'Status',
-        sortable: true,
-        width: '120px',
-        render: (student) => <StudentStatusBadge status={student.status} />,
-      },
-      {
-        key: 'enrollmentDate',
-        header: 'Enrolled',
-        sortable: true,
-        width: '140px',
-        render: (student) => (
-          <span className="text-text-secondary">
-            {formatDate(student.enrollmentDate)}
-          </span>
-        ),
-      },
-      {
-        key: 'contactInfo.email',
-        header: 'Contact',
-        width: '200px',
-        render: (student) => {
-          const email = student.contactInfo?.email
-          const phone = student.contactInfo?.phone
+        size: 260,
+        cell: ({ row }) => {
+          const student = row.original
           return (
-            <div className="min-w-0">
-              {email && (
-                <p className="text-sm text-text-primary truncate">{email}</p>
-              )}
-              {phone && (
-                <p className="text-xs text-text-tertiary truncate">{phone}</p>
-              )}
-              {!email && !phone && (
-                <span className="text-text-tertiary">-</span>
-              )}
+            <div className="flex items-center gap-3">
+              <UserAvatar
+                userId={student.studentId}
+                userName={student.fullName}
+                role="student"
+                size="lg"
+              />
+              <div className="min-w-0">
+                <p
+                  className="text-[13px] font-medium truncate"
+                  style={{ color: 'var(--v2-text-primary)' }}
+                >
+                  {student.fullName}
+                </p>
+                {student.studentNumber && (
+                  <p
+                    className="text-[10px] font-mono truncate"
+                    style={{ color: 'var(--v2-text-hint)' }}
+                  >
+                    #{student.studentNumber}
+                  </p>
+                )}
+              </div>
             </div>
           )
         },
       },
+      {
+        accessorKey: 'currentGradeLevel',
+        header: 'Grade',
+        size: 100,
+        cell: ({ row }) => (
+          <span
+            className="text-[12px] font-medium"
+            style={{ color: 'var(--v2-text-primary)' }}
+          >
+            {row.original.currentGradeLevel}
+          </span>
+        ),
+      },
+      {
+        id: 'attendance',
+        header: 'Attendance',
+        size: 140,
+        enableSorting: false,
+        cell: ({ row }) => {
+          const rate = alertsMap.get(row.original.studentId) ?? null
+          if (rate === null || rate === undefined) {
+            return (
+              <span
+                className="text-[12px]"
+                style={{ color: 'var(--v2-text-hint)' }}
+                title="No attendance recorded yet"
+              >
+                —
+              </span>
+            )
+          }
+          const color = getAttendanceRateColor(rate)
+          return (
+            <div className="flex items-center gap-2">
+              <AttendanceDonutRing rate={rate} size={24} strokeWidth={3} />
+              <span className="text-[12px] font-medium" style={{ color }}>
+                {rate.toFixed(1)}%
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        size: 110,
+        cell: ({ row }) => (
+          <StudentStatusBadge status={row.original.status} />
+        ),
+      },
+      {
+        accessorKey: 'enrollmentDate',
+        header: 'Enrolled',
+        size: 130,
+        cell: ({ row }) => (
+          <span
+            className="text-[12px]"
+            style={{ color: 'var(--v2-text-secondary)' }}
+          >
+            {formatDate(row.original.enrollmentDate)}
+          </span>
+        ),
+      },
+      {
+        id: 'actions',
+        header: '',
+        size: 48,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <RowActionMenu
+            student={row.original}
+            onView={onViewStudent}
+            onWithdraw={onWithdraw}
+          />
+        ),
+      },
     ],
-    []
+    [alertsMap, onViewStudent, onWithdraw]
   )
 
   return (
-    <DataTable
+    <TanstackDataTable
       columns={columns}
       data={students}
-      keyExtractor={(student) => student.studentId}
       isLoading={isLoading}
-      skeletonRows={8}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
       emptyState={{
         icon: <User className="w-12 h-12" />,
         title: 'No students found',
@@ -187,10 +265,8 @@ export function StudentTable({
             }
           : undefined,
       }}
-      hasMore={hasMore}
-      isFetchingMore={isFetchingMore}
-      onLoadMore={onLoadMore}
       onRowClick={onViewStudent}
+      maxHeight="calc(100vh - 22rem)"
     />
   )
 }

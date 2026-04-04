@@ -21,17 +21,34 @@
     "./tenant": {
       "types": "./dist/tenant.d.ts",
       "import": "./dist/tenant.js"
+    },
+    "./use-currency": {
+      "types": "./dist/use-currency.d.ts",
+      "import": "./dist/use-currency.js"
+    },
+    "./format-currency": {
+      "types": "./dist/format-currency.d.ts",
+      "import": "./dist/format-currency.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@aibrains/shared-types": "^0.23.1",
+    "@edforge/config": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
   "devDependencies": {
+    "@types/react": "^18.0.0",
     "typescript": "^5.6.0"
   }
 }
-

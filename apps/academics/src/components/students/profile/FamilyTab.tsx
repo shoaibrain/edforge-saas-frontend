@@ -12,13 +12,16 @@ import {
   Mail,
   Shield,
   UserCheck,
+  KeyRound,
   AlertTriangle,
   Plus,
   ChevronDown,
   ChevronUp,
   Briefcase,
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -29,26 +32,13 @@ export interface FamilyTabProps {
   student: StudentProfileResponseDto
   onAddGuardian?: () => void
   onEditGuardian?: (guardianId: string) => void
+  onGrantPortalAccess?: (guardian: NonNullable<StudentProfileResponseDto['guardians']>[number]) => void
+  isGrantingAccess?: boolean
   canEdit?: boolean
 }
 
 type Guardian = NonNullable<StudentProfileResponseDto['guardians']>[number]
 type EmergencyContact = NonNullable<StudentProfileResponseDto['emergencyContacts']>[number]
-
-// ============================================================================
-// RELATIONSHIP LABELS
-// ============================================================================
-
-const relationshipLabels: Record<string, string> = {
-  mother: 'Mother',
-  father: 'Father',
-  guardian: 'Legal Guardian',
-  grandparent: 'Grandparent',
-  sibling: 'Sibling',
-  aunt: 'Aunt',
-  uncle: 'Uncle',
-  other: 'Other',
-}
 
 // ============================================================================
 // GUARDIAN ROW
@@ -57,13 +47,21 @@ const relationshipLabels: Record<string, string> = {
 function GuardianRow({
   guardian,
   onEdit,
+  onGrantAccess,
+  isGrantingAccess,
   canEdit,
 }: {
   guardian: Guardian
   onEdit?: () => void
+  onGrantAccess?: () => void
+  isGrantingAccess?: boolean
   canEdit?: boolean
 }) {
   const [expanded, setExpanded] = useState(false)
+  const { t } = useTranslation('academics')
+
+  // Map relationship keys to i18n keys (backend uses "guardian", i18n uses "legalGuardian")
+  const relationshipKey = guardian.relationship === 'guardian' ? 'legalGuardian' : guardian.relationship
 
   return (
     <div className="py-4 first:pt-0 last:pb-0 border-b border-border-tertiary last:border-0">
@@ -77,12 +75,12 @@ function GuardianRow({
             {guardian.isPrimary && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full">
                 <Shield className="w-3 h-3" />
-                Primary
+                {t('guardian.primary')}
               </span>
             )}
           </div>
           <p className="text-sm text-text-secondary mt-0.5">
-            {relationshipLabels[guardian.relationship] || guardian.relationship}
+            {t(`relationships.${relationshipKey}`, { defaultValue: guardian.relationship })}
           </p>
 
           {/* Permission tags */}
@@ -90,13 +88,13 @@ function GuardianRow({
             {guardian.hasPortalAccess && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full">
                 <UserCheck className="w-3 h-3" />
-                Portal Access
+                {t('guardian.portalAccess')}
               </span>
             )}
             {guardian.canPickup && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full">
                 <UserCheck className="w-3 h-3" />
-                Pickup Auth
+                {t('guardian.pickupAuth')}
               </span>
             )}
           </div>
@@ -138,7 +136,7 @@ function GuardianRow({
         <div className="mt-3 ml-0 pl-0 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           {guardian.phone && (
             <div>
-              <span className="text-xs text-text-tertiary uppercase tracking-wide">Phone</span>
+              <span className="text-xs text-text-tertiary uppercase tracking-wide">{t('fields.phone')}</span>
               <p className="text-text-primary mt-0.5">
                 {guardian.phone}
                 {guardian.phoneType && (
@@ -149,31 +147,52 @@ function GuardianRow({
           )}
           {guardian.alternatePhone && (
             <div>
-              <span className="text-xs text-text-tertiary uppercase tracking-wide">Alt. Phone</span>
+              <span className="text-xs text-text-tertiary uppercase tracking-wide">{t('fields.altPhone')}</span>
               <p className="text-text-primary mt-0.5">{guardian.alternatePhone}</p>
             </div>
           )}
           {guardian.email && (
             <div>
-              <span className="text-xs text-text-tertiary uppercase tracking-wide">Email</span>
+              <span className="text-xs text-text-tertiary uppercase tracking-wide">{t('fields.email')}</span>
               <p className="text-text-primary mt-0.5 truncate">{guardian.email}</p>
             </div>
           )}
           {(guardian.occupation || guardian.employer) && (
             <div>
-              <span className="text-xs text-text-tertiary uppercase tracking-wide">Occupation</span>
+              <span className="text-xs text-text-tertiary uppercase tracking-wide">{t('fields.occupation')}</span>
               <p className="text-text-primary mt-0.5 flex items-center gap-1.5">
                 <Briefcase className="w-3.5 h-3.5 text-text-tertiary" />
                 {guardian.occupation}
-                {guardian.employer && <span className="text-text-secondary">at {guardian.employer}</span>}
+                {guardian.employer && (
+                  <span className="text-text-secondary">
+                    {t('guardian.atEmployer', { employer: guardian.employer })}
+                  </span>
+                )}
               </p>
             </div>
           )}
-          {canEdit && onEdit && (
-            <div className="sm:col-span-2">
-              <Button variant="ghost" size="sm" onClick={onEdit} className="mt-1">
-                Edit Guardian
-              </Button>
+          {canEdit && (
+            <div className="sm:col-span-2 flex items-center gap-2 mt-1">
+              {onEdit && (
+                <Button variant="ghost" size="sm" onClick={onEdit}>
+                  {t('actions.editGuardian')}
+                </Button>
+              )}
+              {onGrantAccess && !guardian.hasPortalAccess && guardian.email && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onGrantAccess}
+                  disabled={isGrantingAccess}
+                >
+                  {isGrantingAccess ? (
+                    <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <KeyRound className="w-3.5 h-3.5 mr-1" />
+                  )}
+                  {t('actions.grantPortalAccess')}
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -215,8 +234,11 @@ export function FamilyTab({
   student,
   onAddGuardian,
   onEditGuardian,
+  onGrantPortalAccess,
+  isGrantingAccess,
   canEdit = true,
 }: FamilyTabProps) {
+  const { t } = useTranslation('academics')
   const guardians = student.guardians || []
   const emergencyContacts = student.emergencyContacts || []
 
@@ -237,7 +259,7 @@ export function FamilyTab({
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
             <Users className="w-4 h-4 text-purple-500" />
-            Guardians
+            {t('sections.guardians')}
             {guardians.length > 0 && (
               <span className="text-xs text-text-tertiary font-normal ml-1">
                 ({guardians.length})
@@ -247,7 +269,7 @@ export function FamilyTab({
           {canEdit && onAddGuardian && (
             <Button variant="ghost" size="sm" onClick={onAddGuardian}>
               <Plus className="w-3.5 h-3.5 mr-1" />
-              Add
+              {t('actions.add')}
             </Button>
           )}
         </div>
@@ -255,14 +277,14 @@ export function FamilyTab({
         {sortedGuardians.length === 0 ? (
           <div className="text-center py-12">
             <Users className="w-10 h-10 text-text-tertiary mx-auto mb-3" />
-            <p className="text-text-secondary font-medium">No guardians on file</p>
+            <p className="text-text-secondary font-medium">{t('empty.noGuardians')}</p>
             <p className="text-sm text-text-tertiary mt-1">
-              Add a parent or guardian to this student&apos;s profile.
+              {t('empty.addGuardianDescription')}
             </p>
             {canEdit && onAddGuardian && (
               <Button variant="outline" size="sm" onClick={onAddGuardian} className="mt-4">
                 <Plus className="w-4 h-4 mr-1.5" />
-                Add Guardian
+                {t('actions.addGuardian')}
               </Button>
             )}
           </div>
@@ -277,6 +299,12 @@ export function FamilyTab({
                     ? () => onEditGuardian?.(guardian.guardianId!)
                     : undefined
                 }
+                onGrantAccess={
+                  onGrantPortalAccess
+                    ? () => onGrantPortalAccess(guardian)
+                    : undefined
+                }
+                isGrantingAccess={isGrantingAccess}
                 canEdit={canEdit}
               />
             ))}
@@ -288,7 +316,7 @@ export function FamilyTab({
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
           <AlertTriangle className="w-4 h-4 text-red-500" />
-          Emergency Contacts
+          {t('sections.emergencyContacts')}
           {emergencyContacts.length > 0 && (
             <span className="text-xs text-text-tertiary font-normal ml-1">
               ({emergencyContacts.length})
@@ -299,7 +327,7 @@ export function FamilyTab({
         {sortedEmergencyContacts.length === 0 ? (
           <div className="text-center py-8">
             <AlertTriangle className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
-            <p className="text-sm text-text-secondary">No emergency contacts on file</p>
+            <p className="text-sm text-text-secondary">{t('empty.noEmergencyContacts')}</p>
           </div>
         ) : (
           <div>

@@ -1,148 +1,166 @@
 /**
  * School Wizard Utilities
  *
- * Constants, auto-generation helpers, and DTO transformation for the school creation wizard.
+ * Auto-generation helpers, DTO transformation, and re-exports for the school creation wizard.
+ * Grade-level constants and school-type mappings are imported from @aibrains/shared-types.
  */
 
 import type { CreateSchoolDto } from '@aibrains/shared-types'
+import {
+  getDefaultsForCountry,
+  getTimezoneOptionsForCountry,
+} from '@aibrains/shared-types'
+
+// Re-export canonical constants from shared-types for use by wizard steps
+export {
+  ORDERED_GRADES,
+  GRADE_LEVEL_OPTIONS,
+  GRADE_LEVEL_OPTIONS as GRADE_OPTIONS,
+  GRADE_RANGE_TO_DESCRIPTOR,
+  SCHOOL_TYPE_OPTIONS,
+  SCHOOL_TYPE_LABELS,
+  TYPE_TO_SUGGESTED_CATEGORY,
+  TYPE_TO_SUGGESTED_DESCRIPTOR,
+  SCHOOL_TYPE_GRADE_DEFAULTS,
+  getDefaultGradeRange,
+  getGradeLevelLabel,
+  getGradeIndex,
+  isValidGradeRange,
+  computeGradeLevels,
+  getSuggestedCategory,
+  getSuggestedDescriptor,
+  validateSchoolTypeGradeRange,
+  // Country configuration — from shared-types registry
+  COUNTRY_OPTIONS,
+  COUNTRY_REGISTRY,
+  getCountryConfig,
+  getTimezoneOptionsForCountry,
+  getLocaleOptionsForCountry,
+  getDefaultsForCountry,
+  STATE_TIMEZONE_MAP,
+} from '@aibrains/shared-types'
+
+// Backward-compatible aliases
+export const US_TIMEZONE_OPTIONS = getTimezoneOptionsForCountry('USA')
 
 // ============================================================================
-// GRADE RANGE → ED-FI DESCRIPTOR MAPPING
+// SCHOOL DAYS DEFAULTS
 // ============================================================================
 
-export const GRADE_RANGE_TO_DESCRIPTOR: Record<string, string> = {
-  PK: 'Prekindergarten',
-  K: 'Kindergarten',
-  '1': 'FirstGrade',
-  '2': 'SecondGrade',
-  '3': 'ThirdGrade',
-  '4': 'FourthGrade',
-  '5': 'FifthGrade',
-  '6': 'SixthGrade',
-  '7': 'SeventhGrade',
-  '8': 'EighthGrade',
-  '9': 'NinthGrade',
-  '10': 'TenthGrade',
-  '11': 'EleventhGrade',
-  '12': 'TwelfthGrade',
+/**
+ * Returns default operating days for a school based on its calendar system.
+ * Bikram Sambat (Nepal): Sunday–Friday [0,1,2,3,4,5]
+ * Gregorian (default):   Monday–Friday [1,2,3,4,5]
+ * Day numbers follow JS convention: 0 = Sunday, 6 = Saturday.
+ */
+export function getDefaultSchoolDays(calendarSystem: string): number[] {
+  if (calendarSystem === 'bikram_sambat') {
+    return [0, 1, 2, 3, 4, 5] // Sun–Fri
+  }
+  return [1, 2, 3, 4, 5] // Mon–Fri
 }
-
-export const ORDERED_GRADES = [
-  'PK', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-]
-
-export const GRADE_OPTIONS = [
-  { value: 'PK', label: 'Pre-K' },
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1', label: '1st Grade' },
-  { value: '2', label: '2nd Grade' },
-  { value: '3', label: '3rd Grade' },
-  { value: '4', label: '4th Grade' },
-  { value: '5', label: '5th Grade' },
-  { value: '6', label: '6th Grade' },
-  { value: '7', label: '7th Grade' },
-  { value: '8', label: '8th Grade' },
-  { value: '9', label: '9th Grade' },
-  { value: '10', label: '10th Grade' },
-  { value: '11', label: '11th Grade' },
-  { value: '12', label: '12th Grade' },
-]
-
-export const SCHOOL_TYPE_OPTIONS = [
-  { value: 'elementary', label: 'Elementary School' },
-  { value: 'middle', label: 'Middle School' },
-  { value: 'high', label: 'High School' },
-  { value: 'k12', label: 'K-12 School' },
-  { value: 'charter', label: 'Charter School' },
-  { value: 'private', label: 'Private School' },
-  { value: 'vocational', label: 'Vocational School' },
-  { value: 'special_education', label: 'Special Education' },
-]
-
-export const SCHOOL_TYPE_LABELS: Record<string, string> = {
-  elementary: 'Elementary',
-  middle: 'Middle School',
-  high: 'High School',
-  k12: 'K-12',
-  charter: 'Charter',
-  private: 'Private',
-  vocational: 'Vocational',
-  special_education: 'Special Ed',
-  other: 'Other',
-}
-
-/** Map internal school type to suggested Ed-Fi school category */
-export const TYPE_TO_SUGGESTED_CATEGORY: Record<string, string> = {
-  elementary: 'Elementary',
-  middle: 'MiddleSchool',
-  high: 'HighSchool',
-  k12: 'AllLevels',
-  charter: 'AllLevels',
-  private: 'AllLevels',
-  vocational: 'SecondarySchool',
-  special_education: 'Ungraded',
-}
-
-/** Map internal school type to suggested Ed-Fi school type descriptor */
-export const TYPE_TO_SUGGESTED_DESCRIPTOR: Record<string, string> = {
-  elementary: 'Regular',
-  middle: 'Regular',
-  high: 'Regular',
-  k12: 'Regular',
-  charter: 'Regular',
-  private: 'Regular',
-  vocational: 'CareerAndTechnical',
-  special_education: 'SpecialEducation',
-}
-
-export const COUNTRY_OPTIONS = [
-  { value: 'USA', label: 'United States' },
-  { value: 'CAN', label: 'Canada' },
-  { value: 'GBR', label: 'United Kingdom' },
-  { value: 'AUS', label: 'Australia' },
-  { value: 'OTHER', label: 'Other' },
-]
 
 // ============================================================================
 // AUTO-GENERATION HELPERS
 // ============================================================================
 
+const SKIP_WORDS = new Set(['the', 'of', 'and', 'for', 'in', 'at', 'a', 'an'])
+
 export function generateSchoolCode(name: string): string {
-  return name
-    .split(' ')
-    .map((word) => word.charAt(0))
-    .join('')
-    .toUpperCase()
-    .slice(0, 5)
-}
+  if (!name || !name.trim()) return 'XX'
 
-export function computeGradeLevels(start: string, end: string): string[] {
-  if (!start || !end) return []
-  const startIdx = ORDERED_GRADES.indexOf(start)
-  const endIdx = ORDERED_GRADES.indexOf(end)
-  if (startIdx === -1 || endIdx === -1 || startIdx > endIdx) return []
-  return ORDERED_GRADES.slice(startIdx, endIdx + 1)
-    .map((g) => GRADE_RANGE_TO_DESCRIPTOR[g])
-    .filter(Boolean)
-}
+  // Split on spaces and hyphens, filter out articles/prepositions
+  const words = name
+    .replace(/-/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 0)
 
-export function getSuggestedCategory(schoolType: string): string | undefined {
-  return TYPE_TO_SUGGESTED_CATEGORY[schoolType]
-}
+  const significantWords = words.filter((w) => !SKIP_WORDS.has(w.toLowerCase()))
+  const sourceWords = significantWords.length > 0 ? significantWords : words
 
-export function getSuggestedDescriptor(schoolType: string): string | undefined {
-  return TYPE_TO_SUGGESTED_DESCRIPTOR[schoolType]
+  let code: string
+  if (sourceWords.length === 1) {
+    // Single word: take first 4 chars
+    code = sourceWords[0].slice(0, 4).toUpperCase()
+  } else {
+    // Multiple words: take first char of each
+    code = sourceWords
+      .map((w) => w.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 5)
+  }
+
+  // Ensure minimum 2 characters
+  if (code.length < 2) {
+    code = (name.replace(/[^a-zA-Z0-9]/g, '') + 'XX').slice(0, 2).toUpperCase()
+  }
+
+  return code
 }
 
 // ============================================================================
 // DTO TRANSFORMATION
 // ============================================================================
 
+/** Filter out array entries with empty required fields */
+function filterIdCodes(codes: any[] | undefined): any[] | undefined {
+  if (!codes?.length) return undefined
+  const filtered = codes.filter((c) => c?.identificationCode?.trim())
+  return filtered.length > 0 ? filtered : undefined
+}
+
+function filterPhones(phones: any[] | undefined): any[] | undefined {
+  if (!phones?.length) return undefined
+  const filtered = phones.filter((p) => p?.telephoneNumber?.trim())
+  return filtered.length > 0 ? filtered : undefined
+}
+
+function filterRatings(ratings: any[] | undefined): any[] | undefined {
+  if (!ratings?.length) return undefined
+  const filtered = ratings.filter((r) => r?.title?.trim() && r?.rating?.trim())
+  return filtered.length > 0 ? filtered : undefined
+}
+
 /** Transform flat wizard data into the nested CreateSchoolDto structure */
 export function transformWizardDataToDto(
   data: Record<string, unknown>,
 ): CreateSchoolDto {
   const hasAddress = data['address.street1']
+  const country = (data['address.country'] as string) || 'USA'
+  const defaults = getDefaultsForCountry(country)
+
+  // Build address based on country
+  let address: CreateSchoolDto['address'] | undefined
+  if (hasAddress) {
+    const baseAddress: any = {
+      street1: data['address.street1'] as string,
+      street2: (data['address.street2'] as string) || undefined,
+      country,
+    }
+
+    if (country === 'NPL') {
+      // Nepal: ward, municipality, district, province
+      baseAddress.wardNumber = (data['address.wardNumber'] as string) || undefined
+      baseAddress.municipality = (data['address.municipality'] as string) || undefined
+      baseAddress.district = (data['address.district'] as string) || undefined
+      baseAddress.province = (data['address.province'] as string) || undefined
+      baseAddress.city = (data['address.city'] as string) || undefined
+    } else if (country === 'USA') {
+      // US: city, state (2-char), zipCode
+      baseAddress.city = data['address.city'] as string
+      baseAddress.state = data['address.state'] as string
+      baseAddress.zipCode = data['address.zipCode'] as string
+    } else {
+      // Generic: city, state/region, zipCode
+      baseAddress.city = (data['address.city'] as string) || undefined
+      baseAddress.state = (data['address.state'] as string) || undefined
+      baseAddress.zipCode = (data['address.zipCode'] as string) || undefined
+      baseAddress.region = (data['address.region'] as string) || undefined
+    }
+
+    address = baseAddress
+  }
 
   return {
     name: data.name as string,
@@ -156,21 +174,11 @@ export function transformWizardDataToDto(
     phone: (data.phone as string) || undefined,
     email: (data.email as string) || undefined,
     website: (data.website as string) || undefined,
-    address: hasAddress
-      ? {
-          street1: data['address.street1'] as string,
-          street2: (data['address.street2'] as string) || undefined,
-          city: data['address.city'] as string,
-          state: data['address.state'] as string,
-          zipCode: data['address.zipCode'] as string,
-          country: (data['address.country'] as string) || 'USA',
-        }
-      : undefined,
-    principalName: (data.principalName as string) || undefined,
-    principalEmail: (data.principalEmail as string) || undefined,
-    timezone: 'America/Chicago',
-    locale: 'en-US',
-    academicCalendarType: 'semester',
+    address,
+    timezone: (data.timezone as string) || defaults.timezone,
+    locale: (data.locale as string) || defaults.locale,
+    academicCalendarType: (data.academicCalendarType as any) || defaults.calendarSystem === 'bikram_sambat' ? 'annual' : 'semester',
+    calendarSystem: (data.calendarSystem as any) || defaults.calendarSystem,
     localEducationAgencyId:
       (data.localEducationAgencyId as string) || undefined,
     schoolCategories: (data.schoolCategories as string[])?.length
@@ -186,14 +194,8 @@ export function transformWizardDataToDto(
       ((data.administrativeFundingControlDescriptor as string) || undefined) as any,
     titleIPartASchoolDesignationDescriptor:
       (data.titleIPartASchoolDesignationDescriptor as string) || undefined,
-    identificationCodes: (data.identificationCodes as any[])?.length
-      ? (data.identificationCodes as any)
-      : undefined,
-    institutionTelephones: (data.institutionTelephones as any[])?.length
-      ? (data.institutionTelephones as any)
-      : undefined,
-    accountabilityRatings: (data.accountabilityRatings as any[])?.length
-      ? (data.accountabilityRatings as any)
-      : undefined,
+    identificationCodes: filterIdCodes(data.identificationCodes as any[]),
+    institutionTelephones: filterPhones(data.institutionTelephones as any[]),
+    accountabilityRatings: filterRatings(data.accountabilityRatings as any[]),
   }
 }

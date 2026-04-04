@@ -1,6 +1,6 @@
 /**
  * Auth Store
- * 
+ *
  * Zustand store for authentication state management.
  * Integrates with AWS Cognito via @edforge/auth package.
  */
@@ -39,100 +39,9 @@ export interface AuthStore {
   logout: () => Promise<void>
   setError: (error: string | null) => void
 
-  // Dev mode - will be removed in production
-  loginAsMock: (mockUserId: string) => void
-
   // Helpers
   getUserSchools: () => string[]
   getUserRoleInSchool: (schoolId: string) => SchoolRole | null
-}
-
-// ============================================================================
-// MOCK DATA - For development/demo purposes only
-// Will be removed once backend is fully integrated
-// ============================================================================
-
-const MOCK_USERS: Record<string, UserIdentity> = {
-  'tenant-admin': {
-    id: 'user-001',
-    email: 'admin@edforge.com',
-    name: 'Sarah Chen',
-    displayName: 'Sarah',
-    globalRole: 'TenantAdmin',
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Principal',
-      'school-002': 'Principal',
-      'school-003': 'Principal',
-    },
-  },
-  'principal': {
-    id: 'user-002',
-    email: 'principal@lincoln.edu',
-    name: 'James Wilson',
-    displayName: 'James',
-    globalRole: 'StandardUser',
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Principal',
-    },
-  },
-  'teacher': {
-    id: 'user-003',
-    email: 'teacher@lincoln.edu',
-    name: 'Emily Rodriguez',
-    displayName: 'Emily',
-    globalRole: 'StandardUser',
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Teacher',
-      'school-002': 'Teacher',
-    },
-  },
-  'accountant': {
-    id: 'user-004',
-    email: 'finance@edforge.com',
-    name: 'Michael Park',
-    displayName: 'Michael',
-    globalRole: 'StandardUser',
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Accountant',
-      'school-002': 'Accountant',
-      'school-003': 'Accountant',
-    },
-  },
-  'student': {
-    id: 'user-005',
-    email: 'alex.chen@student.lincoln.edu',
-    name: 'Alex Chen',
-    displayName: 'Alex',
-    globalRole: 'StandardUser',
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Student',
-    },
-  },
-  'parent': {
-    id: 'user-006',
-    email: 'robert.thompson@email.com',
-    name: 'Robert Thompson',
-    displayName: 'Robert',
-    globalRole: 'StandardUser',
-    tenantId: 'tenant-001',
-    assignments: {
-      'school-001': 'Parent',
-      'school-002': 'Parent',
-    },
-    childrenIds: ['STU-0001', 'STU-0002'],
-  },
-}
-
-// Mock school metadata - will be replaced by API data
-export const MOCK_SCHOOLS: Record<string, { name: string; code: string }> = {
-  'school-001': { name: 'Lincoln High School', code: 'LHS' },
-  'school-002': { name: 'Washington Elementary', code: 'WES' },
-  'school-003': { name: 'Jefferson Middle School', code: 'JMS' },
 }
 
 // ============================================================================
@@ -270,33 +179,13 @@ export const useAuthStore = create<AuthStore>()(
             tenantTier: null,
             error: null,
           })
+          // Full page reload to clear all in-memory state and navigate to root
+          window.location.href = '/'
         }
       },
 
       setError: (error) => {
         set({ error })
-      },
-
-      /**
-       * DEV MODE: Login as a mock user
-       * This will be removed in production
-       */
-      loginAsMock: (mockUserId) => {
-        const user = MOCK_USERS[mockUserId]
-        if (!user) {
-          console.error(`Mock user "${mockUserId}" not found`)
-          set({ error: `Mock user "${mockUserId}" not found` })
-          return
-        }
-
-        set({
-          user,
-          isAuthenticated: true,
-          isLoading: false,
-          tenantName: 'Demo District',
-          tenantTier: 'PROFESSIONAL',
-          error: null,
-        })
       },
 
       getUserSchools: () => {
@@ -382,34 +271,6 @@ if (typeof window !== 'undefined') {
 // ============================================================================
 
 /**
- * Get the primary role for a user (first assignment's role).
- * Used for display purposes on the login page.
- */
-function getPrimaryRole(user: UserIdentity): SchoolRole {
-  const assignments = Object.values(user.assignments)
-  return assignments[0] ?? 'Staff'
-}
-
-/**
- * Export mock users for the login page (dev mode only)
- */
-export const mockUserOptions = Object.entries(MOCK_USERS).map(([key, user]) => {
-  const primaryRole = getPrimaryRole(user)
-  const roleCategory = getRoleCategory(primaryRole)
-
-  return {
-    id: key,
-    name: user.name,
-    email: user.email,
-    globalRole: user.globalRole,
-    primaryRole,
-    roleCategory,
-    schoolCount: Object.keys(user.assignments).length,
-    childrenCount: user.childrenIds?.length ?? 0,
-  }
-})
-
-/**
  * Helper to get role category for the current user in a specific school.
  * Used by navigation and UI components to determine what to render.
  */
@@ -417,7 +278,10 @@ export function getUserRoleCategory(
   user: UserIdentity | null,
   schoolId: string | null
 ): RoleCategory | null {
-  if (!user || !schoolId) return null
+  if (!user) return null
+  // TenantAdmin has implicit administrator access to all schools (even before any school is created)
+  if (user.globalRole === 'TenantAdmin') return 'administrator'
+  if (!schoolId) return null
   const role = user.assignments[schoolId]
   if (!role) return null
   return getRoleCategory(role)

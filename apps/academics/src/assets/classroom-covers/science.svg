@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="url(#bg)"/>
+  <!-- Atom orbital rings -->
+  <g transform="translate(550, 100)" fill="none" stroke="white" stroke-opacity="0.12" stroke-width="1.5">
+    <ellipse rx="55" ry="20"/>
+    <ellipse rx="55" ry="20" transform="rotate(60)"/>
+    <ellipse rx="55" ry="20" transform="rotate(-60)"/>
+    <circle r="6" fill="white" fill-opacity="0.15" stroke="none"/>
+  </g>
+  <!-- DNA helix -->
+  <g transform="translate(680, 20)" stroke="white" stroke-opacity="0.1" stroke-width="1.5" fill="none">
+    <path d="M0,0 C15,15 15,25 0,40 C-15,55 -15,65 0,80 C15,95 15,105 0,120 C-15,135 -15,145 0,160"/>
+    <path d="M25,0 C10,15 10,25 25,40 C40,55 40,65 25,80 C10,95 10,105 25,120 C40,135 40,145 25,160"/>
+    <line x1="5" y1="20" x2="20" y2="20" stroke-opacity="0.08"/>
+    <line x1="0" y1="40" x2="25" y2="40" stroke-opacity="0.08"/>
+    <line x1="5" y1="60" x2="20" y2="60" stroke-opacity="0.08"/>
+    <line x1="0" y1="80" x2="25" y2="80" stroke-opacity="0.08"/>
+    <line x1="5" y1="100" x2="20" y2="100" stroke-opacity="0.08"/>
+    <line x1="0" y1="120" x2="25" y2="120" stroke-opacity="0.08"/>
+    <line x1="5" y1="140" x2="20" y2="140" stroke-opacity="0.08"/>
+  </g>
+  <!-- Erlenmeyer flask -->
+  <g transform="translate(420, 60)" fill="none" stroke="white" stroke-opacity="0.12" stroke-width="1.5">
+    <path d="M-8,0 L-8,40 L-30,90 L30,90 L8,40 L8,0Z"/>
+    <line x1="-10" y1="0" x2="10" y2="0"/>
+    <ellipse cx="0" cy="75" rx="18" ry="5" fill="white" fill-opacity="0.05" stroke="none"/>
+  </g>
+  <!-- Molecule hexagon -->
+  <g transform="translate(350, 45)" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1">
+    <polygon points="0,-15 13,-7.5 13,7.5 0,15 -13,7.5 -13,-7.5"/>
+    <circle cx="0" cy="-15" r="3" fill="white" fill-opacity="0.06"/>
+    <circle cx="13" cy="7.5" r="3" fill="white" fill-opacity="0.06"/>
+    <circle cx="-13" cy="7.5" r="3" fill="white" fill-opacity="0.06"/>
+  </g>
+  <!-- Microscope silhouette -->
+  <g transform="translate(760, 100)" fill="white" fill-opacity="0.08" stroke="none">
+    <rect x="-15" y="50" width="30" height="4" rx="2"/>
+    <rect x="-3" y="10" width="6" height="45"/>
+    <rect x="-10" y="5" width="8" height="15" rx="3" transform="rotate(-30 -6 12)"/>
+    <circle cx="-14" cy="2" r="6" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1.5"/>
+  </g>
+  <!-- Leaf -->
+  <path d="M320,150 C330,130 360,125 370,140 C360,135 335,140 320,150Z" fill="white" fill-opacity="0.07" stroke="none"/>
+  <!-- Scattered bubbles -->
+  <circle cx="470" cy="30" r="4" fill="white" fill-opacity="0.06"/>
+  <circle cx="490" cy="45" r="3" fill="white" fill-opacity="0.05"/>
+  <circle cx="600" cy="170" r="5" fill="white" fill-opacity="0.05"/>
+  <circle cx="380" cy="170" r="3" fill="white" fill-opacity="0.04"/>
+</svg>

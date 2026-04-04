@@ -11,6 +11,7 @@ import { School, ArrowRight, Building2 } from 'lucide-react'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import { cn } from '@/lib/utils'
 import { apiPatch } from '@/lib/api'
 import { useLocalEducationAgencies, edOrgKeys } from '@/hooks/useEducationOrgs'
@@ -73,7 +74,7 @@ export function QuickSchoolReassign({
       onClose()
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to reassign school')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 

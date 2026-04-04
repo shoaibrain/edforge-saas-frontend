@@ -11,6 +11,12 @@ import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 // ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
+
+// ============================================================================
 // STATE
 // ============================================================================
 
@@ -52,10 +58,12 @@ export const useAttendanceStore = create<AttendanceStoreState>((set, get) => ({
     // Don't allow future dates
     const today = formatDate(new Date())
     if (date > today) return
+    if (DEBUG) console.debug('[Attendance Store] selectedDate change', { to: date })
     set({ selectedDate: date })
   },
 
   setSelectedSectionId: (id: string | null) => {
+    if (DEBUG) console.debug('[Attendance Store] selectedSectionId change', { to: id })
     set({ selectedSectionId: id })
   },
 

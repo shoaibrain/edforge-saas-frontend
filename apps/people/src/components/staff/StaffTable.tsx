@@ -1,17 +1,18 @@
 /**
- * StaffTable Component
+ * StaffTable Component — V2
  *
- * Displays a paginated table of staff with DiceBear avatars.
+ * Displays a paginated table of staff with V2 styling.
+ * DiceBear avatars, V2 role chips, access chips, status chips.
  * Row click opens a quick-info drawer (managed by parent).
- * Follows the StudentTable pattern from the academics app.
  */
 
 import { useMemo } from 'react'
-import { UsersRound, Key } from 'lucide-react'
-import { DataTable, type Column } from '../ui'
+import { UsersRound, Eye, Pencil, MoreVertical } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
-import { StaffRoleBadge } from './StaffRoleBadge'
-import { StaffStatusBadge } from './StaffStatusBadge'
+import { StaffRoleChip } from './StaffRoleChip'
+import { AccessChip } from './AccessChip'
 import { getStaffAvatar } from '../../lib/avatar'
 import { formatDate } from '../../lib/utils'
 
@@ -22,11 +23,34 @@ import { formatDate } from '../../lib/utils'
 interface StaffTableProps {
   staff: StaffResponseDto[]
   isLoading?: boolean
-  hasMore?: boolean
-  isFetchingMore?: boolean
-  onLoadMore?: () => void
   onAddStaff?: () => void
   onViewStaff?: (staff: StaffResponseDto) => void
+}
+
+// ============================================================================
+// EMPLOYMENT TYPE BADGE COLORS
+// ============================================================================
+
+const EMPLOYMENT_STYLES: Record<string, { bg: string; color: string }> = {
+  active: { bg: 'rgba(239,159,39,0.10)', color: '#EF9F27' },
+  on_leave: { bg: 'rgba(239,159,39,0.10)', color: '#EF9F27' },
+  suspended: { bg: 'rgba(226,75,74,0.10)', color: '#E24B4A' },
+  terminated: { bg: 'rgba(226,75,74,0.10)', color: '#E24B4A' },
+  retired: { bg: 'rgba(255,255,255,0.06)', color: 'var(--v2-text-hint, #4a5068)' },
+  resigned: { bg: 'rgba(255,255,255,0.06)', color: 'var(--v2-text-hint, #4a5068)' },
+}
+
+function getEmploymentLabel(status?: string): string {
+  if (!status) return 'Full-time'
+  const labels: Record<string, string> = {
+    active: 'Full-time',
+    on_leave: 'On Leave',
+    suspended: 'Suspended',
+    terminated: 'Terminated',
+    retired: 'Retired',
+    resigned: 'Resigned',
+  }
+  return labels[status] || 'Full-time'
 }
 
 // ============================================================================
@@ -36,111 +60,245 @@ interface StaffTableProps {
 export function StaffTable({
   staff,
   isLoading = false,
-  hasMore = false,
-  isFetchingMore = false,
-  onLoadMore,
   onAddStaff,
   onViewStaff,
 }: StaffTableProps) {
-  const columns: Column<StaffResponseDto>[] = useMemo(
+  const { t } = useTranslation('people')
+
+  const columns: ColumnDef<StaffResponseDto, unknown>[] = useMemo(
     () => [
       {
-        key: 'name',
-        header: 'Staff',
-        sortable: true,
-        width: '280px',
-        render: (s) => (
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-tertiary">
+        id: 'name',
+        accessorFn: (row) => `${row.firstName} ${row.lastSurname}`,
+        header: t('tableHeaders.staff'),
+        size: 280,
+        cell: ({ row }) => {
+          const s = row.original
+          const empStyle = EMPLOYMENT_STYLES[s.employmentStatus] || EMPLOYMENT_STYLES.active
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <img
                 src={getStaffAvatar(s.staffId)}
                 alt={`${s.firstName} ${s.lastSurname}`}
-                className="w-full h-full object-cover"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  flexShrink: 0,
+                  objectFit: 'cover',
+                }}
                 loading="lazy"
               />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: 'var(--v2-text-primary, #e8eaf0)',
+                    }}
+                  >
+                    {s.firstName} {s.lastSurname}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 500,
+                      padding: '1px 5px',
+                      borderRadius: 4,
+                      background: empStyle.bg,
+                      color: empStyle.color,
+                    }}
+                  >
+                    {getEmploymentLabel(s.employmentStatus)}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: 10,
+                    color: 'var(--v2-text-ghost, #2a3045)',
+                  }}
+                >
+                  {s.email}
+                </span>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="font-medium text-text-primary truncate">
-                {s.firstName} {s.lastSurname}
-              </p>
-              <p className="text-xs text-text-tertiary truncate">{s.email}</p>
-            </div>
-          </div>
-        ),
+          )
+        },
       },
       {
-        key: 'role',
-        header: 'Role',
-        sortable: true,
-        width: '140px',
-        render: (s) => <StaffRoleBadge role={s.role} />,
+        accessorKey: 'role',
+        header: t('tableHeaders.role'),
+        size: 140,
+        cell: ({ row }) => <StaffRoleChip role={row.original.role} />,
       },
       {
-        key: 'employmentStatus',
-        header: 'Status',
-        sortable: true,
-        width: '120px',
-        render: (s) => <StaffStatusBadge status={s.employmentStatus} />,
+        accessorKey: 'employmentStatus',
+        header: t('tableHeaders.status'),
+        size: 120,
+        cell: ({ row }) => {
+          const status = row.original.employmentStatus
+          const isActive = status === 'active'
+          return (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 10,
+                fontWeight: 500,
+                padding: '2px 8px',
+                borderRadius: 7,
+                whiteSpace: 'nowrap',
+                background: isActive ? 'rgba(29,158,117,0.10)' : 'rgba(255,255,255,0.05)',
+                color: isActive ? '#1D9E75' : 'var(--v2-text-hint, #4a5068)',
+              }}
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: '50%',
+                  background: isActive ? '#1D9E75' : 'var(--v2-text-hint, #4a5068)',
+                  flexShrink: 0,
+                }}
+              />
+              {isActive ? 'Active' : (status?.replace('_', ' ') || 'Unknown')}
+            </span>
+          )
+        },
       },
       {
-        key: 'hireDate',
-        header: 'Hired',
-        sortable: true,
-        width: '120px',
-        render: (s) => (
-          <span className="text-text-secondary">{formatDate(s.hireDate)}</span>
-        ),
-      },
-      {
-        key: 'department',
-        header: 'Department',
-        width: '140px',
-        render: (s) => (
-          <span className="text-text-secondary text-sm">
-            {s.department || '—'}
+        accessorKey: 'hireDate',
+        header: t('tableHeaders.hired'),
+        size: 120,
+        cell: ({ row }) => (
+          <span style={{ fontSize: 11, color: 'var(--v2-text-muted, #7a8099)' }}>
+            {formatDate(row.original.hireDate)}
           </span>
         ),
       },
       {
-        key: 'systemAccess',
-        header: 'System Access',
-        width: '130px',
-        render: (s) =>
-          s.userId ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">
-              <Key className="w-3 h-3" />
-              Active
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-500/20 dark:text-slate-400">
-              No Access
-            </span>
-          ),
+        accessorKey: 'departmentName',
+        header: t('tableHeaders.department'),
+        size: 140,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span
+            style={{
+              fontSize: 11,
+              color: row.original.departmentName
+                ? 'var(--v2-text-muted, #7a8099)'
+                : 'var(--v2-text-ghost, #2a3045)',
+            }}
+          >
+            {row.original.departmentName || '—'}
+          </span>
+        ),
+      },
+      {
+        id: 'systemAccess',
+        accessorFn: (row) => (row.userId ? 'active' : 'none'),
+        header: t('tableHeaders.systemAccess'),
+        size: 130,
+        enableSorting: false,
+        cell: ({ row }) => <AccessChip hasAccess={!!row.original.userId} />,
+      },
+      {
+        id: 'actions',
+        header: '',
+        size: 100,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+            <ActionBtn
+              icon={<Eye style={{ width: 13, height: 13 }} />}
+              title="View"
+              onClick={(e) => {
+                e.stopPropagation()
+                onViewStaff?.(row.original)
+              }}
+            />
+            <ActionBtn
+              icon={<Pencil style={{ width: 13, height: 13 }} />}
+              title="Edit"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <ActionBtn
+              icon={<MoreVertical style={{ width: 13, height: 13 }} />}
+              title="More"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        ),
       },
     ],
-    [],
+    [t, onViewStaff],
   )
 
   return (
-    <DataTable
+    <TanstackDataTable
       columns={columns}
       data={staff}
-      keyExtractor={(s) => s.staffId}
+      getRowId={(s) => s.staffId}
       isLoading={isLoading}
-      skeletonRows={8}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
+      maxHeight="calc(100vh - 13rem)"
       emptyState={{
         icon: <UsersRound className="w-12 h-12" />,
-        title: 'No staff members found',
-        description:
-          'Get started by adding your first staff member to the directory.',
+        title: t('empty.noStaff'),
+        description: t('empty.getStarted'),
         action: onAddStaff
-          ? { label: 'Add Staff Member', onClick: onAddStaff }
+          ? { label: t('staffDirectory.addStaff'), onClick: onAddStaff }
           : undefined,
       }}
-      hasMore={hasMore}
-      isFetchingMore={isFetchingMore}
-      onLoadMore={onLoadMore}
       onRowClick={onViewStaff}
     />
+  )
+}
+
+// ============================================================================
+// ACTION BUTTON
+// ============================================================================
+
+function ActionBtn({
+  icon,
+  title,
+  onClick,
+}: {
+  icon: React.ReactNode
+  title: string
+  onClick: (e: React.MouseEvent) => void
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      style={{
+        width: 26,
+        height: 26,
+        borderRadius: 6,
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--v2-text-hint, #4a5068)',
+        transition: 'all 0.12s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'rgba(255,255,255,0.07)'
+        e.currentTarget.style.color = 'var(--v2-text-secondary, #c8ccd8)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'transparent'
+        e.currentTarget.style.color = 'var(--v2-text-hint, #4a5068)'
+      }}
+    >
+      {icon}
+    </button>
   )
 }

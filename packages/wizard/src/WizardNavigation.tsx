@@ -173,14 +173,14 @@ export function WizardNavigation({
       </div>
 
       <div className="flex items-center gap-3">
-        {showSkip && isOptional && (
+        {(showSkip || isOptional) && (
           <AnimatedButton
             type="button"
             variant="ghost"
             onClick={handleSkip}
             icon={<SkipForward className="w-4 h-4" />}
           >
-            Skip
+            I'll do this later
           </AnimatedButton>
         )}
 

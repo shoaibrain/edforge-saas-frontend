@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { Loader2, AlertTriangle, Trash2 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 
@@ -25,6 +26,7 @@ export function DeleteConfirmDialog({
   onConfirm,
   isDeleting = false,
 }: DeleteConfirmDialogProps) {
+  const { t } = useTranslation('people')
   const [confirmText, setConfirmText] = useState('')
 
   // Reset confirm text when modal opens/closes
@@ -50,7 +52,7 @@ export function DeleteConfirmDialog({
     <Modal
       open={open}
       onClose={onClose}
-      title="Delete Staff Member"
+      title={t('delete.title')}
       size="sm"
       showCloseButton={!isDeleting}
     >
@@ -62,12 +64,10 @@ export function DeleteConfirmDialog({
           </div>
           <div className="flex-1">
             <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
-              This action cannot be undone
+              {t('delete.warning')}
             </h4>
             <p className="mt-1 text-sm text-red-700 dark:text-red-300">
-              You are about to permanently delete the staff record for{' '}
-              <strong>{fullName}</strong>.
-              This will remove all their data and access.
+              {t('delete.confirmation', { name: fullName })}
             </p>
           </div>
         </div>
@@ -91,7 +91,8 @@ export function DeleteConfirmDialog({
             htmlFor="confirmEmail"
             className="block text-sm font-medium text-text-primary mb-1.5"
           >
-            Type <span className="font-mono text-red-600 dark:text-red-400">{staff.email}</span> to confirm
+            {t('delete.typeToConfirm', { email: '' })}
+            <span className="font-mono text-red-600 dark:text-red-400">{staff.email}</span>
           </label>
           <input
             id="confirmEmail"
@@ -106,13 +107,13 @@ export function DeleteConfirmDialog({
               transition-colors
               ${confirmText && !canDelete ? 'border-red-500' : 'border-border-secondary'}
             `}
-            placeholder="Enter email to confirm"
+            placeholder={t('delete.emailPlaceholder')}
             disabled={isDeleting}
             autoComplete="off"
           />
           {confirmText && !canDelete && (
             <p className="mt-1 text-sm text-red-500">
-              Email doesn't match
+              {t('delete.emailMismatch')}
             </p>
           )}
         </div>
@@ -126,7 +127,7 @@ export function DeleteConfirmDialog({
           onClick={onClose}
           disabled={isDeleting}
         >
-          Cancel
+          {t('actions.cancel')}
         </Button>
         <Button
           type="button"
@@ -138,12 +139,12 @@ export function DeleteConfirmDialog({
           {isDeleting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Deleting...
+              {t('delete.deleting')}
             </>
           ) : (
             <>
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete Staff Member
+              {t('delete.title')}
             </>
           )}
         </Button>

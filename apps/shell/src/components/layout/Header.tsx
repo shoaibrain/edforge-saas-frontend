@@ -1,49 +1,237 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
+import { motion } from 'framer-motion'
 import {
-  Bell,
   User,
   Settings,
-  FileText,
-  Moon,
-  Sun,
-  Monitor,
   LogOut,
-  HelpCircle,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
-import { useThemeStore, type Theme } from '../../stores/theme.store'
+import { useThemeStore } from '../../stores/theme.store'
+import { useHomeStore } from '../../stores/home.store'
+import { useAppStore } from '../../stores/app.store'
 import { Avatar } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
+import { getGreeting } from '../../lib/greeting'
+import { adToBS, formatBSLong } from '@edforge/date-utils'
+import { cn } from '../../lib/utils'
 
 import { Breadcrumbs } from './Breadcrumbs'
+import { SchoolSwitcher } from './SchoolSwitcher'
 
 // ============================================================================
-// USER MENU WITH THEME PICKER
+// LANGUAGE SLIDING TOGGLE
+// ============================================================================
+
+const LANG_OPTIONS = [
+  { code: 'en', label: 'EN' },
+  { code: 'ne', label: 'NP' },
+] as const
+
+function LanguageToggle() {
+  const { i18n } = useTranslation()
+  const currentLang = i18n.language || 'en'
+
+  const handleSwitch = (code: string) => (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    i18n.changeLanguage(code)
+  }
+
+  return (
+    <div
+      className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
+      role="radiogroup"
+      aria-label="Language"
+    >
+      {LANG_OPTIONS.map(({ code, label }) => {
+        const isActive = currentLang === code
+        return (
+          <button
+            key={code}
+            role="radio"
+            aria-checked={isActive}
+            onClick={handleSwitch(code)}
+            className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
+              isActive
+                ? 'text-white'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="lang-toggle-pill"
+                className="absolute inset-0 bg-teal-500 dark:bg-cyan-500 rounded-md shadow-sm"
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{label}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ============================================================================
+// HAMBURGER BUTTON
+// ============================================================================
+
+function HamburgerButton() {
+  const toggleSidebar = useAppStore((s) => s.toggleSidebar)
+  const collapsed = useAppStore((s) => s.sidebarCollapsed)
+
+  return (
+    <button
+      onClick={toggleSidebar}
+      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150"
+      style={{ cursor: 'pointer' }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--shell-ni-hover)' }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+      aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+    >
+      <div className="flex flex-col gap-1">
+        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+      </div>
+    </button>
+  )
+}
+
+// ============================================================================
+// THEME PILL — Light | Dark toggle in topbar
+// ============================================================================
+
+function ThemePill() {
+  const { resolvedTheme, setTheme } = useThemeStore()
+
+  return (
+    <div
+      className="flex items-center gap-0.5 rounded-2xl flex-shrink-0"
+      style={{
+        padding: '3px',
+        background: 'var(--shell-theme-pill-bg)',
+        border: '0.5px solid var(--shell-border-color)',
+        transition: 'background 0.3s',
+      }}
+    >
+      <button
+        className={cn(
+          'rounded-xl text-[10px] font-medium transition-all duration-150 border-none font-[inherit]',
+        )}
+        style={{
+          padding: '3px 10px',
+          background: resolvedTheme === 'light' ? 'var(--shell-cp-bg)' : 'transparent',
+          color: resolvedTheme === 'light' ? 'var(--shell-text-1)' : 'var(--shell-text-3)',
+          boxShadow: resolvedTheme === 'light' ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
+          cursor: 'pointer',
+        }}
+        onClick={() => setTheme('light')}
+      >
+        Light
+      </button>
+      <button
+        className={cn(
+          'rounded-xl text-[10px] font-medium transition-all duration-150 border-none font-[inherit]',
+        )}
+        style={{
+          padding: '3px 10px',
+          background: resolvedTheme === 'dark' ? 'var(--shell-cp-bg)' : 'transparent',
+          color: resolvedTheme === 'dark' ? 'var(--shell-text-1)' : 'var(--shell-text-3)',
+          boxShadow: resolvedTheme === 'dark' ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
+          cursor: 'pointer',
+        }}
+        onClick={() => setTheme('dark')}
+      >
+        Dark
+      </button>
+    </div>
+  )
+}
+
+// ============================================================================
+// V2 HOME TOPBAR CENTER — Greeting + Date
+// ============================================================================
+
+function HomeTopbarCenter() {
+  const user = useAuthStore((s) => s.user)
+  const { t } = useTranslation('dashboard')
+
+  const firstName = user?.displayName || user?.name?.split(' ')[0]
+  const greeting = getGreeting(firstName, t)
+
+  const dateDisplay = useMemo(() => {
+    const now = new Date()
+
+    // BS date
+    let bsPart = ''
+    try {
+      const bs = adToBS(now)
+      bsPart = `${formatBSLong(bs)} BS`
+    } catch {
+      // Fallback: skip BS date if conversion fails
+    }
+
+    // Gregorian date
+    const gregPart = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+
+    const parts = [bsPart, gregPart].filter(Boolean)
+    return parts.join(' · ')
+  }, [])
+
+  return (
+    <div className="flex items-center gap-0 min-w-0">
+      <span
+        className="text-[13.5px] font-medium"
+        style={{ color: 'var(--shell-text-1)', transition: 'color 0.3s' }}
+      >
+        {greeting}
+      </span>
+      <span
+        className="text-[11px] ml-[10px] pl-[10px]"
+        style={{
+          color: 'var(--shell-text-4)',
+          borderLeft: '1px solid var(--shell-border-color)',
+          transition: 'color 0.3s, border-color 0.3s',
+        }}
+      >
+        {dateDisplay}
+      </span>
+    </div>
+  )
+}
+
+// ============================================================================
+// USER MENU — Avatar dropdown (theme picker removed, now in topbar pill)
 // ============================================================================
 
 function UserMenu() {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
-  const { theme, setTheme } = useThemeStore()
+  const { t: tNav } = useTranslation('nav')
 
   if (!user) return null
 
-  const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
-  ]
-
   return (
     <Menu as="div" className="relative">
-      <MenuButton className="flex items-center rounded-full ring-2 ring-[rgb(var(--border-primary))] ring-offset-2 ring-offset-[rgb(var(--surface-secondary))] hover:ring-teal-500/50 transition-all duration-200">
-        <Avatar
-          name={user.name}
-          size="sm"
-          shape="circle"
-        />
+      <MenuButton
+        className="flex items-center rounded-full hover:ring-teal-500/50 transition-all duration-200 ml-1 flex-shrink-0"
+      >
+        <div className="w-[30px] h-[30px] rounded-full overflow-hidden">
+          <Avatar
+            name={user.name}
+            size="sm"
+            shape="circle"
+          />
+        </div>
       </MenuButton>
 
       <Transition
@@ -72,29 +260,10 @@ function UserMenu() {
             </div>
           </div>
 
-          {/* Theme Picker */}
+          {/* Language Toggle */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">Theme</span>
-              <div className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]">
-                {themes.map(({ value, icon: Icon, label }) => (
-                  <button
-                    key={value}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setTheme(value)
-                    }}
-                    className={`p-2 rounded-md transition-all duration-200 ${theme === value
-                      ? 'bg-teal-500 dark:bg-cyan-500 text-white shadow-sm'
-                      : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]'
-                      }`}
-                    title={label}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center justify-end">
+              <LanguageToggle />
             </div>
           </div>
 
@@ -109,8 +278,8 @@ function UserMenu() {
                     <User className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">My Profile</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">View and edit profile</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('myProfile')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('viewEditProfile')}</p>
                   </div>
                 </button>
               )}
@@ -125,21 +294,8 @@ function UserMenu() {
                     <Settings className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Settings</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">Manage preferences</p>
-                  </div>
-                </button>
-              )}
-            </MenuItem>
-            <MenuItem>
-              {({ active }) => (
-                <button className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}>
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] flex items-center justify-center">
-                    <HelpCircle className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Help & Support</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">Get help with Edforge</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('settings')}</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('managePreferences')}</p>
                   </div>
                 </button>
               )}
@@ -156,7 +312,7 @@ function UserMenu() {
                   <div className="w-8 h-8 rounded-lg bg-rust-100 dark:bg-rust-900/30 flex items-center justify-center">
                     <LogOut className="w-4 h-4 text-rust-500" />
                   </div>
-                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">Sign out</span>
+                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">{tNav('signOut')}</span>
                 </button>
               )}
             </MenuItem>
@@ -168,44 +324,48 @@ function UserMenu() {
 }
 
 // ============================================================================
-// MAIN HEADER COMPONENT
+// MAIN HEADER COMPONENT — Shell V2 Three-Zone Layout
 // ============================================================================
 
 export function Header() {
+  const collapsed = useAppStore((s) => s.sidebarCollapsed)
+  const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
+
   return (
-    <>
-      <header
-        className="sticky top-0 z-30 h-16 px-6 flex items-center justify-between border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
-        aria-label="Global header"
+    <header
+      className="fixed top-0 left-0 right-0 z-[45] flex items-center"
+      style={{
+        height: 'var(--shell-topbar-h)',
+        background: 'var(--shell-page-bg)',
+        transition: 'background 0.3s',
+      }}
+      aria-label="Global header"
+    >
+      {/* LEFT ZONE: width tracks sidebar for visual alignment */}
+      <div
+        className="flex items-center gap-1 flex-shrink-0 overflow-hidden"
+        style={{
+          width: collapsed
+            ? 'var(--shell-sidebar-w-collapsed)'
+            : 'var(--shell-sidebar-w)',
+          transition: 'width var(--shell-transition)',
+          paddingLeft: '16px',
+        }}
       >
-        {/* Left Section - Breadcrumbs only (sidebar toggle is now edge-based) */}
-        <div className="flex items-center min-w-0 flex-1">
-          <Breadcrumbs />
-        </div>
+        <HamburgerButton />
+        {!collapsed && <SchoolSwitcher />}
+      </div>
 
-        {/* Right Section - All header actions */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Documentation */}
-          <button
-            className="p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label="Documentation"
-          >
-            <FileText className="w-5 h-5" />
-          </button>
+      {/* CENTER ZONE: Greeting (home) or Breadcrumbs (modules) — flex:1 */}
+      <div className="flex-1 flex items-center px-4 min-w-0">
+        {isHomeV2 ? <HomeTopbarCenter /> : <Breadcrumbs />}
+      </div>
 
-          {/* Notifications */}
-          <button
-            className="relative p-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-all duration-200"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-rust-500 rounded-full ring-2 ring-[rgb(var(--surface-secondary))]" />
-          </button>
-
-          {/* User Menu */}
-          <UserMenu />
-        </div>
-      </header>
-    </>
+      {/* RIGHT ZONE: Theme pill + User avatar */}
+      <div className="flex items-center gap-[2px] flex-shrink-0 pr-4">
+        <ThemePill />
+        <UserMenu />
+      </div>
+    </header>
   )
 }

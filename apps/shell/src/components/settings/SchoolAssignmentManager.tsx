@@ -19,6 +19,7 @@ import {
 import { Button } from '@edforge/ui'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import { cn } from '@/lib/utils'
 import { apiPatch } from '@/lib/api'
 import { useLocalEducationAgencies, edOrgKeys } from '@/hooks/useEducationOrgs'
@@ -100,7 +101,7 @@ export function SchoolAssignmentManager({
       onClose()
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to assign schools')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 

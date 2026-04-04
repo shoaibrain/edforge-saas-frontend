@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#44403c"/>
+      <stop offset="100%" stop-color="#a16207"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="url(#bg)"/>
+  <!-- Globe outline -->
+  <g transform="translate(550, 100)" fill="none" stroke="white" stroke-opacity="0.12" stroke-width="1.5">
+    <circle r="50"/>
+    <ellipse rx="50" ry="20"/>
+    <ellipse rx="20" ry="50"/>
+    <line x1="-50" y1="0" x2="50" y2="0" stroke-opacity="0.08"/>
+    <path d="M-43,-25 L43,-25" stroke-opacity="0.06"/>
+    <path d="M-43,25 L43,25" stroke-opacity="0.06"/>
+  </g>
+  <!-- Compass rose -->
+  <g transform="translate(420, 70)" fill="white" fill-opacity="0.1" stroke="none">
+    <polygon points="0,-25 4,-5 0,-8 -4,-5"/>
+    <polygon points="0,25 4,5 0,8 -4,5" fill-opacity="0.06"/>
+    <polygon points="-25,0 -5,-4 -8,0 -5,4" fill-opacity="0.06"/>
+    <polygon points="25,0 5,-4 8,0 5,4" fill-opacity="0.06"/>
+    <circle cx="0" cy="0" r="2"/>
+  </g>
+  <!-- Map contour lines -->
+  <g fill="none" stroke="white" stroke-opacity="0.06" stroke-width="1">
+    <path d="M650,40 C670,35 690,45 710,40 C730,35 750,42 770,38"/>
+    <path d="M660,55 C680,50 695,58 715,53 C735,48 755,55 775,52"/>
+    <path d="M640,70 C660,65 680,72 700,68"/>
+  </g>
+  <!-- Scroll shape -->
+  <g transform="translate(700, 130)" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="1.5">
+    <path d="M-20,-25 L20,-25 C25,-25 25,-20 25,-15 L25,25 C25,30 20,30 15,28"/>
+    <path d="M-20,-25 C-25,-25 -25,-20 -25,-15 L-25,20 C-25,25 -20,25 -15,23"/>
+    <line x1="-12" y1="-15" x2="15" y2="-15" stroke-opacity="0.06"/>
+    <line x1="-12" y1="-5" x2="15" y2="-5" stroke-opacity="0.06"/>
+    <line x1="-12" y1="5" x2="15" y2="5" stroke-opacity="0.06"/>
+  </g>
+  <!-- Column/pillar -->
+  <g transform="translate(380, 135)" fill="white" fill-opacity="0.07" stroke="none">
+    <rect x="-8" y="-35" width="16" height="55" rx="1"/>
+    <rect x="-12" y="-40" width="24" height="6" rx="2"/>
+    <rect x="-12" y="20" width="24" height="6" rx="2"/>
+    <line x1="-5" y1="-30" x2="-5" y2="18" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+    <line x1="5" y1="-30" x2="5" y2="18" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+  </g>
+  <!-- Small decorative elements -->
+  <circle cx="470" cy="160" r="3" fill="white" fill-opacity="0.05"/>
+  <circle cx="650" cy="170" r="2" fill="white" fill-opacity="0.04"/>
+  <circle cx="350" cy="40" r="2" fill="white" fill-opacity="0.04"/>
+</svg>

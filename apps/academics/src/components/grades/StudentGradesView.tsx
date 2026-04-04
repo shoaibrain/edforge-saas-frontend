@@ -1,4 +1,7 @@
 /**
+ * @deprecated This component has been superseded by the OverviewTab academic dashboard
+ * which includes grade summary inline. Kept for standalone route use if needed.
+ *
  * StudentGradesView Component
  *
  * Displays a student's grades across all courses with GPA summary.
@@ -95,20 +98,20 @@ export function StudentGradesView({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center">
             <p className="text-xs text-text-tertiary mb-1">Term GPA</p>
-            <p className={`text-2xl font-bold ${getGpaBadge(gpa.termGpa).text}`}>
-              {gpa.termGpa.toFixed(2)}
+            <p className={`text-2xl font-bold ${gpa.termGpa != null ? getGpaBadge(gpa.termGpa).text : 'text-text-tertiary'}`}>
+              {gpa.termGpa != null ? gpa.termGpa.toFixed(2) : '—'}
             </p>
           </div>
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center">
             <p className="text-xs text-text-tertiary mb-1">Cumulative GPA</p>
-            <p className={`text-2xl font-bold ${getGpaBadge(gpa.cumulativeGpa).text}`}>
-              {gpa.cumulativeGpa.toFixed(2)}
+            <p className={`text-2xl font-bold ${gpa.cumulativeGpa != null ? getGpaBadge(gpa.cumulativeGpa).text : 'text-text-tertiary'}`}>
+              {gpa.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : '—'}
             </p>
           </div>
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center">
             <p className="text-xs text-text-tertiary mb-1">Weighted GPA</p>
-            <p className={`text-2xl font-bold ${getGpaBadge(gpa.weightedGpa).text}`}>
-              {gpa.weightedGpa.toFixed(2)}
+            <p className={`text-2xl font-bold ${gpa.weightedGpa != null ? getGpaBadge(gpa.weightedGpa).text : 'text-text-tertiary'}`}>
+              {gpa.weightedGpa != null ? gpa.weightedGpa.toFixed(2) : '—'}
             </p>
           </div>
         </div>
@@ -133,22 +136,26 @@ export function StudentGradesView({
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-text-tertiary" />
                     <span className="font-medium text-text-primary">
-                      {grade.studentName || grade.courseId.slice(0, 12)}
+                      {grade.courseName || grade.courseId.slice(0, 12)}
                     </span>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <span className="font-semibold text-text-primary">
-                    {grade.numericGrade.toFixed(1)}%
+                    {grade.numericGrade != null ? `${grade.numericGrade.toFixed(1)}%` : '—'}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`font-bold text-lg ${getLetterGradeColor(grade.letterGrade)}`}>
-                    {grade.letterGrade}
-                  </span>
+                  {grade.letterGrade ? (
+                    <span className={`font-bold text-lg ${getLetterGradeColor(grade.letterGrade)}`}>
+                      {grade.letterGrade}
+                    </span>
+                  ) : (
+                    <span className="text-text-tertiary">—</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-center text-text-secondary">
-                  {grade.gpaPoints.toFixed(1)}
+                  {grade.gpaPoints != null ? grade.gpaPoints.toFixed(1) : '—'}
                 </td>
                 <td className="px-4 py-3 text-center">
                   {grade.isFinal ? (

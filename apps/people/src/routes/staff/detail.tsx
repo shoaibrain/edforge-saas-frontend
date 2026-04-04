@@ -8,9 +8,9 @@
  * - Role assignment management
  */
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useParams, Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueries } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import {
@@ -20,20 +20,24 @@ import {
     School,
     Plus,
     ArrowLeft,
-    GraduationCap,
     Copy,
     Check,
     Clock,
     MapPin,
     Monitor,
+    MoreVertical,
     Smartphone,
     Tablet,
     Key,
     AlertTriangle,
     CheckCircle2,
     Activity,
+    BarChart3,
     Globe,
     Briefcase,
+    Eye,
+    EyeOff,
+    Users,
     Edit2,
     Trash2,
     Loader2,
@@ -55,13 +59,14 @@ import {
     EditAssignmentModal,
     CredentialsSection,
     EmploymentHistory,
-    SectionAssociations,
     LeaveManagement,
 } from '../../components/staff'
 import { useSchools } from '../../hooks/useSchools'
+import { apiGet } from '../../lib/api'
 import { useRemoveAssignment } from '../../hooks'
 import { getStaffAvatar } from '../../lib/avatar'
 import { formatDate, formatEmploymentType } from '../../lib/utils'
+import { useCurrentAcademicYear } from '../../hooks/useAcademicYear'
 
 // ============================================================================
 // ANIMATION VARIANTS
@@ -88,19 +93,54 @@ const fadeInUp = {
 // TYPES
 // ============================================================================
 
-type StaffTab = 'overview' | 'assignments' | 'credentials' | 'employment-history' | 'sections' | 'leave' | 'security'
+type StaffTab = 'overview' | 'profile' | 'assignments' | 'credentials' | 'employment-history' | 'leave' | 'security'
 
-const TABS: { id: StaffTab; label: string; icon: typeof User; teachingOnly?: boolean }[] = [
-    { id: 'overview', label: 'Overview', icon: User },
+interface GradeRecord {
+    gradeId: string
+    percentage?: number
+    letterGrade?: string
+}
+
+function percentageToLetter(avg: number): string {
+    if (avg >= 93) return 'A'
+    if (avg >= 90) return 'A-'
+    if (avg >= 87) return 'B+'
+    if (avg >= 83) return 'B'
+    if (avg >= 80) return 'B-'
+    if (avg >= 77) return 'C+'
+    if (avg >= 73) return 'C'
+    if (avg >= 70) return 'C-'
+    if (avg >= 67) return 'D+'
+    if (avg >= 60) return 'D'
+    return 'F'
+}
+
+interface SectionData {
+    sectionId: string
+    courseId: string
+    courseName?: string
+    courseCode?: string
+    sectionNumber: string
+    sectionName?: string
+    schoolId: string
+    primaryTeacherId: string
+    primaryTeacherName?: string
+    periodName?: string
+    locationRoomNumber?: string
+    currentEnrollment: number
+    maxEnrollment: number
+    isActive: boolean
+}
+
+const TABS: { id: StaffTab; label: string; icon: typeof User }[] = [
+    { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'profile', label: 'Profile', icon: User },
     { id: 'assignments', label: 'Assignments', icon: Briefcase },
     { id: 'credentials', label: 'Credentials', icon: Award },
     { id: 'employment-history', label: 'History', icon: History },
-    { id: 'sections', label: 'Sections', icon: BookOpen, teachingOnly: true },
     { id: 'leave', label: 'Leave', icon: CalendarDays },
     { id: 'security', label: 'Security', icon: Shield },
 ]
-
-const TEACHING_ROLES = ['teacher', 'substitute']
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -156,6 +196,48 @@ function DeviceIcon({ deviceType }: { deviceType: string }) {
         default:
             return <Monitor className="w-4 h-4" />
     }
+}
+
+function StaffActionsDropdown({ onAssignToSchool }: { onAssignToSchool: () => void }) {
+    const [open, setOpen] = useState(false)
+    const ref = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!open) return
+        const handleClickOutside = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [open])
+
+    return (
+        <div className="relative" ref={ref}>
+            <button
+                onClick={() => setOpen(!open)}
+                className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                title="Actions"
+            >
+                <MoreVertical className="w-5 h-5" />
+            </button>
+            {open && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))] rounded-lg shadow-lg z-50 py-1">
+                    <button
+                        onClick={() => {
+                            onAssignToSchool()
+                            setOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Assign to School
+                    </button>
+                </div>
+            )}
+        </div>
+    )
 }
 
 function SecurityScoreRing({ score }: { score: number }) {
@@ -223,7 +305,9 @@ function LoadingSkeleton() {
 // TAB CONTENT COMPONENTS
 // ============================================================================
 
-function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; security?: SecurityOverview; schoolMap: Map<string, string> }) {
+function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; security?: SecurityOverview; schoolMap: Map<string, string> }) {
+    const [showSensitive, setShowSensitive] = useState(false)
+    const mask = (value: string | undefined | null) => (!showSensitive && value ? '••••••••' : (value || '—'))
     const addresses = staff.addresses ?? []
     // These fields are stored by the backend but not yet on StaffResponseDto
     const staffAny = staff as Record<string, unknown>
@@ -237,8 +321,20 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
             variants={staggerChildren}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 lg:grid-cols-3 gap-5"
+            className="space-y-4"
         >
+            {/* Privacy toggle */}
+            <motion.div variants={fadeInUp} className="flex items-center justify-end">
+                <button
+                    onClick={() => setShowSensitive(!showSensitive)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                >
+                    {showSensitive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    {showSensitive ? 'Hide sensitive details' : 'Show sensitive details'}
+                </button>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* Profile Information */}
             <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-5">
                 {/* Demographics */}
@@ -277,19 +373,19 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                         {staff.birthDate && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Date of Birth</span>
-                                <p className="text-sm text-[rgb(var(--text-secondary))]">{formatDate(staff.birthDate)}</p>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{mask(formatDate(staff.birthDate))}</p>
                             </div>
                         )}
                         {staff.gender && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Gender</span>
-                                <p className="text-sm text-[rgb(var(--text-secondary))] capitalize">{staff.gender.replace('_', ' ')}</p>
+                                <p className="text-sm text-[rgb(var(--text-secondary))] capitalize">{mask(staff.gender.replace('_', ' '))}</p>
                             </div>
                         )}
                         {staff.hispanicLatinoEthnicity !== undefined && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Hispanic/Latino</span>
-                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.hispanicLatinoEthnicity ? 'Yes' : 'No'}</p>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{mask(staff.hispanicLatinoEthnicity ? 'Yes' : 'No')}</p>
                             </div>
                         )}
                         <div className="space-y-1">
@@ -322,10 +418,10 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Hire Date</span>
                             <p className="text-sm text-[rgb(var(--text-secondary))]">{formatDate(staff.hireDate)}</p>
                         </div>
-                        {staff.department && (
+                        {staff.departmentName && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Department</span>
-                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.department}</p>
+                                <p className="text-sm text-[rgb(var(--text-secondary))]">{staff.departmentName}</p>
                             </div>
                         )}
                         {staff.title && (
@@ -372,7 +468,7 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                         {staff.phone && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Phone</span>
-                                <p className="text-sm text-[rgb(var(--text-primary))]">{staff.phone}</p>
+                                <p className="text-sm text-[rgb(var(--text-primary))]">{mask(staff.phone)}</p>
                             </div>
                         )}
                     </div>
@@ -387,7 +483,7 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                             <div className="space-y-2">
                                 {telephones.map((tel, i) => (
                                     <div key={i} className="flex items-center gap-2">
-                                        <p className="text-sm text-[rgb(var(--text-secondary))]">{tel.telephoneNumber}</p>
+                                        <p className="text-sm text-[rgb(var(--text-secondary))]">{mask(tel.telephoneNumber)}</p>
                                         {tel.telephoneNumberTypeDescriptor && (
                                             <span className="px-2 py-0.5 rounded-full text-xs bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
                                                 {tel.telephoneNumberTypeDescriptor}
@@ -414,12 +510,18 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                                                 {address.addressTypeDescriptor}
                                             </span>
                                         )}
-                                        {address.streetNumberName && <p>{address.streetNumberName}</p>}
-                                        <p>
-                                            {[address.city, address.stateAbbreviationDescriptor, address.postalCode]
-                                                .filter(Boolean)
-                                                .join(', ')}
-                                        </p>
+                                        {showSensitive ? (
+                                            <>
+                                                {address.streetNumberName && <p>{address.streetNumberName}</p>}
+                                                <p>
+                                                    {[address.city, address.stateAbbreviationDescriptor, address.postalCode]
+                                                        .filter(Boolean)
+                                                        .join(', ')}
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <p>••••••••</p>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -438,7 +540,7 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                             {emergencyContacts.map((contact, i) => (
                                 <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))]">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{contact.name}</p>
+                                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{mask(contact.name)}</p>
                                         {contact.relationship && (
                                             <span className="px-2 py-0.5 rounded-full text-xs bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
                                                 {contact.relationship}
@@ -449,13 +551,13 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                                         {contact.phone && (
                                             <span className="flex items-center gap-1">
                                                 <Phone className="w-3 h-3" />
-                                                {contact.phone}
+                                                {mask(contact.phone)}
                                             </span>
                                         )}
                                         {contact.email && (
                                             <span className="flex items-center gap-1">
                                                 <Mail className="w-3 h-3" />
-                                                {contact.email}
+                                                {mask(contact.email)}
                                             </span>
                                         )}
                                     </div>
@@ -605,6 +707,308 @@ function OverviewTab({ staff, security, schoolMap }: { staff: StaffResponseDto; 
                     </div>
                 </div>
             </motion.div>
+            </div>
+        </motion.div>
+    )
+}
+
+function OverviewTab({
+    staff,
+    assignments,
+    sections,
+    sectionsLoading,
+    schoolMap,
+}: {
+    staff: StaffResponseDto
+    assignments: StaffAssignmentResponseDto[] | undefined
+    sections: SectionData[] | undefined
+    sectionsLoading: boolean
+    schoolMap: Map<string, string>
+}) {
+    const primarySchoolId = staff.primarySchoolId
+
+    // Current academic year for enrollment queries
+    const { data: currentYear } = useCurrentAcademicYear(primarySchoolId)
+
+    // Enrollment summary for staffing ratio
+    const { data: enrollmentSummary } = useQuery<{ totalEnrolled: number } | null>({
+        queryKey: ['enrollment-summary', primarySchoolId, currentYear?.yearId],
+        queryFn: async () => {
+            try {
+                return await apiGet<{ totalEnrolled: number }>(
+                    `/academics/schools/${primarySchoolId}/years/${currentYear!.yearId}/enrollments/summary`,
+                )
+            } catch {
+                return null
+            }
+        },
+        enabled: !!primarySchoolId && !!currentYear?.yearId,
+        staleTime: 5 * 60 * 1000,
+        retry: false,
+    })
+
+    // Staff count at primary school for staffing ratio
+    const { data: staffAtSchool } = useQuery<number>({
+        queryKey: ['staff-count', primarySchoolId],
+        queryFn: async () => {
+            try {
+                const result = await apiGet<{ items: unknown[] }>('/staff', { schoolId: primarySchoolId, limit: 100 })
+                return result.items?.length ?? 0
+            } catch {
+                return 0
+            }
+        },
+        enabled: !!primarySchoolId,
+        staleTime: 5 * 60 * 1000,
+        retry: false,
+    })
+
+    // Grade queries for each section (parallel)
+    const sectionIds = sections?.map(s => s.sectionId) ?? []
+    const gradeQueries = useQueries({
+        queries: sectionIds.map(sectionId => {
+            const section = sections!.find(s => s.sectionId === sectionId)!
+            return {
+                queryKey: ['grades', 'section', sectionId, section.schoolId],
+                queryFn: async () => {
+                    try {
+                        return await apiGet<GradeRecord[]>(
+                            `/academics/grades/section/${sectionId}`,
+                            { schoolId: section.schoolId },
+                        )
+                    } catch {
+                        return [] as GradeRecord[]
+                    }
+                },
+                staleTime: 5 * 60 * 1000,
+                retry: false,
+            }
+        }),
+    })
+
+    // Compute section-level grade averages
+    const sectionGradeMap = new Map<string, { avg: number; letter: string } | null>()
+    sectionIds.forEach((sectionId, i) => {
+        const grades = gradeQueries[i]?.data
+        if (!grades || grades.length === 0) {
+            sectionGradeMap.set(sectionId, null)
+            return
+        }
+        const withPercentage = grades.filter(g => typeof g.percentage === 'number')
+        if (withPercentage.length === 0) {
+            sectionGradeMap.set(sectionId, null)
+            return
+        }
+        const avg = withPercentage.reduce((s, g) => s + g.percentage!, 0) / withPercentage.length
+        sectionGradeMap.set(sectionId, { avg: Math.round(avg), letter: percentageToLetter(avg) })
+    })
+
+    // Overall stats
+    const totalSections = sections?.length ?? 0
+    const totalStudents = sections?.reduce((sum, s) => sum + (s.currentEnrollment ?? 0), 0) ?? 0
+    const totalCapacity = sections?.reduce((sum, s) => sum + (s.maxEnrollment ?? 0), 0) ?? 0
+    const capacityPercent = totalCapacity > 0 ? Math.round((totalStudents / totalCapacity) * 100) : 0
+
+    // Overall average grade across all sections
+    const allAvgs = [...sectionGradeMap.values()].filter(v => v !== null).map(v => v!.avg)
+    const overallAvg = allAvgs.length > 0 ? Math.round(allAvgs.reduce((s, a) => s + a, 0) / allAvgs.length) : null
+    const overallLetter = overallAvg !== null ? percentageToLetter(overallAvg) : null
+
+    // Staffing ratio
+    const staffCount = staffAtSchool ?? 0
+    const studentCount = enrollmentSummary?.totalEnrolled ?? 0
+    const staffingRatio = staffCount > 0 ? Math.round(studentCount / staffCount) : null
+
+    // Active assignments
+    const activeAssignments = assignments?.filter(a => !a.endDate || new Date(a.endDate) >= new Date()) ?? []
+
+    const isTeachingStaff = totalSections > 0
+
+    return (
+        <motion.div
+            variants={staggerChildren}
+            initial="hidden"
+            animate="visible"
+            className="space-y-6"
+        >
+            {/* Stat Cards */}
+            <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Sections</p>
+                    <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
+                        {sectionsLoading ? '—' : totalSections}
+                    </p>
+                </div>
+                <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Students</p>
+                    <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
+                        {sectionsLoading ? '—' : totalStudents}
+                    </p>
+                </div>
+                <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Capacity</p>
+                    <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
+                        {sectionsLoading ? '—' : `${capacityPercent}%`}
+                    </p>
+                </div>
+                <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Avg Grade</p>
+                    <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
+                        {overallLetter ? `${overallLetter} (${overallAvg})` : '—'}
+                    </p>
+                </div>
+            </motion.div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column: Assignments + Section Performance */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* School Assignments */}
+                    <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                        <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Briefcase className="w-3.5 h-3.5" />
+                            School Assignments
+                        </h3>
+                        {activeAssignments.length === 0 ? (
+                            <p className="text-sm text-[rgb(var(--text-tertiary))]">No active assignments</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {activeAssignments.map(a => (
+                                    <div key={a.assignmentId} className="flex items-center justify-between p-2.5 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
+                                                {schoolMap.get(a.schoolId) || a.schoolName || 'Unknown School'}
+                                            </p>
+                                            <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                                                {getRoleLabel(a.role)}
+                                                {typeof a.fullTimeEquivalency === 'number' && ` · FTE ${a.fullTimeEquivalency.toFixed(2)}`}
+                                                {a.beginDate && ` · ${formatDate(a.beginDate)}`}
+                                            </p>
+                                        </div>
+                                        {a.isPrimary && (
+                                            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-600 dark:text-teal-400 flex-shrink-0">
+                                                Primary
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+
+                    {/* Section Performance Table */}
+                    {isTeachingStaff && (
+                        <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))]">
+                            <div className="p-5 pb-3">
+                                <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider flex items-center gap-2">
+                                    <BookOpen className="w-3.5 h-3.5" />
+                                    Section Performance
+                                </h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="bg-[rgb(var(--surface-tertiary))]">
+                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
+                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
+                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Avg Grade</th>
+                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Att %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
+                                        {sectionsLoading ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-5 py-6 text-center">
+                                                    <Loader2 className="w-5 h-5 animate-spin mx-auto text-[rgb(var(--text-tertiary))]" />
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            sections?.map(section => {
+                                                const gradeInfo = sectionGradeMap.get(section.sectionId)
+                                                return (
+                                                    <tr key={section.sectionId} className="bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
+                                                        <td className="px-5 py-3">
+                                                            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                                                                {section.courseName || '—'}
+                                                            </p>
+                                                            {section.courseCode && (
+                                                                <p className="text-[11px] text-[rgb(var(--text-tertiary))]">{section.courseCode}</p>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-5 py-3 text-sm text-[rgb(var(--text-secondary))]">
+                                                            {section.currentEnrollment} / {section.maxEnrollment}
+                                                        </td>
+                                                        <td className="px-5 py-3 text-sm">
+                                                            {gradeInfo ? (
+                                                                <span className="font-medium text-[rgb(var(--text-primary))]">
+                                                                    {gradeInfo.letter} ({gradeInfo.avg})
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-[rgb(var(--text-tertiary))]">—</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-5 py-3 text-sm text-[rgb(var(--text-tertiary))]">
+                                                            —
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Non-teaching fallback */}
+                    {!isTeachingStaff && !sectionsLoading && (
+                        <motion.div variants={fadeInUp} className="text-center py-12 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+                            <BookOpen className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
+                            <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">No Teaching Sections</h4>
+                            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-xs mx-auto">
+                                This staff member is not assigned as a teacher to any sections.
+                            </p>
+                        </motion.div>
+                    )}
+                </div>
+
+                {/* Right Column: Staffing Ratio */}
+                <div className="space-y-6">
+                    <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
+                        <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <Users className="w-3.5 h-3.5" />
+                            Staffing Ratio
+                        </h3>
+                        {primarySchoolId ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-[rgb(var(--text-secondary))]">Staff</span>
+                                    <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{staffCount || '—'}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-[rgb(var(--text-secondary))]">Students</span>
+                                    <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{studentCount || '—'}</span>
+                                </div>
+                                <div className="pt-3 border-t border-[rgb(var(--border-secondary))]">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">Ratio</span>
+                                        <span className="text-lg font-bold text-[rgb(var(--text-primary))]">
+                                            {staffingRatio !== null ? `1:${staffingRatio}` : '—'}
+                                        </span>
+                                    </div>
+                                </div>
+                                {schoolMap.get(primarySchoolId) && (
+                                    <p className="text-xs text-[rgb(var(--text-tertiary))] pt-2">
+                                        At {schoolMap.get(primarySchoolId)}
+                                    </p>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-[rgb(var(--text-tertiary))]">No primary school assigned</p>
+                        )}
+                    </motion.div>
+                </div>
+            </div>
         </motion.div>
     )
 }
@@ -614,13 +1018,15 @@ function AssignmentsTab({
     isLoading,
     staffId,
     schoolMap,
-    onOpenAssignModal,
+    sections,
+    sectionsLoading,
 }: {
     assignments: StaffAssignmentResponseDto[] | undefined
     isLoading: boolean
     staffId: string
     schoolMap: Map<string, string>
-    onOpenAssignModal: () => void
+    sections: SectionData[] | undefined
+    sectionsLoading: boolean
 }) {
     const removeAssignment = useRemoveAssignment()
     const [removingId, setRemovingId] = useState<string | null>(null)
@@ -653,44 +1059,32 @@ function AssignmentsTab({
             variants={staggerChildren}
             initial="hidden"
             animate="visible"
-            className="space-y-6"
+            className="space-y-4"
         >
-            {/* Header */}
-            <motion.div variants={fadeInUp} className="flex items-center justify-between">
-                <div>
-                    <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">School Assignments</h3>
-                    <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                        Manage role assignments across different schools
-                    </p>
-                </div>
-                <button
-                    onClick={onOpenAssignModal}
-                    className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Assign to School
-                </button>
+            {/* Section Label */}
+            <motion.div variants={fadeInUp}>
+                <h3 className="text-sm font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">School Assignments</h3>
             </motion.div>
 
             {/* FTE Indicator */}
             {hasAssignments && activeAssignments.some(a => typeof a.fullTimeEquivalency === 'number') && (
-                <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))] p-4">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Total FTE</span>
-                        <span className={`text-sm font-bold ${totalFTE > 1 ? 'text-red-600 dark:text-red-400' : 'text-[rgb(var(--text-primary))]'}`}>
+                <motion.div variants={fadeInUp} className="rounded-lg border border-[rgb(var(--border-secondary))] p-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Total FTE</span>
+                        <span className={`text-xs font-bold ${totalFTE > 1 ? 'text-red-600 dark:text-red-400' : 'text-[rgb(var(--text-primary))]'}`}>
                             {totalFTE.toFixed(2)}
                         </span>
                     </div>
-                    <div className="w-full bg-[rgb(var(--surface-tertiary))] rounded-full h-2">
+                    <div className="w-full bg-[rgb(var(--surface-tertiary))] rounded-full h-1.5">
                         <div
-                            className={`h-2 rounded-full transition-all ${totalFTE > 1 ? 'bg-red-500' : totalFTE > 0.8 ? 'bg-amber-500' : 'bg-teal-500'}`}
+                            className={`h-1.5 rounded-full transition-all ${totalFTE > 1 ? 'bg-red-500' : totalFTE > 0.8 ? 'bg-amber-500' : 'bg-teal-500'}`}
                             style={{ width: `${Math.min(totalFTE * 100, 100)}%` }}
                         />
                     </div>
                     {totalFTE > 1 && (
-                        <p className="text-xs text-red-600 dark:text-red-400 mt-1.5 flex items-center gap-1">
+                        <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3" />
-                            Overcommitted — total FTE exceeds 1.0
+                            Overcommitted — exceeds 1.0
                         </p>
                     )}
                 </motion.div>
@@ -699,21 +1093,21 @@ function AssignmentsTab({
             {/* Assignments List */}
             <motion.div variants={fadeInUp}>
                 {isLoading ? (
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                         {[1, 2].map((i) => (
-                            <div key={i} className="animate-pulse h-24 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+                            <div key={i} className="animate-pulse h-14 bg-[rgb(var(--surface-secondary))] rounded-lg" />
                         ))}
                     </div>
                 ) : !hasAssignments ? (
-                    <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
-                        <School className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
-                        <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Active Assignments</h4>
-                        <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
-                            This staff member is not currently assigned to any schools. Click &quot;Assign to School&quot; to add one.
+                    <div className="text-center py-12 bg-[rgb(var(--surface-secondary))] rounded-lg border-2 border-dashed border-[rgb(var(--border-secondary))]">
+                        <School className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
+                        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">No Assignments</h4>
+                        <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-xs mx-auto">
+                            Use the actions menu to assign this staff member to a school.
                         </p>
                     </div>
                 ) : (
-                    <div className="grid gap-4">
+                    <div className="grid gap-2">
                         {assignments.map((assignment) => {
                             const schoolName = schoolMap.get(assignment.schoolId) || assignment.schoolName || 'Unknown School'
                             const hasEnded = assignment.endDate && new Date(assignment.endDate) < new Date()
@@ -723,77 +1117,64 @@ function AssignmentsTab({
                                 <motion.div
                                     key={assignment.assignmentId}
                                     variants={fadeInUp}
-                                    className="flex items-center justify-between p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
+                                    className="flex items-center justify-between p-3 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                                            <School className="w-6 h-6" />
-                                        </div>
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="font-semibold text-[rgb(var(--text-primary))]">
-                                                    {schoolName}
-                                                </h4>
-                                                {hasEnded && (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
-                                                        Ended
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-2 mt-2 flex-wrap">
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-secondary))]">
-                                                    <GraduationCap className="w-3.5 h-3.5" />
-                                                    {getRoleLabel(assignment.role)}
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">
+                                                {schoolName}
+                                            </h4>
+                                            {hasEnded && (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400 flex-shrink-0">
+                                                    Ended
                                                 </span>
-                                                {assignment.department && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
-                                                        {assignment.department}
-                                                    </span>
-                                                )}
-                                                {assignment.isPrimary && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                                                        Primary
-                                                    </span>
-                                                )}
-                                                {typeof assignment.fullTimeEquivalency === 'number' && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                                                        FTE: {assignment.fullTimeEquivalency.toFixed(2)}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-4 mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
-                                                {assignment.positionTitle && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Briefcase className="w-3 h-3" />
-                                                        {assignment.positionTitle}
-                                                    </span>
-                                                )}
-                                                <span>Since {formatDate(assignment.beginDate)}</span>
-                                                {assignment.endDate && (
-                                                    <span>Ended {formatDate(assignment.endDate)}</span>
-                                                )}
-                                            </div>
+                                            )}
+                                            {assignment.isPrimary && (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400 flex-shrink-0">
+                                                    Primary
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap text-xs text-[rgb(var(--text-tertiary))]">
+                                            <span className="font-medium text-[rgb(var(--text-secondary))]">{getRoleLabel(assignment.role)}</span>
+                                            {assignment.departmentName && (
+                                                <>
+                                                    <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
+                                                    <span>{assignment.departmentName}</span>
+                                                </>
+                                            )}
+                                            {typeof assignment.fullTimeEquivalency === 'number' && (
+                                                <>
+                                                    <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
+                                                    <span className="text-blue-600 dark:text-blue-400">FTE {assignment.fullTimeEquivalency.toFixed(2)}</span>
+                                                </>
+                                            )}
+                                            <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
+                                            <span>
+                                                {formatDate(assignment.beginDate)}
+                                                {assignment.endDate && ` \u2013 ${formatDate(assignment.endDate)}`}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3">
                                         <button
                                             onClick={() => setEditingAssignment(assignment)}
-                                            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                                            title="Edit assignment"
+                                            className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                                            title="Edit"
                                             disabled={isRemoving}
                                         >
-                                            <Edit2 className="w-4 h-4" />
+                                            <Edit2 className="w-3.5 h-3.5" />
                                         </button>
                                         <button
                                             onClick={() => handleRemoveAssignment(assignment.assignmentId)}
-                                            className="p-2 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
-                                            title="Remove assignment"
+                                            className="p-1.5 rounded-md hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                                            title="Remove"
                                             disabled={isRemoving}
                                         >
                                             {isRemoving ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                             ) : (
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-3.5 h-3.5" />
                                             )}
                                         </button>
                                     </div>
@@ -811,6 +1192,93 @@ function AssignmentsTab({
                 staffId={staffId}
                 assignment={editingAssignment}
             />
+
+            {/* Teaching Sections */}
+            {sectionsLoading ? (
+                <motion.div variants={fadeInUp} className="mt-6">
+                    <div className="space-y-2">
+                        {[1, 2].map((i) => (
+                            <div key={i} className="animate-pulse h-10 bg-[rgb(var(--surface-secondary))] rounded-lg" />
+                        ))}
+                    </div>
+                </motion.div>
+            ) : sections && sections.length > 0 ? (
+                <motion.div variants={fadeInUp} className="mt-6 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Teaching Sections</h3>
+                        <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))]">
+                            <span><strong className="text-[rgb(var(--text-primary))] font-semibold">{sections.length}</strong> sections</span>
+                            <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
+                            <span><strong className="text-[rgb(var(--text-primary))] font-semibold">{sections.reduce((sum, s) => sum + (s.currentEnrollment ?? 0), 0)}</strong> students</span>
+                        </div>
+                    </div>
+
+                    {/* Sections grouped by school */}
+                    {Object.entries(
+                        sections.reduce<Record<string, SectionData[]>>((acc, section) => {
+                            const key = schoolMap.get(section.schoolId) || section.schoolId || 'Unknown School'
+                            if (!acc[key]) acc[key] = []
+                            acc[key].push(section)
+                            return acc
+                        }, {})
+                    ).map(([schoolName, schoolSections]) => (
+                        <div key={schoolName}>
+                            <h4 className="text-xs font-medium text-[rgb(var(--text-tertiary))] mb-2 flex items-center gap-1.5">
+                                <BookOpen className="w-3.5 h-3.5" />
+                                {schoolName}
+                                <span className="font-normal">({schoolSections.length})</span>
+                            </h4>
+                            <div className="overflow-hidden rounded-lg border border-[rgb(var(--border-secondary))]">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="bg-[rgb(var(--surface-tertiary))]">
+                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
+                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
+                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
+                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Room</th>
+                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
+                                        {schoolSections.map((section) => (
+                                            <tr
+                                                key={section.sectionId}
+                                                className="bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+                                            >
+                                                <td className="px-3 py-2">
+                                                    <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
+                                                        {section.courseName || '\u2014'}
+                                                    </p>
+                                                    {section.courseCode && (
+                                                        <p className="text-[11px] text-[rgb(var(--text-tertiary))]">{section.courseCode}</p>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-2">
+                                                    <p className="text-sm text-[rgb(var(--text-secondary))]">
+                                                        {section.sectionName || section.sectionNumber}
+                                                    </p>
+                                                    {section.sectionName && (
+                                                        <p className="text-[11px] text-[rgb(var(--text-tertiary))]">#{section.sectionNumber}</p>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-2 text-sm text-[rgb(var(--text-secondary))]">
+                                                    {section.periodName || '\u2014'}
+                                                </td>
+                                                <td className="px-3 py-2 text-sm text-[rgb(var(--text-secondary))]">
+                                                    {section.locationRoomNumber || '\u2014'}
+                                                </td>
+                                                <td className="px-3 py-2 text-sm text-[rgb(var(--text-secondary))]">
+                                                    {section.currentEnrollment} / {section.maxEnrollment}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ))}
+                </motion.div>
+            ) : null}
         </motion.div>
     )
 }
@@ -1022,6 +1490,26 @@ export default function StaffDetailPage() {
         queryFn: () => staffService.getStaffAssignments(staffId),
     })
 
+    // Fetch Teaching Sections — lazy-loaded when Assignments tab is active
+    const { data: sections, isLoading: isLoadingSections } = useQuery<SectionData[]>({
+        queryKey: ['sections', 'teacher', staffId],
+        queryFn: async () => {
+            try {
+                const response = await apiGet<{ items: SectionData[] } | SectionData[]>(
+                    '/academics/sections',
+                    { teacherId: staffId },
+                )
+                if (Array.isArray(response)) return response
+                return response.items ?? []
+            } catch {
+                return []
+            }
+        },
+        enabled: !!staffId && (activeTab === 'overview' || activeTab === 'assignments'),
+        staleTime: 60_000,
+        retry: false,
+    })
+
     // Fetch Security — only if staff has a linked user account
     const { data: security, isLoading: isLoadingSecurity } = useQuery({
         queryKey: ['user', staff?.userId, 'security'],
@@ -1073,30 +1561,23 @@ export default function StaffDetailPage() {
                 {/* Header Section */}
                 <div className="space-y-0">
                     {/* Profile Info */}
-                    <div className="flex items-start gap-5 pb-6">
-                        <Link
-                            to="/staff"
-                            className="p-2 -ml-2 mt-1 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </Link>
-
+                    <div className="flex items-start gap-4 pb-6">
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
                             <img
                                 src={avatarUrl}
                                 alt={displayName}
-                                className="w-16 h-16 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+                                className="w-14 h-14 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
                             />
-                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[rgb(var(--surface-primary))] ${statusDotColor}`} />
+                            <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--surface-primary))] ${statusDotColor}`} />
                         </div>
 
                         {/* Name & Meta */}
-                        <div className="min-w-0">
-                            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] tracking-tight">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-xl font-bold text-[rgb(var(--text-primary))] tracking-tight">
                                 {displayName}
                             </h1>
-                            <div className="flex flex-wrap items-center gap-3 mt-1.5 text-sm">
+                            <div className="flex flex-wrap items-center gap-2.5 mt-1 text-sm">
                                 <span className="text-[rgb(var(--text-tertiary))] truncate">{staff.email}</span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
                                 <span className="font-medium text-teal-600 dark:text-teal-400">
@@ -1106,6 +1587,9 @@ export default function StaffDetailPage() {
                                 <StaffStatusBadge status={staff.employmentStatus} />
                             </div>
                         </div>
+
+                        {/* Actions Menu */}
+                        <StaffActionsDropdown onAssignToSchool={() => setIsAssignModalOpen(true)} />
                     </div>
 
                     {/* Tabs — left-aligned */}
@@ -1115,8 +1599,6 @@ export default function StaffDetailPage() {
                             const Icon = tab.icon
                             // Hide security tab if staff has no linked user
                             if (tab.id === 'security' && !staff.userId) return null
-                            // Hide sections tab for non-teaching roles
-                            if (tab.teachingOnly && !TEACHING_ROLES.includes(staff.role)) return null
                             return (
                                 <button
                                     key={tab.id}
@@ -1160,7 +1642,16 @@ export default function StaffDetailPage() {
                             transition={{ duration: 0.25, ease: 'easeOut' }}
                         >
                             {activeTab === 'overview' && (
-                                <OverviewTab staff={staff} security={security} schoolMap={schoolMap} />
+                                <OverviewTab
+                                    staff={staff}
+                                    assignments={assignments}
+                                    sections={sections}
+                                    sectionsLoading={isLoadingSections}
+                                    schoolMap={schoolMap}
+                                />
+                            )}
+                            {activeTab === 'profile' && (
+                                <ProfileTab staff={staff} security={security} schoolMap={schoolMap} />
                             )}
                             {activeTab === 'assignments' && (
                                 <AssignmentsTab
@@ -1168,7 +1659,8 @@ export default function StaffDetailPage() {
                                     isLoading={isLoadingAssignments}
                                     staffId={staffId}
                                     schoolMap={schoolMap}
-                                    onOpenAssignModal={() => setIsAssignModalOpen(true)}
+                                    sections={sections}
+                                    sectionsLoading={isLoadingSections}
                                 />
                             )}
                             {activeTab === 'credentials' && (
@@ -1176,9 +1668,6 @@ export default function StaffDetailPage() {
                             )}
                             {activeTab === 'employment-history' && (
                                 <EmploymentHistory staffId={staffId} currentStatus={staff.employmentStatus} />
-                            )}
-                            {activeTab === 'sections' && TEACHING_ROLES.includes(staff.role) && (
-                                <SectionAssociations staffId={staffId} staffRole={staff.role} />
                             )}
                             {activeTab === 'leave' && (
                                 <LeaveManagement staffId={staffId} staffName={displayName} />

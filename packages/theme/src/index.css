@@ -12,3 +12,6 @@
 @import './components.css';
 @import './utilities.css';
 
+/* V2 animation classes (skeleton pulse, bar fill) */
+@import './v2-animations.css';
+

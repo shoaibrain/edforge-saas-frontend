@@ -7,26 +7,32 @@
 // Account
 export { default as AccountPage } from './account'
 export { default as SecurityPage } from './security'
-export { default as NotificationsPage } from './notifications'
+// [MVP-PARKED] export { default as NotificationsPage } from './notifications'  // merged into PreferencesPage
 export { default as PreferencesPage } from './preferences'
 
 // Workspace
 export { default as WorkspaceSettingsPage } from './workspace'
-export { default as SchoolsSettingsPage } from './schools'
 export { default as SchoolDetailPage } from './school-detail'
-export { default as SchoolConfigurationPage } from './school-configuration'
-export { default as SchoolDepartmentsPage } from './school-departments'
-export { default as SchoolAcademicYearsPage } from './school-academic-years'
+export { default as SchoolCreatePage } from './school-create'
+// [V2-REPLACED] Tab components now live in ./tabs/ and are imported by school-detail.tsx directly
+// export { default as SchoolConfigurationPage } from './school-configuration'
+// export { default as SchoolDepartmentsPage } from './school-departments'
+// export { default as SchoolAcademicYearsPage } from './school-academic-years'
 export { default as RBACSecurityPage } from './rbac-security'
 
 // Organization
 export { default as OrganizationSettingsPage } from './organization'
 export { default as EducationOrgDetailPage } from './education-org-detail'
-export { default as EdFiExportPreviewPage } from './edfi-export-preview'
+// [MVP-PARKED] export { default as EdFiExportPreviewPage } from './edfi-export-preview'
+
+// Finance Configuration moved to Finance MFE (/finance/configuration/*)
+
+// Debug
+export { default as AuthDebugPage } from './auth-debug'
 
 // Other
-export { default as IntegrationsSettingsPage } from './integrations'
-export { default as BillingSettingsPage } from './billing'
+// [MVP-PARKED] export { default as IntegrationsSettingsPage } from './integrations'
+// [MVP-PARKED] export { default as BillingSettingsPage } from './billing'
 export { default as PeopleSettingsPage } from './people'
-export { default as DangerZonePage } from './danger'
+// [MVP-PARKED] export { default as DangerZonePage } from './danger'
 

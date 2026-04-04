@@ -1,367 +1,340 @@
 /**
- * HR Administration Module
+ * HR Administration Module — V2
  *
- * Unified human resources interface for the People domain.
- * This consolidated view brings together sensitive HR functionality:
- * - Compensation: Payroll processing and contract management
- * - Development: Professional development and certifications
- * - Performance: Employee reviews and goal tracking
- *
- * Design Philosophy:
- * HR data is sensitive and requires careful access control.
- * This consolidated view groups related functions while
- * maintaining clear separation for audit compliance.
+ * Purposeful empty state with feature preview, notification toast,
+ * and redirect to Staff Directory. Matches HR Admin V2 prototype exactly.
  */
 
 import { useState } from 'react'
-import {
-  BriefcaseBusiness,
-  DollarSign,
-  FileText,
-  GraduationCap,
-  Award,
-  Calendar,
-  Users,
-  TrendingUp,
-  Settings,
-  Shield,
-  Clock,
-  Target,
-} from 'lucide-react'
-
-type HRTab = 'compensation' | 'development' | 'performance'
+import { Briefcase, Bell, Check, DollarSign, FileText, BookOpen, ChevronRight } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 
 export function HRAdminModule() {
-  const [activeTab, setActiveTab] = useState<HRTab>('compensation')
+  const navigate = useNavigate()
+  const [notified, setNotified] = useState(false)
 
-  const tabs = [
-    {
-      id: 'compensation' as const,
-      label: 'Compensation',
-      icon: DollarSign,
-      description: 'Payroll and contracts',
-    },
-    {
-      id: 'development' as const,
-      label: 'Development',
-      icon: GraduationCap,
-      description: 'Training and certifications',
-    },
-    {
-      id: 'performance' as const,
-      label: 'Performance',
-      icon: TrendingUp,
-      description: 'Reviews and goals',
-    },
-  ]
+  const handleNotify = () => {
+    setNotified(true)
+    toast.success("You'll be notified when HR features are available.")
+  }
 
   return (
-    <div className="min-h-full">
-      {/* Page Header */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-              <BriefcaseBusiness className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+    <div data-v2 style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+      {/* PAGE HEADER */}
+      <div style={{ padding: '24px 28px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                background: 'rgba(127,119,221,0.10)',
+                borderRadius: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Briefcase style={{ width: 16, height: 16, color: '#7F77DD' }} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-text-primary">
-                HR Administration
-              </h1>
-              <p className="text-text-secondary mt-1">
-                Manage compensation, professional development, and performance evaluations
-              </p>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                <h1
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 600,
+                    letterSpacing: '-0.3px',
+                    color: 'var(--v2-text-primary, #e8eaf0)',
+                    margin: 0,
+                  }}
+                >
+                  HR Administration
+                </h1>
+                <div style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.10)', alignSelf: 'center' }} />
+                <span style={{ fontSize: 12, color: 'var(--v2-text-muted, #7a8099)' }}>
+                  {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+              </div>
             </div>
           </div>
-
-          {/* Security Notice */}
-          <div className="mt-4 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg w-fit">
-            <Shield className="w-3.5 h-3.5" />
-            <span>Sensitive HR data. Access logged for compliance.</span>
-          </div>
         </div>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="px-6">
-          <nav className="flex gap-1" aria-label="HR tabs">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-t-lg
-                  transition-colors duration-150
-                  ${
-                    activeTab === tab.id
-                      ? 'bg-surface-primary text-text-primary border-t border-x border-border-secondary -mb-px'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
-                  }
-                `}
+      {/* CONTEXT BANNER */}
+      <p style={{ fontSize: 11, color: 'var(--v2-text-muted, #7a8099)', padding: '0 28px 24px', margin: 0 }}>
+        Full HR capabilities — <em style={{ fontStyle: 'normal', fontWeight: 500, color: '#7F77DD' }}>payroll, reviews, contracts</em> — are planned for EdForge v2.0.
+      </p>
+
+      {/* DIVIDER */}
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '0 28px' }} />
+
+      {/* MAIN EMPTY STATE */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '48px 28px',
+        }}
+      >
+        <div style={{ maxWidth: 440, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          {/* ICON with version badge */}
+          <div style={{ position: 'relative', marginBottom: 20 }}>
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                background: 'rgba(127,119,221,0.12)',
+                borderRadius: 16,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px solid rgba(127,119,221,0.15)',
+              }}
+            >
+              <Briefcase style={{ width: 28, height: 28, color: '#7F77DD', strokeWidth: 1.5 }} />
+            </div>
+            <span
+              style={{
+                position: 'absolute',
+                bottom: -8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                fontSize: 9,
+                fontWeight: 600,
+                padding: '2px 7px',
+                borderRadius: 10,
+                background: 'rgba(239,159,39,0.15)',
+                border: '1px solid rgba(239,159,39,0.25)',
+                color: '#EF9F27',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Check style={{ width: 7, height: 7 }} />
+              v2.0
+            </span>
+          </div>
+
+          <h2
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              color: 'var(--v2-text-primary, #e8eaf0)',
+              marginBottom: 10,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            HR administration is coming in EdForge v2.0
+          </h2>
+
+          <p
+            style={{
+              fontSize: 12,
+              color: 'var(--v2-text-muted, #7a8099)',
+              lineHeight: 1.7,
+              maxWidth: 360,
+              marginBottom: 20,
+            }}
+          >
+            Full HR capabilities are being built for the next major release. In the meantime, you can{' '}
+            <strong style={{ color: 'var(--v2-text-secondary, #c8ccd8)', fontWeight: 500 }}>
+              manage staff profiles, roles, and system access
+            </strong>{' '}
+            from the Staff Directory.
+          </p>
+
+          {/* NOTIFY BUTTON */}
+          <button
+            type="button"
+            onClick={notified ? undefined : handleNotify}
+            style={{
+              height: 34,
+              background: notified ? 'rgba(29,158,117,0.08)' : 'rgba(255,255,255,0.05)',
+              border: `1px solid ${notified ? 'rgba(29,158,117,0.20)' : 'rgba(255,255,255,0.09)'}`,
+              borderRadius: 7,
+              padding: '0 14px',
+              fontSize: 12,
+              fontWeight: 500,
+              color: notified ? '#1D9E75' : '#9aa0b8',
+              cursor: notified ? 'default' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              transition: 'all 0.12s',
+            }}
+          >
+            {notified ? (
+              <>
+                <Check style={{ width: 13, height: 13 }} />
+                Notification set
+              </>
+            ) : (
+              <>
+                <Bell style={{ width: 13, height: 13 }} />
+                Notify me when available
+              </>
+            )}
+          </button>
+
+          {/* FEATURE PREVIEW */}
+          <div style={{ width: '100%', maxWidth: 680, margin: '0 auto' }}>
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '28px 0 20px' }} />
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.6px',
+                color: 'var(--v2-text-ghost, #2a3045)',
+                textAlign: 'center',
+                marginBottom: 14,
+              }}
+            >
+              What's included in v2.0
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+              <FeatureCard
+                icon={<DollarSign style={{ width: 13, height: 13, color: '#1D9E75', strokeWidth: 2 }} />}
+                iconBg="rgba(29,158,117,0.10)"
+                title="Payroll & Contracts"
+                description="Manage compensation, salary, and employment contracts in one place."
+              />
+              <FeatureCard
+                icon={<FileText style={{ width: 13, height: 13, color: '#378ADD', strokeWidth: 2 }} />}
+                iconBg="rgba(55,138,221,0.10)"
+                title="Performance Reviews"
+                description="Structured review cycles, goal tracking, and performance history."
+              />
+              <FeatureCard
+                icon={<BookOpen style={{ width: 13, height: 13, color: '#7F77DD', strokeWidth: 2 }} />}
+                iconBg="rgba(127,119,221,0.10)"
+                title="Professional Dev"
+                description="Certifications, training logs, and professional development tracking."
+              />
+            </div>
+
+            {/* REDIRECT SECTION */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '28px 0 20px' }} />
+            <div style={{ textAlign: 'center' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: 'var(--v2-text-secondary, #c8ccd8)',
+                  marginBottom: 6,
+                }}
               >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
+                What you can do right now
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--v2-text-muted, #7a8099)',
+                  marginBottom: 10,
+                }}
+              >
+                View staff profiles, assign roles, and manage system access.
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate({ to: '/staff' as string })}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: '#D85A30',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                Go to Staff Directory
+                <ChevronRight style={{ width: 11, height: 11 }} />
               </button>
-            ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* Tab Content */}
-      <div className="p-6">
-        {activeTab === 'compensation' && <CompensationContent />}
-        {activeTab === 'development' && <DevelopmentContent />}
-        {activeTab === 'performance' && <PerformanceContent />}
-      </div>
-    </div>
-  )
-}
-
-function CompensationContent() {
-  return (
-    <div className="space-y-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={Users}
-          label="Active Employees"
-          value="156"
-          accent="text-blue-600 dark:text-blue-400"
-          bg="bg-blue-500/10"
-        />
-        <StatCard
-          icon={DollarSign}
-          label="Monthly Payroll"
-          value="$487K"
-          accent="text-emerald-600 dark:text-emerald-400"
-          bg="bg-emerald-500/10"
-        />
-        <StatCard
-          icon={FileText}
-          label="Active Contracts"
-          value="142"
-          accent="text-purple-600 dark:text-purple-400"
-          bg="bg-purple-500/10"
-        />
-        <StatCard
-          icon={Calendar}
-          label="Next Payroll"
-          value="Jan 15"
-          accent="text-amber-600 dark:text-amber-400"
-          bg="bg-amber-500/10"
-        />
-      </div>
-
-      {/* Product Description Card */}
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-emerald-500/10">
-            <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-text-primary mb-2">
-              Payroll & Contracts
-            </h3>
-            <p className="text-text-secondary leading-relaxed mb-4">
-              Process payroll, manage employment contracts, and track compensation changes.
-              Supports multiple pay schedules, tax withholding calculations, and direct deposit.
-              All payroll data syncs with the Finance module's general ledger.
-            </p>
-            <div className="flex items-center gap-2 text-sm text-text-tertiary">
-              <Settings className="w-4 h-4" />
-              <span>Configure pay schedules and tax tables in System Admin → Schools</span>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Placeholder */}
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
-        <DollarSign className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">
-          Payroll Dashboard
-        </h4>
-        <p className="text-text-secondary max-w-md mx-auto">
-          View upcoming payroll runs, pending approvals, and compensation changes.
-          Click "Run Payroll" to process the next pay period.
-        </p>
-      </div>
     </div>
   )
 }
 
-function DevelopmentContent() {
-  return (
-    <div className="space-y-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={GraduationCap}
-          label="Training Courses"
-          value="24"
-          accent="text-blue-600 dark:text-blue-400"
-          bg="bg-blue-500/10"
-        />
-        <StatCard
-          icon={Award}
-          label="Certifications"
-          value="312"
-          accent="text-emerald-600 dark:text-emerald-400"
-          bg="bg-emerald-500/10"
-        />
-        <StatCard
-          icon={Clock}
-          label="PD Hours (YTD)"
-          value="1,847"
-          accent="text-purple-600 dark:text-purple-400"
-          bg="bg-purple-500/10"
-        />
-        <StatCard
-          icon={Calendar}
-          label="Expiring Soon"
-          value="8"
-          accent="text-amber-600 dark:text-amber-400"
-          bg="bg-amber-500/10"
-        />
-      </div>
+// ============================================================================
+// FEATURE CARD
+// ============================================================================
 
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-blue-500/10">
-            <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-text-primary mb-2">
-              Professional Development
-            </h3>
-            <p className="text-text-secondary leading-relaxed mb-4">
-              Track certifications, continuing education credits, and professional development hours.
-              Set up training requirements by role and receive alerts when certifications are 
-              expiring. Supports state licensure tracking for educators.
-            </p>
-            <ul className="text-sm text-text-secondary space-y-1">
-              <li>• Teaching license and endorsement tracking</li>
-              <li>• Professional development hour logging</li>
-              <li>• Course catalog and enrollment management</li>
-              <li>• Certification expiration alerts</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
-        <Award className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">
-          Certification Registry
-        </h4>
-        <p className="text-text-secondary max-w-md mx-auto">
-          View all staff certifications organized by type and expiration date.
-          Filter by department or role to identify compliance gaps.
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function PerformanceContent() {
-  return (
-    <div className="space-y-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={FileText}
-          label="Reviews Due"
-          value="12"
-          accent="text-amber-600 dark:text-amber-400"
-          bg="bg-amber-500/10"
-        />
-        <StatCard
-          icon={Target}
-          label="Active Goals"
-          value="234"
-          accent="text-blue-600 dark:text-blue-400"
-          bg="bg-blue-500/10"
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Completed Reviews"
-          value="144"
-          accent="text-emerald-600 dark:text-emerald-400"
-          bg="bg-emerald-500/10"
-        />
-        <StatCard
-          icon={Calendar}
-          label="Review Cycle"
-          value="Annual"
-          accent="text-purple-600 dark:text-purple-400"
-          bg="bg-purple-500/10"
-        />
-      </div>
-
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-purple-500/10">
-            <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-text-primary mb-2">
-              Performance Reviews
-            </h3>
-            <p className="text-text-secondary leading-relaxed mb-4">
-              Conduct annual or periodic performance evaluations with customizable rubrics.
-              Set professional goals, track progress, and maintain evaluation history.
-              Supports 360-degree feedback and self-assessments.
-            </p>
-            <ul className="text-sm text-text-secondary space-y-1">
-              <li>• Customizable evaluation templates</li>
-              <li>• Goal setting and progress tracking</li>
-              <li>• Manager and self-assessment workflows</li>
-              <li>• Historical performance trends</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
-        <TrendingUp className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">
-          Evaluation Dashboard
-        </h4>
-        <p className="text-text-secondary max-w-md mx-auto">
-          View pending evaluations, completed reviews, and aggregate performance metrics.
-          Managers can initiate new review cycles from this dashboard.
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
+function FeatureCard({
+  icon,
+  iconBg,
+  title,
+  description,
 }: {
-  icon: typeof BriefcaseBusiness
-  label: string
-  value: string
-  accent: string
-  bg: string
+  icon: React.ReactNode
+  iconBg: string
+  title: string
+  description: string
 }) {
   return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
+    <div
+      style={{
+        background: 'var(--v2-bg-surface, #161b27)',
+        border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+        borderRadius: 10,
+        padding: 14,
+        opacity: 0.7,
+        transition: 'opacity 0.12s',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9' }}
+      onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div
+          style={{
+            width: 26,
+            height: 26,
+            borderRadius: 6,
+            background: iconBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {icon}
         </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
+        <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--v2-text-primary, #e8eaf0)' }}>
+          {title}
         </div>
       </div>
+      <div style={{ fontSize: 10, color: 'var(--v2-text-muted, #7a8099)', lineHeight: 1.6, marginBottom: 8 }}>
+        {description}
+      </div>
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          fontSize: 9,
+          fontWeight: 500,
+          padding: '2px 6px',
+          borderRadius: 4,
+          background: 'rgba(127,119,221,0.10)',
+          color: '#7F77DD',
+        }}
+      >
+        Planned
+      </span>
     </div>
   )
 }
 
 export default HRAdminModule
-

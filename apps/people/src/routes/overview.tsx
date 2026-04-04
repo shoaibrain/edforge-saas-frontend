@@ -1,130 +1,964 @@
 /**
- * People Overview Page
- * 
- * Main landing page for the People module.
- * Uses ModuleOverviewPage for consistent, customizable layout.
+ * People Overview Page — V2
+ *
+ * Data command center replacing the old navigation-card layout.
+ * Uses live staff data from useStaffList hook.
  */
 
+import { useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import {
-    Users,
-    UserCircle,
-    Briefcase,
-    UserPlus,
-    Building,
-    Shield,
-    UserCog,
-    TrendingUp,
+  Users,
+  UserPlus,
+  BookOpen,
+  Lock,
+  Briefcase,
+  ChevronRight,
+  Clock,
+  BarChart3,
 } from 'lucide-react'
-import { ModuleOverviewPage, type ModuleStat, type ModuleActionCard } from '../components/ModuleOverviewPage'
+import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import type { StaffResponseDto } from '@aibrains/shared-types'
 
-export function Overview() {
-    // Stats for the people module
-    const stats: ModuleStat[] = [
-        {
-            label: 'Total Staff',
-            value: '342',
-            change: '+8',
-            changeType: 'positive',
-            icon: Users,
-            iconBg: 'bg-blue-500/15 dark:bg-blue-500/20',
-            iconColor: 'text-blue-600 dark:text-blue-400',
-        },
-        {
-            label: 'Active Teachers',
-            value: '186',
-            change: '+3',
-            changeType: 'positive',
-            icon: UserCircle,
-            iconBg: 'bg-indigo-400/20',
-            iconColor: 'text-indigo-600 dark:text-indigo-400',
-        },
-        {
-            label: 'Support Staff',
-            value: '89',
-            change: '+2',
-            changeType: 'positive',
-            icon: Briefcase,
-            iconBg: 'bg-purple-400/20',
-            iconColor: 'text-purple-600 dark:text-purple-400',
-        },
-        {
-            label: 'Administrators',
-            value: '24',
-            change: 'No change',
-            changeType: 'neutral',
-            icon: Shield,
-            iconBg: 'bg-emerald-400/20',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
-        },
-    ]
+import { useStaffList } from '../hooks'
+import { useModalState } from '../hooks'
+import { useActiveSchoolId } from '../stores/app.store'
+import { getStaffAvatar } from '../lib/avatar'
+import { StaffRoleChip } from '../components/staff/StaffRoleChip'
+import { CreateUserModal } from '../components/staff'
 
-    // Action cards linking to sub-routes
-    const actionCards: ModuleActionCard[] = [
-        {
-            id: 'staff',
-            title: 'Staff Directory',
-            description: 'View and manage all staff members',
-            icon: Users,
-            href: '/people/staff',
-            iconBg: 'bg-blue-500/15 group-hover:bg-blue-500/25',
-            iconColor: 'text-blue-600 dark:text-blue-400',
-        },
-        {
-            id: 'new-person',
-            title: 'Add New Person',
-            description: 'Onboard a new staff member',
-            icon: UserPlus,
-            href: '/people/new',
-            iconBg: 'bg-emerald-400/20 group-hover:bg-emerald-400/30',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
-        },
-        {
-            id: 'departments',
-            title: 'Departments',
-            description: 'Manage organizational structure',
-            icon: Building,
-            href: '/people/departments',
-            iconBg: 'bg-purple-400/20 group-hover:bg-purple-400/30',
-            iconColor: 'text-purple-600 dark:text-purple-400',
-        },
-        {
-            id: 'roles',
-            title: 'Roles & Permissions',
-            description: 'Configure access and permissions',
-            icon: Shield,
-            href: '/people/roles',
-            iconBg: 'bg-amber-400/20 group-hover:bg-amber-400/30',
-            iconColor: 'text-amber-600 dark:text-amber-400',
-        },
-        {
-            id: 'profiles',
-            title: 'Profile Settings',
-            description: 'Manage profile configurations',
-            icon: UserCog,
-            href: '/people/settings',
-            iconBg: 'bg-slate-400/20 group-hover:bg-slate-400/30',
-            iconColor: 'text-slate-600 dark:text-slate-400',
-        },
-        {
-            id: 'reports',
-            title: 'People Analytics',
-            description: 'View workforce analytics',
-            icon: TrendingUp,
-            href: '/people/analytics',
-            iconBg: 'bg-cyan-400/20 group-hover:bg-cyan-400/30',
-            iconColor: 'text-cyan-600 dark:text-cyan-400',
-        },
-    ]
+// ============================================================================
+// HELPERS
+// ============================================================================
 
-    return (
-        <ModuleOverviewPage
-            moduleId="people"
-            title="People"
-            description="Manage staff, roles, and organizational structure"
-            icon={Users}
-            stats={stats}
-            actionCards={actionCards}
-        />
-    )
+function formatDate(d?: string | Date | null): string {
+  if (!d) return ''
+  const date = new Date(d)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export function Overview() {
+  const navigate = useNavigate()
+  const schoolId = useActiveSchoolId()
+  const modal = useModalState()
+
+  const { items: staff, isLoading } = useStaffList(
+    schoolId ? { schoolId } : undefined,
+  )
+
+  // Derived stats
+  const stats = useMemo(() => {
+    const teachers = staff.filter((s) => s.role === 'teacher')
+    const principals = staff.filter(
+      (s) => s.role === 'principal' || s.role === 'vice_principal',
+    )
+    const support = staff.filter(
+      (s) =>
+        s.role === 'support_staff' ||
+        s.role === 'admin_staff' ||
+        s.role === 'it_staff',
+    )
+    const withAccess = staff.filter((s) => !!s.userId)
+    const noAccess = staff.length - withAccess.length
+
+    // Employment type counts
+    const fullTime = staff.filter((s) => s.employmentStatus === 'active').length
+    const contract = staff.filter((s) => s.employmentStatus === 'on_leave').length
+    const partTime = staff.length - fullTime - contract
+
+    // Department breakdown
+    const deptMap = new Map<string, number>()
+    for (const s of staff) {
+      const dept = s.departmentName || 'Unassigned'
+      deptMap.set(dept, (deptMap.get(dept) || 0) + 1)
+    }
+    const departments = Array.from(deptMap.entries())
+      .sort((a, b) => b[1] - a[1])
+
+    return {
+      total: staff.length,
+      teachers: teachers.length,
+      principals: principals.length,
+      support: support.length,
+      withAccess: withAccess.length,
+      noAccess,
+      fullTime,
+      contract,
+      partTime,
+      departments,
+    }
+  }, [staff])
+
+  // Activity feed — derive from staff creation dates
+  const activityFeed = useMemo(() => {
+    return [...staff]
+      .filter((s) => s.createdAt)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+      )
+      .slice(0, 5)
+      .map((s) => ({
+        id: s.staffId,
+        text: `${s.firstName} ${s.lastSurname} ${s.userId ? 'account created and system access enabled' : `onboarded as ${s.role?.replace('_', ' ') || 'staff'} — no system access`}`,
+        time: formatDate(s.createdAt),
+        color: s.userId ? '#1D9E75' : '#7F77DD',
+      }))
+  }, [staff])
+
+  return (
+    <div data-v2 style={{ padding: '24px 28px', overflow: 'auto' }}>
+      {/* PAGE HEADER */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 6,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              background: 'rgba(216,90,48,0.10)',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Users style={{ width: 16, height: 16, color: '#D85A30' }} />
+          </div>
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 10,
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: 18,
+                  fontWeight: 600,
+                  letterSpacing: '-0.3px',
+                  color: 'var(--v2-text-primary, #e8eaf0)',
+                  margin: 0,
+                }}
+              >
+                People & HR
+              </h1>
+              <div
+                style={{
+                  width: 1,
+                  height: 14,
+                  background: 'rgba(255,255,255,0.10)',
+                  alignSelf: 'center',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 12,
+                  color: 'var(--v2-text-muted, #7a8099)',
+                }}
+              >
+                {new Date().toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Header buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/staff' as string })}
+            style={{
+              height: 36,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.09)',
+              borderRadius: 8,
+              padding: '0 14px',
+              fontSize: 11,
+              fontWeight: 500,
+              color: '#9aa0b8',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <Users style={{ width: 12, height: 12 }} />
+            Staff Directory
+          </button>
+          <button
+            type="button"
+            onClick={() => modal.openCreate()}
+            style={{
+              height: 36,
+              background: '#1D9E75',
+              border: 'none',
+              borderRadius: 8,
+              padding: '0 14px',
+              fontSize: 11,
+              fontWeight: 500,
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <UserPlus style={{ width: 12, height: 12 }} />
+            Add Staff Member
+          </button>
+        </div>
+      </div>
+
+      {/* CONTEXT BANNER */}
+      <p
+        style={{
+          fontSize: 11,
+          color: 'var(--v2-text-muted, #7a8099)',
+          marginBottom: 18,
+        }}
+      >
+        <em style={{ fontStyle: 'normal', fontWeight: 500, color: '#D85A30' }}>
+          {stats.total} staff member{stats.total !== 1 ? 's' : ''}
+        </em>
+        {' · '}
+        <span style={{ color: '#1D9E75', fontStyle: 'normal', fontWeight: 500 }}>
+          {stats.teachers} teacher{stats.teachers !== 1 ? 's' : ''}
+        </span>
+        {' · '}
+        <span style={{ color: '#7F77DD', fontStyle: 'normal', fontWeight: 500 }}>
+          {stats.principals} principal{stats.principals !== 1 ? 's' : ''}
+        </span>
+        {' · '}
+        <span style={{ color: '#378ADD', fontStyle: 'normal', fontWeight: 500 }}>
+          {stats.withAccess} with system access enabled
+        </span>
+      </p>
+
+      {/* KPI TILES */}
+      <WidgetErrorBoundaryV2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+            gap: 10,
+            marginBottom: 18,
+          }}
+        >
+          <StatCard
+            label="Total Staff"
+            value={isLoading ? '—' : stats.total.toString()}
+            icon={Users}
+            accentColor="rgba(216,90,48,0.10)"
+            iconColor="#D85A30"
+            barColor="#D85A30"
+            valueColor="#D85A30"
+            tag={{ text: '+1 this month', color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Active Teachers"
+            value={isLoading ? '—' : stats.teachers.toString()}
+            icon={BookOpen}
+            accentColor="rgba(29,158,117,0.10)"
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            valueColor="#1D9E75"
+            tag={{ text: 'full-time + contract', color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="Support Staff"
+            value={isLoading ? '—' : stats.support.toString()}
+            icon={Briefcase}
+            accentColor={stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
+            iconColor={stats.support > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
+            barColor={stats.support > 0 ? '#378ADD' : 'var(--v2-text-ghost, #2a3045)'}
+            valueColor={stats.support > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
+            tag={{
+              text: stats.support > 0 ? 'active' : 'none onboarded',
+              color: stats.support > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)',
+              bg: stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
+            }}
+            loading={isLoading}
+          />
+          <StatCard
+            label="System Access"
+            value={isLoading ? '—' : stats.withAccess.toString()}
+            icon={Lock}
+            accentColor="rgba(55,138,221,0.10)"
+            iconColor="#378ADD"
+            barColor="#378ADD"
+            valueColor="#378ADD"
+            tag={{
+              text: `${stats.noAccess} no access`,
+              color: '#378ADD',
+              bg: 'rgba(55,138,221,0.10)',
+            }}
+            loading={isLoading}
+          />
+        </div>
+      </WidgetErrorBoundaryV2>
+
+      {/* TWO-COL: Staff Roster + Employment Breakdown */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1.6fr 1fr',
+          gap: 12,
+          marginBottom: 12,
+        }}
+      >
+        {/* STAFF ROSTER */}
+        <div
+          style={{
+            background: 'var(--v2-bg-surface, #161b27)',
+            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '12px 14px',
+              borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--v2-text-primary, #e8eaf0)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 5,
+                  background: 'rgba(216,90,48,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Users style={{ width: 12, height: 12, color: '#D85A30' }} />
+              </div>
+              Staff roster
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate({ to: '/staff' as string })}
+              style={{
+                fontSize: 11,
+                color: '#D85A30',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 3,
+                fontWeight: 500,
+              }}
+            >
+              View directory{' '}
+              <ChevronRight style={{ width: 10, height: 10 }} />
+            </button>
+          </div>
+          <div style={{ padding: '4px 14px 10px' }}>
+            {isLoading ? (
+              <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                <span style={{ fontSize: 11, color: 'var(--v2-text-hint, #4a5068)' }}>
+                  Loading staff...
+                </span>
+              </div>
+            ) : staff.length === 0 ? (
+              <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                <span style={{ fontSize: 11, color: 'var(--v2-text-hint, #4a5068)' }}>
+                  No staff members yet
+                </span>
+              </div>
+            ) : (
+              staff.slice(0, 5).map((s) => (
+                <StaffRow key={s.staffId} staff={s} />
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* EMPLOYMENT BREAKDOWN */}
+        <div
+          style={{
+            background: 'var(--v2-bg-surface, #161b27)',
+            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '12px 14px',
+              borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--v2-text-primary, #e8eaf0)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 5,
+                  background: 'rgba(55,138,221,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <BarChart3 style={{ width: 12, height: 12, color: '#378ADD' }} />
+              </div>
+              Employment breakdown
+            </div>
+          </div>
+          <div style={{ padding: '10px 14px' }}>
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                color: 'var(--v2-text-ghost, #2a3045)',
+                marginBottom: 8,
+              }}
+            >
+              Employment type
+            </div>
+            <BarRow
+              label="Full-time"
+              value={stats.fullTime}
+              total={stats.total}
+              color="#D85A30"
+            />
+            <BarRow
+              label="Contract"
+              value={stats.contract}
+              total={stats.total}
+              color="#EF9F27"
+            />
+            <BarRow
+              label="Part-time"
+              value={stats.partTime}
+              total={stats.total}
+              color="#378ADD"
+            />
+
+            <div
+              style={{
+                height: 1,
+                background: 'rgba(255,255,255,0.05)',
+                margin: '10px 0',
+              }}
+            />
+
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                color: 'var(--v2-text-ghost, #2a3045)',
+                marginBottom: 8,
+              }}
+            >
+              By department
+            </div>
+            {stats.departments.length === 0 ? (
+              <div style={{ fontSize: 11, color: 'var(--v2-text-hint, #4a5068)' }}>
+                No departments assigned
+              </div>
+            ) : (
+              stats.departments.slice(0, 4).map(([dept, count]) => (
+                <BarRow
+                  key={dept}
+                  label={dept}
+                  value={count}
+                  total={stats.total}
+                  color="#7F77DD"
+                  showCount
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* THREE-COL: Activity + Dir shortcut + HR shortcut */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: 12,
+        }}
+      >
+        {/* RECENT ACTIVITY */}
+        <div
+          style={{
+            background: 'var(--v2-bg-surface, #161b27)',
+            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '12px 14px',
+              borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 5,
+                background: 'rgba(239,159,39,0.10)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Clock style={{ width: 12, height: 12, color: '#EF9F27' }} />
+            </div>
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--v2-text-primary, #e8eaf0)',
+              }}
+            >
+              Recent activity
+            </span>
+          </div>
+          <div style={{ padding: '4px 14px 10px' }}>
+            {activityFeed.length === 0 ? (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      padding: '7px 0',
+                      borderBottom:
+                        i < 3
+                          ? '1px solid rgba(255,255,255,0.04)'
+                          : 'none',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: 'var(--v2-text-hint, #4a5068)',
+                        flexShrink: 0,
+                        marginTop: 4,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--v2-text-hint, #4a5068)',
+                      }}
+                    >
+                      No recent activity
+                    </span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              activityFeed.map((item, i) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 8,
+                    padding: '7px 0',
+                    borderBottom:
+                      i < activityFeed.length - 1
+                        ? '1px solid rgba(255,255,255,0.04)'
+                        : 'none',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: item.color,
+                      flexShrink: 0,
+                      marginTop: 4,
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--v2-text-secondary, #c8ccd8)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {item.text}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 9,
+                        color: 'var(--v2-text-ghost, #2a3045)',
+                        marginTop: 2,
+                      }}
+                    >
+                      {item.time}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* STAFF DIRECTORY SHORTCUT */}
+        <button
+          type="button"
+          onClick={() => navigate({ to: '/staff' as string })}
+          style={{
+            background: 'var(--v2-bg-surface, #161b27)',
+            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+            borderRadius: 10,
+            padding: 14,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            cursor: 'pointer',
+            textAlign: 'left',
+            transition: 'border-color 0.12s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor =
+              'var(--v2-border-default, rgba(255,255,255,0.06))'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 7,
+                background: 'rgba(29,158,117,0.10)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Users style={{ width: 14, height: 14, color: '#1D9E75' }} />
+            </div>
+            <ChevronRight
+              style={{
+                width: 14,
+                height: 14,
+                color: 'var(--v2-text-ghost, #2a3045)',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--v2-text-primary, #e8eaf0)',
+            }}
+          >
+            Staff Directory
+          </div>
+          <div
+            style={{
+              fontSize: 10,
+              color: 'var(--v2-text-muted, #7a8099)',
+              lineHeight: 1.5,
+            }}
+          >
+            View, search and manage all staff members, roles and system access.
+          </div>
+        </button>
+
+        {/* HR ADMIN SHORTCUT */}
+        <button
+          type="button"
+          onClick={() => navigate({ to: '/hr' as string })}
+          style={{
+            background: 'var(--v2-bg-surface, #161b27)',
+            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
+            borderRadius: 10,
+            padding: 14,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            cursor: 'pointer',
+            textAlign: 'left',
+            transition: 'border-color 0.12s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor =
+              'var(--v2-border-default, rgba(255,255,255,0.06))'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 7,
+                background: 'rgba(127,119,221,0.10)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Briefcase style={{ width: 14, height: 14, color: '#7F77DD' }} />
+            </div>
+            <ChevronRight
+              style={{
+                width: 14,
+                height: 14,
+                color: 'var(--v2-text-ghost, #2a3045)',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--v2-text-primary, #e8eaf0)',
+            }}
+          >
+            HR Administration
+          </div>
+          <div
+            style={{
+              fontSize: 10,
+              color: 'var(--v2-text-muted, #7a8099)',
+              lineHeight: 1.5,
+            }}
+          >
+            Payroll, performance reviews, contracts and professional development.
+          </div>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 9,
+              fontWeight: 500,
+              padding: '2px 6px',
+              borderRadius: 4,
+              background: 'rgba(239,159,39,0.12)',
+              color: '#EF9F27',
+              width: 'fit-content',
+            }}
+          >
+            Coming in v2.0
+          </span>
+        </button>
+      </div>
+
+      {/* CREATE USER MODAL */}
+      <CreateUserModal
+        open={modal.mode === 'create'}
+        onClose={modal.close}
+      />
+    </div>
+  )
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+function StaffRow({ staff: s }: { staff: StaffResponseDto }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '8px 0',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+      }}
+    >
+      <img
+        src={getStaffAvatar(s.staffId)}
+        alt={`${s.firstName} ${s.lastSurname}`}
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          flexShrink: 0,
+          objectFit: 'cover',
+        }}
+        loading="lazy"
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 500,
+            color: 'var(--v2-text-primary, #e8eaf0)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {s.firstName} {s.lastSurname}
+        </div>
+        <div
+          style={{
+            fontSize: 10,
+            color: 'var(--v2-text-ghost, #2a3045)',
+          }}
+        >
+          {s.role?.replace('_', ' ')} · {s.email}
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <StaffRoleChip role={s.role} />
+        <div
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: s.userId ? '#1D9E75' : 'var(--v2-text-hint, #4a5068)',
+          }}
+          title={s.userId ? 'System Access Active' : 'No System Access'}
+        />
+      </div>
+    </div>
+  )
+}
+
+function BarRow({
+  label,
+  value,
+  total,
+  color,
+  showCount,
+}: {
+  label: string
+  value: number
+  total: number
+  color: string
+  showCount?: boolean
+}) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          color: 'var(--v2-text-muted, #7a8099)',
+          width: 68,
+          flexShrink: 0,
+        }}
+      >
+        {label}
+      </span>
+      <div
+        style={{
+          flex: 1,
+          height: 5,
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: 3,
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            borderRadius: 3,
+            background: color,
+            width: `${pct}%`,
+            transition: 'width 0.8s cubic-bezier(0.16,1,0.3,1)',
+          }}
+        />
+      </div>
+      <span
+        style={{
+          fontSize: 10,
+          color: 'var(--v2-text-hint, #4a5068)',
+          width: 32,
+          textAlign: 'right',
+        }}
+      >
+        {showCount ? value : `${pct}%`}
+      </span>
+    </div>
+  )
+}

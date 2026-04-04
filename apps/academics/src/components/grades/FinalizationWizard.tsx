@@ -16,7 +16,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from 'lucide-react'
-import { useSectionGrades, useFinalizeGrade } from '../../hooks/useGrades'
+import { useSectionGrades, useBulkFinalizeGrades } from '../../hooks/useGrades'
 
 // ============================================================================
 // TYPES
@@ -47,8 +47,8 @@ export function FinalizationWizard({
 }: FinalizationWizardProps) {
   const [step, setStep] = useState<WizardStep>('review')
   const [finalizedCount, setFinalizedCount] = useState(0)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const finalizeMutation = useFinalizeGrade()
+  const [errorCount, setErrorCount] = useState(0)
+  const bulkFinalizeMutation = useBulkFinalizeGrades()
 
   const { data: gradebook, isLoading } = useSectionGrades(
     sectionId,
@@ -58,30 +58,53 @@ export function FinalizationWizard({
 
   const grades = gradebook?.grades ?? []
 
-  // Categorize grades
+  // Categorize grades — distinguish real zeros from empty stubs
   const analysis = useMemo(() => {
-    const unfinalizedGrades = grades.filter((g) => !g.isFinal)
     const finalizedGrades = grades.filter((g) => g.isFinal)
-    const missingGrades = grades.filter(
-      (g) => g.numericGrade === 0 || g.numericGrade === undefined
+    const unfinalizedGrades = grades.filter((g) => !g.isFinal)
+
+    // Students with grade documents but no scored assignments (roster stubs)
+    const emptyStubs = unfinalizedGrades.filter((g) => {
+      const scored = g.assignments?.filter((a) => a.earnedPoints !== undefined) ?? []
+      return scored.length === 0
+    })
+
+    // Students with at least one scored assignment — these are eligible for finalization
+    const eligibleGrades = unfinalizedGrades.filter((g) => {
+      const scored = g.assignments?.filter((a) => a.earnedPoints !== undefined) ?? []
+      return scored.length > 0
+    })
+
+    // Students with real grades that are low/zero
+    const lowGrades = eligibleGrades.filter(
+      (g) => g.numericGrade !== undefined && g.numericGrade < 60
     )
-    return { unfinalizedGrades, finalizedGrades, missingGrades, total: grades.length }
+
+    return {
+      finalizedGrades,
+      unfinalizedGrades,
+      eligibleGrades,
+      emptyStubs,
+      lowGrades,
+      total: grades.length,
+    }
   }, [grades])
 
+  const isProcessing = bulkFinalizeMutation.isPending
+
   const handleFinalize = async () => {
-    setIsProcessing(true)
-    let count = 0
-    for (const grade of analysis.unfinalizedGrades) {
-      try {
-        await finalizeMutation.mutateAsync(grade.gradeId)
-        count++
-      } catch {
-        // Continue on error
-      }
+    try {
+      const result = await bulkFinalizeMutation.mutateAsync({
+        sectionId,
+        termId,
+        schoolId,
+      })
+      setFinalizedCount(result.finalized)
+      setErrorCount(result.errors.length)
+      setStep('complete')
+    } catch {
+      // Error handled by mutation hook toast
     }
-    setFinalizedCount(count)
-    setIsProcessing(false)
-    setStep('complete')
   }
 
   if (!open) return null
@@ -124,49 +147,104 @@ export function FinalizationWizard({
                       Review grades before finalizing. Finalized grades are locked and cannot be changed.
                     </p>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    {/* Summary stats */}
+                    <div className="grid grid-cols-3 gap-3">
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className="text-2xl font-bold text-text-primary">{analysis.total}</p>
-                        <p className="text-xs text-text-tertiary">Total Grades</p>
+                        <p className="text-2xl font-bold text-teal-600">{analysis.eligibleGrades.length}</p>
+                        <p className="text-xs text-text-tertiary">To Finalize</p>
                       </div>
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
                         <p className="text-2xl font-bold text-emerald-600">{analysis.finalizedGrades.length}</p>
                         <p className="text-xs text-text-tertiary">Already Final</p>
                       </div>
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className="text-2xl font-bold text-teal-600">{analysis.unfinalizedGrades.length}</p>
-                        <p className="text-xs text-text-tertiary">To Finalize</p>
-                      </div>
-                      <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className={`text-2xl font-bold ${analysis.missingGrades.length > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                          {analysis.missingGrades.length}
+                        <p className={`text-2xl font-bold ${analysis.emptyStubs.length > 0 ? 'text-text-tertiary' : 'text-emerald-600'}`}>
+                          {analysis.emptyStubs.length}
                         </p>
-                        <p className="text-xs text-text-tertiary">Missing/Zero</p>
+                        <p className="text-xs text-text-tertiary">No Scores</p>
                       </div>
                     </div>
 
-                    {analysis.missingGrades.length > 0 && (
-                      <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
-                        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                            {analysis.missingGrades.length} student(s) have missing or zero grades
-                          </p>
-                          <p className="text-xs text-amber-600 dark:text-amber-300 mt-0.5">
-                            These grades will be finalized as-is. Review before proceeding.
-                          </p>
-                        </div>
+                    {/* Empty stubs warning */}
+                    {analysis.emptyStubs.length > 0 && (
+                      <div className="flex items-start gap-2 p-3 bg-surface-secondary rounded-lg">
+                        <AlertTriangle className="w-4 h-4 text-text-tertiary mt-0.5" />
+                        <p className="text-xs text-text-secondary">
+                          {analysis.emptyStubs.length} student(s) have no scored assignments and will be skipped.
+                        </p>
                       </div>
                     )}
 
-                    {analysis.unfinalizedGrades.length === 0 ? (
+                    {/* Low grades warning */}
+                    {analysis.lowGrades.length > 0 && (
+                      <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
+                        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
+                        <p className="text-xs text-amber-700 dark:text-amber-400">
+                          {analysis.lowGrades.length} student(s) are below passing grade.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Student-level preview table */}
+                    {analysis.eligibleGrades.length > 0 && (
+                      <div className="rounded-lg border border-border-secondary overflow-hidden max-h-[250px] overflow-y-auto">
+                        <table className="w-full text-sm">
+                          <thead className="bg-surface-secondary sticky top-0">
+                            <tr>
+                              <th className="text-left px-3 py-2 text-xs font-medium text-text-secondary">Student</th>
+                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">Grade</th>
+                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">Letter</th>
+                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border-secondary">
+                            {analysis.eligibleGrades.map((g) => {
+                              const isPassing = g.numericGrade !== undefined && g.numericGrade >= 60
+                              return (
+                                <tr key={g.gradeId}>
+                                  <td className="px-3 py-2 text-text-primary">
+                                    {g.studentName || `Student`}
+                                  </td>
+                                  <td className="px-3 py-2 text-center font-medium text-text-primary">
+                                    {g.numericGrade !== undefined ? `${g.numericGrade.toFixed(1)}%` : '—'}
+                                  </td>
+                                  <td className="px-3 py-2 text-center font-bold text-text-primary">
+                                    {g.letterGrade || '—'}
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                                      isPassing
+                                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                                        : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
+                                    }`}>
+                                      {isPassing ? 'Pass' : 'Fail'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {analysis.eligibleGrades.length === 0 && analysis.finalizedGrades.length > 0 && (
                       <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
                         <CheckCircle className="w-4 h-4 text-emerald-500" />
                         <p className="text-sm text-emerald-700 dark:text-emerald-400">
                           All grades are already finalized!
                         </p>
                       </div>
-                    ) : null}
+                    )}
+
+                    {analysis.eligibleGrades.length === 0 && analysis.finalizedGrades.length === 0 && (
+                      <div className="flex items-center gap-2 p-3 bg-surface-secondary rounded-lg">
+                        <AlertTriangle className="w-4 h-4 text-text-tertiary" />
+                        <p className="text-sm text-text-secondary">
+                          No students have scored assignments to finalize.
+                        </p>
+                      </div>
+                    )}
                   </>
                 )}
               </motion.div>
@@ -188,7 +266,7 @@ export function FinalizationWizard({
                       This action cannot be undone
                     </p>
                     <p className="text-sm text-red-600 dark:text-red-300 mt-1">
-                      You are about to finalize <strong>{analysis.unfinalizedGrades.length}</strong> grade(s).
+                      You are about to finalize <strong>{analysis.eligibleGrades.length}</strong> grade(s).
                       Finalized grades are locked and cannot be modified.
                     </p>
                   </div>
@@ -220,6 +298,11 @@ export function FinalizationWizard({
                 </h4>
                 <p className="text-sm text-text-secondary">
                   Successfully finalized {finalizedCount} grade(s). These grades are now locked.
+                  {errorCount > 0 && (
+                    <span className="block mt-1 text-amber-600 dark:text-amber-400">
+                      {errorCount} grade(s) could not be finalized.
+                    </span>
+                  )}
                 </p>
               </motion.div>
             )}
@@ -236,7 +319,7 @@ export function FinalizationWizard({
               <button
                 type="button"
                 onClick={() => setStep('confirm')}
-                disabled={analysis.unfinalizedGrades.length === 0 || isLoading}
+                disabled={analysis.eligibleGrades.length === 0 || isLoading}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue
@@ -262,7 +345,7 @@ export function FinalizationWizard({
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                Finalize {analysis.unfinalizedGrades.length} Grades
+                Finalize {analysis.eligibleGrades.length} Grades
               </button>
             </>
           )}

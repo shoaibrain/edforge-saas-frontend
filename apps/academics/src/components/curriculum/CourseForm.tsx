@@ -6,6 +6,7 @@
  * Must be wrapped in a FormProvider.
  */
 
+import { useMemo } from 'react'
 import { useFieldArray, useFormContext } from '@edforge/forms'
 import {
   TextField,
@@ -30,6 +31,7 @@ import {
   GRADE_LEVEL_OPTIONS,
   MATERIAL_TYPE_OPTIONS,
 } from '../../schemas/course.form'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -38,15 +40,33 @@ import {
 interface CourseFormProps {
   /** Whether course code field is locked (edit mode) */
   isEdit?: boolean
+  /** School's configured grade range for filtering grade options */
+  schoolGradeRange?: { start: string; end: string } | null
 }
 
 // ============================================================================
 // GRADE LEVEL MULTI-SELECT
 // ============================================================================
 
-function GradeLevelSelector() {
+function GradeLevelSelector({
+  schoolGradeRange,
+}: {
+  schoolGradeRange?: { start: string; end: string } | null
+}) {
   const { watch, setValue, formState: { errors } } = useFormContext()
   const selected: string[] = watch('gradeLevels') ?? []
+  const baseOptions = useFilteredGradeOptions(schoolGradeRange)
+
+  // Include any already-selected grades that fall outside the school range
+  // (edge case: school range narrowed after course creation)
+  const options = useMemo(() => {
+    const baseValues = new Set<string>(baseOptions.map((o) => o.value))
+    const outOfRange = selected
+      .filter((v) => !baseValues.has(v))
+      .map((v) => GRADE_LEVEL_OPTIONS.find((o) => o.value === v))
+      .filter(Boolean) as (typeof GRADE_LEVEL_OPTIONS)[number][]
+    return outOfRange.length > 0 ? [...baseOptions, ...outOfRange] : baseOptions
+  }, [baseOptions, selected])
 
   const toggle = (value: string) => {
     const next = selected.includes(value)
@@ -56,6 +76,7 @@ function GradeLevelSelector() {
   }
 
   const error = errors?.gradeLevels?.message as string | undefined
+  const baseValues = new Set<string>(baseOptions.map((o) => o.value))
 
   return (
     <div>
@@ -63,8 +84,9 @@ function GradeLevelSelector() {
         Grade Levels <span className="text-red-500">*</span>
       </label>
       <div className="flex flex-wrap gap-2">
-        {GRADE_LEVEL_OPTIONS.map((opt) => {
+        {options.map((opt) => {
           const isSelected = selected.includes(opt.value)
+          const isOutOfRange = !baseValues.has(opt.value)
           return (
             <button
               key={opt.value}
@@ -72,9 +94,14 @@ function GradeLevelSelector() {
               onClick={() => toggle(opt.value)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
                 isSelected
-                  ? 'bg-teal-500 text-white border-teal-500 shadow-sm'
-                  : 'bg-surface-primary text-text-secondary border-border-primary hover:border-teal-400 hover:text-text-primary'
+                  ? isOutOfRange
+                    ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                    : 'bg-teal-500 text-white border-teal-500 shadow-sm'
+                  : isOutOfRange
+                    ? 'bg-surface-primary text-amber-500 border-amber-300 border-dashed hover:border-amber-400'
+                    : 'bg-surface-primary text-text-secondary border-border-primary hover:border-teal-400 hover:text-text-primary'
               }`}
+              title={isOutOfRange ? 'Outside school grade range' : undefined}
             >
               {opt.label}
             </button>
@@ -270,7 +297,7 @@ function MaterialsList() {
 // COURSE FORM
 // ============================================================================
 
-export function CourseForm({ isEdit = false }: CourseFormProps) {
+export function CourseForm({ isEdit = false, schoolGradeRange }: CourseFormProps) {
   return (
     <div className="space-y-8">
       {/* Section 1: Identity */}
@@ -348,7 +375,7 @@ export function CourseForm({ isEdit = false }: CourseFormProps) {
         title="Grade Levels"
         description="Select which grade levels this course is offered to."
       >
-        <GradeLevelSelector />
+        <GradeLevelSelector schoolGradeRange={schoolGradeRange} />
       </FormSection>
 
       {/* Section 4: Description & Objectives */}

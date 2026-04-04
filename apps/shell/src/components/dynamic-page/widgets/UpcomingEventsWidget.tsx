@@ -1,30 +1,31 @@
 /**
  * UpcomingEventsWidget
- * 
+ *
  * A Notion-inspired calendar widget with customization menu.
  * Features:
  * - Notion-style vertical list view grouped by day
  * - Timeline aesthetic
  * - Role-specific mock events
  * - Options menu
+ *
+ * COMING_SOON: Calendar integration, meeting/conferencing tools, and collaboration
+ * features are not yet available. This widget displays mock data behind a
+ * ComingSoonOverlay. Remove the overlay and connect to real calendar APIs
+ * when these features ship.
  */
 
-import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 
 import {
   Video,
   Users,
-
-  Plus,
-  MoreHorizontal,
-  ArrowUpRight,
-  ChevronRight,
-  Check,
   Calendar as CalendarIcon,
   MapPin,
   Calendar,
 } from 'lucide-react'
+import { ComingSoonOverlay, ComingSoonBadge } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { formatRelativeDate } from '../../../lib/greeting'
 import { WidgetSection } from '../WidgetSection'
 import { useDynamicPage } from '../DynamicPageContext'
@@ -316,159 +317,17 @@ function filterEvents(events: UpcomingEvent[], filters: EventFilters): UpcomingE
 // COMPONENTS
 // ============================================================================
 
-// --- Toggle Switch ---
-function ToggleSwitch({ checked, onChange, disabled }: { checked: boolean; onChange: () => void; disabled?: boolean }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={onChange}
-      className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${checked ? 'bg-[rgb(var(--brand-primary))]' : 'bg-[rgb(var(--border-primary))]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-    >
-      <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-4' : 'translate-x-0.5'}`} style={{ marginTop: '2px' }} />
-    </button>
-  )
-}
-
 // --- Empty State ---
 function EmptyState() {
+  const { t } = useTranslation('dashboard')
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 py-6 px-4 text-[rgb(var(--text-tertiary))]">
       <CalendarIcon className="w-8 h-8 opacity-20" />
       <div>
-        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))]">No upcoming events</h4>
-        <p className="text-xs">Enjoy your free time!</p>
+        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('noUpcomingEvents')}</h4>
+        <p className="text-xs">{t('enjoyFreeTime')}</p>
       </div>
     </motion.div>
-  )
-}
-
-// --- Options Menu ---
-function EventsOptionsMenu({
-  calendars,
-  filters,
-  onUpdateFilters,
-  onHideWidget,
-}: {
-  calendars: string[]
-  filters: EventFilters
-  onUpdateFilters: (updates: Partial<EventFilters>) => void
-  onHideWidget?: () => void
-}) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [activeSubmenu, setActiveSubmenu] = useState<'calendars' | 'days' | null>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        setActiveSubmenu(null)
-      }
-    }
-    if (isOpen) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen])
-
-  return (
-    <div className="relative" ref={menuRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors ${isOpen ? 'bg-[rgb(var(--surface-tertiary))]' : ''}`}
-      >
-        <MoreHorizontal className="w-4 h-4" />
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -8 }}
-            className="absolute right-0 top-full mt-2 z-50 w-64 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-xl overflow-hidden"
-          >
-            {activeSubmenu === null ? (
-              <>
-                <button onClick={() => setActiveSubmenu('calendars')} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                  <span>Calendars</span>
-                  <ChevronRight className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                </button>
-                <button onClick={() => setActiveSubmenu('days')} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                  <span>Include events</span>
-                  <div className="flex items-center gap-1 text-[rgb(var(--text-tertiary))]">
-                    <span>{filters.includeDays} days</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </button>
-                <div className="border-t border-[rgb(var(--border-secondary))] my-1" />
-                <div className="px-3 py-2 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">All-day events</span>
-                    <ToggleSwitch checked={filters.showAllDay} onChange={() => onUpdateFilters({ showAllDay: !filters.showAllDay })} />
-                  </div>
-                </div>
-                <div className="border-t border-[rgb(var(--border-secondary))] my-1" />
-                <button onClick={() => { onHideWidget?.(); setIsOpen(false) }} className="w-full text-left px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">Hide from Home</button>
-              </>
-            ) : (
-              <div>
-                <button onClick={() => setActiveSubmenu(null)} className="flex items-center px-3 py-2 text-sm font-medium border-b border-[rgb(var(--border-secondary))] w-full hover:bg-[rgb(var(--surface-hover))]">
-                  <ChevronRight className="w-4 h-4 rotate-180 mr-2" />
-                  Back
-                </button>
-                {activeSubmenu === 'calendars' && calendars.map(cal => (
-                  <button key={cal} onClick={() => {
-                    const newSet = new Set(filters.calendars)
-                    if (newSet.has(cal)) newSet.delete(cal)
-                    else newSet.add(cal)
-                    onUpdateFilters({ calendars: newSet })
-                  }} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                    <span>{cal}</span>
-                    {filters.calendars.has(cal) && <Check className="w-4 h-4 text-[rgb(var(--brand-primary))]" />}
-                  </button>
-                ))}
-                {activeSubmenu === 'days' && [3, 7, 14].map(d => (
-                  <button key={d} onClick={() => { onUpdateFilters({ includeDays: d as IncludeDays }); setIsOpen(false) }} className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[rgb(var(--surface-hover))]">
-                    <span>{d} days</span>
-                    {filters.includeDays === d && <Check className="w-4 h-4 text-[rgb(var(--brand-primary))]" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-function EventsHeaderActions({
-  calendars,
-  filters,
-  onUpdateFilters,
-  onAddEvent,
-  onExpand,
-  onHideWidget,
-}: {
-  calendars: string[]
-  filters: EventFilters
-  onUpdateFilters: (updates: Partial<EventFilters>) => void
-  onAddEvent?: () => void
-  onExpand?: () => void
-  onHideWidget?: () => void
-}) {
-  return (
-    <div className="flex items-center gap-1">
-      <button onClick={onExpand} className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
-        <ArrowUpRight className="w-4 h-4" />
-      </button>
-      <EventsOptionsMenu calendars={calendars} filters={filters} onUpdateFilters={onUpdateFilters} onHideWidget={onHideWidget} />
-      <button onClick={onAddEvent} className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
-        <Plus className="w-4 h-4" />
-      </button>
-    </div>
   )
 }
 
@@ -534,12 +393,16 @@ function EventItem({ event }: { event: UpcomingEvent }) {
 export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { events?: UpcomingEvent[]; maxDays?: number }) {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  const { toggleWidget } = useDynamicPage() // Hook into dynamic page context
+  // COMING_SOON: Re-enable toggleWidget and setFilters when calendar features ship
+  const _dynPage = useDynamicPage()
+  void _dynPage
+  const { t, i18n } = useTranslation('dashboard')
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const events = propEvents || getEventsForRole(roleCategory ?? undefined)
   const calendars = Array.from(new Set(events.map(e => e.calendar).filter(Boolean) as string[]))
+  const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
 
-  const [filters, setFilters] = useState<EventFilters>({
+  const [filters] = useState<EventFilters>({
     calendars: new Set(calendars),
     includeDays: 3,
     showAllDay: true,
@@ -554,54 +417,47 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
   return (
     <WidgetSection
       widgetId="upcoming-events"
-      label="Upcoming events"
+      label={t('upcomingEvents')}
       overflowVisible={true}
       icon={Calendar}
-      headerActions={
-        <div className="flex items-center gap-1">
-          <EventsHeaderActions
-            calendars={calendars}
-            filters={filters}
-            onUpdateFilters={(u) => setFilters(p => ({ ...p, ...u }))}
-            onHideWidget={() => toggleWidget('upcoming-events')}
-            onAddEvent={() => console.log('add')}
-            onExpand={() => console.log('expand')}
-          />
-        </div>
-      }
+      // COMING_SOON: Replace header actions with badge until calendar features ship
+      headerActions={<ComingSoonBadge size="sm" />}
     >
-      {dayGroups.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="space-y-6 pl-2">
-          {dayGroups.map(([dateKey, dayEvents]) => {
-            const date = new Date(dateKey)
-            const isToday = new Date().toDateString() === date.toDateString()
-            const relativeDate = formatRelativeDate(date)
+      {/* COMING_SOON: Wrap mock events in overlay — remove when real calendar API is connected */}
+      <ComingSoonOverlay>
+        {dayGroups.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="space-y-6 pl-2">
+            {dayGroups.map(([dateKey, dayEvents]) => {
+              const date = new Date(dateKey)
+              const isToday = new Date().toDateString() === date.toDateString()
+              const relativeDate = formatRelativeDate(date, t)
 
-            return (
-              <div key={dateKey} className="flex gap-4">
-                {/* Left Column: Date */}
-                <div className="w-24 flex-shrink-0 pt-2">
-                  <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
-                    {relativeDate === 'Today' || relativeDate === 'Tomorrow' ? relativeDate : date.toLocaleDateString('en-US', { weekday: 'short' })}
+              return (
+                <div key={dateKey} className="flex gap-4">
+                  {/* Left Column: Date */}
+                  <div className="w-24 flex-shrink-0 pt-2">
+                    <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
+                      {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
+                    </div>
+                    <div className="text-xs text-[rgb(var(--text-tertiary))]">
+                      {date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                    </div>
                   </div>
-                  <div className="text-xs text-[rgb(var(--text-tertiary))]">
-                    {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+
+                  {/* Right Column: Events */}
+                  <div className="flex-1 space-y-2 border-l border-[rgb(var(--border-secondary))] pl-4 py-1">
+                    {dayEvents.map(event => (
+                      <EventItem key={event.id} event={event} />
+                    ))}
                   </div>
                 </div>
-
-                {/* Right Column: Events */}
-                <div className="flex-1 space-y-2 border-l border-[rgb(var(--border-secondary))] pl-4 py-1">
-                  {dayEvents.map(event => (
-                    <EventItem key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+              )
+            })}
+          </div>
+        )}
+      </ComingSoonOverlay>
     </WidgetSection>
   )
 }

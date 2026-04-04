@@ -5,15 +5,14 @@
  * Integrated with backend Users API via TanStack Query.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { 
-  Mail, 
-  Camera, 
-  User, 
+import {
+  Mail,
+  User,
   MapPin,
   Phone,
   Upload,
@@ -22,7 +21,7 @@ import {
   Check
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@edforge/ui'
+import { Button, ComingSoonBadge } from '@edforge/ui'
 import { TextField, SelectField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
 import { 
@@ -30,21 +29,20 @@ import {
   type UserProfileFormValues 
 } from '@/schemas/person.schema'
 import { getUserAvatar } from '@/lib/avatar'
-import { 
+import {
   SettingsPageHeader,
   SettingsSection,
   SettingsFormCard,
   SettingsSkeleton,
   SettingsDivider,
-  SaveButton,
+  UnsavedChangesBar,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { 
-  usersService, 
-  type UpdateUserDto, 
+import {
+  usersService,
+  type UpdateUserDto,
   type UserResponseDto,
-  type UserAddress,
 } from '@/services/users.service'
 
 // ============================================================================
@@ -163,130 +161,40 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
 }
 
 // ============================================================================
-// AVATAR UPLOAD COMPONENT
+// AVATAR DISPLAY COMPONENT
+// COMING_SOON: avatar-upload — Restore AvatarUpload interactivity when photo upload ships
 // ============================================================================
 
 interface AvatarUploadProps {
   avatarUrl: string
   displayName: string
-  onUpload: (file: File) => Promise<void>
-  onRemove: () => Promise<void>
-  isUploading: boolean
 }
 
-function AvatarUpload({ avatarUrl, displayName, onUpload, onRemove, isUploading }: AvatarUploadProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const handleFileSelect = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      return
-    }
-    // Max 5MB
-    if (file.size > 5 * 1024 * 1024) {
-      return
-    }
-    await onUpload(file)
-  }, [onUpload])
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleFileSelect(file)
-  }, [handleFileSelect])
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }, [])
-
-  const handleDragLeave = useCallback(() => {
-    setIsDragging(false)
-  }, [])
-
+function AvatarUpload({ avatarUrl, displayName }: AvatarUploadProps) {
   return (
     <div className="flex items-start gap-6">
-      <motion.div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={() => fileInputRef.current?.click()}
-        className="relative group cursor-pointer"
-        whileHover={{ scale: 1.02 }}
-        transition={{ type: 'spring', stiffness: 400 }}
-      >
+      <div className="relative">
         <img
           src={avatarUrl}
           alt={displayName}
-          className={`
-            w-24 h-24 rounded-xl object-cover 
-            ring-2 ring-[rgb(var(--border-primary))] 
-            group-hover:ring-teal-500/50 transition-all
-            ${isDragging ? 'ring-teal-500 ring-4' : ''}
-          `}
+          className="w-24 h-24 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))]"
         />
-        
-        <AnimatePresence>
-          {(isHovered || isDragging || isUploading) && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/60"
-            >
-              {isUploading ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full"
-                />
-              ) : (
-                <Camera className="w-6 h-6 text-white" />
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) handleFileSelect(file)
-          }}
-          className="hidden"
-        />
-      </motion.div>
+      </div>
 
       <div className="flex-1 min-w-0">
         <p className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate">{displayName}</p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          JPG, PNG or GIF. Max 5MB.
-        </p>
+        <div className="flex items-center gap-2 mt-1.5">
+          <ComingSoonBadge size="sm" />
+          <span className="text-xs text-[rgb(var(--text-tertiary))]">
+            Profile photo upload will be available soon
+          </span>
+        </div>
         <div className="flex items-center gap-2 mt-3">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-          >
+          <Button variant="outline" size="sm" type="button" disabled>
             <Upload className="w-3.5 h-3.5 mr-1.5" />
             Upload
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            type="button" 
-            className="text-[rgb(var(--text-tertiary))] hover:text-red-500"
-            onClick={onRemove}
-            disabled={isUploading}
-          >
+          <Button variant="ghost" size="sm" type="button" disabled className="text-[rgb(var(--text-tertiary))]">
             <Trash2 className="w-3.5 h-3.5 mr-1.5" />
             Remove
           </Button>
@@ -349,8 +257,6 @@ function CopyButton({ text }: { text: string }) {
 export default function AccountPage() {
   const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
-  
-  const [avatarUploading, setAvatarUploading] = useState(false)
 
   // Fetch user profile from API
   const {
@@ -385,7 +291,6 @@ export default function AccountPage() {
     defaultValues: {
       firstName: '',
       lastName: '',
-      middleName: '',
       displayName: '',
       email: '',
       phone: '',
@@ -402,13 +307,16 @@ export default function AccountPage() {
 
   const { handleSubmit, formState: { isDirty }, reset } = methods
 
+  const handleReset = useCallback(() => {
+    reset()
+  }, [reset])
+
   // Update form when profile data loads
   useEffect(() => {
     if (userProfile) {
       reset({
         firstName: userProfile.firstName || '',
         lastName: userProfile.lastName || '',
-        middleName: userProfile.middleName || '',
         displayName: userProfile.displayName || '',
         email: userProfile.email || '',
         phone: userProfile.phone || '',
@@ -426,7 +334,6 @@ export default function AccountPage() {
       reset({
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
-        middleName: '',
         displayName: '',
         email: user.email || '',
         phone: '',
@@ -443,52 +350,25 @@ export default function AccountPage() {
   }, [userProfile, user, reset])
 
   const onSubmit = async (data: UserProfileFormValues) => {
-    const address: Partial<UserAddress> = {}
-    if (data.address?.street) address.street = data.address.street
-    if (data.address?.street2) address.street2 = data.address.street2
-    if (data.address?.city) address.city = data.address.city
-    if (data.address?.state) address.state = data.address.state
-    if (data.address?.postalCode) address.postalCode = data.address.postalCode
-    if (data.address?.country) address.country = data.address.country
-    
     const updateData: UpdateUserDto = {
       firstName: data.firstName,
       lastName: data.lastName,
-      middleName: data.middleName || undefined,
       displayName: data.displayName || undefined,
       phone: data.phone || undefined,
-      address: Object.keys(address).length > 0 ? address : undefined,
+      address: {
+        street: data.address?.street || '',
+        street2: data.address?.street2 || '',
+        city: data.address?.city || '',
+        state: data.address?.state || '',
+        postalCode: data.address?.postalCode || '',
+        country: data.address?.country || '',
+      },
     }
-    
+
     updateMutation.mutate(updateData)
   }
 
-  // Avatar handlers
-  const handleAvatarUpload = async (file: File) => {
-    if (!user?.id) return
-    setAvatarUploading(true)
-    try {
-      await usersService.uploadAvatar(user.id, file)
-      queryClient.invalidateQueries({ queryKey: ['user', user.id] })
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to upload photo')
-    } finally {
-      setAvatarUploading(false)
-    }
-  }
-
-  const handleAvatarRemove = async () => {
-    if (!user?.id) return
-    setAvatarUploading(true)
-    try {
-      await usersService.removeAvatar(user.id)
-      queryClient.invalidateQueries({ queryKey: ['user', user.id] })
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to remove photo')
-    } finally {
-      setAvatarUploading(false)
-    }
-  }
+  // COMING_SOON: avatar-upload — Re-add handleAvatarUpload / handleAvatarRemove when photo upload ships
 
   // Computed values
   const avatarUrl = userProfile?.avatarUrl || getUserAvatar(
@@ -519,7 +399,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <motion.div
@@ -532,13 +412,6 @@ export default function AccountPage() {
             <SettingsPageHeader
               title="My Account"
               description="Manage your personal information"
-              action={
-                <SaveButton
-                  isDirty={isDirty}
-                  isSaving={updateMutation.isPending}
-                  saveSuccess={false}
-                />
-              }
             />
 
             {/* Profile Photo Section */}
@@ -548,9 +421,6 @@ export default function AccountPage() {
                   <AvatarUpload
                     avatarUrl={avatarUrl}
                     displayName={displayName}
-                    onUpload={handleAvatarUpload}
-                    onRemove={handleAvatarRemove}
-                    isUploading={avatarUploading}
                   />
                   
                   <div className="flex flex-col items-end gap-2">
@@ -587,15 +457,12 @@ export default function AccountPage() {
                 <TextField name="firstName" label="First Name" placeholder="Enter first name" required />
                 <TextField name="lastName" label="Last Name" placeholder="Enter last name" required />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextField name="middleName" label="Middle Name" placeholder="Enter middle name (optional)" />
-                <TextField 
-                  name="displayName" 
-                  label="Display Name" 
-                  placeholder="How you want to be called"
-                  helperText="This is how your name appears to others"
-                />
-              </div>
+              <TextField
+                name="displayName"
+                label="Display Name"
+                placeholder="How you want to be called"
+                helperText="This is how your name appears to others"
+              />
             </SettingsSection>
 
             {/* Contact Information Section */}
@@ -706,6 +573,13 @@ export default function AccountPage() {
               </>
             )}
           </motion.div>
+
+          <UnsavedChangesBar
+            isDirty={isDirty}
+            onReset={handleReset}
+            onSave={() => handleSubmit(onSubmit)()}
+            isSaving={updateMutation.isPending}
+          />
         </form>
       </FormProvider>
     </div>

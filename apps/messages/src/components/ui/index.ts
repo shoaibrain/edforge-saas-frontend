@@ -14,13 +14,5 @@ export {
   SkeletonModuleOverview,
 } from './Skeleton'
 export { Tooltip } from './Tooltip'
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableRow,
-  TableHead,
-  TableCell,
-} from './Table'
+
 

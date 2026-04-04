@@ -7,6 +7,7 @@
 
 import {
   useQuery,
+  useQueries,
   useInfiniteQuery,
   useMutation,
   useQueryClient,
@@ -279,5 +280,23 @@ export function useRemoveStudent() {
       const parsed = parseApiError(error)
       toast.error(parsed.message)
     },
+  })
+}
+
+// ============================================================================
+// BULK SECTION ROSTERS (Sprint 5)
+// ============================================================================
+
+/**
+ * Batch fetch rosters for multiple sections (for bulk rostering matrix)
+ */
+export function useBulkSectionRosters(sectionIds: string[], schoolId: string) {
+  return useQueries({
+    queries: sectionIds.map(sectionId => ({
+      queryKey: sectionKeys.roster(sectionId),
+      queryFn: () => getSectionRoster(sectionId, schoolId),
+      enabled: !!schoolId && !!sectionId,
+      staleTime: 2 * 60 * 1000,
+    })),
   })
 }

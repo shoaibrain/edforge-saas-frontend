@@ -13,3 +13,15 @@ export * from './tenant'
 // Person types
 export * from './person'
 
+// Billing types (fee structures, invoices, student accounts)
+export * from './billing'
+
+// Payment types (gateways, payments, receipts)
+export * from './payment'
+
+// Finance utilities (formatters for fee types, gateways, statuses, dates)
+export * from './finance-utils'
+
+// Academics utilities (attendance color, grade sorting/formatting)
+export * from './academics-utils'
+

@@ -66,6 +66,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
         timezone: formData.timezone || 'America/Chicago',
         locale: formData.locale || 'en-US',
         academicCalendarType: formData.academicCalendarType || 'semester',
+        calendarSystem: formData.calendarSystem || 'gregorian',
         localEducationAgencyId: formData.localEducationAgencyId,
         schoolCategories: formData.schoolCategories,
         schoolTypeDescriptor: formData.schoolTypeDescriptor,

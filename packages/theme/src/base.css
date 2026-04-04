@@ -5,11 +5,12 @@
  * This file should be imported by all EdForge applications.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Font loaded via <link> in index.html for faster LCP (no render-blocking @import) */
 
 /* Custom theme configuration with Coolors palette */
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-devanagari: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
   
   /* Edforge Brand Colors - Coolors Palette
      https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226 
@@ -187,6 +188,16 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/**
+ * Devanagari font — applied when locale is Nepali.
+ * The <html lang="ne"> attribute is set by useLocaleEffect() hook.
+ * The font stylesheet is injected conditionally via JS (not CSS @import)
+ * to avoid loading Devanagari glyphs for English-only users.
+ */
+html[lang="ne"] {
+  font-family: var(--font-devanagari);
+}
+
 body {
   background-color: rgb(var(--surface-primary));
   color: rgb(var(--text-primary));
@@ -194,6 +205,18 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+/* Pointer cursor for all interactive elements */
+a,
+button,
+[role="button"],
+[role="menuitem"],
+[role="option"],
+[role="tab"],
+[role="radio"],
+summary {
+  cursor: pointer;
 }
 
 /* Typography defaults */

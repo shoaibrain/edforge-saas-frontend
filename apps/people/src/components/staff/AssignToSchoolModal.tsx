@@ -21,6 +21,7 @@ import { Modal, ModalFooter, Button } from '../ui'
 import { useCreateAssignment } from '../../hooks'
 import { useSchools } from '../../hooks/useSchools'
 import { STAFF_ROLE_OPTIONS } from './wizard/staff-wizard.utils'
+import { useDepartments } from './wizard/steps/AssignmentStep'
 import { parseApiError } from '../../services/people.service'
 
 // ============================================================================
@@ -60,7 +61,7 @@ export function AssignToSchoolModal({
     defaultValues: {
       schoolId: '',
       role: '' as AssignStaffToSchoolDto['role'],
-      department: '',
+      departmentId: '',
       isPrimary: false,
       beginDate: new Date().toISOString().split('T')[0],
       positionTitle: '',
@@ -69,6 +70,8 @@ export function AssignToSchoolModal({
   })
 
   const fteValue = watch('fullTimeEquivalency')
+  const selectedSchoolId = watch('schoolId')
+  const { data: departments = [], isLoading: loadingDepts } = useDepartments(selectedSchoolId || undefined)
 
   // Reset form when modal opens
   useEffect(() => {
@@ -76,7 +79,7 @@ export function AssignToSchoolModal({
       reset({
         schoolId: '',
         role: '' as AssignStaffToSchoolDto['role'],
-        department: '',
+        departmentId: '',
         isPrimary: false,
         beginDate: new Date().toISOString().split('T')[0],
         positionTitle: '',
@@ -184,17 +187,22 @@ export function AssignToSchoolModal({
             )}
           </div>
           <div>
-            <label htmlFor="assign-department" className="block text-sm font-medium text-text-primary mb-1.5">
+            <label htmlFor="assign-departmentId" className="block text-sm font-medium text-text-primary mb-1.5">
               Department
             </label>
-            <input
-              id="assign-department"
-              type="text"
-              {...register('department')}
-              className={inputClass(!!errors.department)}
-              placeholder="e.g., Mathematics"
-              disabled={isSubmitting}
-            />
+            <select
+              id="assign-departmentId"
+              {...register('departmentId')}
+              className={inputClass(!!errors.departmentId)}
+              disabled={isSubmitting || !selectedSchoolId || loadingDepts}
+            >
+              <option value="">
+                {!selectedSchoolId ? 'Select a school first...' : loadingDepts ? 'Loading...' : 'Select department...'}
+              </option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+              ))}
+            </select>
           </div>
         </div>
 

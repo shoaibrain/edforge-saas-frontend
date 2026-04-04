@@ -5,7 +5,7 @@
  * Consumes existing backend endpoints (no new backend work).
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import {
@@ -17,6 +17,9 @@ import {
   Loader2,
   Clock,
   Calendar,
+  CalendarCheck2,
+  CalendarX2,
+  Hourglass,
 } from 'lucide-react'
 import type { LeaveRequestResponseDto } from '@aibrains/shared-types'
 import { useStaffLeaveRequests, useApproveLeave, useRejectLeave, useCancelLeave } from '../../hooks'
@@ -113,6 +116,16 @@ export function LeaveManagement({
   const [modalOpen, setModalOpen] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
+  // Leave balance summary
+  const leaveSummary = useMemo(() => {
+    if (!requests || requests.length === 0) return null
+    const approved = requests.filter((r) => r.status === 'approved' || r.status === 'completed' || r.status === 'in_progress')
+    const pending = requests.filter((r) => r.status === 'pending')
+    const totalUsed = approved.reduce((sum, r) => sum + (r.totalDays || 0), 0)
+    const totalPending = pending.reduce((sum, r) => sum + (r.totalDays || 0), 0)
+    return { totalUsed, totalPending, pendingCount: pending.length, totalRequests: requests.length }
+  }, [requests])
+
   const handleApprove = async (leaveId: string) => {
     setActionLoading(leaveId)
     try {
@@ -178,6 +191,56 @@ export function LeaveManagement({
           Request Leave
         </button>
       </motion.div>
+
+      {/* Leave Balance Summary */}
+      {leaveSummary && (
+        <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <CalendarDays className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">Total Requests</p>
+                <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.totalRequests}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-emerald-500/10">
+                <CalendarCheck2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Used</p>
+                <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.totalUsed}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-amber-500/10">
+                <Hourglass className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">Pending Requests</p>
+                <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.pendingCount}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-red-500/10">
+                <CalendarX2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Pending</p>
+                <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.totalPending}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Leave Requests */}
       <motion.div variants={fadeInUp}>

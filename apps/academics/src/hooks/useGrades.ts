@@ -20,6 +20,7 @@ import {
   getSectionGrades,
   getStudentGrades,
   finalizeGrade,
+  bulkFinalizeGrades,
   parseApiError,
   type GradingPolicyResponse,
   type CreateGradingPolicyParams,
@@ -28,6 +29,10 @@ import {
   type RecordBulkGradesParams,
   type SectionGradebookResponse,
   type StudentGradesResponse,
+  type BulkFinalizeParams,
+  type BulkFinalizeResponse,
+  getGradeOverview,
+  type GradeOverviewResponse,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -40,6 +45,8 @@ export const gradeKeys = {
   policyList: (schoolId: string) => [...gradeKeys.policies(), schoolId] as const,
   policy: (policyId: string, schoolId: string) =>
     [...gradeKeys.policies(), policyId, schoolId] as const,
+  overview: (schoolId: string, academicYearId: string) =>
+    [...gradeKeys.all, 'overview', schoolId, academicYearId] as const,
   sectionGrades: () => [...gradeKeys.all, 'section-grades'] as const,
   sectionGrade: (sectionId: string, params?: { schoolId?: string; termId?: string }) =>
     [...gradeKeys.sectionGrades(), sectionId, params] as const,
@@ -67,6 +74,23 @@ export function useGradingPolicy(policyId: string, schoolId: string, enabled = t
     queryFn: () => getGradingPolicy(policyId, schoolId),
     enabled: enabled && !!policyId && !!schoolId,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ============================================================================
+// GRADE OVERVIEW
+// ============================================================================
+
+export function useGradeOverview(
+  schoolId: string,
+  academicYearId: string,
+  enabled = true
+) {
+  return useQuery<GradeOverviewResponse, Error>({
+    queryKey: gradeKeys.overview(schoolId, academicYearId),
+    queryFn: () => getGradeOverview({ schoolId, academicYearId }),
+    enabled: enabled && !!schoolId && !!academicYearId,
+    staleTime: 60 * 1000,
   })
 }
 
@@ -138,7 +162,7 @@ export function useSectionGrades(
 
 export function useStudentGrades(
   studentId: string,
-  params?: { academicYearId?: string; termId?: string },
+  params?: { schoolId?: string; academicYearId?: string; termId?: string },
   enabled = true
 ) {
   return useQuery<StudentGradesResponse, Error>({
@@ -216,6 +240,29 @@ export function useFinalizeGrade() {
       queryClient.invalidateQueries({ queryKey: gradeKeys.sectionGrades() })
       queryClient.invalidateQueries({ queryKey: gradeKeys.studentGrades() })
       toast.success('Grade finalized')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+export function useBulkFinalizeGrades() {
+  const queryClient = useQueryClient()
+
+  return useMutation<BulkFinalizeResponse, Error, BulkFinalizeParams>({
+    mutationFn: (data) => bulkFinalizeGrades(data),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: gradeKeys.sectionGrades() })
+      queryClient.invalidateQueries({ queryKey: gradeKeys.studentGrades() })
+      if (result.errors.length > 0) {
+        toast.warning(
+          `${result.finalized} grades finalized with ${result.errors.length} error(s)`
+        )
+      } else {
+        toast.success(`${result.finalized} grades finalized successfully`)
+      }
     },
     onError: (error) => {
       const parsed = parseApiError(error)

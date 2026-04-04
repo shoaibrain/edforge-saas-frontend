@@ -50,12 +50,39 @@ export {
   TableCell,
 } from './components/Table'
 export { Dropdown, type DropdownOption } from './components/Dropdown'
+
+// TanStack Data Table
 export {
   DataTable,
-  type Column,
+  DataTable as TanstackDataTable,
+  DataTableColumnHeader,
+  DataTablePagination,
+  DataTableToolbar,
+  DataTableFacetedFilter,
+  DataTableViewOptions,
+  DataTableRowActions,
+  DataTableSkeleton,
+  DataTableSkeleton as TanstackDataTableSkeleton,
+  DataTableEmpty,
+  useDataTable,
+  createColumnHelper,
+  createSelectColumn,
+  createExpandColumn,
+  createActionsColumn,
   type DataTableProps,
-  type DataTableEmptyState,
-} from './components/DataTable'
+  type DataTableProps as TanstackDataTableProps,
+  type DataTableEmptyStateConfig,
+  type DataTableColumnMeta,
+  type FacetedFilterOption,
+  type FacetedFilterConfig,
+  type BulkAction,
+  type RowAction,
+  type PaginationConfig,
+  type ColumnDef,
+  type Row,
+  type CellContext,
+  type HeaderContext,
+} from './components/data-table'
 export {
   Modal,
   ModalFooter,
@@ -68,4 +95,50 @@ export {
   type DrawerProps,
   type DrawerFooterProps,
 } from './components/Drawer'
+
+// i18n
+export { LanguageSwitcher } from './components/LanguageSwitcher'
+
+// Coming Soon
+export {
+  ComingSoonBadge,
+  ComingSoonBanner,
+  ComingSoonOverlay,
+  type ComingSoonBadgeProps,
+  type ComingSoonBannerProps,
+  type ComingSoonOverlayProps,
+} from './components/ComingSoon'
+
+// Date
+export { DateDisplay } from './components/DateDisplay'
+export { BsDatePicker, DateInput } from './components/BsDatePicker'
+export { SchoolDate } from './components/SchoolDate'
+
+// V2 Components
+export { StatCard, type StatCardProps } from './components/StatCard'
+export { AnimatedProgressBar, type AnimatedProgressBarProps } from './components/AnimatedProgressBar'
+export { WidgetErrorBoundaryV2 } from './components/SectionErrorBoundary'
+export { V2AlertItem, type V2AlertItemProps } from './components/V2AlertItem'
+
+// V2 Hooks
+export { useCountUp, parseFormattedValue, formatAnimatedValue } from './hooks/useCountUp'
+export { useV2ChartColors } from './hooks/useV2ChartColors'
+export { useMediaQuery } from './hooks/useMediaQuery'
+
+// V2 Shared Components
+export {
+  AttendanceDonutRing,
+  type AttendanceDonutRingProps,
+} from './components/AttendanceDonutRing'
+export {
+  QuickDrawer,
+  useQuickDrawer,
+  type QuickDrawerRootProps,
+  type QuickDrawerHeaderProps,
+  type QuickDrawerBodyProps,
+  type QuickDrawerFooterProps,
+} from './components/QuickDrawer'
+
+// Hooks
+export { useFocusTrap } from './hooks/useFocusTrap'
 

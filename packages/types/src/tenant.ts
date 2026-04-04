@@ -64,6 +64,8 @@ export interface TenantIntegrations {
 /**
  * Represents a school within a tenant
  */
+export type SchoolStatus = 'active' | 'inactive' | 'setup' | 'suspended' | 'closed'
+
 export interface School {
   id: string
   tenantId: string
@@ -72,9 +74,12 @@ export interface School {
   address?: SchoolAddress
   phone?: string
   email?: string
-  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'other'
-  /** Active status */
+  type?: 'elementary' | 'middle' | 'high' | 'k12' | 'charter' | 'private' | 'vocational' | 'special_education' | 'other'
+  status: SchoolStatus
+  /** @deprecated Use `status === 'active'` instead */
   isActive: boolean
+  calendarSystem?: 'gregorian' | 'bikram_sambat'
+  currentAcademicYearId?: string
 }
 
 /**
@@ -87,6 +92,13 @@ export interface SchoolAddress {
   state: string
   postalCode: string
   country: string
+  wardNumber?: string
+  municipality?: string
+  district?: string
+  province?: string
+  region?: string
+  zipCode?: string
+  [key: string]: string | undefined
 }
 
 /**
@@ -129,12 +141,10 @@ export interface WorkspaceSettings {
     defaultDateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
     defaultTimeFormat: '12h' | '24h'
     defaultWeekStartsOn: 'sunday' | 'monday'
-  }
-  /** Academic calendar defaults */
-  calendar: {
-    defaultAcademicYearStart: string // e.g., "08-15" (month-day)
-    defaultAcademicYearEnd: string   // e.g., "06-15"
-    defaultTermStructure: 'semester' | 'trimester' | 'quarter'
+    defaultCurrency: string
+    defaultCalendarSystem: 'gregorian' | 'bikram_sambat'
+    enableDualDateDisplay: boolean
+    defaultNumberFormat: 'south_asian' | 'international'
   }
   /** Organization branding */
   branding: {
@@ -145,12 +155,15 @@ export interface WorkspaceSettings {
   }
   /** Policy defaults */
   policies: {
-    defaultGradingScale: 'letter' | 'percentage' | 'points' | 'custom'
     defaultAttendancePolicy: 'daily' | 'period' | 'both'
   }
   /** Lock status - prevents changes when academic year is active */
   isLocked: boolean
   lockReason?: string
+  /** Timestamp when admin confirmed workspace settings — null if never confirmed */
+  workspaceConfirmedAt?: string
+  /** Timestamp when admin completed the onboarding flow — null if never completed */
+  onboardingCompletedAt?: string
   createdAt: string
   updatedAt: string
 }
@@ -307,6 +320,9 @@ export interface AcademicYear {
   /** Temporal boundaries */
   startDate: string
   endDate: string
+  /** BS date equivalents (YYYY/MM/DD format, present when calendarSystem is bikram_sambat) */
+  startDateBS?: string
+  endDateBS?: string
   /** Current status */
   status: AcademicYearStatus
   /** Terms/grading periods within this academic year */
@@ -329,6 +345,10 @@ export interface CreateAcademicYearDto {
   name: string
   startDate: string
   endDate: string
+  /** BS start date in YYYY/MM/DD format */
+  startDateBS?: string
+  /** BS end date in YYYY/MM/DD format */
+  endDateBS?: string
   terms?: Omit<Term, 'id'>[]
 }
 

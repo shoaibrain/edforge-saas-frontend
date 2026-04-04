@@ -6,7 +6,7 @@
  * All fields are optional — the step itself is skippable.
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Plus, Trash2, Check } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
@@ -62,8 +62,11 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
     [gradeStart, gradeEnd],
   )
 
-  // Additional (non-contiguous) grade levels
-  const [additionalGrades, setAdditionalGrades] = useState<string[]>([])
+  // Additional (non-contiguous) grade levels — persisted in wizard data
+  const additionalGrades = ((data._additionalGrades as string[]) || [])
+  const setAdditionalGrades = (grades: string[]) => {
+    updateData({ _additionalGrades: grades })
+  }
 
   // Sync grade levels to wizard data
   useEffect(() => {
@@ -71,22 +74,35 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
     updateData({ gradeLevels: all.length > 0 ? all : undefined })
   }, [computedGrades, additionalGrades]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-suggest category on mount if not already set
+  // Track previous school type to detect changes
+  const prevSchoolTypeRef = useRef(schoolType)
+
+  // Auto-suggest category when schoolType changes or on first visit
   useEffect(() => {
+    if (!schoolType) return
+    const isFirstVisit = !prevSchoolTypeRef.current
+    const typeChanged = schoolType !== prevSchoolTypeRef.current
+    prevSchoolTypeRef.current = schoolType
+
     const categories = (data.schoolCategories as string[]) || []
-    if (schoolType && categories.length === 0) {
+    if (typeChanged || (isFirstVisit && categories.length === 0)) {
       const suggested = getSuggestedCategory(schoolType)
       if (suggested) updateData({ schoolCategories: [suggested] })
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [schoolType]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-suggest Ed-Fi school type descriptor on mount if not set
+  // Auto-suggest Ed-Fi school type descriptor when schoolType changes or on first visit
+  const prevDescriptorTypeRef = useRef(schoolType)
   useEffect(() => {
-    if (schoolType && !data.schoolTypeDescriptor) {
+    if (!schoolType) return
+    const typeChanged = schoolType !== prevDescriptorTypeRef.current
+    prevDescriptorTypeRef.current = schoolType
+
+    if (typeChanged || !data.schoolTypeDescriptor) {
       const suggested = getSuggestedDescriptor(schoolType)
       if (suggested) updateData({ schoolTypeDescriptor: suggested })
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [schoolType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- Categories ---
   const selectedCategories = ((data.schoolCategories as string[]) || [])
@@ -147,9 +163,10 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
 
   // --- Additional grade toggle ---
   const toggleAdditionalGrade = (grade: string) => {
-    setAdditionalGrades((prev) =>
-      prev.includes(grade) ? prev.filter((g) => g !== grade) : [...prev, grade],
-    )
+    const next = additionalGrades.includes(grade)
+      ? additionalGrades.filter((g) => g !== grade)
+      : [...additionalGrades, grade]
+    setAdditionalGrades(next)
   }
 
   const handleFieldChange = (field: string) => (

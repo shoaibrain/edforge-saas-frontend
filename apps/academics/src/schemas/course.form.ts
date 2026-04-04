@@ -53,22 +53,8 @@ export const DURATION_OPTIONS = [
   { value: 'trimester', label: 'Trimester' },
 ] as const
 
-export const GRADE_LEVEL_OPTIONS = [
-  { value: 'PK', label: 'Pre-K' },
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1', label: 'Grade 1' },
-  { value: '2', label: 'Grade 2' },
-  { value: '3', label: 'Grade 3' },
-  { value: '4', label: 'Grade 4' },
-  { value: '5', label: 'Grade 5' },
-  { value: '6', label: 'Grade 6' },
-  { value: '7', label: 'Grade 7' },
-  { value: '8', label: 'Grade 8' },
-  { value: '9', label: 'Grade 9' },
-  { value: '10', label: 'Grade 10' },
-  { value: '11', label: 'Grade 11' },
-  { value: '12', label: 'Grade 12' },
-] as const
+// Re-exported from shared-types (canonical source of truth)
+export { GRADE_LEVEL_OPTIONS } from '@aibrains/shared-types'
 
 export const MATERIAL_TYPE_OPTIONS = [
   { value: 'textbook', label: 'Textbook' },
@@ -223,7 +209,5 @@ export function getDurationLabel(value: string): string {
   return option?.label ?? value
 }
 
-export function getGradeLevelLabel(value: string): string {
-  const option = GRADE_LEVEL_OPTIONS.find((o) => o.value === value)
-  return option?.label ?? value
-}
+// Re-exported from shared-types (canonical source of truth)
+export { getGradeLevelLabel } from '@aibrains/shared-types'

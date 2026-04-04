@@ -27,6 +27,10 @@ export interface SectionFiltersState {
 // ============================================================================
 
 interface SectionsStoreState extends SectionFiltersState {
+  // View mode
+  viewMode: 'grid' | 'list'
+  setViewMode: (mode: 'grid' | 'list') => void
+
   // Filter actions
   setSearchTerm: (term: string) => void
   setCourseId: (id: string | null) => void
@@ -60,6 +64,12 @@ const defaultFilters: SectionFiltersState = {
 
 export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
   ...defaultFilters,
+
+  viewMode: (typeof window !== 'undefined' && localStorage.getItem('edforge.classrooms.viewMode') === 'list' ? 'list' : 'grid') as 'grid' | 'list',
+  setViewMode: (mode: 'grid' | 'list') => {
+    set({ viewMode: mode })
+    try { localStorage.setItem('edforge.classrooms.viewMode', mode) } catch {}
+  },
 
   setSearchTerm: (term: string) => {
     set({ searchTerm: term })
@@ -149,5 +159,16 @@ export const useSectionFilterActions = () =>
       resetFilters: state.resetFilters,
       hasActiveFilters: state.hasActiveFilters,
       activeFilterCount: state.activeFilterCount,
+    }))
+  )
+
+/**
+ * Get view mode preference
+ */
+export const useViewMode = () =>
+  useSectionsStore(
+    useShallow((state) => ({
+      viewMode: state.viewMode,
+      setViewMode: state.setViewMode,
     }))
   )

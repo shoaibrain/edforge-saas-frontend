@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import {
   getClassPeriods,
   getClassPeriod,
@@ -69,7 +70,7 @@ export function useCreateClassPeriod(schoolId: string) {
       toast.success('Class period created')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create class period')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -85,7 +86,7 @@ export function useUpdateClassPeriod(schoolId: string) {
       toast.success('Class period updated')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update class period')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -100,7 +101,7 @@ export function useDeleteClassPeriod(schoolId: string) {
       toast.success('Class period deleted')
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete class period')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }

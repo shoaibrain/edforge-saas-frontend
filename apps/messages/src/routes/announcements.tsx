@@ -212,8 +212,6 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
 export default function AnnouncementsPage() {
   const { activeSchoolId } = useAppStore()
 
-  // NOTE: Auth/ABAC checks removed - Shell's protected routes handle authentication
-  console.log('[Messages:Announcements] Rendering announcements page, activeSchoolId:', activeSchoolId)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'scheduled' | 'draft'>('all')
 
@@ -229,6 +227,22 @@ export default function AnnouncementsPage() {
     published: MOCK_ANNOUNCEMENTS.filter(a => a.status === 'published').length,
     scheduled: MOCK_ANNOUNCEMENTS.filter(a => a.status === 'scheduled').length,
     draft: MOCK_ANNOUNCEMENTS.filter(a => a.status === 'draft').length,
+  }
+
+  if (!activeSchoolId) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] p-6">
+        <div className="text-center">
+          <Megaphone className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
+          <p className="text-lg font-medium text-[rgb(var(--text-secondary))] mb-2">
+            Select a school
+          </p>
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">
+            Choose a school from the sidebar to view announcements.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (

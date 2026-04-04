@@ -1,0 +1,791 @@
+/**
+ * FullCalendar EdForge Theme
+ *
+ * Maps EdForge CSS custom properties to FullCalendar.
+ * Dark mode works via .dark class on <html>.
+ * Event colors use CSS classes (not inline styles) for theme awareness.
+ *
+ * !important usage policy:
+ * - Background events: REQUIRED — FC applies inline background-color
+ * - Selection: REQUIRED — must override FC's own cell backgrounds
+ * - Print hide: REQUIRED — must override display properties
+ * - Focus ring: REQUIRED — must override FC's own box-shadow reset
+ * - Everything else: use specificity via .fc ancestor selectors
+ */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   1. CORE FC VARIABLE OVERRIDES
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --fc-border-color: rgb(var(--border-primary));
+  --fc-page-bg-color: rgb(var(--surface-primary));
+  --fc-neutral-bg-color: rgb(var(--surface-secondary));
+  --fc-today-bg-color: rgba(20, 184, 166, 0.04);
+  --fc-neutral-text-color: rgb(var(--text-tertiary));
+  --fc-event-border-color: transparent;
+
+  --fc-button-bg-color: #005f73;
+  --fc-button-border-color: #005f73;
+  --fc-button-hover-bg-color: #004e5e;
+  --fc-button-hover-border-color: #004e5e;
+  --fc-button-active-bg-color: #003b46;
+  --fc-button-active-border-color: #003b46;
+  --fc-button-text-color: #ffffff;
+
+  --fc-small-font-size: 0.8125rem;
+}
+
+.dark {
+  --fc-today-bg-color: rgba(20, 184, 166, 0.06);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   2. CONTAINER & STRUCTURE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgb(var(--border-primary));
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  padding: 0.75rem 1rem;
+  background: rgb(var(--surface-secondary));
+  border-bottom: 1px solid rgb(var(--border-primary));
+  margin-bottom: 0;
+  gap: 0.5rem;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(var(--text-primary));
+}
+
+/* Toolbar buttons */
+.fc .fc-button {
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: none;
+}
+
+/* Focus ring — !important needed to override FC's box-shadow: none on :focus */
+.fc .fc-button:focus {
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3) !important;
+}
+
+.fc .fc-button-group > .fc-button {
+  border-radius: 0;
+}
+
+.fc .fc-button-group > .fc-button:first-child {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.fc .fc-button-group > .fc-button:last-child {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   3. DAY GRID
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc .fc-col-header-cell {
+  background: rgb(var(--surface-secondary));
+  padding: 0.625rem 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(var(--text-tertiary));
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: rgb(var(--text-tertiary));
+  text-decoration: none;
+}
+
+.fc .fc-daygrid-day {
+  min-height: 90px;
+  transition: box-shadow 0.15s, background-color 0.15s;
+}
+
+.fc .fc-daygrid-day:hover {
+  box-shadow: inset 0 0 0 2px rgba(20, 184, 166, 0.25);
+  z-index: 1;
+}
+
+.fc .fc-daygrid-day-number {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgb(var(--text-secondary));
+  padding: 0.375rem 0.5rem;
+  text-decoration: none;
+}
+
+/* Today highlight — number badge */
+.fc .fc-day-today .fc-daygrid-day-number {
+  background: #0d9488;
+  color: white;
+  border-radius: 9999px;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0.25rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.dark .fc .fc-day-today .fc-daygrid-day-number {
+  background: #14b8a6;
+}
+
+/* Today badge inside dual-calendar header row (BS mode) —
+   override circle badge to inline pill so it works in flexbox */
+.fc .fc-day-today .fc-day-header-row .fc-daygrid-day-number {
+  width: auto;
+  height: auto;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  margin: 0;
+  display: inline-flex;
+}
+
+/* Hide BS label when today badge is active (already colored) */
+.fc .fc-day-today .fc-bs-date .fc-date-label {
+  color: white;
+  opacity: 0.7;
+}
+
+/* BS dual-title header — shown above FullCalendar for bikram_sambat schools */
+.fc-bs-title-header {
+  text-align: center;
+  padding: 0.625rem 0 0.5rem;
+  border: 1px solid rgb(var(--border-primary));
+  border-bottom: none;
+  background: rgb(var(--surface-secondary));
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.fc-bs-title-header + .fc {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* Weekend cells */
+.fc .fc-day-sat,
+.fc .fc-day-sun {
+  background-color: rgb(var(--surface-secondary));
+}
+
+/* Other-month days */
+.fc .fc-day-other {
+  opacity: 0.35;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   4. EVENT CHIPS (foreground events)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc .fc-daygrid-event {
+  border-radius: 0.3125rem;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  border-width: 1px;
+  border-style: solid;
+  cursor: pointer;
+  margin: 1px 3px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.fc .fc-daygrid-event:hover {
+  opacity: 0.85;
+  transform: translateY(-0.5px);
+}
+
+.fc .fc-daygrid-event .fc-event-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "+N more" link */
+.fc .fc-daygrid-more-link {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #0d9488;
+  padding: 2px 6px;
+  border-radius: 0.375rem;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.fc .fc-daygrid-more-link:hover {
+  color: #0f766e;
+  background-color: rgba(20, 184, 166, 0.1);
+}
+
+.dark .fc .fc-daygrid-more-link {
+  color: #5eead4;
+}
+
+.dark .fc .fc-daygrid-more-link:hover {
+  color: #99f6e4;
+  background-color: rgba(20, 184, 166, 0.15);
+}
+
+/* ── Event type colors (light mode) ──
+   Using .fc .fc-daygrid-event selector for sufficient specificity
+   to override FC defaults without !important */
+
+.fc .fc-daygrid-event.fc-evt-instructional_day {
+  background-color: #d1fae5;
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+.fc .fc-daygrid-event.fc-evt-holiday {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+.fc .fc-daygrid-event.fc-evt-teacher_only {
+  background-color: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+.fc .fc-daygrid-event.fc-evt-break {
+  background-color: #f3e8ff;
+  border-color: #d8b4fe;
+  color: #6b21a8;
+}
+.fc .fc-daygrid-event.fc-evt-non_instructional_day {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+.fc .fc-daygrid-event.fc-evt-student_holiday {
+  background-color: #ffedd5;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+.fc .fc-daygrid-event.fc-evt-early_release {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #075985;
+}
+.fc .fc-daygrid-event.fc-evt-late_start {
+  background-color: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #3730a3;
+}
+.fc .fc-daygrid-event.fc-evt-make_up_day {
+  background-color: #ccfbf1;
+  border-color: #5eead4;
+  color: #115e59;
+}
+.fc .fc-daygrid-event.fc-evt-weather_day {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+.fc .fc-daygrid-event.fc-evt-testing_day {
+  background-color: #fef9c3;
+  border-color: #fde047;
+  color: #854d0e;
+}
+.fc .fc-daygrid-event.fc-evt-conference_day {
+  background-color: #fce7f3;
+  border-color: #f9a8d4;
+  color: #9d174d;
+}
+.fc .fc-daygrid-event.fc-evt-graduation {
+  background-color: #ede9fe;
+  border-color: #c4b5fd;
+  color: #5b21b6;
+}
+.fc .fc-daygrid-event.fc-evt-in_service {
+  background-color: #ecfccb;
+  border-color: #bef264;
+  color: #3f6212;
+}
+.fc .fc-daygrid-event.fc-evt-weekend {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+/* ── Event type colors (dark mode) ── */
+
+.dark .fc .fc-daygrid-event.fc-evt-instructional_day {
+  background-color: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+}
+.dark .fc .fc-daygrid-event.fc-evt-holiday {
+  background-color: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+.dark .fc .fc-daygrid-event.fc-evt-teacher_only {
+  background-color: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fcd34d;
+}
+.dark .fc .fc-daygrid-event.fc-evt-break {
+  background-color: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.45);
+  color: #d8b4fe;
+}
+.dark .fc .fc-daygrid-event.fc-evt-non_instructional_day {
+  background-color: rgba(100, 116, 139, 0.18);
+  border-color: rgba(100, 116, 139, 0.45);
+  color: #cbd5e1;
+}
+.dark .fc .fc-daygrid-event.fc-evt-student_holiday {
+  background-color: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #fdba74;
+}
+.dark .fc .fc-daygrid-event.fc-evt-early_release {
+  background-color: rgba(14, 165, 233, 0.18);
+  border-color: rgba(14, 165, 233, 0.45);
+  color: #7dd3fc;
+}
+.dark .fc .fc-daygrid-event.fc-evt-late_start {
+  background-color: rgba(99, 102, 241, 0.18);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #a5b4fc;
+}
+.dark .fc .fc-daygrid-event.fc-evt-make_up_day {
+  background-color: rgba(20, 184, 166, 0.18);
+  border-color: rgba(20, 184, 166, 0.45);
+  color: #5eead4;
+}
+.dark .fc .fc-daygrid-event.fc-evt-weather_day {
+  background-color: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #93c5fd;
+}
+.dark .fc .fc-daygrid-event.fc-evt-testing_day {
+  background-color: rgba(234, 179, 8, 0.18);
+  border-color: rgba(234, 179, 8, 0.45);
+  color: #fde047;
+}
+.dark .fc .fc-daygrid-event.fc-evt-conference_day {
+  background-color: rgba(236, 72, 153, 0.18);
+  border-color: rgba(236, 72, 153, 0.45);
+  color: #f9a8d4;
+}
+.dark .fc .fc-daygrid-event.fc-evt-graduation {
+  background-color: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.45);
+  color: #c4b5fd;
+}
+.dark .fc .fc-daygrid-event.fc-evt-in_service {
+  background-color: rgba(132, 204, 22, 0.18);
+  border-color: rgba(132, 204, 22, 0.45);
+  color: #bef264;
+}
+.dark .fc .fc-daygrid-event.fc-evt-weekend {
+  background-color: rgba(100, 116, 139, 0.12);
+  border-color: rgba(100, 116, 139, 0.3);
+  color: #94a3b8;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   5. BACKGROUND EVENTS (cell-level coloring)
+   !important IS REQUIRED here — FullCalendar applies background-color as
+   inline style on .fc-bg-event elements, which can only be overridden with
+   !important or JS manipulation.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc .fc-bg-event {
+  opacity: 1;
+}
+
+/* Light mode backgrounds */
+.fc-bg-instructional_day { background-color: rgba(16, 185, 129, 0.06) !important; }
+.fc-bg-holiday { background-color: rgba(239, 68, 68, 0.06) !important; }
+.fc-bg-teacher_only { background-color: rgba(245, 158, 11, 0.06) !important; }
+.fc-bg-break { background-color: rgba(168, 85, 247, 0.06) !important; }
+.fc-bg-non_instructional_day { background-color: rgba(100, 116, 139, 0.04) !important; }
+.fc-bg-student_holiday { background-color: rgba(249, 115, 22, 0.06) !important; }
+.fc-bg-early_release { background-color: rgba(14, 165, 233, 0.06) !important; }
+.fc-bg-late_start { background-color: rgba(99, 102, 241, 0.06) !important; }
+.fc-bg-make_up_day { background-color: rgba(20, 184, 166, 0.06) !important; }
+.fc-bg-weather_day { background-color: rgba(59, 130, 246, 0.06) !important; }
+.fc-bg-testing_day { background-color: rgba(234, 179, 8, 0.06) !important; }
+.fc-bg-conference_day { background-color: rgba(236, 72, 153, 0.06) !important; }
+.fc-bg-graduation { background-color: rgba(139, 92, 246, 0.06) !important; }
+.fc-bg-in_service { background-color: rgba(132, 204, 22, 0.06) !important; }
+.fc-bg-weekend { background-color: rgba(100, 116, 139, 0.04) !important; }
+
+/* Dark mode backgrounds — more visible for better distinction */
+.dark .fc-bg-instructional_day { background-color: rgba(16, 185, 129, 0.10) !important; }
+.dark .fc-bg-holiday { background-color: rgba(239, 68, 68, 0.10) !important; }
+.dark .fc-bg-teacher_only { background-color: rgba(245, 158, 11, 0.10) !important; }
+.dark .fc-bg-break { background-color: rgba(168, 85, 247, 0.10) !important; }
+.dark .fc-bg-non_instructional_day { background-color: rgba(100, 116, 139, 0.08) !important; }
+.dark .fc-bg-student_holiday { background-color: rgba(249, 115, 22, 0.10) !important; }
+.dark .fc-bg-early_release { background-color: rgba(14, 165, 233, 0.10) !important; }
+.dark .fc-bg-late_start { background-color: rgba(99, 102, 241, 0.10) !important; }
+.dark .fc-bg-make_up_day { background-color: rgba(20, 184, 166, 0.10) !important; }
+.dark .fc-bg-weather_day { background-color: rgba(59, 130, 246, 0.10) !important; }
+.dark .fc-bg-testing_day { background-color: rgba(234, 179, 8, 0.10) !important; }
+.dark .fc-bg-conference_day { background-color: rgba(236, 72, 153, 0.10) !important; }
+.dark .fc-bg-graduation { background-color: rgba(139, 92, 246, 0.10) !important; }
+.dark .fc-bg-in_service { background-color: rgba(132, 204, 22, 0.10) !important; }
+.dark .fc-bg-weekend { background-color: rgba(100, 116, 139, 0.08) !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   6. LIST VIEW
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc .fc-list {
+  border: none;
+}
+
+.fc .fc-list-day-cushion {
+  background: rgb(var(--surface-secondary));
+  color: rgb(var(--text-primary));
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
+.fc .fc-list-event:hover td {
+  background: rgba(20, 184, 166, 0.05);
+}
+
+.fc .fc-list-event-title a {
+  color: rgb(var(--text-primary));
+  text-decoration: none;
+}
+
+.fc .fc-list-event-dot {
+  border-radius: 50%;
+}
+
+.fc .fc-list-empty {
+  background: rgb(var(--surface-primary));
+}
+
+.fc .fc-list-empty-cushion {
+  color: rgb(var(--text-tertiary));
+  font-size: 0.875rem;
+}
+
+/* List view event type dot colors — uses high specificity to override FC inline border-color */
+.fc .fc-list-event.fc-evt-instructional_day .fc-list-event-dot { border-color: #10b981 !important; }
+.fc .fc-list-event.fc-evt-holiday .fc-list-event-dot { border-color: #ef4444 !important; }
+.fc .fc-list-event.fc-evt-teacher_only .fc-list-event-dot { border-color: #f59e0b !important; }
+.fc .fc-list-event.fc-evt-break .fc-list-event-dot { border-color: #a855f7 !important; }
+.fc .fc-list-event.fc-evt-non_instructional_day .fc-list-event-dot { border-color: #64748b !important; }
+.fc .fc-list-event.fc-evt-student_holiday .fc-list-event-dot { border-color: #f97316 !important; }
+.fc .fc-list-event.fc-evt-early_release .fc-list-event-dot { border-color: #0ea5e9 !important; }
+.fc .fc-list-event.fc-evt-late_start .fc-list-event-dot { border-color: #6366f1 !important; }
+.fc .fc-list-event.fc-evt-make_up_day .fc-list-event-dot { border-color: #14b8a6 !important; }
+.fc .fc-list-event.fc-evt-weather_day .fc-list-event-dot { border-color: #3b82f6 !important; }
+.fc .fc-list-event.fc-evt-testing_day .fc-list-event-dot { border-color: #eab308 !important; }
+.fc .fc-list-event.fc-evt-conference_day .fc-list-event-dot { border-color: #ec4899 !important; }
+.fc .fc-list-event.fc-evt-graduation .fc-list-event-dot { border-color: #8b5cf6 !important; }
+.fc .fc-list-event.fc-evt-in_service .fc-list-event-dot { border-color: #84cc16 !important; }
+.fc .fc-list-event.fc-evt-weekend .fc-list-event-dot { border-color: #94a3b8 !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   7. SELECTION & INTERACTION
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Focused date class — drawer-active single date
+   !important needed to override FC cell backgrounds */
+.fc .fc-daygrid-day.fc-day--focused {
+  background-color: rgba(20, 184, 166, 0.04) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(20, 184, 166, 0.45) !important;
+  z-index: 2;
+}
+
+.dark .fc .fc-daygrid-day.fc-day--focused {
+  background-color: rgba(20, 184, 166, 0.07) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(20, 184, 166, 0.55) !important;
+}
+
+.fc .fc-daygrid-day.fc-day--focused .fc-daygrid-day-number {
+  color: #0d9488;
+  font-weight: 700;
+}
+
+.dark .fc .fc-daygrid-day.fc-day--focused .fc-daygrid-day-number {
+  color: #5eead4;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   8. CUSTOM CONTENT CLASSES
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Event content row (custom renderEventContent layout) */
+.fc-event-content-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.fc-event-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.35;
+}
+
+/* Instructional dot indicator */
+.fc-event-instructional-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #34d399;
+  margin-right: 3px;
+  flex-shrink: 0;
+}
+
+.dark .fc-event-instructional-dot {
+  background-color: #6ee7b7;
+}
+
+/* Bell schedule label */
+.fc-event-bell-schedule {
+  font-size: 0.5625rem;
+  color: rgb(var(--text-tertiary));
+  line-height: 1;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dual calendar header row (BS primary left, AD secondary right) */
+.fc-day-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+/* BS date group (primary — left side) */
+.fc-bs-date {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.fc-day-header-row .fc-daygrid-day-number {
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* AD date group (secondary — right side) */
+.fc-ad-date {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.fc-ad-day-number {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: rgb(var(--text-tertiary));
+  opacity: 0.6;
+  line-height: 1;
+}
+
+.dark .fc-ad-day-number {
+  opacity: 0.45;
+}
+
+/* Calendar system label (BS / AD) */
+.fc-date-label {
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgb(var(--text-tertiary));
+  opacity: 0.5;
+  line-height: 1;
+  vertical-align: super;
+}
+
+.dark .fc-date-label {
+  opacity: 0.35;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   9. LEGEND DOTS (used by the page legend bar)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc-legend-dot {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+}
+
+.fc-legend-dot--instructional_day { background-color: #10b981; }
+.fc-legend-dot--holiday { background-color: #ef4444; }
+.fc-legend-dot--teacher_only { background-color: #f59e0b; }
+.fc-legend-dot--break { background-color: #a855f7; }
+.fc-legend-dot--non_instructional_day { background-color: #64748b; }
+.fc-legend-dot--student_holiday { background-color: #f97316; }
+.fc-legend-dot--early_release { background-color: #0ea5e9; }
+.fc-legend-dot--late_start { background-color: #6366f1; }
+.fc-legend-dot--make_up_day { background-color: #14b8a6; }
+.fc-legend-dot--weather_day { background-color: #3b82f6; }
+.fc-legend-dot--testing_day { background-color: #eab308; }
+.fc-legend-dot--conference_day { background-color: #ec4899; }
+.fc-legend-dot--graduation { background-color: #8b5cf6; }
+.fc-legend-dot--in_service { background-color: #84cc16; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   10. LOADING OVERLAY
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.fc-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--surface-primary) / 0.6);
+  backdrop-filter: blur(2px);
+  border-radius: 0.75rem;
+  pointer-events: none;
+  animation: fc-fade-in 0.2s ease;
+}
+
+@keyframes fc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   11. RESPONSIVE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .fc .fc-toolbar.fc-header-toolbar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 0.875rem;
+  }
+
+  .fc .fc-button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .fc .fc-daygrid-day {
+    min-height: 60px;
+  }
+
+  .fc .fc-daygrid-day-number {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.375rem;
+  }
+
+  .fc .fc-daygrid-event {
+    font-size: 0.625rem;
+    padding: 1px 3px;
+  }
+
+  .fc-day-header-row {
+    padding: 0.125rem 0.25rem;
+  }
+
+  .fc-day-header-row .fc-daygrid-day-number {
+    font-size: 0.75rem;
+  }
+
+  .fc-ad-day-number {
+    font-size: 0.5625rem;
+  }
+
+  .fc-date-label {
+    font-size: 0.4375rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hide AD secondary date and labels on very small screens */
+  .fc-ad-date {
+    display: none;
+  }
+
+  .fc-date-label {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   12. PRINT
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  .fc {
+    border: 1px solid #d1d5db;
+  }
+
+  .fc .fc-toolbar.fc-header-toolbar {
+    background: #f9fafb;
+  }
+
+  /* !important needed to override display in print context */
+  .fc .fc-button-group,
+  .fc .fc-today-button {
+    display: none !important;
+  }
+
+  .fc .fc-daygrid-day {
+    min-height: 70px;
+  }
+
+  .fc-loading-overlay {
+    display: none;
+  }
+
+  /* Force light-mode colors for print — !important needed for print override */
+  .fc .fc-daygrid-event.fc-evt-instructional_day { background-color: #d1fae5 !important; border-color: #6ee7b7 !important; color: #065f46 !important; }
+  .fc .fc-daygrid-event.fc-evt-holiday { background-color: #fee2e2 !important; border-color: #fca5a5 !important; color: #991b1b !important; }
+  .fc .fc-daygrid-event.fc-evt-teacher_only { background-color: #fef3c7 !important; border-color: #fcd34d !important; color: #92400e !important; }
+  .fc .fc-daygrid-event.fc-evt-break { background-color: #f3e8ff !important; border-color: #d8b4fe !important; color: #6b21a8 !important; }
+  .fc .fc-daygrid-event.fc-evt-non_instructional_day { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #334155 !important; }
+  .fc .fc-daygrid-event.fc-evt-student_holiday { background-color: #ffedd5 !important; border-color: #fdba74 !important; color: #9a3412 !important; }
+  .fc .fc-daygrid-event.fc-evt-early_release { background-color: #e0f2fe !important; border-color: #7dd3fc !important; color: #075985 !important; }
+  .fc .fc-daygrid-event.fc-evt-late_start { background-color: #e0e7ff !important; border-color: #a5b4fc !important; color: #3730a3 !important; }
+  .fc .fc-daygrid-event.fc-evt-make_up_day { background-color: #ccfbf1 !important; border-color: #5eead4 !important; color: #115e59 !important; }
+  .fc .fc-daygrid-event.fc-evt-weather_day { background-color: #dbeafe !important; border-color: #93c5fd !important; color: #1e40af !important; }
+  .fc .fc-daygrid-event.fc-evt-testing_day { background-color: #fef9c3 !important; border-color: #fde047 !important; color: #854d0e !important; }
+  .fc .fc-daygrid-event.fc-evt-conference_day { background-color: #fce7f3 !important; border-color: #f9a8d4 !important; color: #9d174d !important; }
+  .fc .fc-daygrid-event.fc-evt-graduation { background-color: #ede9fe !important; border-color: #c4b5fd !important; color: #5b21b6 !important; }
+  .fc .fc-daygrid-event.fc-evt-in_service { background-color: #ecfccb !important; border-color: #bef264 !important; color: #3f6212 !important; }
+}

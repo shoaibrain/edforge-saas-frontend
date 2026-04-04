@@ -1,20 +1,32 @@
 /**
- * EnrollmentTable Component
+ * EnrollmentTable Component — V2
  *
- * DataTable for enrollment records with search, filters, and actions.
+ * DataTable for enrollment records using TanstackDataTable from @edforge/ui.
+ *
+ * V2 changes:
+ * - Status badge with V2 semantic colors
+ * - Type column: re_enrollment → Re-enrollment
+ * - Entry Date: MMM DD, YYYY format
+ * - Exit Date: em-dash in ghost color when empty
+ * - V2 token-based filter dropdowns
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
-  Search,
   MoreHorizontal,
   UserMinus,
   ArrowRightLeft,
   Users,
   X,
+  UserX,
 } from 'lucide-react'
+import {
+  TanstackDataTable,
+  createActionsColumn,
+  type ColumnDef,
+} from '@edforge/ui'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
-import { useDebounce } from '../../hooks'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -31,13 +43,11 @@ interface EnrollmentTableProps {
   onGradeLevelChange: (level: string | null) => void
   statusFilter: string | null
   onStatusChange: (status: string | null) => void
-  onWithdraw: (enrollment: EnrollmentResponseDto) => void
-  onTransfer: (enrollment: EnrollmentResponseDto) => void
+  onWithdraw?: (enrollment: EnrollmentResponseDto) => void
+  onTransfer?: (enrollment: EnrollmentResponseDto) => void
+  onMarkNoShow?: (enrollment: EnrollmentResponseDto) => void
+  schoolGradeRange?: { start: string; end: string } | null
 }
-
-const gradeLevels = [
-  'Pre-K', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-]
 
 const statusOptions = [
   { value: 'enrolled', label: 'Enrolled' },
@@ -47,16 +57,62 @@ const statusOptions = [
   { value: 'graduated', label: 'Graduated' },
 ]
 
-function getStatusBadge(status: string) {
-  const styles: Record<string, string> = {
-    enrolled: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-    active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-    pending: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-    withdrawn: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-    transferred: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    graduated: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+// ============================================================================
+// V2 STATUS BADGE
+// ============================================================================
+
+const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
+  enrolled: { bg: 'rgba(29, 158, 117, 0.10)', color: '#1D9E75' },
+  active: { bg: 'rgba(29, 158, 117, 0.10)', color: '#1D9E75' },
+  pending: { bg: 'rgba(239, 159, 39, 0.10)', color: '#EF9F27' },
+  withdrawn: { bg: 'rgba(226, 75, 74, 0.10)', color: '#E24B4A' },
+  transferred: { bg: 'rgba(55, 138, 221, 0.10)', color: '#378ADD' },
+  graduated: { bg: 'rgba(127, 119, 221, 0.10)', color: '#7F77DD' },
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const style = STATUS_STYLES[status] || { bg: 'rgba(255, 255, 255, 0.06)', color: 'var(--v2-text-hint)' }
+  return (
+    <span
+      className="inline-flex"
+      style={{
+        background: style.bg,
+        color: style.color,
+        borderRadius: 10,
+        padding: '2px 8px',
+        fontSize: 10,
+        fontWeight: 500,
+        textTransform: 'capitalize',
+      }}
+    >
+      {status}
+    </span>
+  )
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function formatDate(dateStr: string | undefined | null): string {
+  if (!dateStr) return '\u2014'
+  try {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  } catch {
+    return '\u2014'
   }
-  return styles[status] || 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400'
+}
+
+function formatEnrollmentType(type: string | undefined | null): string {
+  if (!type) return '\u2014'
+  return type
+    .replace(/_/g, '-')
+    .replace(/^(.)/, (m) => m.toUpperCase())
+    .replace(/-(.)/g, (_, c) => `-${c}`)
 }
 
 // ============================================================================
@@ -67,10 +123,12 @@ function ActionMenu({
   enrollment,
   onWithdraw,
   onTransfer,
+  onMarkNoShow,
 }: {
   enrollment: EnrollmentResponseDto
   onWithdraw: () => void
   onTransfer: () => void
+  onMarkNoShow?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const isActive = enrollment.status === 'enrolled' || enrollment.status === 'active' || enrollment.status === 'pending'
@@ -82,30 +140,50 @@ function ActionMenu({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
+        className="p-1.5 rounded-md transition-colors hover:opacity-80"
+        style={{ color: 'var(--v2-text-hint)' }}
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-44 bg-surface-primary border border-border-secondary rounded-lg shadow-lg py-1">
+          <div
+            className="absolute right-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg"
+            style={{
+              background: 'var(--v2-bg-elevated)',
+              border: '1px solid var(--v2-border-default)',
+            }}
+          >
             <button
               type="button"
               onClick={() => { onWithdraw(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+              style={{ color: '#E24B4A' }}
             >
-              <UserMinus className="w-4 h-4 text-red-500" />
+              <UserMinus className="w-3.5 h-3.5" />
               Withdraw
             </button>
             <button
               type="button"
               onClick={() => { onTransfer(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+              style={{ color: '#378ADD' }}
             >
-              <ArrowRightLeft className="w-4 h-4 text-blue-500" />
+              <ArrowRightLeft className="w-3.5 h-3.5" />
               Transfer
             </button>
+            {onMarkNoShow && (
+              <button
+                type="button"
+                onClick={() => { onMarkNoShow(); setOpen(false) }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                style={{ color: '#EF9F27' }}
+              >
+                <UserX className="w-3.5 h-3.5" />
+                Mark No-Show
+              </button>
+            )}
           </div>
         </>
       )}
@@ -120,146 +198,194 @@ function ActionMenu({
 export function EnrollmentTable({
   enrollments,
   isLoading,
-  hasMore,
-  onLoadMore,
-  searchTerm,
-  onSearchChange,
+  hasMore: _hasMore,
+  onLoadMore: _onLoadMore,
+  searchTerm: _searchTerm,
+  onSearchChange: _onSearchChange,
   gradeLevel,
   onGradeLevelChange,
   statusFilter,
   onStatusChange,
   onWithdraw,
   onTransfer,
+  onMarkNoShow,
+  schoolGradeRange,
 }: EnrollmentTableProps) {
-  // Client-side search filter
-  const debouncedSearch = useDebounce(searchTerm, 300)
-  const filtered = enrollments.filter((e) => {
-    if (debouncedSearch) {
-      const term = debouncedSearch.toLowerCase()
-      const name = `${(e as Record<string, unknown>).studentName || ''}`.toLowerCase()
-      if (!name.includes(term) && !e.studentId.toLowerCase().includes(term)) return false
+  const gradeLevelOptions = useFilteredGradeOptions(schoolGradeRange)
+  const hasActions = !!(onWithdraw || onTransfer || onMarkNoShow)
+
+  const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(() => {
+    const cols: ColumnDef<EnrollmentResponseDto, unknown>[] = [
+      {
+        accessorFn: (row) =>
+          (row as Record<string, unknown>).studentName as string ||
+          row.studentId.slice(0, 8),
+        id: 'studentName',
+        header: 'Student',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span
+            className="font-medium"
+            style={{ fontSize: 12, color: 'var(--v2-text-primary)' }}
+          >
+            {getValue<string>()}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'gradeLevel',
+        header: 'Grade Level',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+            {getValue<string>()}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        enableSorting: true,
+        cell: ({ getValue }) => <StatusBadge status={getValue<string>()} />,
+      },
+      {
+        accessorFn: (row) => row.entryDate || row.enrollmentDate || null,
+        id: 'entryDate',
+        header: 'Entry Date',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+            {formatDate(getValue<string | null>())}
+          </span>
+        ),
+      },
+      {
+        accessorFn: (row) => row.exitWithdrawDate || row.withdrawalDate || null,
+        id: 'exitDate',
+        header: 'Exit Date',
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const val = getValue<string | null>()
+          return (
+            <span
+              style={{
+                fontSize: 12,
+                color: val ? 'var(--v2-text-secondary)' : 'var(--v2-text-ghost)',
+              }}
+            >
+              {formatDate(val)}
+            </span>
+          )
+        },
+      },
+      {
+        accessorKey: 'enrollmentType',
+        header: 'Type',
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+            {formatEnrollmentType(getValue<string>())}
+          </span>
+        ),
+      },
+    ]
+
+    if (hasActions) {
+      cols.push(
+        createActionsColumn<EnrollmentResponseDto>({
+          cell: ({ row }) => (
+            <ActionMenu
+              enrollment={row.original}
+              onWithdraw={() => onWithdraw?.(row.original)}
+              onTransfer={() => onTransfer?.(row.original)}
+              onMarkNoShow={
+                onMarkNoShow ? () => onMarkNoShow(row.original) : undefined
+              }
+            />
+          ),
+          size: 48,
+        })
+      )
     }
-    return true
-  })
+
+    return cols
+  }, [hasActions, onWithdraw, onTransfer, onMarkNoShow])
+
+  const filteredData = useMemo(() => {
+    let result = enrollments
+    if (gradeLevel) {
+      result = result.filter((e) => e.gradeLevel === gradeLevel)
+    }
+    if (statusFilter) {
+      result = result.filter((e) => e.status === statusFilter)
+    }
+    return result
+  }, [enrollments, gradeLevel, statusFilter])
 
   return (
-    <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search students..."
-            className="w-full pl-10 pr-4 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-          />
-        </div>
-        <select
-          value={gradeLevel ?? ''}
-          onChange={(e) => onGradeLevelChange(e.target.value || null)}
-          className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        >
-          <option value="">All Grades</option>
-          {gradeLevels.map((g) => (
-            <option key={g} value={g}>Grade {g}</option>
-          ))}
-        </select>
-        <select
-          value={statusFilter ?? ''}
-          onChange={(e) => onStatusChange(e.target.value || null)}
-          className="px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        >
-          <option value="">All Status</option>
-          {statusOptions.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
-        {(gradeLevel || statusFilter) && (
-          <button
-            type="button"
-            onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
-            className="flex items-center gap-1 px-3 py-2.5 text-sm text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
+    <TanstackDataTable<EnrollmentResponseDto>
+      columns={columns}
+      data={filteredData}
+      getRowId={(row) => `${row.studentId}-${row.schoolId}`}
+      isLoading={isLoading}
+      enableSorting={true}
+      pagination={{ pageSize: 20 }}
+      searchPlaceholder="Search students..."
+      emptyState={{
+        icon: <Users className="w-10 h-10" style={{ color: 'var(--v2-text-ghost)', opacity: 0.4 }} />,
+        title: 'No enrollments found',
+        description: 'Try adjusting your filters or search term.',
+      }}
+      maxHeight="calc(100vh - 13rem)"
+      toolbarExtra={
+        <div className="flex items-center gap-2">
+          <select
+            value={gradeLevel ?? ''}
+            onChange={(e) => onGradeLevelChange(e.target.value || null)}
+            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none"
+            style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              color: 'var(--v2-text-secondary)',
+            }}
           >
-            <X className="w-3.5 h-3.5" />
-            Clear
-          </button>
-        )}
-      </div>
-
-      {/* Table */}
-      {isLoading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-12 bg-surface-secondary rounded-lg animate-pulse" />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="py-12 text-center">
-          <Users className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-          <h4 className="text-sm font-medium text-text-primary mb-1">
-            No enrollments found
-          </h4>
-          <p className="text-xs text-text-tertiary">
-            Try adjusting your filters or search term.
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-border-secondary overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-surface-secondary">
-                <th className="px-4 py-3 text-left font-semibold text-text-primary">Student</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Grade Level</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Enrollment Date</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Type</th>
-                <th className="px-4 py-3 w-12" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-secondary">
-              {filtered.map((enrollment) => (
-                <tr key={`${enrollment.studentId}-${enrollment.schoolId}`} className="hover:bg-surface-secondary/50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-text-primary">
-                    {(enrollment as Record<string, unknown>).studentName as string || enrollment.studentId.slice(0, 8)}
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary">{enrollment.gradeLevel}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(enrollment.status)}`}>
-                      {enrollment.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary">
-                    {enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString() : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary capitalize">
-                    {enrollment.enrollmentType || '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <ActionMenu
-                      enrollment={enrollment}
-                      onWithdraw={() => onWithdraw(enrollment)}
-                      onTransfer={() => onTransfer(enrollment)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {hasMore && onLoadMore && (
-            <div className="px-4 py-3 text-center border-t border-border-secondary">
-              <button
-                type="button"
-                onClick={onLoadMore}
-                className="text-sm text-teal-600 hover:text-teal-700 font-medium"
-              >
-                Load more
-              </button>
-            </div>
+            <option value="">All Grades</option>
+            {gradeLevelOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <select
+            value={statusFilter ?? ''}
+            onChange={(e) => onStatusChange(e.target.value || null)}
+            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none"
+            style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              color: 'var(--v2-text-secondary)',
+            }}
+          >
+            <option value="">All Status</option>
+            {statusOptions.map((s) => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+          {(gradeLevel || statusFilter) && (
+            <button
+              type="button"
+              onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] rounded-[8px] transition-colors hover:opacity-80"
+              style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                color: 'var(--v2-text-hint)',
+              }}
+            >
+              <X className="w-3 h-3" />
+              Clear
+            </button>
           )}
         </div>
-      )}
-    </div>
+      }
+    />
   )
 }

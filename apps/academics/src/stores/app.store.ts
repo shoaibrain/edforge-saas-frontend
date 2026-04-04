@@ -9,12 +9,19 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 // ============================================================================
+// DEBUG INSTRUMENTATION
+// ============================================================================
+
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('edforge-debug') === 'true';
+
+// ============================================================================
 // APP STORE
 // ============================================================================
 
 interface AppStore {
   // School context - which school the user is currently viewing
   activeSchoolId: string | null
+  activeSchoolStatus: string | null
 
   // Sidebar state
   sidebarCollapsed: boolean
@@ -24,6 +31,7 @@ interface AppStore {
 
   // Actions
   setActiveSchoolId: (schoolId: string | null) => void
+  setActiveSchoolStatus: (status: string | null) => void
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
   setTheme: (theme: 'light' | 'dark' | 'system') => void
@@ -33,11 +41,20 @@ export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       activeSchoolId: null,
+      activeSchoolStatus: null,
       sidebarCollapsed: false,
       theme: 'light',
 
       setActiveSchoolId: (schoolId) => {
+        if (DEBUG) {
+          const prev = useAppStore.getState().activeSchoolId
+          console.debug('[App Store] activeSchoolId change', { from: prev, to: schoolId })
+        }
         set({ activeSchoolId: schoolId })
+      },
+
+      setActiveSchoolStatus: (status) => {
+        set({ activeSchoolStatus: status })
       },
 
       toggleSidebar: () => {
@@ -83,4 +100,5 @@ export const useAppStore = create<AppStore>()(
 // ============================================================================
 
 export const useActiveSchoolId = () => useAppStore((s) => s.activeSchoolId)
+export const useActiveSchoolStatus = () => useAppStore((s) => s.activeSchoolStatus)
 export const useSidebarCollapsed = () => useAppStore((s) => s.sidebarCollapsed)

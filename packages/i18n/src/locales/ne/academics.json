@@ -1,0 +1,185 @@
+{
+  "tabs": {
+    "overview": "अवलोकन",
+    "profile": "प्रोफाइल",
+    "enrollment": "भर्ना",
+    "family": "परिवार"
+  },
+  "error": {
+    "failedToLoad": "प्रोफाइल लोड गर्न असफल",
+    "failedToLoadDescription": "यो विद्यार्थीको प्रोफाइल लोड गर्न सकिएन। कृपया पुन: प्रयास गर्नुहोस्।",
+    "retry": "पुन: प्रयास गर्नुहोस्",
+    "noPermission": "तपाईंसँग यो विद्यार्थीको प्रोफाइल हेर्ने अनुमति छैन। यो विद्यार्थी तपाईंको तोकिएको सेक्सनमा नहुन सक्छ।"
+  },
+  "status": {
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "graduated": "स्नातक",
+    "transferred": "स्थानान्तरित",
+    "withdrawn": "निकालिएको",
+    "suspended": "निलम्बित",
+    "enrolled": "भर्ना भएको",
+    "pending": "विचाराधीन",
+    "completed": "पूरा भएको"
+  },
+  "actions": {
+    "editStudent": "विद्यार्थी सम्पादन गर्नुहोस्",
+    "schoolEnrollment": "विद्यालय भर्ना",
+    "addToSection": "सेक्सनमा थप्नुहोस्",
+    "addGuardian": "अभिभावक थप्नुहोस्",
+    "enrollAtSchool": "विद्यालयमा भर्ना गर्नुहोस्",
+    "newSchoolEnrollment": "नयाँ विद्यालय भर्ना",
+    "grantPortalAccess": "पोर्टल पहुँच प्रदान गर्नुहोस्",
+    "editGuardian": "अभिभावक सम्पादन गर्नुहोस्",
+    "cancel": "रद्द गर्नुहोस्",
+    "saveChanges": "परिवर्तनहरू सुरक्षित गर्नुहोस्",
+    "saving": "सुरक्षित गर्दै...",
+    "adding": "थप्दै...",
+    "add": "थप्नुहोस्"
+  },
+  "stats": {
+    "attendance": "उपस्थिति",
+    "classes": "कक्षाहरू",
+    "termGpa": "सत्र GPA",
+    "cumGpa": "संचित GPA"
+  },
+  "sections": {
+    "attendanceTrend": "उपस्थिति प्रवृत्ति",
+    "coursePerformance": "पाठ्यक्रम प्रदर्शन",
+    "currentClasses": "हालका कक्षाहरू",
+    "history": "इतिहास",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "contactInfo": "सम्पर्क जानकारी",
+    "academicInfo": "शैक्षिक जानकारी",
+    "programsAccommodations": "कार्यक्रमहरू र सुविधाहरू",
+    "medicalInfo": "चिकित्सा जानकारी",
+    "notes": "टिप्पणीहरू",
+    "currentEnrollment": "हालको भर्ना",
+    "enrollmentHistory": "भर्ना इतिहास",
+    "guardians": "अभिभावकहरू",
+    "emergencyContacts": "आपतकालीन सम्पर्कहरू"
+  },
+  "empty": {
+    "noAttendance": "अहिलेसम्म कुनै उपस्थिति डाटा रेकर्ड गरिएको छैन",
+    "noGrades": "अहिलेसम्म कुनै ग्रेड रेकर्ड गरिएको छैन",
+    "gradesWillAppear": "शिक्षकहरूले रेकर्ड गरेपछि ग्रेडहरू यहाँ देखिनेछन्।",
+    "noClasses": "कुनै कक्षा तालिकाबद्ध छैन",
+    "classesWillAppear": "सेक्सनमा भर्ना गरेपछि कक्षाहरू यहाँ देखिनेछन्।",
+    "noAcademicData": "अहिलेसम्म कुनै शैक्षिक डाटा छैन",
+    "noDataDescription": "यो विद्यार्थीसँग अहिलेसम्म कुनै कक्षा सेक्सन वा उपस्थिति डाटा छैन।",
+    "enrollFirst": "पहिले यो विद्यार्थीलाई भर्ना गर्नुहोस्, त्यसपछि कक्षा सेक्सनमा थप्नुहोस्।",
+    "noEnrollment": "कुनै भर्ना रेकर्ड छैन",
+    "enrollmentWillAppear": "विद्यार्थी शैक्षिक वर्षमा भर्ना भएपछि भर्ना डाटा यहाँ देखिनेछ।",
+    "noGuardians": "कुनै अभिभावक फाइलमा छैन",
+    "addGuardianDescription": "यो विद्यार्थीको प्रोफाइलमा अभिभावक थप्नुहोस्।",
+    "noEmergencyContacts": "कुनै आपतकालीन सम्पर्क फाइलमा छैन",
+    "noSectionsAvailable": "तपाईंको तोकिएको सेक्सनका लागि कुनै {{label}} उपलब्ध छैन"
+  },
+  "performance": {
+    "excellent": "उत्कृष्ट",
+    "good": "राम्रो",
+    "atRisk": "जोखिममा",
+    "critical": "गम्भीर"
+  },
+  "alerts": {
+    "lowAttendance": "९०% भन्दा कम उपस्थितिले शैक्षिक प्रदर्शनमा असर पार्न सक्छ। अनुसरण विचार गर्नुहोस्।",
+    "highAttendance": "उत्कृष्ट उपस्थिति रेकर्ड!"
+  },
+  "gradeLegend": {
+    "a": "A (९०+)",
+    "b": "B (८०-८९)",
+    "c": "C (७०-७९)",
+    "d": "D (६०-६९)",
+    "f": "F (<६०)"
+  },
+  "tableHeaders": {
+    "number": "#",
+    "class": "कक्षा",
+    "subject": "विषय",
+    "teacher": "शिक्षक",
+    "grade": "ग्रेड",
+    "school": "विद्यालय",
+    "academicYear": "शैक्षिक वर्ष",
+    "entryDate": "प्रवेश मिति",
+    "exitDate": "निकास मिति",
+    "status": "स्थिति"
+  },
+  "fields": {
+    "dateOfBirth": "जन्म मिति",
+    "gender": "लिङ्ग",
+    "ethnicity": "जातीयता",
+    "primaryLanguage": "प्राथमिक भाषा",
+    "homeLanguage": "घरको भाषा",
+    "countryOfBirth": "जन्म देश",
+    "email": "इमेल",
+    "phone": "फोन",
+    "altPhone": "वैकल्पिक फोन",
+    "address": "ठेगाना",
+    "mailingAddress": "पत्राचार ठेगाना",
+    "currentGrade": "हालको ग्रेड",
+    "enrollmentDate": "भर्ना मिति",
+    "studentNumber": "विद्यार्थी नम्बर",
+    "stateStudentId": "राज्य विद्यार्थी ID",
+    "previousSchool": "अघिल्लो विद्यालय",
+    "gradeLevel": "ग्रेड स्तर",
+    "homeroom": "होमरुम",
+    "occupation": "पेशा",
+    "firstName": "पहिलो नाम",
+    "middleName": "बीचको नाम",
+    "lastName": "थर"
+  },
+  "programs": {
+    "iep": "IEP",
+    "plan504": "५०४ योजना",
+    "specialPrograms": "विशेष कार्यक्रमहरू",
+    "accommodations": "सुविधाहरू"
+  },
+  "medical": {
+    "allergies": "एलर्जीहरू",
+    "medications": "औषधिहरू",
+    "conditions": "अवस्थाहरू",
+    "dietaryRestrictions": "आहार प्रतिबन्धहरू",
+    "bloodType": "रक्त समूह",
+    "physician": "चिकित्सक",
+    "physicianPhone": "चिकित्सक फोन",
+    "insurance": "बीमा",
+    "medicalNotes": "चिकित्सा टिप्पणीहरू"
+  },
+  "gender": {
+    "male": "पुरुष",
+    "female": "महिला",
+    "other": "अन्य",
+    "preferNotToSay": "भन्न चाहन्न"
+  },
+  "relationships": {
+    "mother": "आमा",
+    "father": "बुबा",
+    "legalGuardian": "कानुनी संरक्षक",
+    "grandparent": "हजुरबुबा/हजुरआमा",
+    "sibling": "दाजुभाइ/दिदीबहिनी",
+    "aunt": "फुपू/माइजू",
+    "uncle": "काका/मामा",
+    "other": "अन्य"
+  },
+  "guardian": {
+    "primary": "प्राथमिक",
+    "portalAccess": "पोर्टल पहुँच",
+    "pickupAuth": "लिन अधिकृत",
+    "atEmployer": "{{employer}} मा"
+  },
+  "privacy": {
+    "showSensitive": "संवेदनशील विवरण देखाउनुहोस्",
+    "hideSensitive": "संवेदनशील विवरण लुकाउनुहोस्"
+  },
+  "enrollment": {
+    "studentIsEnrolled": "विद्यार्थी भर्ना भएको छ",
+    "nextStepAddSection": "अर्को चरण: उपस्थिति र ग्रेडिङ सक्षम गर्न यो विद्यार्थीलाई कक्षा सेक्सनमा थप्नुहोस्।",
+    "noActiveEnrollment": "हालको शैक्षिक वर्षको लागि कुनै सक्रिय भर्ना फाइलमा छैन।"
+  },
+  "yesNo": {
+    "yes": "छ",
+    "no": "छैन"
+  },
+  "gradeLabel": "ग्रेड {{level}}",
+  "ageLabel": "{{age}} वर्ष"
+}

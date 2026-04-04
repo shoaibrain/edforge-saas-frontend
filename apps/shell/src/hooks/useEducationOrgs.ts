@@ -11,6 +11,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { extractApiErrorMessage } from '@edforge/api-client'
 import type {
   CreateStateEducationAgencyDto,
   SeaResponseDto,
@@ -119,7 +120,7 @@ export function useCreateOrUpdateSea() {
       toast.success('State Education Agency saved successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to save State Education Agency')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -158,7 +159,7 @@ export function useCreateLea() {
       toast.success('District created successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create district')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -179,7 +180,7 @@ export function useUpdateLea() {
       toast.success('District updated successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update district')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -196,7 +197,7 @@ export function useDeleteLea() {
       toast.success('District removed successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to remove district')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -235,7 +236,7 @@ export function useCreateEsc() {
       toast.success('Education Service Center created successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create Education Service Center')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -256,7 +257,7 @@ export function useUpdateEsc() {
       toast.success('Education Service Center updated successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update Education Service Center')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -273,7 +274,7 @@ export function useDeleteEsc() {
       toast.success('Education Service Center removed successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to remove Education Service Center')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -311,7 +312,7 @@ export function useCreateNetwork() {
       toast.success('Network created successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create network')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -331,7 +332,7 @@ export function useUpdateNetwork() {
       toast.success('Network updated successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update network')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -347,7 +348,7 @@ export function useDeleteNetwork() {
       toast.success('Network removed successfully')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to remove network')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -379,7 +380,7 @@ export function useAddNetworkMember() {
       toast.success('Member added to network')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to add member')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -398,7 +399,7 @@ export function useUpdateNetworkMember() {
       toast.success('Member updated')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update member')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }
@@ -417,7 +418,7 @@ export function useRemoveNetworkMember() {
       toast.success('Member removed from network')
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to remove member')
+      toast.error(extractApiErrorMessage(error))
     },
   })
 }

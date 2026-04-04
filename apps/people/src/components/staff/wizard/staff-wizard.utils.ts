@@ -138,7 +138,8 @@ export const defaultStaffFormData: Record<string, unknown> = {
   role: '',
   employmentType: 'full_time',
   hireDate: new Date().toISOString().split('T')[0],
-  department: '',
+  departmentId: undefined,
+  departmentName: '',
   title: '',
   highlyQualifiedTeacher: false,
   yearsOfPriorTeachingExperience: undefined,
@@ -149,7 +150,7 @@ export const defaultStaffFormData: Record<string, unknown> = {
   // Step 4: Assignment
   primarySchoolId: '',
   primaryAssignmentRole: '',
-  primaryAssignmentDepartment: '',
+  primaryAssignmentDepartmentId: undefined,
   primaryAssignmentBeginDate: '',
   primaryAssignmentFte: 1.0,
   additionalAssignments: [],
@@ -164,7 +165,7 @@ interface AdditionalAssignment {
   role: string
   beginDate: string
   fullTimeEquivalency: number
-  department?: string
+  departmentId?: string
 }
 
 /**
@@ -204,7 +205,7 @@ export function transformWizardDataToStaffDto(
     phone: (data.phone as string) || undefined,
     addresses: addresses?.length ? addresses as CreateStaffDto['addresses'] : undefined,
     telephones: telephones?.length ? telephones as unknown as CreateStaffDto['telephones'] : undefined,
-    department: (data.department as string) || undefined,
+    departmentId: (data.primaryAssignmentDepartmentId as string) || undefined,
     title: (data.title as string) || undefined,
     highlyQualifiedTeacher:
       data.highlyQualifiedTeacher === true ? true : undefined,

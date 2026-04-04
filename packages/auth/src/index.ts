@@ -11,6 +11,8 @@ export { configureAmplify, getAuthConfig, isAmplifyConfigured } from './config'
 // Auth service operations
 export {
   login,
+  signInDirect,
+  completeNewPassword,
   logout,
   getSession,
   getIdToken,
@@ -21,6 +23,7 @@ export {
   getAuthenticatedUser,
   subscribeToAuthChanges,
   handleAuthCallback,
+  getForgotPasswordUrl,
 } from './service'
 
 // User mapping utilities

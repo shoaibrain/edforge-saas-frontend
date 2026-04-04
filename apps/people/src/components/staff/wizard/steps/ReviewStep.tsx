@@ -80,7 +80,7 @@ interface AdditionalAssignment {
   role: string
   beginDate: string
   fullTimeEquivalency: number
-  department?: string
+  departmentId?: string
 }
 
 export function ReviewStep({ data }: WizardStepProps) {
@@ -147,7 +147,6 @@ export function ReviewStep({ data }: WizardStepProps) {
         <DetailRow label="Role" value={STAFF_ROLE_LABELS[(data.role as string) || '']} />
         <DetailRow label="Employment Type" value={EMPLOYMENT_TYPE_LABELS[(data.employmentType as string) || '']} />
         <DetailRow label="Hire Date" value={data.hireDate as string} />
-        <DetailRow label="Department" value={data.department as string} />
         <DetailRow label="Title" value={data.title as string} />
         {data.highlyQualifiedTeacher !== undefined && (
           <DetailRow label="Highly Qualified Teacher" value={data.highlyQualifiedTeacher as boolean} />
@@ -163,6 +162,7 @@ export function ReviewStep({ data }: WizardStepProps) {
       {/* Assignment */}
       <SummaryCard title="School Assignments" icon={<Building2 className="w-4 h-4" />} stepIndex={3}>
         <DetailRow label="Primary School" value={data.primarySchoolId ? 'Assigned' : undefined} />
+        <DetailRow label="Department" value={data.departmentName as string} />
         <DetailRow label="Primary FTE" value={primaryFte.toFixed(2)} />
         {additionalAssignments.length > 0 && (
           <DetailRow label="Additional Assignments" value={`${additionalAssignments.length}`} />

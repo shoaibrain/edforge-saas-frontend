@@ -1,0 +1,240 @@
+/**
+ * EdForge V2 — Design Tokens
+ *
+ * Scoped to [data-page="home-v2"] (home page) and [data-v2] (module pages).
+ * Dark theme is default; light overrides below.
+ */
+
+/* ============================================================================
+ * DARK THEME (DEFAULT)
+ * ============================================================================ */
+
+[data-page="home-v2"],
+[data-v2] {
+  /* Background stack */
+  --v2-bg-app: #0f1117;
+  --v2-bg-surface: #161b27;
+  --v2-bg-elevated: #1e2436;
+
+  /* Text stack */
+  --v2-text-primary: #e8eaf0;
+  --v2-text-secondary: #c8ccd8;
+  --v2-text-muted: #9aa0b8;
+  --v2-text-hint: #7a8099;
+  --v2-text-faint: #4a5068;
+  --v2-text-ghost: #3a4055;
+
+  /* Borders */
+  --v2-border-default: rgba(255, 255, 255, 0.06);
+  --v2-border-hover: rgba(255, 255, 255, 0.10);
+  --v2-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Semantic colors */
+  --v2-brand-primary: #1D9E75;
+  --v2-brand-deep: #0F6E56;
+  --v2-info: #378ADD;
+  --v2-warning: #EF9F27;
+  --v2-danger: #E24B4A;
+  --v2-accent-purple: #7F77DD;
+  --v2-coral: #D85A30;
+
+  /* Semantic backgrounds */
+  --v2-danger-bg: rgba(226, 75, 74, 0.08);
+  --v2-warning-bg: rgba(239, 159, 39, 0.08);
+  --v2-success-bg: rgba(29, 158, 117, 0.08);
+  --v2-info-bg: rgba(55, 138, 221, 0.08);
+
+  /* Semantic borders */
+  --v2-danger-border: rgba(226, 75, 74, 0.20);
+  --v2-warning-border: rgba(239, 159, 39, 0.20);
+  --v2-success-border: rgba(29, 158, 117, 0.20);
+  --v2-info-border: rgba(55, 138, 221, 0.20);
+
+  /* Module accent backgrounds */
+  --v2-accent-enrollment: rgba(29, 158, 117, 0.12);
+  --v2-accent-academics: rgba(55, 138, 221, 0.12);
+  --v2-accent-attendance: rgba(239, 159, 39, 0.12);
+  --v2-accent-finance: rgba(226, 75, 74, 0.12);
+  --v2-accent-staff: rgba(216, 90, 48, 0.10);
+  --v2-accent-reports: rgba(127, 119, 221, 0.12);
+  --v2-accent-settings: rgba(90, 96, 112, 0.15);
+
+  /* Subtle surface layers (for cards, tiles, inset backgrounds) */
+  --v2-surface-inset: rgba(255, 255, 255, 0.03);
+  --v2-surface-interactive: rgba(255, 255, 255, 0.04);
+  --v2-surface-interactive-hover: rgba(255, 255, 255, 0.08);
+  --v2-overlay-dim: rgba(0, 0, 0, 0.20);
+  --v2-scrollbar-thumb: rgba(255, 255, 255, 0.10);
+
+  /* Chart grid */
+  --v2-chart-grid: rgba(255, 255, 255, 0.04);
+
+  /* Spacing */
+  --v2-grid-gap: 12px;
+  --v2-section-gap: 16px;
+  --v2-content-padding-y: 20px;
+  --v2-content-padding-x: 28px;
+  --v2-card-padding: 18px;
+
+  /* Sizing */
+  --v2-card-radius: 12px;
+  --v2-icon-size: 28px;
+  --v2-icon-radius: 7px;
+  --v2-alert-radius: 10px;
+  --v2-qa-radius: 9px;
+  --v2-kpi-bar-height: 2px;
+
+  /* Transitions */
+  --v2-transition-fast: 150ms ease;
+  --v2-transition-medium: 300ms ease-out;
+  --v2-bar-fill-duration: 600ms;
+  --v2-countup-duration: 800ms;
+}
+
+/* ============================================================================
+ * V2 LEGACY TOKEN REMAPPING
+ *
+ * The shared DataTable component uses legacy theme tokens (--surface-secondary,
+ * --surface-tertiary, etc.) which resolve to teal-green in dark mode. Remap
+ * them to V2 neutrals when inside [data-v2] pages so tables match the V2
+ * design system without modifying the shared component.
+ * ============================================================================ */
+
+[data-v2] {
+  /* Surface tokens → V2 neutrals */
+  --surface-secondary: 22 27 39;     /* #161b27 = --v2-bg-surface */
+  --surface-tertiary: 30 36 54;      /* #1e2436 = --v2-bg-elevated */
+
+  /* Border tokens — DataTable uses these at reduced opacity (/0.3, /0.5, /0.7) */
+  --border-primary: 255 255 255;
+  --border-secondary: 255 255 255;
+
+  /* Brand token — DataTable uses for hover state */
+  --brand-primary: 29 158 117;       /* #1D9E75 */
+
+  /* Text tokens used by DataTable */
+  --text-primary: 232 234 240;       /* #e8eaf0 */
+  --text-secondary: 200 204 216;     /* #c8ccd8 */
+  --text-tertiary: 122 128 153;      /* #7a8099 */
+}
+
+/* V2 table row height — comfortable 52px rows */
+[data-v2] table td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+[data-v2] table th {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+/* ============================================================================
+ * V2 FORM INPUT OVERRIDES (Task 3f — scoped under [data-v2])
+ * ============================================================================ */
+
+[data-v2] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+[data-v2] select,
+[data-v2] textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 12px;
+  color: var(--v2-text-primary);
+  outline: none;
+  transition: border-color var(--v2-transition-fast);
+}
+
+[data-v2] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):focus,
+[data-v2] select:focus,
+[data-v2] textarea:focus {
+  border-color: rgba(29, 158, 117, 0.5);
+}
+
+[data-v2] input::placeholder,
+[data-v2] textarea::placeholder {
+  color: var(--v2-text-ghost);
+}
+
+[data-v2] input[type="date"],
+[data-v2] input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+[data-v2] .required-asterisk,
+[data-v2] label .text-red-500,
+[data-v2] label .text-danger {
+  color: var(--v2-danger);
+}
+
+/* Light mode overrides for form inputs */
+:root:not(.dark) [data-v2] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+:root:not(.dark) [data-v2] select,
+:root:not(.dark) [data-v2] textarea {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--v2-border-default);
+}
+
+:root:not(.dark) [data-v2] input[type="date"],
+:root:not(.dark) [data-v2] input[type="datetime-local"] {
+  color-scheme: light;
+}
+
+/* ============================================================================
+ * LIGHT THEME OVERRIDES
+ * ============================================================================ */
+
+/* Light mode legacy token remapping */
+:root:not(.dark) [data-v2] {
+  --surface-secondary: 255 255 255;
+  --surface-tertiary: 240 242 245;
+  --border-primary: 224 228 236;
+  --border-secondary: 224 228 236;
+  --brand-primary: 29 158 117;
+  --text-primary: 26 31 46;
+  --text-secondary: 55 65 81;
+  --text-tertiary: 107 114 128;
+}
+
+:root:not(.dark) [data-page="home-v2"],
+:root:not(.dark) [data-v2] {
+  /* Background stack */
+  --v2-bg-app: #f5f6f8;
+  --v2-bg-surface: #ffffff;
+  --v2-bg-elevated: #f0f2f5;
+
+  /* Text stack */
+  --v2-text-primary: #1a1f2e;
+  --v2-text-secondary: #374151;
+  --v2-text-muted: #6b7280;
+  --v2-text-hint: #9aa0b8;
+  --v2-text-faint: #b0b6c8;
+  --v2-text-ghost: #d1d5db;
+
+  /* Borders */
+  --v2-border-default: #e0e4ec;
+  --v2-border-hover: #c8cdd8;
+  --v2-border-strong: #9aa0b8;
+
+  /* Semantic backgrounds */
+  --v2-danger-bg: #fff1f1;
+  --v2-warning-bg: #fffbf0;
+  --v2-success-bg: #f0faf5;
+  --v2-info-bg: #f0f7ff;
+
+  /* Semantic borders */
+  --v2-danger-border: #fecaca;
+  --v2-warning-border: #fed7aa;
+  --v2-success-border: #6ee7b7;
+  --v2-info-border: #bfdbfe;
+
+  /* Subtle surface layers */
+  --v2-surface-inset: rgba(0, 0, 0, 0.02);
+  --v2-surface-interactive: rgba(0, 0, 0, 0.03);
+  --v2-surface-interactive-hover: rgba(0, 0, 0, 0.06);
+  --v2-overlay-dim: rgba(0, 0, 0, 0.12);
+  --v2-scrollbar-thumb: rgba(0, 0, 0, 0.12);
+
+  /* Chart grid */
+  --v2-chart-grid: rgba(0, 0, 0, 0.04);
+}

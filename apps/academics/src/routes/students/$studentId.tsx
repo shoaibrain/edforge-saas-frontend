@@ -13,6 +13,8 @@
 
 import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
+import { useResourcePermissions } from '@edforge/abac'
+import { useTranslation } from '@edforge/i18n'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -20,13 +22,12 @@ import {
   User,
   GraduationCap,
   Users,
-  BookOpen,
-  Award,
+  BarChart3,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { toast } from 'sonner'
-import { useStudentProfile } from '../../hooks'
-import { NotFound } from '../../components/common'
+import { useStudentProfile, useStudentProfileActions, useGrantPortalAccess } from '../../hooks'
+import { useActiveSchoolId } from '../../stores/app.store'
+import { NotFound, PermissionDenied } from '../../components/common'
 import {
   ProfileHeader,
   ProfileHeaderSkeleton,
@@ -34,22 +35,24 @@ import {
   OverviewTabSkeleton,
   EnrollmentTab,
   FamilyTab,
-  ScheduleTab,
+  ProfileTab,
 } from '../../components/students/profile'
-import { StudentGradesView } from '../../components/grades/StudentGradesView'
+import { EnrollExistingStudentModal } from '../../components/enrollment/EnrollExistingStudentModal'
+import { EditStudentModal } from '../../components/students/EditStudentModal'
+import { AddToSectionModal } from '../../components/students/profile/AddToSectionModal'
+import { AddGuardianModal } from '../../components/students/profile/AddGuardianModal'
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-type TabId = 'overview' | 'enrollment' | 'family' | 'schedule' | 'grades'
+type TabId = 'overview' | 'profile' | 'enrollment' | 'family'
 
-const TABS: { id: TabId; label: string; icon: typeof User }[] = [
-  { id: 'overview', label: 'Overview', icon: User },
-  { id: 'enrollment', label: 'Enrollment', icon: GraduationCap },
-  { id: 'family', label: 'Family', icon: Users },
-  { id: 'schedule', label: 'Schedule', icon: BookOpen },
-  { id: 'grades', label: 'Grades', icon: Award },
+const TAB_IDS: { id: TabId; icon: typeof User }[] = [
+  { id: 'overview', icon: BarChart3 },
+  { id: 'profile', icon: User },
+  { id: 'enrollment', icon: GraduationCap },
+  { id: 'family', icon: Users },
 ]
 
 // ============================================================================
@@ -97,6 +100,7 @@ function ProfileLoadingState() {
 // ============================================================================
 
 function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation('academics')
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
@@ -104,14 +108,14 @@ function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
           <User className="w-7 h-7 text-red-600 dark:text-red-400" />
         </div>
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
-          Failed to Load Profile
+          {t('error.failedToLoad')}
         </h2>
         <p className="text-[rgb(var(--text-secondary))] mb-6">
-          We couldn&apos;t load this student&apos;s profile. Please try again.
+          {t('error.failedToLoadDescription')}
         </p>
         <Button onClick={onRetry} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
-          Retry
+          {t('error.retry')}
         </Button>
       </div>
     </div>
@@ -125,12 +129,22 @@ function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
 export function StudentProfilePage() {
   const params = useParams({ from: '/students/$studentId' })
   const studentId = params.studentId
+  const schoolId = useActiveSchoolId()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const { t } = useTranslation('academics')
+
+  // ABAC: check student permissions
+  const studentPerms = useResourcePermissions('students')
+  const canEdit = !!studentPerms.edit
+
+  // Actions hook — must be called before any conditional returns (Rules of Hooks)
+  const actions = useStudentProfileActions()
+  const grantPortalAccess = useGrantPortalAccess()
 
   // Validate UUID format
   const isValidId = isValidUUID(studentId)
 
-  // Fetch student profile
+  // Fetch student profile — pass schoolId to avoid "School context required" 403
   const {
     data: student,
     isLoading,
@@ -139,6 +153,7 @@ export function StudentProfilePage() {
     refetch,
   } = useStudentProfile({
     studentId,
+    schoolId: schoolId || undefined,
     enabled: isValidId,
   })
 
@@ -158,29 +173,22 @@ export function StudentProfilePage() {
     if (status === 404) {
       return <NotFound type="student" />
     }
+    if (status === 403) {
+      return (
+        <PermissionDenied
+          resource="student profile"
+          action="view"
+          message={t('error.noPermission')}
+          showBackButton
+        />
+      )
+    }
     return <ProfileErrorState onRetry={() => refetch()} />
   }
 
   // No data
   if (!student) {
     return <NotFound type="student" />
-  }
-
-  // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
-  const handleEditStudent = () => {
-    // TODO: Sprint 2 Ticket 2.10 - Open StudentEditModal
-    toast.info('Edit functionality coming soon')
-  }
-
-  const handleAddGuardian = () => {
-    toast.info('Add guardian coming soon')
-  }
-
-  const handleEditGuardian = (_guardianId: string) => {
-    toast.info('Edit guardian coming soon')
   }
 
   // ============================================================================
@@ -194,14 +202,15 @@ export function StudentProfilePage() {
         <div className="pb-6">
           <ProfileHeader
             student={student}
-            onEdit={handleEditStudent}
-            canEdit={true}
+            onEdit={canEdit ? actions.openEdit : undefined}
+            onEnroll={canEdit ? actions.openEnroll : undefined}
+            canEdit={canEdit}
           />
         </div>
 
         {/* Tab Navigation — aligned with Staff Detail pattern */}
         <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
-          {TABS.map((tab) => {
+          {TAB_IDS.map((tab) => {
             const isActive = activeTab === tab.id
             const Icon = tab.icon
             return (
@@ -209,16 +218,16 @@ export function StudentProfilePage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
+                  relative px-4 py-3 pb-3.5 text-sm transition-colors whitespace-nowrap outline-none
                   ${isActive
-                    ? 'text-[rgb(var(--text-primary))]'
-                    : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
+                    ? 'text-teal-600 dark:text-teal-400 font-medium'
+                    : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-primary))]'
                   }
                 `}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
-                  {tab.label}
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-600 dark:text-teal-400' : 'opacity-70'}`} />
+                  {t(`tabs.${tab.id}`)}
                 </span>
 
                 {/* Animated underline indicator */}
@@ -248,27 +257,71 @@ export function StudentProfilePage() {
               {activeTab === 'overview' && (
                 <OverviewTab student={student} />
               )}
+              {activeTab === 'profile' && (
+                <ProfileTab student={student} />
+              )}
               {activeTab === 'enrollment' && (
-                <EnrollmentTab student={student} />
+                <EnrollmentTab
+                  student={student}
+                  onEnroll={canEdit ? actions.openEnroll : undefined}
+                  onAddToSection={canEdit ? actions.openAddToSection : undefined}
+                />
               )}
               {activeTab === 'family' && (
                 <FamilyTab
                   student={student}
-                  onAddGuardian={handleAddGuardian}
-                  onEditGuardian={handleEditGuardian}
-                  canEdit={true}
+                  onAddGuardian={canEdit ? actions.openAddGuardian : undefined}
+                  onEditGuardian={canEdit ? actions.openEditGuardian : undefined}
+                  onGrantPortalAccess={
+                    canEdit
+                      ? (guardian) => {
+                          if (!guardian.email || !schoolId) return
+                          grantPortalAccess.mutate({
+                            email: guardian.email,
+                            firstName: guardian.firstName,
+                            lastName: guardian.lastName,
+                            phone: guardian.phone,
+                            schoolId,
+                            studentId: student.studentId,
+                            guardianId: guardian.guardianId,
+                          })
+                        }
+                      : undefined
+                  }
+                  isGrantingAccess={grantPortalAccess.isPending}
+                  canEdit={canEdit}
                 />
-              )}
-              {activeTab === 'schedule' && (
-                <ScheduleTab student={student} />
-              )}
-              {activeTab === 'grades' && (
-                <StudentGradesView studentId={studentId} />
               )}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Modals — only rendered when user has edit permission */}
+      {canEdit && (
+        <>
+          <EnrollExistingStudentModal
+            open={actions.enrollModalOpen}
+            onClose={() => actions.setEnrollModalOpen(false)}
+            student={student}
+          />
+          <EditStudentModal
+            open={actions.editModalOpen}
+            onClose={() => actions.setEditModalOpen(false)}
+            student={student}
+          />
+          <AddToSectionModal
+            open={actions.addToSectionModalOpen}
+            onClose={() => actions.setAddToSectionModalOpen(false)}
+            student={student}
+          />
+          <AddGuardianModal
+            open={actions.addGuardianModalOpen}
+            onClose={() => actions.setAddGuardianModalOpen(false)}
+            student={student}
+          />
+        </>
+      )}
     </div>
   )
 }

@@ -7,7 +7,7 @@
 
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { User, BookOpen, MapPin, CalendarClock } from 'lucide-react'
+import { User, BookOpen, MapPin } from 'lucide-react'
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
 import { useCourseOfferings, flattenOfferingPages } from '../../hooks/useCourseOfferings'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
@@ -219,20 +219,23 @@ export function SectionForm({ isEdit }: SectionFormProps) {
         </Field>
       </FormSection>
 
-      {/* Logistics */}
+      {/* Logistics & Schedule */}
       <FormSection
         title="Logistics"
-        description="Room assignment, capacity, and term."
+        description="Room, capacity, term, and period assignment."
         icon={MapPin}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Room" error={errors.room?.message}>
-            <input
-              type="text"
-              placeholder="e.g., Room 203"
-              {...register('room')}
-              className={inputClass}
-            />
+          <Field label="Location / Room" error={errors.locationId?.message}>
+            <select {...register('locationId')} className={selectClass}>
+              <option value="">No room assigned</option>
+              {locations.map((l) => (
+                <option key={l.locationId} value={l.locationId}>
+                  {l.roomNumber}{l.buildingName ? ` (${l.buildingName})` : ''}
+                  {l.capacity ? ` — ${l.capacity} seats` : ''}
+                </option>
+              ))}
+            </select>
           </Field>
 
           <Field
@@ -281,14 +284,7 @@ export function SectionForm({ isEdit }: SectionFormProps) {
             </select>
           </Field>
         </div>
-      </FormSection>
 
-      {/* Master Schedule (Sprint 3) */}
-      <FormSection
-        title="Schedule"
-        description="Link to bell schedule period, room, and course offering."
-        icon={CalendarClock}
-      >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Class Period" error={errors.classPeriodId?.message}>
             <select {...register('classPeriodId')} className={selectClass}>
@@ -303,32 +299,20 @@ export function SectionForm({ isEdit }: SectionFormProps) {
             </select>
           </Field>
 
-          <Field label="Location / Room" error={errors.locationId?.message}>
-            <select {...register('locationId')} className={selectClass}>
-              <option value="">No room assigned</option>
-              {locations.map((l) => (
-                <option key={l.locationId} value={l.locationId}>
-                  {l.roomNumber}{l.buildingName ? ` (${l.buildingName})` : ''}
-                  {l.capacity ? ` — ${l.capacity} seats` : ''}
-                </option>
-              ))}
-            </select>
-          </Field>
+          {courseId && (
+            <Field label="Course Offering" error={errors.courseOfferingId?.message}>
+              <select {...register('courseOfferingId')} className={selectClass}>
+                <option value="">No offering linked</option>
+                {offerings.map((o) => (
+                  <option key={o.courseOfferingId} value={o.courseOfferingId}>
+                    {o.courseName || o.courseCode} — {o.sessionName || o.academicSessionId}
+                    {o.localCourseCode ? ` (${o.localCourseCode})` : ''}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
         </div>
-
-        {courseId && (
-          <Field label="Course Offering" error={errors.courseOfferingId?.message}>
-            <select {...register('courseOfferingId')} className={selectClass}>
-              <option value="">No offering linked</option>
-              {offerings.map((o) => (
-                <option key={o.courseOfferingId} value={o.courseOfferingId}>
-                  {o.courseName || o.courseCode} — {o.sessionName || o.academicSessionId}
-                  {o.localCourseCode ? ` (${o.localCourseCode})` : ''}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
       </FormSection>
     </div>
   )

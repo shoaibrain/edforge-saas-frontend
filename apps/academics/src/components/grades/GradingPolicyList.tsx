@@ -12,6 +12,7 @@ import {
   Edit3,
   Scale,
 } from 'lucide-react'
+import { useResourcePermissions } from '@edforge/abac'
 import { useGradingPolicies } from '../../hooks/useGrades'
 import { useActiveSchoolId } from '../../stores/app.store'
 import type { GradingPolicyResponse } from '../../services/academics.service'
@@ -26,7 +27,7 @@ function PolicyCard({
   onEdit,
 }: {
   policy: GradingPolicyResponse
-  onEdit: (policy: GradingPolicyResponse) => void
+  onEdit?: (policy: GradingPolicyResponse) => void
 }) {
   const totalWeight = policy.categoryWeights.reduce((sum, c) => sum + c.weight, 0)
 
@@ -34,7 +35,7 @@ function PolicyCard({
     <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:border-teal-500/30 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <h4 className="text-sm font-semibold text-text-primary">{policy.name}</h4>
+          <h4 className="text-sm font-semibold text-text-primary">{policy.policyName}</h4>
           {policy.isDefault && (
             <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-full">
               <Star className="w-3 h-3" />
@@ -42,23 +43,25 @@ function PolicyCard({
             </span>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => onEdit(policy)}
-          className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
-          aria-label="Edit policy"
-        >
-          <Edit3 className="w-4 h-4" />
-        </button>
+        {onEdit && (
+          <button
+            type="button"
+            onClick={() => onEdit(policy)}
+            className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
+            aria-label="Edit policy"
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Grade Scale Preview */}
       <div className="mb-3">
         <p className="text-xs text-text-tertiary mb-1.5">Grade Scale</p>
         <div className="flex flex-wrap gap-1">
-          {policy.gradingScale.map((entry) => (
+          {policy.gradingScale.map((entry, idx) => (
             <span
-              key={entry.letter}
+              key={`${entry.letter}-${idx}`}
               className="px-2 py-0.5 text-xs font-medium bg-surface-hover rounded text-text-secondary"
             >
               {entry.letter}: {entry.minPercentage}-{entry.maxPercentage}%
@@ -82,7 +85,7 @@ function PolicyCard({
                 />
               </div>
               <span className="text-xs text-text-secondary w-24 text-right">
-                {cat.name} ({cat.weight}%)
+                {cat.categoryName} ({cat.weight}%)
               </span>
             </div>
           ))}
@@ -104,6 +107,7 @@ function PolicyCard({
 
 export function GradingPolicyList() {
   const schoolId = useActiveSchoolId() || ''
+  const gradePerms = useResourcePermissions('grades')
   const { data: policies, isLoading } = useGradingPolicies(schoolId)
   const [editingPolicy, setEditingPolicy] = useState<GradingPolicyResponse | null>(null)
   const [showCreate, setShowCreate] = useState(false)
@@ -126,14 +130,16 @@ export function GradingPolicyList() {
           <h3 className="text-sm font-semibold text-text-primary">Grading Policies</h3>
           <span className="text-xs text-text-tertiary">({policies?.length ?? 0})</span>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          New Policy
-        </button>
+        {gradePerms.create && (
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            New Policy
+          </button>
+        )}
       </div>
 
       {(!policies || policies.length === 0) ? (
@@ -145,14 +151,16 @@ export function GradingPolicyList() {
           <p className="text-xs text-text-tertiary max-w-sm mx-auto mb-4">
             Create a grading policy to define grade scales, category weights, and rounding rules.
           </p>
-          <button
-            type="button"
-            onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Create Policy
-          </button>
+          {gradePerms.create && (
+            <button
+              type="button"
+              onClick={() => setShowCreate(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Create Policy
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -160,7 +168,7 @@ export function GradingPolicyList() {
             <PolicyCard
               key={policy.policyId}
               policy={policy}
-              onEdit={setEditingPolicy}
+              onEdit={gradePerms.edit ? setEditingPolicy : undefined}
             />
           ))}
         </div>

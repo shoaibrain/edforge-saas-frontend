@@ -15,10 +15,13 @@ import type { StudentStatus } from '@aibrains/shared-types'
 // FILTER STATE
 // ============================================================================
 
+export type StudentFilterMode = 'all' | 'active' | 'at-risk' | 'pending'
+
 export interface StudentFiltersState {
   searchTerm: string
   gradeLevel: string | null
   status: StudentStatus | null
+  filterMode: StudentFilterMode
 }
 
 // ============================================================================
@@ -38,6 +41,7 @@ interface StudentsStoreState extends StudentFiltersState, StudentSelectionState 
   setSearchTerm: (term: string) => void
   setGradeLevel: (level: string | null) => void
   setStatus: (status: StudentStatus | null) => void
+  setFilterMode: (mode: StudentFilterMode) => void
   resetFilters: () => void
 
   // Selection actions
@@ -58,6 +62,7 @@ const defaultFilters: StudentFiltersState = {
   searchTerm: '',
   gradeLevel: null,
   status: null,
+  filterMode: 'all',
 }
 
 const defaultSelection: StudentSelectionState = {
@@ -87,6 +92,10 @@ export const useStudentsStore = create<StudentsStoreState>((set, get) => ({
 
   setStatus: (status: StudentStatus | null) => {
     set({ status })
+  },
+
+  setFilterMode: (mode: StudentFilterMode) => {
+    set({ filterMode: mode })
   },
 
   resetFilters: () => {
@@ -126,7 +135,8 @@ export const useStudentsStore = create<StudentsStoreState>((set, get) => ({
     return (
       state.searchTerm.trim() !== '' ||
       state.gradeLevel !== null ||
-      state.status !== null
+      state.status !== null ||
+      state.filterMode !== 'all'
     )
   },
 
@@ -136,6 +146,7 @@ export const useStudentsStore = create<StudentsStoreState>((set, get) => ({
     if (state.searchTerm.trim() !== '') count++
     if (state.gradeLevel !== null) count++
     if (state.status !== null) count++
+    if (state.filterMode !== 'all') count++
     return count
   },
 }))
@@ -153,6 +164,7 @@ export const useStudentFilters = () =>
       searchTerm: state.searchTerm,
       gradeLevel: state.gradeLevel,
       status: state.status,
+      filterMode: state.filterMode,
     }))
   )
 
@@ -165,6 +177,7 @@ export const useStudentFilterActions = () =>
       setSearchTerm: state.setSearchTerm,
       setGradeLevel: state.setGradeLevel,
       setStatus: state.setStatus,
+      setFilterMode: state.setFilterMode,
       resetFilters: state.resetFilters,
       hasActiveFilters: state.hasActiveFilters,
       activeFilterCount: state.activeFilterCount,

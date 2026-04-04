@@ -25,7 +25,6 @@ export const sectionFormSchema = z.object({
   coTeacherIds: z.array(z.string()).max(5).optional(),
 
   // Logistics
-  room: z.string().max(50, 'Room must not exceed 50 characters').optional(),
   maxEnrollment: z.coerce
     .number({ invalid_type_error: 'Enter a valid number' })
     .int('Must be a whole number')
@@ -54,7 +53,6 @@ export const defaultSectionFormData: Partial<SectionFormData> = {
   sectionName: '',
   primaryTeacherId: '',
   coTeacherIds: [],
-  room: '',
   maxEnrollment: 30,
   academicYearId: '',
   termId: '',

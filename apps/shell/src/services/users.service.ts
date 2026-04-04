@@ -55,7 +55,6 @@ export interface UserResponseDto {
 export interface UpdateUserDto {
   firstName?: string
   lastName?: string
-  middleName?: string
   displayName?: string
   phone?: string
   avatarUrl?: string
@@ -201,14 +200,26 @@ function normalizePreferences(raw: RawUserPreferencesResponse): UserPreferences 
   let notifications: NotificationSettings
 
   if (rawNotifications?.channels) {
-    // Already in nested format
-    notifications = rawNotifications as NotificationSettings
+    // Already in nested format — use actual data, fill in missing categories with defaults
+    notifications = {
+      channels: rawNotifications.channels,
+      categories: {
+        announcements: rawNotifications.categories?.announcements ?? true,
+        attendance: rawNotifications.categories?.attendance ?? true,
+        grades: rawNotifications.categories?.grades ?? true,
+        messages: rawNotifications.categories?.messages ?? true,
+        calendar: rawNotifications.categories?.calendar ?? true,
+        billing: rawNotifications.categories?.billing ?? true,
+        security: true, // Always enabled
+      },
+    }
   } else {
-    // Convert flat format to nested format
+    // Convert flat format to nested format, using actual category data if present
+    const emailEnabled = rawNotifications?.email ?? true
     notifications = {
       channels: {
         email: {
-          enabled: rawNotifications?.email ?? true,
+          enabled: emailEnabled,
           digest: rawNotifications?.digest ?? 'immediate'
         },
         push: {
@@ -220,13 +231,13 @@ function normalizePreferences(raw: RawUserPreferencesResponse): UserPreferences 
         }
       },
       categories: {
-        announcements: true,
-        attendance: true,
-        grades: true,
-        messages: true,
-        calendar: true,
-        billing: true,
-        security: true
+        announcements: rawNotifications?.categories?.announcements ?? true,
+        attendance: rawNotifications?.categories?.attendance ?? true,
+        grades: rawNotifications?.categories?.grades ?? true,
+        messages: rawNotifications?.categories?.messages ?? true,
+        calendar: rawNotifications?.categories?.calendar ?? true,
+        billing: rawNotifications?.categories?.billing ?? true,
+        security: true, // Always enabled
       }
     }
   }
@@ -263,35 +274,22 @@ export interface UpdatePreferencesDto {
 }
 
 /**
- * Flatten nested notifications structure to match backend's expected flat format.
- * Backend expects: { email: true, push: true, sms: false, digest: "daily" }
- * Frontend sends: { channels: { email: { enabled: true, digest: "daily" }, ... } }
+ * Prepare notifications for backend.
+ * Backend now accepts both flat and nested formats (via z.union).
+ * We send nested format directly to preserve categories.
  */
-function flattenPreferencesForBackend(data: UpdatePreferencesDto): any {
+function preparePreferencesForBackend(data: UpdatePreferencesDto): any {
   if (!data.notifications) return data
 
-  const { channels } = data.notifications as Partial<NotificationSettings>
-  if (!channels) return data
+  const notif = data.notifications as Partial<NotificationSettings>
 
-  // Convert nested structure to flat structure
-  const flatNotifications: Record<string, unknown> = {}
-
-  if (channels.email !== undefined) {
-    flatNotifications.email = channels.email.enabled
-    if (channels.email.digest) {
-      flatNotifications.digest = channels.email.digest
-    }
-  }
-  if (channels.push !== undefined) {
-    flatNotifications.push = channels.push.enabled
-  }
-  if (channels.sms !== undefined) {
-    flatNotifications.sms = channels.sms.enabled
-  }
-
+  // Send nested format directly — backend normalizes on its side
   return {
     ...data,
-    notifications: flatNotifications
+    notifications: {
+      channels: notif.channels,
+      categories: notif.categories,
+    },
   }
 }
 
@@ -392,17 +390,31 @@ export async function getUser(userId: string): Promise<UserResponseDto> {
 }
 
 /**
- * List users
+ * List/search users with optional filters
  * GET /users
  */
-export async function listUsers(
-  limit: number = 20,
+export interface ListUsersParams {
+  limit?: number
   cursor?: string
-): Promise<UserListResponseDto> {
-  const params: Record<string, any> = { limit }
-  if (cursor) params.cursor = cursor
+  search?: string
+  status?: string
+  globalRole?: string
+  schoolId?: string
+  role?: string
+}
 
-  return apiGet<UserListResponseDto>('/users', params)
+export async function listUsers(
+  params: ListUsersParams = {}
+): Promise<UserListResponseDto> {
+  const query: Record<string, any> = { limit: params.limit ?? 50 }
+  if (params.cursor) query.cursor = params.cursor
+  if (params.search) query.search = params.search
+  if (params.status) query.status = params.status
+  if (params.globalRole) query.globalRole = params.globalRole
+  if (params.schoolId) query.schoolId = params.schoolId
+  if (params.role) query.role = params.role
+
+  return apiGet<UserListResponseDto>('/users', query)
 }
 
 /**
@@ -433,6 +445,25 @@ export async function updateUser(
 }
 
 /**
+ * Change user's global role
+ * PATCH /users/:id/global-role
+ */
+export async function changeGlobalRole(
+  userId: string,
+  newRole: GlobalRole
+): Promise<{ userId: string; previousRole: string; newRole: string; sessionsRevoked: number }> {
+  return apiPatch(`/users/${userId}/global-role`, { newRole })
+}
+
+/**
+ * Delete user (soft delete)
+ * DELETE /users/:id
+ */
+export async function deleteUser(userId: string): Promise<void> {
+  return apiDelete(`/users/${userId}`)
+}
+
+/**
  * Get user preferences
  * GET /users/:id/preferences
  * Note: Response is normalized to handle backend flat structure
@@ -451,12 +482,12 @@ export async function updatePreferences(
   userId: string,
   data: UpdatePreferencesDto
 ): Promise<UserPreferences> {
-  // Flatten nested notifications to backend's expected flat format
-  const flattenedData = flattenPreferencesForBackend(data)
+  // Prepare notifications for backend (sends nested format with categories)
+  const preparedData = preparePreferencesForBackend(data)
 
-  const raw = await apiPatch<RawUserPreferencesResponse, typeof flattenedData>(
+  const raw = await apiPatch<RawUserPreferencesResponse, typeof preparedData>(
     `/users/${userId}/preferences`,
-    flattenedData
+    preparedData
   )
   return normalizePreferences(raw)
 }
@@ -529,12 +560,17 @@ export async function getSecurityOverview(userId: string): Promise<SecurityOverv
 /**
  * Change user password
  * POST /users/:id/security/change-password
+ *
+ * Uses skipAuthRedirect because the backend may return 401 for "wrong
+ * current password" — that is a validation error, not a session expiry.
  */
 export async function changePassword(
   userId: string,
   data: ChangePasswordDto
 ): Promise<{ success: boolean; message: string }> {
-  return apiPost(`/users/${userId}/security/change-password`, data)
+  return apiPost(`/users/${userId}/security/change-password`, data, {
+    meta: { skipAuthRedirect: true },
+  })
 }
 
 /**
@@ -620,6 +656,8 @@ export const usersService = {
   createUser,
   assignRole,
   updateUser,
+  changeGlobalRole,
+  deleteUser,
 
   // Preferences
   getPreferences,

@@ -42,7 +42,7 @@ function display(val: unknown, fallback = '—'): string {
 /** Lookup label from options */
 function labelFor(
   value: string | undefined,
-  options: { value: string; label: string }[]
+  options: readonly { value: string; label: string }[]
 ): string {
   if (!value) return '—'
   return options.find((o) => o.value === value)?.label ?? value
@@ -300,8 +300,6 @@ export function ReviewStep({ data }: WizardStepProps) {
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
-          <DataField label="IEP" value={medicalInfo.hasIEP ? 'Yes' : 'No'} />
-          <DataField label="504 Plan" value={medicalInfo.has504Plan ? 'Yes' : 'No'} />
           <DataField label="Physician" value={display(medicalInfo.physicianName)} />
           <DataField label="Ethnicity" value={display(data.ethnicity)} />
           <DataField label="Primary Language" value={display(data.primaryLanguage)} />

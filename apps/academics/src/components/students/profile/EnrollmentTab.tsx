@@ -11,7 +11,11 @@ import {
   Clock,
   Building2,
   CheckCircle2,
+  Plus,
+  BookOpen,
 } from 'lucide-react'
+import { Button, DateDisplay } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -20,6 +24,8 @@ import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 export interface EnrollmentTabProps {
   student: StudentProfileResponseDto
+  onEnroll?: () => void
+  onAddToSection?: () => void
 }
 
 type CurrentEnrollment = NonNullable<StudentProfileResponseDto['currentEnrollment']>
@@ -31,6 +37,8 @@ type EnrollmentHistory = NonNullable<StudentProfileResponseDto['enrollmentHistor
 
 const statusStyles: Record<string, { bg: string; text: string }> = {
   active: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+  enrolled: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+  pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' },
   withdrawn: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400' },
   transferred: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' },
   graduated: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400' },
@@ -41,55 +49,42 @@ function getStatusStyle(status: string) {
   return statusStyles[status.toLowerCase()] || statusStyles.completed
 }
 
-function formatDate(dateStr: string, format: 'short' | 'full' = 'full'): string {
-  try {
-    const date = new Date(dateStr)
-    if (format === 'short') {
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
-    }
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
-}
 
 // ============================================================================
 // CURRENT ENROLLMENT
 // ============================================================================
 
 function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollment }) {
+  const { t } = useTranslation('academics')
+
   return (
     <div className="mb-8">
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-        Current Enrollment
+        {t('sections.currentEnrollment')}
       </h3>
       <div className="p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Grade Level</p>
-            <p className="text-lg font-semibold text-text-primary">Grade {enrollment.gradeLevel}</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('fields.gradeLevel')}</p>
+            <p className="text-lg font-semibold text-text-primary">{t('gradeLabel', { level: enrollment.gradeLevel })}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Academic Year</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('tableHeaders.academicYear')}</p>
             <p className="text-sm text-text-primary flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-text-tertiary" />
               {enrollment.academicYearName || '—'}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Enrollment Date</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('tableHeaders.entryDate')}</p>
             <p className="text-sm text-text-primary flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-text-tertiary" />
-              {formatDate(enrollment.enrollmentDate)}
+              <DateDisplay date={enrollment.enrollmentDate} format="long" />
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Homeroom</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('fields.homeroom')}</p>
             <p className="text-sm text-text-primary flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-text-tertiary" />
               {enrollment.homeroomName || '—'}
@@ -106,24 +101,26 @@ function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollmen
 // ============================================================================
 
 function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
+  const { t } = useTranslation('academics')
+
   if (history.length === 0) return null
 
   return (
     <div>
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <Clock className="w-4 h-4 text-text-tertiary" />
-        Enrollment History
+        {t('sections.enrollmentHistory')}
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border-secondary">
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Grade</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">School</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Academic Year</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Enrolled</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Withdrawn</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Status</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.grade')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.school')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.academicYear')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.entryDate')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.exitDate')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -135,7 +132,7 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
                   className="border-b border-border-tertiary last:border-0 hover:bg-surface-secondary/50 transition-colors"
                 >
                   <td className="py-3 px-3 font-medium text-text-primary">
-                    Grade {enrollment.gradeLevel}
+                    {t('gradeLabel', { level: enrollment.gradeLevel })}
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
                     {enrollment.schoolName || '—'}
@@ -144,16 +141,16 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
                     {enrollment.academicYearName || '—'}
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
-                    {formatDate(enrollment.enrollmentDate, 'short')}
+                    <DateDisplay date={enrollment.enrollmentDate} format="short" />
                   </td>
                   <td className="py-3 px-3 text-text-secondary">
                     {enrollment.withdrawalDate
-                      ? formatDate(enrollment.withdrawalDate, 'short')
+                      ? <DateDisplay date={enrollment.withdrawalDate} format="short" />
                       : '—'}
                   </td>
                   <td className="py-3 px-3">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${style.bg} ${style.text}`}>
-                      {enrollment.status}
+                      {t(`status.${enrollment.status.toLowerCase()}`, { defaultValue: enrollment.status })}
                     </span>
                   </td>
                 </tr>
@@ -170,7 +167,8 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
 // MAIN COMPONENT
 // ============================================================================
 
-export function EnrollmentTab({ student }: EnrollmentTabProps) {
+export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentTabProps) {
+  const { t } = useTranslation('academics')
   const currentEnrollment = student.currentEnrollment
   const enrollmentHistory = (student.enrollmentHistory || [])
     .filter((e) => e.enrollmentId !== currentEnrollment?.enrollmentId)
@@ -182,24 +180,65 @@ export function EnrollmentTab({ student }: EnrollmentTabProps) {
     return (
       <div className="text-center py-16">
         <GraduationCap className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-        <p className="text-text-secondary font-medium">No enrollment records</p>
+        <p className="text-text-secondary font-medium">{t('empty.noEnrollment')}</p>
         <p className="text-sm text-text-tertiary mt-1">
-          Enrollment data will appear here once the student is enrolled in an academic year.
+          {t('empty.enrollmentWillAppear')}
         </p>
+        {onEnroll && (
+          <Button variant="outline" size="sm" onClick={onEnroll} className="mt-4">
+            <Plus className="w-4 h-4 mr-1.5" />
+            {t('actions.schoolEnrollment')}
+          </Button>
+        )}
       </div>
     )
   }
 
   return (
     <div>
+      {/* Action bar */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        {onEnroll && (
+          <Button variant="outline" size="sm" onClick={onEnroll}>
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            {t('actions.newSchoolEnrollment')}
+          </Button>
+        )}
+      </div>
+
       {currentEnrollment && (
-        <CurrentEnrollmentSection enrollment={currentEnrollment} />
+        <>
+          <CurrentEnrollmentSection enrollment={currentEnrollment} />
+          {/* Success-state CTA: next step is adding to sections */}
+          {onAddToSection && (
+            <div className="mb-6 p-4 rounded-lg bg-teal-500/5 border border-teal-500/15 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-teal-600 dark:text-teal-400">
+                  {t('enrollment.studentIsEnrolled')}
+                </p>
+                <p className="text-xs text-text-tertiary mt-0.5">
+                  {t('enrollment.nextStepAddSection')}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={onAddToSection}>
+                <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                {t('actions.addToSection')}
+              </Button>
+            </div>
+          )}
+        </>
       )}
       {!currentEnrollment && (
-        <div className="mb-6 p-4 rounded-lg bg-amber-500/5 border border-amber-500/15">
+        <div className="mb-6 p-4 rounded-lg bg-amber-500/5 border border-amber-500/15 flex items-center justify-between">
           <p className="text-sm text-amber-600 dark:text-amber-400">
-            No active enrollment on file for the current academic year.
+            {t('enrollment.noActiveEnrollment')}
           </p>
+          {onEnroll && (
+            <Button variant="outline" size="sm" onClick={onEnroll}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              {t('actions.enrollAtSchool')}
+            </Button>
+          )}
         </div>
       )}
       <EnrollmentHistoryTable history={enrollmentHistory} />
