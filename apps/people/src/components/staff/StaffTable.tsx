@@ -244,7 +244,7 @@ export function StaffTable({
       isLoading={isLoading}
       enableSorting={true}
       pagination={{ pageSize: 20 }}
-      maxHeight="calc(100vh - 13rem)"
+      maxHeight="calc(100vh - 22rem)"
       emptyState={{
         icon: <UsersRound className="w-12 h-12" />,
         title: t('empty.noStaff'),

@@ -294,7 +294,7 @@ export function GradeLevelsTab({
           description: 'Grade levels will appear once courses are configured.',
         }}
         onRowClick={handleRowClick}
-        maxHeight="calc(100vh - 13rem)"
+        maxHeight="calc(100vh - 28rem)"
       />
 
       {/* Grade Level Drawer */}

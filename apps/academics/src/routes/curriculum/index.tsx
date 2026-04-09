@@ -18,7 +18,6 @@ import {
   BookOpen,
   Layers,
   Plus,
-  Upload,
   ShieldCheck,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -103,16 +102,6 @@ function StandardsIcon({ active }: { active: boolean }) {
 // ============================================================================
 
 function StandardsContent() {
-  const handleImport = () => {
-    // Toast: coming soon
-    if (typeof window !== 'undefined') {
-      const event = new CustomEvent('edforge:toast', {
-        detail: { message: 'Standards import coming soon', type: 'info' },
-      })
-      window.dispatchEvent(event)
-    }
-  }
-
   return (
     <div
       style={{
@@ -163,29 +152,8 @@ function StandardsContent() {
         }}
       >
         Map courses to academic standards to track curriculum coverage and EdFi
-        compliance. Standards can be imported or configured per course.
+        compliance. Standards can be configured per course.
       </p>
-
-      {/* Import button */}
-      <button
-        type="button"
-        onClick={handleImport}
-        className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
-        style={{
-          height: 36,
-          padding: '0 14px',
-          fontSize: 12,
-          fontWeight: 500,
-          borderRadius: 8,
-          background: 'var(--v2-bg-elevated, rgba(255,255,255,0.05))',
-          border: '1px solid var(--v2-border-default, rgba(255,255,255,0.09))',
-          color: 'var(--v2-text-secondary, #9aa0b8)',
-          cursor: 'pointer',
-        }}
-      >
-        <Upload style={{ width: 12, height: 12 }} />
-        Import standards
-      </button>
     </div>
   )
 }
@@ -345,24 +313,6 @@ export function CurriculumModule() {
 
         {/* Right-side action buttons */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
-            style={{
-              height: 36,
-              padding: '0 14px',
-              fontSize: 12,
-              fontWeight: 500,
-              borderRadius: 8,
-              background: 'var(--v2-bg-elevated, rgba(255,255,255,0.05))',
-              border: '1px solid var(--v2-border-default, rgba(255,255,255,0.09))',
-              color: 'var(--v2-text-secondary, #9aa0b8)',
-              cursor: 'pointer',
-            }}
-          >
-            <Upload style={{ width: 12, height: 12 }} />
-            Import courses
-          </button>
           {coursePerms.create && (
             <button
               type="button"
@@ -591,6 +541,7 @@ export function CurriculumModule() {
               {/* Course Table */}
               <div style={{ marginTop: 12 }}>
                 <CourseTable
+                
                   courses={courses}
                   isLoading={isLoading}
                   onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
