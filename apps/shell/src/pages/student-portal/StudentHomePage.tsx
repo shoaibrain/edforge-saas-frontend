@@ -1,13 +1,11 @@
 /**
- * Parent Portal — Home / Overview Page (v2)
+ * Student Portal — Home Page (v2)
  *
- * Redesigned content pane: hero greeting → stat strip → today timeline →
- * this week assignments → billing callout.
+ * Content pane: hero greeting → stat strip → today timeline →
+ * this week assignments. Shares section components with Parent Home.
  *
- * Inline apiGet migration: removes the inline apiGet('/academics/students/${studentId}/grades')
- * (previously line ~74) and apiGet('/academics/students/${studentId}/attendance/summary')
- * (previously line ~86), replacing them with usePortalStudentGrades and
- * usePortalAttendanceSummary from Sprint 1 hooks.
+ * Enabled by scope exception §1.0 (router.tsx line 631-632 change).
+ * New page — no inline apiGet calls to migrate.
  */
 
 import { useTranslation } from '@edforge/i18n'
@@ -15,39 +13,33 @@ import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { StatStrip, type StatStripItem } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
-import { useParentPortal } from './ParentPortalLayout'
+import { useStudentPortal } from './StudentPortalLayout'
 import { usePortalStudentGrades } from '../../hooks/usePortalStudentGrades'
 import { usePortalAttendanceSummary } from '../../hooks/usePortalStudentAttendance'
 import { useStudentSections } from '../../hooks/useStudentSections'
 import { usePortalBellSchedule } from '../../hooks/usePortalBellSchedule'
 import { usePortalClassPeriods } from '../../hooks/usePortalClassPeriods'
 import { useStudentClasswork } from '../../hooks/useStudentClasswork'
-import { useInvoices } from '../../hooks/usePayments'
-import { NoActiveChild } from '../portal-shared/NoActiveChild'
 import { HeroGreeting } from '../portal-shared/HeroGreeting'
 import { TodayTimeline } from '../portal-shared/TodayTimeline'
 import { AssignmentList } from '../portal-shared/AssignmentList'
-import { BillingCallout } from './sections/BillingCallout'
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-export default function ParentOverviewPage() {
-  const { activeChild } = useParentPortal()
+export default function StudentHomePage() {
+  const { studentId, studentProfile } = useStudentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
 
-  if (!activeChild) return <NoActiveChild />
-
-  const studentId = activeChild.studentId
-  const schoolId = activeSchoolId ?? activeChild.schoolId
+  const schoolId = activeSchoolId ?? studentProfile.schoolId
 
   return (
     <div className="p-6 space-y-6" data-v2>
       <WidgetErrorBoundaryV2>
         <HeroSection
-          name={activeChild.firstName}
+          name={studentProfile.firstName}
           studentId={studentId}
           schoolId={schoolId}
           academicYearId={activeSchoolYear?.id}
@@ -67,7 +59,6 @@ export default function ParentOverviewPage() {
           studentId={studentId}
           schoolId={schoolId}
           academicYearId={activeSchoolYear?.id}
-          childName={activeChild.firstName}
         />
       </WidgetErrorBoundaryV2>
 
@@ -77,16 +68,12 @@ export default function ParentOverviewPage() {
           schoolId={schoolId}
         />
       </WidgetErrorBoundaryV2>
-
-      <WidgetErrorBoundaryV2>
-        <BillingSection schoolId={schoolId} studentId={studentId} />
-      </WidgetErrorBoundaryV2>
     </div>
   )
 }
 
 // ============================================================================
-// SECTION COMPONENTS (wired to hooks)
+// SECTION COMPONENTS
 // ============================================================================
 
 function HeroSection({
@@ -109,8 +96,8 @@ function HeroSection({
     const rate = attendance.attendanceRate
     if (courseCount > 0 && rate != null) {
       contextLine = rate >= 90
-        ? 'A steady week so far.'
-        : 'Keeping an eye on things.'
+        ? 'A steady start to the term.'
+        : 'Keeping things moving.'
     }
   }
 
@@ -133,12 +120,14 @@ function StatStripSection({
     usePortalAttendanceSummary(studentId, schoolId, { academicYearId })
   const { data: sections, isLoading: sectionsLoading } =
     useStudentSections(studentId, schoolId, { academicYearId })
-  const { data: invoices, isLoading: invoicesLoading } =
-    useInvoices(schoolId, { studentId })
+  const sectionIds = sections?.map((s) => s.sectionId) ?? []
+  const { data: classwork, isLoading: classworkLoading } =
+    useStudentClasswork(sectionIds)
 
-  const balanceDue = invoices?.items
-    ?.filter((i: { status: string }) => i.status === 'issued' || i.status === 'partially_paid')
-    .reduce((sum: number, i: { amountDue?: number; totalAmount?: number }) => sum + (i.amountDue ?? i.totalAmount ?? 0), 0) ?? 0
+  const openAssignments = classwork?.filter((item) => {
+    if (!item.dueDate) return false
+    return new Date(item.dueDate) >= new Date()
+  }).length ?? 0
 
   const items: StatStripItem[] = [
     {
@@ -146,6 +135,7 @@ function StatStripSection({
       value: grades?.gpa?.cumulativeGpa != null
         ? grades.gpa.cumulativeGpa.toFixed(2)
         : '—',
+      subtitle: '/ 4.00',
       loading: gradesLoading,
       error: gradesError,
       onRetry: () => refetchGrades(),
@@ -165,9 +155,9 @@ function StatStripSection({
       loading: sectionsLoading,
     },
     {
-      label: t('stats.balanceDue'),
-      value: balanceDue > 0 ? `$${balanceDue.toFixed(0)}` : '$0',
-      loading: invoicesLoading,
+      label: t('stats.openAssignments'),
+      value: String(openAssignments),
+      loading: classworkLoading || sectionsLoading,
     },
   ]
 
@@ -182,12 +172,10 @@ function TodaySection({
   studentId,
   schoolId,
   academicYearId,
-  childName,
 }: {
   studentId: string
   schoolId: string
   academicYearId?: string
-  childName: string
 }) {
   const { t } = useTranslation('portal')
   const { data: sections, isLoading: sectionsLoading } =
@@ -197,15 +185,13 @@ function TodaySection({
   const { data: classPeriods, isLoading: periodsLoading } =
     usePortalClassPeriods(schoolId)
 
-  const loading = sectionsLoading || bellLoading || periodsLoading
-
   return (
     <TodayTimeline
       sections={sections}
       bellSchedules={bellSchedules}
       classPeriods={classPeriods}
-      loading={loading}
-      heading={t('home.todayFor', { name: childName })}
+      loading={sectionsLoading || bellLoading || periodsLoading}
+      heading={t('schedule.today')}
       staggerIndex={2}
     />
   )
@@ -227,25 +213,7 @@ function AssignmentsSection({
       items={classwork}
       loading={isLoading}
       staggerIndex={3}
-      viewAllHref="/parent-portal/grades"
-    />
-  )
-}
-
-function BillingSection({
-  schoolId,
-  studentId,
-}: {
-  schoolId: string
-  studentId: string
-}) {
-  const { data: invoices, isLoading } = useInvoices(schoolId, { studentId })
-
-  return (
-    <BillingCallout
-      invoices={invoices?.items}
-      loading={isLoading}
-      staggerIndex={4}
+      viewAllHref="/student-portal/grades"
     />
   )
 }

@@ -59,6 +59,31 @@
   --v2-accent-reports: rgba(127, 119, 221, 0.12);
   --v2-accent-settings: rgba(90, 96, 112, 0.15);
 
+  /* ---- Portal status tokens (semantic aliases) ---- */
+  --v2-status-present: var(--v2-brand-primary);
+  --v2-status-absent: var(--v2-danger);
+  --v2-status-late: var(--v2-warning);
+  --v2-status-excused: var(--v2-info);
+  --v2-status-paid: var(--v2-brand-primary);
+  --v2-status-overdue: var(--v2-danger);
+  --v2-status-pending: var(--v2-text-muted);
+  --v2-status-upcoming: var(--v2-warning);
+
+  --v2-status-present-bg: var(--v2-success-bg);
+  --v2-status-absent-bg: var(--v2-danger-bg);
+  --v2-status-late-bg: var(--v2-warning-bg);
+  --v2-status-excused-bg: var(--v2-info-bg);
+  --v2-status-paid-bg: var(--v2-success-bg);
+  --v2-status-overdue-bg: var(--v2-danger-bg);
+  --v2-status-pending-bg: var(--v2-surface-inset);
+  --v2-status-upcoming-bg: var(--v2-warning-bg);
+
+  /* Portal grade badge colors */
+  --v2-grade-high: var(--v2-brand-primary);
+  --v2-grade-mid: var(--v2-warning);
+  --v2-grade-low: var(--v2-danger);
+  --v2-grade-none: var(--v2-text-muted);
+
   /* Subtle surface layers (for cards, tiles, inset backgrounds) */
   --v2-surface-inset: rgba(255, 255, 255, 0.03);
   --v2-surface-interactive: rgba(255, 255, 255, 0.04);

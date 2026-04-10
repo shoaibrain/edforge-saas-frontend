@@ -104,6 +104,28 @@ export { DateDisplay } from './components/DateDisplay'
 export { BsDatePicker, DateInput } from './components/BsDatePicker'
 export { SchoolDate } from './components/SchoolDate'
 
+// Portal Primitives
+export { ContentSection, type ContentSectionProps } from './components/ContentSection'
+export { DashedDivider, type DashedDividerProps } from './components/DashedDivider'
+export { StatusPill, type StatusPillProps, type StatusPillVariant } from './components/StatusPill'
+export { StatStrip, type StatStripProps, type StatStripItem } from './components/StatStrip'
+export { GpaRing, type GpaRingProps, type GpaRingSize } from './components/GpaRing'
+export { CategoryBar, type CategoryBarProps } from './components/CategoryBar'
+export { CourseCard, type CourseCardProps, type CourseCardCategory } from './components/CourseCard'
+export {
+  AttendanceHeatmap,
+  type AttendanceHeatmapProps,
+  type HeatmapDay,
+  type HeatmapStatus,
+} from './components/AttendanceHeatmap'
+export {
+  WeekTimetable,
+  type WeekTimetableProps,
+  type TimetableSlot,
+  type TimetableClassBlock,
+} from './components/WeekTimetable'
+export { FilterTabs, type FilterTabsProps, type FilterTab } from './components/FilterTabs'
+
 // V2 Components
 export { StatCard, type StatCardProps } from './components/StatCard'
 export { AnimatedProgressBar, type AnimatedProgressBarProps } from './components/AnimatedProgressBar'

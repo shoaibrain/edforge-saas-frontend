@@ -203,11 +203,15 @@ export function ShellProvider({ children }: ShellProviderProps) {
     staleTime: 30 * 60 * 1000, // 30 minutes
   })
 
-  // Fetch workspace settings for the tenant
+  // Fetch workspace settings for the tenant.
+  // This endpoint requires TenantAdmin role — non-admin users (Parent, Student)
+  // fall back to SYSTEM_DEFAULTS via useResolvedSettings, which is correct behavior.
+  // School-level configuration (fetched via a separate non-admin endpoint) provides
+  // school-specific overrides for currency, timezone, calendar system, etc.
   const { data: workspaceSettingsData } = useQuery({
     queryKey: ['workspaceSettings', user?.tenantId],
     queryFn: () => tenantService.getWorkspaceSettings(user!.tenantId),
-    enabled: isAuthenticated && !!user?.tenantId,
+    enabled: isAuthenticated && !!user?.tenantId && user?.globalRole === 'TenantAdmin',
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

@@ -1,25 +1,32 @@
 /**
- * Parent Portal — Child's Schedule Page
+ * Parent Portal — Child's Schedule Page (v2)
  *
- * Displays class schedule for the active child.
+ * Content pane: pickup info strip → week timetable → course cards.
+ * No view switcher (week view only). No quick reference table.
+ *
+ * Inline apiGet migration: removes apiGet('/academics/students/${studentId}/sections')
+ * (previously line ~35).
+ *
+ * ABAC: all endpoints verified accessible to Parent role (§1.8a).
  */
 
-import { useQuery } from '@tanstack/react-query'
-import { apiGet } from '../../lib/api'
+import { useMemo } from 'react'
+import { useTranslation } from '@edforge/i18n'
+import {
+  WidgetErrorBoundaryV2,
+  ContentSection,
+  CourseCard,
+  WeekTimetable,
+  type TimetableSlot,
+  type TimetableClassBlock,
+} from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
-import { Card, CardContent, Skeleton } from '@edforge/ui'
-import { Calendar, Clock, MapPin, User } from 'lucide-react'
-import type { StudentSectionResponseDto } from '@aibrains/shared-types'
-
-type StudentSection = StudentSectionResponseDto & {
-  periodId?: string
-  periodName?: string
-  dayOfWeek?: string
-  startTime?: string
-  endTime?: string
-}
+import { useStudentSections } from '../../hooks/useStudentSections'
+import { usePortalBellSchedule, type BellSchedulePeriod } from '../../hooks/usePortalBellSchedule'
+import { NoActiveChild } from '../portal-shared/NoActiveChild'
+import { PickupInfoStrip } from './sections/PickupInfoStrip'
 
 // ============================================================================
 // COMPONENT
@@ -30,96 +37,219 @@ export default function ParentSchedulePage() {
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
 
-  const studentId = activeChild?.studentId
+  if (!activeChild) return <NoActiveChild />
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['parent-child-sections', studentId, activeSchoolId, activeSchoolYear?.id],
-    queryFn: () =>
-      apiGet<StudentSection[]>(`/academics/students/${studentId}/sections`, {
-        schoolId: activeSchoolId,
-        ...(activeSchoolYear?.id && { academicYearId: activeSchoolYear.id }),
-      }),
-    enabled: !!studentId && !!activeSchoolId,
-    staleTime: 10 * 60 * 1000,
-  })
-
-  const sections: StudentSection[] = Array.isArray(data) ? data : (data as any)?.items ?? []
-
-  if (!activeChild) {
-    return (
-      <div className="p-6">
-        <p className="text-sm text-[rgb(var(--text-secondary))]">Please select a child to view schedule.</p>
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-8 w-56" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
-        </div>
-      </div>
-    )
-  }
+  const studentId = activeChild.studentId
+  const schoolId = activeSchoolId ?? activeChild.schoolId
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-        {activeChild.firstName}'s Schedule
-        {activeSchoolYear && (
-          <span className="text-base font-normal text-[rgb(var(--text-secondary))] ml-2">{activeSchoolYear.name}</span>
-        )}
-      </h1>
+    <ParentScheduleContent
+      studentId={studentId}
+      schoolId={schoolId}
+      childName={activeChild.firstName}
+      academicYearId={activeSchoolYear?.id}
+    />
+  )
+}
 
-      {sections.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sections.map((section) => (
-            <Card key={section.sectionId}>
-              <CardContent className="p-4">
-                <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-3">
-                  {section.courseName ?? 'Course'}
-                </h3>
-                <p className="text-xs text-[rgb(var(--text-secondary))] mb-3">
-                  {section.sectionName ?? '-'}
-                </p>
-                <div className="space-y-2">
-                  {section.teacherName && (
-                    <div className="flex items-center gap-2 text-xs text-[rgb(var(--text-secondary))]">
-                      <User className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>{section.teacherName}</span>
-                    </div>
-                  )}
-                  {(section.periodName || section.startTime) && (
-                    <div className="flex items-center gap-2 text-xs text-[rgb(var(--text-secondary))]">
-                      <Clock className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>
-                        {section.periodName && `${section.periodName}`}
-                        {section.startTime && section.endTime && ` (${section.startTime} - ${section.endTime})`}
-                      </span>
-                    </div>
-                  )}
-                  {section.roomNumber && (
-                    <div className="flex items-center gap-2 text-xs text-[rgb(var(--text-secondary))]">
-                      <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>Room {section.roomNumber}</span>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <Calendar className="w-12 h-12 text-[rgb(var(--text-tertiary))] mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-2">No Classes Scheduled</h3>
-            <p className="text-sm text-[rgb(var(--text-secondary))]">Class schedule will appear once classes are assigned.</p>
-          </CardContent>
-        </Card>
-      )}
+function ParentScheduleContent({
+  studentId,
+  schoolId,
+  childName,
+  academicYearId,
+}: {
+  studentId: string
+  schoolId: string
+  childName: string
+  academicYearId?: string
+}) {
+  const { t } = useTranslation('portal')
+
+  // Data hooks
+  const { data: sections, isLoading: sectionsLoading } =
+    useStudentSections(studentId, schoolId, { academicYearId })
+  const { data: bellSchedules, isLoading: bellLoading } =
+    usePortalBellSchedule(schoolId)
+
+  const loading = sectionsLoading || bellLoading
+
+  // Resolve the default bell schedule
+  const defaultSchedule = useMemo(() => {
+    if (!bellSchedules || bellSchedules.length === 0) return null
+    return bellSchedules.find((bs) => bs.isDefault && bs.isActive)
+      ?? bellSchedules.find((bs) => bs.isActive)
+      ?? bellSchedules[0]
+  }, [bellSchedules])
+
+  // Period map for time resolution
+  const periodMap = useMemo(() => {
+    if (!defaultSchedule) return new Map<string, BellSchedulePeriod>()
+    const map = new Map<string, BellSchedulePeriod>()
+    for (const p of defaultSchedule.classPeriods) {
+      map.set(String(p.periodNumber), p)
+      map.set(p.classPeriodName, p)
+    }
+    return map
+  }, [defaultSchedule])
+
+  // Timetable slots (rows)
+  const timetableSlots: TimetableSlot[] = useMemo(() => {
+    if (!defaultSchedule) return []
+    return defaultSchedule.classPeriods
+      .filter((p) => p.periodType !== 'passing')
+      .sort((a, b) => a.periodNumber - b.periodNumber)
+      .map((p) => ({
+        periodNumber: p.periodNumber,
+        periodName: p.classPeriodName,
+        startTime: p.startTime,
+        endTime: p.endTime,
+        periodType: p.periodType,
+        isAcademic: p.isAcademic,
+      }))
+  }, [defaultSchedule])
+
+  // Class blocks
+  const timetableBlocks: TimetableClassBlock[] = useMemo(() => {
+    if (!sections || !defaultSchedule) return []
+    const blocks: TimetableClassBlock[] = []
+    for (const section of sections) {
+      const period = section.periodId ? (periodMap.get(section.periodId) ?? null) : null
+      if (!period) continue
+      const days = period.dayOfWeek && period.dayOfWeek.length > 0
+        ? period.dayOfWeek.map(dowToNumber)
+        : [1, 2, 3, 4, 5]
+      for (const day of days) {
+        blocks.push({
+          periodNumber: period.periodNumber,
+          dayOfWeek: day,
+          courseName: section.courseName,
+          courseCode: section.courseCode,
+          room: section.room,
+          teacherName: section.teacherName,
+          sectionId: section.sectionId,
+        })
+      }
+    }
+    return blocks
+  }, [sections, defaultSchedule, periodMap])
+
+  // Week start (Monday)
+  const weekStartDate = useMemo(() => {
+    const now = new Date()
+    const day = now.getDay()
+    const diff = day === 0 ? -6 : 1 - day
+    const monday = new Date(now)
+    monday.setDate(now.getDate() + diff)
+    return monday.toISOString().slice(0, 10)
+  }, [])
+
+  return (
+    <div className="p-6 space-y-6" data-v2>
+      <ContentSection
+        heading={t('pages.childSchedule', { name: childName })}
+        staggerIndex={0}
+      />
+
+      {/* Pickup info strip — conditionally rendered based on bell schedule */}
+      <WidgetErrorBoundaryV2>
+        <PickupInfoStrip bellSchedules={bellSchedules} staggerIndex={1} />
+      </WidgetErrorBoundaryV2>
+
+      {/* Week timetable */}
+      <WidgetErrorBoundaryV2>
+        <ContentSection staggerIndex={2}>
+          {timetableSlots.length > 0 ? (
+            <WeekTimetable
+              periods={timetableSlots}
+              blocks={timetableBlocks}
+              weekStartDate={weekStartDate}
+            />
+          ) : loading ? (
+            <div className="h-64 rounded-xl v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          ) : (
+            <p className="text-sm py-8 text-center" style={{ color: 'var(--v2-text-muted)' }}>
+              {t('schedule.noSections')}
+            </p>
+          )}
+        </ContentSection>
+      </WidgetErrorBoundaryV2>
+
+      {/* Course cards */}
+      <WidgetErrorBoundaryV2>
+        <CourseCardsGrid sections={sections} periodMap={periodMap} loading={loading} />
+      </WidgetErrorBoundaryV2>
     </div>
   )
+}
+
+// ============================================================================
+// COURSE CARDS GRID
+// ============================================================================
+
+function CourseCardsGrid({
+  sections,
+  periodMap,
+  loading,
+}: {
+  sections?: Array<{
+    sectionId: string
+    courseName: string
+    courseCode?: string
+    teacherName?: string
+    room?: string
+    periodId?: string
+  }>
+  periodMap: Map<string, BellSchedulePeriod>
+  loading: boolean
+}) {
+  const { t } = useTranslation('portal')
+
+  if (loading) {
+    return (
+      <ContentSection heading={t('schedule.coursesAndTeachers')} staggerIndex={3}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-36 rounded-xl v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          ))}
+        </div>
+      </ContentSection>
+    )
+  }
+
+  if (!sections || sections.length === 0) return null
+
+  return (
+    <ContentSection heading={t('schedule.coursesAndTeachers')} staggerIndex={3}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        {sections.map((section) => {
+          const period = section.periodId ? periodMap.get(section.periodId) : undefined
+          return (
+            <CourseCard
+              key={section.sectionId}
+              courseName={section.courseName}
+              courseCode={section.courseCode}
+              teacherName={section.teacherName}
+              categories={period ? [{
+                name: `${period.startTime}–${period.endTime}`,
+                weight: 0,
+                percentage: 0,
+              }] : undefined}
+            />
+          )
+        })}
+      </div>
+    </ContentSection>
+  )
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function dowToNumber(day: string): number {
+  const map: Record<string, number> = {
+    monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5,
+    saturday: 6, sunday: 7,
+  }
+  return map[day.toLowerCase()] ?? 1
 }

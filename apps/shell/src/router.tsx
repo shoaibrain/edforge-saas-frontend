@@ -46,6 +46,7 @@ import StudentPortalLayout from './pages/student-portal/StudentPortalLayout'
 import StudentGradesPage from './pages/student-portal/StudentGradesPage'
 import StudentAttendancePage from './pages/student-portal/StudentAttendancePage'
 import StudentSchedulePage from './pages/student-portal/StudentSchedulePage'
+import StudentHomePage from './pages/student-portal/StudentHomePage'
 import ParentPortalLayout from './pages/parent-portal/ParentPortalLayout'
 import ParentOverviewPage from './pages/parent-portal/ParentOverviewPage'
 import ParentGradesPage from './pages/parent-portal/ParentGradesPage'
@@ -628,10 +629,8 @@ const studentPortalRoute = createRoute({
 const studentPortalIndexRoute = createRoute({
   getParentRoute: () => studentPortalRoute,
   path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/student-portal/grades' })
-  },
-  component: () => null,
+  component: StudentHomePage, // Scope exception §1.0: replaced redirect with home page
+  errorComponent: PortalPageError,
 })
 
 const studentPortalGradesRoute = createRoute({

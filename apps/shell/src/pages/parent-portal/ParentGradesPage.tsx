@@ -1,187 +1,212 @@
 /**
- * Parent Portal — Child's Grades Page
+ * Parent Portal — Child's Grades Page (v2)
  *
- * Displays grades for the currently selected child.
- * Reuses same API as student portal, scoped to activeChild from ParentPortalContext.
+ * Same structure as Student Grades but scoped to activeChild from
+ * ParentPortalContext. Header shows "{firstName}'s Progress".
+ *
+ * Inline apiGet migration: removes the inline
+ * apiGet('/academics/students/${studentId}/grades') (previously line ~28).
+ * Replaces with usePortalStudentGrades. Also removes inline StatCard,
+ * StatusBadge, getLetterGradeClass sub-components.
  */
 
-import { useQuery } from '@tanstack/react-query'
-import { apiGet } from '../../lib/api'
+import { useState, useMemo } from 'react'
+import { useTranslation } from '@edforge/i18n'
+import { WidgetErrorBoundaryV2, CourseCard, type CourseCardCategory } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
-import { Card, CardContent, CardHeader, Skeleton } from '@edforge/ui'
-import { GraduationCap, TrendingUp, BookOpen, Award } from 'lucide-react'
-import type { StudentGradesResponseDto } from '@aibrains/shared-types'
+import { usePortalStudentGrades } from '../../hooks/usePortalStudentGrades'
+import { usePortalCurrentAcademicYear, usePortalGradingPeriods } from '../../hooks/usePortalCurrentAcademicYear'
+import { usePortalGradingPolicy } from '../../hooks/usePortalGradingPolicy'
+import { ContentSection } from '@edforge/ui'
+import { NoActiveChild } from '../portal-shared/NoActiveChild'
+import { TermSwitcher } from '../portal-shared/TermSwitcher'
+import { GpaHeroSection } from '../portal-shared/GpaHeroSection'
+import { SignalBanner, type SignalLevel } from '../portal-shared/SignalBanner'
+import { GradedItemTimeline } from '../portal-shared/GradedItemTimeline'
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
 export default function ParentGradesPage() {
+  const { t } = useTranslation('portal')
   const { activeChild } = useParentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
 
-  const studentId = activeChild?.studentId
+  const [activeTerm, setActiveTerm] = useState<string | null>(null)
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['parent-child-grades-detail', studentId, activeSchoolId, activeSchoolYear?.id],
-    queryFn: () =>
-      apiGet<StudentGradesResponseDto>(
-        `/academics/students/${studentId}/grades`,
-        {
-          schoolId: activeSchoolId,
-          ...(activeSchoolYear?.id && { academicYearId: activeSchoolYear.id }),
-        }
-      ),
-    enabled: !!studentId && !!activeSchoolId,
-    staleTime: 5 * 60 * 1000,
-  })
+  // Derive params with optional chaining — hooks below have `enabled` guards
+  // that prevent API calls when these are empty strings.
+  const studentId = activeChild?.studentId ?? ''
+  const schoolId = activeSchoolId ?? activeChild?.schoolId ?? ''
 
-  if (!activeChild) {
-    return (
-      <div className="p-6">
-        <p className="text-sm text-[rgb(var(--text-secondary))]">Please select a child to view grades.</p>
-      </div>
-    )
-  }
+  // Data hooks — ALL called before any conditional return (React hooks rules)
+  // Each hook's enabled guard: usePortalCurrentAcademicYear → !!schoolId,
+  // usePortalGradingPeriods → !!schoolId && !!yearId,
+  // usePortalStudentGrades → !!studentId && !!schoolId,
+  // usePortalGradingPolicy → !!schoolId
+  const { data: yearData } = usePortalCurrentAcademicYear(schoolId)
+  const yearId = activeSchoolYear?.id ?? yearData?.id ?? ''
+  const { data: periods } = usePortalGradingPeriods(schoolId, yearId)
+  const { data: gradesData, isLoading: gradesLoading } = usePortalStudentGrades(
+    studentId,
+    schoolId,
+    { academicYearId: yearId, termId: activeTerm ?? undefined }
+  )
+  const { data: policies } = usePortalGradingPolicy(schoolId)
 
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-8 w-56" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24" />
-          ))}
-        </div>
-        <Skeleton className="h-96" />
-      </div>
-    )
-  }
+  // Signal level
+  const signalLevel = useMemo((): SignalLevel | null => {
+    if (!gradesData?.grades || gradesData.grades.length === 0) return null
+    const hasF = gradesData.grades.some((g) => g.letterGrade?.startsWith('F'))
+    const hasD = gradesData.grades.some((g) => g.letterGrade?.startsWith('D'))
+    if (hasF) return 'concern'
+    if (hasD) return 'attention'
+    return 'good'
+  }, [gradesData])
 
-  const grades = data?.grades ?? []
-  const gpa = data?.gpa
+  // Category map
+  const categoryMap = useMemo(() => {
+    const defaultPolicy = policies?.find((p) => p.isDefault) ?? policies?.[0]
+    if (!defaultPolicy?.categoryWeights) return null
+    const map = new Map<string, { name: string; weight: number }>()
+    for (const cw of defaultPolicy.categoryWeights) {
+      map.set(cw.categoryId, { name: cw.categoryName, weight: cw.weight })
+    }
+    return map
+  }, [policies])
+
+  // Guard: show placeholder when no child is selected.
+  // Placed AFTER all hooks to satisfy React's rules of hooks.
+  if (!activeChild) return <NoActiveChild />
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-        {activeChild.firstName}'s Grades
-      </h1>
-
-      {/* GPA Summary */}
-      {gpa && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={<TrendingUp className="w-5 h-5" />} label="Cumulative GPA" value={gpa.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : '-'} color="teal" />
-          {gpa.weightedGpa != null && (
-            <StatCard icon={<Award className="w-5 h-5" />} label="Weighted GPA" value={gpa.weightedGpa.toFixed(2)} color="blue" />
-          )}
-          <StatCard icon={<BookOpen className="w-5 h-5" />} label="Total Credits" value={(gpa.totalCredits ?? 0).toString()} color="purple" />
-          <StatCard icon={<GraduationCap className="w-5 h-5" />} label="Courses" value={grades.length.toString()} color="amber" />
+    <div className="p-6 space-y-6" data-v2>
+      {/* Page header */}
+      <ContentSection
+        heading={t('pages.childGrades', { name: activeChild.firstName })}
+        staggerIndex={0}
+      >
+        <div className="mt-3">
+          <TermSwitcher
+            periods={periods}
+            activePeriodId={activeTerm}
+            onChange={setActiveTerm}
+          />
         </div>
-      )}
+      </ContentSection>
 
-      {/* Grades Table */}
-      {grades.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              Course Grades
-              {activeSchoolYear && (
-                <span className="text-sm font-normal text-[rgb(var(--text-secondary))] ml-2">{activeSchoolYear.name}</span>
-              )}
-            </h2>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[rgb(var(--border-primary))]">
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Course</th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Grade</th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Numeric</th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">GPA Pts</th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Credits</th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[rgb(var(--border-primary))]">
-                  {grades.map((grade) => (
-                    <tr key={grade.gradeId} className="hover:bg-[rgb(var(--surface-secondary))]">
-                      <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">{grade.courseName}</td>
-                      <td className="px-4 py-3 text-sm text-center">
-                        <span className={getLetterGradeClass(grade.letterGrade)}>{grade.letterGrade ?? '-'}</span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center text-[rgb(var(--text-secondary))]">{grade.numericGrade?.toFixed(1) ?? '-'}</td>
-                      <td className="px-4 py-3 text-sm text-center text-[rgb(var(--text-secondary))]">{grade.gpaPoints?.toFixed(2) ?? '-'}</td>
-                      <td className="px-4 py-3 text-sm text-center text-[rgb(var(--text-secondary))]">{grade.credits ?? '-'}</td>
-                      <td className="px-4 py-3 text-sm text-center">
-                        <StatusBadge status={grade.isFinal ? 'Final' : 'In Progress'} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <GraduationCap className="w-12 h-12 text-[rgb(var(--text-tertiary))] mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-2">No Grades Yet</h3>
-            <p className="text-sm text-[rgb(var(--text-secondary))]">Grades will appear here once they are recorded.</p>
-          </CardContent>
-        </Card>
-      )}
+      <WidgetErrorBoundaryV2>
+        <GpaHeroSection
+          data={gradesData}
+          loading={gradesLoading}
+          staggerIndex={1}
+        />
+      </WidgetErrorBoundaryV2>
+
+      <SignalBanner level={signalLevel} staggerIndex={2} />
+
+      <WidgetErrorBoundaryV2>
+        <CourseGridSection
+          grades={gradesData?.grades}
+          loading={gradesLoading}
+          categoryMap={categoryMap}
+        />
+      </WidgetErrorBoundaryV2>
+
+      <WidgetErrorBoundaryV2>
+        <GradedItemTimeline
+          grades={gradesData?.grades}
+          loading={gradesLoading}
+          staggerIndex={4}
+        />
+      </WidgetErrorBoundaryV2>
     </div>
   )
 }
 
 // ============================================================================
-// SUB-COMPONENTS
+// COURSE GRID (identical to student version — shared component logic)
 // ============================================================================
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: 'teal' | 'blue' | 'purple' | 'amber' }) {
-  const colorMap = {
-    teal: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
-    blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  }
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorMap[color]}`}>{icon}</div>
-          <div>
-            <p className="text-xs text-[rgb(var(--text-secondary))]">{label}</p>
-            <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{value}</p>
-          </div>
+function CourseGridSection({
+  grades,
+  loading,
+  categoryMap,
+}: {
+  grades?: Array<{
+    gradeId: string
+    courseName?: string
+    courseId: string
+    letterGrade?: string
+    numericGrade?: number
+    gpaPoints?: number
+    isFinal: boolean
+    teacherId: string
+    categoryGrades?: Array<{
+      categoryId: string
+      categoryName: string
+      weight: number
+      percentage: number
+    }>
+  }>
+  loading?: boolean
+  categoryMap?: Map<string, { name: string; weight: number }> | null
+}) {
+  const { t } = useTranslation('portal')
+
+  if (loading) {
+    return (
+      <ContentSection heading={t('grades.courseByourse')} staggerIndex={3}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-48 rounded-xl v2-skeleton-pulse"
+              style={{ background: 'var(--v2-bg-elevated)' }}
+            />
+          ))}
         </div>
-      </CardContent>
-    </Card>
+      </ContentSection>
+    )
+  }
+
+  if (!grades || grades.length === 0) {
+    return (
+      <ContentSection heading={t('grades.courseByourse')} staggerIndex={3}>
+        <p className="text-sm py-4" style={{ color: 'var(--v2-text-muted)' }}>
+          {t('grades.noGradesYet')}
+        </p>
+      </ContentSection>
+    )
+  }
+
+  return (
+    <ContentSection heading={t('grades.courseByourse')} staggerIndex={3}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        {grades.map((grade) => {
+          const categories: CourseCardCategory[] = (grade.categoryGrades ?? []).map((cg) => ({
+            name: cg.categoryName,
+            weight: categoryMap?.get(cg.categoryId)?.weight ?? cg.weight,
+            percentage: cg.percentage,
+          }))
+
+          return (
+            <CourseCard
+              key={grade.gradeId}
+              courseName={grade.courseName ?? ''}
+              letterGrade={grade.letterGrade}
+              numericGrade={grade.numericGrade}
+              gpaPoints={grade.gpaPoints}
+              isFinal={grade.isFinal}
+              categories={categories.length > 0 ? categories : undefined}
+            />
+          )
+        })}
+      </div>
+    </ContentSection>
   )
-}
-
-function StatusBadge({ status }: { status?: string | null }) {
-  if (!status) return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">-</span>
-  const n = status.toLowerCase()
-  let cls = 'inline-flex px-2 py-0.5 rounded-full text-xs font-medium '
-  if (n === 'final' || n === 'completed') cls += 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-  else if (n === 'in_progress' || n === 'in progress' || n === 'active') cls += 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-  else cls += 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
-  return <span className={cls}>{status}</span>
-}
-
-function getLetterGradeClass(grade?: string | null): string {
-  if (!grade) return 'text-[rgb(var(--text-secondary))]'
-  const base = 'inline-flex px-2 py-0.5 rounded text-sm font-semibold '
-  if (grade.startsWith('A')) return base + 'text-green-700 dark:text-green-400'
-  if (grade.startsWith('B')) return base + 'text-blue-700 dark:text-blue-400'
-  if (grade.startsWith('C')) return base + 'text-amber-700 dark:text-amber-400'
-  if (grade.startsWith('D')) return base + 'text-orange-700 dark:text-orange-400'
-  if (grade.startsWith('F')) return base + 'text-red-700 dark:text-red-400'
-  return base + 'text-[rgb(var(--text-primary))]'
 }
