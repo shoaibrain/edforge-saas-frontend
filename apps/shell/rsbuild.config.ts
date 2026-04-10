@@ -110,12 +110,6 @@ export default defineConfig({
             academics:          remoteUrl('academics', 'academics', 3002),
             people:             remoteUrl('people', 'people', 3006),
             finance:            remoteUrl('finance', 'finance', 3003),
-            // [MVP-PARKED] Modules parked for post-MVP release
-            // edfi:               remoteUrl('edfi', 'edfi', 3001),
-            // 'special-programs': remoteUrl('special-programs', 'special_programs', 3005),
-            // messages:           remoteUrl('messages', 'messages', 3007),
-            // analytics:          remoteUrl('analytics', 'analytics', 3008),
-            // [/MVP-PARKED]
           },
           shared: getMFSharedConfig('host'),
         }),

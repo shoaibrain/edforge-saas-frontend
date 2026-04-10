@@ -19,35 +19,18 @@ import {
   GalleryVerticalEnd,
   Users,
   Settings,
-  // [MVP-PARKED] MessageCircleMore,
   Layers,
   ShieldCheck,
-  // [MVP-PARKED] Link2,
   School,
-  // [MVP-PARKED] HandCoins,
   UsersRound,
   CreditCard,
   Wallet,
-  // [MVP-PARKED] Receipt,
-  // [MVP-PARKED] Zap,
-  // [MVP-PARKED] Landmark,
-  // [MVP-PARKED] Database,
-  // [MVP-PARKED] TriangleAlert,
-  // [MVP-PARKED] ClipboardList,
   type LucideIcon,
   BrickWallShield,
   Calendars,
   ClipboardPlus,
-  // [MVP-PARKED] Megaphone,
-  // [MVP-PARKED] Mail,
-  // [MVP-PARKED] TrendingUp,
-  // [MVP-PARKED] PieChart,
-  // [MVP-PARKED] LineChart,
-  // Home, — removed with Dashboard links in Sprint 1.4
-  // [MVP-PARKED] Video,
   BookOpen,
   Calendar,
-  FileText,
   Baby,
   Building2,
   Bug,
@@ -109,12 +92,8 @@ export type SidebarModule =
   | 'academics'
   | 'finance'
   | 'people'
-  // [MVP-PARKED] | 'messages'
-  // [MVP-PARKED] | 'analytics'
   | 'parent-portal'
   | 'student-portal'
-  // [MVP-PARKED] | 'special-programs'
-  // [MVP-PARKED] | 'edfi'
 
 // ============================================================================
 // HOME MODULE - Admin/Staff/Teacher dashboard navigation
@@ -136,15 +115,6 @@ const homeModule: ModuleConfig = {
           href: '/academics',
           permission: { action: 'view', resource: 'students' },
         },
-        // [MVP-PARKED] Special Programs
-        // {
-        //   id: 'special-programs',
-        //   label: 'Special Programs',
-        //   icon: ShieldCheck,
-        //   href: '/special-programs',
-        //   permission: { action: 'view', resource: 'special-programs' },
-        // },
-        // [/MVP-PARKED]
         {
           id: 'people',
           label: 'People & HR',
@@ -159,30 +129,6 @@ const homeModule: ModuleConfig = {
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
-        // [MVP-PARKED] Messages, Analytics, State Reporting
-        // {
-        //   id: 'messages',
-        //   label: 'Messages',
-        //   icon: MessageCircleMore,
-        //   href: '/messages',
-        //   permission: { action: 'view', resource: 'communications' },
-        // },
-        // {
-        //   id: 'analytics',
-        //   label: 'Analytics',
-        //   icon: BarChart3,
-        //   href: '/analytics',
-        //   permission: { action: 'view', resource: 'analytics' },
-        // },
-        // {
-        //   id: 'edfi',
-        //   label: 'State Reporting',
-        //   icon: Database,
-        //   href: '/edfi',
-        //   permission: { action: 'view', resource: 'edfi' },
-        //   tenantRoles: ['TenantAdmin'],
-        // },
-        // [/MVP-PARKED]
         {
           id: 'settings',
           label: 'Settings',
@@ -228,33 +174,6 @@ const studentHomeModule: ModuleConfig = {
           icon: Calendar,
           href: '/student-portal/schedule',
           permission: { action: 'view', resource: 'student-portal:schedule' },
-        },
-        {
-          id: 'my-assignments',
-          label: 'Assignments',
-          icon: FileText,
-          href: '/student-portal/assignments',
-          permission: { action: 'view', resource: 'student-portal:assignments' },
-        },
-      ],
-    },
-    {
-      id: 'resources',
-      label: 'RESOURCES',
-      items: [
-        {
-          id: 'curriculum',
-          label: 'Curriculum',
-          icon: BookOpen,
-          href: '/student-portal/curriculum',
-          permission: { action: 'view', resource: 'courses' },
-        },
-        {
-          id: 'calendar',
-          label: 'School Calendar',
-          icon: Calendars,
-          href: '/student-portal/calendar',
-          permission: { action: 'view', resource: 'calendar' },
         },
       ],
     },
@@ -330,19 +249,6 @@ const parentHomeModule: ModuleConfig = {
       ],
     },
     {
-      id: 'school',
-      label: 'SCHOOL',
-      items: [
-        {
-          id: 'calendar',
-          label: 'School Calendar',
-          icon: Calendars,
-          href: '/parent-portal/calendar',
-          permission: { action: 'view', resource: 'calendar' },
-        },
-      ],
-    },
-    {
       id: 'account',
       items: [
         {
@@ -399,15 +305,6 @@ const settingsModule: ModuleConfig = {
           href: '/settings/preferences',
           permission: { action: 'view', resource: 'settings' },
         },
-        // [MVP-PARKED] Notifications merged into Preferences page
-        // {
-        //   id: 'notifications',
-        //   label: 'Notifications',
-        //   icon: MessageCircleMore,
-        //   href: '/settings/notifications',
-        //   permission: { action: 'view', resource: 'settings' },
-        // },
-        // [/MVP-PARKED]
         {
           id: 'security',
           label: 'Security',
@@ -450,51 +347,8 @@ const settingsModule: ModuleConfig = {
           permission: { action: 'manage', resource: 'settings' },
           tenantRoles: ['TenantAdmin'],
         },
-        // Fee Structures and Payment Gateways moved to Finance module (/finance/configuration/*)
-        // [MVP-PARKED] Billing, Integrations, Import/Export — not needed for MVP pilot schools
-        // {
-        //   id: 'billing',
-        //   label: 'Billing',
-        //   icon: CreditCard,
-        //   href: '/settings/billing',
-        //   permission: { action: 'manage', resource: 'settings:tenant' },
-        //   tenantRoles: ['TenantAdmin'],
-        // },
-        // {
-        //   id: 'integrations',
-        //   label: 'Integrations',
-        //   icon: Zap,
-        //   href: '/settings/integrations',
-        //   permission: { action: 'manage', resource: 'settings:tenant' },
-        //   tenantRoles: ['TenantAdmin'],
-        // },
-        // {
-        //   id: 'import-export',
-        //   label: 'Import/Export',
-        //   icon: Database,
-        //   href: '/settings/import-export',
-        //   permission: { action: 'manage', resource: 'settings:tenant' },
-        //   tenantRoles: ['TenantAdmin'],
-        // },
-        // [/MVP-PARKED]
       ],
     },
-    // [MVP-PARKED] Danger Zone — non-functional for MVP
-    // {
-    //   id: 'danger',
-    //   items: [
-    //     {
-    //       id: 'danger-zone',
-    //       label: 'Danger Zone',
-    //       icon: TriangleAlert,
-    //       href: '/settings/danger-zone',
-    //       variant: 'danger',
-    //       permission: { action: 'manage', resource: 'settings:tenant' },
-    //       tenantRoles: ['TenantAdmin'],
-    //     },
-    //   ],
-    // },
-    // [/MVP-PARKED]
   ],
 }
 
@@ -626,41 +480,6 @@ const peopleModule: ModuleConfig = {
   ],
 }
 
-// [MVP-PARKED] Analytics module config
-// const analyticsModule: ModuleConfig = {
-//   id: 'analytics',
-//   title: 'Analytics',
-//   icon: BarChart3,
-//   backTo: { path: '/home', label: 'Back to Home' },
-//   groups: [
-//     {
-//       id: 'overview',
-//       items: [
-//         { id: 'analytics-home', label: 'Overview', icon: GalleryVerticalEnd, href: '/analytics', permission: { action: 'view', resource: 'analytics' } },
-//       ],
-//     },
-//     {
-//       id: 'insights',
-//       label: 'INSIGHTS',
-//       items: [
-//         { id: 'academic-analytics', label: 'Academic Performance', icon: GraduationCap, href: '/analytics/academic', permission: { action: 'view', resource: 'analytics:academic' }, requiresActiveSchool: true },
-//         { id: 'attendance-analytics', label: 'Attendance', icon: ClipboardPlus, href: '/analytics/attendance', permission: { action: 'view', resource: 'analytics:attendance' }, requiresActiveSchool: true },
-//         { id: 'financial-analytics', label: 'Financial', icon: DollarSign, href: '/analytics/financial', permission: { action: 'view', resource: 'analytics:financial' }, requiresActiveSchool: true },
-//         { id: 'enrollment-analytics', label: 'Enrollment Trends', icon: TrendingUp, href: '/analytics/enrollment', permission: { action: 'view', resource: 'enrollment' }, requiresActiveSchool: true },
-//       ],
-//     },
-//     {
-//       id: 'reports',
-//       label: 'REPORTS',
-//       items: [
-//         { id: 'comparisons', label: 'Comparative Analysis', icon: LineChart, href: '/analytics/comparisons', permission: { action: 'view', resource: 'analytics' }, requiresActiveSchool: true },
-//         { id: 'custom-reports', label: 'Custom Reports', icon: PieChart, href: '/analytics/custom', permission: { action: 'view', resource: 'reports:finance' }, requiresActiveSchool: true },
-//       ],
-//     },
-//   ],
-// }
-// [/MVP-PARKED]
-
 // ============================================================================
 // STUDENT PORTAL MODULE - For navigating from sub-pages back to student home
 // ============================================================================
@@ -696,24 +515,8 @@ const studentPortalModule: ModuleConfig = {
           href: '/student-portal/schedule',
           permission: { action: 'view', resource: 'student-portal:schedule' },
         },
-        {
-          id: 'my-assignments',
-          label: 'Assignments',
-          icon: FileText,
-          href: '/student-portal/assignments',
-          permission: { action: 'view', resource: 'student-portal:assignments' },
-        },
       ],
     },
-    // [MVP-PARKED] Communication group (Messages module parked)
-    // {
-    //   id: 'communication', label: 'COMMUNICATION',
-    //   items: [
-    //     { id: 'messages-portal', label: 'Messages', icon: Mail, href: '/communications/messages', permission: { action: 'view', resource: 'messages' } },
-    //     { id: 'announcements-portal', label: 'Announcements', icon: Megaphone, href: '/communications/announcements', permission: { action: 'view', resource: 'announcements' } },
-    //   ],
-    // },
-    // [/MVP-PARKED]
   ],
 }
 
@@ -767,80 +570,8 @@ const parentPortalModule: ModuleConfig = {
         },
       ],
     },
-    // [MVP-PARKED] Communication group (Messages module parked)
-    // {
-    //   id: 'communication', label: 'COMMUNICATION',
-    //   items: [
-    //     { id: 'messages-portal', label: 'Messages', icon: Mail, href: '/communications/messages', permission: { action: 'view', resource: 'messages' } },
-    //     { id: 'announcements-portal', label: 'Announcements', icon: Megaphone, href: '/communications/announcements', permission: { action: 'view', resource: 'announcements' } },
-    //   ],
-    // },
-    // [/MVP-PARKED]
   ],
 }
-
-// ============================================================================
-// MODULE REGISTRY
-// ============================================================================
-
-
-// [MVP-PARKED] Messages module config
-// const messagesModule: ModuleConfig = {
-//   id: 'messages', title: 'Messages', icon: MessageCircleMore,
-//   backTo: { path: '/home', label: 'Back to Home' },
-//   groups: [
-//     { id: 'overview', items: [{ id: 'messages-home', label: 'Overview', icon: GalleryVerticalEnd, href: '/messages', permission: { action: 'view', resource: 'communications' } }] },
-//     { id: 'communication', label: 'COMMUNICATION', items: [
-//       { id: 'inbox', label: 'Inbox', icon: Mail, href: '/messages/inbox', badge: 12, permission: { action: 'view', resource: 'communications' } },
-//       { id: 'announcements', label: 'Announcements', icon: Megaphone, href: '/messages/announcements', permission: { action: 'view', resource: 'announcements' } },
-//     ]},
-//     { id: 'tools', label: 'TOOLS', items: [
-//       { id: 'meetings', label: 'Meetings', icon: Video, href: '/messages/meetings', permission: { action: 'view', resource: 'communications' } },
-//     ]},
-//   ],
-// }
-// [/MVP-PARKED]
-
-// [MVP-PARKED] Ed-Fi module config
-// const edfiModule: ModuleConfig = {
-//   id: 'edfi', title: 'State Reporting', icon: Database,
-//   backTo: { path: '/home', label: 'Back to Home' },
-//   groups: [
-//     { id: 'overview', items: [{ id: 'edfi-home', label: 'Sync Dashboard', icon: GalleryVerticalEnd, href: '/edfi', permission: { action: 'view', resource: 'edfi' } }] },
-//     { id: 'configuration', label: 'CONFIGURATION', items: [
-//       { id: 'edfi-connections', label: 'Connections', icon: Link2, href: '/edfi/connections', permission: { action: 'view', resource: 'edfi:connections' }, tenantRoles: ['TenantAdmin'] },
-//       { id: 'edfi-mapping', label: 'Descriptor Mapping', icon: Layers, href: '/edfi/mapping', permission: { action: 'view', resource: 'edfi:mapping' }, tenantRoles: ['TenantAdmin'] },
-//     ]},
-//     { id: 'monitoring', label: 'MONITORING', items: [
-//       { id: 'edfi-errors', label: 'Error Aggregator', icon: TriangleAlert, href: '/edfi/errors', permission: { action: 'view', resource: 'edfi:sync' } },
-//     ]},
-//   ],
-// }
-// [/MVP-PARKED]
-
-// [MVP-PARKED] Special Programs module config
-// const specialProgramsModule: ModuleConfig = {
-//   id: 'special-programs', title: 'Special Programs', icon: ShieldCheck,
-//   backTo: { path: '/home', label: 'Back to Home' },
-//   groups: [
-//     { id: 'overview', items: [{ id: 'special-programs-home', label: 'Overview', icon: GalleryVerticalEnd, href: '/special-programs', permission: { action: 'view', resource: 'special-programs' } }] },
-//     { id: 'special-education', label: 'SPECIAL EDUCATION', items: [
-//       { id: 'ieps', label: 'IEPs', icon: FileText, href: '/special-programs/ieps', permission: { action: 'view', resource: 'special-programs:ieps' }, requiresActiveSchool: true },
-//       { id: 'iep-meetings', label: 'IEP Meetings', icon: Calendar, href: '/special-programs/ieps/meetings', permission: { action: 'view', resource: 'special-programs:ieps' }, requiresActiveSchool: true },
-//       { id: 'iep-goals', label: 'Goals & Objectives', icon: TrendingUp, href: '/special-programs/ieps/goals', permission: { action: 'view', resource: 'special-programs:ieps' }, requiresActiveSchool: true },
-//     ]},
-//     { id: 'accommodations', label: 'ACCOMMODATIONS', items: [
-//       { id: '504-plans', label: '504 Plans', icon: ShieldCheck, href: '/special-programs/504-plans', permission: { action: 'view', resource: 'special-programs:504' }, requiresActiveSchool: true },
-//       { id: 'accommodations', label: 'Accommodations', icon: Settings, href: '/special-programs/accommodations', permission: { action: 'view', resource: 'special-programs:504' }, requiresActiveSchool: true },
-//       { id: 'accessibility', label: 'Accessibility Services', icon: Zap, href: '/special-programs/accessibility', permission: { action: 'view', resource: 'special-programs:504' }, requiresActiveSchool: true },
-//     ]},
-//     { id: 'support', label: 'SUPPORT SERVICES', items: [
-//       { id: 'counseling', label: 'Counseling', icon: Users, href: '/special-programs/counseling', permission: { action: 'view', resource: 'special-programs' }, requiresActiveSchool: true },
-//       { id: 'interventions', label: 'Interventions', icon: TrendingUp, href: '/special-programs/interventions', permission: { action: 'view', resource: 'special-programs' }, requiresActiveSchool: true },
-//     ]},
-//   ],
-// }
-// [/MVP-PARKED]
 
 // ============================================================================
 // MODULE REGISTRY
@@ -854,12 +585,8 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   academics: academicsModule,
   finance: financeModule,
   people: peopleModule,
-  // [MVP-PARKED] messages: messagesModule,
-  // [MVP-PARKED] analytics: analyticsModule,
   'student-portal': studentPortalModule,
   'parent-portal': parentPortalModule,
-  // [MVP-PARKED] 'special-programs': specialProgramsModule,
-  // [MVP-PARKED] edfi: edfiModule,
 }
 
 
@@ -921,12 +648,8 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/academics')) return 'academics'
   if (pathname.startsWith('/finance')) return 'finance'
   if (pathname.startsWith('/people')) return 'people'
-  // [MVP-PARKED] if (pathname.startsWith('/messages')) return 'messages'
-  // [MVP-PARKED] if (pathname.startsWith('/analytics')) return 'analytics'
   if (pathname.startsWith('/student-portal')) return 'student-portal'
   if (pathname.startsWith('/parent-portal')) return 'parent-portal'
-  // [MVP-PARKED] if (pathname.startsWith('/special-programs')) return 'special-programs'
-  // [MVP-PARKED] if (pathname.startsWith('/edfi')) return 'edfi'
   return 'home'
 }
 

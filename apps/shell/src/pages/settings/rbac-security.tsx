@@ -10,7 +10,6 @@ import {
   Search,
   Check,
   X,
-  Eye,
   Edit,
   UserPlus,
   ChevronRight,
@@ -21,7 +20,6 @@ import { can } from '@edforge/abac'
 import { ROLE_PERMISSIONS } from '@edforge/abac'
 import type { SchoolRole } from '@edforge/types'
 import { usersService } from '@/services/users.service'
-import { ComingSoonBanner } from '@edforge/ui'
 import AssignUserModal from '@/components/modals/AssignUserModal'
 import {
   SettingsPageHeader,
@@ -34,7 +32,7 @@ import {
 // TYPES
 // ============================================================================
 
-type TabId = 'roles' | 'users' | 'audit'
+type TabId = 'roles' | 'users'
 
 interface RoleInfo {
   id: SchoolRole
@@ -52,7 +50,6 @@ interface RoleInfo {
 const TABS: { id: TabId; label: string; icon: typeof Key }[] = [
   { id: 'roles', label: 'Roles & Permissions', icon: Key },
   { id: 'users', label: 'User Assignments', icon: Users },
-  { id: 'audit', label: 'Audit Log', icon: Eye },
 ]
 
 const SYSTEM_ROLES: RoleInfo[] = [
@@ -450,20 +447,6 @@ export default function RBACSecurityPage() {
                 </SettingsSection>
               )}
 
-              {/* COMING_SOON: audit-log — Replace ComingSoonBanner with AuditLogViewer when it ships */}
-              {selectedTab === 'audit' && (
-                <ComingSoonBanner
-                  variant="security"
-                  title="Audit Log"
-                  description="Track security events across your organization including permission changes, role assignments, and authentication activity."
-                  features={[
-                    'Permission denial tracking with endpoint details',
-                    'Role assignment and removal history',
-                    'User lifecycle events (create, update, disable)',
-                    'Authentication events and login history',
-                  ]}
-                />
-              )}
             </motion.div>
           </AnimatePresence>
         </div>

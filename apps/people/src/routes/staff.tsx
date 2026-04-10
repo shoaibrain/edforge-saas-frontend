@@ -392,44 +392,6 @@ export default function StaffPage() {
                 >
                   Quick add user account
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddDropdownOpen(false)
-                    toast.info('Import from CSV coming soon')
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: 11,
-                    color: 'var(--v2-text-secondary, #c8ccd8)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  Import from CSV
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddDropdownOpen(false)
-                    toast.info('Bulk add coming soon')
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: 11,
-                    color: 'var(--v2-text-secondary, #c8ccd8)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  Bulk add
-                </button>
               </div>
             )}
           </div>

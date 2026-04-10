@@ -93,20 +93,12 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: Clock, 
     href: '/academics/classrooms?tab=attendance'
   },
-  { 
-    label: 'Create Invoice', 
+  {
+    label: 'Create Invoice',
     description: 'Generate a new invoice',
-    icon: DollarSign, 
-    href: '/finance/billing/new' 
+    icon: DollarSign,
+    href: '/finance/billing/new'
   },
-  // [MVP-PARKED] Messages quick action
-  // {
-  //   label: 'Send Message',
-  //   description: 'Contact parents or staff',
-  //   icon: Users,
-  //   href: '/messages/compose'
-  // },
-  // [/MVP-PARKED]
 ]
 
 // ============================================================================

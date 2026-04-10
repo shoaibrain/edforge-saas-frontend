@@ -2,9 +2,9 @@
  * Classroom Detail Page
  *
  * Google Classroom-inspired detail view for a single class section.
- * Tabs: Stream, Classwork, People, Progress (Grades + Attendance merged)
+ * Tabs: Overview, Classwork, People, Progress (Grades + Attendance merged)
  *
- * People, Progress (Grades & Attendance), Stream, and Classwork are fully functional.
+ * All tabs are fully functional.
  */
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
@@ -23,7 +23,7 @@ import {
   AlertCircle,
   ClipboardCheck,
   GraduationCap,
-  MessageSquare,
+  LayoutDashboard,
   FileText,
   Plus,
   Lock,
@@ -53,8 +53,8 @@ import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { SectionAttendanceWrapper } from '../../components/attendance/SectionAttendanceWrapper'
 import { useSectionAttendanceRecords } from '../../hooks/useSectionAttendance'
 
-// --- Stream ---
-import { StreamFeed } from '../../components/classrooms/stream'
+// --- Overview ---
+import { ClassroomOverview } from '../../components/classrooms/overview'
 
 // --- Classwork ---
 import { ClassworkFeed } from '../../components/classrooms/classwork'
@@ -63,10 +63,10 @@ import { ClassworkFeed } from '../../components/classrooms/classwork'
 // TYPES
 // ============================================================================
 
-type ClassroomDetailTab = 'stream' | 'classwork' | 'people' | 'progress'
+type ClassroomDetailTab = 'overview' | 'classwork' | 'people' | 'progress'
 
 const TABS: { id: ClassroomDetailTab; label: string; icon: typeof BookOpen }[] = [
-  { id: 'stream', label: 'Stream', icon: MessageSquare },
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'classwork', label: 'Classwork', icon: FileText },
   { id: 'people', label: 'People', icon: Users },
   { id: 'progress', label: 'Progress', icon: TrendingUp },
@@ -161,10 +161,6 @@ function ActionsDropdown({
     </div>
   )
 }
-
-// ============================================================================
-// STREAM TAB PLACEHOLDER
-// ============================================================================
 
 // ============================================================================
 // GRADES TAB (section-scoped)
@@ -610,11 +606,12 @@ export function ClassroomDetailPage() {
 
   // Tab state from URL (with redirects for old tab names)
   const search = useSearch({ strict: false }) as { tab?: string; view?: string }
-  const rawTab = search?.tab || 'stream'
+  const rawTab = search?.tab || 'overview'
   let resolvedTab = rawTab
+  if (resolvedTab === 'stream') resolvedTab = 'overview'
   if (resolvedTab === 'grades') resolvedTab = 'progress'
   if (resolvedTab === 'attendance') resolvedTab = 'progress'
-  const activeTab: ClassroomDetailTab = VALID_TABS.has(resolvedTab) ? (resolvedTab as ClassroomDetailTab) : 'stream'
+  const activeTab: ClassroomDetailTab = VALID_TABS.has(resolvedTab) ? (resolvedTab as ClassroomDetailTab) : 'overview'
 
   // Progress sub-view from URL
   const progressView = search?.view || 'overview'
@@ -799,17 +796,20 @@ export function ClassroomDetailPage() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
           >
-            {activeTab === 'stream' && (
-              <TabErrorBoundary tabName="Stream">
-                <StreamFeed sectionId={sectionId} onSwitchTab={(tab) => {
-                  // Handle "progress:view" format from StreamFeed quick actions
-                  if (tab.startsWith('progress:')) {
-                    const view = tab.split(':')[1]
-                    navigate({ search: { tab: 'progress', view } as any, replace: true })
-                  } else {
-                    setActiveTab(tab as ClassroomDetailTab)
-                  }
-                }} />
+            {activeTab === 'overview' && (
+              <TabErrorBoundary tabName="Overview">
+                <ClassroomOverview
+                  sectionId={sectionId}
+                  section={section}
+                  onNavigateTab={(tab) => {
+                    if (tab.startsWith('progress:')) {
+                      const view = tab.split(':')[1]
+                      navigate({ search: { tab: 'progress', view } as any, replace: true })
+                    } else {
+                      setActiveTab(tab as ClassroomDetailTab)
+                    }
+                  }}
+                />
               </TabErrorBoundary>
             )}
 

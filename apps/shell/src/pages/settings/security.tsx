@@ -1,7 +1,7 @@
 /**
  * Security Settings Page
  *
- * Manage account security settings including password, MFA, and sessions.
+ * Manage account security settings including password.
  * Integrated with backend Security API and Cognito.
  */
 
@@ -22,7 +22,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import axios from 'axios'
-import { Button, Modal, ModalFooter, ComingSoonBanner } from '@edforge/ui'
+import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { TextField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
 import {
@@ -405,7 +405,6 @@ function SecurityOverviewCard({
 
       <div className="space-y-2">
         <StatusItem label="Password" value={passwordText} tone={passwordTone} />
-        <StatusItem label="Two-Factor" value="Coming soon" tone="neutral" />
         <StatusItem
           label="Sessions"
           value={`${overview.activeSessions} active session${overview.activeSessions === 1 ? '' : 's'}`}
@@ -443,12 +442,10 @@ function SecurityOverviewCard({
 // SECURITY TABS
 // ============================================================================
 
-type SecurityTab = 'password' | 'mfa' | 'sessions'
+type SecurityTab = 'password'
 
 const SECURITY_TABS: Array<{ id: SecurityTab; label: string }> = [
   { id: 'password', label: 'Password' },
-  { id: 'mfa', label: 'Two-Factor Auth' },
-  { id: 'sessions', label: 'Sessions & Activity' },
 ]
 
 function SecurityTabs({
@@ -574,49 +571,6 @@ export default function SecurityPage() {
               </motion.div>
             )}
 
-            {/* COMING_SOON: mfa — Replace ComingSoonBanner with MFA settings when 2FA ships */}
-            {activeTab === 'mfa' && (
-              <motion.div
-                key="mfa"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ComingSoonBanner
-                  variant="security"
-                  title="Two-Factor Authentication"
-                  description="Add an extra layer of security to your account with authenticator apps and backup codes."
-                  features={[
-                    'Google Authenticator, Authy, and other TOTP apps',
-                    'Backup codes for account recovery',
-                    'Required for sensitive operations',
-                  ]}
-                />
-              </motion.div>
-            )}
-
-            {/* COMING_SOON: sessions — Replace ComingSoonBanner with session management when it ships */}
-            {activeTab === 'sessions' && (
-              <motion.div
-                key="sessions"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ComingSoonBanner
-                  variant="security"
-                  title="Session Management"
-                  description="See where you're signed in and manage active sessions across your devices."
-                  features={[
-                    'View all active sessions and devices',
-                    'Revoke individual or all sessions',
-                    'Recent login history',
-                  ]}
-                />
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
       </motion.div>
