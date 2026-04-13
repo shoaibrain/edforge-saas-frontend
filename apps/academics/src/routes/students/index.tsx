@@ -34,6 +34,7 @@ import {
 import { useActiveSchoolId } from '../../stores'
 import { useStudentFilters, useStudentFilterActions } from '../../stores/students.store'
 import { useAcademicsOverviewV2 } from '../../hooks/useAcademicsOverviewV2'
+import { filterStudentsByMode } from '../../utils/student-filters'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -351,21 +352,14 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
     return map
   }, [overviewData.alerts.students])
 
-  // Apply filterMode to students list
-  const filteredStudents = useMemo(() => {
-    switch (filters.filterMode) {
-      case 'at-risk':
-        return students.filter((s) => alertsMap.has(s.studentId))
-      case 'active':
-        return students.filter((s) => s.status === 'active')
-      case 'pending':
-        return students.filter(
-          (s) => s.status === 'inactive' || !s.contactInfo?.email
-        )
-      default:
-        return students
-    }
-  }, [students, filters.filterMode, alertsMap])
+  // Apply filterMode chip to the server-filtered student list.
+  // Server-side filters (search/grade/status) have already narrowed `students`
+  // upstream via useStudents({ filters }); the chip filter intersects with
+  // that result. See utils/student-filters.ts for canonical predicates.
+  const filteredStudents = useMemo(
+    () => filterStudentsByMode(students, filters.filterMode, alertsMap),
+    [students, filters.filterMode, alertsMap],
+  )
 
   // Derive KPI values
   const attendanceRate = overviewData.overview.todayAttendanceRate
@@ -465,19 +459,6 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 >
                   <Upload className="w-3.5 h-3.5" />
                   Import students
-                </button>
-                <button
-                  onClick={() => navigate({ to: '/students' })}
-                  aria-label="Bulk enroll"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
-                  style={{
-                    background: 'var(--v2-bg-elevated)',
-                    borderColor: 'var(--v2-border-default)',
-                    color: 'var(--v2-text-secondary)',
-                  }}
-                >
-                  <Users className="w-3.5 h-3.5" />
-                  Bulk enroll
                 </button>
                 <button
                   onClick={handleAddStudent}
@@ -627,12 +608,13 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         )}
       </motion.div>
 
-      {/* Student Quick-Info Drawer — V2 (content-pane-scoped) */}
+      {/* Student Quick-Info Drawer — V3 (content-pane-scoped, privacy-conscious) */}
       <StudentQuickProfile
         open={drawerOpen}
         onClose={handleCloseDrawer}
         student={selectedStudent}
         attendanceRate={selectedStudent ? alertsMap.get(selectedStudent.studentId) : undefined}
+        academicYearName={overviewData.academicYear.name}
         onWithdraw={studentPerms.delete ? handleWithdrawFromDrawer : undefined}
       />
 

@@ -10,6 +10,7 @@
 /* Custom theme configuration with Coolors palette */
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Noto Serif Devanagari', serif;
   --font-devanagari: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
   
   /* Edforge Brand Colors - Coolors Palette
@@ -246,5 +247,20 @@ h3 {
 p {
   color: rgb(var(--text-secondary));
   line-height: 1.625;
+}
+
+/* Display serif font utility — Fraunces with softened terminals.
+   Used for portal headings, hero greetings, and GPA display numbers.
+   The SOFT axis softens terminal strokes for a warmer, more approachable feel.
+   opsz optimizes for the typical heading size range (9-72pt). */
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 50, "opsz" 36;
+}
+
+/* Large display variant — for hero greetings at 36-48px */
+.font-display-hero {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 80, "opsz" 72;
 }
 

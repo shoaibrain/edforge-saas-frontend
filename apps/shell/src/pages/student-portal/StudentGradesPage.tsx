@@ -1,293 +1,217 @@
 /**
- * Student Portal — My Grades Page
+ * Student Portal — My Grades Page (v2)
  *
- * Displays the authenticated student's grades and GPA summary.
- * Data: GET /academics/students/:studentId/grades?schoolId=...&academicYearId=...
+ * Rewritten securely using prototype DOM scoping (.fp-) to avoid
+ * conflicting with generic layouts.
  */
 
-import { useQuery } from '@tanstack/react-query'
-import { apiGet } from '../../lib/api'
+import { useState, useMemo } from 'react'
+import { useTranslation } from '@edforge/i18n'
+import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useStudentPortal } from './StudentPortalLayout'
-import { Card, CardContent, CardHeader, Skeleton } from '@edforge/ui'
-import { GraduationCap, TrendingUp, BookOpen, Award } from 'lucide-react'
-import type { StudentGradesResponseDto } from '@aibrains/shared-types'
+import { usePortalStudentGrades } from '../../hooks/usePortalStudentGrades'
+import { usePortalCurrentAcademicYear, usePortalGradingPeriods } from '../../hooks/usePortalCurrentAcademicYear'
+import { usePortalGradingPolicy } from '../../hooks/usePortalGradingPolicy'
+import { TermSwitcher } from '../portal-shared/TermSwitcher'
+import { GpaHeroSection } from '../portal-shared/GpaHeroSection'
+import { SignalBanner, type SignalLevel } from '../portal-shared/SignalBanner'
+import { GradedItemTimeline } from '../portal-shared/GradedItemTimeline'
+import { PortalCourseCard, type PortalCourseCardCategory } from '../portal-shared/PortalCourseCard'
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
 export default function StudentGradesPage() {
-  const { studentId } = useStudentPortal()
+  const { t } = useTranslation('portal')
+  const { studentId, studentProfile } = useStudentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
+  const schoolId = activeSchoolId ?? studentProfile.schoolId
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['student-grades', studentId, activeSchoolId, activeSchoolYear?.id],
-    queryFn: () =>
-      apiGet<StudentGradesResponseDto>(
-        `/academics/students/${studentId}/grades`,
-        {
-          schoolId: activeSchoolId,
-          ...(activeSchoolYear?.id && { academicYearId: activeSchoolYear.id }),
-        }
-      ),
-    enabled: !!studentId && !!activeSchoolId,
-    staleTime: 5 * 60 * 1000,
-  })
+  const [activeTerm, setActiveTerm] = useState<string | null>(null)
 
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-8 w-40" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24" />
-          ))}
-        </div>
-        <Skeleton className="h-96" />
-      </div>
-    )
-  }
+  // Data hooks
+  const { data: yearData } = usePortalCurrentAcademicYear(schoolId)
+  const yearId = activeSchoolYear?.id ?? yearData?.id ?? ''
+  const { data: periods } = usePortalGradingPeriods(schoolId, yearId)
+  const { data: gradesData, isLoading: gradesLoading } = usePortalStudentGrades(
+    studentId,
+    schoolId,
+    { academicYearId: yearId, termId: activeTerm ?? undefined }
+  )
+  const { data: policies } = usePortalGradingPolicy(schoolId)
 
-  if (error) {
-    return (
-      <div className="p-6">
-        <EmptyState
-          title="Unable to Load Grades"
-          description="There was an error loading your grades. Please try again later."
-        />
-      </div>
-    )
-  }
+  const signalLevel = useMemo((): SignalLevel | null => {
+    if (!gradesData?.grades || gradesData.grades.length === 0) return null
+    const hasF = gradesData.grades.some((g) => g.letterGrade?.startsWith('F'))
+    const hasD = gradesData.grades.some((g) => g.letterGrade?.startsWith('D'))
+    if (hasF) return 'concern'
+    if (hasD) return 'attention'
+    return 'good'
+  }, [gradesData])
 
-  const grades = data?.grades ?? []
-  const gpa = data?.gpa
+  const categoryMap = useMemo(() => {
+    const defaultPolicy = policies?.find((p) => p.isDefault) ?? policies?.[0]
+    if (!defaultPolicy?.categoryWeights) return null
+    const map = new Map<string, { name: string; weight: number }>()
+    for (const cw of defaultPolicy.categoryWeights) {
+      map.set(cw.categoryId, { name: cw.categoryName, weight: cw.weight })
+    }
+    return map
+  }, [policies])
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-        My Grades
-      </h1>
-
-      {/* GPA Summary Cards */}
-      {gpa && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={<TrendingUp className="w-5 h-5" />}
-            label="Cumulative GPA"
-            value={gpa.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : '-'}
-            color="teal"
-          />
-          {gpa.weightedGpa != null && (
-            <StatCard
-              icon={<Award className="w-5 h-5" />}
-              label="Weighted GPA"
-              value={gpa.weightedGpa.toFixed(2)}
-              color="blue"
-            />
-          )}
-          <StatCard
-            icon={<BookOpen className="w-5 h-5" />}
-            label="Total Credits"
-            value={(gpa.totalCredits ?? 0).toString()}
-            color="purple"
-          />
-          <StatCard
-            icon={<GraduationCap className="w-5 h-5" />}
-            label="Courses"
-            value={grades.length.toString()}
-            color="amber"
-          />
+    <div className="fp-content">
+      {/* Page header */}
+      <div className="fp-page-head">
+        <div>
+          <div className="fp-page-eyebrow">Progress report</div>
+          <h1 className="fp-page-title">
+            Your <em>progress.</em>
+          </h1>
+          <p className="fp-page-sub">
+            A running view of how you're doing this term. We'll fill this in as teachers post grades — nothing is cast in stone until the report card.
+          </p>
         </div>
-      )}
-
-      {/* Grades Table */}
-      {grades.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              Course Grades
-              {activeSchoolYear && (
-                <span className="text-sm font-normal text-[rgb(var(--text-secondary))] ml-2">
-                  {activeSchoolYear.name}
-                </span>
-              )}
-            </h2>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[rgb(var(--border-primary))]">
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-                      Course
-                    </th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-                      Grade
-                    </th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-                      Numeric
-                    </th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-                      GPA Points
-                    </th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-                      Credits
-                    </th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[rgb(var(--border-primary))]">
-                  {grades.map((grade) => (
-                    <tr key={grade.gradeId} className="hover:bg-[rgb(var(--surface-secondary))]">
-                      <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">
-                        {grade.courseName}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center">
-                        <span className={getLetterGradeClass(grade.letterGrade)}>
-                          {grade.letterGrade ?? '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center text-[rgb(var(--text-secondary))]">
-                        {grade.numericGrade != null ? grade.numericGrade.toFixed(1) : '-'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center text-[rgb(var(--text-secondary))]">
-                        {grade.gpaPoints != null ? grade.gpaPoints.toFixed(2) : '-'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center text-[rgb(var(--text-secondary))]">
-                        {grade.credits ?? '-'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center">
-                        <StatusBadge status={grade.isFinal ? 'Final' : 'In Progress'} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <EmptyState
-          title="No Grades Yet"
-          description="Your grades will appear here once they are recorded by your teachers."
+        <TermSwitcher
+          periods={periods}
+          activePeriodId={activeTerm}
+          onChange={setActiveTerm}
         />
-      )}
+      </div>
 
-      {/* Term GPA Breakdown */}
-      {gpa?.termGpas && gpa.termGpas.length > 1 && (
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              GPA by Term
-            </h2>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {gpa.termGpas.map((term) => (
-                <div
-                  key={term.termId}
-                  className="p-4 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]"
-                >
-                  <p className="text-sm text-[rgb(var(--text-secondary))]">
-                    {term.termId}
-                  </p>
-                  <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
-                    {(term.gpa ?? 0).toFixed(2)}
-                  </p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                    {term.credits} credits
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <WidgetErrorBoundaryV2>
+        <GpaHeroSection
+          data={gradesData}
+          loading={gradesLoading}
+          childName={studentProfile.firstName}
+        />
+      </WidgetErrorBoundaryV2>
+
+      <SignalBanner level={signalLevel} />
+
+      <WidgetErrorBoundaryV2>
+        <CourseGridSection
+          grades={gradesData?.grades}
+          loading={gradesLoading}
+          categoryMap={categoryMap}
+        />
+      </WidgetErrorBoundaryV2>
+
+      <WidgetErrorBoundaryV2>
+        <GradedItemTimeline
+          grades={gradesData?.grades}
+          loading={gradesLoading}
+        />
+      </WidgetErrorBoundaryV2>
     </div>
   )
 }
 
 // ============================================================================
-// SUB-COMPONENTS
+// COURSE GRID SECTION
 // ============================================================================
 
-function StatCard({
-  icon,
-  label,
-  value,
-  color,
+function CourseGridSection({
+  grades,
+  loading,
+  categoryMap,
 }: {
-  icon: React.ReactNode
-  label: string
-  value: string
-  color: 'teal' | 'blue' | 'purple' | 'amber'
+  grades?: Array<{
+    gradeId: string
+    courseName?: string
+    courseId: string
+    letterGrade?: string
+    numericGrade?: number
+    gpaPoints?: number
+    isFinal: boolean
+    teacherId: string
+    categoryGrades?: Array<{
+      categoryId: string
+      categoryName: string
+      weight: number
+      percentage: number
+    }>
+  }>
+  loading?: boolean
+  categoryMap?: Map<string, { name: string; weight: number }> | null
 }) {
-  const colorMap = {
-    teal: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
-    blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  }
+  const { t } = useTranslation('portal')
 
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorMap[color]}`}>
-            {icon}
-          </div>
-          <div>
-            <p className="text-xs text-[rgb(var(--text-secondary))]">{label}</p>
-            <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{value}</p>
-          </div>
+  if (loading) {
+    return (
+      <section className="fp-section">
+        <div className="fp-section-head">
+          <h2 className="fp-section-title">Course by course</h2>
         </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function StatusBadge({ status }: { status?: string | null }) {
-  if (!status) return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">-</span>
-  const normalized = status.toLowerCase()
-  let className = 'inline-flex px-2 py-0.5 rounded-full text-xs font-medium '
-
-  if (normalized === 'final' || normalized === 'completed') {
-    className += 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-  } else if (normalized === 'in_progress' || normalized === 'in progress' || normalized === 'active') {
-    className += 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-  } else if (normalized === 'incomplete' || normalized === 'missing') {
-    className += 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-  } else {
-    className += 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+        <div className="fp-course-grid">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="fp-course v2-skeleton-pulse"
+              style={{ background: 'var(--fp-paper-2)', minHeight: '200px' }}
+            />
+          ))}
+        </div>
+      </section>
+    )
   }
 
-  return <span className={className}>{status}</span>
-}
+  if (!grades || grades.length === 0) {
+    return (
+      <section className="fp-section">
+        <div className="fp-section-head">
+          <h2 className="fp-section-title">Course by course</h2>
+        </div>
+        <p style={{ color: 'var(--fp-ink-3)' }}>
+          {t('grades.noGradesYet')}
+        </p>
+      </section>
+    )
+  }
 
-function getLetterGradeClass(grade?: string | null): string {
-  if (!grade) return 'text-[rgb(var(--text-secondary))]'
-  const base = 'inline-flex px-2 py-0.5 rounded text-sm font-semibold '
-  if (grade.startsWith('A')) return base + 'text-green-700 dark:text-green-400'
-  if (grade.startsWith('B')) return base + 'text-blue-700 dark:text-blue-400'
-  if (grade.startsWith('C')) return base + 'text-amber-700 dark:text-amber-400'
-  if (grade.startsWith('D')) return base + 'text-orange-700 dark:text-orange-400'
-  if (grade.startsWith('F')) return base + 'text-red-700 dark:text-red-400'
-  return base + 'text-[rgb(var(--text-primary))]'
-}
-
-function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <Card>
-      <CardContent className="py-16 text-center">
-        <GraduationCap className="w-12 h-12 text-[rgb(var(--text-tertiary))] mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-2">{title}</h3>
-        <p className="text-sm text-[rgb(var(--text-secondary))] max-w-sm mx-auto">{description}</p>
-      </CardContent>
-    </Card>
+    <section className="fp-section">
+      <div className="fp-section-head">
+        <h2 className="fp-section-title">Course by course</h2>
+        <a className="fp-section-link" href="#">See schedule →</a>
+      </div>
+      <div className="fp-course-grid">
+        {grades.map((grade, idx) => {
+          const categories: PortalCourseCardCategory[] = (grade.categoryGrades ?? []).map((cg) => {
+            const policyWeight = categoryMap?.get(cg.categoryId)?.weight
+            return {
+              name: cg.categoryName,
+              weight: policyWeight ?? cg.weight,
+              percentage: cg.percentage,
+            }
+          })
+
+          const tColor = idx % 2 === 0 ? 'ind' : 'ter';
+
+          let missedWorkMessage = undefined;
+          if (grade.letterGrade?.startsWith('F')) {
+             missedWorkMessage = { title: "Early notification", body: `The ${grade.letterGrade} reflects missing coursework so far.` }
+          }
+
+          return (
+            <PortalCourseCard
+              key={grade.gradeId}
+              courseName={grade.courseName ?? ''}
+              courseCode={`CODE ${idx+1}`}
+              letterGrade={grade.letterGrade}
+              numericGrade={grade.numericGrade}
+              teacherName="Course Teacher"
+              teacherColor={tColor}
+              categories={categories.length > 0 ? categories : undefined}
+              missedWorkMessage={missedWorkMessage}
+            />
+          )
+        })}
+      </div>
+    </section>
   )
 }

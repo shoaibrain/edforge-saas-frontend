@@ -8,8 +8,14 @@ import { getMFSharedConfig } from '@edforge/config/mf-shared'
 // Load environment variables from .env files
 const { publicVars } = loadEnv({ prefixes: ['VITE_'] })
 
-// Get API URL from environment (used for proxy target)
-const API_URL = process.env.VITE_API_URL || 'https://udmx0atz53.execute-api.us-east-2.amazonaws.com/prod'
+// Get API URL from environment (used for proxy target in dev mode)
+const API_URL = process.env.VITE_API_URL
+if (!API_URL && process.env.NODE_ENV === 'development') {
+  console.warn('[Shell] VITE_API_URL is not set — dev proxy will not work. Set it in .env.local')
+}
+if (!API_URL && process.env.NODE_ENV === 'production') {
+  throw new Error('VITE_API_URL must be set for production builds. Check Vercel environment configuration.')
+}
 
 // Production builds use same-origin relative paths for remotes (consolidated deployment).
 // Development uses localhost ports for each remote's dev server.
@@ -104,12 +110,6 @@ export default defineConfig({
             academics:          remoteUrl('academics', 'academics', 3002),
             people:             remoteUrl('people', 'people', 3006),
             finance:            remoteUrl('finance', 'finance', 3003),
-            // [MVP-PARKED] Modules parked for post-MVP release
-            // edfi:               remoteUrl('edfi', 'edfi', 3001),
-            // 'special-programs': remoteUrl('special-programs', 'special_programs', 3005),
-            // messages:           remoteUrl('messages', 'messages', 3007),
-            // analytics:          remoteUrl('analytics', 'analytics', 3008),
-            // [/MVP-PARKED]
           },
           shared: getMFSharedConfig('host'),
         }),

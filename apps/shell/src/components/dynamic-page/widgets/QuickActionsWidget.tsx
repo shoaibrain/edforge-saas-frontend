@@ -10,12 +10,6 @@ import { motion } from 'framer-motion'
 import {
   Users,
   Calendar,
-  // [MVP-PARKED] Unused icons from parked quick actions
-  // Video,
-  // BarChart3,
-  // MessageSquare,
-  // Bell,
-  // [/MVP-PARKED]
   ArrowRight,
   GraduationCap,
   ClipboardCheck,
@@ -88,32 +82,6 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
       border: 'border-orange-200 dark:border-orange-800/30',
     },
   },
-  // [MVP-PARKED] Messages & Analytics quick actions
-  // {
-  //   id: 'schedule-meeting',
-  //   label: 'Schedule',
-  //   description: 'New meeting',
-  //   icon: Video,
-  //   href: '/messages/schedule',
-  //   color: {
-  //     bg: 'bg-indigo-50 dark:bg-indigo-900/10',
-  //     text: 'text-indigo-600 dark:text-indigo-400',
-  //     border: 'border-indigo-200 dark:border-indigo-800/30',
-  //   },
-  // },
-  // {
-  //   id: 'view-reports',
-  //   label: 'Analytics',
-  //   description: 'View reports',
-  //   icon: BarChart3,
-  //   href: '/analytics',
-  //   color: {
-  //     bg: 'bg-blue-50 dark:bg-blue-900/10',
-  //     text: 'text-blue-600 dark:text-blue-400',
-  //     border: 'border-blue-200 dark:border-blue-800/30',
-  //   },
-  // },
-  // [/MVP-PARKED]
 ]
 
 const TEACHER_QUICK_ACTIONS: QuickAction[] = [
@@ -159,20 +127,6 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
       border: 'border-indigo-200 dark:border-indigo-800/30',
     },
   },
-  // [MVP-PARKED] Messages quick action
-  // {
-  //   id: 'messages',
-  //   label: 'Messages',
-  //   description: 'Parent communication',
-  //   icon: MessageSquare,
-  //   href: '/messages',
-  //   color: {
-  //     bg: 'bg-blue-50 dark:bg-blue-900/10',
-  //     text: 'text-blue-600 dark:text-blue-400',
-  //     border: 'border-blue-200 dark:border-blue-800/30',
-  //   },
-  // },
-  // [/MVP-PARKED]
 ]
 
 const STUDENT_QUICK_ACTIONS: QuickAction[] = [
@@ -218,20 +172,6 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
       border: 'border-indigo-200 dark:border-indigo-800/30',
     },
   },
-  // [MVP-PARKED] Messages quick action
-  // {
-  //   id: 'announcements',
-  //   label: 'News',
-  //   description: 'School updates',
-  //   icon: Bell,
-  //   href: '/messages/announcements',
-  //   color: {
-  //     bg: 'bg-blue-50 dark:bg-blue-900/10',
-  //     text: 'text-blue-600 dark:text-blue-400',
-  //     border: 'border-blue-200 dark:border-blue-800/30',
-  //   },
-  // },
-  // [/MVP-PARKED]
 ]
 
 const PARENT_QUICK_ACTIONS: QuickAction[] = [
@@ -277,20 +217,6 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
       border: 'border-orange-200 dark:border-orange-800/30',
     },
   },
-  // [MVP-PARKED] Messages quick action
-  // {
-  //   id: 'messages',
-  //   label: 'Messages',
-  //   description: 'Contact teachers',
-  //   icon: MessageSquare,
-  //   href: '/messages',
-  //   color: {
-  //     bg: 'bg-blue-50 dark:bg-blue-900/10',
-  //     text: 'text-blue-600 dark:text-blue-400',
-  //     border: 'border-blue-200 dark:border-blue-800/30',
-  //   },
-  // },
-  // [/MVP-PARKED]
 ]
 
 export function getQuickActionsForRole(roleCategory: RoleCategory | null): QuickAction[] {

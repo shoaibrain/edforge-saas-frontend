@@ -21,15 +21,6 @@ import { formatRelativeDate } from '../../lib/greeting'
 // ============================================================================
 
 const EXTENDED_MOCK_PAGES: VisitedPage[] = [
-  // [MVP-PARKED] Communications mock entry
-  // {
-  //   path: '/communications',
-  //   title: 'Meetings',
-  //   icon: 'Video',
-  //   module: 'communications',
-  //   visitedAt: new Date().toISOString(),
-  // },
-  // [/MVP-PARKED]
   {
     path: '/settings',
     title: 'Settings',
@@ -65,15 +56,6 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
     module: 'people',
     visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
   },
-  // [MVP-PARKED] Analytics mock entry
-  // {
-  //   path: '/analytics',
-  //   title: 'Analytics',
-  //   icon: 'BarChart3',
-  //   module: 'analytics',
-  //   visitedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  // },
-  // [/MVP-PARKED]
   {
     path: '/academics/classrooms',
     title: 'Classrooms',
@@ -113,18 +95,6 @@ function VisitedCard({ page, index }: VisitedCardProps) {
       icon: 'text-aqua-700 dark:text-aqua-400',
       gradient: 'from-aqua-400/20 to-aqua-400/5',
     },
-    // [MVP-PARKED] Parked module color schemes
-    // communications: {
-    //   bg: 'bg-violet-500/8 dark:bg-violet-400/12',
-    //   icon: 'text-violet-600 dark:text-violet-400',
-    //   gradient: 'from-violet-500/20 to-violet-500/5 dark:from-violet-400/20 dark:to-violet-400/5',
-    // },
-    // analytics: {
-    //   bg: 'bg-caramel-400/10',
-    //   icon: 'text-caramel-600 dark:text-caramel-400',
-    //   gradient: 'from-caramel-400/20 to-caramel-400/5',
-    // },
-    // [/MVP-PARKED]
     settings: {
       bg: 'bg-slate-500/8 dark:bg-slate-400/12',
       icon: 'text-slate-600 dark:text-slate-400',

@@ -5,8 +5,8 @@
  * active filter badges, and results count.
  */
 
-import { useEffect, useState, useMemo } from 'react'
-import { Search, X } from 'lucide-react'
+import { useMemo } from 'react'
+import { X } from 'lucide-react'
 import { useSectionFilters, useSectionFilterActions } from '../../stores/sections.store'
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
@@ -28,23 +28,6 @@ interface SectionFiltersProps {
 export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) {
   const filters = useSectionFilters()
   const actions = useSectionFilterActions()
-
-  // Local search state with manual debounce
-  const [localSearch, setLocalSearch] = useState(filters.searchTerm)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      actions.setSearchTerm(localSearch)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [localSearch, actions])
-
-  // Sync local state when store resets
-  useEffect(() => {
-    if (filters.searchTerm === '' && localSearch !== '') {
-      setLocalSearch('')
-    }
-  }, [filters.searchTerm])
 
   // Fetch data for selectors
   const { data: coursesData } = useCourses({
@@ -112,27 +95,8 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
 
   return (
     <div className="space-y-2.5">
-      {/* Single-row: Search + Filters + Status chips */}
+      {/* Single-row: Filters + Status chips */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Compact search */}
-        <div className="relative flex-1" style={{ minWidth: 180, maxWidth: 320 }}>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint)' }} />
-          <input
-            type="text"
-            placeholder="Search sections..."
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border transition-colors focus:outline-none focus:ring-2"
-            style={{
-              background: 'var(--v2-bg-surface)',
-              borderColor: 'var(--v2-border-default)',
-              color: 'var(--v2-text-primary)',
-              // @ts-ignore
-              '--tw-ring-color': 'rgba(55,138,221,0.20)',
-            }}
-          />
-        </div>
-
         {/* Course dropdown */}
         <select
           value={filters.courseId || ''}

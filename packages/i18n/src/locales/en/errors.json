@@ -18,11 +18,6 @@
   "unauthorized": "Session expired. Please log in again.",
   "forbidden": "You don't have permission to perform this action",
   "validation": "Please check the form for errors",
-  "comingSoon": {
-    "title": "Coming Soon",
-    "titleWithModule": "{{module}} — Coming Soon",
-    "description": "This module is under development and will be available in a future release."
-  },
   "loadingModule": "Loading module...",
   "moduleLoadFailed": "Failed to load module. Please refresh the page.",
   "developerInfo": "Developer Info",

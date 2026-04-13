@@ -81,7 +81,6 @@ function SettingsOverviewContent({
     { label: t('workspace.title'), icon: Settings, href: '/settings/workspace' },
     { label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures' },
     { label: 'Payment Gateways', icon: CreditCard, href: '/finance/configuration/payment-gateways' },
-    // [MVP-PARKED] { label: 'Billing', icon: CreditCard, href: '/settings/billing' },
   ]
 
   return (

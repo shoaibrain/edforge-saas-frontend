@@ -32,7 +32,6 @@ import {
   LayoutGrid,
   List,
   ChevronDown,
-  Upload,
   Users,
   Gauge,
   UsersRound,
@@ -123,7 +122,6 @@ function OverviewTab() {
       academicYearId: filters.academicYearId || undefined,
       termId: filters.termId || undefined,
       isActive: filters.isActive ?? undefined,
-      searchTerm: filters.searchTerm || undefined,
     },
     enabled: !!schoolId,
   })
@@ -726,19 +724,6 @@ export function ClassroomsModule() {
 
             {schedPerms.create && (
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {/* TODO: import sections handler */}}
-                  aria-label="Import sections"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
-                  style={{
-                    background: 'var(--v2-bg-elevated)',
-                    borderColor: 'var(--v2-border-default)',
-                    color: 'var(--v2-text-secondary)',
-                  }}
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  Import sections
-                </button>
                 <button
                   onClick={() => navigate({ to: '/classrooms/create' })}
                   aria-label="New classroom"

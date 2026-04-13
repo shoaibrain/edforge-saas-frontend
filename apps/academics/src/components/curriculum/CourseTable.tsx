@@ -227,6 +227,7 @@ export function CourseTable({
   const columns: ColumnDef<CourseResponseDto, unknown>[] = useMemo(
     () => [
       {
+
         accessorKey: 'courseCode',
         header: 'Code',
         size: 120,
@@ -359,7 +360,7 @@ export function CourseTable({
       pagination={{ pageSize: 20 }}
       enableSorting={true}
       onRowClick={onViewCourse}
-      maxHeight="calc(100vh - 13rem)"
+      maxHeight="calc(100vh - 24rem)"
     />
   )
 }

@@ -5,13 +5,7 @@
  * Features:
  * - Notion-style vertical list view grouped by day
  * - Timeline aesthetic
- * - Role-specific mock events
  * - Options menu
- *
- * COMING_SOON: Calendar integration, meeting/conferencing tools, and collaboration
- * features are not yet available. This widget displays mock data behind a
- * ComingSoonOverlay. Remove the overlay and connect to real calendar APIs
- * when these features ship.
  */
 
 import { useState } from 'react'
@@ -24,13 +18,10 @@ import {
   MapPin,
   Calendar,
 } from 'lucide-react'
-import { ComingSoonOverlay, ComingSoonBadge } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { formatRelativeDate } from '../../../lib/greeting'
 import { WidgetSection } from '../WidgetSection'
 import { useDynamicPage } from '../DynamicPageContext'
-import { useAuthStore, getUserRoleCategory } from '../../../stores/auth.store'
-import { useAppStore } from '../../../stores/app.store'
 
 // ============================================================================
 // TYPES
@@ -61,219 +52,6 @@ interface EventFilters {
   showWithoutConferencing: boolean
 }
 
-// ============================================================================
-// MOCK DATA
-// ============================================================================
-
-const today = new Date()
-const tomorrow = new Date(today)
-tomorrow.setDate(tomorrow.getDate() + 1)
-const dayAfter = new Date(today)
-dayAfter.setDate(dayAfter.getDate() + 2)
-
-// Admin events
-const ADMIN_EVENTS: UpcomingEvent[] = [
-  {
-    id: 'a1',
-    title: 'Staff Weekly Standup',
-    date: today,
-    time: '9:00 AM',
-    endTime: '10:00 AM',
-    type: 'meeting',
-    platform: 'google-meet',
-    participants: 12,
-    calendar: 'School',
-    hasConferencing: true,
-  },
-  {
-    id: 'a2',
-    title: 'Board of Directors Review',
-    date: today,
-    time: '2:00 PM',
-    endTime: '3:30 PM',
-    type: 'meeting',
-    platform: 'zoom',
-    participants: 8,
-    calendar: 'School',
-    hasConferencing: true,
-  },
-  {
-    id: 'a3',
-    title: 'Budget Planning Session',
-    date: tomorrow,
-    time: '10:00 AM',
-    endTime: '11:30 AM',
-    type: 'meeting',
-    location: 'Conference Room A',
-    participants: 5,
-    calendar: 'School',
-  },
-  {
-    id: 'a4',
-    title: 'District Leadership Meeting',
-    date: tomorrow,
-    time: '3:00 PM',
-    endTime: '4:00 PM',
-    type: 'meeting',
-    platform: 'teams',
-    participants: 15,
-    calendar: 'School',
-    hasConferencing: true,
-  },
-  {
-    id: 'a5',
-    title: 'Quarterly Report Due',
-    date: dayAfter,
-    time: '5:00 PM',
-    type: 'deadline',
-    calendar: 'Personal',
-  },
-]
-
-// Teacher events
-const TEACHER_EVENTS: UpcomingEvent[] = [
-  {
-    id: 't1',
-    title: 'Math Class - Period 1',
-    date: today,
-    time: '8:30 AM',
-    endTime: '9:20 AM',
-    type: 'class',
-    location: 'Room 204',
-    calendar: 'School',
-  },
-  {
-    id: 't2',
-    title: 'Parent-Teacher Conference',
-    date: today,
-    time: '3:30 PM',
-    endTime: '4:00 PM',
-    type: 'meeting',
-    platform: 'zoom',
-    participants: 2,
-    calendar: 'School',
-    hasConferencing: true,
-  },
-  {
-    id: 't3',
-    title: 'Grade Submission Deadline',
-    date: tomorrow,
-    time: '5:00 PM',
-    type: 'deadline',
-    calendar: 'School',
-  },
-  {
-    id: 't4',
-    title: 'Department Meeting',
-    date: tomorrow,
-    time: '2:00 PM',
-    endTime: '3:00 PM',
-    type: 'meeting',
-    location: 'Staff Lounge',
-    participants: 8,
-    calendar: 'School',
-  },
-  {
-    id: 't5',
-    title: 'Science Fair Prep',
-    date: dayAfter,
-    time: '10:00 AM',
-    endTime: '12:00 PM',
-    type: 'event',
-    location: 'Gymnasium',
-    calendar: 'School',
-  },
-]
-
-// Student events
-const STUDENT_EVENTS: UpcomingEvent[] = [
-  {
-    id: 's1',
-    title: 'History Class',
-    date: today,
-    time: '9:00 AM',
-    endTime: '9:50 AM',
-    type: 'class',
-    location: 'Room 101',
-    calendar: 'School',
-  },
-  {
-    id: 's2',
-    title: 'Math Homework Due',
-    date: today,
-    time: '11:59 PM',
-    type: 'deadline',
-    calendar: 'School',
-  },
-  {
-    id: 's3',
-    title: 'Chess Club Meeting',
-    date: tomorrow,
-    time: '3:30 PM',
-    endTime: '4:30 PM',
-    type: 'event',
-    location: 'Library',
-    participants: 12,
-    calendar: 'Personal',
-  },
-  {
-    id: 's4',
-    title: 'Science Project Due',
-    date: dayAfter,
-    time: '9:00 AM',
-    type: 'deadline',
-    calendar: 'School',
-  },
-]
-
-// Parent events
-const PARENT_EVENTS: UpcomingEvent[] = [
-  {
-    id: 'p1',
-    title: 'Parent-Teacher Meeting',
-    date: today,
-    time: '3:30 PM',
-    endTime: '4:00 PM',
-    type: 'meeting',
-    platform: 'zoom',
-    participants: 2,
-    calendar: 'School',
-    hasConferencing: true,
-  },
-  {
-    id: 'p2',
-    title: 'PTA Monthly Meeting',
-    date: tomorrow,
-    time: '6:00 PM',
-    endTime: '8:00 PM',
-    type: 'event',
-    location: 'Main Auditorium',
-    participants: 80,
-    calendar: 'School',
-  },
-  {
-    id: 'p3',
-    title: 'School Play - Spring Musical',
-    date: dayAfter,
-    time: '7:00 PM',
-    type: 'event',
-    location: 'School Theater',
-    calendar: 'School',
-  },
-]
-
-// Re-export mock events to satisfy barrel file
-export const MOCK_UPCOMING_EVENTS = ADMIN_EVENTS
-
-function getEventsForRole(roleCategory?: string): UpcomingEvent[] {
-  switch (roleCategory) {
-    case 'administrator': return ADMIN_EVENTS
-    case 'educator': return TEACHER_EVENTS
-    case 'student': return STUDENT_EVENTS
-    case 'parent': return PARENT_EVENTS
-    default: return ADMIN_EVENTS
-  }
-}
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -391,14 +169,10 @@ function EventItem({ event }: { event: UpcomingEvent }) {
 // --- Main Widget Rendering ---
 
 export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { events?: UpcomingEvent[]; maxDays?: number }) {
-  const user = useAuthStore((s) => s.user)
-  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  // COMING_SOON: Re-enable toggleWidget and setFilters when calendar features ship
   const _dynPage = useDynamicPage()
   void _dynPage
   const { t, i18n } = useTranslation('dashboard')
-  const roleCategory = getUserRoleCategory(user, activeSchoolId)
-  const events = propEvents || getEventsForRole(roleCategory ?? undefined)
+  const events = propEvents || []
   const calendars = Array.from(new Set(events.map(e => e.calendar).filter(Boolean) as string[]))
   const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
 
@@ -420,44 +194,39 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
       label={t('upcomingEvents')}
       overflowVisible={true}
       icon={Calendar}
-      // COMING_SOON: Replace header actions with badge until calendar features ship
-      headerActions={<ComingSoonBadge size="sm" />}
     >
-      {/* COMING_SOON: Wrap mock events in overlay — remove when real calendar API is connected */}
-      <ComingSoonOverlay>
-        {dayGroups.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="space-y-6 pl-2">
-            {dayGroups.map(([dateKey, dayEvents]) => {
-              const date = new Date(dateKey)
-              const isToday = new Date().toDateString() === date.toDateString()
-              const relativeDate = formatRelativeDate(date, t)
+      {dayGroups.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="space-y-6 pl-2">
+          {dayGroups.map(([dateKey, dayEvents]) => {
+            const date = new Date(dateKey)
+            const isToday = new Date().toDateString() === date.toDateString()
+            const relativeDate = formatRelativeDate(date, t)
 
-              return (
-                <div key={dateKey} className="flex gap-4">
-                  {/* Left Column: Date */}
-                  <div className="w-24 flex-shrink-0 pt-2">
-                    <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
-                      {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
-                    </div>
-                    <div className="text-xs text-[rgb(var(--text-tertiary))]">
-                      {date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
-                    </div>
+            return (
+              <div key={dateKey} className="flex gap-4">
+                {/* Left Column: Date */}
+                <div className="w-24 flex-shrink-0 pt-2">
+                  <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
+                    {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
                   </div>
-
-                  {/* Right Column: Events */}
-                  <div className="flex-1 space-y-2 border-l border-[rgb(var(--border-secondary))] pl-4 py-1">
-                    {dayEvents.map(event => (
-                      <EventItem key={event.id} event={event} />
-                    ))}
+                  <div className="text-xs text-[rgb(var(--text-tertiary))]">
+                    {date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </ComingSoonOverlay>
+
+                {/* Right Column: Events */}
+                <div className="flex-1 space-y-2 border-l border-[rgb(var(--border-secondary))] pl-4 py-1">
+                  {dayEvents.map(event => (
+                    <EventItem key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </WidgetSection>
   )
 }
