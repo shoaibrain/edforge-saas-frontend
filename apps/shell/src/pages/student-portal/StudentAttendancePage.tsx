@@ -1,39 +1,61 @@
 /**
  * Student Portal — My Attendance Page (v2)
  *
- * Content pane: rate hero → heatmap → split (trend sparkline + records list).
- *
- * Inline apiGet migration: removes apiGet('/academics/students/${studentId}/attendance/summary')
- * (previously line ~55) and apiGet('/academics/students/${studentId}/attendance') (previously
- * line ~70). Also removes inline SummaryCard, AttendanceBadge, RecordRow sub-components.
+ * Rewritten completely to synchronize layout, grid structure, and aesthetics
+ * with the updated `data-family-portal` components used in the Parent view.
  */
 
 import { useState, useMemo } from 'react'
 import { useTranslation } from '@edforge/i18n'
-import { WidgetErrorBoundaryV2, ContentSection, AttendanceHeatmap, type HeatmapDay, type HeatmapStatus } from '@edforge/ui'
+import { WidgetErrorBoundaryV2 } from '@edforge/ui'
+import type { HeatmapDay, HeatmapStatus } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useStudentPortal } from './StudentPortalLayout'
 import { usePortalAttendanceSummary, usePortalStudentAttendance } from '../../hooks/usePortalStudentAttendance'
 import { usePortalCalendarDates } from '../../hooks/usePortalCalendarDates'
 import { usePortalCurrentAcademicYear } from '../../hooks/usePortalCurrentAcademicYear'
-import { AttendanceRateHero } from '../portal-shared/AttendanceRateHero'
+
+import { PortalAttendanceHero } from '../portal-shared/PortalAttendanceHero'
+import { PortalCalendarGrid } from '../portal-shared/PortalCalendarGrid'
 import { AttendanceRecordsList } from '../portal-shared/AttendanceRecordsList'
-import { AttendanceTrendSparkline } from './sections/AttendanceTrendSparkline'
+import { AttendancePatterns } from '../parent-portal/sections/AttendancePatterns'
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
 export default function StudentAttendancePage() {
-  const { t } = useTranslation('portal')
   const { studentId, studentProfile } = useStudentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
   const schoolId = activeSchoolId ?? studentProfile.schoolId
 
+  return (
+    <StudentAttendanceContent
+      studentId={studentId}
+      schoolId={schoolId}
+      academicYearId={activeSchoolYear?.id}
+      studentName={studentProfile.firstName}
+    />
+  )
+}
+
+function StudentAttendanceContent({
+  studentId,
+  schoolId,
+  academicYearId,
+  studentName
+}: {
+  studentId: string
+  schoolId: string
+  academicYearId?: string
+  studentName: string
+}) {
+  const { t } = useTranslation('portal')
+
   const { data: yearData } = usePortalCurrentAcademicYear(schoolId)
-  const yearId = activeSchoolYear?.id ?? yearData?.id ?? ''
+  const yearId = academicYearId ?? yearData?.id ?? ''
 
   // Month state for heatmap
   const now = new Date()
@@ -61,63 +83,57 @@ export default function StudentAttendancePage() {
   const { data: calendarData } =
     usePortalCalendarDates(schoolId, yearId, { month: heatmapMonth })
 
-  // Build full-year records for sparkline (wider date range)
-  const yearStart = activeSchoolYear?.startDate ?? yearData?.startDate ?? `${now.getFullYear()}-01-01`
-  const { data: yearRecords } = usePortalStudentAttendance(
-    studentId, schoolId, yearStart, now.toISOString().slice(0, 10)
-  )
-
   // Build heatmap days
   const heatmapDays = useMemo(() => {
     return buildHeatmapDays(heatmapMonth, records, calendarData?.items)
   }, [heatmapMonth, records, calendarData])
 
   return (
-    <div className="p-6 space-y-6" data-v2>
-      <ContentSection heading={t('pages.myAttendance')} staggerIndex={0} />
+    <div className="fp-content">
+      {/* Editorial Page Head */}
+      <h1 className="fp-page-title mb-10">
+        My <em>attendance.</em>
+      </h1>
 
+      {/* Hero Metrics */}
       <WidgetErrorBoundaryV2>
-        <AttendanceRateHero
-          attendanceRate={summary?.attendanceRate}
-          totalDays={summary?.totalDays}
-          present={summary?.presentDays}
-          absent={summary?.absentDays}
-          late={summary?.lateDays}
-          excused={summary?.excusedDays}
+        <PortalAttendanceHero
+          summary={summary}
           loading={summaryLoading}
-          staggerIndex={1}
         />
       </WidgetErrorBoundaryV2>
 
+      {/* Monthly Calendar View */}
       <WidgetErrorBoundaryV2>
-        <ContentSection staggerIndex={2}>
-          <AttendanceHeatmap
-            yearMonth={heatmapMonth}
-            days={heatmapDays}
-            onMonthChange={setHeatmapMonth}
-            monthLabel={monthLabel}
-            className="mt-2"
-          />
-        </ContentSection>
+        <PortalCalendarGrid
+          yearMonth={heatmapMonth}
+          days={heatmapDays}
+          onMonthChange={setHeatmapMonth}
+          monthLabel={monthLabel}
+        />
       </WidgetErrorBoundaryV2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Analytics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <WidgetErrorBoundaryV2>
-          <AttendanceTrendSparkline
-            records={yearRecords}
-            loading={recordsLoading}
-            staggerIndex={3}
+          <AttendanceRecordsList
+             records={records}
+             loading={recordsLoading}
           />
         </WidgetErrorBoundaryV2>
 
         <WidgetErrorBoundaryV2>
-          <AttendanceRecordsList
-            records={records}
-            loading={recordsLoading}
-            staggerIndex={4}
+          {/* Note: In Student context, we still render Patterns instead of abstract sparkline
+              for exact feature parity with the Parent UX as requested mapping. */}
+          <AttendancePatterns
+             summary={summary}
+             records={records}
+             calendarDates={calendarData?.items}
+             childName="My"
           />
         </WidgetErrorBoundaryV2>
       </div>
+
     </div>
   )
 }
@@ -138,9 +154,7 @@ function buildHeatmapDays(
 
   const recordMap = new Map<string, string>()
   if (records) {
-    for (const r of records) {
-      recordMap.set(r.date, r.status)
-    }
+    for (const r of records) recordMap.set(r.date, r.status)
   }
 
   const holidaySet = new Set<string>()
@@ -159,22 +173,12 @@ function buildHeatmapDays(
     const isFuture = dateObj > todayDate
 
     let status: HeatmapStatus = 'none'
-    if (isFuture) {
-      status = 'future'
-    } else if (holidaySet.has(dateStr)) {
-      status = 'holiday'
-    } else if (isWeekend) {
-      status = 'weekend'
-    } else if (recordMap.has(dateStr)) {
-      status = recordMap.get(dateStr) as HeatmapStatus
-    }
+    if (isFuture) status = 'future'
+    else if (holidaySet.has(dateStr)) status = 'holiday'
+    else if (isWeekend) status = 'weekend'
+    else if (recordMap.has(dateStr)) status = recordMap.get(dateStr) as HeatmapStatus
 
-    days.push({
-      date: dateStr,
-      dayNumber: d,
-      status,
-      isToday: dateStr === today,
-    })
+    days.push({ date: dateStr, dayNumber: d, status, isToday: dateStr === today })
   }
 
   return days

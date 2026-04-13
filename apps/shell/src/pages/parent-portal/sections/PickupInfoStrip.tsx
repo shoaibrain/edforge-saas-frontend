@@ -74,7 +74,7 @@ export function PickupInfoStrip({ bellSchedules, staggerIndex = 0 }: PickupInfoS
           return (
             <div
               key={card.key}
-              className="rounded-xl border p-4 flex items-center gap-3"
+              className="rounded-xl border p-4 flex items-center gap-3 transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:shadow-md"
               style={{
                 background: 'var(--v2-bg-surface)',
                 borderColor: 'var(--v2-border-default)',

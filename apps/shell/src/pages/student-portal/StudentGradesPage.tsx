@@ -1,29 +1,24 @@
 /**
  * Student Portal — My Grades Page (v2)
  *
- * Redesigned content pane: term switcher → GPA hero → signal banner →
- * course grid → graded items timeline.
- *
- * Inline apiGet migration: removes the inline apiGet('/academics/students/${studentId}/grades')
- * (previously line ~26). Replaces with usePortalStudentGrades. Also removes inline StatCard,
- * StatusBadge, EmptyState, getLetterGradeClass sub-components — all replaced by @edforge/ui
- * and portal-shared primitives.
+ * Rewritten securely using prototype DOM scoping (.fp-) to avoid
+ * conflicting with generic layouts.
  */
 
 import { useState, useMemo } from 'react'
 import { useTranslation } from '@edforge/i18n'
-import { WidgetErrorBoundaryV2, CourseCard, type CourseCardCategory } from '@edforge/ui'
+import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useStudentPortal } from './StudentPortalLayout'
 import { usePortalStudentGrades } from '../../hooks/usePortalStudentGrades'
 import { usePortalCurrentAcademicYear, usePortalGradingPeriods } from '../../hooks/usePortalCurrentAcademicYear'
 import { usePortalGradingPolicy } from '../../hooks/usePortalGradingPolicy'
-import { ContentSection } from '@edforge/ui'
 import { TermSwitcher } from '../portal-shared/TermSwitcher'
 import { GpaHeroSection } from '../portal-shared/GpaHeroSection'
 import { SignalBanner, type SignalLevel } from '../portal-shared/SignalBanner'
 import { GradedItemTimeline } from '../portal-shared/GradedItemTimeline'
+import { PortalCourseCard, type PortalCourseCardCategory } from '../portal-shared/PortalCourseCard'
 
 // ============================================================================
 // COMPONENT
@@ -49,7 +44,6 @@ export default function StudentGradesPage() {
   )
   const { data: policies } = usePortalGradingPolicy(schoolId)
 
-  // Derive signal level from grades
   const signalLevel = useMemo((): SignalLevel | null => {
     if (!gradesData?.grades || gradesData.grades.length === 0) return null
     const hasF = gradesData.grades.some((g) => g.letterGrade?.startsWith('F'))
@@ -59,7 +53,6 @@ export default function StudentGradesPage() {
     return 'good'
   }, [gradesData])
 
-  // Build category map from grading policy
   const categoryMap = useMemo(() => {
     const defaultPolicy = policies?.find((p) => p.isDefault) ?? policies?.[0]
     if (!defaultPolicy?.categoryWeights) return null
@@ -71,31 +64,35 @@ export default function StudentGradesPage() {
   }, [policies])
 
   return (
-    <div className="p-6 space-y-6" data-v2>
-      {/* Page header + term switcher */}
-      <ContentSection heading={t('pages.myGrades')} staggerIndex={0}>
-        <div className="mt-3">
-          <TermSwitcher
-            periods={periods}
-            activePeriodId={activeTerm}
-            onChange={setActiveTerm}
-          />
+    <div className="fp-content">
+      {/* Page header */}
+      <div className="fp-page-head">
+        <div>
+          <div className="fp-page-eyebrow">Progress report</div>
+          <h1 className="fp-page-title">
+            Your <em>progress.</em>
+          </h1>
+          <p className="fp-page-sub">
+            A running view of how you're doing this term. We'll fill this in as teachers post grades — nothing is cast in stone until the report card.
+          </p>
         </div>
-      </ContentSection>
+        <TermSwitcher
+          periods={periods}
+          activePeriodId={activeTerm}
+          onChange={setActiveTerm}
+        />
+      </div>
 
-      {/* GPA Hero */}
       <WidgetErrorBoundaryV2>
         <GpaHeroSection
           data={gradesData}
           loading={gradesLoading}
-          staggerIndex={1}
+          childName={studentProfile.firstName}
         />
       </WidgetErrorBoundaryV2>
 
-      {/* Signal Banner */}
-      <SignalBanner level={signalLevel} staggerIndex={2} />
+      <SignalBanner level={signalLevel} />
 
-      {/* Course Grid */}
       <WidgetErrorBoundaryV2>
         <CourseGridSection
           grades={gradesData?.grades}
@@ -104,12 +101,10 @@ export default function StudentGradesPage() {
         />
       </WidgetErrorBoundaryV2>
 
-      {/* Graded Items Timeline */}
       <WidgetErrorBoundaryV2>
         <GradedItemTimeline
           grades={gradesData?.grades}
           loading={gradesLoading}
-          staggerIndex={4}
         />
       </WidgetErrorBoundaryV2>
     </div>
@@ -148,36 +143,45 @@ function CourseGridSection({
 
   if (loading) {
     return (
-      <ContentSection heading={t('grades.courseByourse')} staggerIndex={3}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+      <section className="fp-section">
+        <div className="fp-section-head">
+          <h2 className="fp-section-title">Course by course</h2>
+        </div>
+        <div className="fp-course-grid">
           {Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
-              className="h-48 rounded-xl v2-skeleton-pulse"
-              style={{ background: 'var(--v2-bg-elevated)' }}
+              className="fp-course v2-skeleton-pulse"
+              style={{ background: 'var(--fp-paper-2)', minHeight: '200px' }}
             />
           ))}
         </div>
-      </ContentSection>
+      </section>
     )
   }
 
   if (!grades || grades.length === 0) {
     return (
-      <ContentSection heading={t('grades.courseByourse')} staggerIndex={3}>
-        <p className="text-sm py-4" style={{ color: 'var(--v2-text-muted)' }}>
+      <section className="fp-section">
+        <div className="fp-section-head">
+          <h2 className="fp-section-title">Course by course</h2>
+        </div>
+        <p style={{ color: 'var(--fp-ink-3)' }}>
           {t('grades.noGradesYet')}
         </p>
-      </ContentSection>
+      </section>
     )
   }
 
   return (
-    <ContentSection heading={t('grades.courseByourse')} staggerIndex={3}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-        {grades.map((grade) => {
-          // Build category bars from either course data or policy
-          const categories: CourseCardCategory[] = (grade.categoryGrades ?? []).map((cg) => {
+    <section className="fp-section">
+      <div className="fp-section-head">
+        <h2 className="fp-section-title">Course by course</h2>
+        <a className="fp-section-link" href="#">See schedule →</a>
+      </div>
+      <div className="fp-course-grid">
+        {grades.map((grade, idx) => {
+          const categories: PortalCourseCardCategory[] = (grade.categoryGrades ?? []).map((cg) => {
             const policyWeight = categoryMap?.get(cg.categoryId)?.weight
             return {
               name: cg.categoryName,
@@ -186,19 +190,28 @@ function CourseGridSection({
             }
           })
 
+          const tColor = idx % 2 === 0 ? 'ind' : 'ter';
+
+          let missedWorkMessage = undefined;
+          if (grade.letterGrade?.startsWith('F')) {
+             missedWorkMessage = { title: "Early notification", body: `The ${grade.letterGrade} reflects missing coursework so far.` }
+          }
+
           return (
-            <CourseCard
+            <PortalCourseCard
               key={grade.gradeId}
               courseName={grade.courseName ?? ''}
+              courseCode={`CODE ${idx+1}`}
               letterGrade={grade.letterGrade}
               numericGrade={grade.numericGrade}
-              gpaPoints={grade.gpaPoints}
-              isFinal={grade.isFinal}
+              teacherName="Course Teacher"
+              teacherColor={tColor}
               categories={categories.length > 0 ? categories : undefined}
+              missedWorkMessage={missedWorkMessage}
             />
           )
         })}
       </div>
-    </ContentSection>
+    </section>
   )
 }

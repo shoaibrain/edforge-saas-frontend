@@ -56,10 +56,11 @@ export function AttendanceRateHero({
 
   return (
     <ContentSection staggerIndex={staggerIndex}>
+      {/* Hero gradient card — subtle brand tint for visual prominence */}
       <div
-        className="rounded-xl p-5 border"
+        className="rounded-2xl p-6 sm:p-8 border"
         style={{
-          background: 'var(--v2-bg-elevated)',
+          background: 'linear-gradient(135deg, var(--v2-bg-elevated) 0%, color-mix(in srgb, var(--v2-brand-primary) 6%, var(--v2-bg-elevated)) 100%)',
           borderColor: 'var(--v2-border-default)',
         }}
       >
@@ -67,7 +68,7 @@ export function AttendanceRateHero({
           {/* Left: rate display */}
           <div className="text-center sm:text-left shrink-0">
             <p
-              className="text-4xl font-bold tabular-nums tracking-tight"
+              className="font-display text-5xl font-medium tabular-nums tracking-tight"
               style={{ color: 'var(--v2-text-primary)' }}
             >
               {displayRate}

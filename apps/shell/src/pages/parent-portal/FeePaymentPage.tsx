@@ -195,7 +195,7 @@ export default function FeePaymentPage() {
   // ===========================================================================
 
   return (
-    <div className="p-6 space-y-6" data-v2>
+    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto" data-v2>
       <ContentSection
         heading={t('title')}
         subheading={`${activeChild.firstName} — ${t('description')}`}
@@ -234,7 +234,7 @@ export default function FeePaymentPage() {
       </WidgetErrorBoundaryV2>
 
       {/* Payment history + Category breakdown split */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <WidgetErrorBoundaryV2>
           <PaymentHistory
             payments={paymentEntries}

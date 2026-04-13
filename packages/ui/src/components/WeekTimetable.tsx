@@ -121,19 +121,29 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   key={label}
                   className="text-center py-2 rounded-lg"
                   style={{
-                    background: isToday ? 'var(--v2-brand-primary)' : 'transparent',
+                    background: isToday
+                      ? 'color-mix(in srgb, var(--v2-brand-primary) 10%, transparent)'
+                      : 'transparent',
                   }}
                 >
-                  <p
-                    className="text-[11px] font-medium"
-                    style={{ color: isToday ? '#fff' : 'var(--v2-text-muted)' }}
-                  >
-                    {label}
-                  </p>
+                  <div className="flex items-center justify-center gap-1">
+                    {isToday && (
+                      <span
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                        style={{ background: 'var(--v2-brand-primary)' }}
+                      />
+                    )}
+                    <p
+                      className="text-[11px] font-medium"
+                      style={{ color: isToday ? 'var(--v2-brand-primary)' : 'var(--v2-text-muted)' }}
+                    >
+                      {label}
+                    </p>
+                  </div>
                   {weekStartDate && (
                     <p
                       className="text-[10px]"
-                      style={{ color: isToday ? 'rgba(255,255,255,0.7)' : 'var(--v2-text-hint)' }}
+                      style={{ color: isToday ? 'var(--v2-brand-primary)' : 'var(--v2-text-hint)' }}
                     >
                       {dayDate(weekStartDate, i)}
                     </p>

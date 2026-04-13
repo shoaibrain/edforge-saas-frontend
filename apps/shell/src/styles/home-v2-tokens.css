@@ -209,12 +209,13 @@
  * LIGHT THEME OVERRIDES
  * ============================================================================ */
 
-/* Light mode legacy token remapping */
+/* Light mode legacy token remapping — warm paper palette
+   Matches prototype values: #FAF7F2 (paper), #ECE7D8 (borders) */
 :root:not(.dark) [data-v2] {
   --surface-secondary: 255 255 255;
-  --surface-tertiary: 240 242 245;
-  --border-primary: 224 228 236;
-  --border-secondary: 224 228 236;
+  --surface-tertiary: 244 239 230;      /* #F4EFE6 — warm elevated */
+  --border-primary: 236 231 216;        /* #ECE7D8 — warm beige, matches --v2-border-default */
+  --border-secondary: 236 231 216;
   --brand-primary: 29 158 117;
   --text-primary: 26 31 46;
   --text-secondary: 55 65 81;
@@ -223,10 +224,10 @@
 
 :root:not(.dark) [data-page="home-v2"],
 :root:not(.dark) [data-v2] {
-  /* Background stack */
-  --v2-bg-app: #f5f6f8;
-  --v2-bg-surface: #ffffff;
-  --v2-bg-elevated: #f0f2f5;
+  /* Background stack — warm paper palette from prototypes */
+  --v2-bg-app: #FAF7F2;                /* warm off-white (was #f5f6f8) */
+  --v2-bg-surface: #ffffff;             /* pure white for cards */
+  --v2-bg-elevated: #F4EFE6;           /* warm elevated (was #f0f2f5) */
 
   /* Text stack */
   --v2-text-primary: #1a1f2e;
@@ -236,10 +237,14 @@
   --v2-text-faint: #b0b6c8;
   --v2-text-ghost: #d1d5db;
 
-  /* Borders */
-  --v2-border-default: #e0e4ec;
-  --v2-border-hover: #c8cdd8;
-  --v2-border-strong: #9aa0b8;
+  /* Borders — warm beige from prototypes */
+  --v2-border-default: #ECE7D8;        /* warm beige (was #e0e4ec) */
+  --v2-border-hover: #DDD6C4;          /* warm hover (was #c8cdd8) */
+  --v2-border-strong: #C8C0AE;         /* warm strong (was #9aa0b8) */
+
+  /* Shadows — warm amber tint */
+  --v2-shadow-card: 0 1px 3px rgba(140, 120, 80, 0.06);
+  --v2-shadow-hover: 0 4px 12px rgba(140, 120, 80, 0.10);
 
   /* Semantic backgrounds */
   --v2-danger-bg: #fff1f1;

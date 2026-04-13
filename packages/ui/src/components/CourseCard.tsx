@@ -73,7 +73,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
       <div
         ref={ref}
         className={cn(
-          'rounded-xl border overflow-hidden transition-all hover:shadow-sm',
+          'rounded-2xl border overflow-hidden transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:shadow-md',
           className
         )}
         style={{
@@ -98,7 +98,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
                 </p>
               )}
               <h3
-                className="text-sm font-semibold truncate"
+                className="font-display text-base font-medium italic truncate"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 {courseName}
@@ -107,7 +107,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
 
             {/* Grade badge */}
             <div
-              className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+              className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
               style={{
                 background: hasGrade
                   ? `color-mix(in srgb, ${gradeTokenColor(letterGrade)} 12%, transparent)`
@@ -116,7 +116,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
               }}
             >
               <span
-                className="text-sm font-bold"
+                className="text-base font-bold"
                 style={{ color: hasGrade ? gradeTokenColor(letterGrade) : 'var(--v2-text-hint)' }}
               >
                 {letterGrade ?? '—'}

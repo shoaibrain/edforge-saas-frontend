@@ -38,6 +38,8 @@ export function StatusTileGrid(props: StatusTileGridProps) {
           key={key}
           className="rounded-lg p-3 flex items-center gap-2.5"
           style={{ background: bg }}
+          role="status"
+          aria-label={`${t(i18nKey)}: ${props[key]} days`}
         >
           <Icon className="w-4 h-4 shrink-0" style={{ color }} />
           <div>

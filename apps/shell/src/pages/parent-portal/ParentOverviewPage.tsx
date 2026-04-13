@@ -1,19 +1,29 @@
 /**
  * Parent Portal — Home / Overview Page (v2)
  *
- * Redesigned content pane: hero greeting → stat strip → today timeline →
- * this week assignments → billing callout.
+ * Editorial home page with intelligent, humanized data presentation.
  *
- * Inline apiGet migration: removes the inline apiGet('/academics/students/${studentId}/grades')
- * (previously line ~74) and apiGet('/academics/students/${studentId}/attendance/summary')
- * (previously line ~86), replacing them with usePortalStudentGrades and
- * usePortalAttendanceSummary from Sprint 1 hooks.
+ * Architecture:
+ *   - All hooks called at the top before any conditional return (React rules)
+ *   - Derived insights via portal-shared/insights.ts produce humanized
+ *     greetings, stat subtitles, and contextual empty states
+ *   - Each section gets its own WidgetErrorBoundaryV2 so one failing section
+ *     doesn't break the whole page
+ *   - Icons and colored chips on stat cards match the editorial palette
+ *
+ * Data flow:
+ *   useParentChildren → activeChild → studentId
+ *   usePortalStudentGrades, usePortalAttendanceSummary, useStudentSections,
+ *   useStudentClasswork, useInvoices → all in parallel via TanStack Query
+ *
+ * Inline apiGet migration: removes the inline apiGet calls from v1.
  */
 
-import { useTranslation } from '@edforge/i18n'
+import { GraduationCap, CalendarCheck2, FileText, Wallet } from 'lucide-react'
 import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { StatStrip, type StatStripItem } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
+import { useAuthStore } from '../../stores/auth.store'
 import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
 import { usePortalStudentGrades } from '../../hooks/usePortalStudentGrades'
@@ -28,6 +38,17 @@ import { HeroGreeting } from '../portal-shared/HeroGreeting'
 import { TodayTimeline } from '../portal-shared/TodayTimeline'
 import { AssignmentList } from '../portal-shared/AssignmentList'
 import { BillingCallout } from './sections/BillingCallout'
+import {
+  timeOfDayGreeting,
+  isWeekend,
+  deriveGpaInsight,
+  deriveAttendanceInsight,
+  deriveAssignmentsInsight,
+  deriveBalanceInsight,
+  deriveHeroNarrative,
+  todayEmptyMessage,
+  assignmentsEmptyMessage,
+} from '../portal-shared/insights'
 
 // ============================================================================
 // COMPONENT
@@ -37,215 +58,173 @@ export default function ParentOverviewPage() {
   const { activeChild } = useParentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
+  const user = useAuthStore((s) => s.user)
+  const parentFirstName = user?.displayName?.split(' ')[0]
+    ?? (user as { firstName?: string } | null)?.firstName
+    ?? 'there'
 
-  if (!activeChild) return <NoActiveChild />
+  // Derive params with optional chaining — hooks below have enabled guards
+  const studentId = activeChild?.studentId ?? ''
+  const schoolId = activeSchoolId ?? activeChild?.schoolId ?? ''
+  const academicYearId = activeSchoolYear?.id
 
-  const studentId = activeChild.studentId
-  const schoolId = activeSchoolId ?? activeChild.schoolId
-
-  return (
-    <div className="p-6 space-y-6" data-v2>
-      <WidgetErrorBoundaryV2>
-        <HeroSection
-          name={activeChild.firstName}
-          studentId={studentId}
-          schoolId={schoolId}
-          academicYearId={activeSchoolYear?.id}
-        />
-      </WidgetErrorBoundaryV2>
-
-      <WidgetErrorBoundaryV2>
-        <StatStripSection
-          studentId={studentId}
-          schoolId={schoolId}
-          academicYearId={activeSchoolYear?.id}
-        />
-      </WidgetErrorBoundaryV2>
-
-      <WidgetErrorBoundaryV2>
-        <TodaySection
-          studentId={studentId}
-          schoolId={schoolId}
-          academicYearId={activeSchoolYear?.id}
-          childName={activeChild.firstName}
-        />
-      </WidgetErrorBoundaryV2>
-
-      <WidgetErrorBoundaryV2>
-        <AssignmentsSection
-          studentId={studentId}
-          schoolId={schoolId}
-        />
-      </WidgetErrorBoundaryV2>
-
-      <WidgetErrorBoundaryV2>
-        <BillingSection schoolId={schoolId} studentId={studentId} />
-      </WidgetErrorBoundaryV2>
-    </div>
-  )
-}
-
-// ============================================================================
-// SECTION COMPONENTS (wired to hooks)
-// ============================================================================
-
-function HeroSection({
-  name,
-  studentId,
-  schoolId,
-  academicYearId,
-}: {
-  name: string
-  studentId: string
-  schoolId: string
-  academicYearId?: string
-}) {
-  const { data: grades } = usePortalStudentGrades(studentId, schoolId, { academicYearId })
-  const { data: attendance } = usePortalAttendanceSummary(studentId, schoolId, { academicYearId })
-
-  let contextLine: string | undefined
-  if (grades && attendance) {
-    const courseCount = grades.grades?.length ?? 0
-    const rate = attendance.attendanceRate
-    if (courseCount > 0 && rate != null) {
-      contextLine = rate >= 90
-        ? 'A steady week so far.'
-        : 'Keeping an eye on things.'
-    }
-  }
-
-  return <HeroGreeting name={name} contextLine={contextLine} staggerIndex={0} />
-}
-
-function StatStripSection({
-  studentId,
-  schoolId,
-  academicYearId,
-}: {
-  studentId: string
-  schoolId: string
-  academicYearId?: string
-}) {
-  const { t } = useTranslation('portal')
+  // ---- ALL hooks called BEFORE any conditional return (React hooks rules) ----
   const { data: grades, isLoading: gradesLoading, isError: gradesError, refetch: refetchGrades } =
     usePortalStudentGrades(studentId, schoolId, { academicYearId })
   const { data: attendance, isLoading: attendanceLoading, isError: attendanceError, refetch: refetchAttendance } =
     usePortalAttendanceSummary(studentId, schoolId, { academicYearId })
   const { data: sections, isLoading: sectionsLoading } =
     useStudentSections(studentId, schoolId, { academicYearId })
+  const { data: bellSchedules, isLoading: bellLoading } =
+    usePortalBellSchedule(schoolId)
+  const { data: classPeriods, isLoading: periodsLoading } =
+    usePortalClassPeriods(schoolId)
+  const sectionIds = sections?.map((s) => s.sectionId) ?? []
+  const { data: classwork, isLoading: classworkLoading } =
+    useStudentClasswork(sectionIds)
   const { data: invoices, isLoading: invoicesLoading } =
     useInvoices(schoolId, { studentId })
 
-  const balanceDue = invoices?.items
-    ?.filter((i: { status: string }) => i.status === 'issued' || i.status === 'partially_paid')
-    .reduce((sum: number, i: { amountDue?: number; totalAmount?: number }) => sum + (i.amountDue ?? i.totalAmount ?? 0), 0) ?? 0
+  // Guard: no child selected (parent has multiple children but none active)
+  if (!activeChild) return <NoActiveChild />
 
-  const items: StatStripItem[] = [
+  // ---- Derive humanized insights from raw data ----
+  const childName = activeChild.firstName
+  const courseCount = sections?.length ?? 0
+  const gradedCount = grades?.grades?.filter((g) => g.letterGrade != null).length ?? 0
+  const allInvoices = invoices?.items ?? []
+  const isWeekendDay = isWeekend()
+
+  const gpaInsight = deriveGpaInsight(
+    grades?.gpa?.cumulativeGpa,
+    gradedCount,
+    courseCount
+  )
+  const attendanceInsight = deriveAttendanceInsight(
+    attendance?.attendanceRate,
+    attendance?.absentDays,
+    attendance?.totalDays
+  )
+  const assignmentsInsight = deriveAssignmentsInsight(classwork)
+  const balanceInsight = deriveBalanceInsight(allInvoices)
+
+  const heroNarrative = deriveHeroNarrative({
+    childName,
+    attendanceRate: attendance?.attendanceRate,
+    absentDays: attendance?.absentDays,
+    courseCount,
+    hasAssignmentsDue: assignmentsInsight.display !== '0',
+    isWeekendDay,
+  })
+
+  // ---- Build stat strip items with icons, colored chips, contextual subtitles ----
+  const statItems: StatStripItem[] = [
     {
-      label: t('stats.gpa'),
-      value: grades?.gpa?.cumulativeGpa != null
-        ? grades.gpa.cumulativeGpa.toFixed(2)
-        : '—',
+      label: 'GPA · Term 1',
+      value: gpaInsight.display,
+      subtitle: gpaInsight.subtitle,
+      icon: <GraduationCap size={18} />,
+      iconBgColor: 'var(--v2-status-excused-bg)',  // soft indigo
+      iconColor: 'var(--v2-status-excused)',
       loading: gradesLoading,
       error: gradesError,
       onRetry: () => refetchGrades(),
     },
     {
-      label: t('stats.attendanceRate'),
-      value: attendance?.attendanceRate != null
-        ? `${Math.round(attendance.attendanceRate)}%`
-        : '—',
+      label: 'Attendance',
+      value: attendanceInsight.display,
+      subtitle: attendanceInsight.subtitle,
+      icon: <CalendarCheck2 size={18} />,
+      iconBgColor: 'var(--v2-status-present-bg)',  // soft sage
+      iconColor: 'var(--v2-status-present)',
       loading: attendanceLoading,
       error: attendanceError,
       onRetry: () => refetchAttendance(),
     },
     {
-      label: t('stats.activeCourses'),
-      value: sections ? String(sections.length) : '—',
-      loading: sectionsLoading,
+      label: 'Assignments due',
+      value: assignmentsInsight.display,
+      subtitle: assignmentsInsight.subtitle,
+      icon: <FileText size={18} />,
+      iconBgColor: 'var(--v2-status-late-bg)',     // soft butter
+      iconColor: 'var(--v2-status-late)',
+      loading: classworkLoading || sectionsLoading,
     },
     {
-      label: t('stats.balanceDue'),
-      value: balanceDue > 0 ? `$${balanceDue.toFixed(0)}` : '$0',
+      label: 'Balance due',
+      value: balanceInsight.display,
+      subtitle: balanceInsight.subtitle,
+      icon: <Wallet size={18} />,
+      iconBgColor: 'var(--v2-status-absent-bg)',   // soft terracotta
+      iconColor: 'var(--v2-status-absent)',
       loading: invoicesLoading,
     },
   ]
 
+  const todayLoading = sectionsLoading || bellLoading || periodsLoading
+
   return (
-    <div className="animate-fade-in stagger-2">
-      <StatStrip items={items} />
+    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto" data-v2>
+      {/* Hero — eyebrow + serif greeting + italic narrative.
+           Greeting addresses the parent, narrative is about the child. */}
+      <WidgetErrorBoundaryV2>
+        <HeroGreeting
+          name={parentFirstName}
+          eyebrow={timeOfDayGreeting()}
+          contextLineEmphasis={heroNarrative}
+          contextLine={
+            courseCount > 0
+              ? `${courseCount} ${courseCount === 1 ? 'course' : 'courses'} this term${
+                  attendance?.attendanceRate != null
+                    ? ` · ${Math.round(attendance.attendanceRate)}% attendance`
+                    : ''
+                }.`
+              : undefined
+          }
+          loading={gradesLoading && attendanceLoading && sectionsLoading}
+          staggerIndex={0}
+        />
+      </WidgetErrorBoundaryV2>
+
+      {/* Stat strip — 4 tiles with icons, values, and contextual subtitles */}
+      <WidgetErrorBoundaryV2>
+        <div className="animate-fade-in stagger-2">
+          <StatStrip items={statItems} />
+        </div>
+      </WidgetErrorBoundaryV2>
+
+      {/* Today timeline — schedule for today with humanized empty state */}
+      <WidgetErrorBoundaryV2>
+        <TodayTimeline
+          sections={sections}
+          bellSchedules={bellSchedules}
+          classPeriods={classPeriods}
+          loading={todayLoading}
+          heading={`Today for ${childName}`}
+          emptyMessage={todayEmptyMessage(childName)}
+          staggerIndex={2}
+        />
+      </WidgetErrorBoundaryV2>
+
+      {/* This week's assignments — list of due items, humanized empty state */}
+      <WidgetErrorBoundaryV2>
+        <AssignmentList
+          items={classwork}
+          loading={classworkLoading}
+          emptyMessage={assignmentsEmptyMessage()}
+          staggerIndex={3}
+          viewAllHref="/parent-portal/grades"
+        />
+      </WidgetErrorBoundaryV2>
+
+      {/* Billing callout — sage gradient when current, terracotta when overdue */}
+      <WidgetErrorBoundaryV2>
+        <BillingCallout
+          invoices={allInvoices}
+          loading={invoicesLoading}
+          staggerIndex={4}
+        />
+      </WidgetErrorBoundaryV2>
     </div>
-  )
-}
-
-function TodaySection({
-  studentId,
-  schoolId,
-  academicYearId,
-  childName,
-}: {
-  studentId: string
-  schoolId: string
-  academicYearId?: string
-  childName: string
-}) {
-  const { t } = useTranslation('portal')
-  const { data: sections, isLoading: sectionsLoading } =
-    useStudentSections(studentId, schoolId, { academicYearId })
-  const { data: bellSchedules, isLoading: bellLoading } =
-    usePortalBellSchedule(schoolId)
-  const { data: classPeriods, isLoading: periodsLoading } =
-    usePortalClassPeriods(schoolId)
-
-  const loading = sectionsLoading || bellLoading || periodsLoading
-
-  return (
-    <TodayTimeline
-      sections={sections}
-      bellSchedules={bellSchedules}
-      classPeriods={classPeriods}
-      loading={loading}
-      heading={t('home.todayFor', { name: childName })}
-      staggerIndex={2}
-    />
-  )
-}
-
-function AssignmentsSection({
-  studentId,
-  schoolId,
-}: {
-  studentId: string
-  schoolId: string
-}) {
-  const { data: sections } = useStudentSections(studentId, schoolId)
-  const sectionIds = sections?.map((s) => s.sectionId) ?? []
-  const { data: classwork, isLoading } = useStudentClasswork(sectionIds)
-
-  return (
-    <AssignmentList
-      items={classwork}
-      loading={isLoading}
-      staggerIndex={3}
-      viewAllHref="/parent-portal/grades"
-    />
-  )
-}
-
-function BillingSection({
-  schoolId,
-  studentId,
-}: {
-  schoolId: string
-  studentId: string
-}) {
-  const { data: invoices, isLoading } = useInvoices(schoolId, { studentId })
-
-  return (
-    <BillingCallout
-      invoices={invoices?.items}
-      loading={isLoading}
-      staggerIndex={4}
-    />
   )
 }

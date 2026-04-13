@@ -24,21 +24,35 @@ export interface BillingCalloutProps {
 
 type BillingState = 'current' | 'due' | 'overdue'
 
-const STATE_STYLES: Record<BillingState, { bg: string; border: string; text: string }> = {
+/**
+ * State styles matching prototype billing-card (parent-home.html):
+ *   - Current: sage gradient background, sage left border accent
+ *   - Due: neutral card, default border
+ *   - Overdue: terracotta gradient, terracotta left border
+ */
+const STATE_STYLES: Record<BillingState, {
+  bg: string; border: string; borderLeft: string; text: string; eyebrowColor: string
+}> = {
   current: {
-    bg: 'var(--v2-success-bg)',
-    border: 'var(--v2-success-border)',
+    bg: 'linear-gradient(135deg, var(--v2-success-bg) 0%, color-mix(in srgb, var(--v2-brand-primary) 4%, var(--v2-bg-surface)) 100%)',
+    border: 'var(--v2-brand-primary)',
+    borderLeft: '6px solid var(--v2-brand-primary)',
     text: 'var(--v2-brand-primary)',
+    eyebrowColor: 'var(--v2-brand-primary)',
   },
   due: {
     bg: 'var(--v2-bg-surface)',
     border: 'var(--v2-border-default)',
+    borderLeft: '6px solid var(--v2-warning)',
     text: 'var(--v2-text-primary)',
+    eyebrowColor: 'var(--v2-warning)',
   },
   overdue: {
-    bg: 'var(--v2-danger-bg)',
-    border: 'var(--v2-danger-border)',
+    bg: 'linear-gradient(135deg, var(--v2-danger-bg) 0%, color-mix(in srgb, var(--v2-danger) 4%, var(--v2-bg-surface)) 100%)',
+    border: 'var(--v2-danger)',
+    borderLeft: '6px solid var(--v2-danger)',
     text: 'var(--v2-danger)',
+    eyebrowColor: 'var(--v2-danger)',
   },
 }
 
@@ -82,26 +96,52 @@ export function BillingCallout({
     <ContentSection staggerIndex={staggerIndex}>
       <a
         href="/parent-portal/fees"
-        className="block rounded-xl border p-4 transition-all hover:shadow-sm"
+        className="block border transition-all duration-200 motion-safe:hover:-translate-y-0.5"
         style={{
           background: styles.bg,
           borderColor: styles.border,
+          borderLeft: styles.borderLeft,
+          borderRadius: 22,
+          padding: '26px 30px',
+          boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          alignItems: 'center',
+          gap: 24,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = 'var(--v2-shadow-hover, 0 4px 12px rgba(0,0,0,0.10))'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))'
         }}
       >
-        <p
-          className="text-sm font-medium"
-          style={{ color: styles.text }}
-        >
-          {state === 'current' && t('fees.allFeesCurrent')}
-          {state === 'due' && `${t('stats.balanceDue')}: ${formatCurrency(totalDue)}`}
-          {state === 'overdue' && `${t('status.overdue')}: ${formatCurrency(totalDue)}`}
-        </p>
-        <p
-          className="text-[11px] mt-0.5"
-          style={{ color: 'var(--v2-text-muted)' }}
+        <div>
+          <p
+            className="font-mono uppercase"
+            style={{ fontSize: 10, letterSpacing: '0.12em', color: styles.eyebrowColor, marginBottom: 6 }}
+          >
+            Billing
+          </p>
+          <p
+            className="font-display"
+            style={{ fontSize: 22, fontWeight: 400, letterSpacing: '-0.01em', color: styles.text }}
+          >
+            {state === 'current' && t('fees.allFeesCurrent')}
+            {state === 'due' && `${t('stats.balanceDue')}: ${formatCurrency(totalDue)}`}
+            {state === 'overdue' && `${t('status.overdue')}: ${formatCurrency(totalDue)}`}
+          </p>
+        </div>
+        <span
+          className="font-mono uppercase"
+          style={{
+            fontSize: 11,
+            letterSpacing: '0.1em',
+            color: 'var(--v2-text-muted)',
+          }}
         >
           {t('fees.invoices')} →
-        </p>
+        </span>
       </a>
     </ContentSection>
   )

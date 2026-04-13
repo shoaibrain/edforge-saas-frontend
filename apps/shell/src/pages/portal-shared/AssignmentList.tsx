@@ -18,6 +18,8 @@ export interface AssignmentListProps {
   limit?: number
   /** Link target for "View all" */
   viewAllHref?: string
+  /** Humanized empty-state message */
+  emptyMessage?: { line1: string; line2?: string }
 }
 
 function getAssignmentStatus(dueDate?: string): { variant: StatusPillVariant; label: string } {
@@ -52,6 +54,7 @@ export function AssignmentList({
   staggerIndex = 3,
   limit = 5,
   viewAllHref,
+  emptyMessage,
 }: AssignmentListProps) {
   const { t } = useTranslation('portal')
 
@@ -81,37 +84,73 @@ export function AssignmentList({
       staggerIndex={staggerIndex}
     >
       {thisWeekItems.length === 0 ? (
-        <p
-          className="text-sm py-4"
-          style={{ color: 'var(--v2-text-muted)' }}
-        >
-          {t('home.noAssignmentsThisWeek')}
-        </p>
-      ) : (
+        /* Humanized empty state — editorial card with italic serif headline */
         <div
-          className="rounded-xl border mt-3 overflow-hidden"
+          className="border mt-4"
           style={{
             background: 'var(--v2-bg-surface)',
             borderColor: 'var(--v2-border-default)',
+            borderRadius: 22,
+            padding: '40px 30px',
+            boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+            textAlign: 'center',
+          }}
+        >
+          <p
+            className="font-display italic"
+            style={{
+              fontSize: 18,
+              fontWeight: 400,
+              color: 'var(--v2-text-secondary)',
+              marginBottom: 6,
+            }}
+          >
+            {emptyMessage?.line1 ?? t('home.noAssignmentsThisWeek')}
+          </p>
+          {emptyMessage?.line2 && (
+            <p style={{ fontSize: 13, color: 'var(--v2-text-muted)' }}>
+              {emptyMessage.line2}
+            </p>
+          )}
+        </div>
+      ) : (
+        <div
+          className="border mt-4 overflow-hidden"
+          style={{
+            background: 'var(--v2-bg-surface)',
+            borderColor: 'var(--v2-border-default)',
+            borderRadius: 22,
+            padding: '20px 30px',
+            boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
           }}
         >
           {thisWeekItems.map((item, i) => {
             const status = getAssignmentStatus(item.dueDate)
             return (
               <div key={item.id}>
-                {i > 0 && <DashedDivider className="mx-4 my-0" />}
-                <div className="flex items-center gap-3 px-4 py-3">
+                {i > 0 && <DashedDivider className="my-0" />}
+                <div className="flex items-center gap-3 py-3.5">
                   <div className="flex-1 min-w-0">
                     <p
-                      className="text-sm font-medium truncate"
-                      style={{ color: 'var(--v2-text-primary)' }}
+                      className="font-display truncate"
+                      style={{
+                        fontSize: 17,
+                        fontWeight: 500,
+                        letterSpacing: '-0.005em',
+                        color: 'var(--v2-text-primary)',
+                      }}
                     >
                       {item.title}
                     </p>
                     {item.courseName && (
                       <p
-                        className="text-[11px] truncate"
-                        style={{ color: 'var(--v2-text-muted)' }}
+                        className="font-mono uppercase truncate"
+                        style={{
+                          fontSize: 10,
+                          letterSpacing: '0.08em',
+                          color: 'var(--v2-text-muted)',
+                          marginTop: 3,
+                        }}
                       >
                         {item.courseName}
                       </p>

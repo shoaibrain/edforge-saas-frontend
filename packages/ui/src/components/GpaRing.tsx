@@ -5,6 +5,7 @@ const SIZES = {
   sm: { viewBox: 80, stroke: 6, fontSize: '14px', subSize: '9px' },
   md: { viewBox: 120, stroke: 8, fontSize: '22px', subSize: '11px' },
   lg: { viewBox: 180, stroke: 10, fontSize: '34px', subSize: '13px' },
+  xl: { viewBox: 220, stroke: 12, fontSize: '40px', subSize: '14px' },
 } as const
 
 export type GpaRingSize = keyof typeof SIZES
@@ -41,6 +42,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
         case 'sm': return 80
         case 'md': return 120
         case 'lg': return 180
+        case 'xl': return 220
       }
     }, [size])
 
@@ -99,7 +101,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
           />
         )}
 
-        {/* Center value */}
+        {/* Center value — uses Fraunces display serif for editorial weight */}
         <text
           x={center}
           y={center}
@@ -107,8 +109,8 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
           dominantBaseline="central"
           fill="var(--v2-text-primary)"
           fontSize={config.fontSize}
-          fontWeight="600"
-          fontFamily="inherit"
+          fontWeight="500"
+          fontFamily="'Fraunces', Georgia, serif"
           style={{ fontVariantNumeric: 'tabular-nums' }}
         >
           {displayValue}

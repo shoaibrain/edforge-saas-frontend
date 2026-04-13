@@ -1,7 +1,7 @@
 /**
  * TermSwitcher — Grading period selector button group
  *
- * Horizontal button group: "All terms" + one button per grading period.
+ * Horizontal button group with prototype .fp-term-switcher classes
  */
 
 import { useTranslation } from '@edforge/i18n'
@@ -19,28 +19,20 @@ export function TermSwitcher({ periods, activePeriodId, onChange }: TermSwitcher
   if (!periods || periods.length === 0) return null
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap">
+    <div className="fp-term-switcher">
       <button
         onClick={() => onChange(null)}
-        className="px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
-        style={{
-          background: activePeriodId === null ? 'var(--v2-brand-primary)' : 'var(--v2-surface-interactive)',
-          color: activePeriodId === null ? '#fff' : 'var(--v2-text-muted)',
-        }}
+        className={`fp-term-opt ${activePeriodId === null ? 'active' : ''}`}
       >
         {t('grades.allTerms')}
       </button>
-      {periods
+      {[...periods]
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map((period) => (
           <button
             key={period.id}
             onClick={() => onChange(period.id)}
-            className="px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
-            style={{
-              background: activePeriodId === period.id ? 'var(--v2-brand-primary)' : 'var(--v2-surface-interactive)',
-              color: activePeriodId === period.id ? '#fff' : 'var(--v2-text-muted)',
-            }}
+            className={`fp-term-opt ${activePeriodId === period.id ? 'active' : ''}`}
           >
             {period.name}
           </button>

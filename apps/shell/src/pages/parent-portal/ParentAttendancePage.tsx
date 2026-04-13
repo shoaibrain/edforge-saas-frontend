@@ -1,17 +1,14 @@
 /**
  * Parent Portal — Child's Attendance Page (v2)
  *
- * Same structure as Student Attendance but scoped to activeChild.
- * Replaces trend sparkline with AttendancePatterns section.
- *
- * Inline apiGet migration: removes apiGet('/academics/students/${studentId}/attendance/summary')
- * (previously line ~43) and apiGet('/academics/students/${studentId}/attendance') (previously
- * line ~54).
+ * Scoped to activeChild and styled exclusively for Family Portal prototypes.
  */
 
 import { useState, useMemo } from 'react'
 import { useTranslation } from '@edforge/i18n'
-import { WidgetErrorBoundaryV2, ContentSection, AttendanceHeatmap, type HeatmapDay, type HeatmapStatus } from '@edforge/ui'
+import { WidgetErrorBoundaryV2 } from '@edforge/ui'
+import type { HeatmapDay, HeatmapStatus } from '@edforge/ui'
+import { AlertCircle } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
@@ -19,7 +16,8 @@ import { usePortalAttendanceSummary, usePortalStudentAttendance } from '../../ho
 import { usePortalCalendarDates } from '../../hooks/usePortalCalendarDates'
 import { usePortalCurrentAcademicYear } from '../../hooks/usePortalCurrentAcademicYear'
 import { NoActiveChild } from '../portal-shared/NoActiveChild'
-import { AttendanceRateHero } from '../portal-shared/AttendanceRateHero'
+import { PortalAttendanceHero } from '../portal-shared/PortalAttendanceHero'
+import { PortalCalendarGrid } from '../portal-shared/PortalCalendarGrid'
 import { AttendanceRecordsList } from '../portal-shared/AttendanceRecordsList'
 import { AttendancePatterns } from './sections/AttendancePatterns'
 
@@ -90,44 +88,63 @@ function ParentAttendanceContent({
     return buildHeatmapDays(heatmapMonth, records, calendarData?.items)
   }, [heatmapMonth, records, calendarData])
 
-  return (
-    <div className="p-6 space-y-6" data-v2>
-      <ContentSection
-        heading={t('pages.childAttendance', { name: childName })}
-        staggerIndex={0}
-      />
+  // Look for any absences missing notes to trigger the unexplained action banner
+  const unexplainedRecord = useMemo(() => {
+    if (!records) return null;
+    return records.find(r => r.status === 'absent' && !r.notes);
+  }, [records]);
 
+  function getDayName(dateStr: string) {
+    return new Date(dateStr).toLocaleDateString(undefined, { weekday: 'long' });
+  }
+
+  return (
+    <div className="fp-content">
+      {/* Editorial Page Head */}
+      <h1 className="fp-page-title mb-10">
+        {childName}'s <em>attendance.</em>
+      </h1>
+      
+      {/* Action Banner (Dynamic parsing of unexplained absences) */}
+      {unexplainedRecord && (
+        <div className="fp-action-banner">
+          <div className="fp-icon"><AlertCircle strokeWidth={2} /></div>
+          <div style={{ flex: 1 }}>
+            <h3>{getDayName(unexplainedRecord.date)}'s absence is <em>unexplained.</em></h3>
+            <p>The front office marked {childName} absent on {new Date(unexplainedRecord.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} but no reason is on file. A quick note closes the loop and keeps the record clean.</p>
+          </div>
+          <div>
+            <button className="fp-t-btn primary" style={{ background: 'var(--fp-ink)', color: 'var(--fp-paper)', padding: '12px 24px', fontSize: '13px' }} disabled>
+              Add a reason
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hero Metrics */}
       <WidgetErrorBoundaryV2>
-        <AttendanceRateHero
-          attendanceRate={summary?.attendanceRate}
-          totalDays={summary?.totalDays}
-          present={summary?.presentDays}
-          absent={summary?.absentDays}
-          late={summary?.lateDays}
-          excused={summary?.excusedDays}
+        <PortalAttendanceHero
+          summary={summary}
           loading={summaryLoading}
-          staggerIndex={1}
         />
       </WidgetErrorBoundaryV2>
 
+      {/* Monthly Calendar View */}
       <WidgetErrorBoundaryV2>
-        <ContentSection staggerIndex={2}>
-          <AttendanceHeatmap
-            yearMonth={heatmapMonth}
-            days={heatmapDays}
-            onMonthChange={setHeatmapMonth}
-            monthLabel={monthLabel}
-            className="mt-2"
-          />
-        </ContentSection>
+        <PortalCalendarGrid
+          yearMonth={heatmapMonth}
+          days={heatmapDays}
+          onMonthChange={setHeatmapMonth}
+          monthLabel={monthLabel}
+        />
       </WidgetErrorBoundaryV2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Analytics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <WidgetErrorBoundaryV2>
           <AttendanceRecordsList
             records={records}
             loading={recordsLoading}
-            staggerIndex={3}
           />
         </WidgetErrorBoundaryV2>
 
@@ -136,7 +153,7 @@ function ParentAttendanceContent({
             summary={summary}
             records={records}
             calendarDates={calendarData?.items}
-            staggerIndex={4}
+            childName={childName}
           />
         </WidgetErrorBoundaryV2>
       </div>

@@ -1,19 +1,19 @@
 /**
  * GradedItemTimeline — Chronological list of graded assignments
  *
- * Shows grade pills, course tags, scores, dates.
- * Pending items at 55% opacity with "PEND" pill.
+ * Modified to securely use the scoped DOM structures from prototype (.fp-t-row),
+ * with added creative touches using lucide-react icons, status chips, and refined typography.
  */
 
 import { useMemo } from 'react'
 import { useTranslation } from '@edforge/i18n'
-import { ContentSection, StatusPill, DashedDivider } from '@edforge/ui'
 import type { CourseGradeResponseDto } from '@aibrains/shared-types'
+import { Skeleton } from '@edforge/ui'
+import { FileText, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
 
 export interface GradedItemTimelineProps {
   grades?: CourseGradeResponseDto[]
   loading?: boolean
-  staggerIndex?: number
 }
 
 interface TimelineItem {
@@ -56,11 +56,7 @@ function formatDate(dateStr?: string): string {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-export function GradedItemTimeline({
-  grades,
-  loading,
-  staggerIndex = 4,
-}: GradedItemTimelineProps) {
+export function GradedItemTimeline({ grades, loading }: GradedItemTimelineProps) {
   const { t } = useTranslation('portal')
 
   const items = useMemo(() => {
@@ -70,83 +66,108 @@ export function GradedItemTimeline({
 
   if (loading) {
     return (
-      <ContentSection staggerIndex={staggerIndex}>
-        <div className="h-5 w-48 rounded bg-[var(--v2-bg-elevated)] v2-skeleton-pulse mb-3" />
-        <div className="space-y-2">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-12 rounded bg-[var(--v2-bg-elevated)] v2-skeleton-pulse" />
-          ))}
+      <section className="fp-section">
+        <div className="fp-section-head">
+          <h2 className="fp-section-title">Graded items</h2>
         </div>
-      </ContentSection>
+        <div className="fp-timeline-card">
+          <Skeleton className="h-[64px] w-full mb-4" />
+          <Skeleton className="h-[64px] w-full mb-4" />
+          <Skeleton className="h-[64px] w-full" />
+        </div>
+      </section>
     )
   }
 
   if (items.length === 0) return null
 
   return (
-    <ContentSection
-      heading={t('grades.gradedAssignments')}
-      staggerIndex={staggerIndex}
-    >
-      <div
-        className="rounded-xl border mt-3 overflow-hidden"
-        style={{
-          background: 'var(--v2-bg-surface)',
-          borderColor: 'var(--v2-border-default)',
-        }}
-      >
-        {items.map((item, i) => (
-          <div key={item.id}>
-            {i > 0 && <DashedDivider className="mx-4 my-0" />}
-            <div
-              className="flex items-center gap-3 px-4 py-3 transition-opacity"
-              style={{ opacity: item.isPending ? 0.55 : 1 }}
-            >
-              {/* Grade pill */}
-              <StatusPill
-                variant={item.isPending ? 'pending' : item.letterGrade?.startsWith('F') ? 'overdue' : 'present'}
-                label={item.isPending ? 'PEND' : (item.letterGrade ?? '—')}
-              />
-
-              {/* Assignment info */}
-              <div className="flex-1 min-w-0">
-                <p
-                  className="text-sm font-medium truncate"
-                  style={{ color: 'var(--v2-text-primary)' }}
-                >
-                  {item.assignmentName}
-                </p>
-                <p
-                  className="text-[11px] truncate"
-                  style={{ color: 'var(--v2-text-muted)' }}
-                >
-                  {item.courseName}
-                </p>
-              </div>
-
-              {/* Score + date */}
-              <div className="text-right shrink-0">
-                {item.percentage != null && (
-                  <p
-                    className="text-[12px] font-mono tabular-nums"
-                    style={{ color: 'var(--v2-text-secondary)' }}
-                  >
-                    {item.percentage.toFixed(0)}%
-                  </p>
-                )}
-                {item.gradedAt && (
-                  <p
-                    className="text-[10px]"
-                    style={{ color: 'var(--v2-text-hint)' }}
-                  >
-                    {formatDate(item.gradedAt)}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+    <section className="fp-section">
+      <div className="fp-section-head">
+        <h2 className="fp-section-title">Graded items <em>recent activity</em></h2>
+        <a className="fp-section-link" href="#">Export report →</a>
       </div>
-    </ContentSection>
+      <div className="fp-timeline-card">
+        <div className="flex flex-col gap-2">
+          {items.map((item) => {
+            let catClass = 'pend';
+            let StatusIcon = Clock;
+            let statusText = 'Pending';
+            let iconColor = 'var(--fp-ink-4)';
+            
+            if (!item.isPending && item.letterGrade) {
+              const first = item.letterGrade.charAt(0).toUpperCase()
+              if (first === 'A' || first === 'B') {
+                catClass = 'high';
+                StatusIcon = CheckCircle2;
+                statusText = 'Excellent';
+                iconColor = 'var(--fp-sage)';
+              }
+              else if (first === 'C') {
+                catClass = 'mid';
+                StatusIcon = AlertCircle;
+                statusText = 'Average';
+                iconColor = 'var(--fp-butter)';
+              }
+              else {
+                catClass = 'low';
+                StatusIcon = AlertCircle;
+                statusText = 'Needs Work';
+                iconColor = 'var(--fp-terracotta)';
+              }
+            } else if (!item.isPending && item.percentage != null) {
+               // Graded without a letter grade
+               catClass = item.percentage >= 80 ? 'high' : item.percentage >= 60 ? 'mid' : 'low';
+               StatusIcon = CheckCircle2;
+               statusText = 'Graded';
+               iconColor = item.percentage >= 80 ? 'var(--fp-sage)' : item.percentage >= 60 ? 'var(--fp-butter)' : 'var(--fp-terracotta)';
+            }
+
+            return (
+              <div key={item.id} className={`fp-t-row group ${item.isPending ? 'pending' : ''}`}>
+                
+                {/* Visual Icon / Letter Badge */}
+                <div className={`fp-t-letter flex items-center justify-center ${catClass} group-hover:scale-105 transition-transform`} style={{ width: '48px', height: '48px', flexShrink: 0 }}>
+                  {item.isPending ? (
+                     <FileText size={20} strokeWidth={1.5} color="var(--fp-ink-3)" />
+                  ) : (
+                     item.letterGrade ?? <FileText size={20} strokeWidth={1.5} color={iconColor} />
+                  )}
+                </div>
+
+                {/* Main Content Body */}
+                <div className="fp-t-body flex flex-col justify-center">
+                  <strong className="text-[15px] mb-[2px] tracking-tight">{item.assignmentName}</strong>
+                  <div className="flex items-center gap-2">
+                    <span>{item.courseName}</span>
+                    <div className="w-[3px] h-[3px] rounded-full bg-[var(--fp-hairline)]" />
+                    <div className="flex items-center gap-[4px]" style={{ color: iconColor }}>
+                      <StatusIcon size={12} strokeWidth={2.5} />
+                      <span style={{ color: 'inherit', fontWeight: 600, fontSize: '10px' }}>{statusText}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Score Section */}
+                <div className="fp-t-num flex flex-col items-end justify-center">
+                  <div className="font-display text-xl font-medium" style={{ color: 'var(--fp-ink)', fontVariationSettings: '"SOFT" 40' }}>
+                    {item.percentage != null ? `${item.percentage.toFixed(0)}%` : '—'}
+                  </div>
+                  <span>Score</span>
+                </div>
+
+                {/* Date Section */}
+                <div className="fp-t-date flex flex-col items-end justify-center px-2">
+                  <span className="opacity-70">
+                    {item.gradedAt ? formatDate(item.gradedAt) : '—'}
+                  </span>
+                </div>
+
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
   )
 }

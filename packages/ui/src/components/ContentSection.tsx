@@ -8,6 +8,10 @@ export interface ContentSectionProps extends HTMLAttributes<HTMLElement> {
   heading?: string
   /** Heading HTML element level */
   headingAs?: 'h2' | 'h3' | 'h4'
+  /** Use larger display heading size (for hero-level sections) */
+  displayHeading?: boolean
+  /** Apply italic to heading (for editorial emphasis, e.g., "Blessed's *Progress*") */
+  headingItalic?: boolean
   /** Optional subheading below the heading */
   subheading?: ReactNode
   /** Stagger animation index (0-based). Controls animation delay via --stagger-index. */
@@ -21,6 +25,8 @@ export const ContentSection = forwardRef<HTMLElement, ContentSectionProps>(
       eyebrow,
       heading,
       headingAs: HeadingTag = 'h2',
+      displayHeading = false,
+      headingItalic = false,
       subheading,
       staggerIndex,
       children,
@@ -44,7 +50,13 @@ export const ContentSection = forwardRef<HTMLElement, ContentSectionProps>(
           </p>
         )}
         {heading && (
-          <HeadingTag className="text-lg font-semibold text-[var(--v2-text-primary)] mb-1">
+          <HeadingTag
+            className={cn(
+              'font-display text-[var(--v2-text-primary)] mb-1 tracking-tight',
+              displayHeading ? 'text-2xl font-medium' : 'text-xl font-medium',
+              headingItalic && 'italic'
+            )}
+          >
             {heading}
           </HeadingTag>
         )}

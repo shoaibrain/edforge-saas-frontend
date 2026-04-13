@@ -37,7 +37,9 @@ const STATUS_COLORS: Record<HeatmapStatus, { bg: string; border?: string }> = {
   absent: { bg: 'var(--v2-status-absent-bg)' },
   late: { bg: 'var(--v2-status-late-bg)' },
   excused: { bg: 'var(--v2-status-excused-bg)' },
-  holiday: { bg: 'var(--v2-surface-inset)', border: '1px dashed var(--v2-border-default)' },
+  holiday: {
+    bg: 'repeating-linear-gradient(-45deg, transparent, transparent 3px, var(--v2-border-default) 3px, var(--v2-border-default) 4px)',
+  },
   weekend: { bg: 'var(--v2-surface-inset)' },
   future: { bg: 'transparent' },
   none: { bg: 'transparent' },
@@ -145,7 +147,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
         </div>
 
         {/* Day cells */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-1" role="grid" aria-label="Attendance calendar">
           {grid.map((cell, i) => {
             if (!cell) {
               return <div key={`empty-${i}`} className="aspect-square" />
@@ -164,7 +166,9 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
                     : colors.border ?? 'none',
                   color: STATUS_TEXT[cell.status],
                 }}
-                aria-label={`${cell.date}: ${cell.status}`}
+                tabIndex={0}
+                role="gridcell"
+                aria-label={`${new Date(cell.date).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}: ${cell.status.charAt(0).toUpperCase() + cell.status.slice(1)}`}
               >
                 {cell.dayNumber}
               </div>
