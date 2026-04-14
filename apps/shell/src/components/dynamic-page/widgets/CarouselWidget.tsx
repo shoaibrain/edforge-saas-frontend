@@ -459,82 +459,11 @@ export function CarouselWidget({
 // RECENTLY VISITED WIDGET (Convenience Wrapper)
 // ============================================================================
 
-// Extended mock data for demo
-const EXTENDED_MOCK_PAGES: VisitedPage[] = [
-  // [MVP-PARKED] Messages mock entry
-  // {
-  //   path: '/messages',
-  //   title: 'Messages',
-  //   icon: 'Mail',
-  //   module: 'messages',
-  //   visitedAt: new Date().toISOString(),
-  // },
-  // [/MVP-PARKED]
-  {
-    path: '/settings',
-    title: 'Settings',
-    icon: 'Settings',
-    module: 'settings',
-    visitedAt: new Date().toISOString(),
-  },
-  {
-    path: '/academics',
-    title: 'Academics',
-    icon: 'GraduationCap',
-    module: 'academics',
-    visitedAt: new Date().toISOString(),
-  },
-  {
-    path: '/academics/students',
-    title: 'Students',
-    icon: 'Users',
-    module: 'academics',
-    visitedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    path: '/finance',
-    title: 'Finance',
-    icon: 'DollarSign',
-    module: 'finance',
-    visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    path: '/people',
-    title: 'People',
-    icon: 'Users',
-    module: 'people',
-    visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-  },
-  // [MVP-PARKED] Analytics mock entry
-  // {
-  //   path: '/analytics',
-  //   title: 'Analytics',
-  //   icon: 'BarChart3',
-  //   module: 'analytics',
-  //   visitedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  // },
-  // [/MVP-PARKED]
-  {
-    path: '/academics/classrooms',
-    title: 'Classrooms',
-    icon: 'BookOpen',
-    module: 'academics',
-    visitedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-]
-
 export function RecentlyVisitedWidget() {
   const { recentPages } = useRecentlyVisited()
   const { t } = useTranslation('dashboard')
 
-  // Use extended mock data if less than 3 real pages
-  const pages: VisitedPage[] = recentPages.length >= 3
-    ? recentPages
-    : (() => {
-      const existingPaths = new Set(recentPages.map((p: VisitedPage) => p.path))
-      const mockToAdd = EXTENDED_MOCK_PAGES.filter((p: VisitedPage) => !existingPaths.has(p.path))
-      return [...recentPages, ...mockToAdd].slice(0, 10)
-    })()
+  const pages: VisitedPage[] = recentPages
 
   // Convert to CarouselCard format - memoized to prevent infinite re-renders
   const cards: CarouselCard[] = useMemo(() =>

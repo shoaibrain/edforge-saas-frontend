@@ -103,6 +103,18 @@ function parseCSV(text: string): { headers: string[]; rows: ParsedRow[] } {
       data[h] = values[idx] || ''
     })
 
+    // Normalize gender values the server doesn't accept
+    const GENDER_MAP: Record<string, string> = {
+      'non-binary': 'other',
+      'non_binary': 'other',
+      'nonbinary': 'other',
+      'nb': 'other',
+    }
+    if (data.gender) {
+      const g = data.gender.toLowerCase().trim()
+      if (GENDER_MAP[g]) data.gender = GENDER_MAP[g]
+    }
+
     if (!data.firstName) errors.push('Missing first name')
     if (!data.lastName) errors.push('Missing last name')
     if (!data.birthDate && !data.dateOfBirth) errors.push('Missing birth date')
@@ -233,8 +245,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
         style={{
           maxWidth: 540,
           maxHeight: '85vh',
-          background: '#161b27',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--v2-bg-surface)',
+          border: '1px solid var(--v2-border-default)',
           borderRadius: 14,
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
         }}
@@ -242,7 +254,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-4"
-          style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
+          style={{ borderBottom: '1px solid var(--v2-border-default)' }}
         >
           <div className="flex items-center gap-3">
             <div
@@ -279,8 +291,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
             style={{
               width: 26,
               height: 26,
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.07)',
+              background: 'var(--v2-surface-interactive)',
+              border: '1px solid var(--v2-border-default)',
               borderRadius: 6,
             }}
           >
@@ -355,8 +367,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
               <div
                 className="flex items-center gap-3"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.07)',
+                  background: 'var(--v2-surface-inset)',
+                  border: '1px solid var(--v2-border-default)',
                   borderRadius: 8,
                   padding: '10px 12px',
                 }}
@@ -366,7 +378,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   style={{
                     width: 28,
                     height: 28,
-                    background: 'rgba(255, 255, 255, 0.06)',
+                    background: 'var(--v2-surface-interactive-hover)',
                     borderRadius: 6,
                   }}
                 >
@@ -449,9 +461,9 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                           fontWeight: 500,
                           padding: '2px 7px',
                           borderRadius: 5,
-                          background: 'rgba(255, 255, 255, 0.04)',
+                          background: 'var(--v2-surface-interactive)',
                           color: '#5a6070',
-                          border: '1px solid rgba(255, 255, 255, 0.07)',
+                          border: '1px solid var(--v2-border-default)',
                         }}
                       >
                         {col}
@@ -732,7 +744,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
         {/* Footer */}
         <div
           className="flex items-center justify-between px-5 py-3"
-          style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
+          style={{ borderTop: '1px solid var(--v2-border-default)' }}
         >
           {/* Left info */}
           <div className="flex items-center gap-1.5">
@@ -787,7 +799,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   className="flex items-center gap-1.5 transition-colors hover:opacity-80"
                   style={{
                     background: 'transparent',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    border: '1px solid var(--v2-border-default)',
                     borderRadius: 8,
                     padding: '7px 14px',
                     fontSize: 12,

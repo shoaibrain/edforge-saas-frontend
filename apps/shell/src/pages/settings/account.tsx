@@ -15,13 +15,11 @@ import {
   User,
   MapPin,
   Phone,
-  Upload,
-  Trash2,
   Copy,
   Check
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, ComingSoonBadge } from '@edforge/ui'
+import { Button } from '@edforge/ui'
 import { TextField, SelectField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
 import { 
@@ -162,7 +160,6 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
 
 // ============================================================================
 // AVATAR DISPLAY COMPONENT
-// COMING_SOON: avatar-upload — Restore AvatarUpload interactivity when photo upload ships
 // ============================================================================
 
 interface AvatarUploadProps {
@@ -183,22 +180,6 @@ function AvatarUpload({ avatarUrl, displayName }: AvatarUploadProps) {
 
       <div className="flex-1 min-w-0">
         <p className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate">{displayName}</p>
-        <div className="flex items-center gap-2 mt-1.5">
-          <ComingSoonBadge size="sm" />
-          <span className="text-xs text-[rgb(var(--text-tertiary))]">
-            Profile photo upload will be available soon
-          </span>
-        </div>
-        <div className="flex items-center gap-2 mt-3">
-          <Button variant="outline" size="sm" type="button" disabled>
-            <Upload className="w-3.5 h-3.5 mr-1.5" />
-            Upload
-          </Button>
-          <Button variant="ghost" size="sm" type="button" disabled className="text-[rgb(var(--text-tertiary))]">
-            <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-            Remove
-          </Button>
-        </div>
       </div>
     </div>
   )
@@ -367,8 +348,6 @@ export default function AccountPage() {
 
     updateMutation.mutate(updateData)
   }
-
-  // COMING_SOON: avatar-upload — Re-add handleAvatarUpload / handleAvatarRemove when photo upload ships
 
   // Computed values
   const avatarUrl = userProfile?.avatarUrl || getUserAvatar(

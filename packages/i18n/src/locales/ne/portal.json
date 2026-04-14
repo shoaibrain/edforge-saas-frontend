@@ -1,0 +1,110 @@
+{
+  "pages": {
+    "home": "गृहपृष्ठ",
+    "myGrades": "मेरो ग्रेडहरू",
+    "myAttendance": "मेरो उपस्थिति",
+    "mySchedule": "मेरो तालिका",
+    "childGrades": "{{name}}को प्रगति",
+    "childAttendance": "{{name}}को उपस्थिति",
+    "childSchedule": "{{name}}को तालिका",
+    "childFees": "{{name}}को शुल्क",
+    "familyOverview": "परिवार अवलोकन"
+  },
+
+  "stats": {
+    "gpa": "जीपीए",
+    "attendanceRate": "उपस्थिति",
+    "activeCourses": "पाठ्यक्रमहरू",
+    "balanceDue": "बाँकी शुल्क",
+    "openAssignments": "कार्यहरू",
+    "invoicesPaid": "भुक्तानी बिल",
+    "nextDue": "अर्को तिर्ने मिति",
+    "yearProgress": "वार्षिक प्रगति",
+    "totalDays": "कुल दिनहरू",
+    "presentDays": "उपस्थित",
+    "absentDays": "अनुपस्थित",
+    "lateDays": "ढिलो",
+    "excusedDays": "माफी"
+  },
+
+  "status": {
+    "present": "उपस्थित",
+    "absent": "अनुपस्थित",
+    "late": "ढिलो",
+    "excused": "माफी",
+    "paid": "भुक्तानी",
+    "overdue": "म्याद सकिएको",
+    "pending": "पर्खिँदै",
+    "upcoming": "आगामी",
+    "outstanding": "बाँकी",
+    "all": "सबै",
+    "inProgress": "प्रगतिमा",
+    "notGraded": "अझै ग्रेड गरिएको छैन"
+  },
+
+  "grades": {
+    "cumulativeGpa": "संचयी जीपीए",
+    "termGpa": "त्रैमासिक जीपीए",
+    "credits": "क्रेडिटहरू",
+    "courses": "पाठ्यक्रमहरू",
+    "gradedItems": "ग्रेड गरिएका",
+    "allTerms": "सबै त्रैमासिक",
+    "courseByourse": "पाठ्यक्रम अनुसार",
+    "gradedAssignments": "ग्रेड गरिएका कार्यहरू",
+    "nothingToWorry": "अहिलेसम्म चिन्ता लिनुपर्ने छैन",
+    "noGradesYet": "अझै ग्रेड रेकर्ड गरिएको छैन। शिक्षकले ग्रेड दिएपछि यहाँ देखिनेछ।",
+    "categoryWeights": "श्रेणी भार"
+  },
+
+  "attendance": {
+    "yearToDate": "वर्षभरिको",
+    "recentRecords": "हालका रेकर्डहरू",
+    "patterns": "ढाँचा र झण्डाहरू",
+    "noConcerns": "कुनै चिन्ताजनक ढाँचा छैन",
+    "monthlyTrend": "मासिक प्रवृत्ति",
+    "noDataToGraph": "प्रवृत्ति देखाउन पर्याप्त डाटा छैन।",
+    "noRecords": "अझै उपस्थिति रेकर्ड छैन।",
+    "holidayUpcoming": "{{date}} मा बिदा आउँदैछ",
+    "goal": "{{rate}}% लक्ष्य"
+  },
+
+  "schedule": {
+    "today": "आज",
+    "thisWeek": "यो हप्ता",
+    "dayView": "दिन",
+    "weekView": "हप्ता",
+    "coursesAndTeachers": "पाठ्यक्रम र शिक्षकहरू",
+    "quickReference": "द्रुत सन्दर्भ",
+    "dropOff": "छाड्ने",
+    "lunch": "खाजा",
+    "pickup": "लिन आउने",
+    "noClassesToday": "आज कक्षा छैन।",
+    "noSections": "कुनै कक्षा तालिकाबद्ध छैन।"
+  },
+
+  "fees": {
+    "yearOnOneLine": "एक लाइनमा वर्ष",
+    "invoices": "बिलहरू",
+    "paymentHistory": "भुक्तानी इतिहास",
+    "categoryBreakdown": "श्रेणी अनुसार",
+    "noPayments": "अझै भुक्तानी रेकर्ड छैन।",
+    "allFeesCurrent": "सबै शुल्क चुक्ता छ",
+    "daysUntilDue": "{{count}} दिन",
+    "receipt": "रसिद"
+  },
+
+  "home": {
+    "greeting": "नमस्ते, {{name}}।",
+    "todayFor": "आज {{name}}को लागि",
+    "thisWeekAssignments": "यो हप्ताको कार्यहरू",
+    "viewAll": "सबै हेर्नुहोस्",
+    "noAssignmentsThisWeek": "यो हप्ता कुनै कार्य छैन।"
+  },
+
+  "empty": {
+    "noData": "अझै यहाँ केही देखाउने छैन।",
+    "selectChild": "उनीहरूको जानकारी हेर्न बच्चा चयन गर्नुहोस्।",
+    "errorRetry": "केही गलत भयो। कृपया पुन: प्रयास गर्नुहोस्।",
+    "retry": "पुन: प्रयास"
+  }
+}

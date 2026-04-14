@@ -12,9 +12,8 @@ export {
 } from './CarouselWidget'
 
 // Events Widget
-export { 
+export {
   UpcomingEventsWidget,
-  MOCK_UPCOMING_EVENTS,
   type UpcomingEvent,
 } from './UpcomingEventsWidget'
 
@@ -34,16 +33,5 @@ export {
   type WelcomeTip,
 } from './WelcomeTipWidget'
 
-// Compliance Alerts Widget (Special Programs)
-export {
-  ComplianceAlertsWidget,
-  type ComplianceAlert,
-} from './ComplianceAlertsWidget'
 
-// Data Health Widget (Ed-Fi)
-export {
-  DataHealthWidget,
-  type DataHealthStatus,
-  type SyncJob,
-} from './DataHealthWidget'
 

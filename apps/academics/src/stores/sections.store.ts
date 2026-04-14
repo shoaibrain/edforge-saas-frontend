@@ -3,7 +3,7 @@
  *
  * Zustand store for section UI state.
  * Server data is handled by React Query, this store manages:
- * - Filter state (search, course, teacher, academic year, term, active status)
+ * - Filter state (course, teacher, academic year, term, active status)
  */
 
 import { create } from 'zustand'
@@ -14,7 +14,6 @@ import { useShallow } from 'zustand/react/shallow'
 // ============================================================================
 
 export interface SectionFiltersState {
-  searchTerm: string
   courseId: string | null
   teacherId: string | null
   academicYearId: string | null
@@ -32,7 +31,6 @@ interface SectionsStoreState extends SectionFiltersState {
   setViewMode: (mode: 'grid' | 'list') => void
 
   // Filter actions
-  setSearchTerm: (term: string) => void
   setCourseId: (id: string | null) => void
   setTeacherId: (id: string | null) => void
   setAcademicYearId: (id: string | null) => void
@@ -50,7 +48,6 @@ interface SectionsStoreState extends SectionFiltersState {
 // ============================================================================
 
 const defaultFilters: SectionFiltersState = {
-  searchTerm: '',
   courseId: null,
   teacherId: null,
   academicYearId: null,
@@ -69,10 +66,6 @@ export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
   setViewMode: (mode: 'grid' | 'list') => {
     set({ viewMode: mode })
     try { localStorage.setItem('edforge.classrooms.viewMode', mode) } catch {}
-  },
-
-  setSearchTerm: (term: string) => {
-    set({ searchTerm: term })
   },
 
   setCourseId: (id: string | null) => {
@@ -103,7 +96,6 @@ export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
   hasActiveFilters: () => {
     const state = get()
     return (
-      state.searchTerm.trim() !== '' ||
       state.courseId !== null ||
       state.teacherId !== null ||
       state.academicYearId !== null ||
@@ -115,7 +107,6 @@ export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
   activeFilterCount: () => {
     const state = get()
     let count = 0
-    if (state.searchTerm.trim() !== '') count++
     if (state.courseId !== null) count++
     if (state.teacherId !== null) count++
     if (state.academicYearId !== null) count++
@@ -135,7 +126,6 @@ export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
 export const useSectionFilters = () =>
   useSectionsStore(
     useShallow((state) => ({
-      searchTerm: state.searchTerm,
       courseId: state.courseId,
       teacherId: state.teacherId,
       academicYearId: state.academicYearId,
@@ -150,7 +140,6 @@ export const useSectionFilters = () =>
 export const useSectionFilterActions = () =>
   useSectionsStore(
     useShallow((state) => ({
-      setSearchTerm: state.setSearchTerm,
       setCourseId: state.setCourseId,
       setTeacherId: state.setTeacherId,
       setAcademicYearId: state.setAcademicYearId,

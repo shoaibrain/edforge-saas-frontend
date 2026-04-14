@@ -173,14 +173,5 @@
   },
   "toast": {
     "deleteSuccess": "Staff member deleted successfully"
-  },
-  "bootstrap": {
-    "selectSchool": "Select a School",
-    "selectSchoolDescription": "Choose a school from the header to access this feature.",
-    "comingSoon": "Feature Coming Soon",
-    "scaffolded": "This module is scaffolded and ready for development.",
-    "planned": "Planned",
-    "inProgress": "In Progress",
-    "plannedFeatures": "Planned Features"
   }
 }

@@ -35,49 +35,28 @@ const indexRoute = createRoute({
     component: Overview,
 })
 
-// Placeholder routes
 const enrollmentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/enrollment',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Enrollment Analytics</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Enrollment trends and projections coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 })
 
 const attendanceRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/attendance',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Attendance Analytics</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Attendance trends and patterns coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 })
 
 const performanceRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/performance',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Academic Performance</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Academic performance analytics coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 })
 
 const financeRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/finance',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Financial Analytics</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Financial reports and forecasts coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 })
 
 // Comparative Analysis
@@ -104,12 +83,7 @@ const reportsRoute = createRoute({
 const dashboardsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/dashboards',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Dashboards</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Custom dashboards coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 })
 
 const routeTree = rootRoute.addChildren([

@@ -1,5 +1,0 @@
-export { StreamFeed } from './StreamFeed'
-export { PostComposer } from './PostComposer'
-export { StreamPostCard } from './StreamPostCard'
-export { CommentThread } from './CommentThread'
-export type { StreamPost, StreamComment, StreamAttachment } from './types'

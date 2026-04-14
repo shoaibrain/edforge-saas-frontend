@@ -70,7 +70,6 @@ const newPersonRoute = createRoute({
     component: NewPersonPage,
 })
 
-// Placeholder routes (coming soon)
 const departmentsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/departments',

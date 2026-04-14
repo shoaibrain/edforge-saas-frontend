@@ -13,6 +13,7 @@ import { Skeleton } from '@edforge/ui'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { RouteErrorBoundary } from '../../components/layout/ErrorBoundary'
+import '../../styles/family-portal.css'
 
 // ============================================================================
 // CONTEXT
@@ -84,9 +85,11 @@ export default function StudentPortalLayout() {
 
   return (
     <StudentPortalContext.Provider value={{ studentId, studentProfile }}>
-      <RouteErrorBoundary>
-        <Outlet />
-      </RouteErrorBoundary>
+      <div data-family-portal="true">
+        <RouteErrorBoundary>
+          <Outlet />
+        </RouteErrorBoundary>
+      </div>
     </StudentPortalContext.Provider>
   )
 }

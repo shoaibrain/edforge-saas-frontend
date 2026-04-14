@@ -33,13 +33,25 @@
   background-color: rgb(var(--text-tertiary) / 0.5);
 }
 
-/* Focus ring */
+/* Focus ring — existing utility class */
 .focus-ring {
   outline: none;
 }
 
 .focus-ring:focus-visible {
   outline: 2px solid #0a9396;
+  outline-offset: 2px;
+}
+
+/* Portal focus ring — scoped to [data-v2] pages, applies to all interactive elements.
+   Uses brand-primary color. Relies on browser-native outline-follows-border-radius
+   (Chrome 94+, Safari 16.2+, Firefox 88+). */
+[data-v2] button:focus-visible,
+[data-v2] a:focus-visible,
+[data-v2] [role="tab"]:focus-visible,
+[data-v2] [role="gridcell"]:focus-visible,
+[data-v2] [tabindex]:focus-visible {
+  outline: 2px solid var(--v2-brand-primary, #1D9E75);
   outline-offset: 2px;
 }
 
@@ -131,6 +143,24 @@
 }
 .stagger-5 {
   animation-delay: 0.25s;
+}
+
+/* Reduced motion — disable all entrance/stagger animations for users who prefer reduced motion.
+   Note: v2-animations.css handles its own reduced motion rules separately. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-in-right {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .animate-shimmer {
+    animation: none !important;
+  }
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5 {
+    animation-delay: 0s !important;
+  }
 }
 
 /* Print utilities */

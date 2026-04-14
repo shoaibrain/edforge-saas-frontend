@@ -11,6 +11,7 @@ import { useParentChildren, type ChildProfile } from '../../hooks/useParentChild
 import { Skeleton, Button } from '@edforge/ui'
 import { AlertTriangle, ChevronDown } from 'lucide-react'
 import { RouteErrorBoundary } from '../../components/layout/ErrorBoundary'
+import '../../styles/family-portal.css'
 
 // ============================================================================
 // CONTEXT
@@ -84,17 +85,19 @@ export default function ParentPortalLayout() {
 
   return (
     <ParentPortalContext.Provider value={{ children, activeChild, setActiveChildId }}>
-      {/* Child selector (shown when parent has multiple children) */}
-      {children.length > 1 && (
-        <ChildSelector
-          children={children}
-          activeChildId={activeChildId}
-          onSelect={setActiveChildId}
-        />
-      )}
-      <RouteErrorBoundary>
-        <Outlet />
-      </RouteErrorBoundary>
+      <div data-family-portal="true">
+        {/* Child selector (shown when parent has multiple children) */}
+        {children.length > 1 && (
+          <ChildSelector
+            children={children}
+            activeChildId={activeChildId}
+            onSelect={setActiveChildId}
+          />
+        )}
+        <RouteErrorBoundary>
+          <Outlet />
+        </RouteErrorBoundary>
+      </div>
     </ParentPortalContext.Provider>
   )
 }

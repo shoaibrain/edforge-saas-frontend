@@ -10,7 +10,6 @@ import type { FederationRuntimePlugin } from '@module-federation/enhanced/runtim
 interface TenantConfig {
   id: string
   remoteUrls: {
-    // [MVP-PARKED] edfi?: string
     academics?: string
     finance?: string
     people?: string
@@ -24,7 +23,6 @@ declare global {
     __EDFORGE_CONFIG__?: {
       tenantId?: string
       remotes?: {
-        // [MVP-PARKED] edfi?: string
         academics?: string
         finance?: string
         people?: string
@@ -52,7 +50,6 @@ function getTenantConfig(): TenantConfig {
     return {
       id: 'dev',
       remoteUrls: {
-        // [MVP-PARKED] edfi: 'http://localhost:3001',
         academics: 'http://localhost:3002',
         finance: 'http://localhost:3003',
         people: 'http://localhost:3004',
@@ -70,7 +67,6 @@ function getTenantConfig(): TenantConfig {
   return {
     id: tenantId || 'default',
     remoteUrls: {
-      // [MVP-PARKED] edfi: import.meta.env.VITE_EDFI_URL ? `${import.meta.env.VITE_EDFI_URL}/remoteEntry.js` : undefined,
       academics: import.meta.env.VITE_ACADEMICS_URL ? `${import.meta.env.VITE_ACADEMICS_URL}/remoteEntry.js` : undefined,
       finance: import.meta.env.VITE_FINANCE_URL ? `${import.meta.env.VITE_FINANCE_URL}/remoteEntry.js` : undefined,
       people: import.meta.env.VITE_PEOPLE_URL ? `${import.meta.env.VITE_PEOPLE_URL}/remoteEntry.js` : undefined,

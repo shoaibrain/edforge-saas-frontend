@@ -18,11 +18,6 @@ import {
   BookOpen,
   ClipboardList,
   Calendar,
-  // [MVP-PARKED] Unused icons from parked module metadata
-  // BarChart3,
-  // Video,
-  // MessageSquare,
-  // [/MVP-PARKED]
   UserCog,
   type LucideIcon,
 } from 'lucide-react'
@@ -58,11 +53,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   BookOpen,
   ClipboardList,
   Calendar,
-  // [MVP-PARKED] Parked module icons
-  // BarChart3,
-  // Video,
-  // MessageSquare,
-  // [/MVP-PARKED]
   UserCog,
 }
 
@@ -96,10 +86,6 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/people': { title: 'People', icon: 'Users', module: 'people' },
   '/people/staff': { title: 'Staff', icon: 'UserCog', module: 'people' },
   '/people/parents': { title: 'Parents', icon: 'Users', module: 'people' },
-  // [MVP-PARKED] Parked module page metadata
-  // '/messages': { title: 'Messages', icon: 'Mail', module: 'messages' },
-  // '/analytics': { title: 'Analytics', icon: 'BarChart3', module: 'analytics' },
-  // [/MVP-PARKED]
   '/settings': { title: 'Settings', icon: 'Settings', module: 'settings' },
 }
 
@@ -235,14 +221,5 @@ export const MOCK_RECENT_PAGES: VisitedPage[] = [
     module: 'academics',
     visitedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
   },
-  // [MVP-PARKED] Analytics mock entry
-  // {
-  //   path: '/analytics',
-  //   title: 'Analytics',
-  //   icon: 'BarChart3',
-  //   module: 'analytics',
-  //   visitedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 days ago
-  // },
-  // [/MVP-PARKED]
 ]
 

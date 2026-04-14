@@ -45,38 +45,22 @@ const meetingsRoute = createRoute({
     component: MeetingsPage,
 });
 
-// Placeholder routes (coming soon)
 const calendarRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/calendar',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Calendar</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Calendar integration coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 });
 
 const notificationsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/notifications',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Notifications</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Notification settings coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 });
 
 const settingsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/settings',
-    component: () => (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Settings</h1>
-            <p className="text-[rgb(var(--text-secondary))] mt-2">Messaging settings coming soon...</p>
-        </div>
-    ),
+    component: () => null,
 });
 
 const routeTree = rootRoute.addChildren([

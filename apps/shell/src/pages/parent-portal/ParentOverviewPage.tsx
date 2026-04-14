@@ -1,168 +1,230 @@
 /**
- * Parent Portal — Overview Page
+ * Parent Portal — Home / Overview Page (v2)
  *
- * Shows a summary of all children with quick-glance GPA and attendance info.
+ * Editorial home page with intelligent, humanized data presentation.
+ *
+ * Architecture:
+ *   - All hooks called at the top before any conditional return (React rules)
+ *   - Derived insights via portal-shared/insights.ts produce humanized
+ *     greetings, stat subtitles, and contextual empty states
+ *   - Each section gets its own WidgetErrorBoundaryV2 so one failing section
+ *     doesn't break the whole page
+ *   - Icons and colored chips on stat cards match the editorial palette
+ *
+ * Data flow:
+ *   useParentChildren → activeChild → studentId
+ *   usePortalStudentGrades, usePortalAttendanceSummary, useStudentSections,
+ *   useStudentClasswork, useInvoices → all in parallel via TanStack Query
+ *
+ * Inline apiGet migration: removes the inline apiGet calls from v1.
  */
 
-import { useQuery } from '@tanstack/react-query'
-import { apiGet } from '../../lib/api'
+import { GraduationCap, CalendarCheck2, FileText, Wallet } from 'lucide-react'
+import { WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { StatStrip, type StatStripItem } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
+import { useAuthStore } from '../../stores/auth.store'
 import { useShell } from '../../lib/shell-context'
 import { useParentPortal } from './ParentPortalLayout'
-import { Card, CardContent, Skeleton } from '@edforge/ui'
-import { GraduationCap, CalendarCheck, BookOpen, User } from 'lucide-react'
-import type {
-  StudentGradesResponseDto,
-  StudentAttendanceSummaryDto,
-} from '@aibrains/shared-types'
+import { usePortalStudentGrades } from '../../hooks/usePortalStudentGrades'
+import { usePortalAttendanceSummary } from '../../hooks/usePortalStudentAttendance'
+import { useStudentSections } from '../../hooks/useStudentSections'
+import { usePortalBellSchedule } from '../../hooks/usePortalBellSchedule'
+import { usePortalClassPeriods } from '../../hooks/usePortalClassPeriods'
+import { useStudentClasswork } from '../../hooks/useStudentClasswork'
+import { useInvoices } from '../../hooks/usePayments'
+import { NoActiveChild } from '../portal-shared/NoActiveChild'
+import { HeroGreeting } from '../portal-shared/HeroGreeting'
+import { TodayTimeline } from '../portal-shared/TodayTimeline'
+import { AssignmentList } from '../portal-shared/AssignmentList'
+import { BillingCallout } from './sections/BillingCallout'
+import {
+  timeOfDayGreeting,
+  isWeekend,
+  deriveGpaInsight,
+  deriveAttendanceInsight,
+  deriveAssignmentsInsight,
+  deriveBalanceInsight,
+  deriveHeroNarrative,
+  todayEmptyMessage,
+  assignmentsEmptyMessage,
+} from '../portal-shared/insights'
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
 export default function ParentOverviewPage() {
-  const { children, activeChild, setActiveChildId } = useParentPortal()
+  const { activeChild } = useParentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
+  const user = useAuthStore((s) => s.user)
+  const parentFirstName = user?.displayName?.split(' ')[0]
+    ?? (user as { firstName?: string } | null)?.firstName
+    ?? 'there'
 
-  return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-        Family Overview
-      </h1>
+  // Derive params with optional chaining — hooks below have enabled guards
+  const studentId = activeChild?.studentId ?? ''
+  const schoolId = activeSchoolId ?? activeChild?.schoolId ?? ''
+  const academicYearId = activeSchoolYear?.id
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {children.map((child) => (
-          <ChildCard
-            key={child.studentId}
-            studentId={child.studentId}
-            name={`${child.firstName} ${child.lastName}`}
-            gradeLevel={child.gradeLevel}
-            schoolId={activeSchoolId}
-            academicYearId={activeSchoolYear?.id}
-            isActive={child.studentId === activeChild?.studentId}
-            onSelect={() => setActiveChildId(child.studentId)}
-          />
-        ))}
-      </div>
-    </div>
+  // ---- ALL hooks called BEFORE any conditional return (React hooks rules) ----
+  const { data: grades, isLoading: gradesLoading, isError: gradesError, refetch: refetchGrades } =
+    usePortalStudentGrades(studentId, schoolId, { academicYearId })
+  const { data: attendance, isLoading: attendanceLoading, isError: attendanceError, refetch: refetchAttendance } =
+    usePortalAttendanceSummary(studentId, schoolId, { academicYearId })
+  const { data: sections, isLoading: sectionsLoading } =
+    useStudentSections(studentId, schoolId, { academicYearId })
+  const { data: bellSchedules, isLoading: bellLoading } =
+    usePortalBellSchedule(schoolId)
+  const { data: classPeriods, isLoading: periodsLoading } =
+    usePortalClassPeriods(schoolId)
+  const sectionIds = sections?.map((s) => s.sectionId) ?? []
+  const { data: classwork, isLoading: classworkLoading } =
+    useStudentClasswork(sectionIds)
+  const { data: invoices, isLoading: invoicesLoading } =
+    useInvoices(schoolId, { studentId })
+
+  // Guard: no child selected (parent has multiple children but none active)
+  if (!activeChild) return <NoActiveChild />
+
+  // ---- Derive humanized insights from raw data ----
+  const childName = activeChild.firstName
+  const courseCount = sections?.length ?? 0
+  const gradedCount = grades?.grades?.filter((g) => g.letterGrade != null).length ?? 0
+  const allInvoices = invoices?.items ?? []
+  const isWeekendDay = isWeekend()
+
+  const gpaInsight = deriveGpaInsight(
+    grades?.gpa?.cumulativeGpa,
+    gradedCount,
+    courseCount
   )
-}
+  const attendanceInsight = deriveAttendanceInsight(
+    attendance?.attendanceRate,
+    attendance?.absentDays,
+    attendance?.totalDays
+  )
+  const assignmentsInsight = deriveAssignmentsInsight(classwork)
+  const balanceInsight = deriveBalanceInsight(allInvoices)
 
-// ============================================================================
-// CHILD CARD
-// ============================================================================
-
-function ChildCard({
-  studentId,
-  name,
-  gradeLevel,
-  schoolId,
-  academicYearId,
-  isActive,
-  onSelect,
-}: {
-  studentId: string
-  name: string
-  gradeLevel?: string
-  schoolId: string | null
-  academicYearId?: string
-  isActive: boolean
-  onSelect: () => void
-}) {
-  // Fetch GPA
-  const { data: gradesData, isLoading: isGradesLoading } = useQuery({
-    queryKey: ['parent-child-grades', studentId, schoolId, academicYearId],
-    queryFn: () =>
-      apiGet<StudentGradesResponseDto>(`/academics/students/${studentId}/grades`, {
-        schoolId,
-        ...(academicYearId && { academicYearId }),
-      }),
-    enabled: !!studentId && !!schoolId,
-    staleTime: 5 * 60 * 1000,
+  const heroNarrative = deriveHeroNarrative({
+    childName,
+    attendanceRate: attendance?.attendanceRate,
+    absentDays: attendance?.absentDays,
+    courseCount,
+    hasAssignmentsDue: assignmentsInsight.display !== '0',
+    isWeekendDay,
   })
 
-  // Fetch attendance summary
-  const { data: attendanceData, isLoading: isAttendanceLoading } = useQuery({
-    queryKey: ['parent-child-attendance', studentId, schoolId, academicYearId],
-    queryFn: () =>
-      apiGet<StudentAttendanceSummaryDto>(`/academics/students/${studentId}/attendance/summary`, {
-        schoolId,
-        ...(academicYearId && { academicYearId }),
-      }),
-    enabled: !!studentId && !!schoolId,
-    staleTime: 5 * 60 * 1000,
-  })
+  // ---- Build stat strip items with icons, colored chips, contextual subtitles ----
+  const statItems: StatStripItem[] = [
+    {
+      label: 'GPA · Term 1',
+      value: gpaInsight.display,
+      subtitle: gpaInsight.subtitle,
+      icon: <GraduationCap size={18} />,
+      iconBgColor: 'var(--v2-status-excused-bg)',  // soft indigo
+      iconColor: 'var(--v2-status-excused)',
+      loading: gradesLoading,
+      error: gradesError,
+      onRetry: () => refetchGrades(),
+    },
+    {
+      label: 'Attendance',
+      value: attendanceInsight.display,
+      subtitle: attendanceInsight.subtitle,
+      icon: <CalendarCheck2 size={18} />,
+      iconBgColor: 'var(--v2-status-present-bg)',  // soft sage
+      iconColor: 'var(--v2-status-present)',
+      loading: attendanceLoading,
+      error: attendanceError,
+      onRetry: () => refetchAttendance(),
+    },
+    {
+      label: 'Assignments due',
+      value: assignmentsInsight.display,
+      subtitle: assignmentsInsight.subtitle,
+      icon: <FileText size={18} />,
+      iconBgColor: 'var(--v2-status-late-bg)',     // soft butter
+      iconColor: 'var(--v2-status-late)',
+      loading: classworkLoading || sectionsLoading,
+    },
+    {
+      label: 'Balance due',
+      value: balanceInsight.display,
+      subtitle: balanceInsight.subtitle,
+      icon: <Wallet size={18} />,
+      iconBgColor: 'var(--v2-status-absent-bg)',   // soft terracotta
+      iconColor: 'var(--v2-status-absent)',
+      loading: invoicesLoading,
+    },
+  ]
+
+  const todayLoading = sectionsLoading || bellLoading || periodsLoading
 
   return (
-    <Card
-      className={`cursor-pointer transition-all hover:shadow-md ${
-        isActive ? 'ring-2 ring-teal-500' : ''
-      }`}
-      onClick={onSelect}
-    >
-      <CardContent className="p-5">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center">
-            <User className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{name}</h3>
-            {gradeLevel && (
-              <p className="text-xs text-[rgb(var(--text-secondary))]">Grade {gradeLevel}</p>
-            )}
-          </div>
+    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto" data-v2>
+      {/* Hero — eyebrow + serif greeting + italic narrative.
+           Greeting addresses the parent, narrative is about the child. */}
+      <WidgetErrorBoundaryV2>
+        <HeroGreeting
+          name={parentFirstName}
+          eyebrow={timeOfDayGreeting()}
+          contextLineEmphasis={heroNarrative}
+          contextLine={
+            courseCount > 0
+              ? `${courseCount} ${courseCount === 1 ? 'course' : 'courses'} this term${
+                  attendance?.attendanceRate != null
+                    ? ` · ${Math.round(attendance.attendanceRate)}% attendance`
+                    : ''
+                }.`
+              : undefined
+          }
+          loading={gradesLoading && attendanceLoading && sectionsLoading}
+          staggerIndex={0}
+        />
+      </WidgetErrorBoundaryV2>
+
+      {/* Stat strip — 4 tiles with icons, values, and contextual subtitles */}
+      <WidgetErrorBoundaryV2>
+        <div className="animate-fade-in stagger-2">
+          <StatStrip items={statItems} />
         </div>
+      </WidgetErrorBoundaryV2>
 
-        <div className="grid grid-cols-3 gap-3">
-          {/* GPA */}
-          <div className="text-center">
-            <GraduationCap className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto mb-1" />
-            {isGradesLoading ? (
-              <Skeleton className="h-5 w-10 mx-auto" />
-            ) : (
-              <p className="text-sm font-bold text-[rgb(var(--text-primary))]">
-                {gradesData?.gpa?.cumulativeGpa?.toFixed(2) ?? '-'}
-              </p>
-            )}
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] uppercase">GPA</p>
-          </div>
+      {/* Today timeline — schedule for today with humanized empty state */}
+      <WidgetErrorBoundaryV2>
+        <TodayTimeline
+          sections={sections}
+          bellSchedules={bellSchedules}
+          classPeriods={classPeriods}
+          loading={todayLoading}
+          heading={`Today for ${childName}`}
+          emptyMessage={todayEmptyMessage(childName)}
+          staggerIndex={2}
+        />
+      </WidgetErrorBoundaryV2>
 
-          {/* Courses */}
-          <div className="text-center">
-            <BookOpen className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto mb-1" />
-            {isGradesLoading ? (
-              <Skeleton className="h-5 w-10 mx-auto" />
-            ) : (
-              <p className="text-sm font-bold text-[rgb(var(--text-primary))]">
-                {gradesData?.grades?.length ?? '-'}
-              </p>
-            )}
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] uppercase">Courses</p>
-          </div>
+      {/* This week's assignments — list of due items, humanized empty state */}
+      <WidgetErrorBoundaryV2>
+        <AssignmentList
+          items={classwork}
+          loading={classworkLoading}
+          emptyMessage={assignmentsEmptyMessage()}
+          staggerIndex={3}
+          viewAllHref="/parent-portal/grades"
+        />
+      </WidgetErrorBoundaryV2>
 
-          {/* Attendance */}
-          <div className="text-center">
-            <CalendarCheck className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto mb-1" />
-            {isAttendanceLoading ? (
-              <Skeleton className="h-5 w-10 mx-auto" />
-            ) : (
-              <p className={`text-sm font-bold ${
-                (attendanceData?.attendanceRate ?? 0) >= 90
-                  ? 'text-green-600 dark:text-green-400'
-                  : (attendanceData?.attendanceRate ?? 0) >= 80
-                    ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-red-600 dark:text-red-400'
-              }`}>
-                {attendanceData?.attendanceRate != null
-                  ? `${attendanceData.attendanceRate.toFixed(0)}%`
-                  : '-'}
-              </p>
-            )}
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] uppercase">Attend.</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Billing callout — sage gradient when current, terracotta when overdue */}
+      <WidgetErrorBoundaryV2>
+        <BillingCallout
+          invoices={allInvoices}
+          loading={invoicesLoading}
+          staggerIndex={4}
+        />
+      </WidgetErrorBoundaryV2>
+    </div>
   )
 }

@@ -1,0 +1,110 @@
+{
+  "pages": {
+    "home": "Home",
+    "myGrades": "My Grades",
+    "myAttendance": "My Attendance",
+    "mySchedule": "My Schedule",
+    "childGrades": "{{name}}'s Progress",
+    "childAttendance": "{{name}}'s Attendance",
+    "childSchedule": "{{name}}'s Schedule",
+    "childFees": "{{name}}'s Fees",
+    "familyOverview": "Family Overview"
+  },
+
+  "stats": {
+    "gpa": "GPA",
+    "attendanceRate": "Attendance",
+    "activeCourses": "Courses",
+    "balanceDue": "Balance Due",
+    "openAssignments": "Assignments",
+    "invoicesPaid": "Invoices Paid",
+    "nextDue": "Next Due",
+    "yearProgress": "Year Progress",
+    "totalDays": "Total Days",
+    "presentDays": "Present",
+    "absentDays": "Absent",
+    "lateDays": "Late",
+    "excusedDays": "Excused"
+  },
+
+  "status": {
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "pending": "Pending",
+    "upcoming": "Upcoming",
+    "outstanding": "Outstanding",
+    "all": "All",
+    "inProgress": "In Progress",
+    "notGraded": "Not graded yet"
+  },
+
+  "grades": {
+    "cumulativeGpa": "Cumulative GPA",
+    "termGpa": "Term GPA",
+    "credits": "Credits",
+    "courses": "Courses",
+    "gradedItems": "Graded Items",
+    "allTerms": "All Terms",
+    "courseByourse": "Course by Course",
+    "gradedAssignments": "Graded Assignments",
+    "nothingToWorry": "Nothing to worry about yet",
+    "noGradesYet": "No grades recorded yet. They will appear here as your teachers enter them.",
+    "categoryWeights": "Category Weights"
+  },
+
+  "attendance": {
+    "yearToDate": "Year to Date",
+    "recentRecords": "Recent Records",
+    "patterns": "Patterns & Flags",
+    "noConcerns": "No concerning patterns",
+    "monthlyTrend": "Monthly Trend",
+    "noDataToGraph": "Not enough data to show a trend yet.",
+    "noRecords": "No attendance records yet.",
+    "holidayUpcoming": "Holiday coming up on {{date}}",
+    "goal": "{{rate}}% goal"
+  },
+
+  "schedule": {
+    "today": "Today",
+    "thisWeek": "This Week",
+    "dayView": "Day",
+    "weekView": "Week",
+    "coursesAndTeachers": "Courses & Teachers",
+    "quickReference": "Quick Reference",
+    "dropOff": "Drop-off",
+    "lunch": "Lunch",
+    "pickup": "Pickup",
+    "noClassesToday": "No classes today.",
+    "noSections": "No classes scheduled."
+  },
+
+  "fees": {
+    "yearOnOneLine": "The year on one line",
+    "invoices": "Invoices",
+    "paymentHistory": "Payment History",
+    "categoryBreakdown": "By Category",
+    "noPayments": "No payments recorded yet.",
+    "allFeesCurrent": "All fees are current",
+    "daysUntilDue": "{{count}} days",
+    "receipt": "Receipt"
+  },
+
+  "home": {
+    "greeting": "Hi, {{name}}.",
+    "todayFor": "Today for {{name}}",
+    "thisWeekAssignments": "This Week's Assignments",
+    "viewAll": "View all",
+    "noAssignmentsThisWeek": "No assignments this week."
+  },
+
+  "empty": {
+    "noData": "Nothing to show here yet.",
+    "selectChild": "Select a child to view their information.",
+    "errorRetry": "Something went wrong. Please try again.",
+    "retry": "Retry"
+  }
+}
