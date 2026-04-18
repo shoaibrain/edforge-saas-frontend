@@ -85,6 +85,11 @@ const PeopleModule = React.lazy(async () => {
   if (!module) throw new Error('Failed to load People remote')
   return module
 })
+const AnalyticsModule = React.lazy(async () => {
+  const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
+  if (!module) throw new Error('Failed to load Analytics remote')
+  return module
+})
 
 // ============================================================================
 // THEME SYNC COMPONENT
@@ -565,6 +570,16 @@ const peopleRoute = createRoute({
   ),
 })
 
+const analyticsRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/analytics/$',
+  component: () => (
+    <Suspense fallback={<LoadingScreen />}>
+      <AnalyticsModule />
+    </Suspense>
+  ),
+})
+
 
 // ============================================================================
 // PORTAL ERROR COMPONENT
@@ -757,6 +772,7 @@ const routeTree = rootRoute.addChildren([
     academicsRoute,
     financeRoute,
     peopleRoute,
+    analyticsRoute,
     paymentCallbackRoute,
     paymentReceiptRoute,
     studentPortalRoute.addChildren([

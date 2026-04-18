@@ -14,7 +14,7 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "==> Running turbo build (MVP modules only)..."
 cd "$REPO_ROOT"
-pnpm turbo build --filter=@edforge/shell --filter=@edforge/academics --filter=@edforge/people --filter=@edforge/finance --filter='./packages/*' --filter='./types/packages/*'
+pnpm turbo build --filter=@edforge/shell --filter=@edforge/academics --filter=@edforge/people --filter=@edforge/finance --filter=@edforge/analytics --filter='./packages/*' --filter='./types/packages/*'
 
 # Shell dist → output root (owns index.html and SPA routing)
 echo "==> Copying shell..."
@@ -23,9 +23,9 @@ cp -r "$REPO_ROOT/apps/shell/dist/"* "$OUTPUT_DIR/"
 # Each remote dist → output/remotes/{name}/
 # Remote assets use publicPath: 'auto', which resolves chunks relative
 # to the directory where remoteEntry.js was loaded from.
-REMOTES=(academics people finance)
+REMOTES=(academics people finance analytics)
 # [MVP-PARKED] Parked modules excluded from deployment
-# REMOTES_PARKED=(edfi special-programs messages analytics)
+# REMOTES_PARKED=(edfi special-programs messages)
 # [/MVP-PARKED]
 for remote in "${REMOTES[@]}"; do
   echo "==> Copying remote: $remote"
@@ -44,7 +44,7 @@ for remote in "${REMOTES[@]}"; do
 done
 
 # Verify no parked modules leaked into output
-PARKED_REMOTES=(edfi special-programs messages analytics)
+PARKED_REMOTES=(edfi special-programs messages)
 for parked in "${PARKED_REMOTES[@]}"; do
   if [ -d "$OUTPUT_DIR/remotes/$parked" ]; then
     echo "  FATAL: Parked module leaked into output: $parked"
