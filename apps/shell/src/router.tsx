@@ -32,12 +32,13 @@ import { useOnboardingRequired } from './hooks/useOnboardingRequired'
 // Landing Pages (public)
 import { PublicLayout } from './components/landing/PublicLayout'
 import { PublicErrorBoundary } from './components/landing/PublicErrorBoundary'
-import LandingPage from './components/landing/pages/LandingPage'
 import AboutPage from './components/landing/pages/AboutPage'
 import ContactPage from './components/landing/pages/ContactPage'
 import PrivacyPage from './components/landing/pages/PrivacyPage'
 import TermsPage from './components/landing/pages/TermsPage'
 import SecurityLandingPage from './components/landing/pages/SecurityPage'
+import AccessibilityPage from './components/landing/pages/AccessibilityPage'
+import { LandingPreviewPage, LandingPageV2 } from './components/landing-v2'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
@@ -272,9 +273,9 @@ function IndexPage() {
     return <OAuthCallbackHandler />
   }
 
-  // Show landing page for unauthenticated users
+  // Unauthenticated visitors land on the V2 marketing page.
   if (!isLoading && !isAuthenticatedState) {
-    return <LandingPage />
+    return <LandingPageV2 />
   }
 
   return <LoadingScreen message="Loading..." />
@@ -327,11 +328,31 @@ const securityLandingRoute = createRoute({
   component: SecurityLandingPage,
 })
 
+// /legal/accessibility — stub linked from the landing-v2 footer.
+// Real copy is a marketing/legal follow-up; the stub exists so the footer
+// link resolves without a 404.
+const legalAccessibilityRoute = createRoute({
+  getParentRoute: () => publicRoute,
+  path: '/legal/accessibility',
+  component: AccessibilityPage,
+})
+
 // Keep the /auth/callback route as a fallback
 const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/callback',
   component: OAuthCallbackHandler,
+})
+
+// ============================================================================
+// LANDING V2 PREVIEW ROUTE — always-on developer preview, unauthenticated.
+// Build-out scratch surface; not linked from product UI.
+// ============================================================================
+
+const landingV2PreviewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/_landing-preview',
+  component: LandingPreviewPage,
 })
 
 // ============================================================================
@@ -743,6 +764,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   authCallbackRoute,
+  landingV2PreviewRoute,
   onboardingRoute,
   publicRoute.addChildren([
     aboutRoute,
@@ -750,6 +772,7 @@ const routeTree = rootRoute.addChildren([
     privacyRoute,
     termsRoute,
     securityLandingRoute,
+    legalAccessibilityRoute,
   ]),
   protectedRoute.addChildren([
     homeRoute,

@@ -14,7 +14,7 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "==> Running turbo build (MVP modules only)..."
 cd "$REPO_ROOT"
-pnpm turbo build --filter=@edforge/shell --filter=@edforge/academics --filter=@edforge/people --filter=@edforge/finance --filter=@edforge/analytics --filter='./packages/*' --filter='./types/packages/*'
+pnpm turbo build --concurrency=1 --filter=@edforge/shell --filter=@edforge/academics --filter=@edforge/people --filter=@edforge/finance --filter=@edforge/analytics --filter='./packages/*' --filter='./types/packages/*'
 
 # Shell dist → output root (owns index.html and SPA routing)
 echo "==> Copying shell..."

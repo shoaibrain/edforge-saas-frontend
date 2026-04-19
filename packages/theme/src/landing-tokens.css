@@ -1,0 +1,262 @@
+/**
+ * Landing V2 design tokens — scoped to [data-surface="landing"] only.
+ *
+ * Palette: "Breeze" (coolors.co/palette/e63946-f1faee-a8dadc-457b9d-1d3557).
+ *   E63946 crimson  → primary
+ *   F1FAEE cream    → background
+ *   A8DADC aqua     → soft accents / tag backgrounds
+ *   457B9D steel    → blue / teal secondary accent
+ *   1D3557 navy     → ink / dark accents
+ *
+ * Scoped at the document-element level (`html[data-surface="landing"]`) so
+ * that portaled UI (Modal, Drawer, Dropdown mounted to document.body)
+ * inherits these tokens when the landing surface is active. The authed
+ * portal does NOT set data-surface="landing"; its base.css tokens are
+ * unaffected.
+ *
+ * Green / violet slots collapse to tints of the steel + navy to stay
+ * palette-true. If distinct accent hues are ever needed, add them
+ * deliberately in a follow-up and update the ADR.
+ */
+
+html[data-surface="landing"] {
+  /* Surfaces — Breeze cream + snow variants */
+  --lp-bg: #F1FAEE;
+  --lp-bg-warm: #E6F1E2;
+  --lp-bg-elevated: #FFFFFF;
+
+  /* Ink stack — derived from Breeze navy 1D3557 */
+  --lp-ink: #1D3557;
+  --lp-ink-2: #2A4169;
+  --lp-ink-3: #42567E;
+  --lp-ink-muted: #6B7A93;
+  --lp-ink-hint: #9AA4B8;
+
+  /* Borders — cream-tinted neutrals */
+  --lp-border: #DCE8D5;
+  --lp-border-strong: #C6D6BE;
+
+  /* Primary — Breeze crimson E63946 */
+  --lp-primary: #E63946;
+  --lp-primary-hover: #C82B38;
+  --lp-primary-ink: #7A1C26;
+  --lp-primary-soft: #FBE3E5;
+
+  /* Teal (secondary accent) — maps to Breeze steel with aqua as soft */
+  --lp-teal: #457B9D;
+  --lp-teal-ink: #1D3557;
+  --lp-teal-soft: #A8DADC;
+
+  /* Green — Breeze has no green; collapse to steel + aqua (soft) */
+  --lp-green: #457B9D;
+  --lp-green-ink: #1D3557;
+  --lp-green-soft: #C9E4E2;
+
+  /* Blue — Breeze steel */
+  --lp-blue: #457B9D;
+  --lp-blue-ink: #1D3557;
+  --lp-blue-soft: #CDDDE8;
+
+  /* Violet — collapse to navy with a cool tint for soft */
+  --lp-violet: #1D3557;
+  --lp-violet-soft: #D4DBE5;
+
+  /* Danger — keep a distinct warning red slightly off the primary crimson */
+  --lp-danger: #B22234;
+
+  /* Shadows */
+  --lp-shadow-sm: 0 1px 2px rgba(29, 53, 87, 0.06);
+  --lp-shadow-md: 0 4px 14px rgba(29, 53, 87, 0.08), 0 1px 2px rgba(29, 53, 87, 0.05);
+  --lp-shadow-lg: 0 18px 40px -12px rgba(29, 53, 87, 0.18), 0 4px 10px rgba(29, 53, 87, 0.06);
+
+  /* Radii */
+  --lp-radius-sm: 8px;
+  --lp-radius: 12px;
+  --lp-radius-lg: 18px;
+  --lp-radius-xl: 24px;
+  --lp-radius-pill: 999px;
+
+  /* Default body colors on landing surface */
+  background: var(--lp-bg);
+  color: var(--lp-ink-2);
+}
+
+html[data-surface="landing"] body {
+  background: var(--lp-bg);
+  color: var(--lp-ink-2);
+}
+
+/* Landing-only typography utilities */
+html[data-surface="landing"] .lp-serif {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+html[data-surface="landing"] .lp-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Focus ring scoped to landing surface */
+html[data-surface="landing"] :focus-visible {
+  outline: 2px solid var(--lp-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Skip link — hidden until focused */
+html[data-surface="landing"] .lp-skip-link {
+  position: absolute;
+  left: 8px;
+  top: -40px;
+  z-index: 1000;
+  padding: 8px 16px;
+  background: var(--lp-ink);
+  color: #fff;
+  border-radius: var(--lp-radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  transition: top 0.15s;
+}
+
+html[data-surface="landing"] .lp-skip-link:focus {
+  top: 8px;
+}
+
+/* Footer grid — 5 cols ≥720px, stacked below */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (max-width: 480px) {
+  html[data-surface="landing"] .lp-footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Platform pillars bento grid — 12 cols ≥720px, single column below */
+html[data-surface="landing"] .lp-pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-pillar-grid {
+    grid-template-columns: 1fr;
+  }
+  html[data-surface="landing"] .lp-pillar-grid .lp-pillar-card {
+    grid-column: span 1 !important;
+    min-height: 320px;
+  }
+}
+
+/* Section padding — mirrors design's .section / .section-sm */
+html[data-surface="landing"] .lp-section {
+  padding: 112px 0;
+}
+html[data-surface="landing"] .lp-section-sm {
+  padding: 72px 0;
+}
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-section {
+    padding: 72px 0;
+  }
+  html[data-surface="landing"] .lp-section-sm {
+    padding: 48px 0;
+  }
+}
+
+/* Section headings — mirrors design's .h-display / .h-section / .h-card */
+html[data-surface="landing"] .lp-h-display {
+  font-size: clamp(40px, 5.2vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  color: var(--lp-ink);
+  text-wrap: balance;
+}
+html[data-surface="landing"] .lp-h-section {
+  font-size: clamp(34px, 3.6vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--lp-ink);
+  text-wrap: balance;
+}
+html[data-surface="landing"] .lp-h-card {
+  font-size: 19px;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  font-weight: 600;
+  color: var(--lp-ink);
+}
+html[data-surface="landing"] .lp-lede {
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--lp-ink-3);
+  max-width: 640px;
+  text-wrap: pretty;
+}
+
+/* Container — max-width wrapper, horizontal padding shrinks at ≤720px */
+html[data-surface="landing"] .lp-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+html[data-surface="landing"] .lp-container--wide {
+  max-width: 1360px;
+}
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-container,
+  html[data-surface="landing"] .lp-container--wide {
+    padding: 0 20px;
+  }
+}
+
+/* LandingButton variant styles — consumed by components/landing-v2/components/LandingButton.tsx */
+html[data-surface="landing"] .lp-btn {
+  border: 0;
+  cursor: pointer;
+}
+
+html[data-surface="landing"] .lp-btn--primary {
+  background: var(--lp-primary);
+  color: #fff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 6px 14px -4px rgba(230, 57, 70, 0.45);
+}
+html[data-surface="landing"] .lp-btn--primary:hover {
+  background: var(--lp-primary-hover);
+  transform: translateY(-1px);
+}
+
+html[data-surface="landing"] .lp-btn--ghost {
+  background: transparent;
+  color: var(--lp-ink-2);
+  border: 1px solid var(--lp-border-strong);
+}
+html[data-surface="landing"] .lp-btn--ghost:hover {
+  background: var(--lp-bg-elevated);
+  border-color: var(--lp-ink-hint);
+}
+
+html[data-surface="landing"] .lp-btn--dark {
+  background: var(--lp-ink);
+  color: #fff;
+}
+html[data-surface="landing"] .lp-btn--dark:hover {
+  background: #000;
+}
+
+html[data-surface="landing"] .lp-btn--light {
+  background: var(--lp-bg-elevated);
+  color: var(--lp-ink);
+  box-shadow: var(--lp-shadow-sm);
+}
+html[data-surface="landing"] .lp-btn--light:hover {
+  background: var(--lp-bg-warm);
+}
