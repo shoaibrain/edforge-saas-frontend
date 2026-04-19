@@ -1,0 +1,21 @@
+firstName,lastName,birthDate,gender,gradeLevel,guardianName,guardianPhone,guardianEmail
+David,Miller,2014-06-05,male,6,Ava Miller,555-2259,ava.miller@example.com
+Michael,Martinez,2010-02-17,other,7,Michael Martinez,555-3921,michael.martinez@example.com
+James,Johnson,2010-09-19,male,6,Emma Johnson,555-9299,emma.johnson@example.com
+Ava,Martinez,2012-05-18,female,8,Emily Martinez,555-7057,emily.martinez@example.com
+Ava,Garcia,2017-11-25,female,11,Olivia Garcia,555-9912,olivia.garcia@example.com
+Olivia,Brown,2018-02-12,male,6,Michael Brown,555-8280,michael.brown@example.com
+Sarah,Brown,2014-10-24,female,2,Michael Brown,555-3487,michael.brown@example.com
+Emma,Brown,2015-01-20,male,2,William Brown,555-2312,william.brown@example.com
+Olivia,Brown,2019-01-23,other,10,Olivia Brown,555-6664,olivia.brown@example.com
+Olivia,Williams,2010-10-26,male,7,Ava Williams,555-5406,ava.williams@example.com
+David,Davis,2017-05-14,female,6,Ava Davis,555-8216,ava.davis@example.com
+Olivia,Smith,2019-06-06,other,6,Michael Smith,555-1088,michael.smith@example.com
+Emma,Johnson,2013-03-26,male,5,Emily Johnson,555-8631,emily.johnson@example.com
+William,Martinez,2019-12-22,female,3,Ava Martinez,555-1245,ava.martinez@example.com
+Sarah,Garcia,2010-06-07,other,12,William Garcia,555-4387,william.garcia@example.com
+Emily,Johnson,2018-12-30,male,10,David Johnson,555-9910,david.johnson@example.com
+James,Martinez,2010-09-11,other,3,James Martinez,555-6793,james.martinez@example.com
+Olivia,Smith,2012-10-12,other,9,James Smith,555-7043,james.smith@example.com
+Ava,Davis,2011-01-16,female,1,Emily Davis,555-9809,emily.davis@example.com
+Benjamin,Martinez,2017-06-09,other,7,Ava Martinez,555-2079,ava.martinez@example.com

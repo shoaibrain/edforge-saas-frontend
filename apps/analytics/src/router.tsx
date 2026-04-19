@@ -13,6 +13,7 @@ import {
 } from '@tanstack/react-router'
 import { AnalyticsLayout } from './layouts/AnalyticsLayout'
 import { Overview } from './routes/overview'
+import { Dashboard } from './routes/dashboard'
 import { ComparisonsModule } from './routes/comparisons'
 import { CustomReportsModule } from './routes/custom'
 
@@ -33,6 +34,13 @@ const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
     component: Overview,
+})
+
+// Adoption dashboard (A-WS3 surfaces)
+const dashboardRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/dashboard',
+    component: Dashboard,
 })
 
 const enrollmentRoute = createRoute({
@@ -88,6 +96,7 @@ const dashboardsRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
     indexRoute,
+    dashboardRoute,
     enrollmentRoute,
     attendanceRoute,
     performanceRoute,

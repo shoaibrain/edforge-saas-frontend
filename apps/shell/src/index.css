@@ -9,6 +9,9 @@
 @import './styles/home-v2-tokens.css';
 @import './styles/home-v2-animations.css';
 
+/* Landing V2 tokens are imported from @edforge/theme (packages/theme/src/index.css).
+   They are scoped to html[data-surface="landing"] so they're inert unless LandingRoot mounts. */
+
 /* Shell-specific utilities */
 
 /* Semantic color classes using CSS variables */

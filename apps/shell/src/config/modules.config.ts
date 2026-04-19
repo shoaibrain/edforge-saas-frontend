@@ -5,6 +5,7 @@ export const MODULE_AVAILABILITY = {
   academics: true,
   people: true,
   finance: true,
+  analytics: true,
 } as const
 
 export type ModuleId = keyof typeof MODULE_AVAILABILITY

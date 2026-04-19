@@ -5,7 +5,11 @@ Allow: /contact
 Allow: /privacy
 Allow: /terms
 Allow: /security
+Allow: /legal/accessibility
 Disallow: /login
 Disallow: /portal
+Disallow: /_landing-preview
+Disallow: /home
+Disallow: /settings
 
 Sitemap: https://www.edforge.app/sitemap.xml

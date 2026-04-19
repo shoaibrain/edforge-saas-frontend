@@ -25,3 +25,6 @@ export * from './finance-utils'
 // Academics utilities (attendance color, grade sorting/formatting)
 export * from './academics-utils'
 
+// Analytics API contract (re-export from @aibrains/shared-types/schemas/analytics)
+export * from './analytics'
+

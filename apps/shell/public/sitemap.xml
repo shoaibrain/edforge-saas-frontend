@@ -6,4 +6,5 @@
   <url><loc>https://www.edforge.app/privacy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://www.edforge.app/terms</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://www.edforge.app/security</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.edforge.app/legal/accessibility</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

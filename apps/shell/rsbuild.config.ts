@@ -110,6 +110,7 @@ export default defineConfig({
             academics:          remoteUrl('academics', 'academics', 3002),
             people:             remoteUrl('people', 'people', 3006),
             finance:            remoteUrl('finance', 'finance', 3003),
+            analytics:          remoteUrl('analytics', 'analytics', 3008),
           },
           shared: getMFSharedConfig('host'),
         }),
