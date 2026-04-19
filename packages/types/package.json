@@ -29,6 +29,10 @@
     "./format-currency": {
       "types": "./dist/format-currency.d.ts",
       "import": "./dist/format-currency.js"
+    },
+    "./analytics": {
+      "types": "./dist/analytics.d.ts",
+      "import": "./dist/analytics.js"
     }
   },
   "files": [
@@ -41,7 +45,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aibrains/shared-types": "^0.23.1",
+    "@aibrains/shared-types": "^0.24.0",
     "@edforge/config": "workspace:*"
   },
   "peerDependencies": {

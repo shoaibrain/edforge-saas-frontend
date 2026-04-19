@@ -50,6 +50,8 @@ export {
   TableCell,
 } from './components/Table'
 export { Dropdown, type DropdownOption } from './components/Dropdown'
+export { Tag, tagVariants, type TagProps } from './components/Tag'
+export { Accordion, type AccordionItem, type AccordionProps } from './components/Accordion'
 
 // TanStack Data Table
 export {

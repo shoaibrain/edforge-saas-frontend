@@ -34,6 +34,7 @@ import {
   Baby,
   Building2,
   Bug,
+  BarChart3,
 } from 'lucide-react'
 import type { Action, Resource } from '@edforge/abac'
 import type { GlobalRole, RoleCategory, SchoolRole } from '@edforge/types'
@@ -92,6 +93,7 @@ export type SidebarModule =
   | 'academics'
   | 'finance'
   | 'people'
+  | 'analytics'
   | 'parent-portal'
   | 'student-portal'
 
@@ -128,6 +130,13 @@ const homeModule: ModuleConfig = {
           icon: DollarSign,
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
+        },
+        {
+          id: 'analytics',
+          label: 'Analytics',
+          icon: BarChart3,
+          href: '/analytics/dashboard',
+          permission: { action: 'view', resource: 'analytics' },
         },
         {
           id: 'settings',
@@ -481,6 +490,38 @@ const peopleModule: ModuleConfig = {
 }
 
 // ============================================================================
+// ANALYTICS MODULE - Tenant adoption insights, dashboards, exports
+// ============================================================================
+
+const analyticsModule: ModuleConfig = {
+  id: 'analytics',
+  title: 'Analytics',
+  icon: BarChart3,
+  backTo: { path: '/home', label: 'Back to Home' },
+  groups: [
+    {
+      id: 'main',
+      items: [
+        {
+          id: 'analytics-overview',
+          label: 'Overview',
+          icon: GalleryVerticalEnd,
+          href: '/analytics',
+          permission: { action: 'view', resource: 'analytics' },
+        },
+        {
+          id: 'analytics-dashboard',
+          label: 'Adoption Dashboard',
+          icon: BarChart3,
+          href: '/analytics/dashboard',
+          permission: { action: 'view', resource: 'analytics' },
+        },
+      ],
+    },
+  ],
+}
+
+// ============================================================================
 // STUDENT PORTAL MODULE - For navigating from sub-pages back to student home
 // ============================================================================
 
@@ -585,6 +626,7 @@ export const SIDEBAR_MODULES: Record<SidebarModule, ModuleConfig> = {
   academics: academicsModule,
   finance: financeModule,
   people: peopleModule,
+  analytics: analyticsModule,
   'student-portal': studentPortalModule,
   'parent-portal': parentPortalModule,
 }
@@ -648,6 +690,7 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
   if (pathname.startsWith('/academics')) return 'academics'
   if (pathname.startsWith('/finance')) return 'finance'
   if (pathname.startsWith('/people')) return 'people'
+  if (pathname.startsWith('/analytics')) return 'analytics'
   if (pathname.startsWith('/student-portal')) return 'student-portal'
   if (pathname.startsWith('/parent-portal')) return 'parent-portal'
   return 'home'
