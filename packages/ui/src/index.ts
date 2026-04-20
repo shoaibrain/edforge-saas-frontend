@@ -40,6 +40,7 @@ export {
   SkeletonModuleOverview,
 } from './components/Skeleton'
 export { Tooltip } from './components/Tooltip'
+export { FieldLockTooltip, type FieldLockTooltipProps } from './components/FieldLockTooltip'
 export {
   Table,
   TableHeader,

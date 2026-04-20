@@ -18,16 +18,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Globe,
   Shield,
+  ShieldCheck,
   Lock,
+  Info,
   AlertTriangle,
   Building2,
   RefreshCw,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, FieldLockTooltip } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
+import { useTenant } from '@/lib/shell-context'
 
 // Local type matching backend WorkspaceSettingsResponseDto
 interface WorkspaceSettings {
@@ -176,17 +179,84 @@ const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'tenantId'> = {
 }
 
 // ============================================================================
-// LOCK INDICATOR
+// TENANT INFO CARD — read-only identity fields (archetype, country, tier, created)
 // ============================================================================
 
-function LockIndicator({ reason }: { reason?: string }) {
+interface TenantInfoCardProps {
+  tenantName: string | null
+  archetype: string | null
+  country: string | null
+  tier: string | null
+  createdAt: string | null
+}
+
+function TenantInfoField({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-golden-500/10 border border-golden-500/20">
-      <Lock className="w-4 h-4 text-golden-600" />
-      <span className="text-sm text-golden-700 dark:text-golden-400">
-        {reason || 'Settings locked during active academic year'}
+    <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-tertiary))] last:border-b-0">
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide">
+          {label}
+        </span>
+        <FieldLockTooltip />
+      </div>
+      <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+        {value}
       </span>
     </div>
+  )
+}
+
+function TenantInfoCard({
+  tenantName,
+  archetype,
+  country,
+  tier,
+  createdAt,
+}: TenantInfoCardProps) {
+  const createdAtDisplay = createdAt
+    ? new Date(createdAt).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : null
+
+  return (
+    <motion.div variants={fadeInUp}>
+      <div
+        data-testid="tenant-info-card"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4"
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+            <Building2 className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+              Tenant Info
+            </h2>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+              Read-only. These fields are set at provisioning and cannot be changed.
+            </p>
+          </div>
+        </div>
+        <div className="space-y-0">
+          {tenantName && <TenantInfoField label="Name" value={tenantName} />}
+          {archetype && <TenantInfoField label="Archetype" value={archetype} />}
+          {country && <TenantInfoField label="Country" value={country} />}
+          {tier && <TenantInfoField label="Tier" value={tier} />}
+          {createdAtDisplay && (
+            <TenantInfoField label="Created" value={createdAtDisplay} />
+          )}
+        </div>
+      </div>
+    </motion.div>
   )
 }
 
@@ -221,6 +291,7 @@ export default function WorkspaceSettingsPage() {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const queryClient = useQueryClient()
+  const { tenantName, archetype, country, tenantTier, createdAt } = useTenant()
 
   // Local form state + dirty tracking
   const [formState, setFormState] = useState<WorkspaceSettings | null>(null)
@@ -380,12 +451,18 @@ export default function WorkspaceSettingsPage() {
           icon={Building2}
         />
 
-        {/* Lock Warning */}
-        {isLocked && (
-          <motion.div variants={fadeInUp}>
-            <LockIndicator reason={displaySettings.lockReason} />
-          </motion.div>
-        )}
+        {/* Tenant Info Card — read-only identity fields (immutable at provisioning) */}
+        <TenantInfoCard
+          tenantName={tenantName}
+          archetype={archetype}
+          country={country}
+          tier={tenantTier}
+          createdAt={createdAt}
+        />
+
+        {/* Note: lock status is now surfaced inside Regional Settings (section-scoped),
+            because Regional is the only subtree that actually locks — Tenant Info is
+            permanently locked, and Branding/Policies are always editable. */}
 
         {/* Regional Settings */}
         <SettingsSection
@@ -393,6 +470,35 @@ export default function WorkspaceSettingsPage() {
           icon={Globe}
           description="Default timezone, language, and date/time formatting"
         >
+          {/* Forewarning: these fields lock conditionally. Shown in both states so users
+              know what to expect before activating an academic year. */}
+          <div
+            className={`flex items-start gap-2.5 px-3 py-2.5 rounded-lg mb-2 border text-xs ${
+              isLocked
+                ? 'bg-golden-500/5 border-golden-500/20 text-golden-700 dark:text-golden-400'
+                : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-tertiary))] text-[rgb(var(--text-tertiary))]'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              {isLocked ? (
+                <>
+                  <strong className="font-semibold">Locked.</strong>{' '}
+                  {displaySettings.lockReason ||
+                    'Regional settings cannot be edited while an academic year is active.'}{' '}
+                  Complete or deactivate the active year to resume editing.
+                </>
+              ) : (
+                <>
+                  <strong className="font-semibold">Heads up —</strong> these settings
+                  become read-only when an academic year is active, to preserve
+                  consistency across reports, invoices, and audit trails. Plan any
+                  changes before activating a year.
+                </>
+              )}
+            </p>
+          </div>
+
           <SettingsFieldRow label="Default Timezone" description="Organization's primary timezone for scheduling and timestamps" inline>
             <select
               value={displaySettings.regional.defaultTimezone}
@@ -531,15 +637,49 @@ export default function WorkspaceSettingsPage() {
 
         {/* COMING SOON — Attendance Defaults section (re-enable when attendance policy config ships) */}
 
-        {/* Info Note */}
-        <motion.div variants={fadeInUp}>
+        {/* Lock taxonomy + permissions hint — replaces the older single "Important" note */}
+        <motion.div variants={fadeInUp} className="space-y-3">
           <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
-            <AlertTriangle className="w-5 h-5 text-golden-600 flex-shrink-0 mt-0.5" />
+            <Info className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-1.5">
+                How locking works
+              </p>
+              <ul className="space-y-1 text-sm text-[rgb(var(--text-secondary))]">
+                <li>
+                  <strong className="font-medium text-[rgb(var(--text-primary))]">
+                    Tenant Info
+                  </strong>{' '}
+                  fields above are permanently locked — set once at provisioning.
+                </li>
+                <li>
+                  <strong className="font-medium text-[rgb(var(--text-primary))]">
+                    Regional Settings
+                  </strong>{' '}
+                  lock automatically when any academic year is active. Deactivate the year to edit.
+                </li>
+                <li>
+                  <strong className="font-medium text-[rgb(var(--text-primary))]">
+                    Branding &amp; Policies
+                  </strong>{' '}
+                  (coming soon) remain editable at any time, independent of academic-year state.
+                </li>
+              </ul>
+              <p className="text-xs text-[rgb(var(--text-tertiary))] mt-2">
+                Schools can override these defaults in their individual School Configuration.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+            <ShieldCheck className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-1.5">
+                Permissions
+              </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                <strong>Important:</strong> These settings define organization-wide defaults.
-                Individual schools can override these settings in their School Configuration.
-                Some settings become locked when an academic year is active.
+                Only users with the <strong className="font-medium text-[rgb(var(--text-primary))]">Tenant Admin</strong> role can modify these
+                settings. Every change is audit-logged with your user ID and a timestamp.
               </p>
             </div>
           </div>

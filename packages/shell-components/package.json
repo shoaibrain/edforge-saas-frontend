@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@edforge/types": "workspace:*",
     "@edforge/ui": "workspace:*",
     "@tanstack/react-router": "^1.82.0",
     "@react-spring/web": "^10.0.3",
