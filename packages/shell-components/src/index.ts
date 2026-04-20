@@ -6,9 +6,11 @@
  */
 
 export { ModuleOverviewPage } from './ModuleOverviewPage'
-export type { 
-    ModuleOverviewPageProps, 
-    ModuleStat, 
-    ModuleActionCard 
+export type {
+    ModuleOverviewPageProps,
+    ModuleStat,
+    ModuleActionCard
 } from './ModuleOverviewPage'
+
+export { TenantBadge, type TenantBadgeProps } from './TenantBadge'
 
