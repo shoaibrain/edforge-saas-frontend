@@ -4,12 +4,32 @@
  */
 
 /**
+ * Tenant archetype — umbrella operational pattern that drives regional + policy defaults.
+ * Write-once at provisioning (immutable per backend field-governance).
+ * V1 runtime-valid: 'PABSON' | 'GENERIC'. The rest are reserved for future archetypes.
+ */
+export type TenantArchetype =
+  | 'PABSON'
+  | 'GENERIC'
+  | 'CBSE_IN'
+  | 'NAIS_US'
+  | 'GEMS_UAE'
+
+/**
  * Represents a tenant (district/organization) in the multi-tenant system
  */
 export interface Tenant {
   id: string
   name: string
   subdomain: string
+  /** Archetype — immutable, set at provisioning. May be absent on legacy tenants. */
+  archetype?: TenantArchetype
+  /** ISO-3166 alpha-3 country code (e.g. NPL, USA). Immutable, set at provisioning. */
+  country?: string
+  /** Tier — BASIC | ADVANCED | PREMIUM. */
+  tier?: string
+  /** Provisioning timestamp (ISO-8601). */
+  createdAt?: string
   /** List of school IDs belonging to this tenant */
   schools: string[]
   /** Active school year for this tenant */
