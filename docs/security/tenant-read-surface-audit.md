@@ -46,12 +46,23 @@ and consumed via `shell-context.tsx` + page components.
 
 Sprint A adds **zero new endpoints** and **zero new guards**. The change is purely
 display-layer: `archetype` + `country` fields — already returned by the existing
-`GET /tenants/:tenantId` response since commit `ca8e254` — are now rendered in
-the shell header and workspace-settings page.
+`GET /tenants/:tenantId` response since commit `ca8e254` — are now rendered on
+the Workspace Settings page.
 
 - `GET /tenants/:tenantId` is already behind `JwtAuthGuard` (any authenticated user may read their own tenant).
 - Displaying archetype/country does not leak information: these are tenant-level identity attributes already visible to any authenticated session of that tenant.
 - Cross-tenant reads remain blocked at the DDB ABAC policy layer.
+
+### Design revision — header mount reverted
+
+The sprint plan (MIDNIGHT_LOCKIN_POST_SHIP_PLAN §3, task A.3) prescribed mounting
+the `<TenantBadge />` in the global shell header. After live review this was
+walked back: a persistent header pill is visual noise because tenant identity is
+only actionable on the Workspace Settings page. The `<TenantBadge />` component
+still ships as a primitive in `@edforge/shell-components` for future contextual
+uses (e.g. tenant-scoped breadcrumbs, admin views) but is not mounted globally.
+Tenant identity now surfaces only through the `<TenantInfoCard />` on
+`apps/shell/src/pages/settings/workspace.tsx`.
 
 ## Frontend-side permission layer (ABAC package)
 

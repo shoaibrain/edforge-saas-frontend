@@ -12,11 +12,9 @@ import { useThemeStore } from '../../stores/theme.store'
 import { useHomeStore } from '../../stores/home.store'
 import { useAppStore } from '../../stores/app.store'
 import { Avatar } from '@edforge/ui'
-import { TenantBadge } from '@edforge/shell-components'
 import { useTranslation } from '@edforge/i18n'
 import { getGreeting } from '../../lib/greeting'
 import { adToBS, formatBSLong } from '@edforge/date-utils'
-import { useTenant } from '../../lib/shell-context'
 import { cn } from '../../lib/utils'
 
 import { Breadcrumbs } from './Breadcrumbs'
@@ -332,7 +330,6 @@ function UserMenu() {
 export function Header() {
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
-  const { tenantName, archetype, country } = useTenant()
 
   return (
     <header
@@ -364,13 +361,8 @@ export function Header() {
         {isHomeV2 ? <HomeTopbarCenter /> : <Breadcrumbs />}
       </div>
 
-      {/* RIGHT ZONE: Tenant badge + Theme pill + User avatar */}
-      <div className="flex items-center gap-2 flex-shrink-0 pr-4">
-        <TenantBadge
-          tenantName={tenantName}
-          archetype={archetype}
-          country={country}
-        />
+      {/* RIGHT ZONE: Theme pill + User avatar */}
+      <div className="flex items-center gap-[2px] flex-shrink-0 pr-4">
         <ThemePill />
         <UserMenu />
       </div>
