@@ -19,6 +19,7 @@
     "@edforge/finance-services": "workspace:*",
     "@edforge/forms": "workspace:*",
     "@edforge/i18n": "workspace:*",
+    "@edforge/shell-components": "workspace:*",
     "@edforge/theme": "workspace:*",
     "@edforge/types": "workspace:*",
     "@edforge/ui": "workspace:*",

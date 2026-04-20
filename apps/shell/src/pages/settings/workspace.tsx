@@ -23,11 +23,12 @@ import {
   Building2,
   RefreshCw,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, FieldLockTooltip } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
+import { useTenant } from '@/lib/shell-context'
 
 // Local type matching backend WorkspaceSettingsResponseDto
 interface WorkspaceSettings {
@@ -176,6 +177,88 @@ const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'tenantId'> = {
 }
 
 // ============================================================================
+// TENANT INFO CARD — read-only identity fields (archetype, country, tier, created)
+// ============================================================================
+
+interface TenantInfoCardProps {
+  tenantName: string | null
+  archetype: string | null
+  country: string | null
+  tier: string | null
+  createdAt: string | null
+}
+
+function TenantInfoField({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-tertiary))] last:border-b-0">
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide">
+          {label}
+        </span>
+        <FieldLockTooltip />
+      </div>
+      <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+        {value}
+      </span>
+    </div>
+  )
+}
+
+function TenantInfoCard({
+  tenantName,
+  archetype,
+  country,
+  tier,
+  createdAt,
+}: TenantInfoCardProps) {
+  const createdAtDisplay = createdAt
+    ? new Date(createdAt).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : null
+
+  return (
+    <motion.div variants={fadeInUp}>
+      <div
+        data-testid="tenant-info-card"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4"
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+            <Building2 className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+              Tenant Info
+            </h2>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+              Read-only. These fields are set at provisioning and cannot be changed.
+            </p>
+          </div>
+        </div>
+        <div className="space-y-0">
+          {tenantName && <TenantInfoField label="Name" value={tenantName} />}
+          {archetype && <TenantInfoField label="Archetype" value={archetype} />}
+          {country && <TenantInfoField label="Country" value={country} />}
+          {tier && <TenantInfoField label="Tier" value={tier} />}
+          {createdAtDisplay && (
+            <TenantInfoField label="Created" value={createdAtDisplay} />
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ============================================================================
 // LOCK INDICATOR
 // ============================================================================
 
@@ -221,6 +304,7 @@ export default function WorkspaceSettingsPage() {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const queryClient = useQueryClient()
+  const { tenantName, archetype, country, tenantTier, createdAt } = useTenant()
 
   // Local form state + dirty tracking
   const [formState, setFormState] = useState<WorkspaceSettings | null>(null)
@@ -378,6 +462,15 @@ export default function WorkspaceSettingsPage() {
           title="Workspace Settings"
           description="Organization-wide configuration that applies to all schools"
           icon={Building2}
+        />
+
+        {/* Tenant Info Card — read-only identity fields (immutable at provisioning) */}
+        <TenantInfoCard
+          tenantName={tenantName}
+          archetype={archetype}
+          country={country}
+          tier={tenantTier}
+          createdAt={createdAt}
         />
 
         {/* Lock Warning */}

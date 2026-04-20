@@ -451,7 +451,15 @@ export function useShell(): ShellContextValue {
 
 export function useTenant() {
   const { tenant, tenantId, tenantName, tenantTier } = useShell()
-  return { tenant, tenantId, tenantName, tenantTier }
+  return {
+    tenant,
+    tenantId,
+    tenantName,
+    tenantTier,
+    archetype: tenant?.archetype ?? null,
+    country: tenant?.country ?? null,
+    createdAt: tenant?.createdAt ?? null,
+  }
 }
 
 export function useActiveSchool() {
