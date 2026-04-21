@@ -139,6 +139,14 @@ export interface SchoolProfileDto {
   schoolId: string
   name: string
   schoolCode: string
+  /**
+   * Nepal IEMIS school code — the government-issued identifier used to
+   * gate the IEMIS bulk student import flow. Required for PABSON tenants
+   * at creation (enforced backend-side); optional on other archetypes.
+   * Presence here is the canonical "this school can receive IEMIS imports"
+   * signal used by the IemisImport page.
+   */
+  emisSchoolCode?: string
   schoolType: string
   gradeRange?: { start: string; end: string }
   status: string
