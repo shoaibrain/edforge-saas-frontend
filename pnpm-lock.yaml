@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  zod: ~3.24.4
+
 importers:
 
   .:
@@ -23,6 +26,9 @@ importers:
       react-i18next:
         specifier: ^16.5.4
         version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.9.3)
+      zod:
+        specifier: ~3.24.4
+        version: 3.24.4
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.1.18
@@ -67,8 +73,8 @@ importers:
   apps/academics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.23.1
-        version: 0.23.1(zod@3.25.76)
+        specifier: ^0.28.1
+        version: 0.28.1(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -127,8 +133,8 @@ importers:
         specifier: ^1.7.1
         version: 1.7.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -164,8 +170,8 @@ importers:
   apps/analytics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.24.0
-        version: 0.24.0(zod@3.25.76)
+        specifier: ^0.28.1
+        version: 0.28.1(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -217,6 +223,9 @@ importers:
       sonner:
         specifier: ^1.7.1
         version: 1.7.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      zod:
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -285,8 +294,8 @@ importers:
         specifier: ^7.54.0
         version: 7.73.1(react@19.2.5)
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -373,8 +382,8 @@ importers:
         specifier: ^1.7.0
         version: 1.7.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -443,8 +452,8 @@ importers:
         specifier: ^7.54.0
         version: 7.73.1(react@19.2.5)
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -480,8 +489,8 @@ importers:
   apps/people:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.23.1
-        version: 0.23.1(zod@3.25.76)
+        specifier: ^0.28.1
+        version: 0.28.1(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -543,8 +552,8 @@ importers:
         specifier: ^1.7.0
         version: 1.7.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -580,8 +589,8 @@ importers:
   apps/shell:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.23.1
-        version: 0.23.1(zod@3.25.76)
+        specifier: ^0.28.1
+        version: 0.28.1(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -684,6 +693,9 @@ importers:
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.5.0
+      zod:
+        specifier: ~3.24.4
+        version: 3.24.4
       zustand:
         specifier: ^5.0.0
         version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -932,8 +944,8 @@ importers:
         specifier: ^2.6.0
         version: 2.6.1
       zod:
-        specifier: ^3.24.4
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
     devDependencies:
       '@edforge/ui':
         specifier: workspace:*
@@ -1019,14 +1031,17 @@ importers:
   packages/types:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.24.0
-        version: 0.24.0(zod@3.25.76)
+        specifier: ^0.28.1
+        version: 0.28.1(zod@3.24.4)
       '@edforge/config':
         specifier: workspace:*
         version: link:../config
       react:
         specifier: '>=18'
         version: 19.2.5
+      zod:
+        specifier: ~3.24.4
+        version: 3.24.4
     devDependencies:
       '@types/react':
         specifier: ^18.0.0
@@ -1102,8 +1117,8 @@ importers:
         specifier: ^2.6.0
         version: 2.6.1
       zod:
-        specifier: ^3.24.4
-        version: 3.25.76
+        specifier: ~3.24.4
+        version: 3.24.4
     devDependencies:
       '@edforge/ui':
         specifier: workspace:*
@@ -1154,15 +1169,10 @@ packages:
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
 
-  '@aibrains/shared-types@0.23.1':
-    resolution: {integrity: sha512-an0/IS4ONgzdQJ6ZaI7J20hLs+DbtyzNVR+i2pgUJblky+HGLsgjuZ2jQbCFP0ciBP17yrNC3mAgDAt7+nPIeQ==}
+  '@aibrains/shared-types@0.28.1':
+    resolution: {integrity: sha512-1NaG/f54/AL1uV9LUoULGoK5leStAW6qhISKnXMd4xloEQi1JdobHD1q4G6t67aQkRnjF8E2keiKjN/+pUW6pQ==}
     peerDependencies:
-      zod: '>=3.22.0'
-
-  '@aibrains/shared-types@0.24.0':
-    resolution: {integrity: sha512-bXOvDTJNh6CC03cHfMGUs71FqOcrsgVPY1lhP4ydNKlozvVSJyTgX8tpDH0m423GaFvVA8IGHcTeBJUrtqNjIQ==}
-    peerDependencies:
-      zod: '>=3.22.0'
+      zod: ~3.24.4
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -5326,8 +5336,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+  zod@3.24.4:
+    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
 
   zustand@5.0.12:
     resolution: {integrity: sha512-i77ae3aZq4dhMlRhJVCYgMLKuSiZAaUPAct2AksxQ+gOtimhGMdXljRT21P5BNpeT4kXlLIckvkPM029OljD7g==}
@@ -5353,13 +5363,9 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@aibrains/shared-types@0.23.1(zod@3.25.76)':
+  '@aibrains/shared-types@0.28.1(zod@3.24.4)':
     dependencies:
-      zod: 3.25.76
-
-  '@aibrains/shared-types@0.24.0(zod@3.25.76)':
-    dependencies:
-      zod: 3.25.76
+      zod: 3.24.4
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -9940,7 +9946,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.76: {}
+  zod@3.24.4: {}
 
   zustand@5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)):
     optionalDependencies:
