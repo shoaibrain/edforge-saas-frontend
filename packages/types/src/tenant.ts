@@ -180,6 +180,20 @@ export interface WorkspaceSettings {
   /** Lock status - prevents changes when academic year is active */
   isLocked: boolean
   lockReason?: string
+  /**
+   * Which (school, active-academic-year) pairs are currently holding the
+   * workspace in a locked state. Populated by the backend when `isLocked`
+   * is `true`; empty/omitted otherwise. Multi-school tenants use this to
+   * tell the admin precisely which year on which school must close before
+   * data-integrity-critical regional fields unlock.
+   */
+  lockHolders?: Array<{
+    schoolId: string
+    schoolName: string
+    yearId: string
+    yearName: string
+    activatedAt?: string
+  }>
   /** Timestamp when admin confirmed workspace settings — null if never confirmed */
   workspaceConfirmedAt?: string
   /** Timestamp when admin completed the onboarding flow — null if never completed */
