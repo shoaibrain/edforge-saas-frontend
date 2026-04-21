@@ -15,10 +15,10 @@ import { WizardContainer } from '@edforge/wizard'
 import type { WizardStep } from '@edforge/wizard'
 import type { SchoolResponseDto } from '@aibrains/shared-types'
 import { useAuthStore } from '@/stores/auth.store'
-import { useShell } from '@/lib/shell-context'
+import { useShell, useTenant } from '@/lib/shell-context'
 import { tenantService } from '@/services/tenant.service'
 import { transformWizardDataToDto, getDefaultGradeRange, getDefaultSchoolDays } from './school-wizard.utils'
-import { basicInfoSchema, locationContactSchema, edfiComplianceSchema } from './school-wizard.schemas'
+import { makeBasicInfoSchema, locationContactSchema, edfiComplianceSchema } from './school-wizard.schemas'
 import { BasicInfoStep } from './steps/BasicInfoStep'
 import { LocationContactStep } from './steps/LocationContactStep'
 import { OrganizationStep } from './steps/OrganizationStep'
@@ -29,49 +29,57 @@ import { ReviewStep } from './steps/ReviewStep'
 // STEP CONFIGURATION
 // ============================================================================
 
-const SCHOOL_WIZARD_STEPS: WizardStep[] = [
-  {
-    id: 'basic',
-    title: 'School Identity',
-    description: 'Name, code, type, and grade range',
-    icon: Building2,
-    schema: basicInfoSchema,
-    component: BasicInfoStep,
-  },
-  {
-    id: 'location-contact',
-    title: 'Location & Contact',
-    description: 'Physical address, phone, email, and website',
-    icon: MapPin,
-    isOptional: true,
-    schema: locationContactSchema,
-    component: LocationContactStep,
-  },
-  {
-    id: 'organization',
-    title: 'Organization',
-    description: 'District assignment and principal',
-    icon: Users,
-    isOptional: true,
-    component: OrganizationStep,
-  },
-  {
-    id: 'edfi',
-    title: 'Ed-Fi Compliance',
-    description: 'Categories, descriptors, and classification',
-    icon: Tag,
-    isOptional: true,
-    schema: edfiComplianceSchema,
-    component: EdFiComplianceStep,
-  },
-  {
-    id: 'review',
-    title: 'Review & Create',
-    description: 'Confirm details and create school',
-    icon: CheckCircle2,
-    component: ReviewStep,
-  },
-]
+/**
+ * Build the wizard step config with archetype-aware Step 1 schema.
+ * PABSON tenants require emisSchoolCode; others keep it optional. The
+ * factory pattern avoids re-instantiating Zod on every render — callers
+ * should memoize on `archetype`.
+ */
+function buildSchoolWizardSteps(archetype: string | null): WizardStep[] {
+  return [
+    {
+      id: 'basic',
+      title: 'School Identity',
+      description: 'Name, code, type, and grade range',
+      icon: Building2,
+      schema: makeBasicInfoSchema(archetype),
+      component: BasicInfoStep,
+    },
+    {
+      id: 'location-contact',
+      title: 'Location & Contact',
+      description: 'Physical address, phone, email, and website',
+      icon: MapPin,
+      isOptional: true,
+      schema: locationContactSchema,
+      component: LocationContactStep,
+    },
+    {
+      id: 'organization',
+      title: 'Organization',
+      description: 'District assignment and principal',
+      icon: Users,
+      isOptional: true,
+      component: OrganizationStep,
+    },
+    {
+      id: 'edfi',
+      title: 'Ed-Fi Compliance',
+      description: 'Categories, descriptors, and classification',
+      icon: Tag,
+      isOptional: true,
+      schema: edfiComplianceSchema,
+      component: EdFiComplianceStep,
+    },
+    {
+      id: 'review',
+      title: 'Review & Create',
+      description: 'Confirm details and create school',
+      icon: CheckCircle2,
+      component: ReviewStep,
+    },
+  ]
+}
 
 // ============================================================================
 // WIZARD HEADER
@@ -114,6 +122,7 @@ function schoolToWizardData(school: SchoolResponseDto): Record<string, unknown> 
     name: school.name || '',
     shortName: school.shortName || '',
     schoolCode: school.schoolCode || '',
+    emisSchoolCode: school.emisSchoolCode || '',
     schoolType: school.schoolType || 'high',
     'gradeRange.start': school.gradeRange?.start || '9',
     'gradeRange.end': school.gradeRange?.end || '12',
@@ -163,8 +172,14 @@ interface SchoolWizardProps {
 export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: SchoolWizardProps) {
   const user = useAuthStore((s) => s.user)
   const { resolvedSettings, workspaceConfirmedAt } = useShell()
+  const { archetype } = useTenant()
   const queryClient = useQueryClient()
   const isEditMode = !!school
+
+  // Archetype-aware step config. Memoized on `archetype` so Zod schemas
+  // aren't rebuilt on every render of SchoolWizard; WizardContainer reads
+  // the schema at step-validate time (see WizardContext.tsx:100).
+  const steps = useMemo(() => buildSchoolWizardSteps(archetype), [archetype])
 
   const initialData = useMemo(
     () => {
@@ -203,10 +218,28 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
       }
       onSuccess()
     } catch (error: any) {
+      // Sprint C Gap 1/3 — map the PABSON emisSchoolCode rejection to a
+      // helpful toast so the user doesn't need to decode raw server text.
+      // The backend returns { errorCode: 'EMIS_CODE_REQUIRED', details: {
+      // field: 'emisSchoolCode', ... } }. If the wizard's own client-side
+      // gate missed it (e.g. user navigated past Step 1 in edit mode),
+      // this is our safety net.
+      const errorCode = error?.response?.data?.errorCode
+      const serverDetails = error?.response?.data?.details
+      if (errorCode === 'EMIS_CODE_REQUIRED') {
+        toast.error(
+          'IEMIS School Code is required for PABSON tenants. Please return to ' +
+            'Step 1 and fill the IEMIS School Code field.',
+        )
+        throw error
+      }
+
       const message = error?.response?.data?.message
         || error?.message
         || `Failed to ${isEditMode ? 'update' : 'create'} school. Please try again.`
-      toast.error(message)
+      // Surface structured field name in toast if backend provided one.
+      const fieldHint = serverDetails?.field ? ` (field: ${serverDetails.field})` : ''
+      toast.error(`${message}${fieldHint}`)
       throw error
     }
   }
@@ -230,7 +263,7 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
         </div>
       )}
       <WizardContainer
-        steps={SCHOOL_WIZARD_STEPS}
+        steps={steps}
         initialData={initialData}
         onSubmit={handleSubmit}
         onCancel={onCancel}
