@@ -49,6 +49,9 @@ export interface ShellContextValue {
 
   // Workspace Settings
   workspaceSettings: WorkspaceSettings['regional'] | null
+  workspaceIsLocked: boolean
+  workspaceLockReason: string | null
+  workspaceLockHolders: NonNullable<WorkspaceSettings['lockHolders']>
   workspaceConfirmedAt: string | null
   onboardingCompletedAt: string | null
   schoolConfiguration: SchoolConfiguration | null
@@ -234,6 +237,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const effectiveSchoolYear = schoolYear ?? null
   const effectiveWorkspaceSettings = workspaceSettingsData?.regional ?? null
   const effectiveSchoolConfiguration = (schoolConfigurationData as SchoolConfiguration) ?? null
+  const effectiveLockHolders = workspaceSettingsData?.lockHolders ?? []
 
   // Filter schools user has access to based on assignments
   const availableSchools = useMemo(() => {
@@ -385,6 +389,9 @@ export function ShellProvider({ children }: ShellProviderProps) {
       availableSchools,
       activeSchoolYear: effectiveSchoolYear,
       workspaceSettings: effectiveWorkspaceSettings,
+      workspaceIsLocked: workspaceSettingsData?.isLocked ?? false,
+      workspaceLockReason: workspaceSettingsData?.lockReason ?? null,
+      workspaceLockHolders: effectiveLockHolders,
       workspaceConfirmedAt: workspaceSettingsData?.workspaceConfirmedAt ?? null,
       onboardingCompletedAt: workspaceSettingsData?.onboardingCompletedAt ?? null,
       schoolConfiguration: effectiveSchoolConfiguration,
@@ -409,6 +416,9 @@ export function ShellProvider({ children }: ShellProviderProps) {
       availableSchools,
       effectiveSchoolYear,
       effectiveWorkspaceSettings,
+      workspaceSettingsData?.isLocked,
+      workspaceSettingsData?.lockReason,
+      effectiveLockHolders,
       workspaceSettingsData?.workspaceConfirmedAt,
       workspaceSettingsData?.onboardingCompletedAt,
       effectiveSchoolConfiguration,
