@@ -25,12 +25,15 @@ import {
   Building2,
   RefreshCw,
 } from 'lucide-react'
-import { Button, FieldLockTooltip } from '@edforge/ui'
+import { Button, FieldLockTooltip, FieldLockIcon } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
 import { useTenant } from '@/lib/shell-context'
+import { useFieldLockState } from '@/hooks/useFieldLockState'
+import { isWorkspaceFieldLocked } from '@edforge/types'
+import type { FieldLockViolation, WorkspaceLockHolder } from '@edforge/types'
 
 // Local type matching backend WorkspaceSettingsResponseDto
 interface WorkspaceSettings {
@@ -57,6 +60,8 @@ interface WorkspaceSettings {
   }
   isLocked: boolean
   lockReason?: string
+  /** Sprint B.8 — populated by backend when isLocked=true. */
+  lockHolders?: WorkspaceLockHolder[]
   createdAt: string
   updatedAt: string
 }
@@ -286,12 +291,35 @@ function AccessDenied({ message }: { message: string }) {
 // MAIN COMPONENT
 // ============================================================================
 
+/**
+ * Compose a tooltip detail string from the lockHolders list. Used by each
+ * locked field's tooltip so the admin learns which school+year to close.
+ */
+function formatLockHoldersDetail(heldBy: WorkspaceLockHolder[]): string | undefined {
+  if (!heldBy.length) return undefined
+  if (heldBy.length === 1) {
+    return `${heldBy[0].schoolName} · ${heldBy[0].yearName}`
+  }
+  return `${heldBy.length} active academic years across schools`
+}
+
 export default function WorkspaceSettingsPage() {
   // All hooks MUST be called before any conditional returns
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const queryClient = useQueryClient()
   const { tenantName, archetype, country, tenantTier, createdAt } = useTenant()
+
+  // Per-field lock states. Call order must stay stable across renders.
+  const lkTimezone = useFieldLockState('regional.defaultTimezone')
+  const lkLocale = useFieldLockState('regional.defaultLocale')
+  const lkDateFormat = useFieldLockState('regional.defaultDateFormat')
+  const lkTimeFormat = useFieldLockState('regional.defaultTimeFormat')
+  const lkWeekStartsOn = useFieldLockState('regional.defaultWeekStartsOn')
+  const lkCurrency = useFieldLockState('regional.defaultCurrency')
+  const lkCalendarSystem = useFieldLockState('regional.defaultCalendarSystem')
+  const lkDualDate = useFieldLockState('regional.enableDualDateDisplay')
+  const lkNumberFormat = useFieldLockState('regional.defaultNumberFormat')
 
   // Local form state + dirty tracking
   const [formState, setFormState] = useState<WorkspaceSettings | null>(null)
@@ -312,7 +340,9 @@ export default function WorkspaceSettingsPage() {
     retry: 1,
   })
 
-  // Update mutation — sends full settings object
+  // Update mutation — sends partial settings object. Lock violations come
+  // back as structured 400s that we route to per-field toasts so the admin
+  // can see exactly which input needs their attention.
   const updateMutation = useMutation({
     mutationFn: (data: Partial<WorkspaceSettings>) =>
       tenantService.updateWorkspaceSettings(user!.tenantId, data),
@@ -321,8 +351,27 @@ export default function WorkspaceSettingsPage() {
       originalStateRef.current = formState
       toast.success('Workspace settings saved')
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to save settings')
+    onError: (err: Error & { response?: { data?: unknown } }) => {
+      // Backend (Sprint B.5) returns 403
+      //   { message: "Field lock violation",
+      //     details: { violations: [{field, reason, class, heldBy?}] } }
+      // wrapped by axios as err.response.data. `details` is the envelope
+      // the global exception filter whitelists; top-level extra keys get
+      // stripped, so `violations` lives inside `details`.
+      const payload = err.response?.data as
+        | { message?: string; details?: { violations?: FieldLockViolation[] } }
+        | undefined
+      const violations = payload?.details?.violations
+      if (violations?.length) {
+        for (const v of violations) {
+          const fieldLabel = v.field.replace(/^[a-z]+\./, '').replace(/([A-Z])/g, ' $1').trim()
+          const holder = v.heldBy?.[0]
+          const detail = holder ? ` (${holder.schoolName} · ${holder.yearName})` : ''
+          toast.error(`${fieldLabel}: ${v.reason}${detail}`)
+        }
+        return
+      }
+      toast.error(payload?.message || err.message || 'Failed to save settings')
     },
   })
 
@@ -339,13 +388,20 @@ export default function WorkspaceSettingsPage() {
     && originalStateRef.current !== null
     && JSON.stringify(formState) !== JSON.stringify(originalStateRef.current)
 
-  // Update a nested section field in local form state (no API call)
+  /**
+   * Per-field local-state update. Guards per-field with the shared governance
+   * map so a locked input can't silently accept edits even if the `disabled`
+   * attribute were bypassed (defensive). Unknown paths always pass through —
+   * the server is the authoritative gate.
+   */
   const updateField = <S extends 'regional' | 'branding' | 'policies'>(
     section: S,
     key: string,
     value: unknown
   ) => {
-    if (formState?.isLocked) return
+    const path = `${section}.${key}`
+    const lock = isWorkspaceFieldLocked(path, formState?.isLocked ?? false)
+    if (lock.locked) return
     setFormState((prev) => {
       if (!prev) return prev
       return {
@@ -358,16 +414,45 @@ export default function WorkspaceSettingsPage() {
     })
   }
 
-  // Save all pending changes
-  // Note: branding and policies are still sent (round-tripping server data)
-  // even though their UI sections are currently hidden for pilot release.
+  /**
+   * Save only the fields that actually changed since last load/save.
+   *
+   * Sprint B fix — the prior implementation round-tripped the full
+   * regional/branding/policies objects on every save, which tripped the
+   * backend's per-field lock check on every PATCH against a locked tenant
+   * (even when the user edited a display-only field). Sending a sparse
+   * diff keeps governance enforcement correct: the classifier only sees
+   * fields the user intended to change.
+   *
+   * Backend defense-in-depth (`computeEffectiveDiff` on the service) also
+   * guards against misbehaving clients — this is the client-side half.
+   */
   const handleSave = () => {
-    if (!formState) return
-    updateMutation.mutate({
-      regional: formState.regional,
-      branding: formState.branding,
-      policies: formState.policies,
-    })
+    if (!formState || !originalStateRef.current) return
+    const orig = originalStateRef.current
+
+    const diffSection = <K extends 'regional' | 'branding' | 'policies'>(
+      section: K,
+    ): Record<string, unknown> | undefined => {
+      const d: Record<string, unknown> = {}
+      const proposed = formState[section] as Record<string, unknown>
+      const baseline = orig[section] as Record<string, unknown>
+      for (const [key, val] of Object.entries(proposed)) {
+        if (val !== baseline[key]) d[key] = val
+      }
+      return Object.keys(d).length ? d : undefined
+    }
+
+    const payload: Partial<WorkspaceSettings> = {}
+    const r = diffSection('regional')
+    if (r) payload.regional = r as WorkspaceSettings['regional']
+    const b = diffSection('branding')
+    if (b) payload.branding = b as WorkspaceSettings['branding']
+    const p = diffSection('policies')
+    if (p) payload.policies = p as WorkspaceSettings['policies']
+
+    if (Object.keys(payload).length === 0) return
+    updateMutation.mutate(payload)
   }
 
   // Reset to original server state
@@ -435,6 +520,28 @@ export default function WorkspaceSettingsPage() {
     ...DEFAULT_SETTINGS,
   }
   const isLocked = displaySettings.isLocked
+  const lockHolders: WorkspaceLockHolder[] = displaySettings.lockHolders ?? []
+
+  /**
+   * Render a field label with an inline FieldLockIcon when that specific
+   * field is locked. Keeps the labels calm when the workspace is editable
+   * and becomes loud only for the rows that are frozen.
+   */
+  const renderLabel = (
+    text: string,
+    lock: { locked: boolean; reason?: string; heldBy: WorkspaceLockHolder[] },
+  ) => {
+    if (!lock.locked) return text
+    return (
+      <span className="inline-flex items-center gap-2">
+        {text}
+        <FieldLockIcon
+          reason={lock.reason ?? 'Locked'}
+          detail={formatLockHoldersDetail(lock.heldBy)}
+        />
+      </span>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
@@ -470,8 +577,12 @@ export default function WorkspaceSettingsPage() {
           icon={Globe}
           description="Default timezone, language, and date/time formatting"
         >
-          {/* Forewarning: these fields lock conditionally. Shown in both states so users
-              know what to expect before activating an academic year. */}
+          {/* Forewarning banner.
+              - Unlocked: muted heads-up that these fields WILL lock.
+              - Locked: amber notice with specific lockHolders so a multi-school
+                admin learns exactly which school+year to close to unlock.
+              Display-only fields (locale, date/time/number format,
+              enableDualDateDisplay) remain editable in either state. */}
           <div
             className={`flex items-start gap-2.5 px-3 py-2.5 rounded-lg mb-2 border text-xs ${
               isLocked
@@ -480,30 +591,44 @@ export default function WorkspaceSettingsPage() {
             }`}
           >
             <Lock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-            <p className="leading-relaxed">
+            <div className="flex-1 leading-relaxed">
               {isLocked ? (
                 <>
-                  <strong className="font-semibold">Locked.</strong>{' '}
-                  {displaySettings.lockReason ||
-                    'Regional settings cannot be edited while an academic year is active.'}{' '}
-                  Complete or deactivate the active year to resume editing.
+                  <p>
+                    <strong className="font-semibold">Locked.</strong>{' '}
+                    {displaySettings.lockReason ||
+                      'Regional settings that affect stored data are frozen while an academic year is active.'}{' '}
+                    Display-only fields (language, date/time format, number grouping) remain editable.
+                  </p>
+                  {lockHolders.length > 0 && (
+                    <ul className="mt-2 space-y-0.5 text-[11px] opacity-90">
+                      {lockHolders.map((h) => (
+                        <li key={`${h.schoolId}#${h.yearId}`}>
+                          Blocked by <strong className="font-semibold">{h.schoolName}</strong>
+                          {' · '}
+                          <span>{h.yearName}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </>
               ) : (
-                <>
-                  <strong className="font-semibold">Heads up —</strong> these settings
+                <p>
+                  <strong className="font-semibold">Heads up —</strong> fields that
+                  affect stored data (currency, calendar system, timezone, week start)
                   become read-only when an academic year is active, to preserve
-                  consistency across reports, invoices, and audit trails. Plan any
-                  changes before activating a year.
-                </>
+                  consistency across reports, invoices, and audit trails. Display-only
+                  fields remain editable throughout.
+                </p>
               )}
-            </p>
+            </div>
           </div>
 
-          <SettingsFieldRow label="Default Timezone" description="Organization's primary timezone for scheduling and timestamps" inline>
+          <SettingsFieldRow label={renderLabel('Default Timezone', lkTimezone)} description="Organization's primary timezone for scheduling and timestamps" inline>
             <select
               value={displaySettings.regional.defaultTimezone}
               onChange={(e) => updateField('regional', 'defaultTimezone', e.target.value)}
-              disabled={isLocked}
+              disabled={lkTimezone.locked}
               className={SELECT_CLASS}
             >
               {TIMEZONE_OPTIONS.map((opt) => (
@@ -514,11 +639,11 @@ export default function WorkspaceSettingsPage() {
             </select>
           </SettingsFieldRow>
 
-          <SettingsFieldRow label="Default Language" description="Primary language for new users and system communications" inline>
+          <SettingsFieldRow label={renderLabel('Default Language', lkLocale)} description="Primary language for new users and system communications" inline>
             <select
               value={displaySettings.regional.defaultLocale}
               onChange={(e) => updateField('regional', 'defaultLocale', e.target.value)}
-              disabled={isLocked}
+              disabled={lkLocale.locked}
               className={SELECT_CLASS}
             >
               {LOCALE_OPTIONS.map((opt) => (
@@ -527,11 +652,11 @@ export default function WorkspaceSettingsPage() {
             </select>
           </SettingsFieldRow>
 
-          <SettingsFieldRow label="Date Format" description="How dates are displayed across the platform" inline>
+          <SettingsFieldRow label={renderLabel('Date Format', lkDateFormat)} description="How dates are displayed across the platform" inline>
             <select
               value={displaySettings.regional.defaultDateFormat}
               onChange={(e) => updateField('regional', 'defaultDateFormat', e.target.value)}
-              disabled={isLocked}
+              disabled={lkDateFormat.locked}
               className={SELECT_CLASS}
             >
               {DATE_FORMAT_OPTIONS.map((opt) => (
@@ -542,11 +667,11 @@ export default function WorkspaceSettingsPage() {
             </select>
           </SettingsFieldRow>
 
-          <SettingsFieldRow label="Time Format" description="12 or 24 hour clock" inline>
+          <SettingsFieldRow label={renderLabel('Time Format', lkTimeFormat)} description="12 or 24 hour clock" inline>
             <select
               value={displaySettings.regional.defaultTimeFormat}
               onChange={(e) => updateField('regional', 'defaultTimeFormat', e.target.value)}
-              disabled={isLocked}
+              disabled={lkTimeFormat.locked}
               className={SELECT_CLASS}
             >
               {TIME_FORMAT_OPTIONS.map((opt) => (
@@ -557,11 +682,11 @@ export default function WorkspaceSettingsPage() {
             </select>
           </SettingsFieldRow>
 
-          <SettingsFieldRow label="Week Starts On" description="First day of the week in calendars" inline>
+          <SettingsFieldRow label={renderLabel('Week Starts On', lkWeekStartsOn)} description="First day of the week in calendars" inline>
             <select
               value={displaySettings.regional.defaultWeekStartsOn}
               onChange={(e) => updateField('regional', 'defaultWeekStartsOn', e.target.value)}
-              disabled={isLocked}
+              disabled={lkWeekStartsOn.locked}
               className={SELECT_CLASS}
             >
               {WEEK_START_OPTIONS.map((opt) => (
@@ -570,11 +695,11 @@ export default function WorkspaceSettingsPage() {
             </select>
           </SettingsFieldRow>
 
-          <SettingsFieldRow label="Default Currency" description="Currency used for invoices, payments, and financial reports" inline>
+          <SettingsFieldRow label={renderLabel('Default Currency', lkCurrency)} description="Currency used for invoices, payments, and financial reports" inline>
             <select
               value={displaySettings.regional.defaultCurrency}
               onChange={(e) => updateField('regional', 'defaultCurrency', e.target.value)}
-              disabled={isLocked}
+              disabled={lkCurrency.locked}
               className={SELECT_CLASS}
             >
               {CURRENCY_OPTIONS.map((opt) => (
@@ -583,11 +708,11 @@ export default function WorkspaceSettingsPage() {
             </select>
           </SettingsFieldRow>
 
-          <SettingsFieldRow label="Calendar System" description="Primary calendar system for date display" inline>
+          <SettingsFieldRow label={renderLabel('Calendar System', lkCalendarSystem)} description="Primary calendar system for date display" inline>
             <select
               value={displaySettings.regional.defaultCalendarSystem}
               onChange={(e) => updateField('regional', 'defaultCalendarSystem', e.target.value)}
-              disabled={isLocked}
+              disabled={lkCalendarSystem.locked}
               className={SELECT_CLASS}
             >
               {CALENDAR_SYSTEM_OPTIONS.map((opt) => (
@@ -597,18 +722,18 @@ export default function WorkspaceSettingsPage() {
           </SettingsFieldRow>
 
           {displaySettings.regional.defaultCalendarSystem === 'bikram_sambat' && (
-            <SettingsFieldRow label="Show Bikram Sambat Dates" description="Display BS dates alongside Gregorian dates in finance and academic modules" inline>
+            <SettingsFieldRow label={renderLabel('Show Bikram Sambat Dates', lkDualDate)} description="Display BS dates alongside Gregorian dates in finance and academic modules" inline>
               <button
                 type="button"
                 role="switch"
                 aria-checked={displaySettings.regional.enableDualDateDisplay}
                 onClick={() => updateField('regional', 'enableDualDateDisplay', !displaySettings.regional.enableDualDateDisplay)}
-                disabled={isLocked}
+                disabled={lkDualDate.locked}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/40 ${
                   displaySettings.regional.enableDualDateDisplay
                     ? 'bg-teal-600'
                     : 'bg-[rgb(var(--border-primary))]'
-                } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                } ${lkDualDate.locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -619,11 +744,11 @@ export default function WorkspaceSettingsPage() {
             </SettingsFieldRow>
           )}
 
-          <SettingsFieldRow label="Number Format" description="How numbers are grouped in financial displays" inline>
+          <SettingsFieldRow label={renderLabel('Number Format', lkNumberFormat)} description="How numbers are grouped in financial displays" inline>
             <select
               value={displaySettings.regional.defaultNumberFormat}
               onChange={(e) => updateField('regional', 'defaultNumberFormat', e.target.value)}
-              disabled={isLocked}
+              disabled={lkNumberFormat.locked}
               className={SELECT_CLASS}
             >
               {NUMBER_FORMAT_OPTIONS.map((opt) => (
@@ -654,9 +779,15 @@ export default function WorkspaceSettingsPage() {
                 </li>
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">
-                    Regional Settings
+                    Regional Settings — data-integrity fields
                   </strong>{' '}
-                  lock automatically when any academic year is active. Deactivate the year to edit.
+                  (currency, calendar system, timezone, week start) lock automatically when any academic year is active.
+                </li>
+                <li>
+                  <strong className="font-medium text-[rgb(var(--text-primary))]">
+                    Regional Settings — display-only fields
+                  </strong>{' '}
+                  (language, date/time format, number format, Bikram Sambat toggle) stay editable throughout — changing them re-renders without touching stored data.
                 </li>
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">

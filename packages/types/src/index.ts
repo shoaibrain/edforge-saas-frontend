@@ -28,3 +28,15 @@ export * from './academics-utils'
 // Analytics API contract (re-export from @aibrains/shared-types/schemas/analytics)
 export * from './analytics'
 
+// Workspace field governance (Sprint B) — canonical source is
+// @aibrains/shared-types 0.28.0. Re-exported here so frontend consumers
+// can keep a single `@edforge/types` import surface.
+export {
+  WORKSPACE_FIELD_LOCK_CLASS,
+  isWorkspaceFieldLocked,
+  classifyWorkspaceUpdate,
+  type WorkspaceFieldLockClass,
+  type FieldLockViolation,
+  type WorkspaceLockHolder,
+} from '@aibrains/shared-types'
+
