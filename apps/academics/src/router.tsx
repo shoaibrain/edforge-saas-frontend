@@ -30,6 +30,7 @@ import { StudentProfilePage } from './routes/students/$studentId'
 import { TeachersModule } from './routes/teachers'
 import { EnrollmentModule } from './routes/enrollment'
 import { StudentProfilesModule } from './routes/students/profiles'
+import { IemisImport } from './components/students/iemis/IemisImport'
 import { CalendarModule } from './routes/calendar'
 import { SectionRosterPage } from './routes/sections/roster'
 import { BulkRosteringPage } from './routes/rostering'
@@ -89,6 +90,15 @@ const studentProfilesRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/profiles',
     component: StudentProfilesModule,
+})
+
+// Phase 3.1 — IEMIS bulk import flow (PABSON pilot / Saraswati day-1).
+// Full-page route instead of a modal because import findings can span
+// 100+ rows and operators often side-by-side with the source xlsx.
+const studentIemisImportRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/students/import/iemis',
+    component: IemisImport,
 })
 
 // Teachers
@@ -335,6 +345,7 @@ const routeTree = rootRoute.addChildren([
     studentEnrollmentRoute,
     studentProfileRoute,
     studentProfilesRoute,
+    studentIemisImportRoute,
     teachersRoute,
     calendarRoute,
     // Classrooms (nested tree)

@@ -23,6 +23,7 @@ import {
   createEnrollment,
   checkDuplicateStudents,
   importStudentsCsv,
+  importStudentsIemis,
   createParentAccount,
   createStudentAccount,
   linkGuardianToUser,
@@ -322,6 +323,51 @@ export function useImportStudentsCsv() {
       }
     },
     onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// IEMIS IMPORT (Phase 3.1 — PABSON Nepal government EMIS)
+// ============================================================================
+
+import type {
+  IemisImportRequest,
+  IemisImportResult,
+} from '../components/students/iemis/iemis-import.types'
+
+/**
+ * Mutation hook for the IEMIS bulk student import. Unlike the CSV variant,
+ * this hook is USED TWICE per flow — once with `dryRun: true` for the
+ * preview, then again with `dryRun: false` to commit. Callers manage the
+ * phase state; this hook is stateless apart from TanStack mutation state.
+ *
+ * Cache invalidation: only on `dryRun=false` success (a dry-run doesn't
+ * mutate DDB, so the student list is unchanged). We detect this by
+ * reading `variables.dryRun` in `onSuccess` rather than forcing callers
+ * to branch.
+ *
+ * Toasts: deliberately minimal here because the IemisImport component
+ * renders a full results panel. An aggressive toast stack is noise on
+ * a page already dedicated to showing import results.
+ */
+export function useImportStudentsIemis() {
+  const queryClient = useQueryClient()
+
+  return useMutation<IemisImportResult, Error, IemisImportRequest>({
+    mutationFn: (data) => importStudentsIemis(data),
+    onSuccess: (_result, variables) => {
+      if (!variables.dryRun) {
+        queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      }
+    },
+    onError: (error) => {
+      // Row-level issues come back in the IemisImportResult.findings array
+      // on a 200 response, so the error path is reached only for
+      // infrastructure failures — network, 4xx (auth/validation at the
+      // envelope level), or 5xx. Surface all of those as a toast.
       const parsed = parseApiError(error)
       toast.error(parsed.message)
     },

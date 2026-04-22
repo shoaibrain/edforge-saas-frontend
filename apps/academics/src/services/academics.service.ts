@@ -6,7 +6,7 @@
  */
 
 import axios from 'axios'
-import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
+import { api, apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
 
 // ============================================================================
 // DEBUG INSTRUMENTATION
@@ -505,6 +505,37 @@ export async function importStudentsCsv(
   data: { students: Record<string, unknown>[]; schoolId: string }
 ): Promise<CsvImportResult> {
   return apiPost<CsvImportResult>('/academics/students/import', data)
+}
+
+// ============================================================================
+// IEMIS BULK IMPORT (PABSON — Nepal government EMIS export)
+// Phase 3.1 / Saraswati pilot. Paired with backend endpoint
+// `POST /academics/students/import/iemis` (students.controller.ts#importStudentsIemis)
+// ============================================================================
+
+import type {
+  IemisImportRequest,
+  IemisImportResult,
+} from '../components/students/iemis/iemis-import.types'
+
+/**
+ * Import students from an IEMIS xlsx export. Supports a mandatory dry-run
+ * phase (caller passes `dryRun: true` first, then `false` to commit).
+ *
+ * Uses `api.post` directly (not `apiPost`) so we can bump the timeout.
+ * The default 30s is too tight: committing 779 rows against a cold DDB
+ * warm-up (first invocation after low-traffic period) has been observed
+ * to take 45-60s end-to-end. 120s gives comfortable headroom.
+ */
+export async function importStudentsIemis(
+  data: IemisImportRequest,
+): Promise<IemisImportResult> {
+  const response = await api.post<IemisImportResult>(
+    '/academics/students/import/iemis',
+    data,
+    { timeout: 120_000 },
+  )
+  return response.data
 }
 
 // ============================================================================

@@ -458,7 +458,28 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   }}
                 >
                   <Upload className="w-3.5 h-3.5" />
-                  Import students
+                  Import CSV
+                </button>
+                {/*
+                  Phase 3.1 — IEMIS button is always visible. The eligibility
+                  gate (active school must have emisSchoolCode) is enforced
+                  on the target page itself, not here, because hiding the
+                  button creates a "where'd it go?" mystery for PABSON
+                  admins who swap between an IEMIS-ready school and a
+                  non-IEMIS school mid-session.
+                */}
+                <button
+                  onClick={() => navigate({ to: '/students/import/iemis' })}
+                  aria-label="Import from IEMIS"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  style={{
+                    background: 'var(--v2-bg-elevated)',
+                    borderColor: 'var(--v2-border-default)',
+                    color: 'var(--v2-text-secondary)',
+                  }}
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  Import IEMIS
                 </button>
                 <button
                   onClick={handleAddStudent}
