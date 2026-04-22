@@ -45,8 +45,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aibrains/shared-types": "^0.24.0",
-    "@edforge/config": "workspace:*"
+    "@aibrains/shared-types": "^0.29.0",
+    "@edforge/config": "workspace:*",
+    "zod": "~3.24.4"
   },
   "peerDependencies": {
     "react": ">=18"

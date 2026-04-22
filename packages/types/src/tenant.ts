@@ -4,12 +4,32 @@
  */
 
 /**
+ * Tenant archetype — umbrella operational pattern that drives regional + policy defaults.
+ * Write-once at provisioning (immutable per backend field-governance).
+ * V1 runtime-valid: 'PABSON' | 'GENERIC'. The rest are reserved for future archetypes.
+ */
+export type TenantArchetype =
+  | 'PABSON'
+  | 'GENERIC'
+  | 'CBSE_IN'
+  | 'NAIS_US'
+  | 'GEMS_UAE'
+
+/**
  * Represents a tenant (district/organization) in the multi-tenant system
  */
 export interface Tenant {
   id: string
   name: string
   subdomain: string
+  /** Archetype — immutable, set at provisioning. May be absent on legacy tenants. */
+  archetype?: TenantArchetype
+  /** ISO-3166 alpha-3 country code (e.g. NPL, USA). Immutable, set at provisioning. */
+  country?: string
+  /** Tier — BASIC | ADVANCED | PREMIUM. */
+  tier?: string
+  /** Provisioning timestamp (ISO-8601). */
+  createdAt?: string
   /** List of school IDs belonging to this tenant */
   schools: string[]
   /** Active school year for this tenant */
@@ -160,6 +180,20 @@ export interface WorkspaceSettings {
   /** Lock status - prevents changes when academic year is active */
   isLocked: boolean
   lockReason?: string
+  /**
+   * Which (school, active-academic-year) pairs are currently holding the
+   * workspace in a locked state. Populated by the backend when `isLocked`
+   * is `true`; empty/omitted otherwise. Multi-school tenants use this to
+   * tell the admin precisely which year on which school must close before
+   * data-integrity-critical regional fields unlock.
+   */
+  lockHolders?: Array<{
+    schoolId: string
+    schoolName: string
+    yearId: string
+    yearName: string
+    activatedAt?: string
+  }>
   /** Timestamp when admin confirmed workspace settings — null if never confirmed */
   workspaceConfirmedAt?: string
   /** Timestamp when admin completed the onboarding flow — null if never completed */

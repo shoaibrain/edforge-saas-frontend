@@ -165,6 +165,11 @@ export function transformWizardDataToDto(
   return {
     name: data.name as string,
     schoolCode: data.schoolCode as string,
+    // Sprint C Gap 3 — pass through IEMIS/external school code. Backend
+    // enforces PABSON-required + immutable (shared-types 0.29.0 +
+    // FIELD_MUTABILITY.immutable). Empty string becomes undefined so the
+    // payload stays clean.
+    emisSchoolCode: (data.emisSchoolCode as string) || undefined,
     shortName: (data.shortName as string) || undefined,
     schoolType: data.schoolType as any,
     gradeRange: {
