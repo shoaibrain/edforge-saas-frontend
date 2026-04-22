@@ -25,6 +25,7 @@ export function HeroStage() {
     <div
       id="stage"
       ref={stageRef}
+      className="lp-hero-stage"
       style={{
         position: 'relative',
         width: '100%',
@@ -32,9 +33,10 @@ export function HeroStage() {
         marginTop: 8,
       }}
     >
-      {/* Solid accent band */}
+      {/* Solid accent band — hidden on mobile via .lp-hero-band */}
       <div
         aria-hidden
+        className="lp-hero-band"
         style={{
           position: 'absolute',
           left: gutter,
@@ -48,8 +50,9 @@ export function HeroStage() {
           transition: 'box-shadow 0.2s linear',
         }}
       />
-      {/* Device — scaled by scroll progress */}
+      {/* Device — scaled by scroll progress; static on mobile via .lp-hero-device */}
       <div
+        className="lp-hero-device"
         style={{
           position: 'absolute',
           left: '50%',

@@ -99,6 +99,7 @@ export function SecurityStrip() {
 
           {/* Promise cards */}
           <div
+            className="lp-promise-grid"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
@@ -119,6 +120,7 @@ export function SecurityStrip() {
 
           {/* Frameworks row */}
           <div
+            className="lp-frameworks-row"
             style={{
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.1)',
@@ -142,6 +144,7 @@ export function SecurityStrip() {
               {SECURITY_STRIP.frameworksLabel}
             </div>
             <div
+              className="lp-frameworks-badges"
               style={{
                 flex: 1,
                 display: 'flex',

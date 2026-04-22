@@ -9,9 +9,9 @@ describe('PlatformPillars', () => {
   it('renders the section heading + eyebrow', () => {
     const { getByRole, getByText } = render(<PlatformPillars />)
     expect(getByRole('heading', { level: 2 }).textContent).toMatch(
-      /Everything your district runs on/i
+      /Six modules/i
     )
-    expect(getByText('EDFORGE APP')).toBeInTheDocument()
+    expect(getByText('HOW IT ALL CONNECTS')).toBeInTheDocument()
   })
 
   it('renders 6 pillar cards (one per module) as <a> elements', () => {

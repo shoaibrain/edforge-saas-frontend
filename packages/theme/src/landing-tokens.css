@@ -260,3 +260,67 @@ html[data-surface="landing"] .lp-btn--light {
 html[data-surface="landing"] .lp-btn--light:hover {
   background: var(--lp-bg-warm);
 }
+
+/* ── UseCasePanel ── stack to 1-col, video always on top ── */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-usecase-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  html[data-surface="landing"] .lp-usecase-media {
+    order: -1 !important;
+    position: static !important;
+  }
+  html[data-surface="landing"] .lp-usecase-rail {
+    order: 1 !important;
+  }
+  html[data-surface="landing"] .lp-usecase-header {
+    margin-bottom: 32px !important;
+  }
+  html[data-surface="landing"] .lp-usecase-rail [role="tab"] {
+    padding: 16px 0 16px 20px !important;
+  }
+}
+
+/* ── Hero ── clean mobile treatment: drop red band, static device ── */
+@media (max-width: 720px) {
+  /* Hide the red accent band — laptop shadow provides depth */
+  html[data-surface="landing"] .lp-hero-band {
+    display: none !important;
+  }
+  /* Stage: auto-height, let the device dictate size */
+  html[data-surface="landing"] .lp-hero-stage {
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 32px !important;
+  }
+  /* Device: static flow, centered, no scroll transforms */
+  html[data-surface="landing"] .lp-hero-device {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: calc(100% - 8px) !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+  }
+  html[data-surface="landing"] .lp-hero {
+    padding-top: 32px !important;
+  }
+}
+
+/* ── SecurityStrip ── promise cards stack, frameworks wrap ── */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-promise-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  html[data-surface="landing"] .lp-frameworks-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+  html[data-surface="landing"] .lp-frameworks-badges {
+    justify-content: flex-start !important;
+  }
+}

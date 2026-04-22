@@ -108,6 +108,7 @@ export function UseCasePanel({
       role="tablist"
       aria-label={`${sectionId}-features`}
       aria-orientation="vertical"
+      className="lp-usecase-rail"
     >
       {features.map((f, i) => {
         const isActive = i === active
@@ -187,6 +188,7 @@ export function UseCasePanel({
       id={`${sectionId}-panel`}
       role="tabpanel"
       aria-labelledby={`${sectionId}-tab-${features[active]?.id ?? ''}`}
+      className="lp-usecase-media"
       style={{ position: 'sticky', top: 100 }}
     >
       <DemoVideo
@@ -218,7 +220,7 @@ export function UseCasePanel({
       style={{ background, position: 'relative' }}
     >
       <Container>
-        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+        <div className="lp-usecase-header" style={{ textAlign: 'center', marginBottom: 56 }}>
           {eyebrow ? (
             <div
               style={{
@@ -244,7 +246,7 @@ export function UseCasePanel({
             {lede}
           </p>
         </div>
-        <div style={gridStyle}>
+        <div className="lp-usecase-grid" style={gridStyle}>
           {reverse ? (
             <>
               {media}
