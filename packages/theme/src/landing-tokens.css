@@ -282,11 +282,17 @@ html[data-surface="landing"] .lp-btn--light:hover {
   }
 }
 
-/* ── Hero ── clean mobile treatment: drop red band, static device ── */
+/* ── Hero ── clean mobile treatment: subtle brand blush, static device ── */
 @media (max-width: 720px) {
-  /* Hide the red accent band — laptop shadow provides depth */
+  /* Brand blush: reshape the band into a subtle crimson glow */
   html[data-surface="landing"] .lp-hero-band {
-    display: none !important;
+    top: 50% !important;
+    bottom: -16px !important;
+    left: 8% !important;
+    right: 8% !important;
+    border-radius: 28px !important;
+    opacity: 0.12 !important;
+    box-shadow: none !important;
   }
   /* Stage: auto-height, let the device dictate size */
   html[data-surface="landing"] .lp-hero-stage {
@@ -300,12 +306,12 @@ html[data-surface="landing"] .lp-btn--light:hover {
     left: auto !important;
     top: auto !important;
     transform: none !important;
-    width: calc(100% - 8px) !important;
+    width: calc(100% - 40px) !important;
     max-width: 480px !important;
     margin: 0 auto !important;
   }
   html[data-surface="landing"] .lp-hero {
-    padding-top: 32px !important;
+    padding-top: 100px !important;
   }
 }
 
@@ -323,4 +329,23 @@ html[data-surface="landing"] .lp-btn--light:hover {
   html[data-surface="landing"] .lp-frameworks-badges {
     justify-content: flex-start !important;
   }
+}
+
+/* ── Footer ── compact 2-col on mobile ── */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 24px 20px !important;
+  }
+  html[data-surface="landing"] .lp-footer-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── Navbar Sign In ── crimson on landing surface ── */
+html[data-surface="landing"] .lp-nav-signin {
+  background-color: var(--lp-primary) !important;
+}
+html[data-surface="landing"] .lp-nav-signin:hover {
+  background-color: var(--lp-primary-hover) !important;
 }

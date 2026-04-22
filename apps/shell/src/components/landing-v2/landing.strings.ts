@@ -285,7 +285,7 @@ export const MIGRATION = {
   daysHeadline: 'Days, start to finish.',
   daysSub: 'Not 30 months. Not 30 meetings. Thirty days.',
   sampleLink: 'See a sample migration plan',
-  sampleHref: 'mailto:hello@edforge.app?subject=Migration%20plan%20sample',
+  sampleHref: 'mailto:shoaib@edforge.app?subject=Migration%20plan%20sample',
 } as const
 
 export const FAQ = {
@@ -324,9 +324,9 @@ export const FINAL_CTA = {
   headingLead: 'A platform this important should be',
   headingSerif: 'built with you',
   headingTail: ',\nnot sold to you.',
-  lede: "We're at the early, honest stage — where the people who use Edforge also help decide what it becomes. If your school is ready for a modern system and an unusual partnership, we'd like to talk.",
+  lede: "We're at the early stage — where the people who use Edforge also help decide what it becomes. If your school is ready for a modern system and an unusual partnership, we'd like to talk.",
   cta: 'Start the conversation',
-  ctaHref: 'mailto:hello@edforge.app',
+  ctaHref: 'mailto:shoaib@edforge.app',
   ctaMicro: 'No slide deck. No pressure. A 30-minute working session.',
 } as const
 

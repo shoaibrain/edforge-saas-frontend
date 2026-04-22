@@ -439,14 +439,43 @@ export function Navbar() {
       <div
         className={`md:hidden fixed inset-0 z-40 backdrop-blur-xl transition-all duration-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-4 invisible pointer-events-none'
           }`}
-        style={{ top: '64px', backgroundColor: 'rgba(250, 249, 246, 0.97)' }}
+        style={{ top: isScrolled ? 64 : 80, backgroundColor: 'rgba(250, 249, 246, 0.97)' }}
       >
-        <div className="flex flex-col h-[calc(100vh-64px)] overflow-y-auto overscroll-contain p-4 pt-4" style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
-          {/* Sign In CTA — immediately visible at top */}
-          <div className="pb-4 mb-4" style={{ borderBottom: '1px solid rgba(226, 232, 240, 0.8)' }}>
+        <div className="flex flex-col" style={{ height: `calc(100vh - ${isScrolled ? 64 : 80}px)` }}>
+          {/* Scrollable nav links */}
+          <div className="flex-1 overflow-y-auto overscroll-contain p-4" style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              {NAV_ITEMS.filter((item) => item.type === 'mega_menu').map((item) => (
+                <div key={item.label}>
+                  <div
+                    className="mb-2 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'rgb(var(--text-tertiary))' }}
+                  >
+                    {item.label}
+                  </div>
+                  <div className="space-y-0.5">
+                    {item.dropdown?.items.map((subItem, idx) => (
+                      <NavLink
+                        key={idx}
+                        href={subItem.href}
+                        className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-[44px] transition-colors touch-manipulation hover:bg-white"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <subItem.icon className="w-4 h-4 shrink-0" style={{ color: subItem.iconColor }} />
+                        <span className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>{subItem.title}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sign In CTA — pinned at bottom, always visible */}
+          <div className="p-4" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
             <Link
               to="/login"
-              className="flex items-center justify-center w-full min-h-[48px] py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+              className="lp-nav-signin flex items-center justify-center w-full min-h-[48px] py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
               style={{
                 borderRadius: 'var(--lp-radius-pill)',
                 backgroundColor: '#F97316',
@@ -456,33 +485,6 @@ export function Navbar() {
             >
               Sign In
             </Link>
-          </div>
-
-          {/* Two-column categorized grid */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            {NAV_ITEMS.filter((item) => item.type === 'mega_menu').map((item) => (
-              <div key={item.label}>
-                <div
-                  className="mb-2 text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'rgb(var(--text-tertiary))' }}
-                >
-                  {item.label}
-                </div>
-                <div className="space-y-0.5">
-                  {item.dropdown?.items.map((subItem, idx) => (
-                    <NavLink
-                      key={idx}
-                      href={subItem.href}
-                      className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-[44px] transition-colors touch-manipulation hover:bg-white"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <subItem.icon className="w-4 h-4 shrink-0" style={{ color: subItem.iconColor }} />
-                      <span className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>{subItem.title}</span>
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
