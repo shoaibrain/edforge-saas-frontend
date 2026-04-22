@@ -25,10 +25,10 @@ describe('landing.strings', () => {
     }
   })
 
-  it('each use-case has 4 features with numeric chapter starts', () => {
+  it('each use-case has 3 features with numeric chapter starts', () => {
     const blocks = [STR.USE_CASE_DISTRICT, STR.USE_CASE_TEACHERS, STR.USE_CASE_STUDENTS]
     for (const b of blocks) {
-      expect(b.features).toHaveLength(4)
+      expect(b.features).toHaveLength(3)
       for (const f of b.features) {
         expect(typeof f.start).toBe('number')
         expect(f.id).toBeTruthy()

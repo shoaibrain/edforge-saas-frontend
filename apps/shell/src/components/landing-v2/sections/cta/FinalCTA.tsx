@@ -90,6 +90,17 @@ export function FinalCTA() {
               {FINAL_CTA.cta} <Icon name="arrow" size={16} />
             </LandingButton>
           </div>
+          {'ctaMicro' in FINAL_CTA && (
+            <p
+              style={{
+                fontSize: 13,
+                color: 'rgba(255,255,255,0.7)',
+                marginTop: 12,
+              }}
+            >
+              {FINAL_CTA.ctaMicro}
+            </p>
+          )}
         </div>
       </Container>
     </section>

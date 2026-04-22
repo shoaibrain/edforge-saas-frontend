@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "generate": "ts-node scripts/generate-local.ts",
-    "build": "NODE_OPTIONS=--max-old-space-size=8192 tsc",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc",
     "prepublishOnly": "pnpm generate && pnpm build"
   },
   "keywords": [
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.10.0",
+    "cross-env": "^10.1.0",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
     "json-schema-to-typescript": "^14.0.0",

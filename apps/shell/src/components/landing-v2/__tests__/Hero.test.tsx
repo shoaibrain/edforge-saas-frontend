@@ -8,14 +8,14 @@ describe('Hero', () => {
   it('renders the h1 with the hero heading', () => {
     const { getByRole } = render(<Hero />)
     const h1 = getByRole('heading', { level: 1 })
-    expect(h1.textContent).toMatch(/One platform to power/i)
-    expect(h1.textContent).toMatch(/every school/i)
+    expect(h1.textContent).toMatch(/Well-run/i)
+    expect(h1.textContent).toMatch(/that idea/i)
   })
 
   it('links the scroll-down chip to #stage', () => {
     const { container } = render(<Hero />)
     const link = Array.from(container.querySelectorAll('a')).find((a) =>
-      (a.textContent ?? '').includes('Learn about Edforge')
+      (a.textContent ?? '').includes('See Edforge')
     )
     expect(link?.getAttribute('href')).toBe('#stage')
   })

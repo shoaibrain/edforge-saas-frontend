@@ -260,3 +260,92 @@ html[data-surface="landing"] .lp-btn--light {
 html[data-surface="landing"] .lp-btn--light:hover {
   background: var(--lp-bg-warm);
 }
+
+/* ── UseCasePanel ── stack to 1-col, video always on top ── */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-usecase-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  html[data-surface="landing"] .lp-usecase-media {
+    order: -1 !important;
+    position: static !important;
+  }
+  html[data-surface="landing"] .lp-usecase-rail {
+    order: 1 !important;
+  }
+  html[data-surface="landing"] .lp-usecase-header {
+    margin-bottom: 32px !important;
+  }
+  html[data-surface="landing"] .lp-usecase-rail [role="tab"] {
+    padding: 16px 0 16px 20px !important;
+  }
+}
+
+/* ── Hero ── clean mobile treatment: subtle brand blush, static device ── */
+@media (max-width: 720px) {
+  /* Brand blush: reshape the band into a subtle crimson glow */
+  html[data-surface="landing"] .lp-hero-band {
+    top: 50% !important;
+    bottom: -16px !important;
+    left: 8% !important;
+    right: 8% !important;
+    border-radius: 28px !important;
+    opacity: 0.12 !important;
+    box-shadow: none !important;
+  }
+  /* Stage: auto-height, let the device dictate size */
+  html[data-surface="landing"] .lp-hero-stage {
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 32px !important;
+  }
+  /* Device: static flow, centered, no scroll transforms */
+  html[data-surface="landing"] .lp-hero-device {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: calc(100% - 40px) !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+  }
+  html[data-surface="landing"] .lp-hero {
+    padding-top: 100px !important;
+  }
+}
+
+/* ── SecurityStrip ── promise cards stack, frameworks wrap ── */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-promise-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  html[data-surface="landing"] .lp-frameworks-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+  html[data-surface="landing"] .lp-frameworks-badges {
+    justify-content: flex-start !important;
+  }
+}
+
+/* ── Footer ── compact 2-col on mobile ── */
+@media (max-width: 720px) {
+  html[data-surface="landing"] .lp-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 24px 20px !important;
+  }
+  html[data-surface="landing"] .lp-footer-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── Navbar Sign In ── crimson on landing surface ── */
+html[data-surface="landing"] .lp-nav-signin {
+  background-color: var(--lp-primary) !important;
+}
+html[data-surface="landing"] .lp-nav-signin:hover {
+  background-color: var(--lp-primary-hover) !important;
+}
