@@ -11,7 +11,7 @@ import { useEffect } from 'react'
  * portal doesn't inherit the landing title after navigation.
  */
 const DEFAULT_TITLE =
-  'Edforge — One platform to power every school in your district'
+  'Edforge — Well-run schools teach better'
 const CANONICAL = 'https://www.edforge.app/'
 
 export function useLandingSeo(title: string = DEFAULT_TITLE) {

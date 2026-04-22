@@ -196,7 +196,10 @@ export function Navbar() {
   const activeIndex = activeDropdown ? MEGA_MENU_LABELS.indexOf(activeDropdown) : -1
   const showDropdown = activeIndex !== -1
 
+  const navbarHeight = isScrolled ? 64 : 80
+
   return (
+    <>
     <nav
       ref={navRef}
       aria-label="Main navigation"
@@ -435,30 +438,27 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu — two-column categorized layout */}
-      <div
-        className={`md:hidden fixed inset-0 z-40 backdrop-blur-xl transition-all duration-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-4 invisible pointer-events-none'
-          }`}
-        style={{ top: '64px', backgroundColor: 'rgba(250, 249, 246, 0.97)' }}
-      >
-        <div className="flex flex-col h-[calc(100vh-64px)] overflow-y-auto overscroll-contain p-4 pt-4" style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
-          {/* Sign In CTA — immediately visible at top */}
-          <div className="pb-4 mb-4" style={{ borderBottom: '1px solid rgba(226, 232, 240, 0.8)' }}>
-            <Link
-              to="/login"
-              className="flex items-center justify-center w-full min-h-[48px] py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
-              style={{
-                borderRadius: 'var(--lp-radius-pill)',
-                backgroundColor: '#F97316',
-                color: '#FFFFFF',
-              }}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Sign In
-            </Link>
-          </div>
+    </nav>
 
-          {/* Two-column categorized grid */}
+    {/* Mobile Menu — OUTSIDE <nav> to avoid backdrop-filter containing block issue.
+        When the nav has backdrop-blur (scrolled state), backdrop-filter makes the nav
+        the containing block for position:fixed children, breaking the menu dimensions. */}
+    <div
+      className={`md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+        }`}
+      style={{
+        position: 'fixed',
+        top: navbarHeight,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 40,
+        backgroundColor: '#FAF9F6',
+      }}
+    >
+      <div className="flex flex-col" style={{ height: '100%' }}>
+        {/* Scrollable nav links */}
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4" style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
           <div className="grid grid-cols-2 gap-x-6 gap-y-4">
             {NAV_ITEMS.filter((item) => item.type === 'mega_menu').map((item) => (
               <div key={item.label}>
@@ -485,7 +485,24 @@ export function Navbar() {
             ))}
           </div>
         </div>
+
+        {/* Sign In CTA — pinned at bottom, always visible */}
+        <div className="p-4" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
+          <Link
+            to="/login"
+            className="lp-nav-signin flex items-center justify-center w-full min-h-[48px] py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+            style={{
+              borderRadius: 'var(--lp-radius-pill)',
+              backgroundColor: '#F97316',
+              color: '#FFFFFF',
+            }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Sign In
+          </Link>
+        </div>
       </div>
-    </nav>
+    </div>
+    </>
   )
 }

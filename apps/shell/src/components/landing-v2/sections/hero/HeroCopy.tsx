@@ -7,6 +7,7 @@ import { landingEvents } from '../../../../analytics/landing-events'
  * Copy sourced from landing.strings.ts.
  */
 export function HeroCopy() {
+  const midParts = HERO.headingMid.split('\n')
   return (
     <Container>
       <div style={{ textAlign: 'center', position: 'relative', zIndex: 3, paddingBottom: 20 }}>
@@ -23,14 +24,24 @@ export function HeroCopy() {
             textWrap: 'balance',
           }}
         >
-          {HERO.headingLead}
-          <br />
           <span
             className="lp-serif"
             style={{ color: 'var(--lp-primary)', fontSize: '1.02em' }}
           >
-            {HERO.headingSerif}
-          </span>{' '}
+            {HERO.headingSerif1}
+          </span>
+          {midParts.map((part, i) => (
+            <span key={i}>
+              {part}
+              {i < midParts.length - 1 ? <br /> : null}
+            </span>
+          ))}
+          <span
+            className="lp-serif"
+            style={{ color: 'var(--lp-primary)', fontSize: '1.02em' }}
+          >
+            {HERO.headingSerif2}
+          </span>
           {HERO.headingTail}
         </h1>
         <p

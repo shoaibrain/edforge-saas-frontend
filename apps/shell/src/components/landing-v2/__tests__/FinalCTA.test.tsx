@@ -8,7 +8,7 @@ describe('FinalCTA', () => {
 
   it('renders the closing heading + lede', () => {
     const { getByRole, getByText } = render(<FinalCTA />)
-    expect(getByRole('heading', { level: 2 }).textContent).toMatch(/forge something/i)
+    expect(getByRole('heading', { level: 2 }).textContent).toMatch(/platform this important/i)
     expect(getByText(FINAL_CTA.lede)).toBeInTheDocument()
   })
 
