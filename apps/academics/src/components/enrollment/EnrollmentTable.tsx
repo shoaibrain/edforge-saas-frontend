@@ -36,6 +36,7 @@ interface EnrollmentTableProps {
   enrollments: EnrollmentResponseDto[]
   isLoading: boolean
   hasMore?: boolean
+  isFetchingMore?: boolean
   onLoadMore?: () => void
   searchTerm: string
   onSearchChange: (term: string) => void
@@ -198,8 +199,9 @@ function ActionMenu({
 export function EnrollmentTable({
   enrollments,
   isLoading,
-  hasMore: _hasMore,
-  onLoadMore: _onLoadMore,
+  hasMore,
+  isFetchingMore,
+  onLoadMore,
   searchTerm: _searchTerm,
   onSearchChange: _onSearchChange,
   gradeLevel,
@@ -330,6 +332,11 @@ export function EnrollmentTable({
       isLoading={isLoading}
       enableSorting={true}
       pagination={{ pageSize: 20 }}
+      serverPagination={
+        onLoadMore
+          ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore }
+          : undefined
+      }
       searchPlaceholder="Search students..."
       emptyState={{
         icon: <Users className="w-10 h-10" style={{ color: 'var(--v2-text-ghost)', opacity: 0.4 }} />,
