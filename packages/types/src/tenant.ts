@@ -91,6 +91,12 @@ export interface School {
   tenantId: string
   name: string
   code: string
+  /**
+   * External government/EMIS school code (e.g. Nepal IEMIS 8–10 digit code).
+   * Required for PABSON tenants (enforced server-side). Format validated by
+   * `iemisSchoolCodeSchema` in `@aibrains/shared-types`. Immutable after save.
+   */
+  emisSchoolCode?: string
   address?: SchoolAddress
   phone?: string
   email?: string

@@ -40,6 +40,7 @@ import ConfigurationTab from './tabs/ConfigurationTab'
 import AcademicSetupTab from './tabs/AcademicSetupTab'
 import StructureTab from './tabs/StructureTab'
 import AuditLogTab from './tabs/AuditLogTab'
+import { IemisCodeBadge } from '@/components/settings/IemisCodeBadge'
 
 // ============================================================================
 // CONSTANTS
@@ -568,11 +569,14 @@ export default function SchoolDetailPage() {
               <h1 className="text-xl font-bold text-[rgb(var(--text-primary))] tracking-tight leading-tight">
                 {displaySchool.name}
               </h1>
-              <div className="flex items-center gap-1.5 mt-1.5">
+              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                 {/* Code chip */}
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
                   {displaySchool.code}
                 </span>
+                {/* IEMIS Code chip (S1.11) — renders only for PABSON schools
+                    that have an emisSchoolCode set. */}
+                <IemisCodeBadge code={displaySchool.emisSchoolCode} />
                 {/* Type chip */}
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
                   {SCHOOL_TYPE_LABELS[displaySchool.type || ''] || displaySchool.type || 'School'}
