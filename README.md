@@ -188,6 +188,66 @@ const canEdit = usePermission('edit', 'students')
 const canViewGrades = useCanAccess('gradebook')
 ```
 
+## Paginated Tables
+
+`TanstackDataTable` supports two pagination modes. Picking the wrong one is
+the #1 cause of "Next button disabled even though more data exists" bugs.
+
+### Client-side (default)
+
+All rows are already in the `data` array. The table paginates them locally
+with `pageSize`. Use when the dataset is bounded (a tenant's sections,
+school-year list, etc.).
+
+```tsx
+<TanstackDataTable
+  columns={columns}
+  data={allSections}          // everything the server has
+  pagination={{ pageSize: 20 }}
+/>
+```
+
+### Server-side (for `useInfiniteQuery` consumers)
+
+The `data` array is a growing window (first N pages of an infinite query).
+Pass a `serverPagination` adapter so the Next button stays enabled while
+more pages exist on the server, and fetches them on demand.
+
+```tsx
+const {
+  data,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
+} = useStudents({ schoolId })
+
+const students = flattenStudentPages(data)
+
+<TanstackDataTable
+  columns={columns}
+  data={students}
+  pagination={{ pageSize: 20 }}
+  serverPagination={{
+    hasMore: hasNextPage,
+    isFetching: isFetchingNextPage,
+    onLoadMore: () => { void fetchNextPage() },
+    serverTotalHint: getTotalFromPages(data),
+  }}
+/>
+```
+
+The Next button's semantics when `serverPagination` is set:
+- Stays enabled while `hasMore=true`, even if the loaded buffer has only one
+  page's worth of rows.
+- When the user clicks Next past the last loaded page, `onLoadMore()` fires;
+  once the new rows arrive, the table auto-advances to show them.
+- Shows `Showing X-Y of N+ results` when total is unknown (`+` signals "more
+  exist, not shown").
+
+Existing tables wired for server pagination: `StudentTable`,
+`EnrollmentTable`. Any table built on a `useInfiniteQuery`-backed hook
+should use this mode.
+
 ## Scripts
 
 | Command | Description |

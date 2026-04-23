@@ -22,6 +22,7 @@ export function DataTable<TData>({
   emptyState,
   pagination,
   totalCount,
+  serverPagination,
   enableSorting = false,
   onSortingChange,
   enableColumnFilters = false,
@@ -255,6 +256,7 @@ export function DataTable<TData>({
             table={table}
             totalCount={totalCount}
             pageSizeOptions={pagination.pageSizeOptions}
+            serverPagination={serverPagination}
           />
         </div>
       )}

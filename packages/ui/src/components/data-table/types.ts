@@ -86,6 +86,29 @@ export interface PaginationConfig {
   pageSizeOptions?: number[]
 }
 
+/**
+ * Server-side pagination hook for tables whose `data` is a growing window
+ * (e.g. a `useInfiniteQuery` result) rather than the complete row set.
+ *
+ * When supplied, the pagination footer's Next button:
+ *   - remains enabled while the client table has more pages OR the server
+ *     reports `hasMore=true`
+ *   - triggers `onLoadMore()` when the user runs past the last loaded page
+ *     and `hasMore=true`, then advances the client pageIndex once the new
+ *     rows are in
+ *
+ * The `Showing X-Y of Z+` label uses `serverTotalHint` (when the server
+ * reports an upper bound) or displays a "+" suffix on the loaded count to
+ * signal "more exist, not shown yet".
+ */
+export interface ServerPaginationConfig {
+  hasMore: boolean
+  isFetching?: boolean
+  onLoadMore: () => void
+  /** Optional hint from the server for the total known count. */
+  serverTotalHint?: number
+}
+
 // ============================================================================
 // MAIN DATA TABLE PROPS
 // ============================================================================
@@ -115,6 +138,12 @@ export interface DataTableProps<TData> {
   pagination?: PaginationConfig
   /** Total row count (if known from server) — enables "Page X of Y" display */
   totalCount?: number
+  /**
+   * Optional server-pagination adapter. Set alongside `pagination` when the
+   * component is driving a `useInfiniteQuery`-style data source. See the
+   * `ServerPaginationConfig` docstring for Next-button semantics.
+   */
+  serverPagination?: ServerPaginationConfig
 
   // -- Sorting --
   enableSorting?: boolean

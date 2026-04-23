@@ -31,6 +31,15 @@ interface StudentTableProps {
   onAddStudent?: () => void
   onViewStudent?: (student: StudentResponseDto) => void
   onWithdraw?: (student: StudentResponseDto) => void
+  /**
+   * Server-pagination adapter. Set when the caller is driving an infinite
+   * query; keeps the Next button enabled while `hasMore=true`, auto-fetches
+   * additional pages when the user runs off the end of the client buffer.
+   */
+  hasMore?: boolean
+  isFetchingMore?: boolean
+  onLoadMore?: () => void
+  serverTotalHint?: number
 }
 
 // ============================================================================
@@ -129,6 +138,10 @@ export function StudentTable({
   onAddStudent,
   onViewStudent,
   onWithdraw,
+  hasMore,
+  isFetchingMore,
+  onLoadMore,
+  serverTotalHint,
 }: StudentTableProps) {
   const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(
     () => [
@@ -246,6 +259,15 @@ export function StudentTable({
     [alertsMap, onViewStudent, onWithdraw]
   )
 
+  const serverPagination = onLoadMore
+    ? {
+        hasMore: Boolean(hasMore),
+        isFetching: Boolean(isFetchingMore),
+        onLoadMore,
+        serverTotalHint,
+      }
+    : undefined
+
   return (
     <TanstackDataTable
       columns={columns}
@@ -253,6 +275,7 @@ export function StudentTable({
       isLoading={isLoading}
       enableSorting={true}
       pagination={{ pageSize: 20 }}
+      serverPagination={serverPagination}
       emptyState={{
         icon: <User className="w-12 h-12" />,
         title: 'No students found',

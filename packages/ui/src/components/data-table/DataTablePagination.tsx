@@ -1,28 +1,71 @@
+import { useEffect, useRef } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { cn } from '../../utils'
+import type { ServerPaginationConfig } from './types'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
   totalCount?: number
   pageSizeOptions?: number[]
+  /**
+   * Server-pagination adapter. When supplied, the Next button stays enabled
+   * while the server reports `hasMore=true`, even if the loaded `data` has
+   * been exhausted client-side. See `ServerPaginationConfig` for details.
+   */
+  serverPagination?: ServerPaginationConfig
 }
 
 export function DataTablePagination<TData>({
   table,
   totalCount,
   pageSizeOptions = [10, 20, 50, 100],
+  serverPagination,
 }: DataTablePaginationProps<TData>) {
   const pageIndex = table.getState().pagination.pageIndex
   const pageSize = table.getState().pagination.pageSize
   const pageCount = table.getPageCount()
-  const totalRows = totalCount ?? table.getFilteredRowModel().rows.length
-  const start = pageIndex * pageSize + 1
-  const end = Math.min((pageIndex + 1) * pageSize, totalRows)
+  const loadedRows = table.getFilteredRowModel().rows.length
+  const totalRows = totalCount ?? serverPagination?.serverTotalHint ?? loadedRows
+  const start = loadedRows === 0 ? 0 : pageIndex * pageSize + 1
+  const end = Math.min((pageIndex + 1) * pageSize, loadedRows)
+
+  // Track whether we just requested more server data so we can advance the
+  // page once the new rows land. Without this the user would have to click
+  // Next a second time after the fetch completes.
+  const pendingAdvance = useRef(false)
+  useEffect(() => {
+    if (pendingAdvance.current && !serverPagination?.isFetching && table.getCanNextPage()) {
+      pendingAdvance.current = false
+      table.nextPage()
+    }
+  }, [serverPagination?.isFetching, loadedRows, table])
+
+  const serverHasMore = serverPagination?.hasMore ?? false
+  const canClientNext = table.getCanNextPage()
+  const canNext = canClientNext || serverHasMore
+
+  const handleNext = () => {
+    if (canClientNext) {
+      table.nextPage()
+      return
+    }
+    if (serverHasMore && serverPagination && !serverPagination.isFetching) {
+      // Schedule an auto-advance for when the fetched rows land.
+      pendingAdvance.current = true
+      serverPagination.onLoadMore()
+    }
+  }
+
+  // The `of Z` label: when server pagination is active and we only know a
+  // lower bound (loaded count), suffix with "+" to communicate "more exist".
+  const totalDisplay = serverHasMore && totalCount == null && serverPagination?.serverTotalHint == null
+    ? `${totalRows}+`
+    : String(totalRows)
 
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-t border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--surface-tertiary)/0.25)]">
       <span className="text-xs text-[rgb(var(--text-secondary))]">
-        Showing {start}-{end} of {totalRows} results
+        Showing {start}-{end} of {totalDisplay} results
       </span>
       <div className="flex items-center gap-1">
         {/* Page size selector */}
@@ -51,40 +94,43 @@ export function DataTablePagination<TData>({
           Prev
         </button>
 
-        {/* Page numbers */}
-        {getPageNumbers(pageIndex, pageCount).map((page, i) =>
-          page === 'ellipsis' ? (
-            <span
-              key={`ellipsis-${i}`}
-              className="px-1.5 text-xs text-[rgb(var(--text-tertiary))]"
-            >
-              ...
-            </span>
-          ) : (
-            <button
-              key={page}
-              type="button"
-              onClick={() => table.setPageIndex(page as number)}
-              className={cn(
-                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
-                pageIndex === page
-                  ? 'bg-teal-600 text-white shadow-sm'
-                  : 'border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))]'
-              )}
-            >
-              {(page as number) + 1}
-            </button>
-          )
-        )}
+        {/* Page numbers — only in pure client-side mode. When server
+            pagination is active the total page count is unknown, so
+            numbered buttons would be misleading. */}
+        {!serverPagination &&
+          getPageNumbers(pageIndex, pageCount).map((page, i) =>
+            page === 'ellipsis' ? (
+              <span
+                key={`ellipsis-${i}`}
+                className="px-1.5 text-xs text-[rgb(var(--text-tertiary))]"
+              >
+                ...
+              </span>
+            ) : (
+              <button
+                key={page}
+                type="button"
+                onClick={() => table.setPageIndex(page as number)}
+                className={cn(
+                  'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                  pageIndex === page
+                    ? 'bg-teal-600 text-white shadow-sm'
+                    : 'border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))]'
+                )}
+              >
+                {(page as number) + 1}
+              </button>
+            )
+          )}
 
         {/* Next */}
         <button
           type="button"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={handleNext}
+          disabled={!canNext || serverPagination?.isFetching}
           className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          Next
+          {serverPagination?.isFetching ? 'Loading…' : 'Next'}
         </button>
       </div>
     </div>
