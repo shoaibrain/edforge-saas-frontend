@@ -10,6 +10,7 @@ export {
   useCreateStudent,
   useCreateEnrollment,
   useUpdateStudent,
+  useUpdateStudentDescriptors,
   useDeleteStudent,
   useGrantPortalAccess,
   useCreateStudentAccount,

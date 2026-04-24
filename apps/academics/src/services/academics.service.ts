@@ -429,6 +429,38 @@ export async function updateStudent(
 }
 
 /**
+ * Payload for PATCH /academics/students/:id/descriptors. All 8 fields are
+ * optional; only those present in the request are updated. Backend validates
+ * via `studentDescriptorPatchSchema` from `@aibrains/shared-types` (Sprint 3).
+ */
+export interface StudentDescriptorPatchInput {
+  sexDescriptor?: string
+  languageDescriptor?: string
+  motherTongueDescriptor?: string
+  disabilities?: Array<{ descriptor: string; notes?: string }>
+  ethnicityDescriptor?: string
+  isTransferred?: boolean
+  belowPovertyLine?: boolean
+  scholarshipCategory?: string
+}
+
+/**
+ * Update student Ed-Fi descriptor fields (Sprint 3 S3.7).
+ * PATCH /academics/students/:id/descriptors
+ *
+ * The backend emits a `student.descriptor.edited` audit event on every
+ * successful call. Notes inside `disabilities[]` are stripped before the
+ * audit event is emitted (privacy guard — verified in the Sprint 3 DDB
+ * verifier smoke).
+ */
+export async function updateStudentDescriptors(
+  studentId: string,
+  data: StudentDescriptorPatchInput,
+): Promise<StudentResponseDto> {
+  return apiPatch<StudentResponseDto>(`/academics/students/${studentId}/descriptors`, data)
+}
+
+/**
  * Create a new student
  * POST /academics/students
  */

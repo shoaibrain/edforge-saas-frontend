@@ -19,6 +19,7 @@ import {
   getStudentProfile,
   createStudent,
   updateStudent,
+  updateStudentDescriptors,
   deleteStudent,
   createEnrollment,
   checkDuplicateStudents,
@@ -28,6 +29,7 @@ import {
   createStudentAccount,
   linkGuardianToUser,
   parseApiError,
+  type StudentDescriptorPatchInput,
   type StudentFilterDto,
   type StudentResponseDto,
   type StudentListResponseDto,
@@ -194,6 +196,39 @@ export function useUpdateStudent() {
       })
 
       toast.success('Student updated successfully')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+/**
+ * Mutate Ed-Fi descriptor fields on a student (Sprint 3 S3.7).
+ * PATCH /academics/students/:id/descriptors — emits a
+ * `student.descriptor.edited` audit event on success.
+ *
+ * Shares the same cache-update pattern as `useUpdateStudent`:
+ * invalidate lists, update detail cache with server response,
+ * invalidate profile query so UI re-reads fresh values.
+ */
+export function useUpdateStudentDescriptors() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    StudentResponseDto,
+    Error,
+    { studentId: string; data: StudentDescriptorPatchInput }
+  >({
+    mutationFn: ({ studentId, data }) => updateStudentDescriptors(studentId, data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      queryClient.setQueryData(studentKeys.detail(variables.studentId), data)
+      queryClient.invalidateQueries({
+        queryKey: studentKeys.profile(variables.studentId),
+      })
+      toast.success('Demographics updated')
     },
     onError: (error) => {
       const parsed = parseApiError(error)

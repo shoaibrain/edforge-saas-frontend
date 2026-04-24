@@ -47,3 +47,8 @@ export {
   ScheduleTabSkeleton,
   type ScheduleTabProps,
 } from './ScheduleTab'
+
+export {
+  DemographicsTab,
+  type DemographicsTabProps,
+} from './DemographicsTab'
