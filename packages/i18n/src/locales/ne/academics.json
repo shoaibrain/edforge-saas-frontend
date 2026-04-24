@@ -3,7 +3,8 @@
     "overview": "अवलोकन",
     "profile": "प्रोफाइल",
     "enrollment": "भर्ना",
-    "family": "परिवार"
+    "family": "परिवार",
+    "demographics": "जनसांख्यिकी"
   },
   "error": {
     "failedToLoad": "प्रोफाइल लोड गर्न असफल",

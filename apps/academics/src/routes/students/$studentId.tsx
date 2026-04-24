@@ -23,6 +23,7 @@ import {
   GraduationCap,
   Users,
   BarChart3,
+  IdCard,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { useStudentProfile, useStudentProfileActions, useGrantPortalAccess } from '../../hooks'
@@ -36,6 +37,7 @@ import {
   EnrollmentTab,
   FamilyTab,
   ProfileTab,
+  DemographicsTab,
 } from '../../components/students/profile'
 import { EnrollExistingStudentModal } from '../../components/enrollment/EnrollExistingStudentModal'
 import { EditStudentModal } from '../../components/students/EditStudentModal'
@@ -46,13 +48,14 @@ import { AddGuardianModal } from '../../components/students/profile/AddGuardianM
 // CONSTANTS
 // ============================================================================
 
-type TabId = 'overview' | 'profile' | 'enrollment' | 'family'
+type TabId = 'overview' | 'profile' | 'enrollment' | 'family' | 'demographics'
 
 const TAB_IDS: { id: TabId; icon: typeof User }[] = [
   { id: 'overview', icon: BarChart3 },
   { id: 'profile', icon: User },
   { id: 'enrollment', icon: GraduationCap },
   { id: 'family', icon: Users },
+  { id: 'demographics', icon: IdCard },
 ]
 
 // ============================================================================
@@ -291,6 +294,9 @@ export function StudentProfilePage() {
                   isGrantingAccess={grantPortalAccess.isPending}
                   canEdit={canEdit}
                 />
+              )}
+              {activeTab === 'demographics' && (
+                <DemographicsTab student={student} canEdit={canEdit} />
               )}
             </motion.div>
           </AnimatePresence>

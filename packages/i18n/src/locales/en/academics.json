@@ -3,7 +3,8 @@
     "overview": "Overview",
     "profile": "Profile",
     "enrollment": "Enrollment",
-    "family": "Family"
+    "family": "Family",
+    "demographics": "Demographics"
   },
   "error": {
     "failedToLoad": "Failed to Load Profile",
