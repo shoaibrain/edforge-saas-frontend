@@ -190,7 +190,18 @@ export function WizardProvider({
 
     setIsSubmitting(true)
     try {
-      await onSubmit(formDataRef.current)
+      const result = await onSubmit(formDataRef.current)
+      // If the handler returned per-field server errors, surface them inline
+      // instead of clearing auto-save or treating the submit as successful.
+      if (result?.serverErrors && Object.keys(result.serverErrors).length > 0) {
+        setErrors(result.serverErrors)
+        if (typeof result.targetStepIndex === 'number'
+            && result.targetStepIndex >= 0
+            && result.targetStepIndex < steps.length) {
+          setCurrentStep(result.targetStepIndex)
+        }
+        return
+      }
       // Clear auto-save on successful submit
       if (autoSaveKey) {
         try { localStorage.removeItem(autoSaveKey) } catch { /* ignore */ }

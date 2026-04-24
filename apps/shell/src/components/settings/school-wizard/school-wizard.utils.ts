@@ -1,9 +1,38 @@
 /**
  * School Wizard Utilities
  *
- * Auto-generation helpers, DTO transformation, and re-exports for the school creation wizard.
+ * Auto-generation helpers, DTO transformation, server-error mapping, and
+ * re-exports for the school creation wizard.
  * Grade-level constants and school-type mappings are imported from @aibrains/shared-types.
  */
+
+// ============================================================================
+// SERVER ERROR MAPPING
+// ============================================================================
+
+export const STEP_INDEX_BASIC = 0
+export const STEP_INDEX_LOCATION = 1
+export const STEP_INDEX_ORGANIZATION = 2
+export const STEP_INDEX_EDFI = 3
+
+/**
+ * Route a Zod error path (`['address', 'country']`) to the step index that
+ * owns that field, so the wizard can navigate straight to the step where the
+ * user can fix the error. Unknown paths default to Step 1 (Basic Info) —
+ * the rare unmapped field will still be visible alongside the toast.
+ */
+export function fieldPathToStepIndex(path: string): number {
+  if (/^(address|phone|email|institutionTelephones)(\.|$)/.test(path)) return STEP_INDEX_LOCATION
+  if (/^(localEducationAgencyId|administrativeFundingControlDescriptor|schoolTypeDescriptor)(\.|$)/.test(path)) return STEP_INDEX_ORGANIZATION
+  if (/^(gradeLevels|schoolCategories)(\.|$)/.test(path)) return STEP_INDEX_EDFI
+  return STEP_INDEX_BASIC
+}
+
+/** Normalise a Zod error `path` (array of string/number) to a dotted string. */
+export function flattenZodPath(path: unknown): string {
+  if (!Array.isArray(path)) return typeof path === 'string' ? path : ''
+  return path.filter((p) => p != null).map(String).join('.')
+}
 
 import type { CreateSchoolDto } from '@aibrains/shared-types'
 import {
