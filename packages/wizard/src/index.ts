@@ -15,6 +15,7 @@ export type {
   WizardContainerProps,
   WizardCardProps,
   WizardModalProps,
+  WizardSubmitResult,
 } from './types'
 
 // Context

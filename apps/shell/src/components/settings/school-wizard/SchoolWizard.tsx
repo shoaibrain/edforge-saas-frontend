@@ -12,12 +12,19 @@ import { ArrowLeft, Building2, MapPin, Users, Tag, CheckCircle2, AlertTriangle }
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { WizardContainer } from '@edforge/wizard'
-import type { WizardStep } from '@edforge/wizard'
+import type { WizardStep, WizardSubmitResult } from '@edforge/wizard'
 import type { SchoolResponseDto } from '@aibrains/shared-types'
 import { useAuthStore } from '@/stores/auth.store'
 import { useShell, useTenant } from '@/lib/shell-context'
 import { tenantService } from '@/services/tenant.service'
-import { transformWizardDataToDto, getDefaultGradeRange, getDefaultSchoolDays } from './school-wizard.utils'
+import {
+  transformWizardDataToDto,
+  getDefaultGradeRange,
+  getDefaultSchoolDays,
+  STEP_INDEX_BASIC,
+  fieldPathToStepIndex,
+  flattenZodPath,
+} from './school-wizard.utils'
 import { makeBasicInfoSchema, locationContactSchema, edfiComplianceSchema } from './school-wizard.schemas'
 import { BasicInfoStep } from './steps/BasicInfoStep'
 import { LocationContactStep } from './steps/LocationContactStep'
@@ -203,7 +210,7 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
     [initialLeaId, school, resolvedSettings.timezone, resolvedSettings.locale, resolvedSettings.calendarSystem],
   )
 
-  const handleSubmit = async (data: Record<string, unknown>) => {
+  const handleSubmit = async (data: Record<string, unknown>): Promise<void | WizardSubmitResult> => {
     try {
       if (isEditMode && school) {
         const dto = transformWizardDataToDto(data)
@@ -218,26 +225,46 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
       }
       onSuccess()
     } catch (error: any) {
-      // Sprint C Gap 1/3 — map the PABSON emisSchoolCode rejection to a
-      // helpful toast so the user doesn't need to decode raw server text.
-      // The backend returns { errorCode: 'EMIS_CODE_REQUIRED', details: {
-      // field: 'emisSchoolCode', ... } }. If the wizard's own client-side
-      // gate missed it (e.g. user navigated past Step 1 in edit mode),
-      // this is our safety net.
-      const errorCode = error?.response?.data?.errorCode
-      const serverDetails = error?.response?.data?.details
+      const errorData = error?.response?.data
+      const errorCode = errorData?.errorCode
+      const serverDetails = errorData?.details
+
+      // Sprint C Gap 1/3 — PABSON gate rejection has its own errorCode and a
+      // tailored message. Surface inline on Step 1 so the user sees the
+      // required-field marker exactly where they need to fix it.
       if (errorCode === 'EMIS_CODE_REQUIRED') {
-        toast.error(
-          'IEMIS School Code is required for PABSON tenants. Please return to ' +
-            'Step 1 and fill the IEMIS School Code field.',
-        )
-        throw error
+        const msg = 'IEMIS School Code is required for PABSON tenants — 8–10 digits issued by your local municipality.'
+        toast.error(msg)
+        return {
+          serverErrors: { emisSchoolCode: msg },
+          targetStepIndex: STEP_INDEX_BASIC,
+        }
       }
 
-      const message = error?.response?.data?.message
+      // Zod-based BAD_REQUEST responses carry a structured `errors[]` array
+      // ({ path, message, code }). Map each to a flat dotted field path and
+      // return them — WizardContext surfaces them inline via WizardStepProps.
+      if (Array.isArray(errorData?.errors) && errorData.errors.length > 0) {
+        const serverErrors: Record<string, string> = {}
+        for (const e of errorData.errors as Array<{ path?: unknown; message?: string }>) {
+          const path = flattenZodPath(e.path)
+          if (path && e.message) serverErrors[path] = e.message
+        }
+        if (Object.keys(serverErrors).length > 0) {
+          const count = Object.keys(serverErrors).length
+          const firstField = Object.keys(serverErrors)[0]
+          toast.error(`Validation failed — ${count} field${count === 1 ? '' : 's'} need${count === 1 ? 's' : ''} correction`)
+          return {
+            serverErrors,
+            targetStepIndex: fieldPathToStepIndex(firstField),
+          }
+        }
+      }
+
+      // Fallback for non-field server errors (network, 500, unmapped).
+      const message = errorData?.message
         || error?.message
         || `Failed to ${isEditMode ? 'update' : 'create'} school. Please try again.`
-      // Surface structured field name in toast if backend provided one.
       const fieldHint = serverDetails?.field ? ` (field: ${serverDetails.field})` : ''
       toast.error(`${message}${fieldHint}`)
       throw error

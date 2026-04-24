@@ -114,13 +114,40 @@ export interface WizardContextValue {
 // WIZARD PROVIDER PROPS
 // ============================================================================
 
+/**
+ * Optional structured result an `onSubmit` handler can return when the API
+ * rejects the submission with per-field validation errors (e.g. a backend
+ * Zod `errors[]` payload). Returning this from onSubmit instead of throwing
+ * makes the wizard:
+ *   - apply `serverErrors` as the step-level error dict (surfaces inline
+ *     under each field via `WizardStepProps.errors`)
+ *   - optionally navigate to `targetStepIndex` so the first bad field is
+ *     visible
+ *   - skip clearing the auto-save blob (the submit did not succeed)
+ *
+ * Consumers can still `throw` for non-field server errors (network, 500,
+ * unmapped errors) — existing callers returning `Promise<void>` are
+ * unaffected by this extension.
+ */
+export interface WizardSubmitResult {
+  /** Per-field server errors, keyed by flat dotted field path (e.g. `address.country`). */
+  serverErrors?: Record<string, string>
+  /** Optional step index to navigate to after applying errors. */
+  targetStepIndex?: number
+}
+
 export interface WizardProviderProps {
   /** Wizard step configurations */
   steps: WizardStep[]
   /** Initial form data */
   initialData?: Record<string, unknown>
-  /** Called when wizard is submitted */
-  onSubmit: (data: Record<string, unknown>) => Promise<void>
+  /**
+   * Called when wizard is submitted. Return `void` on success (default) or a
+   * `WizardSubmitResult` with per-field `serverErrors` to surface inline
+   * (see `WizardSubmitResult`). Throwing is still supported for non-field
+   * errors (e.g. network failures, 500s).
+   */
+  onSubmit: (data: Record<string, unknown>) => Promise<void | WizardSubmitResult>
   /** Called when wizard is cancelled */
   onCancel?: () => void
   /** localStorage key for auto-save. If set, wizard state is saved/restored automatically. */
