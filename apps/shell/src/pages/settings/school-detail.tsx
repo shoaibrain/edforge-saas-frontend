@@ -41,6 +41,8 @@ import AcademicSetupTab from './tabs/AcademicSetupTab'
 import StructureTab from './tabs/StructureTab'
 import AuditLogTab from './tabs/AuditLogTab'
 
+import { IemisCodeBadge } from '@/components/settings/IemisCodeBadge'
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -582,6 +584,10 @@ export default function SchoolDetailPage() {
                   <span className={`w-[5px] h-[5px] rounded-full ${statusCfg.dot}`} />
                   {statusCfg.label}
                 </span>
+                {/* IEMIS School Code badge — renders nothing for non-PABSON tenants
+                    that have no emisSchoolCode set. Format validation + copy/tooltip
+                    behavior lives inside the component. */}
+                <IemisCodeBadge code={displaySchool.emisSchoolCode} />
               </div>
             </div>
           </div>
