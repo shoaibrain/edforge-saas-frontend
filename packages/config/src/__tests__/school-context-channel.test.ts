@@ -121,6 +121,51 @@ describe('school-context-channel', () => {
     })
   })
 
+  describe('Sprint A.12 — archetype + country fields', () => {
+    it('threads archetype and country through the payload', () => {
+      broadcastSchoolChange(
+        'school-1',
+        'active',
+        undefined, // resolvedSettings
+        'tenant-1',
+        'PABSON',
+        'NPL',
+      )
+
+      const event = dispatchSpy.mock.calls[0][0] as CustomEvent<SchoolContextPayload>
+      expect(event.detail.archetype).toBe('PABSON')
+      expect(event.detail.country).toBe('NPL')
+      expect(event.detail.tenantId).toBe('tenant-1')
+    })
+
+    it('archetype + country surface synchronously via getSchoolContext', () => {
+      broadcastSchoolChange('school-1', 'active', undefined, 'tenant-1', 'PABSON', 'NPL')
+
+      const ctx = getSchoolContext()
+      expect(ctx.archetype).toBe('PABSON')
+      expect(ctx.country).toBe('NPL')
+    })
+
+    it('subscribers receive archetype + country in the payload', () => {
+      const callback = vi.fn()
+      const unsubscribe = onSchoolChange(callback)
+
+      broadcastSchoolChange('school-1', 'active', undefined, 'tenant-1', 'PABSON', 'NPL')
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({ archetype: 'PABSON', country: 'NPL' }),
+      )
+      unsubscribe()
+    })
+
+    it('omits archetype + country gracefully when not provided (legacy callers)', () => {
+      broadcastSchoolChange('school-1', 'active')
+      const ctx = getSchoolContext()
+      expect(ctx.archetype).toBeUndefined()
+      expect(ctx.country).toBeUndefined()
+    })
+  })
+
   describe('getSchoolContext', () => {
     it('returns the last broadcast payload', () => {
       broadcastSchoolChange('school-99', 'active')

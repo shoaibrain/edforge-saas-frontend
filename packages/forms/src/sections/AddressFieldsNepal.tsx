@@ -33,7 +33,6 @@ import { MapPin, type LucideIcon } from 'lucide-react'
 import {
   NEPAL_PROVINCES,
   NEPAL_DISTRICTS,
-  NEPAL_MUNICIPALITY_TYPES,
 } from '@aibrains/shared-types'
 import { TextField, SelectField } from '../fields'
 import { FormSection } from './FormSection'
@@ -43,17 +42,13 @@ const PROVINCE_OPTIONS = NEPAL_PROVINCES.map((p) => ({
   label: `${p.nameEn} / ${p.nameNe}`,
 }))
 
-const MUNICIPALITY_TYPE_OPTIONS = NEPAL_MUNICIPALITY_TYPES.map((t) => ({
-  value: t,
-  label:
-    t === 'metropolitan'
-      ? 'Metropolitan City'
-      : t === 'sub_metropolitan'
-        ? 'Sub-Metropolitan City'
-        : t === 'municipality'
-          ? 'Municipality'
-          : 'Rural Municipality',
-}))
+// NOTE: NEPAL_MUNICIPALITY_TYPES is exported from shared-types but currently
+// has no backing field in the backend addressSchema (Sprint A.1) or
+// staffAddressSchema (Sprint A.2). The municipality TEXT field captures
+// "Kathmandu Metropolitan City"-style names which already convey the type
+// suffix. If/when CEHRD aggregations need a structured municipalityType
+// enum field, we'll add it to the backend schemas in a follow-up sprint
+// and re-introduce a SelectField here.
 
 export interface AddressFieldsNepalProps {
   /** Prefix for field names (e.g., "address" → "address.street1"). */
@@ -174,23 +169,13 @@ export function AddressFieldsNepal({
           />
         </div>
 
-        {/* Municipality + type */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <TextField
-            name={`${prefix}municipality`}
-            label="Municipality / Rural Municipality / VDC"
-            placeholder="e.g., Kathmandu Metropolitan City"
-            disabled={disabled}
-            className="md:col-span-2"
-          />
-          <SelectField
-            name={`${prefix}municipalityType`}
-            label="Type"
-            placeholder="Select type"
-            options={MUNICIPALITY_TYPE_OPTIONS}
-            disabled={disabled}
-          />
-        </div>
+        {/* Municipality */}
+        <TextField
+          name={`${prefix}municipality`}
+          label="Municipality / Rural Municipality / VDC"
+          placeholder="e.g., Kathmandu Metropolitan City"
+          disabled={disabled}
+        />
 
         {/* Ward + Postal */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
