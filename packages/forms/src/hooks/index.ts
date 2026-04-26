@@ -6,4 +6,5 @@
 
 export { useFormField, type UseFormFieldReturn } from './useFormField'
 export { useFormSection, type UseFormSectionOptions, type UseFormSectionReturn } from './useFormSection'
+export { useTenantContext, isNepalShape, type TenantContext } from './useTenantContext'
 

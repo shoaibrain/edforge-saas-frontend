@@ -114,9 +114,12 @@ export {
 export {
   useFormField,
   useFormSection,
+  useTenantContext,
+  isNepalShape,
   type UseFormFieldReturn,
   type UseFormSectionOptions,
   type UseFormSectionReturn,
+  type TenantContext,
 } from './hooks'
 
 // Re-export react-hook-form essentials for convenience
