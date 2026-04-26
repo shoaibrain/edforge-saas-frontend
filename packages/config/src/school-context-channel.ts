@@ -19,6 +19,19 @@ export interface SchoolContextPayload {
   schoolStatus: string | null
   tenantId?: string | null
   resolvedSettings?: ResolvedSettings
+  /**
+   * Tenant archetype (PABSON | GENERIC | …). Used by region-aware UI
+   * components (e.g., AddressFields, PhoneInput in Sprint A) to decide
+   * which form variant to render. Optional for backwards-compat: legacy
+   * payloads without archetype get treated as GENERIC by consumers.
+   */
+  archetype?: string | null
+  /**
+   * Tenant country (ISO-3166 alpha-3, e.g., 'NPL' | 'USA'). Country
+   * fallback when archetype isn't authoritative — e.g., a GENERIC
+   * archetype tenant operating in Nepal still gets Nepal-shaped forms.
+   */
+  country?: string | null
 }
 
 // ============================================================================
@@ -40,11 +53,13 @@ export function broadcastSchoolChange(
   schoolStatus: string | null,
   resolvedSettings?: ResolvedSettings,
   tenantId?: string | null,
+  archetype?: string | null,
+  country?: string | null,
 ): void {
-  _lastPayload = { schoolId, schoolStatus, tenantId, resolvedSettings }
+  _lastPayload = { schoolId, schoolStatus, tenantId, resolvedSettings, archetype, country }
   window.dispatchEvent(
     new CustomEvent<SchoolContextPayload>(EVENT_NAME, {
-      detail: { schoolId, schoolStatus, tenantId, resolvedSettings },
+      detail: { schoolId, schoolStatus, tenantId, resolvedSettings, archetype, country },
     }),
   )
 }

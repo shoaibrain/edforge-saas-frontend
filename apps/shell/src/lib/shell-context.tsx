@@ -269,14 +269,21 @@ export function ShellProvider({ children }: ShellProviderProps) {
 
   // Broadcast resolved settings to MFEs whenever they change
   const tenantId = user?.tenantId ?? effectiveTenant?.id ?? null
+  // Sprint A.12: thread tenant archetype + country through the channel so
+  // MFEs (e.g., Staff Wizard in apps/people) can render region-aware forms
+  // without coupling to apps/shell's React context.
+  const tenantArchetype = effectiveTenant?.archetype ?? null
+  const tenantCountry = effectiveTenant?.country ?? null
   useEffect(() => {
     broadcastSchoolChange(
       activeSchoolId,
       activeSchool?.status ?? null,
       resolvedSettings,
       tenantId,
+      tenantArchetype,
+      tenantCountry,
     )
-  }, [activeSchoolId, activeSchool?.status, resolvedSettings, tenantId])
+  }, [activeSchoolId, activeSchool?.status, resolvedSettings, tenantId, tenantArchetype, tenantCountry])
 
   // Consolidated auto-select: restore from localStorage or pick first available
   useEffect(() => {
