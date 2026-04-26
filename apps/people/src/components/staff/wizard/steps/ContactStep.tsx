@@ -17,15 +17,11 @@
  * single decoupling boundary.
  */
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, AlertTriangle, Plus, X } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
-import {
-  getSchoolContext,
-  onSchoolChange,
-  type SchoolContextPayload,
-} from '@edforge/config/school-context-channel'
+import { useTenantContext, isNepalShape } from '@edforge/forms'
 import {
   NEPAL_PROVINCES,
   NEPAL_DISTRICTS,
@@ -36,39 +32,6 @@ import {
   RELATIONSHIP_OPTIONS,
 } from '../staff-wizard.utils'
 import { AnimatedInput, AnimatedSelect, SectionHeader } from './shared'
-
-// ============================================================================
-// ARCHETYPE HOOK (reads via @edforge/config channel — no apps/shell import)
-// ============================================================================
-
-interface TenantContext {
-  archetype: string | null
-  country: string | null
-}
-
-function useTenantContext(): TenantContext {
-  const initial = getSchoolContext()
-  const [ctx, setCtx] = useState<TenantContext>({
-    archetype: initial.archetype ?? null,
-    country: initial.country ?? null,
-  })
-
-  useEffect(() => {
-    const unsub = onSchoolChange((payload: SchoolContextPayload) => {
-      setCtx({
-        archetype: payload.archetype ?? null,
-        country: payload.country ?? null,
-      })
-    })
-    return unsub
-  }, [])
-
-  return ctx
-}
-
-function isNepalShape(archetype: string | null, country: string | null): boolean {
-  return archetype === 'PABSON' || country === 'NPL'
-}
 
 // ============================================================================
 // ADDRESS ENTRY

@@ -5,11 +5,27 @@
  * Collects email, phone, physical address, and optional mailing address.
  *
  * V2: Collapsible sections with icons, titles, and completion indicators.
+ *
+ * Sprint A.13 + A.18: AddressSection → AddressFields, PhoneField → PhoneInput.
+ * Both branch on the tenant's archetype + country (read via the
+ * useTenantContext hook from @edforge/forms — sourced from the
+ * @edforge/config school-context-channel populated by Shell).
+ *
+ * PABSON tenants (Nepal pilot) see the CEHRD-canonical Province/District/
+ * Municipality/Ward layout + +977 phone prefix. GENERIC tenants see the
+ * existing US-shaped form unchanged.
  */
 
 import { FormProvider } from 'react-hook-form'
 import { Phone, MapPin, Mail } from 'lucide-react'
-import { TextField, PhoneField, SelectField, ToggleField, AddressSection } from '@edforge/forms'
+import {
+  TextField,
+  SelectField,
+  ToggleField,
+  AddressFields,
+  PhoneInput,
+  useTenantContext,
+} from '@edforge/forms'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { PHONE_TYPE_OPTIONS } from '../../../../schemas/student.form'
@@ -23,6 +39,7 @@ export function ContactInfoStep({
 }: WizardStepProps) {
   const form = useWizardForm({ data, updateData, errors, clearError })
   const useMailingAddress = form.watch('contactInfo.useMailingAddress')
+  const { archetype, country } = useTenantContext()
 
   return (
     <FormProvider {...form}>
@@ -44,10 +61,11 @@ export function ContactInfoStep({
               placeholder="student@example.com"
               helperText="Optional for students"
             />
-            <PhoneField
+            <PhoneInput
               name="contactInfo.phone"
+              archetype={archetype}
+              country={country}
               label="Phone Number"
-              placeholder="(555) 123-4567"
             />
             <SelectField
               name="contactInfo.phoneType"
@@ -69,10 +87,18 @@ export function ContactInfoStep({
             'contactInfo.address.city',
             'contactInfo.address.state',
             'contactInfo.address.zipCode',
+            // Nepal-shaped extension fields (Sprint A.1) — populated by
+            // PABSON tenants via AddressFieldsNepal.
+            'contactInfo.address.province',
+            'contactInfo.address.district',
+            'contactInfo.address.municipality',
+            'contactInfo.address.wardNumber',
           ]}
           defaultExpanded
         >
-          <AddressSection
+          <AddressFields
+            archetype={archetype}
+            country={country}
             namePrefix="contactInfo.address"
             showAddressLine2
             showCountry
@@ -96,7 +122,9 @@ export function ContactInfoStep({
             />
 
             {useMailingAddress && (
-              <AddressSection
+              <AddressFields
+                archetype={archetype}
+                country={country}
                 namePrefix="contactInfo.mailingAddress"
                 title="Mailing Address"
                 showAddressLine2
