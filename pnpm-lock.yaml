@@ -73,8 +73,8 @@ importers:
   apps/academics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.32.0
-        version: 0.32.0(zod@3.24.4)
+        specifier: ^0.35.0
+        version: 0.35.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -173,8 +173,8 @@ importers:
   apps/analytics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.32.0
-        version: 0.32.0(zod@3.24.4)
+        specifier: ^0.35.0
+        version: 0.35.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -492,8 +492,8 @@ importers:
   apps/people:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.32.0
-        version: 0.32.0(zod@3.24.4)
+        specifier: ^0.35.0
+        version: 0.35.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -592,8 +592,8 @@ importers:
   apps/shell:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.32.0
-        version: 0.32.0(zod@3.24.4)
+        specifier: ^0.35.0
+        version: 0.35.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -1034,8 +1034,8 @@ importers:
   packages/types:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.32.0
-        version: 0.32.0(zod@3.24.4)
+        specifier: ^0.35.0
+        version: 0.35.0(zod@3.24.4)
       '@edforge/config':
         specifier: workspace:*
         version: link:../config
@@ -1175,8 +1175,8 @@ packages:
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
 
-  '@aibrains/shared-types@0.32.0':
-    resolution: {integrity: sha512-qf8mBA5zTFIkJ9LQ6cWFRqnMqC/l7J171Fahopb7eoS67N1vbC7n8q9dlq2qBAvCkxWgffVcwgBPGfuMs2Hukg==}
+  '@aibrains/shared-types@0.35.0':
+    resolution: {integrity: sha512-xUaWl7jLmegE/u4We3y6Bw2xfNUlUvIa/mi1b4+nr03wrJkeiKqX2ZbQg4bpZ0VnefnVuyfDVNOkDECkoBdjQg==}
     peerDependencies:
       zod: ~3.24.4
 
@@ -5410,7 +5410,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@aibrains/shared-types@0.32.0(zod@3.24.4)':
+  '@aibrains/shared-types@0.35.0(zod@3.24.4)':
     dependencies:
       zod: 3.24.4
 
