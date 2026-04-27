@@ -70,27 +70,42 @@ import {
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React, { lazy } from 'react'
+import { handleChunkLoadError } from './lib/chunk-error-handler'
 
-const AcademicsModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('academics/AcademicsModule')
-  if (!module) throw new Error('Failed to load Academics remote')
-  return module
-})
-const FinanceModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('finance/FinanceModule')
-  if (!module) throw new Error('Failed to load Finance remote')
-  return module
-})
-const PeopleModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('people/PeopleModule')
-  if (!module) throw new Error('Failed to load People remote')
-  return module
-})
-const AnalyticsModule = React.lazy(async () => {
-  const module = await loadRemote<{ default: React.ComponentType }>('analytics/AnalyticsModule')
-  if (!module) throw new Error('Failed to load Analytics remote')
-  return module
-})
+async function loadRemoteWithRetry(
+  remotePath: string,
+  maxRetries = 1
+): Promise<{ default: React.ComponentType }> {
+  let lastError: unknown
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const module = await loadRemote<{ default: React.ComponentType }>(remotePath)
+      if (!module) throw new Error(`Failed to load remote: ${remotePath}`)
+      return module
+    } catch (error) {
+      lastError = error
+      if (attempt < maxRetries) {
+        console.warn(`[MFE] Retrying ${remotePath} (${maxRetries - attempt} retries left)...`)
+        await new Promise(r => setTimeout(r, 1000))
+      }
+    }
+  }
+  handleChunkLoadError(lastError)
+  throw lastError
+}
+
+const AcademicsModule = React.lazy(() =>
+  loadRemoteWithRetry('academics/AcademicsModule')
+)
+const FinanceModule = React.lazy(() =>
+  loadRemoteWithRetry('finance/FinanceModule')
+)
+const PeopleModule = React.lazy(() =>
+  loadRemoteWithRetry('people/PeopleModule')
+)
+const AnalyticsModule = React.lazy(() =>
+  loadRemoteWithRetry('analytics/AnalyticsModule')
+)
 
 // ============================================================================
 // THEME SYNC COMPONENT

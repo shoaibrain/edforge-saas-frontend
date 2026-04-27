@@ -139,7 +139,13 @@ const tenantResolverPlugin: FederationRuntimePlugin = {
   errorLoadRemote(args) {
     console.error(`[MFE] Failed to load remote: ${args.id}`, args.error)
 
-    // Could trigger a fallback UI or retry logic here
+    // Check if this is a stale deployment error and trigger reload
+    if (args.error) {
+      import('../lib/chunk-error-handler').then(({ handleChunkLoadError }) => {
+        handleChunkLoadError(args.error)
+      })
+    }
+
     return args
   },
 

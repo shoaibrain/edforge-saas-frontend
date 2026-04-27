@@ -50,6 +50,12 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
   const isDev = import.meta.env.DEV
   const shouldShowDetails = showDetails ?? isDev
 
+  const isDeploymentError = error && (
+    error.name === 'ChunkLoadError' ||
+    error.message.toLowerCase().includes('loading chunk') ||
+    error.message.includes("Unexpected token '<'")
+  )
+
   return (
     <div className="min-h-[400px] flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
@@ -63,17 +69,19 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
         {/* Error Message */}
         <div className="text-center mb-6">
           <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
-            Something went wrong
+            {isDeploymentError ? 'New version available' : 'Something went wrong'}
           </h2>
           <p className="text-[rgb(var(--text-secondary))] text-sm">
-            We encountered an unexpected error. This has been logged and we're working on a fix.
+            {isDeploymentError
+              ? 'A new version of EdForge has been deployed. Please reload the page to get the latest version.'
+              : 'We encountered an unexpected error. This has been logged and we\'re working on a fix.'}
           </p>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center justify-center gap-3 mb-6">
           <button
-            onClick={resetError}
+            onClick={isDeploymentError ? () => window.location.reload() : resetError}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-xl',
               'bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600',
@@ -83,7 +91,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
             )}
           >
             <RefreshCw className="w-4 h-4" />
-            Try Again
+            {isDeploymentError ? 'Reload Page' : 'Try Again'}
           </button>
           <a
             href="/home"
@@ -173,7 +181,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo })
-    
+
+    // Check for chunk load error (stale deployment) — reload before showing UI
+    if (
+      error.name === 'ChunkLoadError' ||
+      error.message.toLowerCase().includes('loading chunk') ||
+      error.message.includes("Unexpected token '<'")
+    ) {
+      import('../../lib/chunk-error-handler').then(({ handleChunkLoadError }) => {
+        handleChunkLoadError(error)
+      })
+      return
+    }
+
     // Log to console in development
     if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo)
@@ -181,11 +201,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     // Call optional error handler
     this.props.onError?.(error, errorInfo)
-
-    // TODO: In production, send to error tracking service (e.g., Sentry)
-    // if (import.meta.env.PROD) {
-    //   captureException(error, { extra: errorInfo })
-    // }
   }
 
   resetError = (): void => {
