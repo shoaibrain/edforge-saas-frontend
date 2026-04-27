@@ -90,7 +90,11 @@ async function loadRemoteWithRetry(
       }
     }
   }
-  handleChunkLoadError(lastError)
+  // If reload was initiated, return a never-resolving promise so Suspense
+  // keeps showing the loading screen instead of flashing an error UI.
+  if (handleChunkLoadError(lastError)) {
+    return new Promise(() => {})
+  }
   throw lastError
 }
 
@@ -564,12 +568,67 @@ const settingsOrgSchoolCreateRoute = createRoute({
 
 
 // ============================================================================
+// REMOTE MODULE ERROR COMPONENT
+// ============================================================================
+
+function RemoteModuleError({ error, reset }: ErrorComponentProps) {
+  const isDeploymentError = error && (
+    error.name === 'ChunkLoadError' ||
+    error.message.toLowerCase().includes('loading chunk') ||
+    error.message.includes("Unexpected token '<'")
+  )
+
+  return (
+    <div className="min-h-[400px] flex items-center justify-center p-6">
+      <div className="max-w-lg w-full text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182M2.985 19.644l3.181-3.183" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
+          {isDeploymentError ? 'New version available' : 'Something went wrong'}
+        </h2>
+        <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
+          {isDeploymentError
+            ? 'A new version of EdForge has been deployed. Please reload the page to get the latest version.'
+            : 'We encountered an unexpected error loading this module.'}
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-medium text-sm transition-colors"
+          >
+            Reload Page
+          </button>
+          {!isDeploymentError && (
+            <button
+              onClick={reset}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+            >
+              Try Again
+            </button>
+          )}
+          <a
+            href="/home"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+          >
+            Go Home
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
 // ACADEMICS ROUTES
 // ============================================================================
 
 const academicsRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/academics/$', // Splat route
+  errorComponent: RemoteModuleError,
   component: () => (
     <Suspense fallback={<LoadingScreen />}>
       <AcademicsModule />
@@ -577,20 +636,16 @@ const academicsRoute = createRoute({
   ),
 })
 
-
-
 const financeRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/finance/$',
+  errorComponent: RemoteModuleError,
   component: () => (
     <Suspense fallback={<LoadingScreen />}>
       <FinanceModule />
     </Suspense>
   ),
 })
-
-
-
 
 // ============================================================================
 // PEOPLE ROUTES
@@ -599,6 +654,7 @@ const financeRoute = createRoute({
 const peopleRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/people/$',
+  errorComponent: RemoteModuleError,
   component: () => (
     <Suspense fallback={<LoadingScreen />}>
       <PeopleModule />
@@ -609,6 +665,7 @@ const peopleRoute = createRoute({
 const analyticsRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/analytics/$',
+  errorComponent: RemoteModuleError,
   component: () => (
     <Suspense fallback={<LoadingScreen />}>
       <AnalyticsModule />

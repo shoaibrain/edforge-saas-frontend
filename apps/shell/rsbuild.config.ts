@@ -19,10 +19,13 @@ if (!API_URL && process.env.NODE_ENV === 'production') {
 
 // Production builds use same-origin relative paths for remotes (consolidated deployment).
 // Development uses localhost ports for each remote's dev server.
+// Build timestamp is appended as a query param in production to bust browser cache
+// across deployments — prevents stale remoteEntry.js from being served from HTTP cache.
 const isProd = process.env.NODE_ENV === 'production'
+const buildTimestamp = Date.now()
 function remoteUrl(dirName: string, mfName: string, devPort: number): string {
   return isProd
-    ? `${mfName}@/remotes/${dirName}/remoteEntry.js`
+    ? `${mfName}@/remotes/${dirName}/remoteEntry.js?t=${buildTimestamp}`
     : `${mfName}@http://localhost:${devPort}/remoteEntry.js`
 }
 
