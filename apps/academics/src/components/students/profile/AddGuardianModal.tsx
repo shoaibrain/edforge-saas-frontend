@@ -14,6 +14,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, Users } from 'lucide-react'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { useTenantContext } from '@edforge/forms'
+import { phoneFormatForArchetype } from '@aibrains/shared-types'
 import { useUpdateStudent } from '../../../hooks'
 import { parseApiError } from '../../../services/academics.service'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
@@ -67,6 +69,10 @@ export function AddGuardianModal({
 }: AddGuardianModalProps) {
   const firstInputRef = useRef<HTMLInputElement>(null)
   const updateMutation = useUpdateStudent()
+
+  // Sprint A.15 — archetype-aware phone format hint (e.g., +977 for PABSON).
+  const { archetype, country } = useTenantContext()
+  const phoneFmt = phoneFormatForArchetype(archetype, country)
 
   const {
     register,
@@ -234,14 +240,19 @@ export function AddGuardianModal({
             <label htmlFor="guardianPhone" className="block text-sm font-medium text-text-primary mb-1.5">
               Phone <span className="text-red-500">*</span>
             </label>
-            <input
-              id="guardianPhone"
-              type="tel"
-              {...register('phone')}
-              className={inputClass(!!errors.phone)}
-              placeholder="+1 (555) 123-4567"
-              disabled={isSubmitting}
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary pointer-events-none border-r border-border-primary pr-2">
+                {phoneFmt.dialCode}
+              </span>
+              <input
+                id="guardianPhone"
+                type="tel"
+                {...register('phone')}
+                className={`${inputClass(!!errors.phone)} pl-16`}
+                placeholder={phoneFmt.placeholder}
+                disabled={isSubmitting}
+              />
+            </div>
             {errors.phone && (
               <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
             )}

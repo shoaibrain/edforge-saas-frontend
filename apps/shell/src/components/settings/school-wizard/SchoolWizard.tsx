@@ -194,11 +194,15 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
         return schoolToWizardData(school)
       }
       const defaultRange = getDefaultGradeRange('high')
+      // Sprint A.16 — default `address.country` based on tenant archetype.
+      // PABSON tenants (Nepal pilot) default to NPL so the country-adaptive
+      // address fieldset renders Nepal-shape on first paint instead of US.
+      const defaultCountry = archetype === 'PABSON' ? 'NPL' : 'USA'
       return {
         schoolType: 'high',
         'gradeRange.start': defaultRange.start,
         'gradeRange.end': defaultRange.end,
-        'address.country': 'USA',
+        'address.country': defaultCountry,
         timezone: resolvedSettings.timezone,
         locale: resolvedSettings.locale,
         calendarSystem: resolvedSettings.calendarSystem,
@@ -207,7 +211,7 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
         ...(initialLeaId ? { localEducationAgencyId: initialLeaId } : {}),
       }
     },
-    [initialLeaId, school, resolvedSettings.timezone, resolvedSettings.locale, resolvedSettings.calendarSystem],
+    [initialLeaId, school, archetype, resolvedSettings.timezone, resolvedSettings.locale, resolvedSettings.calendarSystem],
   )
 
   const handleSubmit = async (data: Record<string, unknown>): Promise<void | WizardSubmitResult> => {
