@@ -181,10 +181,10 @@ export function TrainingModal({
           ? 'Update this professional development record'
           : 'Record a professional development / training event'
       }
-      size="md"
+      size="2xl"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Title */}
+      <form onSubmit={onSubmit} className="space-y-5">
+        {/* Row 1 — Title (full width) */}
         <div>
           <label htmlFor="trainingTitle" className="block text-sm font-medium text-text-primary mb-1.5">
             Training Title <span className="text-red-500">*</span>
@@ -206,8 +206,8 @@ export function TrainingModal({
           )}
         </div>
 
-        {/* Type + Status */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Row 2 — Type / Status / Hours (3-col, all short fixed-shape inputs) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="trainingType" className="block text-sm font-medium text-text-primary mb-1.5">
               Type <span className="text-red-500">*</span>
@@ -244,28 +244,44 @@ export function TrainingModal({
               <p className="mt-1 text-sm text-red-500">{errors.status.message}</p>
             )}
           </div>
+          <div>
+            <label htmlFor="durationHours" className="block text-sm font-medium text-text-primary mb-1.5">
+              Hours <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="durationHours"
+              type="number"
+              min={0}
+              max={9999}
+              step={1}
+              {...register('durationHours', { valueAsNumber: true })}
+              className={inputClass(!!errors.durationHours)}
+              disabled={isSubmitting}
+            />
+            {errors.durationHours && (
+              <p className="mt-1 text-sm text-red-500">{errors.durationHours.message}</p>
+            )}
+          </div>
         </div>
 
-        {/* Provider */}
-        <div>
-          <label htmlFor="trainingProvider" className="block text-sm font-medium text-text-primary mb-1.5">
-            Provider <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="trainingProvider"
-            type="text"
-            {...register('trainingProvider')}
-            className={inputClass(!!errors.trainingProvider)}
-            placeholder="CEHRD Bagmati Resource Center"
-            disabled={isSubmitting}
-          />
-          {errors.trainingProvider && (
-            <p className="mt-1 text-sm text-red-500">{errors.trainingProvider.message}</p>
-          )}
-        </div>
-
-        {/* Dates + Duration */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* Row 3 — Provider (col-span 2) + Start / End dates */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-2">
+            <label htmlFor="trainingProvider" className="block text-sm font-medium text-text-primary mb-1.5">
+              Provider <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="trainingProvider"
+              type="text"
+              {...register('trainingProvider')}
+              className={inputClass(!!errors.trainingProvider)}
+              placeholder="CEHRD Bagmati Resource Center"
+              disabled={isSubmitting}
+            />
+            {errors.trainingProvider && (
+              <p className="mt-1 text-sm text-red-500">{errors.trainingProvider.message}</p>
+            )}
+          </div>
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-text-primary mb-1.5">
               Start Date <span className="text-red-500">*</span>
@@ -288,7 +304,11 @@ export function TrainingModal({
             <input
               id="endDate"
               type="date"
-              {...register('endDate')}
+              {...register('endDate', {
+                // empty input → undefined (Zod date refinement on optional
+                // field is too strict on empty string otherwise)
+                setValueAs: (v: string) => (v === '' ? undefined : v),
+              })}
               className={inputClass(!!errors.endDate)}
               disabled={isSubmitting}
             />
@@ -296,28 +316,10 @@ export function TrainingModal({
               <p className="mt-1 text-sm text-red-500">{errors.endDate.message}</p>
             )}
           </div>
-          <div>
-            <label htmlFor="durationHours" className="block text-sm font-medium text-text-primary mb-1.5">
-              Hours <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="durationHours"
-              type="number"
-              min={0}
-              max={9999}
-              step={1}
-              {...register('durationHours', { valueAsNumber: true })}
-              className={inputClass(!!errors.durationHours)}
-              disabled={isSubmitting}
-            />
-            {errors.durationHours && (
-              <p className="mt-1 text-sm text-red-500">{errors.durationHours.message}</p>
-            )}
-          </div>
         </div>
 
-        {/* Certificate (optional) */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Row 4 — Certificate Number / URL (optional pair) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="certificateNumber" className="block text-sm font-medium text-text-primary mb-1.5">
               Certificate Number
@@ -325,7 +327,9 @@ export function TrainingModal({
             <input
               id="certificateNumber"
               type="text"
-              {...register('certificateNumber')}
+              {...register('certificateNumber', {
+                setValueAs: (v: string) => (v === '' ? undefined : v),
+              })}
               className={inputClass(!!errors.certificateNumber)}
               placeholder="(optional)"
               disabled={isSubmitting}
@@ -341,7 +345,12 @@ export function TrainingModal({
             <input
               id="certificateUrl"
               type="url"
-              {...register('certificateUrl')}
+              {...register('certificateUrl', {
+                // CRITICAL: empty string fails z.string().url() even with
+                // .optional() because Zod treats '' as a present-but-invalid
+                // value. Coerce to undefined so the optional path runs.
+                setValueAs: (v: string) => (v === '' ? undefined : v),
+              })}
               className={inputClass(!!errors.certificateUrl)}
               placeholder="https://… (optional)"
               disabled={isSubmitting}
@@ -352,15 +361,17 @@ export function TrainingModal({
           </div>
         </div>
 
-        {/* Notes */}
+        {/* Row 5 — Notes (full width) */}
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-text-primary mb-1.5">
             Notes
           </label>
           <textarea
             id="notes"
-            rows={2}
-            {...register('notes')}
+            rows={3}
+            {...register('notes', {
+              setValueAs: (v: string) => (v === '' ? undefined : v),
+            })}
             className={inputClass(!!errors.notes)}
             placeholder="(optional, max 1000 chars)"
             disabled={isSubmitting}

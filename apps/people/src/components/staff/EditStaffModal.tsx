@@ -177,7 +177,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
       onClose={handleClose}
       title="Edit Staff Member"
       description={`Update information for ${staff.firstName} ${staff.lastSurname}`}
-      size="md"
+      size="2xl"
     >
       <form onSubmit={onSubmit} className="space-y-4">
         {/* Email (read-only) */}
@@ -193,8 +193,8 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           </p>
         </div>
 
-        {/* Name Row */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Name + Phone Row (3-col) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-1.5">
               First Name <span className="text-red-500">*</span>
@@ -231,24 +231,22 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               <p className="mt-1 text-sm text-red-500">{errors.lastSurname.message}</p>
             )}
           </div>
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-1.5">
-            Phone Number
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            {...register('phone')}
-            className={inputClass(!!errors.phone)}
-            placeholder="+1 (555) 123-4567"
-            disabled={isSubmitting}
-          />
-          {errors.phone && (
-            <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
-          )}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-1.5">
+              Phone Number
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              {...register('phone')}
+              className={inputClass(!!errors.phone)}
+              placeholder="+1 (555) 123-4567"
+              disabled={isSubmitting}
+            />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
+            )}
+          </div>
         </div>
 
         {/* Role & Employment Status */}
@@ -332,10 +330,15 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
 
         {/* IEMIS Identity (Sprint B.9) — Nepal CEHRD register fields */}
         <div className="pt-4 border-t border-border-secondary">
-          <h3 className="text-sm font-semibold text-text-primary mb-3">
+          <h3 className="text-sm font-semibold text-text-primary mb-1">
             IEMIS / CEHRD Identity
           </h3>
-          <div className="grid grid-cols-2 gap-4">
+          <p className="text-xs text-text-tertiary mb-4">
+            Optional — populate to support CEHRD Flash-II Staff register exports.
+          </p>
+
+          {/* Row 1 — IEMIS Staff ID + Nationality */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="emisStaffId" className="block text-sm font-medium text-text-primary mb-1.5">
                 IEMIS Staff ID
@@ -344,7 +347,11 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 id="emisStaffId"
                 type="text"
                 inputMode="numeric"
-                {...register('emisStaffId')}
+                // Empty input → undefined so Zod's optional path runs and the
+                // 16-digit format check doesn't fire on a cleared field.
+                {...register('emisStaffId', {
+                  setValueAs: (v: string) => (v === '' ? undefined : v),
+                })}
                 className={inputClass(!!errors.emisStaffId)}
                 placeholder="16-digit CEHRD ID"
                 maxLength={16}
@@ -363,7 +370,9 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               </label>
               <select
                 id="nationality"
-                {...register('nationality')}
+                {...register('nationality', {
+                  setValueAs: (v: string) => (v === '' ? undefined : v),
+                })}
                 className={inputClass(!!errors.nationality)}
                 disabled={isSubmitting}
               >
@@ -378,14 +387,17 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          {/* Row 2 — Marital Status / Appointment Type / Appointment Date (3-col) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
               <label htmlFor="maritalStatus" className="block text-sm font-medium text-text-primary mb-1.5">
                 Marital Status
               </label>
               <select
                 id="maritalStatus"
-                {...register('maritalStatus')}
+                {...register('maritalStatus', {
+                  setValueAs: (v: string) => (v === '' ? undefined : v),
+                })}
                 className={inputClass(!!errors.maritalStatus)}
                 disabled={isSubmitting}
               >
@@ -404,7 +416,9 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               </label>
               <select
                 id="appointmentType"
-                {...register('appointmentType')}
+                {...register('appointmentType', {
+                  setValueAs: (v: string) => (v === '' ? undefined : v),
+                })}
                 className={inputClass(!!errors.appointmentType)}
                 disabled={isSubmitting}
               >
@@ -417,25 +431,26 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 <p className="mt-1 text-sm text-red-500">{errors.appointmentType.message}</p>
               )}
             </div>
-          </div>
-
-          <div className="mt-4">
-            <label htmlFor="appointmentDate" className="block text-sm font-medium text-text-primary mb-1.5">
-              Appointment Date
-            </label>
-            <input
-              id="appointmentDate"
-              type="date"
-              {...register('appointmentDate')}
-              className={inputClass(!!errors.appointmentDate)}
-              disabled={isSubmitting}
-            />
-            {errors.appointmentDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.appointmentDate.message}</p>
-            )}
-            <p className="mt-1 text-xs text-text-tertiary">
-              Official appointment date per CEHRD register.
-            </p>
+            <div>
+              <label htmlFor="appointmentDate" className="block text-sm font-medium text-text-primary mb-1.5">
+                Appointment Date
+              </label>
+              <input
+                id="appointmentDate"
+                type="date"
+                {...register('appointmentDate', {
+                  setValueAs: (v: string) => (v === '' ? undefined : v),
+                })}
+                className={inputClass(!!errors.appointmentDate)}
+                disabled={isSubmitting}
+              />
+              {errors.appointmentDate && (
+                <p className="mt-1 text-sm text-red-500">{errors.appointmentDate.message}</p>
+              )}
+              <p className="mt-1 text-xs text-text-tertiary">
+                Per CEHRD register.
+              </p>
+            </div>
           </div>
         </div>
 
