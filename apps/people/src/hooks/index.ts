@@ -37,6 +37,11 @@ export {
   useCreateCredential,
   useUpdateCredential,
   useDeleteCredential,
+  // Trainings (Sprint B)
+  useStaffTrainings,
+  useCreateStaffTraining,
+  useUpdateStaffTraining,
+  useDeleteStaffTraining,
   // Leave
   useStaffLeaveRequests,
   useCreateLeaveRequest,

@@ -16,6 +16,8 @@ export { AssignToSchoolModal, type AssignToSchoolModalProps } from './AssignToSc
 export { EditAssignmentModal, type EditAssignmentModalProps } from './EditAssignmentModal'
 export { CredentialsSection } from './CredentialsSection'
 export { CredentialModal, type CredentialModalProps } from './CredentialModal'
+export { TrainingsSection } from './TrainingsSection'
+export { TrainingModal, type TrainingModalProps } from './TrainingModal'
 export { EmploymentHistory } from './EmploymentHistory'
 export { LeaveManagement } from './LeaveManagement'
 export { CreateLeaveModal, type CreateLeaveModalProps } from './CreateLeaveModal'

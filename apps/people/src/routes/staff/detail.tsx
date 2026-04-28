@@ -42,6 +42,7 @@ import {
     Trash2,
     Loader2,
     Award,
+    GraduationCap,
     CalendarDays,
     History,
     BookOpen,
@@ -58,6 +59,7 @@ import {
     AssignToSchoolModal,
     EditAssignmentModal,
     CredentialsSection,
+    TrainingsSection,
     EmploymentHistory,
     LeaveManagement,
 } from '../../components/staff'
@@ -93,7 +95,7 @@ const fadeInUp = {
 // TYPES
 // ============================================================================
 
-type StaffTab = 'overview' | 'profile' | 'assignments' | 'credentials' | 'employment-history' | 'leave' | 'security'
+type StaffTab = 'overview' | 'profile' | 'assignments' | 'credentials' | 'trainings' | 'employment-history' | 'leave' | 'security'
 
 interface GradeRecord {
     gradeId: string
@@ -137,6 +139,7 @@ const TABS: { id: StaffTab; label: string; icon: typeof User }[] = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'assignments', label: 'Assignments', icon: Briefcase },
     { id: 'credentials', label: 'Credentials', icon: Award },
+    { id: 'trainings', label: 'Trainings', icon: GraduationCap },
     { id: 'employment-history', label: 'History', icon: History },
     { id: 'leave', label: 'Leave', icon: CalendarDays },
     { id: 'security', label: 'Security', icon: Shield },
@@ -1665,6 +1668,9 @@ export default function StaffDetailPage() {
                             )}
                             {activeTab === 'credentials' && (
                                 <CredentialsSection staffId={staffId} />
+                            )}
+                            {activeTab === 'trainings' && (
+                                <TrainingsSection staffId={staffId} />
                             )}
                             {activeTab === 'employment-history' && (
                                 <EmploymentHistory staffId={staffId} currentStatus={staff.employmentStatus} />

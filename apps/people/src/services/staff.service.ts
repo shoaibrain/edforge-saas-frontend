@@ -23,6 +23,9 @@ import type {
   CreateCredentialDto,
   UpdateCredentialDto,
   CredentialResponseDto,
+  CreateStaffTrainingDto,
+  UpdateStaffTrainingDto,
+  StaffTrainingResponseDto,
   CreateLeaveRequestDto,
   LeaveRequestResponseDto,
   ApproveLeaveDto,
@@ -47,6 +50,9 @@ export type {
   CreateCredentialDto,
   UpdateCredentialDto,
   CredentialResponseDto,
+  CreateStaffTrainingDto,
+  UpdateStaffTrainingDto,
+  StaffTrainingResponseDto,
   CreateLeaveRequestDto,
   LeaveRequestResponseDto,
   ApproveLeaveDto,
@@ -268,6 +274,53 @@ export async function deleteCredential(
 }
 
 // ============================================================================
+// STAFF TRAININGS (Sprint B — routes: /staff/:staffId/trainings)
+// ============================================================================
+
+/**
+ * Get staff trainings.
+ * GET /staff/:staffId/trainings
+ */
+export async function getStaffTrainings(staffId: string): Promise<StaffTrainingResponseDto[]> {
+  const response = await apiGet<{ items: StaffTrainingResponseDto[] }>(`/staff/${staffId}/trainings`)
+  return response.items ?? []
+}
+
+/**
+ * Add a training record to a staff member.
+ * POST /staff/:staffId/trainings
+ */
+export async function addStaffTraining(
+  staffId: string,
+  data: CreateStaffTrainingDto,
+): Promise<StaffTrainingResponseDto> {
+  return apiPost<StaffTrainingResponseDto>(`/staff/${staffId}/trainings`, data)
+}
+
+/**
+ * Update a staff training record.
+ * PATCH /staff/:staffId/trainings/:trainingId
+ */
+export async function updateStaffTraining(
+  staffId: string,
+  trainingId: string,
+  data: UpdateStaffTrainingDto,
+): Promise<StaffTrainingResponseDto> {
+  return apiPatch<StaffTrainingResponseDto>(`/staff/${staffId}/trainings/${trainingId}`, data)
+}
+
+/**
+ * Delete a staff training record.
+ * DELETE /staff/:staffId/trainings/:trainingId
+ */
+export async function deleteStaffTraining(
+  staffId: string,
+  trainingId: string,
+): Promise<void> {
+  return apiDelete(`/staff/${staffId}/trainings/${trainingId}`)
+}
+
+// ============================================================================
 // LEAVE (existing backend — routes: /staff/:staffId/leave)
 // ============================================================================
 
@@ -354,6 +407,11 @@ export const staffService = {
   addCredential,
   updateCredential,
   deleteCredential,
+  // Trainings (Sprint B)
+  getStaffTrainings,
+  addStaffTraining,
+  updateStaffTraining,
+  deleteStaffTraining,
   // Leave
   getLeaveRequests,
   createLeaveRequest,
