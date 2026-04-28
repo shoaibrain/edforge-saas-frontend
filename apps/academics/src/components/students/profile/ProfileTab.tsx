@@ -53,7 +53,13 @@ function calculateAge(dateOfBirth?: string): number | null {
   }
 }
 
-function formatAddress(address?: {
+/**
+ * Address shape — covers both legacy US fields (street1/city/state/zipCode)
+ * and Sprint A.1 Nepal extension fields (wardNumber/municipality/district/
+ * province). Country may be 'NPL' when the IEMIS import populated Nepal-shape
+ * data, even on tenants whose archetype is GENERIC.
+ */
+interface DisplayableAddress {
   street1?: string
   street2?: string
   city?: string
@@ -61,8 +67,52 @@ function formatAddress(address?: {
   zipCode?: string
   postalCode?: string
   country?: string
-}): string | null {
+  // Sprint A.1 Nepal extension fields
+  wardNumber?: string
+  municipality?: string
+  district?: string
+  province?: string
+}
+
+function isNepalAddress(address: DisplayableAddress): boolean {
+  // Treat as Nepal-shape if country is NPL OR any Nepal extension field is
+  // populated. This handles both PABSON tenants on edforge.app AND legacy
+  // imported records that landed via the IEMIS xlsx import.
+  return (
+    address.country === 'NPL' ||
+    address.country === 'Nepal' ||
+    Boolean(address.wardNumber || address.municipality || address.district || address.province)
+  )
+}
+
+function formatAddress(address?: DisplayableAddress): string | null {
   if (!address) return null
+
+  // Sprint A.14a — Nepal-aware display branch.
+  // Format: "Tole / Street\nWard X, Municipality\nDistrict, Province\nNepal"
+  if (isNepalAddress(address)) {
+    const parts: string[] = []
+    if (address.street1) parts.push(address.street1)
+    if (address.street2) parts.push(address.street2)
+    const wardMunicipality = [
+      address.wardNumber ? `Ward ${address.wardNumber}` : null,
+      address.municipality,
+    ]
+      .filter(Boolean)
+      .join(', ')
+    if (wardMunicipality) parts.push(wardMunicipality)
+    const districtProvince = [address.district, address.province].filter(Boolean).join(', ')
+    if (districtProvince) parts.push(districtProvince)
+    if (address.postalCode) parts.push(address.postalCode)
+    parts.push(
+      address.country === 'NPL' || address.country === 'Nepal'
+        ? 'Nepal'
+        : address.country || 'Nepal',
+    )
+    return parts.length > 0 ? parts.join('\n') : null
+  }
+
+  // Legacy US-shaped display (unchanged).
   const parts: string[] = []
   if (address.street1) parts.push(address.street1)
   if (address.street2) parts.push(address.street2)

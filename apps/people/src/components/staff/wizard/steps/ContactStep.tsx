@@ -3,12 +3,30 @@
  *
  * Step 2: Email, phone, addresses, and emergency contacts.
  * Email is required; everything else is optional.
+ *
+ * Sprint A.12 + A.17: address fieldset and phone fields branch on the
+ * tenant's archetype + country. PABSON (Nepal pilot) sees the CEHRD-canonical
+ * Province/District (cascading) / Municipality / Ward / Tole / Postal Code
+ * layout with country locked to NPL. Phone fields show the +977 prefix and
+ * Nepal-mobile placeholder. GENERIC tenants see the existing US-shaped form
+ * unchanged.
+ *
+ * Archetype is read once on mount via getSchoolContext() (populated by Shell
+ * via the school-context-channel) and updated live via onSchoolChange. The
+ * MFE doesn't import from apps/shell directly — keeps the channel as the
+ * single decoupling boundary.
  */
 
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, AlertTriangle, Plus, X } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
+import { useTenantContext, isNepalShape } from '@edforge/forms'
+import {
+  NEPAL_PROVINCES,
+  NEPAL_DISTRICTS,
+  phoneFormatForArchetype,
+} from '@aibrains/shared-types'
 import {
   ADDRESS_TYPE_OPTIONS,
   RELATIONSHIP_OPTIONS,
@@ -22,22 +40,36 @@ import { AnimatedInput, AnimatedSelect, SectionHeader } from './shared'
 interface StaffAddress {
   addressTypeDescriptor: string
   streetNumberName: string
+  // Legacy / US-shaped fields (kept for GENERIC archetype + backwards-compat)
   city: string
   stateAbbreviationDescriptor: string
   postalCode: string
   country: string
+  // Nepal-aware extension fields (Sprint A.2 backend; populated for PABSON)
+  wardNumber?: string
+  municipality?: string
+  district?: string
+  province?: string
 }
 
-function emptyAddress(): StaffAddress {
+function emptyAddress(nepalShape: boolean): StaffAddress {
   return {
     addressTypeDescriptor: 'home',
     streetNumberName: '',
     city: '',
     stateAbbreviationDescriptor: '',
     postalCode: '',
-    country: 'US',
+    country: nepalShape ? 'NPL' : 'US',
+    ...(nepalShape
+      ? { wardNumber: '', municipality: '', district: '', province: '' }
+      : {}),
   }
 }
+
+const PROVINCE_OPTIONS = NEPAL_PROVINCES.map((p) => ({
+  value: p.nameEn,
+  label: `${p.nameEn} / ${p.nameNe}`,
+}))
 
 // ============================================================================
 // EMERGENCY CONTACT ENTRY
@@ -62,6 +94,11 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
   const addresses = (data.addresses as StaffAddress[]) || []
   const emergencyContacts = (data.emergencyContacts as EmergencyContact[]) || []
 
+  // Sprint A.12: read tenant archetype + country once + subscribe to changes.
+  const { archetype, country } = useTenantContext()
+  const nepalShape = isNepalShape(archetype, country)
+  const phoneFmt = phoneFormatForArchetype(archetype, country)
+
   const handleChange = (field: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -71,7 +108,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
 
   // Address helpers
   const addAddress = () => {
-    updateData({ addresses: [...addresses, emptyAddress()] })
+    updateData({ addresses: [...addresses, emptyAddress(nepalShape)] })
   }
   const removeAddress = (index: number) => {
     updateData({ addresses: addresses.filter((_, i) => i !== index) })
@@ -80,6 +117,20 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
     const updated = [...addresses]
     updated[index] = { ...updated[index], [field]: value }
     updateData({ addresses: updated })
+  }
+
+  // Cascading-district options for Nepal-shape: filter NEPAL_DISTRICTS by
+  // the address's selected province.
+  const districtOptionsFor = (provinceName: string | undefined) => {
+    if (!provinceName) return [] as { value: string; label: string }[]
+    const province = NEPAL_PROVINCES.find((p) => p.nameEn === provinceName)
+    if (!province) return []
+    return NEPAL_DISTRICTS
+      .filter((d) => d.provinceCode === province.provinceCode)
+      .map((d) => ({
+        value: d.nameEn,
+        label: d.nameNe ? `${d.nameEn} / ${d.nameNe}` : d.nameEn,
+      }))
   }
 
   // Emergency contact helpers
@@ -117,9 +168,9 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
             icon={<Mail className="w-4 h-4" />}
           />
           <AnimatedInput
-            label="Phone Number"
+            label={`Phone Number ${phoneFmt.dialCode}`}
             type="tel"
-            placeholder="(555) 123-4567"
+            placeholder={phoneFmt.placeholder}
             autoComplete="tel"
             value={(data.phone as string) || ''}
             onChange={handleChange('phone')}
@@ -160,40 +211,118 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <AnimatedInput
-              label="Street"
-              placeholder="123 Main Street"
-              value={addr.streetNumberName || ''}
-              onChange={(e) => updateAddress(index, 'streetNumberName', e.target.value)}
-            />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <AnimatedInput
-                label="City"
-                placeholder="Springfield"
-                value={addr.city || ''}
-                onChange={(e) => updateAddress(index, 'city', e.target.value)}
-              />
-              <AnimatedInput
-                label="State"
-                placeholder="IL"
-                maxLength={2}
-                value={addr.stateAbbreviationDescriptor || ''}
-                onChange={(e) => updateAddress(index, 'stateAbbreviationDescriptor', e.target.value.toUpperCase())}
-                className="uppercase"
-              />
-              <AnimatedInput
-                label="ZIP Code"
-                placeholder="62704"
-                value={addr.postalCode || ''}
-                onChange={(e) => updateAddress(index, 'postalCode', e.target.value)}
-              />
-              <AnimatedInput
-                label="Country"
-                placeholder="US"
-                value={addr.country || 'US'}
-                onChange={(e) => updateAddress(index, 'country', e.target.value)}
-              />
-            </div>
+            {nepalShape ? (
+              /* Nepal-shaped fieldset (Sprint A.12) — for PABSON archetype or
+                 GENERIC tenants in Nepal. Province → District cascading. */
+              <>
+                <AnimatedInput
+                  label="Street / Tole / House"
+                  placeholder="e.g., Tole-12, Bishal Bazar"
+                  value={addr.streetNumberName || ''}
+                  onChange={(e) => updateAddress(index, 'streetNumberName', e.target.value)}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <AnimatedSelect
+                    label="Province"
+                    value={addr.province || ''}
+                    onChange={(e) => {
+                      // When province changes, clear stale district that
+                      // doesn't belong to the new province.
+                      const updated = [...addresses]
+                      updated[index] = {
+                        ...updated[index],
+                        province: e.target.value,
+                        district: '',
+                      }
+                      updateData({ addresses: updated })
+                    }}
+                    options={[{ value: '', label: 'Select province' }, ...PROVINCE_OPTIONS]}
+                  />
+                  <AnimatedSelect
+                    label="District"
+                    value={addr.district || ''}
+                    onChange={(e) => updateAddress(index, 'district', e.target.value)}
+                    options={[
+                      {
+                        value: '',
+                        label: addr.province ? 'Select district' : 'Pick province first',
+                      },
+                      ...districtOptionsFor(addr.province),
+                    ]}
+                  />
+                </div>
+                <AnimatedInput
+                  label="Municipality / Rural Municipality / VDC"
+                  placeholder="e.g., Kathmandu Metropolitan City"
+                  value={addr.municipality || ''}
+                  onChange={(e) => updateAddress(index, 'municipality', e.target.value)}
+                />
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <AnimatedInput
+                    label="Ward Number"
+                    placeholder="e.g., 12"
+                    maxLength={10}
+                    value={addr.wardNumber || ''}
+                    onChange={(e) => updateAddress(index, 'wardNumber', e.target.value)}
+                  />
+                  <AnimatedInput
+                    label="Postal Code"
+                    placeholder="e.g., 44600"
+                    value={addr.postalCode || ''}
+                    onChange={(e) => updateAddress(index, 'postalCode', e.target.value)}
+                  />
+                  <AnimatedInput
+                    label="Country"
+                    placeholder="Nepal"
+                    value="Nepal"
+                    disabled
+                    onChange={() => {
+                      /* locked to NPL — set on emptyAddress + persisted in updateData */
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              /* US/generic-shaped fieldset (existing behavior — GENERIC tenants) */
+              <>
+                <AnimatedInput
+                  label="Street"
+                  placeholder="123 Main Street"
+                  value={addr.streetNumberName || ''}
+                  onChange={(e) => updateAddress(index, 'streetNumberName', e.target.value)}
+                />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <AnimatedInput
+                    label="City"
+                    placeholder="Springfield"
+                    value={addr.city || ''}
+                    onChange={(e) => updateAddress(index, 'city', e.target.value)}
+                  />
+                  <AnimatedInput
+                    label="State"
+                    placeholder="IL"
+                    maxLength={2}
+                    value={addr.stateAbbreviationDescriptor || ''}
+                    onChange={(e) =>
+                      updateAddress(index, 'stateAbbreviationDescriptor', e.target.value.toUpperCase())
+                    }
+                    className="uppercase"
+                  />
+                  <AnimatedInput
+                    label="ZIP Code"
+                    placeholder="62704"
+                    value={addr.postalCode || ''}
+                    onChange={(e) => updateAddress(index, 'postalCode', e.target.value)}
+                  />
+                  <AnimatedInput
+                    label="Country"
+                    placeholder="US"
+                    value={addr.country || 'US'}
+                    onChange={(e) => updateAddress(index, 'country', e.target.value)}
+                  />
+                </div>
+              </>
+            )}
           </motion.div>
         ))}
 
@@ -252,9 +381,9 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <AnimatedInput
-                label="Phone"
+                label={`Phone ${phoneFmt.dialCode}`}
                 type="tel"
-                placeholder="(555) 987-6543"
+                placeholder={phoneFmt.placeholder}
                 value={contact.phone || ''}
                 onChange={(e) => updateEmergencyContact(index, 'phone', e.target.value)}
               />

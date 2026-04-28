@@ -13,7 +13,7 @@ import {
   Trash2,
   User,
 } from 'lucide-react'
-import { TextField, PhoneField, SelectField, CheckboxField } from '@edforge/forms'
+import { TextField, PhoneInput, SelectField, CheckboxField, useTenantContext } from '@edforge/forms'
 import {
   RELATIONSHIP_OPTIONS,
   PHONE_TYPE_OPTIONS,
@@ -35,6 +35,9 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
   // Watch portal access to conditionally require email
   const { watch } = useFormContext()
   const hasPortalAccess = watch(`${prefix}.hasPortalAccess`) as boolean
+
+  // Sprint A.18: archetype-aware phone format (PABSON → +977 / Nepal mobile)
+  const { archetype, country } = useTenantContext()
 
   return (
     <div className="rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-primary))] overflow-hidden">
@@ -118,10 +121,11 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                   placeholder="email@example.com"
                   required={hasPortalAccess}
                 />
-                <PhoneField
+                <PhoneInput
                   name={`${prefix}.phone`}
+                  archetype={archetype}
+                  country={country}
                   label="Phone"
-                  placeholder="(555) 123-4567"
                 />
                 <SelectField
                   name={`${prefix}.phoneType`}

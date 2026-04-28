@@ -36,11 +36,26 @@ export {
   PersonalInfoSection,
   ContactInfoSection,
   AddressSection,
+  // Region-aware address forms (Sprint A.8/A.9/A.10)
+  AddressFields,
+  AddressFieldsNepal,
+  AddressFieldsLegacy,
+  resolveAddressVariant,
   type FormSectionProps,
   type PersonalInfoSectionProps,
   type ContactInfoSectionProps,
   type AddressSectionProps,
+  type AddressFieldsProps,
+  type AddressFieldsNepalProps,
+  type AddressFieldsLegacyProps,
 } from './sections'
+
+// Inputs (higher-level archetype-aware composites)
+export {
+  PhoneInput,
+  buildPhoneInputRules,
+  type PhoneInputProps,
+} from './inputs'
 
 // Schemas
 export {
@@ -99,9 +114,12 @@ export {
 export {
   useFormField,
   useFormSection,
+  useTenantContext,
+  isNepalShape,
   type UseFormFieldReturn,
   type UseFormSectionOptions,
   type UseFormSectionReturn,
+  type TenantContext,
 } from './hooks'
 
 // Re-export react-hook-form essentials for convenience
