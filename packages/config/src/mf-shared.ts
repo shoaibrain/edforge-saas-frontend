@@ -42,6 +42,20 @@ export function getMFSharedConfig(_role: 'host' | 'remote'): MFSharedConfig {
     '@edforge/types': { singleton: true, requiredVersion: '0.0.1', eager: true },
     '@edforge/theme': { singleton: true, requiredVersion: '0.0.1', eager: true },
 
+    // @edforge/config — CRITICAL: hosts the school-context-channel singleton
+    // (`_lastPayload` module-level variable). If not shared, each MFE bundles
+    // its own copy of the singleton and the Shell's broadcasts never reach
+    // the MFEs' copies → MFE forms see archetype=null → US-shape renders on
+    // PABSON tenants. This was the Sprint A.12/A.13 wiring root-cause bug
+    // discovered on the 2026-04-28 Vercel preview test.
+    '@edforge/config': { singleton: true, requiredVersion: '0.0.1', eager: true },
+
+    // @edforge/forms — singleton because (a) useTenantContext is a React hook
+    // that must share React state with @edforge/config's broadcast subscriber,
+    // and (b) AddressFields/PhoneInput components must come from the same
+    // module instance to interop with react-hook-form's FormProvider context.
+    '@edforge/forms': { singleton: true, requiredVersion: '0.0.1', eager: true },
+
     // i18n — singleton so language changes propagate across all modules
     '@edforge/i18n': { singleton: true, requiredVersion: '0.0.1', eager: true },
     i18next: { singleton: true, eager: true },
