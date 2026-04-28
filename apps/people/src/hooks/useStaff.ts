@@ -26,6 +26,9 @@ import type {
   CreateCredentialDto,
   UpdateCredentialDto,
   CredentialResponseDto,
+  CreateStaffTrainingDto,
+  UpdateStaffTrainingDto,
+  StaffTrainingResponseDto,
   CreateLeaveRequestDto,
   LeaveRequestResponseDto,
   ApproveLeaveDto,
@@ -52,6 +55,8 @@ export const staffKeys = {
     [...staffKeys.all, 'history', id] as const,
   credentials: (id: string) =>
     [...staffKeys.all, 'credentials', id] as const,
+  trainings: (id: string) =>
+    [...staffKeys.all, 'trainings', id] as const,
   leave: (id: string) =>
     [...staffKeys.all, 'leave', id] as const,
 }
@@ -331,6 +336,77 @@ export function useDeleteCredential() {
       staffService.deleteCredential(staffId, credentialId),
     onSuccess: (_, { staffId }) => {
       queryClient.invalidateQueries({ queryKey: staffKeys.credentials(staffId) })
+      queryClient.invalidateQueries({ queryKey: staffKeys.detail(staffId) })
+    },
+  })
+}
+
+// ============================================================================
+// STAFF TRAINING HOOKS (Sprint B)
+// ============================================================================
+
+/**
+ * Get staff trainings.
+ */
+export function useStaffTrainings(staffId: string | undefined) {
+  return useQuery<StaffTrainingResponseDto[]>({
+    queryKey: staffKeys.trainings(staffId!),
+    queryFn: () => staffService.getStaffTrainings(staffId!),
+    enabled: !!staffId,
+    staleTime: 30_000,
+  })
+}
+
+/**
+ * Create a training record.
+ */
+export function useCreateStaffTraining() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    StaffTrainingResponseDto,
+    Error,
+    { staffId: string; data: CreateStaffTrainingDto }
+  >({
+    mutationFn: ({ staffId, data }) =>
+      staffService.addStaffTraining(staffId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.trainings(staffId) })
+      queryClient.invalidateQueries({ queryKey: staffKeys.detail(staffId) })
+    },
+  })
+}
+
+/**
+ * Update a training record.
+ */
+export function useUpdateStaffTraining() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    StaffTrainingResponseDto,
+    Error,
+    { staffId: string; trainingId: string; data: UpdateStaffTrainingDto }
+  >({
+    mutationFn: ({ staffId, trainingId, data }) =>
+      staffService.updateStaffTraining(staffId, trainingId, data),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.trainings(staffId) })
+    },
+  })
+}
+
+/**
+ * Delete a training record.
+ */
+export function useDeleteStaffTraining() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, { staffId: string; trainingId: string }>({
+    mutationFn: ({ staffId, trainingId }) =>
+      staffService.deleteStaffTraining(staffId, trainingId),
+    onSuccess: (_, { staffId }) => {
+      queryClient.invalidateQueries({ queryKey: staffKeys.trainings(staffId) })
       queryClient.invalidateQueries({ queryKey: staffKeys.detail(staffId) })
     },
   })

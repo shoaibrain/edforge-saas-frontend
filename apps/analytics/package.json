@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aibrains/shared-types": "^0.35.0",
+    "@aibrains/shared-types": "^0.36.0",
     "@edforge/abac": "workspace:*",
     "@edforge/auth": "workspace:*",
     "@edforge/date-utils": "workspace:*",
