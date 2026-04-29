@@ -73,8 +73,8 @@ importers:
   apps/academics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.36.0
-        version: 0.36.0(zod@3.24.4)
+        specifier: ^0.37.0
+        version: 0.37.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -173,8 +173,8 @@ importers:
   apps/analytics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.36.0
-        version: 0.36.0(zod@3.24.4)
+        specifier: ^0.37.0
+        version: 0.37.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -492,8 +492,8 @@ importers:
   apps/people:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.36.0
-        version: 0.36.0(zod@3.24.4)
+        specifier: ^0.37.0
+        version: 0.37.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -592,8 +592,8 @@ importers:
   apps/shell:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.36.0
-        version: 0.36.0(zod@3.24.4)
+        specifier: ^0.37.0
+        version: 0.37.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -923,8 +923,8 @@ importers:
   packages/forms:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.35.0
-        version: 0.35.0(zod@3.24.4)
+        specifier: ^0.37.0
+        version: 0.37.0(zod@3.24.4)
       '@edforge/config':
         specifier: workspace:*
         version: link:../config
@@ -1040,8 +1040,8 @@ importers:
   packages/types:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.36.0
-        version: 0.36.0(zod@3.24.4)
+        specifier: ^0.37.0
+        version: 0.37.0(zod@3.24.4)
       '@edforge/config':
         specifier: workspace:*
         version: link:../config
@@ -1181,13 +1181,8 @@ packages:
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
 
-  '@aibrains/shared-types@0.35.0':
-    resolution: {integrity: sha512-xUaWl7jLmegE/u4We3y6Bw2xfNUlUvIa/mi1b4+nr03wrJkeiKqX2ZbQg4bpZ0VnefnVuyfDVNOkDECkoBdjQg==}
-    peerDependencies:
-      zod: ~3.24.4
-
-  '@aibrains/shared-types@0.36.0':
-    resolution: {integrity: sha512-mRz2FlvICkIZKyZLRa5F7ZXGUOJsQX+v2YSTDz/wgZ2jfVyvozlW6uLKQ+znAx7J72CHjlXc8/f4LqQm9SOjQQ==}
+  '@aibrains/shared-types@0.37.0':
+    resolution: {integrity: sha512-v5HA0ywsFuYhILKx9QvfNrEOmYJZkLZMwjK5FzUQ/onq2umACf4pZoWs4ARsvxlj4pBPs2EBuWrArZ+sPgmfEw==}
     peerDependencies:
       zod: ~3.24.4
 
@@ -5421,11 +5416,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@aibrains/shared-types@0.35.0(zod@3.24.4)':
-    dependencies:
-      zod: 3.24.4
-
-  '@aibrains/shared-types@0.36.0(zod@3.24.4)':
+  '@aibrains/shared-types@0.37.0(zod@3.24.4)':
     dependencies:
       zod: 3.24.4
 
