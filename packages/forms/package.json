@@ -34,7 +34,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aibrains/shared-types": "^0.35.0",
+    "@aibrains/shared-types": "^0.37.0",
     "@edforge/config": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
     "clsx": "^2.1.1",

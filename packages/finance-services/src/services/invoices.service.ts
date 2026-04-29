@@ -110,9 +110,14 @@ export async function getStudentLedger(
   schoolId: string,
   accountId: string
 ): Promise<StudentLedgerEntry[]> {
-  return apiGet<StudentLedgerEntry[]>(
+  // Backend returns the FinancePaginatedResponse shape ({ items, hasMore });
+  // older callers also tolerate a bare array. Mirror the unwrap pattern used
+  // by getInvoices / getStudentAccounts above so the consumer always sees an array.
+  const response = await apiGet<FinancePaginatedResponse<StudentLedgerEntry> | StudentLedgerEntry[]>(
     `/finance/schools/${schoolId}/student-accounts/${accountId}/ledger`
   )
+  if (Array.isArray(response)) return response
+  return response?.items ?? []
 }
 
 // ============================================================================
