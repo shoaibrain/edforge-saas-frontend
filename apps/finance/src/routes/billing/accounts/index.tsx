@@ -94,13 +94,35 @@ function TabButton({
 function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: string }) {
   const ledgerSettings = useFinanceSettings()
   const { format } = useCurrency(ledgerSettings)
-  const { data: ledger, isLoading } = useStudentLedger(schoolId, accountId)
+  const { data: ledger, isLoading, isError, error, refetch } = useStudentLedger(schoolId, accountId)
+  // getStudentLedger now always returns an array; the Array.isArray fallback
+  // remains as a defense against a future regression but should never fire.
   const entries: StudentLedgerEntry[] = Array.isArray(ledger) ? ledger : []
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
         <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-6">
+        <p className="text-xs text-red-600 dark:text-red-400">
+          Failed to load ledger entries.
+        </p>
+        <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1">
+          {(error as Error)?.message ?? 'Unknown error'}
+        </p>
+        <button
+          type="button"
+          onClick={() => { void refetch() }}
+          className="mt-2 text-xs px-2 py-1 rounded border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-secondary))]"
+        >
+          Retry
+        </button>
       </div>
     )
   }
