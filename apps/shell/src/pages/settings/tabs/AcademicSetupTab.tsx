@@ -112,9 +112,18 @@ interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
   generatedTerms?: CreateGradingPeriodDto[]
 }
 
-export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
+export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabProps) {
   const localeDefaults = useLocaleDefaults()
   const queryClient = useQueryClient()
+
+  // Sprint C4 rev-2: bind picker calendar to the SCHOOL being edited, not
+  // the user's active-school workspace context. The school-detail page
+  // loads `school` via tenantService.getSchool(schoolId) and passes it in;
+  // localeDefaults is the fallback for any caller that doesn't pass a
+  // school (none in-tree today; defensive).
+  const schoolCalendarSystem =
+    (school as { calendarSystem?: string } | undefined)?.calendarSystem ||
+    localeDefaults.calendarSystem
 
   // Academic year modal state
   const [isCreateYearOpen, setIsCreateYearOpen] = useState(false)
@@ -246,7 +255,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
           <YearsStep
             years={years}
             isLoading={yearsLoading}
-            calendarSystem={localeDefaults.calendarSystem}
+            calendarSystem={schoolCalendarSystem}
             onCreateYear={() => setIsCreateYearOpen(true)}
             onEditYear={(year: any) => setYearToEdit(year)}
             onActivateYear={(year: any) => setYearToActivate(year)}
@@ -258,6 +267,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
             activeYear={activeYear}
             sessions={sessions}
             isNepal={localeDefaults.isNepal}
+            calendarSystem={schoolCalendarSystem}
           />
         )}
         {activeStep === 'calendar' && (
@@ -285,7 +295,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
         onSubmit={(data) => createYearMutation.mutate(data)}
         isLoading={createYearMutation.isPending}
         schoolId={schoolId}
-        calendarSystem={localeDefaults.calendarSystem}
+        calendarSystem={schoolCalendarSystem}
       />
       <EditAcademicYearModal
         isOpen={!!yearToEdit}
@@ -296,7 +306,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
           if (yid) updateYearMutation.mutate({ yearId: yid, data })
         }}
         isLoading={updateYearMutation.isPending}
-        calendarSystem={localeDefaults.calendarSystem}
+        calendarSystem={schoolCalendarSystem}
       />
       <ActivateConfirmModal
         isOpen={!!yearToActivate}
@@ -327,36 +337,10 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
   const [name, setName] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [termStructure, setTermStructure] = useState<'semester' | 'trimester' | 'quarter'>('semester')
 
-  const generateGradingPeriods = (): CreateGradingPeriodDto[] => {
-    if (!startDate || !endDate) return []
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    const totalDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-    const termConfigs = {
-      semester: { count: 2, names: ['Fall Semester', 'Spring Semester'], shortNames: ['Fall', 'Spring'] },
-      trimester: { count: 3, names: ['Fall Trimester', 'Winter Trimester', 'Spring Trimester'], shortNames: ['T1', 'T2', 'T3'] },
-      quarter: { count: 4, names: ['Q1', 'Q2', 'Q3', 'Q4'], shortNames: ['Q1', 'Q2', 'Q3', 'Q4'] },
-    }
-    const config = termConfigs[termStructure]
-    const daysPerTerm = Math.floor(totalDays / config.count)
-    return config.names.map((periodName, index) => {
-      const termStart = new Date(start)
-      termStart.setDate(termStart.getDate() + (index * daysPerTerm))
-      const termEnd = new Date(termStart)
-      termEnd.setDate(termEnd.getDate() + daysPerTerm - 1)
-      if (index === config.count - 1) termEnd.setTime(end.getTime())
-      return {
-        name: periodName,
-        shortName: config.shortNames[index],
-        termType: termStructure,
-        sequence: index + 1,
-        startDate: termStart.toISOString().split('T')[0],
-        endDate: termEnd.toISOString().split('T')[0],
-      }
-    })
-  }
+  // Sprint C4 — same change as in school-academic-years.tsx: AY creation
+  // no longer auto-creates sessions. The user picks a template (or creates
+  // each one explicitly) on the Sessions & Terms step after the AY exists.
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -365,8 +349,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
       name,
       startDate,
       endDate,
-      calendarType: termStructure,
-      generatedTerms: generateGradingPeriods(),
+      calendarType: 'semester',
     })
   }
 
@@ -429,37 +412,13 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
             />
           </div>
 
-          <div>
-            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1.5">Term Structure</label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { value: 'semester' as const, label: 'Semester', count: 2 },
-                { value: 'trimester' as const, label: 'Trimester', count: 3 },
-                { value: 'quarter' as const, label: 'Quarter', count: 4 },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setTermStructure(option.value)}
-                  className={`p-2.5 rounded-lg border text-center transition-all ${
-                    termStructure === option.value
-                      ? 'border-[rgba(55,138,221,0.4)] bg-[rgba(55,138,221,0.08)]'
-                      : 'border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)]'
-                  }`}
-                >
-                  <p className={`text-xs font-medium ${termStructure === option.value ? 'text-[#378ADD]' : 'text-[rgb(var(--text-primary))]'}`}>
-                    {option.label}
-                  </p>
-                  <p className="text-[10px] text-[rgb(var(--text-tertiary))]">{option.count} terms</p>
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
             <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
             <p className="text-[10px] text-[rgb(var(--text-tertiary))] leading-relaxed">
-              The academic year will be created in "Planning" status. You can activate it when ready. Once active, dates cannot be changed.
+              The academic year will be created in "Planning" status with no
+              sessions yet. Open the next step (<b>Sessions &amp; Terms</b>) to
+              define your terms — pick a template or create them individually,
+              then activate the year.
             </p>
           </div>
 
@@ -770,11 +729,16 @@ function YearsStep({ years, isLoading, calendarSystem, onCreateYear, onEditYear,
 // STEP 2: SESSIONS & TERMS
 // ============================================================================
 
-function SessionsStep({ schoolId, activeYear, sessions, isNepal }: {
+function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem }: {
   schoolId: string
   activeYear: any
   sessions: any[]
   isNepal: boolean
+  // Sprint C4 rev-2: explicit calendarSystem of the SCHOOL being edited.
+  // Without this, the inline session form fell back to native HTML5 date
+  // picker even on PABSON schools because the picker component was a
+  // bare `<input type="date">` (always Gregorian, browser-native).
+  calendarSystem: string
 }) {
   const [showForm, setShowForm] = useState(sessions.length === 0)
   const [sessionName, setSessionName] = useState('')
@@ -890,11 +854,19 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal }: {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Begin Date <span className="text-red-500">*</span></label>
-                <input className={inputClass} type="date" value={beginDate} onChange={e => { setBeginDate(e.target.value); setFormError(null) }} />
+                <DateInput
+                  value={beginDate}
+                  onChange={(iso) => { setBeginDate(iso); setFormError(null) }}
+                  calendarSystem={calendarSystem}
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">End Date <span className="text-red-500">*</span></label>
-                <input className={inputClass} type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setFormError(null) }} />
+                <DateInput
+                  value={endDate}
+                  onChange={(iso) => { setEndDate(iso); setFormError(null) }}
+                  calendarSystem={calendarSystem}
+                />
               </div>
             </div>
             {formError && (

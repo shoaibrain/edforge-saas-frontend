@@ -36,6 +36,7 @@ import {
 import { Button, DateInput } from '@edforge/ui'
 import { getAcademicYearLabel } from '@aibrains/shared-types'
 import { adToBS, formatBSDate } from '@edforge/date-utils'
+import { TenantDateRange } from '@/components/common/TenantDate'
 
 // ============================================================================
 // LOCAL TYPES
@@ -160,9 +161,7 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
                       {year.isLocked && <Lock className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />}
                     </div>
                     <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                      {year.startDateBS
-                        ? `(${new Date(year.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} – ${new Date(year.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})`
-                        : `${new Date(year.startDate).toLocaleDateString()} - ${new Date(year.endDate).toLocaleDateString()}`}
+                      <TenantDateRange start={year.startDate} end={year.endDate} />
                     </p>
                   </div>
                   <CalendarDays className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
@@ -203,47 +202,15 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
   const [name, setName] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [termStructure, setTermStructure] = useState<'semester' | 'trimester' | 'quarter'>('semester')
 
-  // Generate grading period DTOs that match backend schema
-  const generateGradingPeriods = (): CreateGradingPeriodDto[] => {
-    if (!startDate || !endDate) return []
-
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    const totalDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-
-    const termConfigs = {
-      semester: { count: 2, names: ['Fall Semester', 'Spring Semester'], shortNames: ['Fall', 'Spring'] },
-      trimester: { count: 3, names: ['Fall Trimester', 'Winter Trimester', 'Spring Trimester'], shortNames: ['T1', 'T2', 'T3'] },
-      quarter: { count: 4, names: ['Q1', 'Q2', 'Q3', 'Q4'], shortNames: ['Q1', 'Q2', 'Q3', 'Q4'] },
-    }
-
-    const config = termConfigs[termStructure]
-    const daysPerTerm = Math.floor(totalDays / config.count)
-
-    return config.names.map((periodName, index) => {
-      const termStart = new Date(start)
-      termStart.setDate(termStart.getDate() + (index * daysPerTerm))
-
-      const termEnd = new Date(termStart)
-      termEnd.setDate(termEnd.getDate() + daysPerTerm - 1)
-
-      // Last term ends on the year end date
-      if (index === config.count - 1) {
-        termEnd.setTime(end.getTime())
-      }
-
-      return {
-        name: periodName,
-        shortName: config.shortNames[index],
-        termType: termStructure,
-        sequence: index + 1,
-        startDate: termStart.toISOString().split('T')[0],
-        endDate: termEnd.toISOString().split('T')[0],
-      }
-    })
-  }
+  // Sprint C4 — Sessions are NO LONGER auto-created on AY creation. Each
+  // school's term structure is too varied for synthetic defaults to be
+  // safe (Nepal festivals like Dashain/Tihar break the assumption that
+  // year length divides evenly; PABSON terms have school-specific names
+  // like "टर्म 1"; once Grades reference termIds, fixing wrong session
+  // dates becomes destructive). After AY creation, the user is directed
+  // to the Sessions & Terms tab where they explicitly create each session
+  // — optionally seeded from a template — and review before saving.
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -252,10 +219,13 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
       name,
       startDate,
       endDate,
-      calendarType: termStructure,
-      generatedTerms: generateGradingPeriods(),
+      // calendarType is preserved as a school-level hint for Session UI
+      // template defaults; the AY itself doesn't enforce it. Default to
+      // 'semester' since the AY modal no longer asks the user to pick one.
+      calendarType: 'semester',
+      // No generatedTerms — sessions are created explicitly on the
+      // Sessions & Terms tab after the AY exists.
     }
-    // Include BS dates when using Bikram Sambat calendar
     if (calendarSystem === 'bikram_sambat' && startDate && endDate) {
       try {
         payload.startDateBS = formatBSDate(adToBS(startDate))
@@ -329,43 +299,14 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Term Structure
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { value: 'semester', label: 'Semester', count: 2 },
-                { value: 'trimester', label: 'Trimester', count: 3 },
-                { value: 'quarter', label: 'Quarter', count: 4 },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setTermStructure(option.value as typeof termStructure)}
-                  className={`
-                    p-3 rounded-xl border-2 text-center transition-all
-                    ${termStructure === option.value
-                      ? 'border-teal-500 bg-teal-500/5'
-                      : 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
-                    }
-                  `}
-                >
-                  <p className={`text-sm font-medium ${termStructure === option.value ? 'text-teal-700 dark:text-teal-400' : 'text-[rgb(var(--text-primary))]'}`}>
-                    {option.label}
-                  </p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))]">{option.count} terms</p>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Info */}
           <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
             <AlertCircle className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              The academic year will be created in "Planning" status.
-              You can activate it when ready. Once active, dates cannot be changed.
+              The academic year will be created in "Planning" status with no
+              sessions yet. After creation, open the <b>Sessions &amp; Terms</b>{' '}
+              tab to define your terms — pick a template or create them
+              individually. You can activate the year once sessions are in place.
             </p>
           </div>
 

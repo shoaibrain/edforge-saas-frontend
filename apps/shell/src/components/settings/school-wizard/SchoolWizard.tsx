@@ -17,6 +17,7 @@ import type { SchoolResponseDto } from '@aibrains/shared-types'
 import { useAuthStore } from '@/stores/auth.store'
 import { useShell, useTenant } from '@/lib/shell-context'
 import { tenantService } from '@/services/tenant.service'
+import { edOrgKeys } from '@/hooks/useEducationOrgs'
 import {
   transformWizardDataToDto,
   getDefaultGradeRange,
@@ -219,12 +220,19 @@ export function SchoolWizard({ onCancel, onSuccess, initialLeaId, school }: Scho
       if (isEditMode && school) {
         const dto = transformWizardDataToDto(data)
         await tenantService.updateSchool(school.schoolId, dto as any)
+        // Invalidate BOTH queries: the SchoolSwitcher dropdown uses
+        // `['schools', tenantId]`, and the /settings/organization page
+        // renders schools off `edOrgKeys.hierarchy()`. Pre-C4 only the
+        // first was invalidated, so the org page kept showing the stale
+        // count after a create or update.
         queryClient.invalidateQueries({ queryKey: ['schools', user?.tenantId] })
+        queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
         toast.success('School updated successfully')
       } else {
         const dto = transformWizardDataToDto(data)
         await tenantService.createSchool(dto)
         queryClient.invalidateQueries({ queryKey: ['schools', user?.tenantId] })
+        queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
         toast.success('School created successfully')
       }
       onSuccess()
