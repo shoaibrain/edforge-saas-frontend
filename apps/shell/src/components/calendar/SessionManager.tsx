@@ -21,6 +21,16 @@ import {
 import { toast } from 'sonner'
 import { Button, DateInput } from '@edforge/ui'
 import { useSettings } from '@/lib/shell-context'
+
+// Sprint C4 deployment marker — bumping this string forces a unique JS
+// bundle hash on each fix push, defeating any stale CDN/browser cache.
+// Visible in DevTools console on page load so the operator can confirm
+// which build they're hitting.
+const C4_FIX_MARKER = 'C4-fix-rev-2-2026-04-30T17:00Z'
+if (typeof window !== 'undefined') {
+  // eslint-disable-next-line no-console
+  console.log(`[edforge:c4] SessionManager build marker: ${C4_FIX_MARKER}`)
+}
 import {
   useAcademicSessions,
   useCreateAcademicSession,
@@ -66,6 +76,17 @@ interface SessionManagerProps {
   academicYearId: string
   academicYearStartDate: string
   academicYearEndDate: string
+  /**
+   * The calendar system of the school whose sessions are being managed.
+   * `bikram_sambat` → BS picker; anything else (or undefined) → native.
+   *
+   * Passed in by the parent (school-detail / AcademicSetupTab) so the picker
+   * matches the SCHOOL being edited, not the user's active-school context.
+   * Without this prop, the previous fix used `useSettings()` which resolved
+   * the active workspace's school — wrong when the user is editing a
+   * different school's sessions on the school-detail page.
+   */
+  calendarSystem?: string
 }
 
 // ============================================================================
@@ -133,21 +154,21 @@ function SessionForm({
   onCancel,
   isLoading,
   submitLabel,
+  calendarSystem,
 }: {
   initial: SessionFormData
   onSubmit: (data: SessionFormData) => void
   onCancel: () => void
   isLoading: boolean
   submitLabel: string
+  calendarSystem: string
 }) {
   const [form, setForm] = useState<SessionFormData>(initial)
-  // Sprint C4 — render the BS calendar picker for PABSON tenants and the
-  // standard date picker for everyone else. `DateInput` from @edforge/ui
-  // owns this branching internally; we just pass `calendarSystem` through
-  // from the resolved workspace settings (which already collapse tenant +
-  // school precedence). Same pattern as school-academic-years.tsx.
-  const settings = useSettings()
-  const calendarSystem = settings?.calendarSystem || 'gregorian'
+  // Sprint C4 (rev 2): render BS calendar picker for `bikram_sambat`,
+  // native otherwise. `calendarSystem` flows in as a prop from the parent
+  // SessionManager → AcademicSetupTab → school-detail (queryFn:
+  // tenantService.getSchool). This binds the picker to the SCHOOL being
+  // edited, not the user's active-school context (the rev-1 bug).
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -223,7 +244,17 @@ export function SessionManager({
   academicYearId,
   academicYearStartDate,
   academicYearEndDate,
+  calendarSystem: calendarSystemProp,
 }: SessionManagerProps) {
+  // Resolve picker calendar system: explicit prop wins (set by parent who
+  // knows the SPECIFIC school being edited); fall back to active workspace
+  // settings only when the parent didn't provide one. The fallback is the
+  // rev-1 behavior — kept so any out-of-tree caller (e.g. an embedded
+  // session manager on the active school's main page) still works.
+  const settings = useSettings()
+  const calendarSystem =
+    calendarSystemProp || settings?.calendarSystem || 'gregorian'
+
   const [showCreate, setShowCreate] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -395,6 +426,7 @@ export function SessionManager({
                 onCancel={() => setShowCreate(false)}
                 isLoading={createSession.isPending}
                 submitLabel="Create"
+                calendarSystem={calendarSystem}
               />
             </motion.div>
           )}
@@ -426,6 +458,7 @@ export function SessionManager({
                     }}
                     onSubmit={(form) => handleUpdate(session.academicSessionId, form)}
                     onCancel={() => setEditingId(null)}
+                    calendarSystem={calendarSystem}
                     isLoading={updateSession.isPending}
                     submitLabel="Update"
                   />

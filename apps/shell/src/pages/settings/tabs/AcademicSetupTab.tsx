@@ -112,9 +112,18 @@ interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
   generatedTerms?: CreateGradingPeriodDto[]
 }
 
-export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
+export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabProps) {
   const localeDefaults = useLocaleDefaults()
   const queryClient = useQueryClient()
+
+  // Sprint C4 rev-2: bind picker calendar to the SCHOOL being edited, not
+  // the user's active-school workspace context. The school-detail page
+  // loads `school` via tenantService.getSchool(schoolId) and passes it in;
+  // localeDefaults is the fallback for any caller that doesn't pass a
+  // school (none in-tree today; defensive).
+  const schoolCalendarSystem =
+    (school as { calendarSystem?: string } | undefined)?.calendarSystem ||
+    localeDefaults.calendarSystem
 
   // Academic year modal state
   const [isCreateYearOpen, setIsCreateYearOpen] = useState(false)
@@ -246,7 +255,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
           <YearsStep
             years={years}
             isLoading={yearsLoading}
-            calendarSystem={localeDefaults.calendarSystem}
+            calendarSystem={schoolCalendarSystem}
             onCreateYear={() => setIsCreateYearOpen(true)}
             onEditYear={(year: any) => setYearToEdit(year)}
             onActivateYear={(year: any) => setYearToActivate(year)}
@@ -258,6 +267,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
             activeYear={activeYear}
             sessions={sessions}
             isNepal={localeDefaults.isNepal}
+            calendarSystem={schoolCalendarSystem}
           />
         )}
         {activeStep === 'calendar' && (
@@ -285,7 +295,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
         onSubmit={(data) => createYearMutation.mutate(data)}
         isLoading={createYearMutation.isPending}
         schoolId={schoolId}
-        calendarSystem={localeDefaults.calendarSystem}
+        calendarSystem={schoolCalendarSystem}
       />
       <EditAcademicYearModal
         isOpen={!!yearToEdit}
@@ -296,7 +306,7 @@ export default function AcademicSetupTab({ schoolId }: AcademicSetupTabProps) {
           if (yid) updateYearMutation.mutate({ yearId: yid, data })
         }}
         isLoading={updateYearMutation.isPending}
-        calendarSystem={localeDefaults.calendarSystem}
+        calendarSystem={schoolCalendarSystem}
       />
       <ActivateConfirmModal
         isOpen={!!yearToActivate}
@@ -719,11 +729,16 @@ function YearsStep({ years, isLoading, calendarSystem, onCreateYear, onEditYear,
 // STEP 2: SESSIONS & TERMS
 // ============================================================================
 
-function SessionsStep({ schoolId, activeYear, sessions, isNepal }: {
+function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem }: {
   schoolId: string
   activeYear: any
   sessions: any[]
   isNepal: boolean
+  // Sprint C4 rev-2: explicit calendarSystem of the SCHOOL being edited.
+  // Without this, the inline session form fell back to native HTML5 date
+  // picker even on PABSON schools because the picker component was a
+  // bare `<input type="date">` (always Gregorian, browser-native).
+  calendarSystem: string
 }) {
   const [showForm, setShowForm] = useState(sessions.length === 0)
   const [sessionName, setSessionName] = useState('')
@@ -839,11 +854,19 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal }: {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Begin Date <span className="text-red-500">*</span></label>
-                <input className={inputClass} type="date" value={beginDate} onChange={e => { setBeginDate(e.target.value); setFormError(null) }} />
+                <DateInput
+                  value={beginDate}
+                  onChange={(iso) => { setBeginDate(iso); setFormError(null) }}
+                  calendarSystem={calendarSystem}
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">End Date <span className="text-red-500">*</span></label>
-                <input className={inputClass} type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setFormError(null) }} />
+                <DateInput
+                  value={endDate}
+                  onChange={(iso) => { setEndDate(iso); setFormError(null) }}
+                  calendarSystem={calendarSystem}
+                />
               </div>
             </div>
             {formError && (
