@@ -25,6 +25,9 @@ import {
   checkDuplicateStudents,
   importStudentsCsv,
   importStudentsIemis,
+  previewIemisImport,
+  startIemisImport,
+  getIemisImportJob,
   createParentAccount,
   createStudentAccount,
   linkGuardianToUser,
@@ -366,27 +369,20 @@ export function useImportStudentsCsv() {
 
 // ============================================================================
 // IEMIS IMPORT (Phase 3.1 — PABSON Nepal government EMIS)
+// Sprint C4: split into a sync dry-run preview + an async commit job.
 // ============================================================================
 
 import type {
   IemisImportRequest,
   IemisImportResult,
+  IemisImportAsyncAck,
+  IemisImportJob,
 } from '../components/students/iemis/iemis-import.types'
 
 /**
- * Mutation hook for the IEMIS bulk student import. Unlike the CSV variant,
- * this hook is USED TWICE per flow — once with `dryRun: true` for the
- * preview, then again with `dryRun: false` to commit. Callers manage the
- * phase state; this hook is stateless apart from TanStack mutation state.
- *
- * Cache invalidation: only on `dryRun=false` success (a dry-run doesn't
- * mutate DDB, so the student list is unchanged). We detect this by
- * reading `variables.dryRun` in `onSuccess` rather than forcing callers
- * to branch.
- *
- * Toasts: deliberately minimal here because the IemisImport component
- * renders a full results panel. An aggressive toast stack is noise on
- * a page already dedicated to showing import results.
+ * @deprecated Sprint C4 split this into `usePreviewIemisImport` (dry-run) +
+ * `useStartIemisImport` + `useIemisImportJob` (async commit). Kept so any
+ * out-of-tree callers still compile during the rollout window.
  */
 export function useImportStudentsIemis() {
   const queryClient = useQueryClient()
@@ -399,12 +395,78 @@ export function useImportStudentsIemis() {
       }
     },
     onError: (error) => {
-      // Row-level issues come back in the IemisImportResult.findings array
-      // on a 200 response, so the error path is reached only for
-      // infrastructure failures — network, 4xx (auth/validation at the
-      // envelope level), or 5xx. Surface all of those as a toast.
       const parsed = parseApiError(error)
       toast.error(parsed.message)
+    },
+  })
+}
+
+/**
+ * Mutation hook for the IEMIS dry-run preview. Synchronous; backend
+ * short-circuits before Phase 3 so it returns well within the 29s
+ * gateway timeout even at the 1000-row cap.
+ */
+export function usePreviewIemisImport() {
+  return useMutation<
+    IemisImportResult,
+    Error,
+    Omit<IemisImportRequest, 'dryRun' | 'enrollInAcademicYearId'>
+  >({
+    mutationFn: (data) => previewIemisImport(data),
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+/**
+ * Mutation hook for the real IEMIS commit. Returns 202 + jobId immediately;
+ * caller should switch to `useIemisImportJob(jobId)` for polling. Cache
+ * invalidation happens in `useIemisImportJob` once the job reaches
+ * terminal-succeeded — kicking it off here would invalidate too early.
+ */
+export function useStartIemisImport() {
+  return useMutation<
+    IemisImportAsyncAck,
+    Error,
+    Omit<IemisImportRequest, 'dryRun'>
+  >({
+    mutationFn: (data) => startIemisImport(data),
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+/**
+ * Polling query for an in-flight or completed IEMIS import job. Polls every
+ * 2s while the status is `queued` or `running`; stops on terminal status.
+ *
+ * Pass `jobId === null/undefined` to disable the query (e.g. before the
+ * commit mutation has returned).
+ */
+export function useIemisImportJob(jobId: string | null | undefined) {
+  const queryClient = useQueryClient()
+  return useQuery<IemisImportJob, Error>({
+    queryKey: ['iemis-import-job', jobId],
+    queryFn: () => getIemisImportJob(jobId as string),
+    enabled: !!jobId,
+    refetchInterval: (query) => {
+      const status = query.state.data?.status
+      return status === 'succeeded' || status === 'failed' ? false : 2000
+    },
+    refetchIntervalInBackground: false,
+    staleTime: 0,
+    gcTime: 60_000,
+    // Invalidate the student list once the job ends successfully — this is
+    // the right moment because that's when DDB rows become visible.
+    select: (data) => {
+      if (data.status === 'succeeded') {
+        queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+      }
+      return data
     },
   })
 }

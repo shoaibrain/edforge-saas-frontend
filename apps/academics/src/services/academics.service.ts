@@ -548,16 +548,60 @@ export async function importStudentsCsv(
 import type {
   IemisImportRequest,
   IemisImportResult,
+  IemisImportAsyncAck,
+  IemisImportJob,
 } from '../components/students/iemis/iemis-import.types'
 
 /**
- * Import students from an IEMIS xlsx export. Supports a mandatory dry-run
- * phase (caller passes `dryRun: true` first, then `false` to commit).
+ * Dry-run preview of the IEMIS import. Synchronous. Backend short-circuits
+ * before Phase 3 (no DDB writes) so this returns in well under 30s for the
+ * 779-row case. Default 30s timeout is fine; we keep the explicit 60s here
+ * as a safety net for slow STS warm-ups.
+ */
+export async function previewIemisImport(
+  data: Omit<IemisImportRequest, 'dryRun' | 'enrollInAcademicYearId'>,
+): Promise<IemisImportResult> {
+  const response = await api.post<IemisImportResult>(
+    '/academics/students/import/iemis',
+    { ...data, dryRun: true },
+    { timeout: 60_000 },
+  )
+  return response.data
+}
+
+/**
+ * Real (non-dryRun) import. Backend returns 202 + jobId immediately and
+ * runs the work asynchronously. Caller polls `getIemisImportJob(jobId)`
+ * until the job's status is `succeeded` or `failed`.
  *
- * Uses `api.post` directly (not `apiPost`) so we can bump the timeout.
- * The default 30s is too tight: committing 779 rows against a cold DDB
- * warm-up (first invocation after low-traffic period) has been observed
- * to take 45-60s end-to-end. 120s gives comfortable headroom.
+ * Solves the API Gateway 29s integration timeout that previously dropped
+ * the response on >500-row imports while the backend silently kept
+ * committing rows.
+ */
+export async function startIemisImport(
+  data: Omit<IemisImportRequest, 'dryRun'>,
+): Promise<IemisImportAsyncAck> {
+  const response = await api.post<IemisImportAsyncAck>(
+    '/academics/students/import/iemis',
+    { ...data, dryRun: false },
+    { timeout: 30_000 },
+  )
+  return response.data
+}
+
+/**
+ * Poll the status of an in-flight or completed IEMIS import job.
+ *
+ * Returns the full record. Frontend should call this every 2s while
+ * `status` is `queued` or `running`, and stop on `succeeded` / `failed`.
+ */
+export async function getIemisImportJob(jobId: string): Promise<IemisImportJob> {
+  return apiGet<IemisImportJob>(`/academics/students/import/iemis/jobs/${jobId}`)
+}
+
+/**
+ * @deprecated Use `previewIemisImport` (dryRun) or `startIemisImport` (commit)
+ * directly. Kept temporarily to avoid breaking callers during the C4 rollout.
  */
 export async function importStudentsIemis(
   data: IemisImportRequest,

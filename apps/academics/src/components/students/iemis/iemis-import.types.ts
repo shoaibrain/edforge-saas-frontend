@@ -80,7 +80,9 @@ export interface IemisDuplicate {
   existingStudentId: string
 }
 
-/** Backend response for `POST /academics/students/import/iemis`. */
+/** Backend response for `POST /academics/students/import/iemis` when dryRun=true.
+ *  Real-import (dryRun=false) returns `IemisImportAsyncAck` instead.
+ */
 export interface IemisImportResult {
   succeeded: number
   failed: number
@@ -89,11 +91,57 @@ export interface IemisImportResult {
   duplicates: IemisDuplicate[]
 }
 
+/**
+ * 202 Accepted shape returned by the real-import path (dryRun=false).
+ * Client should poll GET /academics/students/import/iemis/jobs/:jobId.
+ */
+export interface IemisImportAsyncAck {
+  jobId: string
+  status: 'queued'
+  totalRows: number
+  schoolId: string
+  enrollInAcademicYearId?: string
+}
+
+export type IemisImportJobStatus = 'queued' | 'running' | 'succeeded' | 'failed'
+
+/** Full job record returned by `GET /academics/students/import/iemis/jobs/:jobId`. */
+export interface IemisImportJob {
+  jobId: string
+  schoolId: string
+  status: IemisImportJobStatus
+  totalRows: number
+  enrollInAcademicYearId?: string
+
+  studentsCreated: number
+  studentsEnrolled: number
+  failed: number
+  skipped: number
+
+  findings: IemisFinding[]
+  findingsTruncated: boolean
+  duplicates: IemisDuplicate[]
+  duplicatesTruncated: boolean
+
+  startedAt?: string
+  completedAt?: string
+  durationMs?: number
+  error?: string
+
+  createdAt: string
+  updatedAt: string
+}
+
 /** Backend request body. */
 export interface IemisImportRequest {
   students: IemisRow[]
   schoolId: string
   dryRun?: boolean
+  /** Optional academic-year-id; when set on dryRun=false, every successfully
+   *  created Student also gets a SchoolEnrollment row inside the same async
+   *  job. Ignored on dryRun=true.
+   */
+  enrollInAcademicYearId?: string
 }
 
 /**
@@ -132,9 +180,10 @@ export type IemisImportPhase =
   | 'dryRunning' // POST with dryRun=true in-flight
   | 'preview' // Dry-run complete; findings + duplicates shown
   | 'confirming' // User opened the confirm modal; awaiting Yes/No
-  | 'committing' // POST with dryRun=false in-flight
-  | 'results' // Commit returned; show final counts
-  | 'commitError' // Commit failed (network/5xx/4xx)
+  | 'committing' // POST with dryRun=false in-flight (server returns 202 quickly)
+  | 'progress' // Job accepted; polling GET /jobs/:jobId for terminal state
+  | 'results' // Job terminal=succeeded; show final counts
+  | 'commitError' // Job terminal=failed OR initial POST failed
 
 /**
  * File size ceiling in bytes. 5MB covers 779-row Saraswati exports with

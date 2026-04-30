@@ -38,12 +38,13 @@
  *    Acceptable for V1 given the flow is <5 minutes end-to-end.
  */
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
   AlertTriangle,
   ArrowLeft,
+  CalendarCheck,
   CheckCircle2,
   Download,
   FileSpreadsheet,
@@ -55,7 +56,12 @@ import {
 import { toast } from 'sonner'
 import { useActiveSchoolId } from '../../../stores/app.store'
 import { getSchoolProfile } from '../../../services/school.service'
-import { useImportStudentsIemis } from '../../../hooks/useStudents'
+import { getAcademicYears } from '../../../services/school.service'
+import {
+  usePreviewIemisImport,
+  useStartIemisImport,
+  useIemisImportJob,
+} from '../../../hooks/useStudents'
 import { parseIemisXlsx } from './iemis-parser'
 import {
   buildFindingsExport,
@@ -66,6 +72,7 @@ import {
   MAX_IEMIS_ROW_COUNT,
   type IemisImportPhase,
   type IemisImportResult,
+  type IemisImportJob,
   type IemisParseResult,
 } from './iemis-import.types'
 
@@ -92,9 +99,54 @@ export function IemisImport() {
   const [parseResult, setParseResult] = useState<IemisParseResult | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
   const [dryRunResult, setDryRunResult] = useState<IemisImportResult | null>(null)
-  const [commitResult, setCommitResult] = useState<IemisImportResult | null>(null)
   const [commitError, setCommitError] = useState<string | null>(null)
-  const importMutation = useImportStudentsIemis()
+
+  // Sprint C4 — async commit. After the commit POST returns 202, we hold the
+  // jobId here and `useIemisImportJob` polls until the job reaches a terminal
+  // state. The final `IemisImportJob` row is the source of truth for the
+  // results view; we no longer keep a separate `commitResult`.
+  const [jobId, setJobId] = useState<string | null>(null)
+  const jobQuery = useIemisImportJob(jobId)
+
+  // Sprint C4 — auto-enroll-on-import. The user can opt to enroll every
+  // successfully created Student into the chosen academic year inside the
+  // same async job. Default is the school's `isCurrent` AY when its status
+  // is `active`. If no eligible AY exists, the checkbox is disabled.
+  const [enrollInAcademicYearId, setEnrollInAcademicYearId] = useState<string | undefined>(undefined)
+
+  const previewMutation = usePreviewIemisImport()
+  const startMutation = useStartIemisImport()
+
+  // ── Academic years (for enroll-on-import option) ───────────────────────
+  // Only fetched when the school is eligible — keeps the gate fast-path lean.
+  const academicYearsQuery = useQuery({
+    queryKey: ['academic-years', schoolId],
+    queryFn: () => getAcademicYears(schoolId!),
+    enabled: !!schoolId && !!schoolQuery.data?.emisSchoolCode,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  // The "active + current" AY is the natural enrollment target. If none
+  // exists, we fall back to any AY with status='active'. If none of those
+  // either, the checkbox stays disabled.
+  const eligibleAcademicYear = useMemo(() => {
+    const all = academicYearsQuery.data ?? []
+    const activeCurrent = all.find((y) => y.status === 'active' && y.isCurrent)
+    if (activeCurrent) return activeCurrent
+    return all.find((y) => y.status === 'active')
+  }, [academicYearsQuery.data])
+
+  // Default the enrollment-on-import selection to the eligible AY, but only
+  // once we've actually loaded one. The user can uncheck.
+  useEffect(() => {
+    if (
+      eligibleAcademicYear &&
+      enrollInAcademicYearId === undefined &&
+      academicYearsQuery.isSuccess
+    ) {
+      setEnrollInAcademicYearId(eligibleAcademicYear.yearId)
+    }
+  }, [eligibleAcademicYear, enrollInAcademicYearId, academicYearsQuery.isSuccess])
 
   // ── Derived gate state ────────────────────────────────────────────────
   const school = schoolQuery.data
@@ -179,64 +231,80 @@ export function IemisImport() {
       if (!schoolId) return
       setPhase('dryRunning')
       try {
-        const result = await importMutation.mutateAsync({
+        const result = await previewMutation.mutateAsync({
           students: parsed.rows,
           schoolId,
-          dryRun: true,
         })
         setDryRunResult(result)
         setPhase('preview')
       } catch (err) {
-        // Mutation already toasted via parseApiError in the hook.
-        // Bounce back to chooseFile so operator can retry.
         console.warn('[IemisImport] Dry-run failed', err)
         setPhase('chooseFile')
       }
     },
-    [schoolId, importMutation],
+    [schoolId, previewMutation],
   )
 
   // ── Commit handler ────────────────────────────────────────────────────
+  // Sprint C4: kicks off an async job (202 + jobId) and switches to the
+  // `progress` phase. Polling is owned by `useIemisImportJob`; transitions
+  // to `results` / `commitError` are owned by the effect below.
   const handleCommit = useCallback(async () => {
     if (!parseResult || !schoolId) return
     setCommitError(null)
     setPhase('committing')
     try {
-      const result = await importMutation.mutateAsync({
+      const ack = await startMutation.mutateAsync({
         students: parseResult.rows,
         schoolId,
-        dryRun: false,
+        enrollInAcademicYearId,
       })
-      setCommitResult(result)
-      setPhase('results')
-      if (result.succeeded > 0) {
-        toast.success(
-          `Imported ${result.succeeded} student${result.succeeded === 1 ? '' : 's'}`,
-        )
-      }
+      setJobId(ack.jobId)
+      setPhase('progress')
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Import failed. Please try again.'
       setCommitError(message)
       setPhase('commitError')
     }
-  }, [parseResult, schoolId, importMutation])
+  }, [parseResult, schoolId, enrollInAcademicYearId, startMutation])
+
+  // ── Job terminal-state transition ─────────────────────────────────────
+  useEffect(() => {
+    if (phase !== 'progress' || !jobQuery.data) return
+    if (jobQuery.data.status === 'succeeded') {
+      setPhase('results')
+      if (jobQuery.data.studentsCreated > 0) {
+        toast.success(
+          `Imported ${jobQuery.data.studentsCreated} student${jobQuery.data.studentsCreated === 1 ? '' : 's'}` +
+            (jobQuery.data.studentsEnrolled > 0
+              ? ` · enrolled ${jobQuery.data.studentsEnrolled}`
+              : ''),
+        )
+      }
+    } else if (jobQuery.data.status === 'failed') {
+      setCommitError(jobQuery.data.error ?? 'Import job failed.')
+      setPhase('commitError')
+    }
+  }, [phase, jobQuery.data])
 
   // ── Reset to chooseFile ───────────────────────────────────────────────
   const resetToChooser = useCallback(() => {
     setParseResult(null)
     setParseError(null)
     setDryRunResult(null)
-    setCommitResult(null)
     setCommitError(null)
+    setJobId(null)
     setPhase('chooseFile')
   }, [])
 
   // ── Error-CSV export ──────────────────────────────────────────────────
+  // Accepts either a sync IemisImportResult (dryRun) or an async IemisImportJob
+  // (post-commit). Both expose `findings` in the same shape.
   const downloadFindings = useCallback(
-    (result: IemisImportResult) => {
+    (source: IemisImportResult | IemisImportJob) => {
       if (!parseResult) return
-      const exportRows = buildFindingsExport(result.findings, parseResult.rows)
+      const exportRows = buildFindingsExport(source.findings, parseResult.rows)
       const ts = new Date().toISOString().slice(0, 10)
       downloadFindingsCsv(exportRows, `iemis-import-findings-${ts}.csv`)
     },
@@ -315,6 +383,9 @@ export function IemisImport() {
         <PreviewView
           parse={parseResult}
           dryRun={dryRunResult}
+          eligibleAcademicYear={eligibleAcademicYear}
+          enrollInAcademicYearId={enrollInAcademicYearId}
+          onToggleEnroll={(yearId) => setEnrollInAcademicYearId(yearId)}
           onConfirm={() => setPhase('confirming')}
           onCancel={resetToChooser}
           onDownloadFindings={() => downloadFindings(dryRunResult)}
@@ -327,17 +398,35 @@ export function IemisImport() {
           parse={parseResult}
           dryRun={dryRunResult}
           schoolName={school?.name ?? 'this school'}
+          enrollInAcademicYearName={
+            enrollInAcademicYearId && eligibleAcademicYear?.yearId === enrollInAcademicYearId
+              ? eligibleAcademicYear.name
+              : undefined
+          }
           onConfirm={handleCommit}
           onCancel={() => setPhase('preview')}
         />
       )}
 
-      {/* Committing spinner */}
+      {/* Committing — POST in flight, expecting 202 quickly */}
       {effectivePhase === 'committing' && (
         <InlineStatus
           icon={<Loader2 className="w-5 h-5 animate-spin" />}
-          title="Importing students"
-          description={`Creating ${parseResult?.rowCount ?? 0} student records in batches of 10. Please keep this tab open — it may take up to 2 minutes.`}
+          title="Submitting import"
+          description="Queuing the import job."
+        />
+      )}
+
+      {/* Progress — polling the job until it terminates */}
+      {effectivePhase === 'progress' && (
+        <ProgressView
+          job={jobQuery.data}
+          totalRows={parseResult?.rowCount ?? 0}
+          enrollInAcademicYearName={
+            enrollInAcademicYearId && eligibleAcademicYear?.yearId === enrollInAcademicYearId
+              ? eligibleAcademicYear.name
+              : undefined
+          }
         />
       )}
 
@@ -351,14 +440,19 @@ export function IemisImport() {
         />
       )}
 
-      {/* Results */}
-      {effectivePhase === 'results' && commitResult && parseResult && (
+      {/* Results — reads from the terminal job row */}
+      {effectivePhase === 'results' && jobQuery.data && parseResult && (
         <ResultsView
-          commit={commitResult}
+          job={jobQuery.data}
           totalRows={parseResult.rowCount}
+          enrollInAcademicYearName={
+            jobQuery.data.enrollInAcademicYearId && eligibleAcademicYear?.yearId === jobQuery.data.enrollInAcademicYearId
+              ? eligibleAcademicYear.name
+              : undefined
+          }
           onImportAnother={resetToChooser}
           onViewStudents={() => navigate({ to: '/students' })}
-          onDownloadFindings={() => downloadFindings(commitResult)}
+          onDownloadFindings={() => downloadFindings(jobQuery.data!)}
         />
       )}
     </div>
@@ -496,12 +590,20 @@ function FileChooserCard({
 function PreviewView({
   parse,
   dryRun,
+  eligibleAcademicYear,
+  enrollInAcademicYearId,
+  onToggleEnroll,
   onConfirm,
   onCancel,
   onDownloadFindings,
 }: {
   parse: IemisParseResult
   dryRun: IemisImportResult
+  eligibleAcademicYear:
+    | { yearId: string; name: string; startDate: string; endDate: string; isCurrent: boolean }
+    | undefined
+  enrollInAcademicYearId: string | undefined
+  onToggleEnroll: (yearId: string | undefined) => void
   onConfirm: () => void
   onCancel: () => void
   onDownloadFindings: () => void
@@ -541,6 +643,68 @@ function PreviewView({
         <CountTile label="Duplicates (skip)" value={dryRun.skipped} tone={dryRun.skipped > 0 ? 'warn' : 'neutral'} />
         <CountTile label="Warnings" value={warnings.length} tone={warnings.length > 0 ? 'warn' : 'neutral'} />
       </div>
+
+      {/* Enroll-on-import — Sprint C4 ────────────────────────────────────
+          Defaults ON when the school has an active+current AY. Without
+          enrollment, every imported student lands in `pending` status with
+          no class assignment / attendance / grades — workable for one-off
+          historical imports, painful at pilot scale (779 manual clicks). */}
+      {willImport > 0 && (
+        <div
+          className={`rounded-xl border p-4 ${
+            eligibleAcademicYear
+              ? 'border-teal-300 bg-teal-50 dark:bg-teal-950/30 dark:border-teal-800'
+              : 'border-border-primary bg-surface-secondary'
+          }`}
+        >
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              className="mt-1 h-4 w-4"
+              disabled={!eligibleAcademicYear}
+              checked={
+                !!eligibleAcademicYear &&
+                enrollInAcademicYearId === eligibleAcademicYear.yearId
+              }
+              onChange={(e) => {
+                if (!eligibleAcademicYear) return
+                onToggleEnroll(e.target.checked ? eligibleAcademicYear.yearId : undefined)
+              }}
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
+                <CalendarCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                Enroll all imported students into this year
+              </div>
+              {eligibleAcademicYear ? (
+                <div className="mt-1 text-xs text-text-secondary">
+                  <b>{eligibleAcademicYear.name}</b>
+                  {eligibleAcademicYear.isCurrent && (
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-200">
+                      current
+                    </span>
+                  )}
+                  {' · '}
+                  {eligibleAcademicYear.startDate} → {eligibleAcademicYear.endDate}
+                </div>
+              ) : (
+                <div className="mt-1 text-xs text-text-tertiary">
+                  No active academic year on this school. Imported students
+                  will be created without an enrollment record. Set up an
+                  academic year first to enable this option.
+                </div>
+              )}
+              <div className="mt-2 text-xs text-text-tertiary">
+                When enabled, every successfully created student also gets a
+                SchoolEnrollment for the year and is moved to <i>active</i> status.
+                When disabled, students are created in <i>pending</i> status
+                and you'll need to enroll each one individually from the
+                student detail page.
+              </div>
+            </div>
+          </label>
+        </div>
+      )}
 
       {/* Errors */}
       {errors.length > 0 && (
@@ -623,12 +787,14 @@ function ConfirmModal({
   parse,
   dryRun,
   schoolName,
+  enrollInAcademicYearName,
   onConfirm,
   onCancel,
 }: {
   parse: IemisParseResult
   dryRun: IemisImportResult
   schoolName: string
+  enrollInAcademicYearName: string | undefined
   onConfirm: () => void
   onCancel: () => void
 }) {
@@ -659,7 +825,12 @@ function ConfirmModal({
         <div className="p-5 space-y-3 text-sm text-text-secondary">
           <p>
             <b>{willImport}</b> student record{willImport === 1 ? '' : 's'} will
-            be created in <b>{schoolName}</b>.{' '}
+            be created in <b>{schoolName}</b>
+            {enrollInAcademicYearName && (
+              <>
+                {' '}and enrolled in <b>{enrollInAcademicYearName}</b>
+              </>
+            )}.{' '}
             {dryRun.skipped > 0 && (
               <>
                 <b>{dryRun.skipped}</b> duplicate{dryRun.skipped === 1 ? '' : 's'} will be skipped.{' '}
@@ -704,20 +875,87 @@ function ConfirmModal({
   )
 }
 
-function ResultsView({
-  commit,
+/**
+ * ProgressView — Sprint C4. Renders while we're polling the async import
+ * job. The backend reports `status='running'` once the worker starts but
+ * does NOT stream per-batch progress (that would require either a separate
+ * progress write per batch — DDB write amplification — or a streaming
+ * response). For V1 we show an indeterminate progress bar with a simple
+ * status copy. The polling cadence (2s in `useIemisImportJob`) plus a
+ * realistic 30–60s import window means the user sees the spinner for
+ * ~15-30 polls before the terminal transition fires the results view.
+ */
+function ProgressView({
+  job,
   totalRows,
+  enrollInAcademicYearName,
+}: {
+  job: IemisImportJob | undefined
+  totalRows: number
+  enrollInAcademicYearName: string | undefined
+}) {
+  const status = job?.status ?? 'queued'
+  const isQueued = status === 'queued'
+  const description = isQueued
+    ? `Job is queued. Processing ${totalRows} row${totalRows === 1 ? '' : 's'}.`
+    : `Importing ${totalRows} row${totalRows === 1 ? '' : 's'}` +
+      (enrollInAcademicYearName ? ` and enrolling into ${enrollInAcademicYearName}.` : '.')
+
+  return (
+    <div className="rounded-xl border border-teal-300 bg-teal-50 dark:bg-teal-950/30 dark:border-teal-800 p-5">
+      <div className="flex items-start gap-3">
+        <Loader2 className="w-5 h-5 text-teal-600 dark:text-teal-400 animate-spin flex-shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <div className="text-sm font-medium text-teal-900 dark:text-teal-200">
+            {isQueued ? 'Import queued' : 'Importing students…'}
+          </div>
+          <p className="mt-1 text-sm text-teal-800 dark:text-teal-300">{description}</p>
+          <p className="mt-2 text-xs text-teal-700 dark:text-teal-400">
+            You can keep this tab open. The import runs server-side; closing
+            the tab won't cancel the job, but you'll lose the live status view.
+          </p>
+        </div>
+      </div>
+
+      {/* Indeterminate stripe — until the worker reports per-batch progress */}
+      <div className="mt-4 h-1.5 rounded-full bg-teal-200/70 dark:bg-teal-900/60 overflow-hidden">
+        <div className="h-full w-1/3 bg-teal-500 animate-[indeterminate_1.4s_ease-in-out_infinite] [animation-name:indeterminate]"
+          style={{
+            animation: 'indeterminate 1.4s ease-in-out infinite',
+          }}
+        />
+      </div>
+      <style>{`
+        @keyframes indeterminate {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function ResultsView({
+  job,
+  totalRows,
+  enrollInAcademicYearName,
   onImportAnother,
   onViewStudents,
   onDownloadFindings,
 }: {
-  commit: IemisImportResult
+  job: IemisImportJob
   totalRows: number
+  enrollInAcademicYearName: string | undefined
   onImportAnother: () => void
   onViewStudents: () => void
   onDownloadFindings: () => void
 }) {
-  const allSuccess = commit.failed === 0 && commit.succeeded === totalRows - commit.skipped
+  const enrollAttempted = !!job.enrollInAcademicYearId
+  const allSuccess =
+    job.failed === 0 &&
+    job.studentsCreated === totalRows - job.skipped &&
+    (!enrollAttempted || job.studentsEnrolled === job.studentsCreated)
+
   return (
     <div className="space-y-4">
       <div
@@ -738,29 +976,50 @@ function ResultsView({
               {allSuccess ? 'Import complete' : 'Import finished with issues'}
             </div>
             <div className="mt-1 text-sm text-text-secondary">
-              {commit.succeeded} created, {commit.skipped} skipped (duplicates),{' '}
-              {commit.failed} failed out of {totalRows} total rows.
+              {job.studentsCreated} student{job.studentsCreated === 1 ? '' : 's'} created
+              {enrollAttempted && (
+                <>, {job.studentsEnrolled} enrolled{enrollInAcademicYearName ? ` in ${enrollInAcademicYearName}` : ''}</>
+              )}
+              , {job.skipped} skipped (duplicates), {job.failed} failed out of {totalRows} total rows.
             </div>
+            {job.durationMs !== undefined && (
+              <div className="mt-1 text-xs text-text-tertiary">
+                Took {(job.durationMs / 1000).toFixed(1)}s.
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
-        <CountTile label="Created" value={commit.succeeded} tone="success" />
-        <CountTile label="Skipped (duplicate)" value={commit.skipped} tone="warn" />
-        <CountTile label="Failed" value={commit.failed} tone={commit.failed > 0 ? 'danger' : 'neutral'} />
+      <div className={`grid gap-3 ${enrollAttempted ? 'grid-cols-4' : 'grid-cols-3'}`}>
+        <CountTile label="Created" value={job.studentsCreated} tone="success" />
+        {enrollAttempted && (
+          <CountTile
+            label="Enrolled"
+            value={job.studentsEnrolled}
+            tone={job.studentsEnrolled === job.studentsCreated ? 'success' : 'warn'}
+          />
+        )}
+        <CountTile label="Skipped (duplicate)" value={job.skipped} tone="warn" />
+        <CountTile label="Failed" value={job.failed} tone={job.failed > 0 ? 'danger' : 'neutral'} />
       </div>
-      {commit.findings.length > 0 && (
+      {job.findingsTruncated && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 text-xs text-amber-800 dark:text-amber-300">
+          The first 500 findings are shown. Re-run a dry-run to download the
+          full findings CSV.
+        </div>
+      )}
+      {job.findings.length > 0 && (
         <FindingsList
           tone="info"
-          title={`${commit.findings.length} finding${commit.findings.length === 1 ? '' : 's'} from import`}
-          findings={commit.findings}
+          title={`${job.findings.length} finding${job.findings.length === 1 ? '' : 's'} from import`}
+          findings={job.findings}
           collapsible
         />
       )}
       <div className="flex items-center justify-between gap-3 pt-2">
         <button
           onClick={onDownloadFindings}
-          disabled={commit.findings.length === 0}
+          disabled={job.findings.length === 0}
           className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-border-primary text-text-primary hover:bg-surface-hover disabled:opacity-40"
         >
           <Download className="w-4 h-4" />
