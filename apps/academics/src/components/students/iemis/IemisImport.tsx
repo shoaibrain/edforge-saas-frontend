@@ -648,12 +648,19 @@ function PreviewView({
           Defaults ON when the school has an active+current AY. Without
           enrollment, every imported student lands in `pending` status with
           no class assignment / attendance / grades — workable for one-off
-          historical imports, painful at pilot scale (779 manual clicks). */}
+          historical imports, painful at pilot scale (779 manual clicks).
+
+          Dark-mode contrast note: text colors here are tone-tinted
+          (text-teal-900 dark:text-teal-100 etc.) instead of the semantic
+          text-text-primary CSS-vars. The CSS-vars resolve to white in dark
+          mode, which becomes washed out against the teal-tinted background;
+          tone-tinted classes pair correctly with both light and dark bgs.
+      */}
       {willImport > 0 && (
         <div
           className={`rounded-xl border p-4 ${
             eligibleAcademicYear
-              ? 'border-teal-300 bg-teal-50 dark:bg-teal-950/30 dark:border-teal-800'
+              ? 'border-teal-300 bg-teal-50 dark:bg-teal-950/40 dark:border-teal-800'
               : 'border-border-primary bg-surface-secondary'
           }`}
         >
@@ -672,15 +679,21 @@ function PreviewView({
               }}
             />
             <div className="flex-1">
-              <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
-                <CalendarCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <div
+                className={`flex items-center gap-2 text-sm font-medium ${
+                  eligibleAcademicYear
+                    ? 'text-teal-900 dark:text-teal-100'
+                    : 'text-text-primary'
+                }`}
+              >
+                <CalendarCheck className="w-4 h-4 text-teal-600 dark:text-teal-300" />
                 Enroll all imported students into this year
               </div>
               {eligibleAcademicYear ? (
-                <div className="mt-1 text-xs text-text-secondary">
+                <div className="mt-1 text-xs text-teal-800 dark:text-teal-200">
                   <b>{eligibleAcademicYear.name}</b>
                   {eligibleAcademicYear.isCurrent && (
-                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-200">
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-teal-100 dark:bg-teal-900/70 text-teal-800 dark:text-teal-100">
                       current
                     </span>
                   )}
@@ -694,7 +707,13 @@ function PreviewView({
                   academic year first to enable this option.
                 </div>
               )}
-              <div className="mt-2 text-xs text-text-tertiary">
+              <div
+                className={`mt-2 text-xs ${
+                  eligibleAcademicYear
+                    ? 'text-teal-700 dark:text-teal-300'
+                    : 'text-text-tertiary'
+                }`}
+              >
                 When enabled, every successfully created student also gets a
                 SchoolEnrollment for the year and is moved to <i>active</i> status.
                 When disabled, students are created in <i>pending</i> status
@@ -1083,23 +1102,42 @@ function FindingsList({
   collapsible?: boolean
 }) {
   const [open, setOpen] = useState(!collapsible)
-  const toneClass = {
-    danger: 'border-rust-300 bg-rust-50 dark:bg-rust-950/20 dark:border-rust-800',
-    warn: 'border-amber-300 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800',
+  // Sprint C4 dark-mode fix: previously used `text-text-primary/secondary`
+  // (CSS vars that resolve to white in dark mode). On `bg-amber-50` /
+  // `bg-rust-50` light-tone backgrounds, white text is invisible. Switching
+  // to tone-tinted text colors that pair with both light and dark bgs.
+  const containerClass = {
+    danger: 'border-rust-300 bg-rust-50 dark:bg-rust-950/40 dark:border-rust-800',
+    warn: 'border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800',
     info: 'border-border-primary bg-surface-secondary',
   }[tone]
+  const titleClass = {
+    danger: 'text-rust-900 dark:text-rust-100',
+    warn: 'text-amber-900 dark:text-amber-100',
+    info: 'text-text-primary',
+  }[tone]
+  const itemClass = {
+    danger: 'text-rust-800 dark:text-rust-200',
+    warn: 'text-amber-800 dark:text-amber-200',
+    info: 'text-text-secondary',
+  }[tone]
+  const subtleClass = {
+    danger: 'text-rust-700 dark:text-rust-300',
+    warn: 'text-amber-700 dark:text-amber-300',
+    info: 'text-text-tertiary',
+  }[tone]
   return (
-    <div className={`rounded-xl border p-4 ${toneClass}`}>
+    <div className={`rounded-xl border p-4 ${containerClass}`}>
       <button
         onClick={() => collapsible && setOpen(!open)}
-        className="flex w-full items-center justify-between text-sm font-medium text-text-primary"
+        className={`flex w-full items-center justify-between text-sm font-medium ${titleClass}`}
         disabled={!collapsible}
       >
         <span>{title}</span>
-        {collapsible && <span className="text-xs text-text-tertiary">{open ? 'Collapse' : 'Expand'}</span>}
+        {collapsible && <span className={`text-xs ${subtleClass}`}>{open ? 'Collapse' : 'Expand'}</span>}
       </button>
       {open && (
-        <ul className="mt-3 space-y-1 text-xs font-mono text-text-secondary max-h-64 overflow-y-auto">
+        <ul className={`mt-3 space-y-1 text-xs font-mono max-h-64 overflow-y-auto ${itemClass}`}>
           {findings.slice(0, 100).map((f, idx) => (
             <li key={idx}>
               Row {f.row} · <b>{f.field}</b> — {f.message}

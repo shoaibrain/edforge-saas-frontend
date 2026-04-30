@@ -19,7 +19,8 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@edforge/ui'
+import { Button, DateInput } from '@edforge/ui'
+import { useSettings } from '@/lib/shell-context'
 import {
   useAcademicSessions,
   useCreateAcademicSession,
@@ -140,6 +141,13 @@ function SessionForm({
   submitLabel: string
 }) {
   const [form, setForm] = useState<SessionFormData>(initial)
+  // Sprint C4 — render the BS calendar picker for PABSON tenants and the
+  // standard date picker for everyone else. `DateInput` from @edforge/ui
+  // owns this branching internally; we just pass `calendarSystem` through
+  // from the resolved workspace settings (which already collapse tenant +
+  // school precedence). Same pattern as school-academic-years.tsx.
+  const settings = useSettings()
+  const calendarSystem = settings?.calendarSystem || 'gregorian'
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -182,26 +190,18 @@ function SessionForm({
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Begin Date</label>
-          <input
-            type="date"
-            value={form.beginDate}
-            onChange={(e) => setForm(f => ({ ...f, beginDate: e.target.value }))}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">End Date</label>
-          <input
-            type="date"
-            value={form.endDate}
-            onChange={(e) => setForm(f => ({ ...f, endDate: e.target.value }))}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5"
-            required
-          />
-        </div>
+        <DateInput
+          label="Begin Date"
+          value={form.beginDate}
+          onChange={(iso) => setForm(f => ({ ...f, beginDate: iso }))}
+          calendarSystem={calendarSystem}
+        />
+        <DateInput
+          label="End Date"
+          value={form.endDate}
+          onChange={(iso) => setForm(f => ({ ...f, endDate: iso }))}
+          calendarSystem={calendarSystem}
+        />
       </div>
       <div className="flex justify-end gap-2">
         <Button variant="ghost" size="sm" type="button" onClick={onCancel}>Cancel</Button>
