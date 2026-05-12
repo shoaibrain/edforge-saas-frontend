@@ -1,7 +1,7 @@
 {
   "buildCommand": "bash scripts/build-deploy.sh",
   "outputDirectory": "output",
-  "installCommand": "npm i -g pnpm@9.15.0 && pnpm install",
+  "installCommand": "npm i -g pnpm@10.33.0 && pnpm install --frozen-lockfile",
   "framework": null,
   "headers": [
     {

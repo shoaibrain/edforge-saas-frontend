@@ -3,3 +3,22 @@ packages:
   - "packages/*"
   - "types/packages/*"
 
+# Supply-chain hardening (pnpm ≥ 10.16 + 10.26)
+# Refuses to install any npm version younger than 7 days (10080 minutes).
+# The typical detection lag for malicious npm releases is 12-72h; 7 days
+# gives margin without being annoying. Internal @edforge/* workspace
+# packages are excluded so local development isn't gated.
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - "@edforge/*"
+
+# Lifecycle scripts (preinstall/install/postinstall) are disallowed unless
+# the package is explicitly allowlisted below. This is the primary delivery
+# vector for npm supply-chain malware. List discovered via pnpm install
+# under strictDepBuilds; each entry verified case-by-case.
+strictDepBuilds: true
+allowBuilds:
+  esbuild: true        # registers native platform binary; vite depends on it
+  msw: true            # copies mockServiceWorker.js into the project; needed for browser request mocking
+  core-js: false       # postinstall prints a funding banner only; no functional impact
+  es5-ext: false       # postinstall prints a sponsorship banner only; no functional impact

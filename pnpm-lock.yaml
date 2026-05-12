@@ -6,6 +6,17 @@ settings:
 
 overrides:
   zod: ~3.24.4
+  '@tanstack/react-router': 1.168.23
+  '@tanstack/react-query': 5.99.2
+  '@tanstack/react-table': 8.21.3
+  '@tanstack/react-virtual': 3.13.24
+  '@tanstack/react-store': 0.9.3
+  '@tanstack/history': 1.161.6
+  '@tanstack/router-core': 1.168.15
+  '@tanstack/store': 0.9.3
+  '@tanstack/table-core': 8.21.3
+  '@tanstack/virtual-core': 3.14.0
+  '@tanstack/query-core': 5.99.2
 
 importers:
 
@@ -100,13 +111,13 @@ importers:
         specifier: ^2.2.0
         version: 2.2.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-table':
-        specifier: ^8.20.0
+        specifier: 8.21.3
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       axios:
         specifier: ^1.7.8
@@ -200,10 +211,10 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       axios:
         specifier: ^1.7.8
@@ -279,7 +290,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       framer-motion:
         specifier: ^11.15.0
@@ -355,13 +366,13 @@ importers:
         specifier: ^3.9.0
         version: 3.10.0(react-hook-form@7.73.1(react@19.2.5))
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-table':
-        specifier: ^8.20.0
+        specifier: 8.21.3
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       framer-motion:
         specifier: ^11.15.0
@@ -431,13 +442,13 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-table':
-        specifier: ^8.20.0
+        specifier: 8.21.3
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       framer-motion:
         specifier: ^11.15.0
@@ -525,13 +536,13 @@ importers:
         specifier: ^2.2.0
         version: 2.2.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-table':
-        specifier: ^8.20.0
+        specifier: 8.21.3
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       axios:
         specifier: ^1.7.0
@@ -652,10 +663,10 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@vercel/analytics':
         specifier: ^1.6.1
@@ -749,7 +760,7 @@ importers:
         specifier: ^1.0.0
         version: 1.4.6(@rsbuild/core@1.7.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react:
         specifier: ^19.0.0
@@ -907,7 +918,7 @@ importers:
         specifier: workspace:*
         version: link:../types
       '@tanstack/react-query':
-        specifier: ^5.60.0
+        specifier: 5.99.2
         version: 5.99.2(react@19.2.5)
       react:
         specifier: ^19.0.0
@@ -1000,7 +1011,7 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tanstack/react-router':
-        specifier: ^1.82.0
+        specifier: 1.168.23
         version: 1.168.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       framer-motion:
         specifier: ^11.15.0
@@ -1087,7 +1098,7 @@ importers:
         specifier: workspace:*
         version: link:../types
       '@tanstack/react-table':
-        specifier: ^8.20.0
+        specifier: 8.21.3
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@types/react':
         specifier: ^19.0.0
