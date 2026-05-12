@@ -12,6 +12,8 @@ import {
   signOut,
   fetchAuthSession,
   getCurrentUser,
+  resetPassword,
+  confirmResetPassword,
 } from 'aws-amplify/auth'
 import { Hub } from 'aws-amplify/utils'
 import type { CognitoIdTokenPayload, AuthSession, AuthState } from './types'
@@ -222,6 +224,28 @@ export function subscribeToAuthChanges(
   })
 
   return hubListener
+}
+
+/**
+ * Initiates an in-app password reset by asking Cognito to email a verification code.
+ * Errors (including UserNotFoundException) are re-thrown unchanged so callers can
+ * decide policy — the LoginPage flow masks UserNotFoundException to avoid leaking
+ * account existence.
+ */
+export async function forgotPassword(username: string) {
+  return await resetPassword({ username })
+}
+
+/**
+ * Completes the in-app password reset using the code Cognito emailed.
+ * Cognito enforces the pool's password policy on `newPassword`.
+ */
+export async function confirmForgotPassword(
+  username: string,
+  confirmationCode: string,
+  newPassword: string,
+) {
+  return await confirmResetPassword({ username, confirmationCode, newPassword })
 }
 
 /**

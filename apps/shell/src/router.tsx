@@ -23,6 +23,7 @@ import { LoadingScreen } from './components/layout/LoadingScreen'
 import { NotFound } from './components/layout/NotFound'
 // Pages
 import { LoginPage } from './components/layout/LoginPage'
+import { ForgotPasswordPage } from './components/layout/ForgotPasswordPage'
 import { useThemeStore } from './stores/theme.store'
 import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
@@ -187,6 +188,12 @@ const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
   component: LoginPage,
+})
+
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/forgot-password',
+  component: ForgotPasswordPage,
 })
 
 // ============================================================================
@@ -835,6 +842,7 @@ function PaymentReceiptRouteComponent() {
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
+  forgotPasswordRoute,
   authCallbackRoute,
   landingV2PreviewRoute,
   onboardingRoute,

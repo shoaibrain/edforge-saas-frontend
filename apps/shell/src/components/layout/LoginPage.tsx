@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { LanguageSwitcher } from '@edforge/ui'
-import { signInDirect, completeNewPassword, getForgotPasswordUrl } from '@edforge/auth'
+import { signInDirect, completeNewPassword } from '@edforge/auth'
 import { useTranslation } from '@edforge/i18n'
 import { useAuthStore } from '../../stores/auth.store'
 
@@ -121,8 +121,6 @@ export function LoginPage() {
     setConfirmNewPassword('')
     setShowNewPassword(false)
   }
-
-  const forgotPasswordUrl = getForgotPasswordUrl()
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#FAF9F6' }}>
@@ -255,17 +253,15 @@ export function LoginPage() {
                     </div>
 
                     {/* Forgot password */}
-                    {forgotPasswordUrl && (
-                      <div className="text-right">
-                        <a
-                          href={forgotPasswordUrl}
-                          className="text-sm font-medium transition-colors hover:underline"
-                          style={{ color: '#F97316' }}
-                        >
-                          {t('forgotPassword')}
-                        </a>
-                      </div>
-                    )}
+                    <div className="text-right">
+                      <Link
+                        to="/forgot-password"
+                        className="text-sm font-medium transition-colors hover:underline"
+                        style={{ color: '#F97316' }}
+                      >
+                        {t('forgotPassword')}
+                      </Link>
+                    </div>
 
                     {/* Submit */}
                     <button
