@@ -24,6 +24,8 @@ export {
   subscribeToAuthChanges,
   handleAuthCallback,
   getForgotPasswordUrl,
+  forgotPassword,
+  confirmForgotPassword,
 } from './service'
 
 // User mapping utilities
