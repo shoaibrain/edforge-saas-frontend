@@ -31,6 +31,7 @@ import {
   flattenStudentPages,
   getTotalFromPages,
   useDeleteStudent,
+  useSchoolGradeRange,
 } from '../../hooks'
 import { useActiveSchoolId } from '../../stores'
 import { useStudentFilters, useStudentFilterActions } from '../../stores/students.store'
@@ -323,6 +324,11 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   // Student filters from store
   const filters = useStudentFilters()
 
+  // School grade range — feeds the StudentsFilterRow grade dropdown so it
+  // reflects the school's actual configured range (ECD..12 for PABSON full-range
+  // schools, 6..10 for secondary-only, etc.) instead of a hardcoded K..12.
+  const { gradeRange: schoolGradeRange } = useSchoolGradeRange(schoolId)
+
   // Fetch students with filters
   const {
     data,
@@ -518,6 +524,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
             isExporting={overviewData.isExporting}
             hasAcademicYear={!!overviewData.academicYear.id}
             onExport={overviewData.handleExportCSV}
+            schoolGradeRange={schoolGradeRange}
           />
         </motion.div>
 

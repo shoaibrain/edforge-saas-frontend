@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { Search, X, Loader2, Download } from 'lucide-react'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 import {
   useStudentFilters,
   useStudentFilterActions,
@@ -24,22 +25,6 @@ const MODE_CHIPS: { key: StudentFilterMode; label: string }[] = [
   { key: 'active', label: 'Active' },
   { key: 'at-risk', label: 'At-risk' },
   { key: 'pending', label: 'Pending' },
-]
-
-const GRADE_LEVELS = [
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1', label: 'Grade 1' },
-  { value: '2', label: 'Grade 2' },
-  { value: '3', label: 'Grade 3' },
-  { value: '4', label: 'Grade 4' },
-  { value: '5', label: 'Grade 5' },
-  { value: '6', label: 'Grade 6' },
-  { value: '7', label: 'Grade 7' },
-  { value: '8', label: 'Grade 8' },
-  { value: '9', label: 'Grade 9' },
-  { value: '10', label: 'Grade 10' },
-  { value: '11', label: 'Grade 11' },
-  { value: '12', label: 'Grade 12' },
 ]
 
 // TODO(sprint-2 follow-up): Add `{ value: 'pending', label: 'Pending' }` here.
@@ -68,14 +53,18 @@ interface StudentsFilterRowProps {
   isExporting: boolean
   hasAcademicYear: boolean
   onExport: () => void
+  /** School's configured grade range — drives the Grade filter dropdown options. */
+  schoolGradeRange?: { start: string; end: string } | null
 }
 
 export function StudentsFilterRow({
   isExporting,
   hasAcademicYear,
   onExport,
+  schoolGradeRange,
 }: StudentsFilterRowProps) {
   const filters = useStudentFilters()
+  const gradeOptions = useFilteredGradeOptions(schoolGradeRange)
   const {
     setSearchTerm,
     setGradeLevel,
@@ -160,7 +149,7 @@ export function StudentsFilterRow({
         style={inputStyle}
       >
         <option value="">All Grades</option>
-        {GRADE_LEVELS.map((g) => (
+        {gradeOptions.map((g) => (
           <option key={g.value} value={g.value}>{g.label}</option>
         ))}
       </select>
