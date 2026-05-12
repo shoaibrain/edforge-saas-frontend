@@ -124,13 +124,14 @@ export const homeKeys = {
 // ============================================================================
 
 export function useHomeAcademicYear(schoolId: string | null) {
+  // The current AY changes once per year. Background polling here is pure noise —
+  // the value React Query already has is correct for the entire session.
   return useQuery({
     queryKey: homeKeys.academicYear(schoolId!),
     queryFn: () => getCurrentAcademicYear(schoolId!),
     enabled: !!schoolId,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchInterval: 5 * 60 * 1000,
     retryDelay,
   })
 }
@@ -149,14 +150,16 @@ export function useAcademicsSnapshot(
   const today = useMemo(() => getTodayISO(), [])
   const enabled = !!schoolId && !!academicYearId
 
-  // Primary: unified dashboard overview endpoint
+  // Primary: unified dashboard overview endpoint.
+  // Enrollment + attendance + sections change on user action (roll submission,
+  // student enrollment), not on a clock. React Query revalidates on navigation
+  // back to Home after staleTime; explicit mutations invalidate this key.
   const dashboard = useQuery<AcademicsOverviewResponse, Error>({
     queryKey: homeKeys.overview(schoolId!, academicYearId!, today),
     queryFn: () => getAcademicsOverview(schoolId!, academicYearId!, today),
     enabled,
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchInterval: 5 * 60 * 1000,
     retry: 2,
     retryDelay,
   })
@@ -302,6 +305,10 @@ export function useHomeAlerts(
   const today = useMemo(() => getTodayISO(), [])
   const startDate = useMemo(() => getDaysAgoISO(90), [])
 
+  // Attendance data is teacher-driven (only changes when a roll is submitted), so
+  // background polling produces network noise without freshness gain. React Query
+  // already revalidates whenever the user navigates back to Home after staleTime,
+  // and explicit mutations can invalidate this key when needed.
   const attendanceQuery = useQuery<AttendanceAlertItem[], Error>({
     queryKey: homeKeys.alerts(schoolId!, academicYearId!),
     queryFn: () =>
@@ -309,7 +316,6 @@ export function useHomeAlerts(
     enabled: enabled && !!schoolId && !!academicYearId,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchInterval: 5 * 60 * 1000,
     retryDelay,
   })
 
@@ -381,13 +387,13 @@ export function useHomeAttendanceTrend(
   const today = useMemo(() => getTodayISO(), [])
   const startDate = useMemo(() => getDaysAgoISO(30), [])
 
+  // 30-day rolling trend; sparse data that doesn't shift within a 5-minute window.
   const query = useQuery<DailyAttendanceSummary[], Error>({
     queryKey: homeKeys.trend(schoolId!),
     queryFn: () => getAttendanceTrend(schoolId!, startDate, today),
     enabled: enabled && !!schoolId,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchInterval: 5 * 60 * 1000,
     retryDelay,
   })
 
