@@ -33,6 +33,12 @@ interface GradeLevelsTabProps {
   onViewCourse?: (course: CourseResponseDto) => void
   /** Optional school grade range to filter displayed grades (e.g., { start: '9', end: '12' }) */
   schoolGradeRange?: { start: string; end: string }
+  /** Per-grade enrollment counts from the current academic year (canonical Space A keys). */
+  enrollmentByGradeLevel?: Record<string, number> | null
+  /** True while the enrollment query is in flight on first paint. */
+  enrollmentLoading?: boolean
+  /** False when the active school has no current academic year yet. */
+  hasCurrentAY?: boolean
 }
 
 // ============================================================================
@@ -123,6 +129,9 @@ export function GradeLevelsTab({
   isLoading,
   onViewCourse,
   schoolGradeRange,
+  enrollmentByGradeLevel,
+  enrollmentLoading = false,
+  hasCurrentAY = true,
 }: GradeLevelsTabProps) {
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -161,14 +170,20 @@ export function GradeLevelsTab({
 
     return filteredGradeOptions.map((opt) => {
       const gradeCourses = courseMap.get(opt.value) ?? []
+      const studentCount = enrollmentByGradeLevel?.[opt.value] ?? 0
       return {
         value: opt.value,
         label: opt.label,
         courseCount: gradeCourses.length,
         courses: gradeCourses,
+        studentCount,
       }
     })
-  }, [courses, filteredGradeOptions])
+  }, [courses, filteredGradeOptions, enrollmentByGradeLevel])
+
+  // Whether to show numeric student counts vs em-dash placeholders
+  const showStudentCounts = hasCurrentAY && enrollmentByGradeLevel != null
+  const studentsPending = hasCurrentAY && enrollmentLoading && enrollmentByGradeLevel == null
 
   // Summary stats
   const stats = useMemo(() => {
@@ -178,7 +193,7 @@ export function GradeLevelsTab({
       totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
     const withCourses = gradeData.filter((g) => g.courseCount > 0).length
     return { totalGrades, totalAssignments, avgPerGrade, withCourses }
-  }, [gradeData])
+  }, [gradeData, filteredGradeOptions])
 
   // Open grade detail drawer
   const handleRowClick = useCallback((grade: GradeLevelData) => {
@@ -235,15 +250,39 @@ export function GradeLevelsTab({
         cell: ({ row }) => <CourseChips courses={row.original.courses} />,
       },
       {
-        accessorKey: 'students',
+        accessorKey: 'studentCount',
         header: 'Students',
         size: 120,
-        cell: () => (
-          <span className="text-sm text-text-tertiary">&mdash;</span>
-        ),
+        cell: ({ row }) => {
+          if (!hasCurrentAY) {
+            return (
+              <span
+                className="text-sm text-text-tertiary"
+                title="No active academic year — enrollment counts will appear once an academic year is set as current."
+              >
+                &mdash;
+              </span>
+            )
+          }
+          if (studentsPending) {
+            return <span className="text-sm text-text-tertiary">…</span>
+          }
+          return (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-text-primary">
+                {row.original.studentCount}
+              </span>
+              {row.original.studentCount > 0 && (
+                <span className="text-xs text-text-tertiary">
+                  student{row.original.studentCount !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          )
+        },
       },
     ],
-    []
+    [hasCurrentAY, studentsPending]
   )
 
   return (
@@ -303,6 +342,7 @@ export function GradeLevelsTab({
         onClose={handleCloseDrawer}
         gradeLevel={selectedGrade}
         onViewCourse={onViewCourse ? handleViewCourseFromDrawer : undefined}
+        showStudentCount={showStudentCounts}
       />
     </div>
   )

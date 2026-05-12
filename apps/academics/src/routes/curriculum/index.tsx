@@ -21,7 +21,8 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
-import { useSchoolGradeRange } from '../../hooks/useSchool'
+import { useSchoolGradeRange, useCurrentAcademicYear } from '../../hooks/useSchool'
+import { useAcademicsOverview } from '../../hooks/useAcademicsOverview'
 import { useCourseFilters } from '../../stores/courses.store'
 import {
   useCourses,
@@ -167,6 +168,13 @@ export function CurriculumModule() {
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
   const { gradeRange } = useSchoolGradeRange(schoolId)
+
+  // Current academic year + per-grade enrollment counts (reuses unified dashboard
+  // query — cached & deduped with the Overview / Students pages).
+  const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(
+    schoolId ?? ''
+  )
+  const overview = useAcademicsOverview(schoolId, currentYear?.yearId)
 
   // ABAC: check course/curriculum permissions
   const coursePerms = useResourcePermissions('courses')
@@ -560,6 +568,9 @@ export function CurriculumModule() {
               isLoading={isLoading}
               onViewCourse={openViewDrawer}
               schoolGradeRange={gradeRange ?? undefined}
+              enrollmentByGradeLevel={overview.enrollmentByGradeLevel}
+              enrollmentLoading={yearLoading || overview.isLoading}
+              hasCurrentAY={!!currentYear?.yearId}
             />
           )}
 

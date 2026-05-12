@@ -35,6 +35,8 @@ export interface GradeLevelData {
   label: string
   courseCount: number
   courses: CourseResponseDto[]
+  /** Enrolled student count for this grade in the current academic year, or 0 if unknown. */
+  studentCount: number
 }
 
 interface GradeLevelDrawerProps {
@@ -42,6 +44,8 @@ interface GradeLevelDrawerProps {
   onClose: () => void
   gradeLevel: GradeLevelData | null
   onViewCourse?: (course: CourseResponseDto) => void
+  /** When false (no active AY or enrollment query not yet resolved), render the count tile as a placeholder. */
+  showStudentCount?: boolean
 }
 
 // ============================================================================
@@ -176,6 +180,7 @@ export function GradeLevelDrawer({
   onClose,
   gradeLevel,
   onViewCourse,
+  showStudentCount = false,
 }: GradeLevelDrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -302,7 +307,7 @@ export function GradeLevelDrawer({
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
                         <Users className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
-                          &mdash;
+                          {showStudentCount ? gradeLevel.studentCount : <>&mdash;</>}
                         </p>
                         <p className="text-xs text-text-tertiary mt-0.5">
                           Students
