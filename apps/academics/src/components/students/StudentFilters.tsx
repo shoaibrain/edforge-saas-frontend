@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import { Search, X, ChevronDown } from 'lucide-react'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
+import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 import {
   useStudentFilters,
   useStudentFilterActions,
@@ -20,22 +21,6 @@ import {
 // ============================================================================
 // CONSTANTS
 // ============================================================================
-
-const GRADE_LEVELS = [
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1', label: 'Grade 1' },
-  { value: '2', label: 'Grade 2' },
-  { value: '3', label: 'Grade 3' },
-  { value: '4', label: 'Grade 4' },
-  { value: '5', label: 'Grade 5' },
-  { value: '6', label: 'Grade 6' },
-  { value: '7', label: 'Grade 7' },
-  { value: '8', label: 'Grade 8' },
-  { value: '9', label: 'Grade 9' },
-  { value: '10', label: 'Grade 10' },
-  { value: '11', label: 'Grade 11' },
-  { value: '12', label: 'Grade 12' },
-]
 
 const STATUS_OPTIONS: { value: StudentStatus; label: string }[] = [
   { value: 'active', label: 'Active' },
@@ -143,11 +128,14 @@ function FilterDropdown({
 interface StudentFiltersProps {
   /** Callback when filters change (debounced search) */
   onFiltersChange?: () => void
+  /** School's configured grade range — drives the Grade dropdown options. */
+  schoolGradeRange?: { start: string; end: string } | null
 }
 
-export function StudentFilters({ onFiltersChange }: StudentFiltersProps) {
+export function StudentFilters({ onFiltersChange, schoolGradeRange }: StudentFiltersProps) {
   const filters = useStudentFilters()
   const { setSearchTerm, setGradeLevel, setStatus, resetFilters } = useStudentFilterActions()
+  const gradeOptions = useFilteredGradeOptions(schoolGradeRange)
 
   // Local search state for immediate UI feedback
   const [localSearch, setLocalSearch] = useState(filters.searchTerm)
@@ -221,7 +209,7 @@ export function StudentFilters({ onFiltersChange }: StudentFiltersProps) {
         <FilterDropdown
           label="Grade Level"
           value={filters.gradeLevel}
-          options={GRADE_LEVELS}
+          options={[...gradeOptions]}
           onChange={handleGradeLevelChange}
           placeholder="All Grades"
         />
