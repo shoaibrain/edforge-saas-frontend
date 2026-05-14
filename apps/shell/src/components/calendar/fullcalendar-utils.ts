@@ -4,61 +4,24 @@
  * Transforms CalendarDateResponseDto -> FullCalendar EventInput[].
  * Uses CSS class names (not inline styles) for dark mode support.
  * Color definitions live in fullcalendar-theme.css.
+ *
+ * Sprint S2.8 — event-type taxonomy consolidated into
+ * `./event-types.ts`. Everything in this file now derives from there.
  */
 
 import type { EventInput } from '@fullcalendar/core'
 import type { CalendarDateResponseDto } from '@aibrains/shared-types'
+import {
+  ALL_EVENT_TYPES,
+  type CalendarEventType,
+  LEGEND_ITEMS,
+  EVENT_TYPE_LABELS,
+} from './event-types'
 
-// ============================================================================
-// EVENT TYPES
-// ============================================================================
-
-// Sprint S1 cutover (2026-05-14): removed `testing_day`; added
-// `exam_window`, `school_program`, `monthly_test`. Must stay lockstep
-// with packages/shared-types/src/schemas/identity/calendar-date.schema.ts.
-export const ALL_EVENT_TYPES = [
-  'instructional_day',
-  'holiday',
-  'teacher_only',
-  'break',
-  'non_instructional_day',
-  'student_holiday',
-  'early_release',
-  'late_start',
-  'make_up_day',
-  'weather_day',
-  'exam_window',
-  'school_program',
-  'monthly_test',
-  'conference_day',
-  'graduation',
-  'in_service',
-] as const
-
-export type CalendarEventType = (typeof ALL_EVENT_TYPES)[number]
-
-// ============================================================================
-// LEGEND CONFIG (used by school-calendar page legend)
-// ============================================================================
-
-export const LEGEND_ITEMS: { type: string; label: string }[] = [
-  { type: 'instructional_day', label: 'Instructional' },
-  { type: 'holiday', label: 'Holiday' },
-  { type: 'teacher_only', label: 'Teacher Only' },
-  { type: 'break', label: 'Break' },
-  { type: 'non_instructional_day', label: 'Non-Instructional' },
-  { type: 'student_holiday', label: 'Student Holiday' },
-  { type: 'early_release', label: 'Early Release' },
-  { type: 'late_start', label: 'Late Start' },
-  { type: 'make_up_day', label: 'Make-up Day' },
-  { type: 'weather_day', label: 'Weather Day' },
-  { type: 'exam_window', label: 'Exam Window' },
-  { type: 'school_program', label: 'School Program' },
-  { type: 'monthly_test', label: 'Monthly Test' },
-  { type: 'conference_day', label: 'Conference' },
-  { type: 'graduation', label: 'Graduation' },
-  { type: 'in_service', label: 'In-Service' },
-]
+// Re-export for backward compatibility — callers that import from
+// fullcalendar-utils keep working; new code should import from event-types directly.
+export { ALL_EVENT_TYPES, LEGEND_ITEMS }
+export type { CalendarEventType }
 
 // ============================================================================
 // EVENT TYPE HELPERS
@@ -87,27 +50,8 @@ export function getPrimaryEventType(calendarDate: CalendarDateResponseDto): stri
   return 'non_instructional_day'
 }
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  instructional_day: 'Instructional Day',
-  holiday: 'Holiday',
-  teacher_only: 'Teacher Only',
-  break: 'Break',
-  non_instructional_day: 'Non-Instructional',
-  student_holiday: 'Student Holiday',
-  early_release: 'Early Release',
-  late_start: 'Late Start',
-  make_up_day: 'Make-up Day',
-  weather_day: 'Weather Day',
-  exam_window: 'Exam Window',
-  school_program: 'School Program',
-  monthly_test: 'Monthly Test',
-  conference_day: 'Conference',
-  graduation: 'Graduation',
-  in_service: 'In-Service',
-}
-
 export function getEventTypeLabel(eventType: string): string {
-  return EVENT_TYPE_LABELS[eventType] || eventType.replace(/_/g, ' ')
+  return (EVENT_TYPE_LABELS as Record<string, string>)[eventType] || eventType.replace(/_/g, ' ')
 }
 
 export function getEventLabel(calendarDate: CalendarDateResponseDto): string | null {
