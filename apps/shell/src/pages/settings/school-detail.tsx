@@ -30,8 +30,9 @@ import { useAuthStore } from '@/stores/auth.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
 import { edOrgKeys } from '@/hooks/useEducationOrgs'
-import { useBellSchedules } from '@/hooks/useBellSchedules'
-import { useAcademicSessions, useCalendarStats } from '@/hooks/useCalendar'
+// useBellSchedules / useAcademicSessions / useCalendarStats removed in S0.7 —
+// the setup checklist now reads `GET /schools/:id/activation-requirements`
+// instead of duplicating the gate logic client-side.
 import type { School as SchoolType, SchoolStatus } from '@edforge/types'
 import { Button } from '@edforge/ui'
 
@@ -148,82 +149,52 @@ interface SetupTask {
   completed: boolean
 }
 
-function useSetupTasks(school: SchoolType | undefined, schoolId: string) {
-  const { data: academicYears } = useQuery({
-    queryKey: ['academicYears', schoolId],
-    queryFn: () => tenantService.getAcademicYears(schoolId),
+/**
+ * S0.7 — backend-driven setup checklist.
+ *
+ * Reads `GET /schools/:id/activation-requirements`, which returns exactly
+ * the same checklist the backend's `setup → active` gate enforces. The
+ * UI and backend can no longer disagree on what "complete setup" means.
+ *
+ * Replaces 5 client-side queries (academicYears, departments, bell,
+ * sessions, calendar-stats) + a hand-coded completion table with a single
+ * API call. PABSON schools see 4 tasks (AY, terms, bell, calendar);
+ * GENERIC schools see 1 task (AY).
+ *
+ * `_school` is retained in the signature for source-compat with the
+ * previous hook — present for any future client-side check on identity
+ * fields. Not currently read.
+ */
+function useSetupTasks(_school: SchoolType | undefined, schoolId: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['activationRequirements', schoolId],
+    queryFn: () => tenantService.getActivationRequirements(schoolId),
     enabled: !!schoolId,
-    staleTime: 5 * 60 * 1000,
+    // Short stale window — this drives the "Activate School" button and
+    // changes whenever the operator finishes a setup task.
+    staleTime: 30 * 1000,
   })
-
-  const { data: departments } = useQuery({
-    queryKey: ['departments', schoolId],
-    queryFn: () => tenantService.getDepartments(schoolId),
-    enabled: !!schoolId,
-    staleTime: 5 * 60 * 1000,
-  })
-
-  const { data: bellSchedules } = useBellSchedules(schoolId)
-
-  // Derive active year ID for dependent queries
-  const years = useMemo(() => {
-    return Array.isArray(academicYears) ? academicYears : (academicYears as any)?.data ?? []
-  }, [academicYears])
-  const activeYearId = useMemo(() => {
-    const active = years.find((y: any) => y.isCurrent || y.isActive)
-    return active?.academicYearId || active?.id || (years.length > 0 ? (years[0] as any).academicYearId || (years[0] as any).id : '')
-  }, [years])
-
-  const { data: sessionsData } = useAcademicSessions(schoolId, activeYearId, !!activeYearId)
-  const { data: calendarStats } = useCalendarStats(schoolId, activeYearId, !!activeYearId)
 
   return useMemo(() => {
-    const depts = Array.isArray(departments) ? departments : (departments as any)?.data ?? []
-    const schedules = Array.isArray(bellSchedules) ? bellSchedules : (bellSchedules as any)?.data ?? []
-    const sessions = (sessionsData as any)?.items || (sessionsData as any)?.data || (Array.isArray(sessionsData) ? sessionsData : [])
-
-    const tasks: SetupTask[] = [
-      {
-        id: 'identity',
-        label: 'School Identity',
-        tab: 'config',
-        completed: !!(school?.name && school?.type),
-      },
-      {
-        id: 'academic-year',
-        label: 'Academic Year',
-        tab: 'academic-setup',
-        completed: years.length > 0,
-      },
-      {
-        id: 'sessions',
-        label: 'Sessions & Terms',
-        tab: 'academic-setup',
-        completed: sessions.length > 0,
-      },
-      {
-        id: 'calendar',
-        label: 'Calendar',
-        tab: 'academic-setup',
-        completed: (calendarStats as any)?.totalDays > 0,
-      },
-      {
-        id: 'bell-schedule',
-        label: 'Bell Schedule',
-        tab: 'academic-setup',
-        completed: schedules.length > 0,
-      },
-      {
-        id: 'departments',
-        label: 'Departments',
-        tab: 'structure',
-        completed: depts.length > 0,
-      },
-    ]
-
-    const completedCount = tasks.filter(t => t.completed).length
-    return { tasks, completedCount, totalCount: tasks.length }
-  }, [school, years, departments, bellSchedules, sessionsData, calendarStats])
+    const requirements = data?.requirements ?? []
+    const tasks: SetupTask[] = requirements.map(r => ({
+      id: r.key,
+      label: r.label,
+      // All four V1 PABSON requirements live under the Academic Setup tab.
+      // Future archetypes that gate on structure-tab resources (e.g. a
+      // theoretical 'departments_min' rule) would add a tab mapping here.
+      tab: 'academic-setup' as SchoolTab,
+      completed: r.met,
+    }))
+    return {
+      tasks,
+      completedCount: tasks.filter(t => t.completed).length,
+      totalCount: tasks.length,
+      canActivate: data?.canActivate ?? false,
+      archetype: data?.archetype,
+      isLoading,
+    }
+  }, [data, isLoading])
 }
 
 // ============================================================================
