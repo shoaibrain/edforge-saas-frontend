@@ -64,10 +64,24 @@ export const LEGEND_ITEMS: { type: string; label: string }[] = [
 // EVENT TYPE HELPERS
 // ============================================================================
 
+// Event types that act as a generic "the school is open today" baseline.
+// When a CalendarDate row carries one of these alongside a more specific
+// event (e.g. exam_window, school_program, holiday), the specific one
+// should win the visual treatment. This avoids the Sprint S1 bug where
+// auto-synced exam_window events appended onto an existing instructional_day
+// row rendered green (instructional) instead of orange (exam) because
+// `calendarEvents[0]` was the underlying instructional_day.
+const BASELINE_EVENT_TYPES = new Set<string>(['instructional_day', 'non_instructional_day'])
+
 export function getPrimaryEventType(calendarDate: CalendarDateResponseDto): string {
   if (calendarDate.isWeekend) return '__weekend__'
-  if (calendarDate.calendarEvents?.length > 0) {
-    return calendarDate.calendarEvents[0].eventType
+  const events = calendarDate.calendarEvents ?? []
+  if (events.length > 0) {
+    // Prefer the first non-baseline event so a specific overlay
+    // (exam_window, school_program, holiday, etc.) wins the cell color.
+    const specific = events.find(e => !BASELINE_EVENT_TYPES.has(e.eventType))
+    if (specific) return specific.eventType
+    return events[0].eventType
   }
   if (calendarDate.isInstructionalDay) return 'instructional_day'
   return 'non_instructional_day'
@@ -97,12 +111,14 @@ export function getEventTypeLabel(eventType: string): string {
 }
 
 export function getEventLabel(calendarDate: CalendarDateResponseDto): string | null {
-  if (calendarDate.calendarEvents?.length > 0) {
-    const evt = calendarDate.calendarEvents[0]
-    if (evt.description) return evt.description
-    return evt.eventType.replace(/_/g, ' ')
-  }
-  return null
+  const events = calendarDate.calendarEvents ?? []
+  if (events.length === 0) return null
+  // Mirror getPrimaryEventType — prefer the specific event over the
+  // instructional baseline so the rendered label matches the rendered color.
+  const specific = events.find(e => !BASELINE_EVENT_TYPES.has(e.eventType))
+  const evt = specific ?? events[0]
+  if (evt.description) return evt.description
+  return evt.eventType.replace(/_/g, ' ')
 }
 
 function cssClass(eventType: string): string {

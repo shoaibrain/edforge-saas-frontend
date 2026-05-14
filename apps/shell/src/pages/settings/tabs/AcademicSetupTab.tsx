@@ -1059,7 +1059,13 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
 
         {/* Day cells */}
         {cells.map(({ day, dateStr, entry, inRange, bsDay }) => {
-          const eventType = entry?.calendarEvents?.[0]?.eventType || (entry?.isWeekend ? 'weekend' : null)
+          // Pick the most-specific event so overlay event types (exam_window,
+          // school_program, holiday) win the cell color over an underlying
+          // baseline instructional_day. Mirrors getPrimaryEventType in
+          // fullcalendar-utils.ts; consolidate in S1.5 follow-up.
+          const events = entry?.calendarEvents ?? []
+          const specific = events.find((e: any) => e.eventType !== 'instructional_day' && e.eventType !== 'non_instructional_day')
+          const eventType = specific?.eventType ?? events[0]?.eventType ?? (entry?.isWeekend ? 'weekend' : null)
           const isWeekend = entry?.isWeekend
           const isSelected = selectedDate === dateStr
           const colorCfg = eventType ? EVENT_TYPE_COLORS[eventType] : null
@@ -1120,6 +1126,17 @@ const CALENDAR_EVENT_TYPES = [
   'graduation', 'break', 'in_service', 'make_up_day', 'other',
 ] as const
 
+// Pick the most-specific event type from a CalendarDate row. Prefers
+// overlay events (exam_window, school_program, holiday, etc.) over the
+// underlying instructional baseline so the operator sees the meaningful
+// event preselected when they click on an exam day.
+function pickSpecificEventType(dateEntry: any, fallback = 'instructional_day'): string {
+  const events = (dateEntry?.calendarEvents ?? []) as Array<{ eventType: string }>
+  if (events.length === 0) return fallback
+  const specific = events.find(e => e.eventType !== 'instructional_day' && e.eventType !== 'non_instructional_day')
+  return specific?.eventType ?? events[0].eventType ?? fallback
+}
+
 function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }: {
   dateEntry: any
   onClose: () => void
@@ -1127,13 +1144,13 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
   isSaving: boolean
   calendarSystem?: 'gregorian' | 'bikram_sambat'
 }) {
-  const currentEventType = dateEntry?.calendarEvents?.[0]?.eventType || 'instructional_day'
+  const currentEventType = pickSpecificEventType(dateEntry)
   const [eventType, setEventType] = useState(currentEventType)
   const [isInstructional, setIsInstructional] = useState(dateEntry?.isInstructionalDay ?? true)
 
   // Reset when dateEntry changes
   useEffect(() => {
-    setEventType(dateEntry?.calendarEvents?.[0]?.eventType || 'instructional_day')
+    setEventType(pickSpecificEventType(dateEntry))
     setIsInstructional(dateEntry?.isInstructionalDay ?? true)
   }, [dateEntry?.date])
 
@@ -1154,8 +1171,12 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
 
   const colorCfg = EVENT_TYPE_COLORS[eventType] || EVENT_TYPE_COLORS.other
 
-  // Holiday name from calendarEvents description
-  const holidayName = dateEntry?.calendarEvents?.[0]?.description || ''
+  // Description from the most-specific event (matches the eventType chosen
+  // above), falling back to events[0] then empty string.
+  const specificForLabel = (dateEntry?.calendarEvents ?? []).find((e: any) =>
+    e.eventType === eventType,
+  )
+  const holidayName = specificForLabel?.description || dateEntry?.calendarEvents?.[0]?.description || ''
   const isWeekend = dateEntry?.isWeekend
   const isWeekendWithHoliday = isWeekend && dateEntry?.calendarEvents?.[0]?.eventType === 'holiday'
 
