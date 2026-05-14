@@ -769,6 +769,76 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
   })
   const gradingPeriods = Array.isArray(gradingPeriodsData) ? gradingPeriodsData : []
 
+  // Sprint S2.10 — PABSON 4-term template pre-fill. Saves operators the
+  // tedium of manually creating + naming each of 4 standard quarters.
+  // Visible only when the AY exists, no sessions configured yet, and the
+  // tenant is PABSON archetype (isNepal). The "Apply template" button
+  // bulk-creates 4 quarter-based sessions in one click.
+  const [isTemplateApplying, setIsTemplateApplying] = useState(false)
+  const pabsonTemplate = useMemo(() => {
+    if (!activeYear?.startDate || !activeYear?.endDate) return null
+    // Split the AY into 4 equal quarters by calendar date.
+    const start = new Date(activeYear.startDate + 'T12:00:00Z')
+    const end = new Date(activeYear.endDate + 'T12:00:00Z')
+    const totalMs = end.getTime() - start.getTime()
+    const quarterMs = totalMs / 4
+    const segments: Array<{ name: string; descriptor: string; beginDate: string; endDate: string }> = []
+    const labels = [
+      { name: 'First Term (Baisakh–Asar)', descriptor: 'first_quarter' },
+      { name: 'Second Term (Shrawan–Ashwin)', descriptor: 'second_quarter' },
+      { name: 'Third Term (Kartik–Poush)', descriptor: 'third_quarter' },
+      { name: 'Fourth Term (Magh–Chaitra)', descriptor: 'fourth_quarter' },
+    ]
+    for (let i = 0; i < 4; i++) {
+      const segStart = new Date(start.getTime() + i * quarterMs)
+      const segEndRaw = new Date(start.getTime() + (i + 1) * quarterMs)
+      // Last term ends exactly on AY endDate; intermediate terms end the
+      // day BEFORE the next term begins (no overlap, no gap).
+      const segEnd = i === 3 ? end : new Date(segEndRaw.getTime() - 24 * 60 * 60 * 1000)
+      segments.push({
+        name: labels[i].name,
+        descriptor: labels[i].descriptor,
+        beginDate: segStart.toISOString().split('T')[0],
+        endDate: segEnd.toISOString().split('T')[0],
+      })
+    }
+    return segments
+  }, [activeYear?.startDate, activeYear?.endDate])
+
+  const showPabsonTemplate = isNepal && sessions.length === 0 && pabsonTemplate
+
+  const handleApplyTemplate = async () => {
+    if (!pabsonTemplate || !activeYear?.id || isTemplateApplying) return
+    setIsTemplateApplying(true)
+    setFormError(null)
+    try {
+      for (const seg of pabsonTemplate) {
+        await new Promise<void>((resolve, reject) => {
+          createSession.mutate(
+            {
+              sessionName: seg.name,
+              termDescriptor: seg.descriptor as any,
+              beginDate: seg.beginDate,
+              endDate: seg.endDate,
+              academicYearId: activeYear.id,
+            },
+            {
+              onSuccess: () => resolve(),
+              onError: (e: any) => reject(e),
+            },
+          )
+        })
+      }
+      toast.success('PABSON 4-term template applied — 4 sessions created')
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Template apply failed'
+      setFormError(msg)
+      toast.error(`Template apply stopped: ${msg}`)
+    } finally {
+      setIsTemplateApplying(false)
+    }
+  }
+
   const handleCreate = () => {
     if (!sessionName || !termType || !beginDate || !endDate || !activeYear?.id) return
     setFormError(null)
@@ -836,6 +906,53 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
         <span>ℹ️</span>
         <span>Sessions define grading periods (e.g., "First Semester", "Q1"). Each session maps to Ed-Fi <strong>GradingPeriodDescriptor</strong>. Students receive report cards per session.</span>
       </div>
+
+      {/* Sprint S2.10 — PABSON 4-term template pre-fill.
+          Shown only when (a) school is on PABSON archetype (isNepal) and
+          (b) no sessions have been created yet. Saves operators the
+          tedium of manually creating + naming each of the 4 standard
+          PABSON quarters. */}
+      {showPabsonTemplate && (
+        <div className="bg-[rgba(29,158,117,0.04)] border border-[rgba(29,158,117,0.18)] rounded-xl p-3.5 mb-3">
+          <div className="flex items-start justify-between gap-3 mb-2.5">
+            <div>
+              <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-0.5 flex items-center gap-1.5">
+                <span aria-hidden>✨</span>
+                PABSON 4-term template
+              </h3>
+              <p className="text-[10.5px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+                One click creates the standard PABSON 4-quarter structure
+                aligned to the BS calendar. You can edit names or dates
+                afterward. Skip this if your school uses a different
+                rhythm.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleApplyTemplate}
+              disabled={isTemplateApplying}
+              className="flex-shrink-0 bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg hover:opacity-90 disabled:opacity-50"
+            >
+              {isTemplateApplying ? 'Applying…' : 'Apply template'}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+            {pabsonTemplate.map((t, i) => (
+              <div
+                key={i}
+                className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-md px-2.5 py-1.5"
+              >
+                <div className="font-medium text-[rgb(var(--text-secondary))]">{t.name}</div>
+                <div className="text-[9.5px] text-[rgb(var(--text-tertiary))] mt-0.5">
+                  {new Date(t.beginDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {' → '}
+                  {new Date(t.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Sessions card */}
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
