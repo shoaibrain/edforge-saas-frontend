@@ -13,6 +13,9 @@ import type { CalendarDateResponseDto } from '@aibrains/shared-types'
 // EVENT TYPES
 // ============================================================================
 
+// Sprint S1 cutover (2026-05-14): removed `testing_day`; added
+// `exam_window`, `school_program`, `monthly_test`. Must stay lockstep
+// with packages/shared-types/src/schemas/identity/calendar-date.schema.ts.
 export const ALL_EVENT_TYPES = [
   'instructional_day',
   'holiday',
@@ -24,7 +27,9 @@ export const ALL_EVENT_TYPES = [
   'late_start',
   'make_up_day',
   'weather_day',
-  'testing_day',
+  'exam_window',
+  'school_program',
+  'monthly_test',
   'conference_day',
   'graduation',
   'in_service',
@@ -47,7 +52,9 @@ export const LEGEND_ITEMS: { type: string; label: string }[] = [
   { type: 'late_start', label: 'Late Start' },
   { type: 'make_up_day', label: 'Make-up Day' },
   { type: 'weather_day', label: 'Weather Day' },
-  { type: 'testing_day', label: 'Testing Day' },
+  { type: 'exam_window', label: 'Exam Window' },
+  { type: 'school_program', label: 'School Program' },
+  { type: 'monthly_test', label: 'Monthly Test' },
   { type: 'conference_day', label: 'Conference' },
   { type: 'graduation', label: 'Graduation' },
   { type: 'in_service', label: 'In-Service' },
@@ -77,7 +84,9 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   late_start: 'Late Start',
   make_up_day: 'Make-up Day',
   weather_day: 'Weather Day',
-  testing_day: 'Testing Day',
+  exam_window: 'Exam Window',
+  school_program: 'School Program',
+  monthly_test: 'Monthly Test',
   conference_day: 'Conference',
   graduation: 'Graduation',
   in_service: 'In-Service',
