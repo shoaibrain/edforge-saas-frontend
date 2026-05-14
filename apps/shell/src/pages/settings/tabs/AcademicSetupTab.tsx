@@ -1427,18 +1427,28 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           <h2 className="text-base font-bold text-[rgb(var(--text-primary))]">School Calendar</h2>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{yearLabel} Calendar Management</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <button className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
             Sessions
           </button>
           {calendarExists ? (
-            <button
-              onClick={() => setShowGenPanel(p => !p)}
-              disabled={generateCalendar.isPending}
-              className="bg-[#D97706] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
+            /*
+              Sprint S2.2a — Regenerate Calendar is a DESTRUCTIVE action
+              that wipes all 364 calendar dates (including operator overrides).
+              It used to live here in the wizard, one click + one confirmation
+              away from data loss. V1 validation (F-V1-STRUCT-001) flagged
+              this as a structural smell.
+              Moved behind a typed-confirmation Danger Zone on the
+              Configuration tab. The wizard now shows a passive status pill
+              only — no destructive action exposed.
+            */
+            <span
+              className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#1D9E75] bg-[rgba(29,158,117,0.08)] border border-[rgba(29,158,117,0.2)] rounded-md px-2.5 py-1"
+              title="To reset the calendar, use Configuration → Danger Zone"
             >
-              Regenerate Calendar
-            </button>
+              <span aria-hidden>✓</span>
+              Calendar generated{totalDays ? ` · ${totalDays} days` : ''}
+            </span>
           ) : (
             <button
               onClick={() => setShowGenPanel(true)}
@@ -1520,11 +1530,18 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         />
       )}
 
-      {/* Generate Calendar Panel — collapsible after first generation */}
-      {showGenPanel && (
+      {/*
+        Sprint S2.2a — wizard's inline Generate Panel is now FIRST-TIME ONLY.
+        When a calendar already exists, the panel won't open from the wizard
+        (the Regenerate button was removed). Destructive reset moved to
+        Configuration → Danger Zone with typed-confirmation.
+        Defense in depth: `showGenPanel && !calendarExists` so even if state
+        flips through some other path, the panel stays closed.
+      */}
+      {showGenPanel && !calendarExists && (
         <div className="bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.12)] rounded-xl p-3.5 mb-3">
           <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-1">
-            {calendarExists ? 'Regenerate Calendar' : 'Generate Calendar'}
+            Generate Calendar
           </h3>
           <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
             Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.
@@ -1627,43 +1644,36 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
             <button
               onClick={() => setShowConfirm(true)}
               disabled={!yearId || generateCalendar.isPending}
-              className={`px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 ${
-                calendarExists ? 'bg-[#D97706]' : 'bg-[#1D9E75]'
-              }`}
+              className="px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 bg-[#1D9E75]"
             >
-              {calendarExists ? 'Regenerate Calendar' : 'Generate Calendar'}
+              Generate Calendar
             </button>
           </div>
         </div>
       )}
 
-      {/* Confirmation dialog — stronger warning for regeneration */}
-      {showConfirm && (
+      {/*
+        Confirmation dialog. Sprint S2.2a — destructive branch removed.
+        Only first-time-create confirmation is reachable from the wizard.
+        Regenerate (destructive) is gated behind the Danger Zone on the
+        Configuration tab with typed-confirmation.
+      */}
+      {showConfirm && !calendarExists && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
           <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
             <h3 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">
-              {calendarExists ? 'Regenerate Calendar' : 'Generate Calendar'}
+              Generate Calendar
             </h3>
-            {calendarExists ? (
-              <div className="bg-[rgba(239,68,68,0.06)] border border-[rgba(239,68,68,0.15)] rounded-lg p-3 mb-3">
-                <p className="text-xs text-[#EF4444] font-medium mb-1">This is a destructive action</p>
-                <p className="text-[11px] text-[rgb(var(--text-secondary))] leading-relaxed">
-                  This will <strong>delete all {totalDays} existing calendar dates</strong> for {yearLabel} and regenerate.
-                  Any manual edits (teacher in-service days, early releases, holiday overrides) will be permanently lost.
-                </p>
-              </div>
-            ) : (
-              <p className="text-xs text-[rgb(var(--text-secondary))] mb-3 leading-relaxed">
-                This will generate calendar dates for <strong>{yearLabel}</strong> from{' '}
-                <strong className="text-[#378ADD]">
-                  {startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
-                </strong>{' '}to{' '}
-                <strong className="text-[#378ADD]">
-                  {endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
-                </strong>.
-              </p>
-            )}
+            <p className="text-xs text-[rgb(var(--text-secondary))] mb-3 leading-relaxed">
+              This will generate calendar dates for <strong>{yearLabel}</strong> from{' '}
+              <strong className="text-[#378ADD]">
+                {startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
+              </strong>{' '}to{' '}
+              <strong className="text-[#378ADD]">
+                {endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
+              </strong>.
+            </p>
             <div className="space-y-1.5 text-[11px] text-[rgb(var(--text-tertiary))] mb-4">
               <p>✔ Active days will be marked as instructional</p>
               <p>✔ Weekend days will be marked as non-instructional</p>
@@ -1682,16 +1692,9 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
               <button
                 onClick={handleGenerate}
                 disabled={generateCalendar.isPending}
-                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 ${
-                  calendarExists ? 'bg-[#EF4444]' : 'bg-[#1D9E75]'
-                }`}
+                className="px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 bg-[#1D9E75]"
               >
-                {generateCalendar.isPending
-                  ? 'Generating...'
-                  : calendarExists
-                    ? 'Delete & Regenerate'
-                    : 'Confirm & Generate'
-                }
+                {generateCalendar.isPending ? 'Generating...' : 'Confirm & Generate'}
               </button>
             </div>
           </div>
