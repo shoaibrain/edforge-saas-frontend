@@ -299,7 +299,23 @@
   border-color: #93c5fd;
   color: #1e40af;
 }
-.fc .fc-daygrid-event.fc-evt-testing_day {
+/* Sprint S1: exam_window — orange (term-scoped exam day, auto-synced from
+   GradingPeriod.examStartDate/examEndDate by identity service). */
+.fc .fc-daygrid-event.fc-evt-exam_window {
+  background-color: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+/* Sprint S1: school_program — green (operator-curated cultural/religious
+   community event; Saraswati Puja, sports day, etc.). */
+.fc .fc-daygrid-event.fc-evt-school_program {
+  background-color: #d1fae5;
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+/* Sprint S1: monthly_test — yellow (periodic assessment day, distinct from
+   term-scoped exam_window; PABSON monthly cadence pattern). */
+.fc .fc-daygrid-event.fc-evt-monthly_test {
   background-color: #fef9c3;
   border-color: #fde047;
   color: #854d0e;
@@ -377,7 +393,18 @@
   border-color: rgba(59, 130, 246, 0.45);
   color: #93c5fd;
 }
-.dark .fc .fc-daygrid-event.fc-evt-testing_day {
+/* Sprint S1 — dark variants */
+.dark .fc .fc-daygrid-event.fc-evt-exam_window {
+  background-color: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #fdba74;
+}
+.dark .fc .fc-daygrid-event.fc-evt-school_program {
+  background-color: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+}
+.dark .fc .fc-daygrid-event.fc-evt-monthly_test {
   background-color: rgba(234, 179, 8, 0.18);
   border-color: rgba(234, 179, 8, 0.45);
   color: #fde047;
@@ -425,7 +452,10 @@
 .fc-bg-late_start { background-color: rgba(99, 102, 241, 0.06) !important; }
 .fc-bg-make_up_day { background-color: rgba(20, 184, 166, 0.06) !important; }
 .fc-bg-weather_day { background-color: rgba(59, 130, 246, 0.06) !important; }
-.fc-bg-testing_day { background-color: rgba(234, 179, 8, 0.06) !important; }
+/* Sprint S1 background variants */
+.fc-bg-exam_window { background-color: rgba(249, 115, 22, 0.06) !important; }
+.fc-bg-school_program { background-color: rgba(16, 185, 129, 0.06) !important; }
+.fc-bg-monthly_test { background-color: rgba(234, 179, 8, 0.06) !important; }
 .fc-bg-conference_day { background-color: rgba(236, 72, 153, 0.06) !important; }
 .fc-bg-graduation { background-color: rgba(139, 92, 246, 0.06) !important; }
 .fc-bg-in_service { background-color: rgba(132, 204, 22, 0.06) !important; }
@@ -442,7 +472,9 @@
 .dark .fc-bg-late_start { background-color: rgba(99, 102, 241, 0.10) !important; }
 .dark .fc-bg-make_up_day { background-color: rgba(20, 184, 166, 0.10) !important; }
 .dark .fc-bg-weather_day { background-color: rgba(59, 130, 246, 0.10) !important; }
-.dark .fc-bg-testing_day { background-color: rgba(234, 179, 8, 0.10) !important; }
+.dark .fc-bg-exam_window { background-color: rgba(249, 115, 22, 0.10) !important; }
+.dark .fc-bg-school_program { background-color: rgba(16, 185, 129, 0.10) !important; }
+.dark .fc-bg-monthly_test { background-color: rgba(234, 179, 8, 0.10) !important; }
 .dark .fc-bg-conference_day { background-color: rgba(236, 72, 153, 0.10) !important; }
 .dark .fc-bg-graduation { background-color: rgba(139, 92, 246, 0.10) !important; }
 .dark .fc-bg-in_service { background-color: rgba(132, 204, 22, 0.10) !important; }

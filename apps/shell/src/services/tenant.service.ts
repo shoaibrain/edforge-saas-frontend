@@ -574,6 +574,9 @@ interface GradingPeriod {
   endDate: string
   gradesDueDate?: string
   reportCardDate?: string
+  /** Sprint S1: term-scoped exam window (auto-syncs exam_window CalendarDate rows server-side). */
+  examStartDate?: string
+  examEndDate?: string
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -588,6 +591,22 @@ interface CreateGradingPeriodDto {
   endDate: string
   gradesDueDate?: string
   reportCardDate?: string
+  /** Sprint S1: exam window inside [startDate, endDate]. Server validates with errorCode EXAM_DATES_OUT_OF_TERM_RANGE. */
+  examStartDate?: string
+  examEndDate?: string
+}
+
+interface UpdateGradingPeriodDto {
+  name?: string
+  shortName?: string
+  startDate?: string
+  endDate?: string
+  gradesDueDate?: string
+  reportCardDate?: string
+  isActive?: boolean
+  /** Sprint S1: exam window inside the effective [startDate, endDate]. */
+  examStartDate?: string
+  examEndDate?: string
 }
 
 interface GradingPeriodResponse {
@@ -609,6 +628,9 @@ function mapApiGradingPeriod(apiPeriod: any): GradingPeriod {
     endDate: apiPeriod.endDate,
     gradesDueDate: apiPeriod.gradesDueDate,
     reportCardDate: apiPeriod.reportCardDate,
+    // Sprint S1
+    examStartDate: apiPeriod.examStartDate,
+    examEndDate: apiPeriod.examEndDate,
     isActive: apiPeriod.isActive ?? true,
     createdAt: apiPeriod.createdAt || new Date().toISOString(),
     updatedAt: apiPeriod.updatedAt || new Date().toISOString(),
@@ -658,6 +680,28 @@ export async function createGradingPeriods(
     periods.map(period => createGradingPeriod(schoolId, yearId, period))
   )
   return results
+}
+
+/**
+ * Update a grading period (partial fields permitted).
+ * PUT /schools/{schoolId}/academic-years/{yearId}/grading-periods/{termId}
+ *
+ * Sprint S1: setting examStartDate/examEndDate triggers server-side
+ * auto-sync of exam_window CalendarDate rows. Server validates with
+ * errorCode `EXAM_DATES_OUT_OF_TERM_RANGE` when the window falls outside
+ * the effective term range.
+ */
+export async function updateGradingPeriod(
+  schoolId: string,
+  yearId: string,
+  termId: string,
+  data: UpdateGradingPeriodDto
+): Promise<GradingPeriod> {
+  const result = await apiPut<any, UpdateGradingPeriodDto>(
+    `/schools/${schoolId}/academic-years/${yearId}/grading-periods/${termId}`,
+    data
+  )
+  return mapApiGradingPeriod(result)
 }
 
 // ============================================================================
@@ -822,6 +866,7 @@ export const tenantService = {
   getGradingPeriods,
   createGradingPeriod,
   createGradingPeriods,
+  updateGradingPeriod,
 
   // Holidays
   getHolidays,
@@ -837,5 +882,5 @@ export const tenantService = {
 }
 
 // Export types for use in components
-export type { GradingPeriod, CreateGradingPeriodDto }
+export type { GradingPeriod, CreateGradingPeriodDto, UpdateGradingPeriodDto }
 
