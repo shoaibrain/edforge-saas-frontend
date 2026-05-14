@@ -199,6 +199,45 @@ export async function transitionSchoolStatus(schoolId: string, status: string): 
   return mapApiSchool(data)
 }
 
+// ============================================================================
+// S0.6 / S0.7 — Archetype-aware activation requirements
+// ============================================================================
+
+/**
+ * Per-requirement check returned by GET /schools/:id/activation-requirements.
+ * Mirrors the `ActivationRequirementCheck` type exported by `@aibrains/shared-types`
+ * — duplicated here as a local type so the frontend isn't forced to import
+ * runtime symbols from the backend-shaped package.
+ */
+export interface ActivationRequirementCheck {
+  key: string
+  label: string
+  required: number
+  current: number
+  met: boolean
+}
+
+export interface ActivationRequirementsResponse {
+  archetype: string
+  requirements: ActivationRequirementCheck[]
+  canActivate: boolean
+}
+
+/**
+ * GET /schools/:schoolId/activation-requirements
+ *
+ * Returns the same checklist the backend enforces in the `setup → active`
+ * transition. Consumed by the school-detail page's setup checklist so the
+ * UI cannot disagree with what the backend would accept.
+ */
+export async function getActivationRequirements(
+  schoolId: string,
+): Promise<ActivationRequirementsResponse> {
+  return apiGet<ActivationRequirementsResponse>(
+    `/schools/${schoolId}/activation-requirements`,
+  )
+}
+
 /**
  * Delete a school
  * - Setup schools: permanently removed (hard-delete)
@@ -757,6 +796,7 @@ export const tenantService = {
   updateSchool,
   transitionSchoolStatus,
   deleteSchool,
+  getActivationRequirements, // S0.6/S0.7 — archetype-aware gate readout
 
   // School Configuration
   getSchoolConfiguration,
