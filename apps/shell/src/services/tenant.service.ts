@@ -683,6 +683,26 @@ export async function createGradingPeriods(
 }
 
 /**
+ * Sprint S2.1 — non-blocking warning that the server attaches to the
+ * create/update GradingPeriod response when the exam window overlaps
+ * an existing holiday. Operator may legitimately schedule make-up
+ * exams on holidays, so this is advisory not blocking.
+ */
+export interface HolidayOverlapWarning {
+  code: 'EXAM_OVERLAPS_HOLIDAY'
+  date: string
+  holidayName: string
+}
+
+/**
+ * GradingPeriod response shape with the optional warnings field that
+ * the server attaches when exam dates overlap holidays (S2.1).
+ */
+export interface GradingPeriodUpdateResult extends GradingPeriod {
+  warnings?: HolidayOverlapWarning[]
+}
+
+/**
  * Update a grading period (partial fields permitted).
  * PUT /schools/{schoolId}/academic-years/{yearId}/grading-periods/{termId}
  *
@@ -690,18 +710,26 @@ export async function createGradingPeriods(
  * auto-sync of exam_window CalendarDate rows. Server validates with
  * errorCode `EXAM_DATES_OUT_OF_TERM_RANGE` when the window falls outside
  * the effective term range.
+ *
+ * Sprint S2.1: when the new exam window overlaps holidays already on
+ * the calendar, the response carries a `warnings: [...]` array. Callers
+ * should surface these as a non-blocking heads-up to the operator.
  */
 export async function updateGradingPeriod(
   schoolId: string,
   yearId: string,
   termId: string,
   data: UpdateGradingPeriodDto
-): Promise<GradingPeriod> {
+): Promise<GradingPeriodUpdateResult> {
   const result = await apiPut<any, UpdateGradingPeriodDto>(
     `/schools/${schoolId}/academic-years/${yearId}/grading-periods/${termId}`,
     data
   )
-  return mapApiGradingPeriod(result)
+  return {
+    ...mapApiGradingPeriod(result),
+    // Preserve server's optional warnings field through the mapper.
+    warnings: (result as any)?.warnings,
+  }
 }
 
 // ============================================================================
@@ -883,4 +911,6 @@ export const tenantService = {
 
 // Export types for use in components
 export type { GradingPeriod, CreateGradingPeriodDto, UpdateGradingPeriodDto }
+// HolidayOverlapWarning + GradingPeriodUpdateResult are already exported
+// as named exports above (Sprint S2.1 additions).
 

@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Plus, AlertCircle, Lock } from 'lucide-react'
 import type { School } from '@edforge/types'
 import type { CreateAcademicYearDto, UpdateAcademicYearDto } from '@aibrains/shared-types'
@@ -756,6 +757,18 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
 
   const createSession = useCreateAcademicSession(schoolId)
 
+  // Sprint S2.4 — fetch GradingPeriods for the active year so each session
+  // row can render + edit its associated exam window. The data is 1:1 in
+  // V1 (every session auto-creates a grading period at backend session-
+  // creation time), so the wizard can pair them by academicSessionId.
+  const { data: gradingPeriodsData } = useQuery({
+    queryKey: ['grading-periods', schoolId, activeYear?.id],
+    queryFn: () => tenantService.getGradingPeriods(schoolId, activeYear.id),
+    enabled: !!schoolId && !!activeYear?.id,
+    staleTime: 30_000,
+  })
+  const gradingPeriods = Array.isArray(gradingPeriodsData) ? gradingPeriodsData : []
+
   const handleCreate = () => {
     if (!sessionName || !termType || !beginDate || !endDate || !activeYear?.id) return
     setFormError(null)
@@ -891,19 +904,22 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
         {/* Session list or empty state */}
         {sessions.length > 0 ? (
           <div className="px-4 py-3 space-y-2">
+            {/*
+              Sprint S2.4 — Each session row now exposes an inline "Set exam
+              window" affordance. The session is paired with its auto-created
+              GradingPeriod (1:1 in V1) so the operator can configure exam
+              dates without leaving the wizard. See SessionRowWithExamForm
+              below for the pairing logic + form UX.
+            */}
             {sessions.map((session: any) => (
-              <div key={session.id} className="flex items-center justify-between px-3 py-2.5 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#378ADD]" />
-                  <span className="text-xs font-medium text-[rgb(var(--text-primary))]">{session.sessionName || session.name}</span>
-                  <span className="text-[10px] text-[rgb(var(--text-tertiary))]">
-                    {session.beginDate && session.endDate ? `${new Date(session.beginDate).toLocaleDateString()} – ${new Date(session.endDate).toLocaleDateString()}` : ''}
-                  </span>
-                </div>
-                <span className="text-[10px] px-1.5 py-px rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.04)] text-[rgb(var(--text-tertiary))]">
-                  {session.termDescriptor || session.termType || 'Session'}
-                </span>
-              </div>
+              <SessionRowWithExamForm
+                key={session.id}
+                session={session}
+                schoolId={schoolId}
+                yearId={activeYear?.id}
+                gradingPeriods={gradingPeriods}
+                calendarSystem={calendarSystem}
+              />
             ))}
           </div>
         ) : (
@@ -952,6 +968,254 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
 // instead of redefining it inline. See top of file for the new import.
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+// ============================================================================
+// SESSION ROW WITH INLINE EXAM-WINDOW EDIT FORM (Sprint S2.4)
+// ============================================================================
+
+/**
+ * One row per session inside the Sessions wizard step. Renders the session
+ * summary + an inline edit form for the associated GradingPeriod's
+ * `examStartDate` / `examEndDate`.
+ *
+ * Why this lives here (vs a dedicated Term form): V1's session → grading
+ * period mapping is 1:1 (every Session auto-creates a GradingPeriod with
+ * `academicSessionId` back-reference). Editing the exam window inline on
+ * the session row matches the operator's mental model — they think in
+ * terms of "Semester 1's exams" not "Grading Period uuid-xxx's exams".
+ *
+ * Sprint S2.1 — when the server returns `warnings: [{ code, date, holidayName }]`
+ * (exam window overlaps a holiday), render a non-blocking advisory banner
+ * after a successful save. Operator can choose to keep or change.
+ */
+function SessionRowWithExamForm({
+  session,
+  schoolId,
+  yearId,
+  gradingPeriods,
+  calendarSystem,
+}: {
+  session: any
+  schoolId: string
+  yearId: string | undefined
+  gradingPeriods: any[]
+  calendarSystem: string
+}) {
+  // Pair the session to its grading period. V1 has 1:1 mapping; prefer
+  // back-reference from grading-period → session; fall back to forward
+  // reference on the session row if present.
+  const associatedGp = useMemo(() => {
+    if (!session) return null
+    return (
+      gradingPeriods.find(
+        (gp: any) =>
+          gp.academicSessionId === session.academicSessionId ||
+          gp.academicSessionId === session.id,
+      ) ??
+      gradingPeriods.find(
+        (gp: any) => session.gradingPeriodIds?.includes(gp.id),
+      ) ??
+      null
+    )
+  }, [session, gradingPeriods])
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [examStart, setExamStart] = useState<string>(associatedGp?.examStartDate ?? '')
+  const [examEnd, setExamEnd] = useState<string>(associatedGp?.examEndDate ?? '')
+  const [warnings, setWarnings] = useState<Array<{ code: string; date: string; holidayName: string }>>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const queryClient = useQueryClient()
+  const updateGp = useMutation({
+    mutationFn: () => {
+      if (!yearId || !associatedGp?.id) {
+        return Promise.reject(new Error('Missing yearId or gradingPeriodId'))
+      }
+      return tenantService.updateGradingPeriod(schoolId, yearId, associatedGp.id, {
+        examStartDate: examStart || undefined,
+        examEndDate: examEnd || undefined,
+      })
+    },
+    onSuccess: (result: any) => {
+      // Refresh grading periods so the row re-renders with the new dates.
+      queryClient.invalidateQueries({ queryKey: ['grading-periods', schoolId, yearId] })
+      // Refresh calendar dates so the auto-synced exam_window rows show up
+      // immediately on the wizard's inline grid + the SchoolFullCalendar.
+      queryClient.invalidateQueries({ queryKey: ['calendar-dates'] })
+      setErrorMessage(null)
+      setWarnings(result.warnings ?? [])
+      // Close the form on save success; the operator can re-open to edit
+      // again. Leave warnings visible on the row even after close.
+      setIsEditing(false)
+      if (!result.warnings || result.warnings.length === 0) {
+        toast.success('Exam window saved')
+      } else {
+        toast.warning(`Exam window saved with ${result.warnings.length} holiday overlap warning(s)`)
+      }
+    },
+    onError: (err: any) => {
+      const apiBody = err?.response?.data
+      const errorCode = apiBody?.errorCode ?? apiBody?.response?.errorCode
+      if (errorCode === 'EXAM_DATES_OUT_OF_TERM_RANGE') {
+        setErrorMessage(
+          `Exam dates must be inside the session range (${session.beginDate} – ${session.endDate}).`,
+        )
+      } else {
+        setErrorMessage(
+          apiBody?.message ?? err?.message ?? 'Failed to save exam window. Try again.',
+        )
+      }
+    },
+  })
+
+  // Sync local state when grading period data refreshes
+  useEffect(() => {
+    setExamStart(associatedGp?.examStartDate ?? '')
+    setExamEnd(associatedGp?.examEndDate ?? '')
+  }, [associatedGp?.examStartDate, associatedGp?.examEndDate])
+
+  const hasExamDates = !!(associatedGp?.examStartDate && associatedGp?.examEndDate)
+  const formatRange = (s?: string, e?: string) =>
+    s && e
+      ? `${new Date(s + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} → ${new Date(e + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+      : 'Not set'
+
+  return (
+    <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg overflow-hidden">
+      {/* Session summary row */}
+      <div className="flex items-center justify-between px-3 py-2.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="w-2 h-2 rounded-full bg-[#378ADD]" />
+          <span className="text-xs font-medium text-[rgb(var(--text-primary))]">
+            {session.sessionName || session.name}
+          </span>
+          <span className="text-[10px] text-[rgb(var(--text-tertiary))]">
+            {session.beginDate && session.endDate
+              ? `${new Date(session.beginDate).toLocaleDateString()} – ${new Date(session.endDate).toLocaleDateString()}`
+              : ''}
+          </span>
+          {hasExamDates && (
+            <span
+              className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+              style={{
+                background: 'rgba(249,115,22,0.08)',
+                color: '#F97316',
+                border: '1px solid rgba(249,115,22,0.2)',
+              }}
+              title="Exam window — auto-syncs to the calendar"
+            >
+              Exam: {formatRange(associatedGp.examStartDate, associatedGp.examEndDate)}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] px-1.5 py-px rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.04)] text-[rgb(var(--text-tertiary))]">
+            {session.termDescriptor || session.termType || 'Session'}
+          </span>
+          {associatedGp && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditing(p => !p)
+                setErrorMessage(null)
+              }}
+              className="text-[10px] font-medium text-[#378ADD] hover:underline"
+            >
+              {isEditing ? 'Close' : hasExamDates ? 'Edit exam window' : 'Set exam window'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Inline edit form */}
+      {isEditing && associatedGp && (
+        <div className="px-3 py-3 border-t border-[rgba(55,138,221,0.12)] bg-[rgba(55,138,221,0.03)]">
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mb-2">
+            Exam dates must be inside the session range ({session.beginDate} – {session.endDate}).
+            Saving auto-generates orange exam-window markers on the calendar.
+          </p>
+          <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">
+                Exam Start Date
+              </label>
+              <DateInput
+                value={examStart}
+                onChange={(iso) => {
+                  setExamStart(iso)
+                  setErrorMessage(null)
+                }}
+                calendarSystem={calendarSystem}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">
+                Exam End Date
+              </label>
+              <DateInput
+                value={examEnd}
+                onChange={(iso) => {
+                  setExamEnd(iso)
+                  setErrorMessage(null)
+                }}
+                calendarSystem={calendarSystem}
+              />
+            </div>
+          </div>
+          {errorMessage && (
+            <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-2">
+              {errorMessage}
+            </div>
+          )}
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditing(false)
+                setErrorMessage(null)
+                setExamStart(associatedGp?.examStartDate ?? '')
+                setExamEnd(associatedGp?.examEndDate ?? '')
+              }}
+              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => updateGp.mutate()}
+              disabled={updateGp.isPending || !examStart || !examEnd}
+              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {updateGp.isPending ? 'Saving…' : 'Save exam dates'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Holiday-overlap warnings (S2.1 consumer) */}
+      {warnings.length > 0 && !isEditing && (
+        <div className="px-3 py-2.5 border-t border-[rgba(239,159,39,0.18)] bg-[rgba(239,159,39,0.05)]">
+          <p className="text-[11px] font-medium text-[#EF9F27] mb-1 flex items-center gap-1.5">
+            <span aria-hidden>⚠</span>
+            Heads up — {warnings.length} date{warnings.length > 1 ? 's' : ''} in this exam window
+            overlap{warnings.length > 1 ? '' : 's'} a holiday:
+          </p>
+          <ul className="text-[10.5px] text-[rgb(var(--text-secondary))] space-y-0.5 ml-4 list-disc">
+            {warnings.map(w => (
+              <li key={w.date}>
+                <strong>{new Date(w.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>{' '}
+                — {w.holidayName}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1.5">
+            Saved as-is. Adjust dates above or clear the warning by setting the exam window outside the holidays.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate, onSelectDate, startDate, endDate, calendarSystem }: {
   currentMonth: Date
