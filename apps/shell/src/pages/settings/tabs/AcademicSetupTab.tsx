@@ -28,6 +28,13 @@ import { useBellSchedules, useCreateBellSchedule } from '@/hooks/useBellSchedule
 import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
 import { type DayOfWeek, dayToIndex } from '@/utils/localeDefaults'
 import { adToBS, BS_MONTH_NAMES_EN } from '@edforge/date-utils'
+// Sprint S2.8 — single source of truth for the calendar event-type taxonomy.
+import {
+  EVENT_TYPE_COLORS,
+  OPERATOR_SELECTABLE_TYPES,
+  INSTRUCTIONAL_TYPES,
+  DAY_TYPE_LEGEND_CHIPS,
+} from '@/components/calendar/event-types'
 
 // ============================================================================
 // TYPES
@@ -940,29 +947,9 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
 // CALENDAR MONTH GRID (lightweight inline view)
 // ============================================================================
 
-// Sprint S1 cutover: removed `testing_day`; added `exam_window` (orange),
-// `school_program` (green), `monthly_test` (yellow). Colors match
-// fullcalendar-theme.css for visual continuity across the FullCalendar
-// view and this inline month-grid.
-const EVENT_TYPE_COLORS: Record<string, { bg: string; dot: string; label: string }> = {
-  instructional_day: { bg: 'rgba(29,158,117,0.12)', dot: '#1D9E75', label: 'Instructional' },
-  holiday: { bg: 'rgba(226,75,74,0.12)', dot: '#E24B4A', label: 'Holiday' },
-  teacher_only: { bg: 'rgba(239,159,39,0.12)', dot: '#EF9F27', label: 'Teacher Only' },
-  student_holiday: { bg: 'rgba(239,159,39,0.08)', dot: '#EF9F27', label: 'Student Holiday' },
-  break: { bg: 'rgba(127,119,221,0.1)', dot: '#7F77DD', label: 'Break' },
-  non_instructional_day: { bg: 'rgba(255,255,255,0.04)', dot: 'rgb(var(--text-tertiary))', label: 'Non-Instructional' },
-  early_release: { bg: 'rgba(55,138,221,0.1)', dot: '#378ADD', label: 'Early Release' },
-  late_start: { bg: 'rgba(55,138,221,0.08)', dot: '#378ADD', label: 'Late Start' },
-  exam_window: { bg: 'rgba(249,115,22,0.12)', dot: '#F97316', label: 'Exam Window' },
-  school_program: { bg: 'rgba(16,185,129,0.12)', dot: '#10B981', label: 'School Program' },
-  monthly_test: { bg: 'rgba(234,179,8,0.12)', dot: '#EAB308', label: 'Monthly Test' },
-  in_service: { bg: 'rgba(239,159,39,0.08)', dot: '#EF9F27', label: 'In-Service' },
-  weather_day: { bg: 'rgba(255,255,255,0.06)', dot: 'rgb(var(--text-tertiary))', label: 'Weather Day' },
-  make_up_day: { bg: 'rgba(29,158,117,0.08)', dot: '#1D9E75', label: 'Make-up Day' },
-  conference_day: { bg: 'rgba(127,119,221,0.08)', dot: '#7F77DD', label: 'Conference' },
-  graduation: { bg: 'rgba(239,159,39,0.1)', dot: '#EF9F27', label: 'Graduation' },
-  other: { bg: 'rgba(255,255,255,0.04)', dot: 'rgb(var(--text-tertiary))', label: 'Other' },
-}
+// Sprint S2.8 — event-type taxonomy consolidated into ./calendar/event-types.ts.
+// This component imports EVENT_TYPE_COLORS from that single source of truth
+// instead of redefining it inline. See top of file for the new import.
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
@@ -1068,7 +1055,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
           const eventType = specific?.eventType ?? events[0]?.eventType ?? (entry?.isWeekend ? 'weekend' : null)
           const isWeekend = entry?.isWeekend
           const isSelected = selectedDate === dateStr
-          const colorCfg = eventType ? EVENT_TYPE_COLORS[eventType] : null
+          const colorCfg = eventType ? (EVENT_TYPE_COLORS as Record<string, { bg: string; dot: string; label: string }>)[eventType] : null
 
           return (
             <button
@@ -1117,14 +1104,12 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
 // DATE EDIT PANEL (inline, below calendar grid)
 // ============================================================================
 
-// Sprint S1 cutover: removed `testing_day`; added `exam_window`,
-// `school_program`, `monthly_test`. Used by the inline date-edit dropdown.
-const CALENDAR_EVENT_TYPES = [
-  'instructional_day', 'non_instructional_day', 'holiday', 'teacher_only',
-  'student_holiday', 'weather_day', 'exam_window', 'school_program',
-  'monthly_test', 'early_release', 'late_start', 'conference_day',
-  'graduation', 'break', 'in_service', 'make_up_day', 'other',
-] as const
+// Sprint S2.8 + S2.5 — operator-selectable types now come from the single
+// source of truth in ./calendar/event-types.ts. exam_window is correctly
+// excluded because it's server-managed (auto-synced from
+// GradingPeriod.examStartDate/examEndDate); if the operator manually
+// picked it, the auto-sync wouldn't know to clean it up later.
+const CALENDAR_EVENT_TYPES = OPERATOR_SELECTABLE_TYPES
 
 // Pick the most-specific event type from a CalendarDate row. Prefers
 // overlay events (exam_window, school_program, holiday, etc.) over the
@@ -1169,7 +1154,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
     } catch { /* ignore */ }
   }
 
-  const colorCfg = EVENT_TYPE_COLORS[eventType] || EVENT_TYPE_COLORS.other
+  const colorCfg = (EVENT_TYPE_COLORS as Record<string, { bg: string; dot: string; label: string }>)[eventType] || EVENT_TYPE_COLORS.other
 
   // Description from the most-specific event (matches the eventType chosen
   // above), falling back to events[0] then empty string.
@@ -1261,15 +1246,12 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
             value={eventType}
             onChange={e => {
               setEventType(e.target.value)
-              // Auto-set instructional based on event type.
-              // S1 cutover: `testing_day` removed; `exam_window` and
-              // `monthly_test` ARE instructional (students attend and write
-              // exams = a school day). `school_program` is NOT instructional
-              // by default — operator can override the checkbox.
-              const instructionalTypes = [
-                'instructional_day', 'exam_window', 'monthly_test', 'make_up_day',
-              ]
-              setIsInstructional(instructionalTypes.includes(e.target.value))
+              // Sprint S2.8 — auto-set instructional from the central
+              // INSTRUCTIONAL_TYPES list. exam_window won't actually
+              // appear in this dropdown anymore (excluded by S2.5),
+              // but the flag-on-pick logic stays correct for any other
+              // type that's both instructional and operator-pickable.
+              setIsInstructional((INSTRUCTIONAL_TYPES as string[]).includes(e.target.value))
             }}
           >
             {CALENDAR_EVENT_TYPES.map(t => (
@@ -1698,25 +1680,12 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         </div>
       )}
 
-      {/* Day type legend.
-          Sprint S1 cutover added Exam Window / School Program / Monthly Test
-          chips alongside the existing types. RGBA values match
-          fullcalendar-theme.css so colors stay consistent across this
-          wizard hint and the actual calendar render. */}
+      {/* Day type legend — Sprint S2.8 derives chips from event-types.ts.
+          DAY_TYPE_LEGEND_CHIPS automatically excludes server-managed types
+          (exam_window) per S2.5 so operators only see types they can pick. */}
       <div className="flex flex-wrap gap-1.5 items-center">
         <span className="text-[10px] text-[rgb(var(--text-tertiary))] mr-1">Day types:</span>
-        {[
-          { label: 'Instructional', color: 'rgba(29,158,117,0.08)', text: '#1D9E75', border: 'rgba(29,158,117,0.2)' },
-          { label: 'Holiday', color: 'rgba(226,75,74,0.08)', text: '#E24B4A', border: 'rgba(226,75,74,0.2)' },
-          { label: 'Teacher Only', color: 'rgba(239,159,39,0.08)', text: '#EF9F27', border: 'rgba(239,159,39,0.2)' },
-          { label: 'Break', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
-          { label: 'Non-Instructional', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
-          { label: 'Early Release', color: 'rgba(55,138,221,0.08)', text: '#378ADD', border: 'rgba(55,138,221,0.2)' },
-          { label: 'Exam Window', color: 'rgba(249,115,22,0.08)', text: '#F97316', border: 'rgba(249,115,22,0.2)' },
-          { label: 'School Program', color: 'rgba(16,185,129,0.08)', text: '#10B981', border: 'rgba(16,185,129,0.2)' },
-          { label: 'Monthly Test', color: 'rgba(234,179,8,0.08)', text: '#EAB308', border: 'rgba(234,179,8,0.2)' },
-          { label: 'In-Service', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
-        ].map(dt => (
+        {DAY_TYPE_LEGEND_CHIPS.map(dt => (
           <span
             key={dt.label}
             className="text-[9px] font-medium px-1.5 py-0.5 rounded"

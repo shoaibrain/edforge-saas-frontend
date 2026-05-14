@@ -34,6 +34,7 @@ import { useBellSchedules } from '@/hooks/useBellSchedules'
 import { SchoolFullCalendar } from '@/components/calendar/SchoolFullCalendar'
 import { SessionManager } from '@/components/calendar/SessionManager'
 import { LEGEND_ITEMS, ALL_EVENT_TYPES, getEventTypeLabel } from '@/components/calendar/fullcalendar-utils'
+import { OPERATOR_SELECTABLE_TYPES, EVENT_TYPE_LABELS } from '@/components/calendar/event-types'
 import { adToBS, BS_MONTH_NAMES_EN, BS_MONTH_NAMES_NE, DAY_NAMES_NE } from '@edforge/date-utils'
 import {
   SettingsAlert,
@@ -43,27 +44,13 @@ import {
 // CONSTANTS
 // ============================================================================
 
-// Sprint S1 cutover (2026-05-14): removed `testing_day`; added `exam_window`,
-// `school_program`, `monthly_test`. Must stay lockstep with shared-types
-// calendarEventDescriptorSchema + fullcalendar-utils ALL_EVENT_TYPES + theme CSS.
-const EVENT_TYPE_OPTIONS = [
-  { value: 'instructional_day', label: 'Instructional Day' },
-  { value: 'holiday', label: 'Holiday' },
-  { value: 'teacher_only', label: 'Teacher Only' },
-  { value: 'break', label: 'Break' },
-  { value: 'non_instructional_day', label: 'Non-Instructional' },
-  { value: 'student_holiday', label: 'Student Holiday' },
-  { value: 'early_release', label: 'Early Release' },
-  { value: 'late_start', label: 'Late Start' },
-  { value: 'make_up_day', label: 'Make-up Day' },
-  { value: 'weather_day', label: 'Weather Day' },
-  { value: 'exam_window', label: 'Exam Window' },
-  { value: 'school_program', label: 'School Program' },
-  { value: 'monthly_test', label: 'Monthly Test' },
-  { value: 'conference_day', label: 'Conference Day' },
-  { value: 'graduation', label: 'Graduation' },
-  { value: 'in_service', label: 'In-Service' },
-]
+// Sprint S2.8 — derived from event-types.ts single source of truth.
+// Sprint S2.5 — uses OPERATOR_SELECTABLE_TYPES so server-managed types
+// (e.g. exam_window) don't appear in the operator dropdown.
+const EVENT_TYPE_OPTIONS = OPERATOR_SELECTABLE_TYPES.map(t => ({
+  value: t,
+  label: EVENT_TYPE_LABELS[t],
+}))
 
 // ============================================================================
 // HELPERS
