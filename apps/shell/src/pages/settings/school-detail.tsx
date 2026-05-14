@@ -614,16 +614,13 @@ export default function SchoolDetailPage() {
               </Menu>
             )}
 
-            {/* Activate School button — only in setup status */}
-            {displaySchool.status === 'setup' && isTenantAdmin && (
-              <button
-                onClick={() => statusMutation.mutate('active')}
-                disabled={statusMutation.isPending}
-                className="bg-[#1D9E75] text-white text-xs font-medium px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
-              >
-                Activate School <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
+            {/* S0 polish: the in-header `Activate School` button was a duplicate
+                of the `✓ Activate School` button inside SetupProgressBanner —
+                both rendered simultaneously when status === 'setup'. The banner
+                button is contextually correct (sits inside the setup checklist
+                with the gating tasks alongside). The header CTA was redundant.
+                Status transitions away from `active` (active → suspended/closed)
+                still go through the "..." menu dropdown. */}
           </div>
         </div>
 
