@@ -43,6 +43,9 @@ import {
 // CONSTANTS
 // ============================================================================
 
+// Sprint S1 cutover (2026-05-14): removed `testing_day`; added `exam_window`,
+// `school_program`, `monthly_test`. Must stay lockstep with shared-types
+// calendarEventDescriptorSchema + fullcalendar-utils ALL_EVENT_TYPES + theme CSS.
 const EVENT_TYPE_OPTIONS = [
   { value: 'instructional_day', label: 'Instructional Day' },
   { value: 'holiday', label: 'Holiday' },
@@ -54,7 +57,9 @@ const EVENT_TYPE_OPTIONS = [
   { value: 'late_start', label: 'Late Start' },
   { value: 'make_up_day', label: 'Make-up Day' },
   { value: 'weather_day', label: 'Weather Day' },
-  { value: 'testing_day', label: 'Testing Day' },
+  { value: 'exam_window', label: 'Exam Window' },
+  { value: 'school_program', label: 'School Program' },
+  { value: 'monthly_test', label: 'Monthly Test' },
   { value: 'conference_day', label: 'Conference Day' },
   { value: 'graduation', label: 'Graduation' },
   { value: 'in_service', label: 'In-Service' },

@@ -940,6 +940,10 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
 // CALENDAR MONTH GRID (lightweight inline view)
 // ============================================================================
 
+// Sprint S1 cutover: removed `testing_day`; added `exam_window` (orange),
+// `school_program` (green), `monthly_test` (yellow). Colors match
+// fullcalendar-theme.css for visual continuity across the FullCalendar
+// view and this inline month-grid.
 const EVENT_TYPE_COLORS: Record<string, { bg: string; dot: string; label: string }> = {
   instructional_day: { bg: 'rgba(29,158,117,0.12)', dot: '#1D9E75', label: 'Instructional' },
   holiday: { bg: 'rgba(226,75,74,0.12)', dot: '#E24B4A', label: 'Holiday' },
@@ -949,7 +953,9 @@ const EVENT_TYPE_COLORS: Record<string, { bg: string; dot: string; label: string
   non_instructional_day: { bg: 'rgba(255,255,255,0.04)', dot: 'rgb(var(--text-tertiary))', label: 'Non-Instructional' },
   early_release: { bg: 'rgba(55,138,221,0.1)', dot: '#378ADD', label: 'Early Release' },
   late_start: { bg: 'rgba(55,138,221,0.08)', dot: '#378ADD', label: 'Late Start' },
-  testing_day: { bg: 'rgba(127,119,221,0.08)', dot: '#7F77DD', label: 'Testing' },
+  exam_window: { bg: 'rgba(249,115,22,0.12)', dot: '#F97316', label: 'Exam Window' },
+  school_program: { bg: 'rgba(16,185,129,0.12)', dot: '#10B981', label: 'School Program' },
+  monthly_test: { bg: 'rgba(234,179,8,0.12)', dot: '#EAB308', label: 'Monthly Test' },
   in_service: { bg: 'rgba(239,159,39,0.08)', dot: '#EF9F27', label: 'In-Service' },
   weather_day: { bg: 'rgba(255,255,255,0.06)', dot: 'rgb(var(--text-tertiary))', label: 'Weather Day' },
   make_up_day: { bg: 'rgba(29,158,117,0.08)', dot: '#1D9E75', label: 'Make-up Day' },
@@ -1105,11 +1111,13 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
 // DATE EDIT PANEL (inline, below calendar grid)
 // ============================================================================
 
+// Sprint S1 cutover: removed `testing_day`; added `exam_window`,
+// `school_program`, `monthly_test`. Used by the inline date-edit dropdown.
 const CALENDAR_EVENT_TYPES = [
   'instructional_day', 'non_instructional_day', 'holiday', 'teacher_only',
-  'student_holiday', 'weather_day', 'testing_day', 'early_release',
-  'late_start', 'conference_day', 'graduation', 'break', 'in_service',
-  'make_up_day', 'other',
+  'student_holiday', 'weather_day', 'exam_window', 'school_program',
+  'monthly_test', 'early_release', 'late_start', 'conference_day',
+  'graduation', 'break', 'in_service', 'make_up_day', 'other',
 ] as const
 
 function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }: {
@@ -1232,8 +1240,14 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
             value={eventType}
             onChange={e => {
               setEventType(e.target.value)
-              // Auto-set instructional based on event type
-              const instructionalTypes = ['instructional_day', 'testing_day', 'make_up_day']
+              // Auto-set instructional based on event type.
+              // S1 cutover: `testing_day` removed; `exam_window` and
+              // `monthly_test` ARE instructional (students attend and write
+              // exams = a school day). `school_program` is NOT instructional
+              // by default — operator can override the checkbox.
+              const instructionalTypes = [
+                'instructional_day', 'exam_window', 'monthly_test', 'make_up_day',
+              ]
               setIsInstructional(instructionalTypes.includes(e.target.value))
             }}
           >
@@ -1663,7 +1677,11 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         </div>
       )}
 
-      {/* Day type legend */}
+      {/* Day type legend.
+          Sprint S1 cutover added Exam Window / School Program / Monthly Test
+          chips alongside the existing types. RGBA values match
+          fullcalendar-theme.css so colors stay consistent across this
+          wizard hint and the actual calendar render. */}
       <div className="flex flex-wrap gap-1.5 items-center">
         <span className="text-[10px] text-[rgb(var(--text-tertiary))] mr-1">Day types:</span>
         {[
@@ -1673,6 +1691,9 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           { label: 'Break', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
           { label: 'Non-Instructional', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
           { label: 'Early Release', color: 'rgba(55,138,221,0.08)', text: '#378ADD', border: 'rgba(55,138,221,0.2)' },
+          { label: 'Exam Window', color: 'rgba(249,115,22,0.08)', text: '#F97316', border: 'rgba(249,115,22,0.2)' },
+          { label: 'School Program', color: 'rgba(16,185,129,0.08)', text: '#10B981', border: 'rgba(16,185,129,0.2)' },
+          { label: 'Monthly Test', color: 'rgba(234,179,8,0.08)', text: '#EAB308', border: 'rgba(234,179,8,0.2)' },
           { label: 'In-Service', color: 'rgba(255,255,255,0.05)', text: 'rgb(var(--text-tertiary))', border: 'rgba(255,255,255,0.06)' },
         ].map(dt => (
           <span
