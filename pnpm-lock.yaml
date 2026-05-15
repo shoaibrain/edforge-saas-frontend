@@ -859,6 +859,9 @@ importers:
 
   packages/date-utils:
     dependencies:
+      '@aibrains/shared-types':
+        specifier: ^0.40.0
+        version: 0.40.0(zod@3.24.4)
       react:
         specifier: ^19.0.0
         version: 19.2.5
