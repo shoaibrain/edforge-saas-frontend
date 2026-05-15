@@ -15,6 +15,9 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@aibrains/shared-types": "^0.40.0"
+  },
   "peerDependencies": {
     "react": "^19.0.0"
   },
