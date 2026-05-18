@@ -1452,9 +1452,24 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
           const isSelected = selectedDate === dateStr
           const colorCfg = eventType ? (EVENT_TYPE_COLORS as Record<string, { bg: string; dot: string; label: string }>)[eventType] : null
 
+          // Sprint C4-FE — block-overlay metadata. Backend denormalizes
+          // blockId/blockName/subEventName onto each child date row
+          // (PR A). Use them for a browser tooltip on hover so the
+          // operator can scan the grid and see which dates belong to
+          // which block without clicking each one. Avoids visual
+          // clutter — no inline text label inside the small cells.
+          const blockName: string | undefined = entry?.blockName
+          const subEventName: string | undefined = entry?.subEventName
+          const cellTitle = blockName
+            ? subEventName
+              ? `${blockName} · ${subEventName}`
+              : blockName
+            : undefined
+
           return (
             <button
               key={dateStr}
+              title={cellTitle}
               onClick={() => inRange && entry ? onSelectDate(isSelected ? null : dateStr) : undefined}
               disabled={!inRange || !entry}
               className={`${isBSCalendar ? 'h-10' : 'h-8'} rounded-md text-[11px] font-medium relative flex ${isBSCalendar ? 'flex-col' : ''} items-center justify-center transition-all ${
@@ -1478,6 +1493,17 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
                 <span
                   className="absolute bottom-0.5 w-1 h-1 rounded-full"
                   style={{ background: colorCfg.dot }}
+                />
+              )}
+              {/* Block indicator — small ring at the top-right when this
+                  date belongs to a multi-day block. Visible accent
+                  without consuming cell space. Click + DateEditPanel
+                  shows the full block context pill. */}
+              {blockName && !isSelected && (
+                <span
+                  className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full"
+                  style={{ background: 'rgba(127,119,221,0.7)' }}
+                  aria-hidden
                 />
               )}
             </button>
