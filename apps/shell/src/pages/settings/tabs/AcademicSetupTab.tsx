@@ -36,6 +36,20 @@ import {
   INSTRUCTIONAL_TYPES,
   DAY_TYPE_LEGEND_CHIPS,
 } from '@/components/calendar/event-types'
+// Sprint C4-FE — multi-day Calendar Blocks (Dashain, vacations, exam windows).
+import { BlocksPanel } from '@/components/calendar/BlocksPanel'
+// Sprint C4-FE — curated single-day event dropdown (audit Q2). Replaces the
+// raw enum dropdown with operator-friendly labelled options (Holiday /
+// Staff PD / Early Release — Students / etc.).
+import {
+  CURATED_OPTIONS_FOR_DROPDOWN,
+  decodeCalendarEvent,
+  encodeCuratedOption,
+  getCuratedMeta,
+  type CuratedSingleDayKey,
+  type CalendarEventInput,
+} from '@/components/calendar/single-day-curated-options'
+import type { CalendarEventDescriptor } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES
@@ -1503,20 +1517,58 @@ function pickSpecificEventType(dateEntry: any, fallback = 'instructional_day'): 
   return specific?.eventType ?? events[0].eventType ?? fallback
 }
 
+// Sprint C4-FE — return the full most-specific event (with audience,
+// category, description) so the curated dropdown can decode the
+// (eventType, audience) triple correctly on edit-open. Pre-seeded
+// PABSON holidays carry `category: 'religious'`; without seeing the
+// full event the curated dropdown would fall through to "Other".
+function pickSpecificEvent(dateEntry: any): CalendarEventInput | undefined {
+  const events = (dateEntry?.calendarEvents ?? []) as CalendarEventInput[]
+  if (events.length === 0) return undefined
+  const specific = events.find(
+    e => e.eventType !== 'instructional_day' && e.eventType !== 'non_instructional_day',
+  )
+  return specific ?? events[0]
+}
+
 function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }: {
   dateEntry: any
   onClose: () => void
-  onSave: (eventType: string, isInstructional: boolean) => void
+  /**
+   * Sprint C4-FE expanded signature — caller receives the full encoded
+   * calendar event (eventType + optional audience/category/description)
+   * plus the instructional flag. Maps directly onto
+   * `UpdateCalendarDateDto.calendarEvents[0]`.
+   */
+  onSave: (event: CalendarEventInput, isInstructional: boolean) => void
   isSaving: boolean
   calendarSystem?: 'gregorian' | 'bikram_sambat'
 }) {
+  const currentEvent = pickSpecificEvent(dateEntry)
   const currentEventType = pickSpecificEventType(dateEntry)
-  const [eventType, setEventType] = useState(currentEventType)
+  const currentCuratedKey = decodeCalendarEvent(currentEvent)
+  const [curatedKey, setCuratedKey] = useState<CuratedSingleDayKey>(currentCuratedKey)
+  // "Other" reveals a raw eventType picker; default to the existing event's
+  // type so the operator sees what's currently stored.
+  const [rawOverride, setRawOverride] = useState<CalendarEventDescriptor>(
+    currentEventType as CalendarEventDescriptor,
+  )
   const [isInstructional, setIsInstructional] = useState(dateEntry?.isInstructionalDay ?? true)
+  const [description, setDescription] = useState<string>(currentEvent?.description ?? '')
+
+  // Derive the actual eventType that will land server-side from the
+  // current curated selection (used by the preview swatch + the
+  // auto-instructional toggle).
+  const effectiveEventType: CalendarEventDescriptor =
+    curatedKey === 'other' ? rawOverride : getCuratedMeta(curatedKey).eventType
 
   // Reset when dateEntry changes
   useEffect(() => {
-    setEventType(pickSpecificEventType(dateEntry))
+    const evt = pickSpecificEvent(dateEntry)
+    const key = decodeCalendarEvent(evt)
+    setCuratedKey(key)
+    setRawOverride((evt?.eventType as CalendarEventDescriptor) ?? 'non_instructional_day')
+    setDescription(evt?.description ?? '')
     setIsInstructional(dateEntry?.isInstructionalDay ?? true)
   }, [dateEntry?.date])
 
@@ -1535,12 +1587,12 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
     } catch { /* ignore */ }
   }
 
-  const colorCfg = (EVENT_TYPE_COLORS as Record<string, { bg: string; dot: string; label: string }>)[eventType] || EVENT_TYPE_COLORS.other
+  const colorCfg = (EVENT_TYPE_COLORS as Record<string, { bg: string; dot: string; label: string }>)[effectiveEventType] || EVENT_TYPE_COLORS.other
 
   // Description from the most-specific event (matches the eventType chosen
   // above), falling back to events[0] then empty string.
   const specificForLabel = (dateEntry?.calendarEvents ?? []).find((e: any) =>
-    e.eventType === eventType,
+    e.eventType === effectiveEventType,
   )
   const holidayName = specificForLabel?.description || dateEntry?.calendarEvents?.[0]?.description || ''
   const isWeekend = dateEntry?.isWeekend
@@ -1619,26 +1671,56 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
         </div>
       </div>
 
+      {/* Sprint C4-FE — block-context info pill (when this date is part
+          of a multi-day block). Server-side denormalization (PR A)
+          exposes blockId/blockName on the date row. */}
+      {dateEntry?.blockId && (
+        <div className="bg-[rgba(127,119,221,0.06)] border border-[rgba(127,119,221,0.15)] rounded-lg px-3 py-2 mb-2.5 text-[11px] text-[rgb(var(--text-secondary))]">
+          <span className="font-medium">Part of:</span> {dateEntry.blockName ?? 'Multi-day block'}
+          {dateEntry.subEventName && (
+            <span className="text-[rgb(var(--text-tertiary))]"> · {dateEntry.subEventName}</span>
+          )}
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+            Saving an override here keeps the block link but customizes this single day.
+          </p>
+        </div>
+      )}
+
+      {/* Sprint C4-FE — curated event-type dropdown (audit Q2). Operators
+          see labelled options like "Staff Professional Development" /
+          "Early Release — Students Only" instead of raw `teacher_only` /
+          `early_release` enum jargon. Mapping handled in
+          single-day-curated-options.ts. */}
       <div className="grid grid-cols-2 gap-2.5 mb-2.5">
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Event Type</label>
           <select
             className={inputClass}
-            value={eventType}
+            value={curatedKey}
             onChange={e => {
-              setEventType(e.target.value)
-              // Sprint S2.8 — auto-set instructional from the central
-              // INSTRUCTIONAL_TYPES list. exam_window won't actually
-              // appear in this dropdown anymore (excluded by S2.5),
-              // but the flag-on-pick logic stays correct for any other
-              // type that's both instructional and operator-pickable.
-              setIsInstructional((INSTRUCTIONAL_TYPES as string[]).includes(e.target.value))
+              const newKey = e.target.value as CuratedSingleDayKey
+              setCuratedKey(newKey)
+              // Auto-set instructional from the underlying eventType the
+              // curated key resolves to.
+              const newType =
+                newKey === 'other'
+                  ? rawOverride
+                  : getCuratedMeta(newKey).eventType
+              setIsInstructional(
+                (INSTRUCTIONAL_TYPES as string[]).includes(newType) ||
+                  getCuratedMeta(newKey).autoInstructional,
+              )
             }}
           >
-            {CALENDAR_EVENT_TYPES.map(t => (
-              <option key={t} value={t}>{EVENT_TYPE_COLORS[t]?.label || t}</option>
+            {CURATED_OPTIONS_FOR_DROPDOWN.map(opt => (
+              <option key={opt.key} value={opt.key}>{opt.label}</option>
             ))}
+            <option key="other" value="other">────────</option>
+            <option key="other-real" value="other">Other (advanced)…</option>
           </select>
+          <p className="text-[10px] text-[rgb(var(--text-tertiary))] leading-tight">
+            {curatedKey === 'other' ? 'Pick a raw type below' : getCuratedMeta(curatedKey).description}
+          </p>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Instructional Day</label>
@@ -1656,13 +1738,66 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
         </div>
       </div>
 
+      {/* "Other" escape hatch — raw eventType dropdown */}
+      {curatedKey === 'other' && (
+        <div className="mb-2.5">
+          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))] block mb-1">
+            Raw Event Type
+          </label>
+          <select
+            className={inputClass}
+            value={rawOverride}
+            onChange={e => {
+              const newType = e.target.value as CalendarEventDescriptor
+              setRawOverride(newType)
+              setIsInstructional((INSTRUCTIONAL_TYPES as string[]).includes(newType))
+            }}
+          >
+            {CALENDAR_EVENT_TYPES.map(t => (
+              <option key={t} value={t}>{EVENT_TYPE_COLORS[t]?.label || t}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Optional description (operator notes — stored as the event's
+          `description` field; appears in tooltips and reports). */}
+      <div className="flex flex-col gap-1 mb-2.5">
+        <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">
+          Description (optional)
+        </label>
+        <input
+          type="text"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="e.g., Mid-term Conference Day, Quarter 2 Inservice"
+          maxLength={255}
+          className={inputClass}
+        />
+      </div>
+
       <div className="flex justify-end gap-2">
         <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
           Cancel
         </button>
         <button
-          onClick={() => onSave(eventType, isInstructional)}
-          disabled={isSaving || (eventType === currentEventType && isInstructional === dateEntry?.isInstructionalDay)}
+          onClick={() => onSave(
+            encodeCuratedOption(
+              curatedKey,
+              description,
+              curatedKey === 'other' ? rawOverride : undefined,
+            ),
+            isInstructional,
+          )}
+          disabled={
+            isSaving ||
+            // No-op detection: same curated key, same instructional flag,
+            // unchanged description, and (if "other") same raw override.
+            (curatedKey === currentCuratedKey &&
+              isInstructional === dateEntry?.isInstructionalDay &&
+              description === (currentEvent?.description ?? '') &&
+              (curatedKey !== 'other' || rawOverride === (currentEvent?.eventType ?? rawOverride)))
+          }
           className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
         >
           {isSaving ? 'Saving...' : 'Save Changes'}
@@ -1871,17 +2006,44 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         />
       )}
 
+      {/* Multi-Day Event Blocks (Sprint C4-FE) — operator-self-serve UI for
+          Dashain / Tihar / Summer Vacation / exam windows / etc. Gated on
+          calendarExists because the AY date range is required for the
+          block date pickers' min/max + because a fresh tenant has nothing
+          to attach blocks to. */}
+      {calendarExists && yearId && startDate && endDate && (
+        <BlocksPanel
+          schoolId={schoolId}
+          academicYearId={yearId}
+          academicYearStartDate={startDate}
+          academicYearEndDate={endDate}
+          calendarSystem={localeDefaults.calendarSystem}
+        />
+      )}
+
       {/* Inline Date Edit Panel */}
       {selectedDate && dateMap.has(selectedDate) && (
         <DateEditPanel
           dateEntry={dateMap.get(selectedDate)}
           onClose={() => setSelectedDate(null)}
-          onSave={(eventType, isInstructional) => {
+          /* Sprint C4-FE — onSave now receives the full encoded
+             CalendarEvent (eventType + optional audience/category/
+             description) from the curated dropdown. Passes through
+             as-is to the calendarEvents[0] in the PATCH payload. */
+          onSave={(event, isInstructional) => {
             updateCalendarDate.mutate(
               {
                 date: selectedDate,
                 data: {
-                  calendarEvents: [{ eventType: eventType as any, isAllDay: true }],
+                  calendarEvents: [
+                    {
+                      eventType: event.eventType,
+                      isAllDay: event.isAllDay ?? true,
+                      ...(event.description ? { description: event.description } : {}),
+                      ...(event.audience ? { audience: event.audience } : {}),
+                      ...(event.category ? { category: event.category } : {}),
+                    } as any,
+                  ],
                   isInstructionalDay: isInstructional,
                 },
               },

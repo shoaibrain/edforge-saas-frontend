@@ -6,11 +6,16 @@ packages:
 # Supply-chain hardening (pnpm ≥ 10.16 + 10.26)
 # Refuses to install any npm version younger than 7 days (10080 minutes).
 # The typical detection lag for malicious npm releases is 12-72h; 7 days
-# gives margin without being annoying. Internal @edforge/* workspace
-# packages are excluded so local development isn't gated.
+# gives margin without being annoying. Our internal namespaces are
+# excluded so local development isn't gated on our own publish cadence:
+#   - @edforge/*  — workspace packages (always local)
+#   - @aibrains/* — shared-types is published to npm (AdminWeb constraint
+#                   per CLAUDE.md), but it's still our package; gating on
+#                   release-age would block every shared-types-consumer PR.
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - "@edforge/*"
+  - "@aibrains/*"
 
 # Lifecycle scripts (preinstall/install/postinstall) are disallowed unless
 # the package is explicitly allowlisted below. This is the primary delivery
