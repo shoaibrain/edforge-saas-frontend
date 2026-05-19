@@ -35,6 +35,20 @@ import { SchoolFullCalendar } from '@/components/calendar/SchoolFullCalendar'
 import { SessionManager } from '@/components/calendar/SessionManager'
 import { LEGEND_ITEMS, ALL_EVENT_TYPES, getEventTypeLabel } from '@/components/calendar/fullcalendar-utils'
 import { OPERATOR_SELECTABLE_TYPES, EVENT_TYPE_LABELS } from '@/components/calendar/event-types'
+// Sprint C4-FE §3.7 — curated single-day dropdown (audit Q2). This file is
+// the legacy dormant calendar page (not currently routed); the retrofit
+// exercises the curated mapper from both call sites (it + the active
+// CalendarStep DateEditPanel in AcademicSetupTab.tsx) so they stay in sync
+// if/when this page gets re-routed. Audit follow-up #2.
+import {
+  CURATED_OPTIONS_FOR_DROPDOWN,
+  decodeCalendarEvent,
+  encodeCuratedOption,
+  getCuratedMeta,
+  type CuratedSingleDayKey,
+  type CalendarEventInput,
+} from '@/components/calendar/single-day-curated-options'
+import type { CalendarEventDescriptor } from '@aibrains/shared-types'
 import { adToBS, BS_MONTH_NAMES_EN, BS_MONTH_NAMES_NE, DAY_NAMES_NE } from '@edforge/date-utils'
 import {
   SettingsAlert,
@@ -111,6 +125,11 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   const [editEventType, setEditEventType] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [editIsInstructional, setEditIsInstructional] = useState(true)
+  // Sprint C4-FE §3.7 — curated dropdown state. `editEventType` is preserved
+  // as the underlying raw event type (computed from `editCuratedKey` on
+  // non-"other" selections, set directly when "Other" is picked). Save flow
+  // routes everything through `encodeCuratedOption`.
+  const [editCuratedKey, setEditCuratedKey] = useState<CuratedSingleDayKey>('other')
   const [editBellScheduleId, setEditBellScheduleId] = useState<string | null>(null)
   const [editCalendarDate, setEditCalendarDate] = useState<CalendarDateResponseDto | null>(null)
 
@@ -205,16 +224,23 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
 
     // Pre-populate edit form from existing calendar date data
     if (calendarDate) {
-      const evt = calendarDate.calendarEvents?.[0]
+      const evt = calendarDate.calendarEvents?.[0] as CalendarEventInput | undefined
       if (evt) {
         setEditEventType(evt.eventType)
         setEditDescription(evt.description || '')
+        // Sprint C4-FE §3.7 — decode the stored event into a curated key so
+        // the dropdown shows the right operator-facing label on edit-open.
+        // Pre-seeded PABSON holidays decode cleanly to 'holiday' rather
+        // than falling through to 'other'.
+        setEditCuratedKey(decodeCalendarEvent(evt))
       } else if (calendarDate.isInstructionalDay) {
         setEditEventType('instructional_day')
         setEditDescription('')
+        setEditCuratedKey('other')
       } else {
         setEditEventType('non_instructional_day')
         setEditDescription('')
+        setEditCuratedKey('other')
       }
       setEditIsInstructional(calendarDate.isInstructionalDay)
       setEditBellScheduleId(calendarDate.bellScheduleId || null)
@@ -224,6 +250,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
       setEditDescription('')
       setEditIsInstructional(true)
       setEditBellScheduleId(null)
+      setEditCuratedKey('other')
     }
   }
 
@@ -232,11 +259,21 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
     if (!selectedDate || !editEventType) return
     const bellScheduleId = editBellScheduleId && editBellScheduleId !== '__none__' ? editBellScheduleId : undefined
     const bellScheduleName = getScheduleName(editBellScheduleId)
+    // Sprint C4-FE §3.7 — encode the curated dropdown selection into the
+    // full CalendarEvent triple (eventType + optional audience + category).
+    // When the operator picked "Other", `editEventType` carries the raw
+    // override they selected from the secondary dropdown. For every other
+    // curated key, the eventType is derived from `getCuratedMeta(key)`.
+    const encodedEvent = encodeCuratedOption(
+      editCuratedKey,
+      editDescription,
+      editCuratedKey === 'other' ? (editEventType as CalendarEventDescriptor) : undefined,
+    )
     updateDate.mutate(
       {
         date: selectedDate,
         data: {
-          calendarEvents: [{ eventType: editEventType as any, isAllDay: true, description: editDescription || undefined }],
+          calendarEvents: [encodedEvent as any],
           isInstructionalDay: editIsInstructional,
           bellScheduleId,
           bellScheduleName,
@@ -491,20 +528,57 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
 
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Event Type</label>
+            {/* Sprint C4-FE §3.7 — curated dropdown (operator-friendly labels).
+                Mirrors the active DateEditPanel in AcademicSetupTab.tsx.
+                "Other" reveals the raw eventType picker as an escape hatch. */}
             <select
-              value={editEventType}
+              value={editCuratedKey}
               onChange={(e) => {
-                setEditEventType(e.target.value)
-                setEditIsInstructional(e.target.value === 'instructional_day')
+                const newKey = e.target.value as CuratedSingleDayKey
+                setEditCuratedKey(newKey)
+                // Update underlying editEventType for state-consistency +
+                // the save-button-enabled check (`editEventType` is the
+                // truth flag for "is something selected").
+                if (newKey !== 'other') {
+                  const meta = getCuratedMeta(newKey)
+                  setEditEventType(meta.eventType)
+                  setEditIsInstructional(meta.autoInstructional)
+                }
               }}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
             >
-              <option value="">Select...</option>
-              {EVENT_TYPE_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+              {CURATED_OPTIONS_FOR_DROPDOWN.map(opt => (
+                <option key={opt.key} value={opt.key}>{opt.label}</option>
               ))}
+              <option value="other">Other (advanced)…</option>
             </select>
+            {editCuratedKey !== 'other' && (
+              <p className="mt-1 text-[10px] text-[rgb(var(--text-tertiary))] leading-tight">
+                {getCuratedMeta(editCuratedKey).description}
+              </p>
+            )}
           </div>
+
+          {/* "Other" escape hatch — raw eventType dropdown when the curated
+              options don't fit. */}
+          {editCuratedKey === 'other' && (
+            <div>
+              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Raw Event Type</label>
+              <select
+                value={editEventType}
+                onChange={(e) => {
+                  setEditEventType(e.target.value)
+                  setEditIsInstructional(e.target.value === 'instructional_day')
+                }}
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
+              >
+                <option value="">Select...</option>
+                {EVENT_TYPE_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Description</label>
             <input
