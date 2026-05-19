@@ -226,6 +226,26 @@ export function useLocaleHolidays(
 // CALENDAR DATE MUTATION HOOKS
 // ============================================================================
 
+/**
+ * Update a single CalendarDate.
+ *
+ * ## Cache-invalidation contract (Sprint C4-FE §3.8)
+ *
+ * **This hook invalidates `calendarKeys.all` AND seeds the per-date cache.**
+ * It does NOT need to invalidate `calendarBlockKeys.*` — per-day operator
+ * edits don't change the parent CalendarBlock envelope (blockId / blockName /
+ * blockDescriptor / subEventName stay denormalized on the date row regardless
+ * of what eventType the operator picks).
+ *
+ * The reverse direction IS load-bearing: block writes (create/update/delete
+ * in `useCalendarBlocks`) invalidate `calendarKeys.all` because the backend
+ * mutates child CalendarDate rows. See `useCalendarBlocks.ts` for that side.
+ *
+ * If a future change introduces backend logic that mutates the parent block
+ * on per-day edit (e.g. auto-recomputing block.childDateCount when a day is
+ * removed from the range), this hook must also invalidate
+ * `calendarBlockKeys.list(schoolId, academicYearId)`.
+ */
 export function useUpdateCalendarDate(schoolId: string) {
   const queryClient = useQueryClient()
   return useMutation<CalendarDateResponseDto, Error, { date: string; data: UpdateCalendarDateDto }>({
