@@ -29,12 +29,55 @@ export async function getInvoices(
   schoolId: string,
   filters?: InvoiceFilterDto
 ): Promise<FinancePaginatedResponse<Invoice>> {
-  const response = await apiGet<FinancePaginatedResponse<Invoice> | Invoice[]>(
-    `/finance/schools/${schoolId}/invoices`,
-    filters as Record<string, unknown>
-  )
-  if (Array.isArray(response)) return { items: response, hasMore: false }
-  return { items: response?.items ?? [], hasMore: response?.hasMore ?? false }
+  const baseParams = { ...(filters as Record<string, unknown> | undefined) }
+  const allItems: Invoice[] = []
+  const seenCursors = new Set<string>()
+
+  let cursor: string | undefined = undefined
+  let hasMore = true
+  let pageCount = 0
+  const MAX_PAGES = 500
+
+  while (hasMore && pageCount < MAX_PAGES) {
+    const response = await apiGet<FinancePaginatedResponse<Invoice> | Invoice[]>(
+      `/finance/schools/${schoolId}/invoices`,
+      {
+        ...baseParams,
+        ...(cursor ? { cursor } : {}),
+      }
+    )
+
+    // Backward compatibility: tolerate legacy bare-array response shape.
+    if (Array.isArray(response)) {
+      allItems.push(...response)
+      return { items: allItems, hasMore: false }
+    }
+
+    const pageItems = response?.items ?? []
+    allItems.push(...pageItems)
+
+    const nextCursor = response?.lastEvaluatedKey
+    hasMore = Boolean(response?.hasMore && nextCursor)
+
+    if (!hasMore) {
+      return { items: allItems, hasMore: false }
+    }
+
+    if (seenCursors.has(nextCursor!)) {
+      // Defensive break to avoid infinite loops on malformed cursor chains.
+      return { items: allItems, hasMore: true, lastEvaluatedKey: nextCursor }
+    }
+
+    seenCursors.add(nextCursor!)
+    cursor = nextCursor
+    pageCount += 1
+  }
+
+  return {
+    items: allItems,
+    hasMore,
+    lastEvaluatedKey: cursor,
+  }
 }
 
 export async function getInvoice(
