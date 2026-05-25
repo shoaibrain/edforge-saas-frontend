@@ -5,13 +5,14 @@
  * PAN/VAT tax breakdown, and print-friendly layout.
  */
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef } from 'react'
 import type { Receipt } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
+import { useDownloadReceiptPdf } from '@edforge/finance-services'
 import { CheckCircle2, Printer, ArrowLeft, Download, Loader2 } from 'lucide-react'
-import { useSettings } from '../../lib/shell-context'
+import { useSettings, useActiveSchool } from '../../lib/shell-context'
 
 interface PaymentReceiptProps {
   receipt: Receipt
@@ -23,34 +24,36 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
   const settings = useSettings()
   const { format } = useCurrency(settings)
   const fmt = (amount: number) => format(amount)
+  // receiptRef is retained on the receipt card below; it's no longer used
+  // for PDF capture (we render server-side now) but keeping the ref hook
+  // would let a future "print-this-section" feature target the same node
+  // without re-wiring. Removed in V1.5 if still unused.
   const receiptRef = useRef<HTMLDivElement>(null)
-  const [downloading, setDownloading] = useState(false)
+  const { activeSchoolId } = useActiveSchool()
+  const downloadReceipt = useDownloadReceiptPdf()
+  const downloading = downloadReceipt.isPending
 
-  const handleDownloadPdf = useCallback(async () => {
-    if (!receiptRef.current || downloading) return
-    setDownloading(true)
-    try {
-      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-        import('html2canvas'),
-        import('jspdf'),
-      ])
-      const canvas = await html2canvas(receiptRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-      })
-      const imgData = canvas.toDataURL('image/png')
-      const pdf = new jsPDF('p', 'mm', 'a4')
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-      pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight)
-      pdf.save(`Receipt-${receipt.receiptNumber}.pdf`)
-    } catch (err) {
-      console.error('PDF generation failed:', err)
-    } finally {
-      setDownloading(false)
-    }
-  }, [receipt.receiptNumber, downloading])
+  /**
+   * Download the receipt as a server-rendered PDF (Sprint C.1.6 frontend).
+   *
+   * Replaces the prior jspdf+html2canvas client-side raster screenshot.
+   * The server response embeds Devanagari fonts + uses BS+AD dual-date
+   * formatting + tenant-customized branding — none of which the raster
+   * approach could produce. Print button below stays through C.5 as a
+   * fallback for users on browsers that block large blob downloads.
+   *
+   * Bails out (without erroring) when `activeSchoolId` is not yet
+   * resolved — the shell context may not have loaded yet on cold-mount;
+   * the user can click again once it has.
+   */
+  const handleDownloadPdf = useCallback(() => {
+    if (!activeSchoolId || downloading) return
+    downloadReceipt.mutate({
+      paymentId: receipt.paymentId,
+      schoolId: activeSchoolId,
+      receiptNumber: receipt.receiptNumber,
+    })
+  }, [activeSchoolId, downloading, downloadReceipt, receipt.paymentId, receipt.receiptNumber])
 
   return (
     <div className="max-w-lg mx-auto">

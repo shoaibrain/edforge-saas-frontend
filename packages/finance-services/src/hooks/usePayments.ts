@@ -41,6 +41,7 @@ import {
   getDashboardSummary,
   exportInvoicesCsv,
   exportPaymentsCsv,
+  downloadReceiptPdf,
 } from '../services/payments.service'
 import { searchStudents } from '../services/students.service'
 
@@ -446,6 +447,62 @@ export function useExportPaymentsCsv() {
       throw error instanceof Error
         ? error
         : new Error('Failed to export payments CSV')
+    },
+  })
+}
+
+// ============================================================================
+// DOWNLOAD RECEIPT PDF (Sprint C.1.6 frontend — retires jspdf+html2canvas)
+// ============================================================================
+
+/**
+ * Download a payment receipt as a server-rendered PDF.
+ *
+ * Replaces the prior `jspdf+html2canvas` client-side raster approach in
+ * `PaymentReceipt.tsx`. The new server-rendered PDF (via
+ * `@aibrains/pdf-renderer` on the finance microservice — Sprint C.1.6
+ * backend PR #202) has selectable text + embedded Devanagari fonts +
+ * proper BS+AD dual-date rendering + tenant-customized branding,
+ * none of which the raster approach could produce.
+ *
+ * Mirrors `useExportInvoicesCsv` blob-anchor pattern: mutationFn fetches
+ * the Blob, onSuccess creates a temporary `<a download>` and clicks it,
+ * cleanup after 100ms. Print button on the receipt stays as a fallback
+ * through C.5.
+ *
+ * @example
+ *   const downloadReceipt = useDownloadReceiptPdf()
+ *   downloadReceipt.mutate({ paymentId: '...', schoolId: '...',
+ *                            receiptNumber: 'RCT-2026-001' })
+ */
+export function useDownloadReceiptPdf() {
+  return useMutation({
+    mutationFn: (vars: { paymentId: string; schoolId: string; receiptNumber?: string }) =>
+      downloadReceiptPdf(vars.paymentId, vars.schoolId),
+    onSuccess: (blob, vars) => {
+      const filename = `${vars.receiptNumber ?? `receipt-${vars.paymentId.slice(0, 8)}`}.pdf`
+      // Wrap explicitly with the application/pdf MIME so Safari + Edge
+      // honor the .pdf extension on save. The server already sends
+      // Content-Type: application/pdf but the Blob constructor here
+      // controls the client-side download MIME independent of network.
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' })
+      const url = URL.createObjectURL(pdfBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      // Same cleanup window as the CSV export hooks above.
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 100)
+    },
+    onError: (error) => {
+      throw error instanceof Error
+        ? error
+        : new Error('Failed to download receipt PDF')
     },
   })
 }

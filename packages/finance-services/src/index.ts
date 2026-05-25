@@ -100,6 +100,7 @@ export {
   useDashboardSummary,
   useExportInvoicesCsv,
   useExportPaymentsCsv,
+  useDownloadReceiptPdf,
   studentKeys,
   useSearchStudents,
   useEnrolledStudents,

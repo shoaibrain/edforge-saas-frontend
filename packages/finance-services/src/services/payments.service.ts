@@ -196,6 +196,57 @@ export async function exportPaymentsCsv(schoolId: string): Promise<Blob> {
 }
 
 // ============================================================================
+// RECEIPT PDF DOWNLOAD (Sprint C.1.6 frontend)
+// ============================================================================
+
+/**
+ * Download the payment receipt PDF as a Blob.
+ *
+ * Calls the backend endpoint shipped in Sprint C.1.6 (PR #202):
+ *   GET /finance/payments/{paymentId}/receipt/pdf?schoolId=<sid>
+ *
+ * Backend renders the receipt server-side via `@aibrains/pdf-renderer` —
+ * the returned PDF has selectable text + embedded fonts (Devanagari for
+ * PABSON tenants), unlike the prior jspdf+html2canvas client-side raster
+ * approach this replaces.
+ *
+ * The 5xx fallback chain lives entirely on the backend (graceful
+ * degradation to descriptor defaults when identity is mid-deploy); from
+ * the frontend's POV this is either a 200 + Blob or an error to surface.
+ */
+export async function downloadReceiptPdf(
+  paymentId: string,
+  schoolId: string,
+): Promise<Blob> {
+  try {
+    const response = await api.get(`/finance/payments/${paymentId}/receipt/pdf`, {
+      params: { schoolId },
+      responseType: 'blob',
+    })
+    if (!response.data || !(response.data instanceof Blob)) {
+      throw new Error('Server returned an invalid response for receipt PDF')
+    }
+    return response.data
+  } catch (error: any) {
+    // If the error response is a blob (server sent application/json error
+    // wrapped in blob), parse + surface the error message. Mirror of the
+    // exportInvoicesCsv error-handling pattern.
+    if (error?.response?.data instanceof Blob) {
+      const text = await error.response.data.text()
+      try {
+        const parsed = JSON.parse(text)
+        throw new Error(parsed.message || 'Failed to download receipt PDF')
+      } catch {
+        throw new Error(text || 'Failed to download receipt PDF')
+      }
+    }
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to download receipt PDF')
+  }
+}
+
+// ============================================================================
 // CONVENIENCE EXPORT
 // ============================================================================
 
@@ -211,4 +262,5 @@ export const paymentsService = {
   getDashboardSummary,
   exportInvoicesCsv,
   exportPaymentsCsv,
+  downloadReceiptPdf,
 }
