@@ -229,16 +229,27 @@ export async function downloadReceiptPdf(
     return response.data
   } catch (error: any) {
     // If the error response is a blob (server sent application/json error
-    // wrapped in blob), parse + surface the error message. Mirror of the
-    // exportInvoicesCsv error-handling pattern.
+    // wrapped in blob because we set responseType:'blob'), parse + surface
+    // the backend's `message` field.
+    //
+    // **Important:** the `throw` must happen OUTSIDE the JSON.parse try
+    // block — if it's inside, the surrounding `catch` swallows our thrown
+    // error and re-throws with the raw text, defeating the parse. This
+    // bug shape exists in the pre-existing exportInvoicesCsv +
+    // exportPaymentsCsv blocks above; intentionally NOT fixing those
+    // here per minimal-changes (separate cleanup PR). Fixing only this
+    // C.1.6 block which I authored.
     if (error?.response?.data instanceof Blob) {
       const text = await error.response.data.text()
+      let parsedMessage: string | undefined
       try {
         const parsed = JSON.parse(text)
-        throw new Error(parsed.message || 'Failed to download receipt PDF')
+        parsedMessage = parsed?.message
       } catch {
-        throw new Error(text || 'Failed to download receipt PDF')
+        // Not JSON — fall through with `parsedMessage` undefined so we
+        // use the raw text or the generic fallback below.
       }
+      throw new Error(parsedMessage || text || 'Failed to download receipt PDF')
     }
     throw error instanceof Error
       ? error

@@ -73,10 +73,15 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
           <button
             type="button"
             onClick={handleDownloadPdf}
-            disabled={downloading}
+            // Disable when actively downloading OR when the shell context
+            // hasn't resolved an active school yet (rare cold-mount path
+            // — without this guard, clicks would silently no-op in the
+            // handler because the API call needs `?schoolId=<sid>`).
+            disabled={downloading || !activeSchoolId}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
               border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))]
-              hover:bg-[rgb(var(--bg-tertiary))] transition-colors disabled:opacity-50"
+              hover:bg-[rgb(var(--bg-tertiary))] transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {downloading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
