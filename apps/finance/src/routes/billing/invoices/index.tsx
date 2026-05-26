@@ -291,7 +291,7 @@ export default function InvoicesPage() {
           return (
             <div className="flex items-center justify-end gap-1">
               <button
-                onClick={() => navigate({ to: `/invoices/${invoice.id}` as string })}
+                onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
                 className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                 title="View"
               >
@@ -381,7 +381,7 @@ export default function InvoicesPage() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => navigate({ to: '/invoices/bulk-generate' as string })}
+              onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80"
               style={{
                 background: 'var(--v2-bg-elevated)',

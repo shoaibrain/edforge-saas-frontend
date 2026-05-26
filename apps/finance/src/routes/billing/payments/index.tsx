@@ -519,7 +519,7 @@ function usePaymentColumns(
                   type="button"
                   onClick={() =>
                     navigate({
-                      to: '/payments/$paymentId/receipt' as string,
+                      to: '/payments/$paymentId/receipt',
                       params: { paymentId: payment.id },
                     })
                   }
@@ -687,7 +687,7 @@ export default function PaymentsPage() {
         actions={
           <button
             type="button"
-            onClick={() => navigate({ to: '/payments/record' as string })}
+            onClick={() => navigate({ to: '/payments/record' })}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
             style={{
               background: 'var(--v2-brand-primary)',
@@ -787,7 +787,7 @@ export default function PaymentsPage() {
           description: 'Payments will appear here once students start paying invoices.',
           action: {
             label: 'Record Manual Payment',
-            onClick: () => navigate({ to: '/payments/record' as string }),
+            onClick: () => navigate({ to: '/payments/record' }),
           },
         }}
         maxHeight="calc(100vh - 24rem)"

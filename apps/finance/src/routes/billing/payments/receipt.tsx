@@ -55,10 +55,10 @@ export default function FinanceReceiptPage() {
         </p>
         <button
           type="button"
-          onClick={() => navigate({ to: '/payments' as string })}
+          onClick={() => navigate({ to: '/payments' })}
           className="mt-4 px-4 py-2 rounded-lg text-sm font-medium bg-teal-600 text-white hover:bg-teal-700 transition-colors"
         >
-          {t('flow.returnToInvoices')}
+          {t('flow.returnToPayments')}
         </button>
       </div>
     )
@@ -68,7 +68,7 @@ export default function FinanceReceiptPage() {
     <div className="max-w-2xl mx-auto px-4 py-6">
       <PaymentReceipt
         receipt={receipt}
-        onBack={() => navigate({ to: '/payments' as string })}
+        onBack={() => navigate({ to: '/payments' })}
       />
     </div>
   )
