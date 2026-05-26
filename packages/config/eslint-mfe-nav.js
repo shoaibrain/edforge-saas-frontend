@@ -90,30 +90,66 @@ const MFE_NAV_MESSAGE = [
 ].join(' ')
 
 /**
- * Two selectors cover the common shapes:
- *   - String literal:   navigate({to: '/payments/abc/receipt'})
- *   - Template literal: navigate({to: `/payments/${id}/receipt`})
+ * Three selectors cover the common shapes:
+ *   A. String literal:   navigate({to: '/payments/abc/receipt'})
+ *   B. Template literal interpolated payment id:
+ *                        navigate({to: `/payments/${id}/receipt`})
+ *   C. Template literal under /settings or /home:
+ *                        navigate({to: `/settings/${section}`})
  *
- * The TemplateLiteral selector matches when the literal STARTS with a
- * shell route fragment. `quasis.0.value.raw` is the first chunk before
- * any `${}`. For interpolated paths like `/payments/${id}/receipt`,
- * the raw first chunk is `/payments/`; we still want to flag this, so
- * we match the path-prefix loosely (no end-anchor) for TemplateLiteral.
- * Same-segment-discrimination as the Literal case is impossible at
- * lint time because the `${id}` value is unknown — but the very
- * specific `/payments/.../receipt` shape makes false positives
- * essentially impossible.
+ * For TemplateLiteral nodes, `quasis.0.value.raw` is the first chunk
+ * before any `${}`. For `/payments/${id}/receipt` it is `/payments/`;
+ * for `/payments/${id}` it is ALSO `/payments/`. A naive prefix match
+ * on the first quasi would false-positive on the latter (which is
+ * finance-MFE-owned, NOT a shell route).
+ *
+ * Selector B inspects BOTH quasis: requires the first to be exactly
+ * `/payments/` AND the second to start with `/receipt`. That uniquely
+ * identifies the shell receipt shape — interpolated payment-detail
+ * routes like `/payments/${id}` (no second quasi) and arbitrary
+ * extensions like `/payments/${id}/refund` are NOT flagged.
+ *
+ * Selector C keeps the simple first-quasi prefix match for /settings
+ * and /home because no MFE owns those roots — anything starting with
+ * those prefixes from inside an MFE is a real bug.
+ *
+ * Cases this DOES NOT catch (deliberately):
+ *   - `/payments/abc/receipt` as a TemplateLiteral with no expressions
+ *     (quasis.0.value.raw === '/payments/abc/receipt'). Pure literal
+ *     paths should be String literals; if a dev wraps one in
+ *     backticks for no reason, the runtime 404 boundary surfaces it.
+ *   - Templates that build the prefix dynamically:
+ *     `${base}/payments/${id}/receipt`. Lint can't statically resolve
+ *     ${base}; code review + the M0.5 boundary catch this.
  */
-const TEMPLATE_PREFIX_REGEX = `^\\/(payments\\/$|settings(\\/|$)|home(\\/|$))`
+// Exact-string equality in esquery uses literal quoted values — no
+// regex escaping needed for the first-quasi check below. The
+// second-quasi check uses a regex; backslashes in regex syntax are
+// doubled because we're embedding the regex inside a JS string.
+const PAYMENTS_FIRST_QUASI_VALUE = '/payments/'
+const RECEIPT_SECOND_QUASI_REGEX = '^\\/receipt(\\/|$)'
+const SETTINGS_HOME_PREFIX_REGEX = '^\\/(settings|home)(\\/|$)'
 
 const restrictedSyntaxRule = [
   'error',
+  // A. String literal — full path is known, anchored regex.
   {
     selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > Literal[value=/${SHELL_ROUTE_REGEX}/]`,
     message: MFE_NAV_MESSAGE,
   },
+  // B. Template literal: `/payments/${id}/receipt[...]` — requires
+  //    BOTH quasis to match. The first quasi must be EXACTLY
+  //    "/payments/" (string equality); the second must START with
+  //    "/receipt" (regex). So `/payments/${id}` alone — which has
+  //    no second quasi — is NOT flagged.
   {
-    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/${TEMPLATE_PREFIX_REGEX}/]`,
+    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw='${PAYMENTS_FIRST_QUASI_VALUE}'][quasis.1.value.raw=/${RECEIPT_SECOND_QUASI_REGEX}/]`,
+    message: MFE_NAV_MESSAGE,
+  },
+  // C. Template literal: `/settings/...` or `/home/...` — first-quasi
+  //    prefix is sufficient because no MFE owns these roots.
+  {
+    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/${SETTINGS_HOME_PREFIX_REGEX}/]`,
     message: MFE_NAV_MESSAGE,
   },
 ]
