@@ -24,6 +24,7 @@ import {
   getStudentLedger,
   bulkGenerateInvoices,
   bulkIssueInvoices,
+  downloadInvoicePdf,
 } from '../services/invoices.service'
 import type {
   BulkGenerateInvoiceDto,
@@ -503,6 +504,62 @@ export function useDownloadReceiptPdf() {
       throw error instanceof Error
         ? error
         : new Error('Failed to download receipt PDF')
+    },
+  })
+}
+
+// ============================================================================
+// DOWNLOAD INVOICE PDF (Sprint M1.4 — frontend half of C.1.5)
+// ============================================================================
+
+/**
+ * Download an issued invoice as a server-rendered PDF.
+ *
+ * Symmetric to `useDownloadReceiptPdf`. Server endpoint is C.1.5
+ * (live in prod 2026-05-26). The PDF has selectable text + embedded
+ * Devanagari fonts + BS+AD dual-date rendering + tenant-customized
+ * branding — none of which the legacy `window.print()` fallback
+ * (still mounted as Print button) produces.
+ *
+ * Filename defaults to the invoice number when supplied
+ * (`INV-2026-001.pdf`), falling back to the first 8 chars of the
+ * invoiceId so two PDFs from the same browser session don't collide
+ * in the user's downloads folder.
+ *
+ * @example
+ *   const downloadInvoice = useDownloadInvoicePdf()
+ *   downloadInvoice.mutate({ schoolId: '...', invoiceId: '...',
+ *                            invoiceNumber: 'INV-2026-001' })
+ */
+export function useDownloadInvoicePdf() {
+  return useMutation({
+    mutationFn: (vars: { schoolId: string; invoiceId: string; invoiceNumber?: string }) =>
+      downloadInvoicePdf(vars.schoolId, vars.invoiceId),
+    onSuccess: (blob, vars) => {
+      const filename = `${vars.invoiceNumber ?? `invoice-${vars.invoiceId.slice(0, 8)}`}.pdf`
+      // Wrap with explicit application/pdf MIME so Safari + Edge honor
+      // the .pdf extension on save — same reasoning as the receipt
+      // hook above.
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' })
+      const url = URL.createObjectURL(pdfBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      // Mirror the receipt hook's cleanup window. Revoking immediately
+      // races Safari's download-initiation; 100ms is the documented
+      // safe window across browsers.
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 100)
+    },
+    onError: (error) => {
+      throw error instanceof Error
+        ? error
+        : new Error('Failed to download invoice PDF')
     },
   })
 }

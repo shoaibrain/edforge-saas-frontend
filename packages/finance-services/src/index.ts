@@ -102,6 +102,7 @@ export {
   useExportInvoicesCsv,
   useExportPaymentsCsv,
   useDownloadReceiptPdf,
+  useDownloadInvoicePdf,
   studentKeys,
   useSearchStudents,
   useEnrolledStudents,
