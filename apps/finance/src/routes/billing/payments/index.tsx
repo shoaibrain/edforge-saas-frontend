@@ -418,6 +418,10 @@ function usePaymentColumns(
   formatAmount: (amount: number, opts?: { decimals?: number }) => string,
 ): ColumnDef<Payment, unknown>[] {
   const colSettings = useFinanceSettings()
+  // Sprint C.1.7 — `navigate` is needed inside the actions cell so the
+  // View Receipt button can route into the SPA's receipt page instead of
+  // opening the raw JSON API URL in a new tab.
+  const navigate = useNavigate()
   return useMemo(
     () => [
       {
@@ -501,17 +505,26 @@ function usePaymentColumns(
           const payment = row.original
           return (
             <div className="flex items-center justify-end gap-1">
-              {/* View receipt */}
+              {/* View receipt — Sprint C.1.7 fix.
+                  Pre-C.1.7 this was an `<a href="/api/.../receipt" target="_blank">`
+                  pointing at the raw JSON API endpoint. Browser top-level
+                  navigation strips the Cognito bearer token (api-client only
+                  attaches it to XHRs), so the link opened a new tab with
+                  `{"message":"Unauthorized"}` from JwtAuthGuard. Mirrors the
+                  Invoice list's correct pattern at
+                  apps/finance/src/routes/billing/invoices/index.tsx:241-247 —
+                  navigate inside the SPA to the receipt page (which then
+                  fetches with proper auth + renders the C.1.6 Download PDF +
+                  Print buttons). */}
               {payment.receiptNumber && (
-                <a
-                  href={`/api/finance/payments/${payment.id}/receipt`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: `/payments/${payment.id}/receipt` as string })}
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                   title="View Receipt"
                 >
                   <Eye className="w-4 h-4" />
-                </a>
+                </button>
               )}
               {/* Void (for completed only) */}
               {payment.status === 'completed' && (
@@ -540,7 +553,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate],
   )
 }
 
