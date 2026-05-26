@@ -14,7 +14,7 @@
  *   live in the consumer MFE for now.
  */
 
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { receiptHref, viewDocument } from '@edforge/finance-services'
 
 describe('receiptHref', () => {
@@ -61,6 +61,13 @@ describe('viewDocument', () => {
       configurable: true,
       value: {
         ...originalLocation,
+        // Location properties are prototype getters in jsdom/happy-dom —
+        // spread copies own props only, so we re-expose `origin`
+        // explicitly. The new same-origin guard in viewDocument reads
+        // it to resolve the target URL.
+        get origin() {
+          return originalLocation.origin
+        },
         get href() {
           return originalLocation.href
         },
@@ -83,5 +90,79 @@ describe('viewDocument', () => {
       value: undefined,
     })
     expect(() => viewDocument('/payments/abc/receipt')).not.toThrow()
+  })
+
+  // ----- same-origin guard (open-redirect protection) -----
+
+  /**
+   * Wraps each rejection case in a tiny helper: stub `window.location`
+   * with a writable `href`, call `viewDocument(unsafeHref)`, and assert
+   * the setter was never invoked. A `console.warn` spy confirms the
+   * helper surfaces the bug instead of silently dropping.
+   */
+  const expectRefused = (unsafeHref: string) => {
+    let nextHref: string | null = null
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        ...originalLocation,
+        get origin() {
+          return originalLocation.origin
+        },
+        get href() {
+          return originalLocation.href
+        },
+        set href(value: string) {
+          nextHref = value
+        },
+      },
+    })
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      viewDocument(unsafeHref)
+      expect(nextHref).toBeNull()
+      expect(warnSpy).toHaveBeenCalled()
+      expect(warnSpy.mock.calls[0]?.[0]).toMatch(/Refusing to navigate/)
+    } finally {
+      warnSpy.mockRestore()
+    }
+  }
+
+  it('refuses protocol-relative URLs (//evil.com/path)', () => {
+    expectRefused('//evil.com/path')
+  })
+
+  it('refuses cross-origin absolute URLs', () => {
+    expectRefused('https://evil.com/path')
+  })
+
+  it('refuses javascript: URIs', () => {
+    expectRefused('javascript:alert(1)')
+  })
+
+  it('refuses data: URIs', () => {
+    expectRefused('data:text/html,<script>alert(1)</script>')
+  })
+
+  it('allows same-origin absolute URLs', () => {
+    let nextHref: string | null = null
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        ...originalLocation,
+        get origin() {
+          return originalLocation.origin
+        },
+        get href() {
+          return originalLocation.href
+        },
+        set href(value: string) {
+          nextHref = value
+        },
+      },
+    })
+    const safeAbsolute = `${originalLocation.origin}/payments/abc/receipt`
+    viewDocument(safeAbsolute)
+    expect(nextHref).toBe(safeAbsolute)
   })
 })
