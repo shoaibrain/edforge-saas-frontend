@@ -90,12 +90,16 @@ const MFE_NAV_MESSAGE = [
 ].join(' ')
 
 /**
- * Three selectors cover the common shapes:
+ * Four selectors cover the common shapes:
  *   A. String literal:   navigate({to: '/payments/abc/receipt'})
  *   B. Template literal interpolated payment id:
  *                        navigate({to: `/payments/${id}/receipt`})
  *   C. Template literal under /settings or /home:
  *                        navigate({to: `/settings/${section}`})
+ *   D. Template literal with the receipt path baked into the first
+ *      quasi (no interpolation OR receipt path before any expression):
+ *                        navigate({to: `/payments/abc/receipt`})
+ *                        navigate({to: `/payments/abc/receipt/${x}`})
  *
  * For TemplateLiteral nodes, `quasis.0.value.raw` is the first chunk
  * before any `${}`. For `/payments/${id}/receipt` it is `/payments/`;
@@ -114,10 +118,6 @@ const MFE_NAV_MESSAGE = [
  * those prefixes from inside an MFE is a real bug.
  *
  * Cases this DOES NOT catch (deliberately):
- *   - `/payments/abc/receipt` as a TemplateLiteral with no expressions
- *     (quasis.0.value.raw === '/payments/abc/receipt'). Pure literal
- *     paths should be String literals; if a dev wraps one in
- *     backticks for no reason, the runtime 404 boundary surfaces it.
  *   - Templates that build the prefix dynamically:
  *     `${base}/payments/${id}/receipt`. Lint can't statically resolve
  *     ${base}; code review + the M0.5 boundary catch this.
@@ -150,6 +150,18 @@ const restrictedSyntaxRule = [
   //    prefix is sufficient because no MFE owns these roots.
   {
     selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/${SETTINGS_HOME_PREFIX_REGEX}/]`,
+    message: MFE_NAV_MESSAGE,
+  },
+  // D. Template literal with the full payments-receipt path baked into
+  //    the first quasi: matches `\`/payments/abc/receipt\`` (no
+  //    interpolation — sometimes wrapped in backticks unintentionally),
+  //    as well as multi-quasi templates whose first quasi already
+  //    contains the receipt path (e.g. `\`/payments/abc/receipt/${x}\``).
+  //    The anchored receipt regex requires a non-empty id segment,
+  //    so it does NOT overlap with Selector B (which targets
+  //    `\`/payments/${id}/receipt\`` — first quasi exactly "/payments/").
+  {
+    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/^\\/payments\\/[^\\/]+\\/receipt(\\/.*)?$/]`,
     message: MFE_NAV_MESSAGE,
   },
 ]
