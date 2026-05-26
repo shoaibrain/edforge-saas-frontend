@@ -1,0 +1,49 @@
+{
+  "page": {
+    "title": "Branding",
+    "subtitle": "Logo, colors, and document-letterhead identity for PDFs",
+    "subtitleForSchool": "Branding for {{schoolName}} — appears on invoices, receipts, and other PDF documents",
+    "backToSettings": "Settings"
+  },
+  "sections": {
+    "identity": "School Identity",
+    "contact": "Contact",
+    "colors": "Brand Colors",
+    "assets": "Assets"
+  },
+  "fields": {
+    "formalName": "Formal Name",
+    "tagline": "Tagline",
+    "panNumber": "PAN",
+    "vatNumber": "VAT Reg.",
+    "phone": "Phone",
+    "email": "Email",
+    "addressLines": "Address",
+    "primaryColor": "Primary",
+    "accentColor": "Accent",
+    "logo": "Logo",
+    "principalSignature": "Principal Signature",
+    "letterheadBackground": "Letterhead Background"
+  },
+  "emptyField": {
+    "colorPalette": "No color palette set",
+    "logo": "No logo uploaded",
+    "principalSignature": "No signature uploaded",
+    "letterheadBackground": "No letterhead uploaded"
+  },
+  "empty": {
+    "title": "No branding configured yet",
+    "description": "PDF documents will use default styling. Configure branding to add your school's logo, colors, and identity to receipts and invoices."
+  },
+  "forbidden": {
+    "title": "Permission required",
+    "description": "Branding settings are managed by Principals and Tenant Admins. Ask your administrator if you need access.",
+    "action": "Back to Settings"
+  },
+  "noActiveSchool": "Select a school to view its branding.",
+  "error": {
+    "failedToLoad": "Failed to load branding settings",
+    "retry": "Try again"
+  },
+  "versionLabel": "Branding version"
+}

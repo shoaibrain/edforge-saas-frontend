@@ -19,6 +19,15 @@ export type Action =
   | 'approve'
   | 'send'
   | 'export'
+  /**
+   * Sprint M2 (Branding read) — `configure` covers any settings-style
+   * customization action that isn't a CRUD primitive. Backend models
+   * branding update as a single PATCH, not as edit-of-records, so
+   * 'configure' is the semantic-correct verb (mirrors backend's
+   * `DEFAULT_ROLE_PERMISSIONS` map at
+   * server/.../identity/src/common/entities/role-assignment.entity.ts).
+   */
+  | 'configure'
 
 export type Resource =
   // Dashboard
@@ -83,6 +92,13 @@ export type Resource =
   | 'settings'
   | 'settings:school'
   | 'settings:tenant'
+  // PDF service surfaces (Sprint M2 onward)
+  /**
+   * School branding (logo, color palette, formal name, PAN/VAT, etc.)
+   * rendered onto every PDF document. Read by M2; written by M3.
+   * Backend gate: see `branding.controller.ts` `@RequirePermission`.
+   */
+  | 'branding'
   // Ed-Fi
   | 'edfi'
   | 'edfi:connections'
@@ -164,6 +180,11 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     settings: ['view', 'edit'],
     'settings:school': ['view', 'edit', 'manage'],
     'settings:tenant': ['view'],
+    // M2 Branding — Principal sees branding via the settings hub and
+    // may configure it for their own school. Mirrors backend grant on
+    // role-assignment.entity.ts. (TenantAdmin short-circuits via
+    // globalRole — no explicit row here.)
+    branding: ['view', 'configure'],
     edfi: ['view', 'manage'],
     'edfi:connections': ['view', 'create', 'edit', 'delete'],
     'edfi:mapping': ['view', 'edit'],

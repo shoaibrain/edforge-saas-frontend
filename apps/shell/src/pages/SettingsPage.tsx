@@ -13,6 +13,7 @@ import {
   CreditCard,
   User,
   Palette,
+  Paintbrush,
   Building2,
   Search,
   Settings,
@@ -79,6 +80,8 @@ function SettingsOverviewContent({
     { label: t('preferences.title'), icon: Palette, href: '/settings/preferences' },
     { label: t('organization.title'), icon: Building2, href: '/settings/organization' },
     { label: t('workspace.title'), icon: Settings, href: '/settings/workspace' },
+    // Sprint M2 — branding read; M3 will toggle the same page into edit
+    { label: t('branding.title', { defaultValue: 'Branding' }), icon: Paintbrush, href: '/settings/branding' },
     { label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures' },
     { label: 'Payment Gateways', icon: CreditCard, href: '/finance/configuration/payment-gateways' },
   ]
