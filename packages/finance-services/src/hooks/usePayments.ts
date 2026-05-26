@@ -536,7 +536,15 @@ export function useDownloadInvoicePdf() {
     mutationFn: (vars: { schoolId: string; invoiceId: string; invoiceNumber?: string }) =>
       downloadInvoicePdf(vars.schoolId, vars.invoiceId),
     onSuccess: (blob, vars) => {
-      const filename = `${vars.invoiceNumber ?? `invoice-${vars.invoiceId.slice(0, 8)}`}.pdf`
+      // Use `.trim() ||` (NOT `??`) so empty/whitespace invoiceNumber
+      // strings — which sometimes leak from optional form fields —
+      // fall back to the id-derived name instead of producing ".pdf".
+      // Optional-chain on invoiceId is defense against a `as any` cast
+      // bypassing the TS-required prop; `unknown` is a stable last
+      // resort so we never crash building the download filename.
+      const trimmedNumber = vars.invoiceNumber?.trim()
+      const idSlice = vars.invoiceId?.slice(0, 8) ?? 'unknown'
+      const filename = `${trimmedNumber || `invoice-${idSlice}`}.pdf`
       // Wrap with explicit application/pdf MIME so Safari + Edge honor
       // the .pdf extension on save — same reasoning as the receipt
       // hook above.
