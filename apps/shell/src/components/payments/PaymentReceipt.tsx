@@ -5,7 +5,7 @@
  * PAN/VAT tax breakdown, and print-friendly layout.
  */
 
-import { useCallback, useRef } from 'react'
+import { useCallback } from 'react'
 import type { Receipt } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
@@ -24,11 +24,6 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
   const settings = useSettings()
   const { format } = useCurrency(settings)
   const fmt = (amount: number) => format(amount)
-  // receiptRef is retained on the receipt card below; it's no longer used
-  // for PDF capture (we render server-side now) but keeping the ref hook
-  // would let a future "print-this-section" feature target the same node
-  // without re-wiring. Removed in V1.5 if still unused.
-  const receiptRef = useRef<HTMLDivElement>(null)
   const { activeSchoolId } = useActiveSchool()
   const downloadReceipt = useDownloadReceiptPdf()
   const downloading = downloadReceipt.isPending
@@ -104,7 +99,7 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
       </div>
 
       {/* Receipt card */}
-      <div ref={receiptRef} className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-black">
+      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-black">
         {/* Success header */}
         <div className="text-center mb-6 pb-6 border-b border-[rgb(var(--border-primary))] border-dashed">
           <div className="inline-flex p-3 rounded-full bg-emerald-100 dark:bg-emerald-500/10 mb-3 print:hidden">
