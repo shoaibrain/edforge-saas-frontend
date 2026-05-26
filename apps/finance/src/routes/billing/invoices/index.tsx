@@ -25,6 +25,7 @@ import {
   Check,
   X,
   Eye,
+  Download,
   Users,
   Send,
   Clock,
@@ -35,6 +36,7 @@ import {
 } from 'lucide-react'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoices,
@@ -42,6 +44,7 @@ import {
   useIssueInvoice,
   useCancelInvoice,
   useBulkIssueInvoices,
+  useDownloadInvoicePdf,
   useFeeStructures,
   useAcademicYears,
 } from '@edforge/finance-services'
@@ -66,6 +69,53 @@ function getOverdueDays(dueDate: string | undefined): number {
   const now = new Date()
   const diffMs = now.getTime() - due.getTime()
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
+}
+
+/**
+ * Per-row Download PDF icon button (M1.6).
+ *
+ * Lives as its own component (not inline JSX) so each row gets its OWN
+ * `useDownloadInvoicePdf` hook instance — `mutation.isPending` is then
+ * naturally scoped per-row. Inline JSX with a single hoisted mutation
+ * would make clicking row N's button disable EVERY row's button.
+ *
+ * Style mirrors the surrounding View/Issue/Cancel icon buttons so the
+ * actions column reads as a coherent group.
+ */
+function InvoiceDownloadIconButton({
+  schoolId,
+  invoiceId,
+  invoiceNumber,
+}: {
+  schoolId: string
+  invoiceId: string
+  invoiceNumber?: string | null
+}) {
+  const downloadInvoice = useDownloadInvoicePdf()
+  const { t } = useTranslation('payments')
+  const label = t('actions.downloadPdf')
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        downloadInvoice.mutate({
+          schoolId,
+          invoiceId,
+          invoiceNumber: invoiceNumber ?? undefined,
+        })
+      }
+      disabled={downloadInvoice.isPending}
+      className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
+      title={label}
+      aria-label={label}
+    >
+      {downloadInvoice.isPending ? (
+        <Loader2 className="w-4 h-4 animate-spin" data-testid={`invoice-download-spinner-${invoiceId}`} />
+      ) : (
+        <Download className="w-4 h-4" data-testid={`invoice-download-icon-${invoiceId}`} />
+      )}
+    </button>
+  )
 }
 
 export default function InvoicesPage() {
@@ -233,7 +283,9 @@ export default function InvoicesPage() {
         enableSorting: true,
       },
       createActionsColumn<Invoice>({
-        size: 120,
+        // Bumped from 120 → 150 to fit the new Download button (M1.6)
+        // alongside View / Issue / Cancel without wrapping.
+        size: 150,
         cell: ({ row }) => {
           const invoice = row.original
           return (
@@ -245,6 +297,21 @@ export default function InvoicesPage() {
               >
                 <Eye className="w-4 h-4" />
               </button>
+              {/*
+                M1.6 — Download PDF per-row action. Always rendered
+                (draft invoices download fine — operators sometimes
+                send drafts as quotes). Schools without an active
+                schoolId hit the same disabled state as the rest of
+                the table because `useInvoices` wouldn't have data
+                either, so the cell never renders without one.
+              */}
+              {schoolId && (
+                <InvoiceDownloadIconButton
+                  schoolId={schoolId}
+                  invoiceId={invoice.id}
+                  invoiceNumber={invoice.invoiceNumber}
+                />
+              )}
               {invoice.status === 'draft' && (
                 <>
                   <button
