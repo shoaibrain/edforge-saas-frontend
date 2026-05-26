@@ -25,6 +25,7 @@
  * (`docs/pilot-greenlight/pdf-service-mfe-integration-plan.md` §2).
  */
 
+import { useEffect } from 'react'
 import { AlertTriangle, Home } from 'lucide-react'
 
 export interface MfeNotFoundBoundaryProps {
@@ -43,14 +44,17 @@ export function MfeNotFoundBoundary({ mfe }: MfeNotFoundBoundaryProps) {
   const attemptedPath =
     typeof window !== 'undefined' ? window.location.pathname : '<unknown>'
 
-  // Fire the warn at render time. React strict-mode in dev will fire it
-  // twice — that's OK, the message is identifiable + idempotent.
-  if (typeof console !== 'undefined' && typeof console.warn === 'function') {
-    console.warn(
-      `[MfeNotFoundBoundary] No route matched in MFE "${mfe}" for path "${attemptedPath}". ` +
-        `This usually means a cross-MFE navigation used the local router's basepath when it should have used window.location.href.`,
-    )
-  }
+  // Fire the warn in an effect so render stays pure. React strict-mode
+  // in dev will run effects once per (mfe, attemptedPath) tuple change;
+  // the message is identifiable so duplicate fires in dev are harmless.
+  useEffect(() => {
+    if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+      console.warn(
+        `[MfeNotFoundBoundary] No route matched in MFE "${mfe}" for path "${attemptedPath}". ` +
+          `This usually means a cross-MFE navigation used the local router's basepath when it should have used window.location.href.`,
+      )
+    }
+  }, [mfe, attemptedPath])
 
   const goHome = () => {
     if (typeof window !== 'undefined') {
