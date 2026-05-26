@@ -23,5 +23,12 @@
   "developerInfo": "विकासकर्ता जानकारी",
   "tryAgain": "पुन: प्रयास गर्नुहोस्",
   "goHome": "गृहपृष्ठमा जानुहोस्",
-  "goBack": "पछाडि जानुहोस्"
+  "goBack": "पछाडि जानुहोस्",
+  "pdf": {
+    "downloadFailed": "PDF डाउनलोड गर्न सकिएन",
+    "invoiceDownloadFailed": "बिल PDF डाउनलोड गर्न सकिएन",
+    "receiptDownloadFailed": "रसिद PDF डाउनलोड गर्न सकिएन",
+    "reportCardDownloadFailed": "रिजल्ट कार्ड PDF डाउनलोड गर्न सकिएन",
+    "admitCardDownloadFailed": "प्रवेश पत्र PDF डाउनलोड गर्न सकिएन"
+  }
 }

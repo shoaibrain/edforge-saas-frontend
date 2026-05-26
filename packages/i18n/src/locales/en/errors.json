@@ -23,5 +23,12 @@
   "developerInfo": "Developer Info",
   "tryAgain": "Try again",
   "goHome": "Go Home",
-  "goBack": "Go Back"
+  "goBack": "Go Back",
+  "pdf": {
+    "downloadFailed": "Couldn't download the PDF",
+    "invoiceDownloadFailed": "Couldn't download invoice PDF",
+    "receiptDownloadFailed": "Couldn't download receipt PDF",
+    "reportCardDownloadFailed": "Couldn't download report card PDF",
+    "admitCardDownloadFailed": "Couldn't download admit card PDF"
+  }
 }

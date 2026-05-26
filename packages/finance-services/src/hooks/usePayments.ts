@@ -45,6 +45,7 @@ import {
   downloadReceiptPdf,
 } from '../services/payments.service'
 import { searchStudents } from '../services/students.service'
+import { usePdfErrorToast } from './usePdfErrorToast'
 
 // ============================================================================
 // QUERY KEY FACTORY
@@ -477,6 +478,11 @@ export function useExportPaymentsCsv() {
  *                            receiptNumber: 'RCT-2026-001' })
  */
 export function useDownloadReceiptPdf() {
+  // M1.11 — surface a canonical localized toast on failure so the
+  // PaymentReceipt download button stops silently no-op'ing on 4xx/5xx.
+  // The hook still re-throws so callers can attach their own onError
+  // handling if they want; the toast is purely additive.
+  const showPdfError = usePdfErrorToast()
   return useMutation({
     mutationFn: (vars: { paymentId: string; schoolId: string; receiptNumber?: string }) =>
       downloadReceiptPdf(vars.paymentId, vars.schoolId),
@@ -501,6 +507,7 @@ export function useDownloadReceiptPdf() {
       }, 100)
     },
     onError: (error) => {
+      showPdfError(error, 'receipt')
       throw error instanceof Error
         ? error
         : new Error('Failed to download receipt PDF')
@@ -532,6 +539,8 @@ export function useDownloadReceiptPdf() {
  *                            invoiceNumber: 'INV-2026-001' })
  */
 export function useDownloadInvoicePdf() {
+  // M1.11 — same canonical toast as the receipt hook above.
+  const showPdfError = usePdfErrorToast()
   return useMutation({
     mutationFn: (vars: { schoolId: string; invoiceId: string; invoiceNumber?: string }) =>
       downloadInvoicePdf(vars.schoolId, vars.invoiceId),
@@ -557,6 +566,7 @@ export function useDownloadInvoicePdf() {
       }, 100)
     },
     onError: (error) => {
+      showPdfError(error, 'invoice')
       throw error instanceof Error
         ? error
         : new Error('Failed to download invoice PDF')
