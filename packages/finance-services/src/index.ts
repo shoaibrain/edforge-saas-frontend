@@ -118,3 +118,6 @@ export {
   useAcademicYears,
   useCurrentAcademicYear,
 } from './hooks/useAcademicYears'
+
+// Cross-MFE navigation helpers (M1.1)
+export { viewDocument, receiptHref } from './utils/navigation'
