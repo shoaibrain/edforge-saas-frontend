@@ -12,6 +12,7 @@ import {
     redirect,
     Outlet,
 } from '@tanstack/react-router'
+import { MfeNotFoundBoundary } from '@edforge/ui'
 import { FinanceLayout } from './layouts/FinanceLayout'
 import { Overview } from './routes/overview'
 import InvoicesPage from './routes/billing/invoices/index'
@@ -169,7 +170,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
     routeTree,
     basepath: '/finance', // IMPORTANT: Matches Shell mount point
-    defaultNotFoundComponent: () => null, // Shell handles 404 UI
+    defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="finance" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 })
 
 declare module '@tanstack/react-router' {

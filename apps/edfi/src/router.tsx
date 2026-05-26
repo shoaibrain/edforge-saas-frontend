@@ -11,6 +11,7 @@ import {
   createRootRoute,
   Outlet,
 } from '@tanstack/react-router'
+import { MfeNotFoundBoundary } from '@edforge/ui'
 import { EdFiLayout } from './layouts/EdFiLayout'
 import { SyncDashboard } from './components/sync/SyncDashboard'
 import { ConnectionWizard } from './components/connection/ConnectionWizard'
@@ -79,7 +80,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
   routeTree,
   basepath: '/edfi',
-  defaultNotFoundComponent: () => null, // Shell handles 404 UI
+  defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="edfi" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 })
 
 declare module '@tanstack/react-router' {

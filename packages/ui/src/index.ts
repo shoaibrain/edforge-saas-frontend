@@ -158,3 +158,9 @@ export {
 // Hooks
 export { useFocusTrap } from './hooks/useFocusTrap'
 
+// MFE infrastructure
+export {
+  MfeNotFoundBoundary,
+  type MfeNotFoundBoundaryProps,
+} from './components/MfeNotFoundBoundary'
+
