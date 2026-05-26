@@ -121,8 +121,10 @@ export {
   useCurrentAcademicYear,
 } from './hooks/useAcademicYears'
 
-// Cross-MFE navigation helpers (M1.1)
-export { viewDocument, receiptHref } from './utils/navigation'
+// M1.1 cross-MFE navigation helpers (viewDocument + receiptHref)
+// retired in M1.5-FU.6 — the receipt page moved into Finance MFE so
+// the cross-MFE shim has no consumers. Re-export removed; the
+// helpers' source file is deleted.
 
 // PDF error-toast helper (M1.11)
 export { usePdfErrorToast, type PdfDocType } from './hooks/usePdfErrorToast'
