@@ -44,6 +44,7 @@ import type { Payment } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
+import { canShowReceiptActions } from '../../../utils/can-show-receipt-actions'
 import {
   FinancePageHeader,
   FinanceStatusChip,
@@ -487,6 +488,11 @@ function usePaymentColumns(
   // button only when schoolId is set, mirroring the rest of the
   // Payments page (queries are gated on schoolId too).
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+  // M1.5-FU.7.5 — i18n for the View Receipt icon button's title +
+  // aria-label (was hardcoded English). Aligns the 4 actions-column
+  // icon buttons on a consistent localized-tooltip pattern.
+  const { t: tPayments } = useTranslation('payments')
+  const viewReceiptLabel = tPayments('actions.viewReceipt')
   return useMemo(
     () => [
       {
@@ -570,8 +576,11 @@ function usePaymentColumns(
           const payment = row.original
           return (
             <div className="flex items-center justify-end gap-1">
-              {/* View receipt */}
-              {payment.receiptNumber && (
+              {/* View receipt — gated on completed status (M1.5-FU.7.2,
+                  closes Issue #19). See `canShowReceiptActions` above
+                  for the why; the same predicate gates the per-row
+                  Download button below. */}
+              {canShowReceiptActions(payment) && (
                 // M1.5-FU.3 — in-MFE navigate now that the receipt page
                 // lives at `/payments/$paymentId/receipt` inside Finance
                 // MFE (M1.5-FU.2). Resolves through Finance's
@@ -589,20 +598,22 @@ function usePaymentColumns(
                     })
                   }
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
-                  title="View Receipt"
-                  aria-label="View receipt"
+                  title={viewReceiptLabel}
+                  aria-label={viewReceiptLabel}
                 >
                   <Eye className="w-4 h-4" />
                 </button>
               )}
               {/*
                 M1.5-FU.4 — per-row Download PDF action. Symmetric to
-                M1.6 on the Invoice list. Only rendered when both
-                schoolId is resolved AND the row has a receipt
-                (completed payments). The hook is per-row-isolated
-                so clicking row N doesn't disable rows ≠ N.
+                M1.6 on the Invoice list. Gated by `canShowReceiptActions`
+                AND `activeSchoolId` — same predicate as the View button
+                above, plus the activeSchoolId requirement (the rest of
+                the page also gates queries on it). The hook is
+                per-row-isolated so clicking row N doesn't disable
+                rows ≠ N.
               */}
-              {activeSchoolId && payment.receiptNumber && (
+              {activeSchoolId && canShowReceiptActions(payment) && (
                 <ReceiptDownloadIconButton
                   schoolId={activeSchoolId}
                   paymentId={payment.id}
@@ -636,7 +647,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId, viewReceiptLabel],
   )
 }
 

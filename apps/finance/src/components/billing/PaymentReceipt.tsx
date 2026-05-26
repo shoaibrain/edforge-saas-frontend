@@ -30,7 +30,7 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
 import { useDownloadReceiptPdf } from '@edforge/finance-services'
-import { CheckCircle2, Printer, ArrowLeft, Download, Loader2 } from 'lucide-react'
+import { CheckCircle2, ArrowLeft, Download, Loader2 } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
@@ -79,6 +79,22 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
           </button>
         )}
         <div className="flex gap-2 ml-auto">
+          {/*
+            M1.5-FU.7.4 — Print Receipt button removed (closes Issue #21).
+            The previous `window.print()` button rendered the live HTML
+            page through the browser print pipeline — sidebar, header,
+            breadcrumb and all — producing chrome-included output that
+            mismatched the polished PABSON-branded server PDF this same
+            button row's Download produces. Two divergent outputs for
+            the same intent. Operators wanting paper can Download →
+            open the PDF → OS Cmd-P; one canonical print path.
+
+            The `receipt.print` i18n key is intentionally retained in
+            `payments.json` because the parallel shell-side
+            `PaymentReceipt.tsx` (parent-portal flows) still references
+            it. The two copies will converge when parent portal moves
+            into its own MFE (V1.5+).
+          */}
           <button
             type="button"
             onClick={handleDownloadPdf}
@@ -94,16 +110,6 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
               <Download className="w-3.5 h-3.5" />
             )}
             {downloading ? t('receipt.generating') : t('receipt.download')}
-          </button>
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-              border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))]
-              hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            {t('receipt.print')}
           </button>
         </div>
       </div>

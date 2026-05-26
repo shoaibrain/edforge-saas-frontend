@@ -177,6 +177,16 @@ interface BreadcrumbItem {
   isDynamic: boolean
   isNonNavigable: boolean
   routeId?: string
+  /**
+   * False when no route in the current match chain has this exact pathname,
+   * meaning the segment can't be navigated to as a standalone page even
+   * though it shows up in the URL — typically a dynamic param mid-path
+   * (e.g. the `<paymentId>` in `/finance/payments/<id>/receipt` where the
+   * route is registered as `/payments/$paymentId/receipt`, with no
+   * intermediate `/payments/$paymentId` page). Rendering it as a `<Link>`
+   * triggers `MfeNotFoundBoundary` on click — see Sprint M1.5-FU.7.1.
+   */
+  isNavigable: boolean
 }
 
 // ============================================================================
@@ -262,6 +272,7 @@ export function Breadcrumbs() {
         isDynamic,
         isNonNavigable,
         routeId: matchingRoute?.routeId,
+        isNavigable: !!matchingRoute,
       }
     })
 
@@ -274,6 +285,7 @@ export function Breadcrumbs() {
         isCurrentPage: false,
         isDynamic: false,
         isNonNavigable: false,
+        isNavigable: true,
       },
       ...items,
     ]
@@ -308,8 +320,17 @@ export function Breadcrumbs() {
                 />
               )}
 
-              {/* Breadcrumb item */}
-              {crumb.isCurrentPage || crumb.isNonNavigable ? (
+              {/* Breadcrumb item — render as span when:
+                  - this is the current page,
+                  - the segment is in NON_NAVIGABLE_SEGMENTS, OR
+                  - no route in the current match chain has this exact
+                    pathname (typically a dynamic param mid-path with no
+                    own-page route — e.g. `<paymentId>` in
+                    `/finance/payments/<id>/receipt`). Without this guard
+                    the breadcrumb auto-generates a `<Link>` to a path
+                    that doesn't resolve, triggering MfeNotFoundBoundary
+                    on click. Sprint M1.5-FU.7.1 (closes Issue #18). */}
+              {crumb.isCurrentPage || crumb.isNonNavigable || !crumb.isNavigable ? (
                 <span
                   className={cn(
                     crumb.isCurrentPage
