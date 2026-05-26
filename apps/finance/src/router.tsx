@@ -20,6 +20,7 @@ import InvoiceDetailPage from './routes/billing/invoices/$invoiceId'
 import BulkInvoicesPage from './routes/billing/invoices/bulk-generate'
 import PaymentsPage from './routes/billing/payments/index'
 import RecordPaymentPage from './routes/billing/payments/record'
+import FinanceReceiptPage from './routes/billing/payments/receipt'
 import StudentAccountsPage from './routes/billing/accounts/index'
 import FeeStructuresPage from './routes/configuration/fee-structures'
 import PaymentGatewaysPage from './routes/configuration/payment-gateways'
@@ -80,6 +81,13 @@ const recordPaymentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/payments/record',
     component: RecordPaymentPage,
+})
+
+// Receipt Detail (M1.5-FU.2 — moved from shell)
+const receiptRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/payments/$paymentId/receipt',
+    component: FinanceReceiptPage,
 })
 
 // Student Accounts
@@ -153,6 +161,7 @@ const routeTree = rootRoute.addChildren([
     invoiceDetailRoute,
     paymentsRoute,
     recordPaymentRoute,
+    receiptRoute,
     accountsRoute,
     feeStructuresRoute,
     paymentGatewaysRoute,
