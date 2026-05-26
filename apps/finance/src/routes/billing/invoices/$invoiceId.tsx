@@ -9,14 +9,16 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
-import { ArrowLeft, Check, X, Loader2, Printer, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Check, X, Loader2, Printer, Download, AlertTriangle } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoice,
   useIssueInvoice,
   useCancelInvoice,
   useInvoicePayments,
+  useDownloadInvoicePdf,
 } from '@edforge/finance-services'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
@@ -34,6 +36,8 @@ export default function InvoiceDetailPage() {
   const { data: payments } = useInvoicePayments(schoolId ?? '', invoiceId)
   const issueMutation = useIssueInvoice(schoolId ?? '')
   const cancelMutation = useCancelInvoice(schoolId ?? '')
+  const downloadInvoice = useDownloadInvoicePdf()
+  const { t } = useTranslation('payments')
 
   const [showCancelDialog, setShowCancelDialog] = useState(false)
 
@@ -95,6 +99,35 @@ export default function InvoiceDetailPage() {
 
         {/* Action buttons */}
         <div className="flex items-center gap-2 print:hidden">
+          {/*
+            M1.5 — Download PDF button. Uses the M1.4 hook which:
+              - fires `pdf_download_started/succeeded/failed` telemetry (M1.10)
+              - dispatches a localized error toast on failure (M1.11)
+            So this call site doesn't need its own error handling — the
+            hook owns the full UX. invoiceNumber is passed so the
+            download filename matches the on-screen invoice number
+            (falls back to `invoice-<8chars>.pdf` per the M1.4 followup).
+          */}
+          <Button
+            variant="outline"
+            onClick={() =>
+              schoolId &&
+              downloadInvoice.mutate({
+                schoolId,
+                invoiceId,
+                invoiceNumber: invoice.invoiceNumber,
+              })
+            }
+            disabled={downloadInvoice.isPending || !schoolId}
+            aria-label={t('actions.downloadPdf')}
+          >
+            {downloadInvoice.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+            ) : (
+              <Download className="w-4 h-4 mr-1.5" />
+            )}
+            {t('actions.downloadPdf')}
+          </Button>
           <Button variant="outline" onClick={() => window.print()}>
             <Printer className="w-4 h-4 mr-1.5" />
             Print
