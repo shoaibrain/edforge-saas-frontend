@@ -35,6 +35,8 @@ import {
   useVoidPayment,
   useCreateRefund,
   useExportPaymentsCsv,
+  viewDocument,
+  receiptHref,
 } from '@edforge/finance-services'
 import { formatGatewayLabel } from '@edforge/types'
 import type { Payment } from '@edforge/types'
@@ -503,15 +505,24 @@ function usePaymentColumns(
             <div className="flex items-center justify-end gap-1">
               {/* View receipt */}
               {payment.receiptNumber && (
-                <a
-                  href={`/api/finance/payments/${payment.id}/receipt`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                // M1.2 — fix View Receipt navigation.
+                // Previously this anchor pointed to the raw API endpoint
+                // (`/api/finance/payments/${id}/receipt`) and opened it
+                // in a new tab. Browser top-level navigation strips the
+                // Cognito Bearer (the api-client only attaches it to
+                // XHRs), so the new tab showed `{"message":"Unauthorized"}`
+                // from JwtAuthGuard. The shell route at
+                // `/payments/$paymentId/receipt` renders the proper
+                // PaymentReceipt with Download PDF + Print buttons.
+                <button
+                  type="button"
+                  onClick={() => viewDocument(receiptHref(payment.id))}
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                   title="View Receipt"
+                  aria-label="View receipt"
                 >
                   <Eye className="w-4 h-4" />
-                </a>
+                </button>
               )}
               {/* Void (for completed only) */}
               {payment.status === 'completed' && (
