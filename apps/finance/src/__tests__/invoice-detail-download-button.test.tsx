@@ -164,11 +164,13 @@ describe('Invoice detail Download PDF button (M1.5)', () => {
     expect(screen.queryByTestId('spinner')).not.toBeInTheDocument()
 
     // Click → mutation never resolves → button enters pending state.
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button'))
-      await Promise.resolve()
-    })
-    expect(screen.getByTestId('spinner')).toBeInTheDocument()
+    // `findByTestId` (= waitFor + getByTestId) polls until the
+    // re-render happens — `await Promise.resolve()` flushes only one
+    // microtask but React Query schedules the isPending update across
+    // more turns than that, so single-flush is not enough.
+    fireEvent.click(screen.getByRole('button'))
+    const spinner = await screen.findByTestId('spinner')
+    expect(spinner).toBeInTheDocument()
     expect(screen.queryByTestId('download-icon')).not.toBeInTheDocument()
     expect(screen.getByRole('button')).toBeDisabled()
   })
