@@ -218,7 +218,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
           <tr
             key={invoice.id}
             className="hover:bg-[rgb(var(--surface-primary))] cursor-pointer transition-colors"
-            onClick={() => navigate({ to: `/invoices/${invoice.id}` as string })}
+            onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
           >
             <td className="px-2 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400">
               {invoice.invoiceNumber}

@@ -75,7 +75,7 @@ export default function InvoiceDetailPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       {/* Back nav */}
       <button
-        onClick={() => navigate({ to: '/invoices' as string })}
+        onClick={() => navigate({ to: '/invoices' })}
         className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors print:hidden"
       >
         <ArrowLeft className="w-4 h-4" />

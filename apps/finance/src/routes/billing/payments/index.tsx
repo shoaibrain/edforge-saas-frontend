@@ -35,8 +35,6 @@ import {
   useVoidPayment,
   useCreateRefund,
   useExportPaymentsCsv,
-  viewDocument,
-  receiptHref,
 } from '@edforge/finance-services'
 import { formatGatewayLabel } from '@edforge/types'
 import type { Payment } from '@edforge/types'
@@ -420,6 +418,10 @@ function usePaymentColumns(
   formatAmount: (amount: number, opts?: { decimals?: number }) => string,
 ): ColumnDef<Payment, unknown>[] {
   const colSettings = useFinanceSettings()
+  // M1.5-FU.3 — used by the View Receipt eye-icon cell below to
+  // navigate in-MFE to /finance/payments/$paymentId/receipt instead
+  // of the prior cross-MFE viewDocument shim.
+  const navigate = useNavigate()
   return useMemo(
     () => [
       {
@@ -505,18 +507,22 @@ function usePaymentColumns(
             <div className="flex items-center justify-end gap-1">
               {/* View receipt */}
               {payment.receiptNumber && (
-                // M1.2 — fix View Receipt navigation.
-                // Previously this anchor pointed to the raw API endpoint
-                // (`/api/finance/payments/${id}/receipt`) and opened it
-                // in a new tab. Browser top-level navigation strips the
-                // Cognito Bearer (the api-client only attaches it to
-                // XHRs), so the new tab showed `{"message":"Unauthorized"}`
-                // from JwtAuthGuard. The shell route at
-                // `/payments/$paymentId/receipt` renders the proper
-                // PaymentReceipt with Download PDF + Print buttons.
+                // M1.5-FU.3 — in-MFE navigate now that the receipt page
+                // lives at `/payments/$paymentId/receipt` inside Finance
+                // MFE (M1.5-FU.2). Resolves through Finance's
+                // `basepath: '/finance'` to
+                // `/finance/payments/<id>/receipt` — no full-page reload,
+                // no cross-MFE shim. Previously used
+                // `viewDocument(receiptHref(...))` to jump to a shell-
+                // owned route; that shim retires in M1.5-FU.6.
                 <button
                   type="button"
-                  onClick={() => viewDocument(receiptHref(payment.id))}
+                  onClick={() =>
+                    navigate({
+                      to: '/payments/$paymentId/receipt',
+                      params: { paymentId: payment.id },
+                    })
+                  }
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
                   title="View Receipt"
                   aria-label="View receipt"
@@ -551,7 +557,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate],
   )
 }
 
@@ -681,7 +687,7 @@ export default function PaymentsPage() {
         actions={
           <button
             type="button"
-            onClick={() => navigate({ to: '/payments/record' as string })}
+            onClick={() => navigate({ to: '/payments/record' })}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
             style={{
               background: 'var(--v2-brand-primary)',
@@ -781,7 +787,7 @@ export default function PaymentsPage() {
           description: 'Payments will appear here once students start paying invoices.',
           action: {
             label: 'Record Manual Payment',
-            onClick: () => navigate({ to: '/payments/record' as string }),
+            onClick: () => navigate({ to: '/payments/record' }),
           },
         }}
         maxHeight="calc(100vh - 24rem)"

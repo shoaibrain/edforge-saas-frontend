@@ -32,7 +32,7 @@ export default function BulkInvoicesPage() {
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
-          onClick={() => navigate({ to: '/invoices' as string })}
+          onClick={() => navigate({ to: '/invoices' })}
           className="p-2"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -51,8 +51,8 @@ export default function BulkInvoicesPage() {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl p-6">
         <BulkInvoiceForm
           schoolId={schoolId}
-          onComplete={() => navigate({ to: '/invoices' as string })}
-          onCancel={() => navigate({ to: '/invoices' as string })}
+          onComplete={() => navigate({ to: '/invoices' })}
+          onCancel={() => navigate({ to: '/invoices' })}
         />
       </div>
     </div>
