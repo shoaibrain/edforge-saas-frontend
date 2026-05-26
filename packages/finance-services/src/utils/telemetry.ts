@@ -29,12 +29,21 @@ import type { PdfDocType } from '../hooks/usePdfErrorToast'
 
 /**
  * Shape of `window.va` as installed by `@vercel/analytics/react`'s
- * `<Analytics />` mount. Declared narrowly here so we don't pull in
- * the SDK's full ambient typings.
+ * `<Analytics />` mount. The `properties` parameter is intentionally
+ * `unknown` because that's how `@vercel/analytics` declares it
+ * ambiently — apps/shell imports the SDK, which adds its own
+ * `Window.va` declaration, and a narrower signature here would
+ * cause TS2717 ("Subsequent property declarations must have the
+ * same type") when shell typechecks the finance-services source
+ * via workspace resolution.
+ *
+ * The narrowness lives at the CALL SITES below instead (each
+ * `track*` helper passes a typed payload literal), so we keep
+ * payload-shape safety without conflicting with shell.
  */
 type VercelAnalyticsGlobal = (
   event: 'event' | 'beforeSend' | 'pageview',
-  properties?: Record<string, string | number | boolean | null | undefined>,
+  properties?: unknown,
 ) => void
 
 declare global {
