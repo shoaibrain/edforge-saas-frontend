@@ -8,7 +8,9 @@
     "build": "rsbuild build",
     "preview": "rsbuild preview",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@edforge/abac": "workspace:*",
@@ -37,8 +39,12 @@
     "@module-federation/rsbuild-plugin": "^0.8.0",
     "@rsbuild/core": "^1.1.0",
     "@rsbuild/plugin-react": "^1.1.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.6.0"
+    "happy-dom": "^15.11.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
   }
 }
