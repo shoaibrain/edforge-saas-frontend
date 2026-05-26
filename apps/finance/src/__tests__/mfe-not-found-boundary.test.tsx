@@ -50,12 +50,17 @@ describe('MfeNotFoundBoundary', () => {
     // exposes it as a normal object so we can spy on the setter via a
     // proxy. Simplest path: capture writes by overriding `href` with a
     // setter on a fresh property descriptor.
-    const originalHref = window.location.href
+    // Capture the actual Location object BEFORE replacing it — the
+    // `finally` block restores this exact reference, not a plain-object
+    // spread (which would leak into subsequent specs and lose Location
+    // prototype semantics like `assign`, `reload`, etc.).
+    const originalLocation = window.location
+    const originalHref = originalLocation.href
     let nextHref: string | null = null
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: {
-        ...window.location,
+        ...originalLocation,
         pathname: '/finance/wrong-route',
         // The component only reads `pathname` + writes `href`; this
         // stub keeps everything else intact while letting us assert.
@@ -74,10 +79,9 @@ describe('MfeNotFoundBoundary', () => {
       fireEvent.click(button)
       expect(nextHref).toBe('/')
     } finally {
-      // Restore the real location so subsequent specs aren't affected.
       Object.defineProperty(window, 'location', {
         configurable: true,
-        value: { ...window.location, href: originalHref },
+        value: originalLocation,
       })
     }
   })
