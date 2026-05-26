@@ -21,7 +21,11 @@
  */
 
 import { useCallback, useId } from 'react'
-import { Controller, useFormContext } from 'react-hook-form'
+// Use @edforge/forms re-exports to keep the dependency declaration honest:
+// apps/shell doesn't declare react-hook-form directly — only @edforge/forms
+// does. Importing through the package keeps the dependency graph traceable
+// and matches BrandingForm.tsx's import style. (PR #89 review-fix.)
+import { Controller, useFormContext } from '@edforge/forms'
 
 interface BrandingColorPickerProps {
   /** RHF field name (e.g. `colorPalette.primary`). Supports dot notation. */

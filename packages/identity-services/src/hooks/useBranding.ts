@@ -91,8 +91,21 @@ export function useUpdateBranding(
 ): UseMutationResult<BrandingResponse, Error, UpdateBrandingRequest> {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (body: UpdateBrandingRequest) =>
-      updateBranding(schoolId as string, body),
+    // Fail-fast when schoolId is undefined. Without this guard, the
+    // `schoolId as string` cast would let `updateBranding` issue a
+    // `PATCH /schools/undefined/branding` request — the server's
+    // routing would return 404 and the caller would see a confusing
+    // error after the round-trip. Surfacing the error synchronously
+    // (before any network call) keeps the failure mode honest +
+    // testable. PR #89 review-fix.
+    mutationFn: (body: UpdateBrandingRequest) => {
+      if (!schoolId) {
+        return Promise.reject(
+          new Error('useUpdateBranding: schoolId is required'),
+        )
+      }
+      return updateBranding(schoolId, body)
+    },
     onSuccess: (data) => {
       if (!schoolId) return
       queryClient.setQueryData(brandingKeys.school(schoolId), data)

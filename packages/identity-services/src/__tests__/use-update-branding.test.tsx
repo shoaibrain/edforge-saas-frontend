@@ -110,16 +110,21 @@ describe('useUpdateBranding (M3.1)', () => {
     expect(result.current.error).toBe(err)
   })
 
-  it('does NOT crash if schoolId is undefined (no-op invalidation)', async () => {
-    apiPatchMock.mockResolvedValueOnce(RESPONSE)
+  it('fails fast (no network call) when schoolId is undefined', async () => {
+    // PR #89 review-fix: pre-fix the hook's `schoolId as string` cast
+    // let undefined leak through to `PATCH /schools/undefined/branding`.
+    // Post-fix the mutationFn rejects synchronously before any network
+    // call. Test asserts BOTH parts of the contract:
+    //   1. apiPatch is never invoked (no malformed request reaches the wire)
+    //   2. the invalidation path is never reached (no cache mutation)
     const { Wrapper, invalidateSpy } = makeFixture()
     const { result } = renderHook(() => useUpdateBranding(undefined), { wrapper: Wrapper })
 
     result.current.mutate({ formalName: 'X' })
-    await waitFor(() => expect(result.current.isSuccess || result.current.isError).toBe(true))
+    await waitFor(() => expect(result.current.isError).toBe(true))
 
-    // Either it errored (apiPatch called with undefined path part — produces "/schools/undefined/branding")
-    // OR it succeeded. Either way, invalidate must NOT be called (the success guard checks !schoolId).
+    expect(apiPatchMock).not.toHaveBeenCalled()
     expect(invalidateSpy).not.toHaveBeenCalled()
+    expect(result.current.error?.message).toMatch(/schoolId is required/)
   })
 })
