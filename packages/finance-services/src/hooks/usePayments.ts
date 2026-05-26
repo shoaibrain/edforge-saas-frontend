@@ -46,6 +46,11 @@ import {
 } from '../services/payments.service'
 import { searchStudents } from '../services/students.service'
 import { usePdfErrorToast } from './usePdfErrorToast'
+import {
+  trackPdfDownloadStarted,
+  trackPdfDownloadSucceeded,
+  trackPdfDownloadFailed,
+} from '../utils/telemetry'
 
 // ============================================================================
 // QUERY KEY FACTORY
@@ -484,9 +489,18 @@ export function useDownloadReceiptPdf() {
   // handling if they want; the toast is purely additive.
   const showPdfError = usePdfErrorToast()
   return useMutation({
-    mutationFn: (vars: { paymentId: string; schoolId: string; receiptNumber?: string }) =>
-      downloadReceiptPdf(vars.paymentId, vars.schoolId),
+    mutationFn: (vars: { paymentId: string; schoolId: string; receiptNumber?: string }) => {
+      // M1.10 telemetry — emit `started` at mutation kickoff so the
+      // pipeline sees the click even if the network call hangs.
+      trackPdfDownloadStarted({ docType: 'receipt', schoolId: vars.schoolId })
+      return downloadReceiptPdf(vars.paymentId, vars.schoolId)
+    },
     onSuccess: (blob, vars) => {
+      trackPdfDownloadSucceeded({
+        docType: 'receipt',
+        schoolId: vars.schoolId,
+        byteSize: blob.size,
+      })
       const filename = `${vars.receiptNumber ?? `receipt-${vars.paymentId.slice(0, 8)}`}.pdf`
       // Wrap explicitly with the application/pdf MIME so Safari + Edge
       // honor the .pdf extension on save. The server already sends
@@ -506,7 +520,8 @@ export function useDownloadReceiptPdf() {
         URL.revokeObjectURL(url)
       }, 100)
     },
-    onError: (error) => {
+    onError: (error, vars) => {
+      trackPdfDownloadFailed({ docType: 'receipt', schoolId: vars.schoolId, error })
       showPdfError(error, 'receipt')
       throw error instanceof Error
         ? error
@@ -542,9 +557,17 @@ export function useDownloadInvoicePdf() {
   // M1.11 — same canonical toast as the receipt hook above.
   const showPdfError = usePdfErrorToast()
   return useMutation({
-    mutationFn: (vars: { schoolId: string; invoiceId: string; invoiceNumber?: string }) =>
-      downloadInvoicePdf(vars.schoolId, vars.invoiceId),
+    mutationFn: (vars: { schoolId: string; invoiceId: string; invoiceNumber?: string }) => {
+      // M1.10 telemetry — see receipt hook above for rationale.
+      trackPdfDownloadStarted({ docType: 'invoice', schoolId: vars.schoolId })
+      return downloadInvoicePdf(vars.schoolId, vars.invoiceId)
+    },
     onSuccess: (blob, vars) => {
+      trackPdfDownloadSucceeded({
+        docType: 'invoice',
+        schoolId: vars.schoolId,
+        byteSize: blob.size,
+      })
       // Use `.trim() ||` (NOT `??`) so empty/whitespace invoiceNumber
       // strings — which sometimes leak from optional form fields —
       // fall back to the id-derived name instead of producing ".pdf".
@@ -573,7 +596,8 @@ export function useDownloadInvoicePdf() {
         URL.revokeObjectURL(url)
       }, 100)
     },
-    onError: (error) => {
+    onError: (error, vars) => {
+      trackPdfDownloadFailed({ docType: 'invoice', schoolId: vars.schoolId, error })
       showPdfError(error, 'invoice')
       throw error instanceof Error
         ? error
