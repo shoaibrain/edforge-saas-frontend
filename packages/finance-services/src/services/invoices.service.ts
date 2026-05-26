@@ -4,7 +4,7 @@
  * API client for invoice operations (CRUD, generation, filtering).
  */
 
-import { apiGet, apiPost, apiPatch } from '@edforge/api-client'
+import { api, apiGet, apiPost, apiPatch } from '@edforge/api-client'
 import type {
   Invoice,
   InvoiceFilterDto,
@@ -171,6 +171,81 @@ export async function bulkIssueInvoices(
 }
 
 // ============================================================================
+// INVOICE PDF DOWNLOAD (Sprint M1.3 — frontend half of C.1.5)
+// ============================================================================
+
+/**
+ * Download the invoice PDF as a Blob.
+ *
+ * Calls the backend endpoint shipped in Sprint C.1.5 (server PR #201):
+ *   GET /finance/schools/{schoolId}/invoices/{invoiceId}/pdf
+ *
+ * Backend renders the invoice server-side via `@aibrains/pdf-renderer` —
+ * the returned PDF has selectable text + embedded fonts (Devanagari for
+ * PABSON tenants) + tenant-customized branding. From the frontend's
+ * POV this is either a 200 + Blob or an error to surface.
+ *
+ * Mirrors the shape of `downloadReceiptPdf` in payments.service.ts:
+ * returns the raw Blob and lets the consuming hook (M1.4
+ * `useDownloadInvoicePdf`) handle filename construction + the
+ * anchor-blob download dance.
+ */
+export async function downloadInvoicePdf(
+  schoolId: string,
+  invoiceId: string,
+): Promise<Blob> {
+  try {
+    const response = await api.get(
+      `/finance/schools/${schoolId}/invoices/${invoiceId}/pdf`,
+      { responseType: 'blob' },
+    )
+    if (!response.data || !(response.data instanceof Blob)) {
+      throw new Error('Server returned an invalid response for invoice PDF')
+    }
+    return response.data
+  } catch (error: any) {
+    // If the error response is a blob (server sent application/json
+    // error wrapped in blob because we set responseType: 'blob'),
+    // parse + surface the backend's `message` field.
+    //
+    // **Important:** the `throw` must happen OUTSIDE the JSON.parse
+    // try block — if it's inside, the surrounding `catch` swallows
+    // our thrown error and re-throws with the raw text, defeating
+    // the parse. Same bug-shape that exists in the older
+    // exportInvoicesCsv / exportPaymentsCsv blocks; intentionally
+    // mirrored from the C.1.6 downloadReceiptPdf which got it right.
+    if (error?.response?.data instanceof Blob) {
+      const text = await error.response.data.text()
+      let parsedMessage: string | undefined
+      try {
+        const parsed = JSON.parse(text)
+        // Backend convention is `{ message: string }`, but a future
+        // ValidationException could surface `message` as a structured
+        // object. Guard the type so `new Error(...)` never receives a
+        // non-string — otherwise the UI would show `"[object Object]"`.
+        const candidate = parsed?.message
+        if (typeof candidate === 'string') {
+          parsedMessage = candidate
+        } else if (candidate != null) {
+          try {
+            parsedMessage = JSON.stringify(candidate)
+          } catch {
+            // Circular ref or BigInt — fall through to the raw text.
+          }
+        }
+      } catch {
+        // Not JSON — fall through with `parsedMessage` undefined so
+        // we use the raw text or the generic fallback below.
+      }
+      throw new Error(parsedMessage || text || 'Failed to download invoice PDF')
+    }
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to download invoice PDF')
+  }
+}
+
+// ============================================================================
 // CONVENIENCE EXPORT
 // ============================================================================
 
@@ -185,4 +260,5 @@ export const invoicesService = {
   getStudentLedger,
   bulkGenerateInvoices,
   bulkIssueInvoices,
+  downloadInvoicePdf,
 }

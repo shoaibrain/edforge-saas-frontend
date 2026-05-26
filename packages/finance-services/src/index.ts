@@ -17,6 +17,7 @@ export {
   getStudentLedger,
   bulkGenerateInvoices,
   bulkIssueInvoices,
+  downloadInvoicePdf,
   invoicesService,
 } from './services/invoices.service'
 export type {
