@@ -353,6 +353,9 @@ importers:
       '@edforge/finance-services':
         specifier: workspace:*
         version: link:../../packages/finance-services
+      '@edforge/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@edforge/theme':
         specifier: workspace:*
         version: link:../../packages/theme
@@ -939,9 +942,15 @@ importers:
         specifier: ^19.0.0
         version: 19.2.5
     devDependencies:
+      '@edforge/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
+      sonner:
+        specifier: ^1.7.0
+        version: 1.7.4(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       typescript:
         specifier: ^5.6.0
         version: 5.9.3

@@ -123,3 +123,6 @@ export {
 
 // Cross-MFE navigation helpers (M1.1)
 export { viewDocument, receiptHref } from './utils/navigation'
+
+// PDF error-toast helper (M1.11)
+export { usePdfErrorToast, type PdfDocType } from './hooks/usePdfErrorToast'
