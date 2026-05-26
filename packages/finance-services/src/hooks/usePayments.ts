@@ -207,11 +207,26 @@ export function useVerifyPayment(
 // RECEIPT
 // ============================================================================
 
-export function usePaymentReceipt(paymentId: string | null) {
+/**
+ * Fetch the JSON receipt for a completed payment.
+ *
+ * `schoolId` is REQUIRED by the backend (see getPaymentReceipt in
+ * payments.service.ts for the DDB-key-construction reason). The hook
+ * stays gated until BOTH paymentId AND schoolId are resolved, so a
+ * cold-mount where activeSchoolId hasn't loaded yet won't fire a
+ * request that's destined to 404.
+ *
+ * The queryKey includes schoolId so React Query naturally invalidates
+ * if the active school switches mid-session.
+ */
+export function usePaymentReceipt(
+  paymentId: string | null,
+  schoolId: string | null,
+) {
   return useQuery({
-    queryKey: paymentKeys.receipt(paymentId ?? ''),
-    queryFn: () => getPaymentReceipt(paymentId!),
-    enabled: !!paymentId,
+    queryKey: [...paymentKeys.receipt(paymentId ?? ''), schoolId ?? ''],
+    queryFn: () => getPaymentReceipt(paymentId!, schoolId!),
+    enabled: !!paymentId && !!schoolId,
     staleTime: Infinity,
   })
 }
