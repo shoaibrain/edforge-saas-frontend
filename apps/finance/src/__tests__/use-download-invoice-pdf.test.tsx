@@ -146,6 +146,27 @@ describe('useDownloadInvoicePdf', () => {
     expect(anchor!.href).toBe('blob:test-url')
   })
 
+  it('treats empty or whitespace-only invoiceNumber as absent (no ".pdf" filename)', async () => {
+    // Regression guard for the post-M1.4 CodeRabbit finding: `??`
+    // only falls back on null/undefined, so an empty string produced
+    // ".pdf" (no name). The fix uses `.trim() ||` so empty AND
+    // whitespace-only strings fall through to the id-derived name.
+    const blob = new Blob(['%PDF-...'], { type: 'application/pdf' })
+    apiGetMock.mockResolvedValueOnce({ data: blob })
+
+    const { result } = renderHook(() => useDownloadInvoicePdf(), { wrapper })
+    await act(async () => {
+      await result.current.mutateAsync({
+        schoolId: 'school-1',
+        invoiceId: 'abcdef1234567890',
+        invoiceNumber: '   ', // whitespace only
+      })
+    })
+
+    const anchor = getAnchor()
+    expect(anchor!.download).toBe('invoice-abcdef12.pdf')
+  })
+
   it('falls back to invoice-<first-8-chars-of-id>.pdf when invoiceNumber is absent', async () => {
     const blob = new Blob(['%PDF-...'], { type: 'application/pdf' })
     apiGetMock.mockResolvedValueOnce({ data: blob })
