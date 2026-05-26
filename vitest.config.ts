@@ -30,7 +30,16 @@ export default defineConfig({
       '@edforge/theme': resolve(__dirname, 'packages/theme/src'),
       '@edforge/i18n': resolve(__dirname, 'packages/i18n/src'),
       '@edforge/date-utils': resolve(__dirname, 'packages/date-utils/src'),
-      '@edforge/config': resolve(__dirname, 'packages/config'),
+      // `@edforge/config` is published with an exports map (no `main`)
+      // that puts every subpath under `./src/`. Aliasing to `packages/config`
+      // here means subpaths like `@edforge/config/school-context-channel`
+      // resolve to `packages/config/school-context-channel` — which doesn't
+      // exist; the real file is `packages/config/src/school-context-channel.ts`.
+      // Targeting `./src` makes subpath imports resolve correctly. No bare
+      // `@edforge/config` imports exist in the codebase (all consumers use
+      // subpaths), so this doesn't break anything.
+      '@edforge/config': resolve(__dirname, 'packages/config/src'),
+      '@edforge/identity-services': resolve(__dirname, 'packages/identity-services/src'),
       '@edforge/api-client': resolve(__dirname, 'packages/api-client/src'),
       '@edforge/finance-services': resolve(__dirname, 'packages/finance-services/src'),
     },

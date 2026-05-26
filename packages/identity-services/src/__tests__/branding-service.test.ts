@@ -10,12 +10,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const apiGetMock = vi.fn()
+const apiPatchMock = vi.fn()
 vi.mock('@edforge/api-client', () => ({
   apiGet: (...args: unknown[]) => apiGetMock(...args),
+  apiPatch: (...args: unknown[]) => apiPatchMock(...args),
 }))
 
-const { getBranding } = await import('../services/branding.service')
-import type { BrandingResponse } from '../types'
+const { getBranding, updateBranding } = await import('../services/branding.service')
+import type { BrandingResponse, UpdateBrandingRequest } from '../types'
 
 describe('getBranding (M2.2)', () => {
   beforeEach(() => {
@@ -68,5 +70,55 @@ describe('getBranding (M2.2)', () => {
     })
     apiGetMock.mockRejectedValueOnce(err)
     await expect(getBranding('s')).rejects.toBe(err)
+  })
+})
+
+describe('updateBranding (M3.1)', () => {
+  beforeEach(() => {
+    apiPatchMock.mockReset()
+  })
+
+  it('calls PATCH /schools/:schoolId/branding with the partial body', async () => {
+    const body: UpdateBrandingRequest = { formalName: 'Saraswati Higher Secondary School' }
+    apiPatchMock.mockResolvedValueOnce({ branding: null })
+    await updateBranding('school-1', body)
+    expect(apiPatchMock).toHaveBeenCalledTimes(1)
+    expect(apiPatchMock).toHaveBeenCalledWith('/schools/school-1/branding', body)
+  })
+
+  it('URL-encodes the schoolId path segment', async () => {
+    apiPatchMock.mockResolvedValueOnce({ branding: null })
+    await updateBranding('a/b c', {})
+    expect(apiPatchMock).toHaveBeenCalledWith('/schools/a%2Fb%20c/branding', {})
+  })
+
+  it('returns the post-update BrandingResponse verbatim', async () => {
+    const response: BrandingResponse = {
+      branding: {
+        formalName: 'New Name',
+        colorPalette: { primary: '#005A5B', accent: '#FFC000' },
+        brandingVersionId: 'v-after-patch',
+      },
+      urls: { logo: 'https://example.s3/signed/logo' },
+    }
+    apiPatchMock.mockResolvedValueOnce(response)
+    const result = await updateBranding('s', { formalName: 'New Name' })
+    expect(result).toEqual(response)
+  })
+
+  it('propagates 400 Zod validation errors unchanged', async () => {
+    const err = Object.assign(new Error('Request failed with status code 400'), {
+      response: { status: 400, data: { message: 'Validation failed' } },
+    })
+    apiPatchMock.mockRejectedValueOnce(err)
+    await expect(updateBranding('s', { panNumber: '!!!' })).rejects.toBe(err)
+  })
+
+  it('propagates 403 permission errors unchanged', async () => {
+    const err = Object.assign(new Error('Forbidden'), {
+      response: { status: 403 },
+    })
+    apiPatchMock.mockRejectedValueOnce(err)
+    await expect(updateBranding('s', {})).rejects.toBe(err)
   })
 })

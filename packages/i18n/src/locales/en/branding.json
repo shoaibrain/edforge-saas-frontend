@@ -5,6 +5,19 @@
     "subtitleForSchool": "Branding for {{schoolName}} — appears on invoices, receipts, and other PDF documents",
     "backToSettings": "Settings"
   },
+  "actions": {
+    "edit": "Edit"
+  },
+  "form": {
+    "save": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "saveSuccess": "Branding updated. Future PDF documents will use the new settings.",
+    "saveError": "We couldn't save your branding changes. Please try again.",
+    "addressLinesPlaceholder": "One address line per row (max 4 lines)",
+    "addressLinesHelper": "Up to 4 lines, each at most 120 characters. Appears on the letterhead.",
+    "colorsHelper": "Both primary and accent are required when a palette is set. Use 6-digit hex (e.g. #1F4E79). Leave both empty to use defaults."
+  },
   "sections": {
     "identity": "School Identity",
     "contact": "Contact",

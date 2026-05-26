@@ -1,21 +1,34 @@
 /**
- * Branding query hooks (Sprint M2 — Branding read).
+ * Branding query + mutation hooks (Sprint M2 — read; Sprint M3 — write).
  *
- * `useSchoolBranding(schoolId)` — gated `useQuery` for the school's
- * branding read. Disabled when `schoolId` is falsy (pre-school-context
- * cold mount in Shell). Sprint M3 (write) will use the exported
- * `brandingKeys` for cache invalidation after a PATCH.
+ * `useSchoolBranding(schoolId)` — gated `useQuery` for the read.
+ *   Disabled when `schoolId` is falsy (pre-school-context cold mount
+ *   in Shell). staleTime = 60s mirrors the backend's signed-URL TTL
+ *   (10 min) with an order-of-magnitude buffer.
  *
- * staleTime = 60s mirrors the backend's signed-URL TTL (10 min) with
- * an order-of-magnitude buffer. Short enough that operator-side mutations
- * land within reasonable time; long enough to avoid hammering the
- * endpoint on tab switches.
+ * `useUpdateBranding(schoolId)` — `useMutation` for PATCH. On success:
+ *   - writes the server's freshly-returned `BrandingResponse` into the
+ *     `brandingKeys.school(schoolId)` cache slot via `setQueryData`
+ *     (eager update — view reflects the save immediately, no spinner
+ *     between save-success and refetch-completion)
+ *   - invalidates the same key so any other component subscribed to
+ *     `useSchoolBranding(schoolId)` re-renders with the new data
+ *
+ * Error path: AxiosError propagates to the mutation's `error` field
+ * unchanged; consumers can branch on `error.response?.status` for
+ * 400 (Zod) vs 403 (perm) vs 5xx.
  */
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationResult,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 
-import { getBranding } from '../services/branding.service'
-import type { BrandingResponse } from '../types'
+import { getBranding, updateBranding } from '../services/branding.service'
+import type { BrandingResponse, UpdateBrandingRequest } from '../types'
 
 /**
  * Stable React Query keys for the branding namespace.
@@ -52,5 +65,38 @@ export function useSchoolBranding(
     queryFn: () => getBranding(schoolId as string),
     enabled: !!schoolId,
     staleTime: 60_000,
+  })
+}
+
+/**
+ * Mutation for `PATCH /schools/:schoolId/branding` (Sprint M3).
+ *
+ * Mirrors the `useUpdateInvoice` shape in finance-services. The
+ * onSuccess handler does TWO things:
+ *   1. `setQueryData` — writes the server-returned response into the
+ *      cache slot eagerly. The Branding settings page (or any other
+ *      consumer subscribed to `useSchoolBranding(schoolId)`) renders
+ *      the updated branding without a spinner gap.
+ *   2. `invalidateQueries` — marks the slot stale so any consumer
+ *      that mounts AFTER the mutation completes (e.g., a sibling
+ *      settings tab) gets a fresh fetch on next render. Cheap belt-
+ *      and-suspenders alongside the setQueryData write.
+ *
+ * The mutation does NOT swallow errors — consumers wire toasts at the
+ * call site (Sprint M3.5 BrandingForm uses `sonner` for save success
+ * + failure).
+ */
+export function useUpdateBranding(
+  schoolId: string | undefined,
+): UseMutationResult<BrandingResponse, Error, UpdateBrandingRequest> {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: UpdateBrandingRequest) =>
+      updateBranding(schoolId as string, body),
+    onSuccess: (data) => {
+      if (!schoolId) return
+      queryClient.setQueryData(brandingKeys.school(schoolId), data)
+      queryClient.invalidateQueries({ queryKey: brandingKeys.school(schoolId) })
+    },
   })
 }

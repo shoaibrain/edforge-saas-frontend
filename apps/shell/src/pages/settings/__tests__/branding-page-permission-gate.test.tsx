@@ -14,7 +14,7 @@
  */
 
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 
 const usePermissionMock = vi.fn()
 const useActiveSchoolMock = vi.fn()
@@ -22,7 +22,8 @@ const useSchoolBrandingMock = vi.fn()
 const navigateMock = vi.fn()
 
 vi.mock('@edforge/abac', () => ({
-  usePermission: (...args: unknown[]) => usePermissionMock(...args),
+  usePermission: (action: string, resource: string, ...rest: unknown[]) =>
+    usePermissionMock(action, resource, ...rest),
 }))
 
 vi.mock('@edforge/i18n', () => ({
@@ -45,16 +46,31 @@ vi.mock('../../../lib/shell-context', () => ({
   useActiveSchool: () => useActiveSchoolMock(),
 }))
 
-// BrandingDisplay's full dependency graph is unnecessary for these tests —
-// we only care which schoolId reaches the hook.
+// BrandingDisplay + BrandingForm full dependency graphs are unnecessary
+// for these tests — we only care about gate behavior + which one mounts.
 vi.mock('../../../components/branding/BrandingDisplay', () => ({
   BrandingDisplay: () => <div data-testid="branding-display" />,
+}))
+vi.mock('../../../components/branding/BrandingForm', () => ({
+  BrandingForm: ({
+    onCancel,
+    onSaved,
+  }: {
+    onCancel: () => void
+    onSaved: () => void
+  }) => (
+    <div data-testid="branding-form">
+      <button type="button" onClick={onCancel}>form-cancel</button>
+      <button type="button" onClick={onSaved}>form-saved</button>
+    </div>
+  ),
 }))
 
 const { BrandingSettingsPage } = await import('../branding')
 
 function setup(opts: {
   canView: boolean
+  canConfigure?: boolean
   activeSchoolId: string | null
   hookReturn?: {
     data?: unknown
@@ -63,7 +79,14 @@ function setup(opts: {
     error?: unknown
   }
 }) {
-  usePermissionMock.mockReturnValue(opts.canView)
+  // Two-arg-aware mock: usePermission('view', 'branding') vs
+  // usePermission('configure', 'branding'). canConfigure defaults to
+  // canView for the existing M2 tests (which assumed a single boolean).
+  const canConfigure = opts.canConfigure ?? opts.canView
+  usePermissionMock.mockImplementation((action: string) => {
+    if (action === 'configure') return canConfigure
+    return opts.canView
+  })
   useActiveSchoolMock.mockReturnValue({
     activeSchoolId: opts.activeSchoolId,
     activeSchool: opts.activeSchoolId ? { name: 'Test School' } : null,
@@ -150,5 +173,128 @@ describe('BrandingSettingsPage — permission gate (PR #88 review-fix)', () => {
     })
     render(<BrandingSettingsPage />)
     expect(screen.getByTestId('branding-display')).toBeInTheDocument()
+  })
+})
+
+describe('BrandingSettingsPage — Edit toggle (Sprint M3.5)', () => {
+  beforeEach(() => {
+    usePermissionMock.mockReset()
+    useActiveSchoolMock.mockReset()
+    useSchoolBrandingMock.mockReset()
+    navigateMock.mockReset()
+  })
+
+  it('shows the Edit button when canConfigure is true and data is loaded', () => {
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { data: { branding: { formalName: 'School' } } },
+    })
+    render(<BrandingSettingsPage />)
+    expect(screen.getByRole('button', { name: /actions\.edit/i })).toBeInTheDocument()
+  })
+
+  it('HIDES the Edit button when canView is true but canConfigure is false', () => {
+    // E.g., a Principal at school-1 viewing branding for school-2 they
+    // do not have configure on (rare but possible cross-school case).
+    setup({
+      canView: true,
+      canConfigure: false,
+      activeSchoolId: 'school-1',
+      hookReturn: { data: { branding: { formalName: 'School' } } },
+    })
+    render(<BrandingSettingsPage />)
+    expect(screen.queryByRole('button', { name: /actions\.edit/i })).not.toBeInTheDocument()
+    // Display still renders.
+    expect(screen.getByTestId('branding-display')).toBeInTheDocument()
+  })
+
+  it('HIDES the Edit button while the branding query is still loading', () => {
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { isLoading: true, isPending: true },
+    })
+    render(<BrandingSettingsPage />)
+    expect(screen.queryByRole('button', { name: /actions\.edit/i })).not.toBeInTheDocument()
+  })
+
+  it('HIDES the Edit button when the load errored', () => {
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { error: new Error('boom') },
+    })
+    render(<BrandingSettingsPage />)
+    expect(screen.queryByRole('button', { name: /actions\.edit/i })).not.toBeInTheDocument()
+  })
+
+  it('clicking Edit swaps Display → Form', () => {
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { data: { branding: { formalName: 'School' } } },
+    })
+    render(<BrandingSettingsPage />)
+    expect(screen.getByTestId('branding-display')).toBeInTheDocument()
+    expect(screen.queryByTestId('branding-form')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /actions\.edit/i }))
+
+    // After click: form is mounted, display is gone.
+    expect(screen.queryByTestId('branding-display')).not.toBeInTheDocument()
+    expect(screen.getByTestId('branding-form')).toBeInTheDocument()
+    // And the Edit button itself is now hidden (form is the active surface).
+    expect(screen.queryByRole('button', { name: /actions\.edit/i })).not.toBeInTheDocument()
+  })
+
+  it('form onSaved callback swaps Form → Display', () => {
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { data: { branding: { formalName: 'School' } } },
+    })
+    render(<BrandingSettingsPage />)
+    fireEvent.click(screen.getByRole('button', { name: /actions\.edit/i }))
+    expect(screen.getByTestId('branding-form')).toBeInTheDocument()
+
+    // Mocked form exposes a `form-saved` button that invokes onSaved.
+    fireEvent.click(screen.getByText('form-saved'))
+
+    expect(screen.queryByTestId('branding-form')).not.toBeInTheDocument()
+    expect(screen.getByTestId('branding-display')).toBeInTheDocument()
+  })
+
+  it('form onCancel callback swaps Form → Display', () => {
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { data: { branding: { formalName: 'School' } } },
+    })
+    render(<BrandingSettingsPage />)
+    fireEvent.click(screen.getByRole('button', { name: /actions\.edit/i }))
+
+    fireEvent.click(screen.getByText('form-cancel'))
+    expect(screen.getByTestId('branding-display')).toBeInTheDocument()
+  })
+
+  it('renders the Edit button even when branding is null (first-time configure)', () => {
+    // First-time setup path: branding === null but data shape is valid.
+    // Operator should still be able to click Edit and configure
+    // branding from scratch.
+    setup({
+      canView: true,
+      canConfigure: true,
+      activeSchoolId: 'school-1',
+      hookReturn: { data: { branding: null } },
+    })
+    render(<BrandingSettingsPage />)
+    expect(screen.getByRole('button', { name: /actions\.edit/i })).toBeInTheDocument()
   })
 })
