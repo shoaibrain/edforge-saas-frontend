@@ -27,12 +27,19 @@ export default function ReceiptPage({ paymentId }: ReceiptPageProps) {
   // structural; this hotpatch keeps it working in shell in the meantime.
   const { activeSchoolId } = useActiveSchool()
 
-  const { data: receipt, isLoading, error } = usePaymentReceipt(
+  const { data: receipt, isLoading, isPending, error } = usePaymentReceipt(
     paymentId,
     activeSchoolId,
   )
 
-  if (isLoading) {
+  // `isLoading` is only true while a fetch is in-flight. The query
+  // stays `enabled: false` until activeSchoolId resolves from shell
+  // context (rare cold-mount path), in which case TanStack Query v5
+  // reports `isLoading: false` + `isPending: true` + `error: undefined`
+  // + `data: undefined`. Without the `isPending` branch below, the
+  // user would see the "Failed to load" UI for that pre-resolution
+  // window even though nothing has failed.
+  if (isLoading || isPending) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
