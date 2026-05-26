@@ -35,8 +35,13 @@ export function BrandingSettingsPage() {
   const { activeSchoolId, activeSchool } = useActiveSchool()
   const canView = usePermission('view', 'branding')
 
+  // PR #88 review-fix — gate the hook's schoolId arg on `canView` so
+  // non-privileged users never trigger a network request that would
+  // 403 anyway. `useSchoolBranding` keeps the underlying React Query
+  // idle when schoolId is falsy (see `enabled: !!schoolId` in the hook).
+  // The forbidden-state UI below renders without ever firing the fetch.
   const { data, isLoading, isPending, error, refetch } = useSchoolBranding(
-    activeSchoolId ?? undefined,
+    canView ? activeSchoolId ?? undefined : undefined,
   )
 
   // Permission gate — mirrors the workspace / security-policies pages.
