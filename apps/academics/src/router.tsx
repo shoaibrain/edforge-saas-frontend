@@ -22,6 +22,7 @@ import {
     Outlet,
     redirect,
 } from '@tanstack/react-router'
+import { MfeNotFoundBoundary } from '@edforge/ui'
 import { z } from 'zod'
 import { AcademicsLayout } from './layouts/AcademicsLayout'
 import { Overview } from './routes/overview'
@@ -386,7 +387,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
     routeTree,
     basepath: '/academics', // IMPORTANT: Matches Shell mount point
-    defaultNotFoundComponent: () => null, // Shell handles 404 UI
+    defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="academics" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 })
 
 declare module '@tanstack/react-router' {

@@ -6,6 +6,7 @@
  */
 
 import { createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { MfeNotFoundBoundary } from '@edforge/ui';
 import { Overview } from './routes/overview';
 import InboxPage from './routes/inbox';
 import AnnouncementsPage from './routes/announcements';
@@ -77,7 +78,7 @@ export const router = createRouter({
     routeTree,
     defaultPreload: 'intent',
     basepath: '/messages',
-    defaultNotFoundComponent: () => null, // Shell handles 404 UI
+    defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="messages" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 });
 
 // Register the router instance for type safety

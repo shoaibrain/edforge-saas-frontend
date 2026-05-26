@@ -11,6 +11,7 @@ import {
     createRootRoute,
     Outlet,
 } from '@tanstack/react-router'
+import { MfeNotFoundBoundary } from '@edforge/ui'
 import { AnalyticsLayout } from './layouts/AnalyticsLayout'
 import { Overview } from './routes/overview'
 import { Dashboard } from './routes/dashboard'
@@ -110,7 +111,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
     routeTree,
     basepath: '/analytics',
-    defaultNotFoundComponent: () => null, // Shell handles 404 UI
+    defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="analytics" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 })
 
 declare module '@tanstack/react-router' {

@@ -11,6 +11,7 @@ import {
     createRootRoute,
     Outlet,
 } from '@tanstack/react-router'
+import { MfeNotFoundBoundary } from '@edforge/ui'
 import { Overview } from './routes/overview'
 
 // ============================================================================
@@ -106,7 +107,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
     routeTree,
     basepath: '/special-programs',
-    defaultNotFoundComponent: () => null, // Shell handles 404 UI
+    defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="special-programs" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 })
 
 declare module '@tanstack/react-router' {

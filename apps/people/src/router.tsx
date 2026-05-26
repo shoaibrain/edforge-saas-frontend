@@ -11,6 +11,7 @@ import {
     createRootRoute,
     Outlet,
 } from '@tanstack/react-router'
+import { MfeNotFoundBoundary } from '@edforge/ui'
 import { PeopleLayout } from './layouts/PeopleLayout'
 import { Overview } from './routes/overview'
 import StaffPage from './routes/staff'
@@ -117,7 +118,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
     routeTree,
     basepath: '/people',
-    defaultNotFoundComponent: () => null, // Shell handles 404 UI
+    defaultNotFoundComponent: () => <MfeNotFoundBoundary mfe="people" />, // M0.5 — was () => null which hid cross-MFE nav bugs
 })
 
 declare module '@tanstack/react-router' {
