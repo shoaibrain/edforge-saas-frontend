@@ -76,8 +76,30 @@ export async function getSchoolPayments(
 // RECEIPT
 // ============================================================================
 
-export async function getPaymentReceipt(paymentId: string): Promise<Receipt> {
-  return apiGet<Receipt>(`/finance/payments/${paymentId}/receipt`)
+/**
+ * Fetch the JSON receipt for a completed payment.
+ *
+ * The backend (payments.controller.ts:179 — Sprint C.1.6 era) requires
+ * `?schoolId=<sid>` as a query parameter. Internally, the controller
+ * resolves the payment via `EntityKeyBuilder.payment(schoolId, paymentId)`
+ * → DDB SK `PAYMENT#{schoolId}#{paymentId}`. When schoolId is missing,
+ * the key becomes `PAYMENT#undefined#<paymentId>` and the lookup
+ * returns null → 404 "Payment not found" — even though the payment
+ * exists in DynamoDB.
+ *
+ * This signature was missing the schoolId param when the shell-owned
+ * receipt page shipped, because that page had no natural source of
+ * school context. M1.5-FU.1 fixes the symptom (this file). M1.5-FU.2+
+ * fixes the root cause (moves the page into Finance MFE where
+ * `useAppStore().activeSchoolId` is the obvious source).
+ */
+export async function getPaymentReceipt(
+  paymentId: string,
+  schoolId: string,
+): Promise<Receipt> {
+  return apiGet<Receipt>(`/finance/payments/${paymentId}/receipt`, {
+    schoolId,
+  })
 }
 
 // ============================================================================

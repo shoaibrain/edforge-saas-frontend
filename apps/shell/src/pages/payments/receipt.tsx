@@ -9,6 +9,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
 import { Loader2, AlertTriangle } from 'lucide-react'
 import { usePaymentReceipt } from '../../hooks/usePayments'
+import { useActiveSchool } from '../../lib/shell-context'
 import { PaymentReceipt } from '../../components/payments/PaymentReceipt'
 
 interface ReceiptPageProps {
@@ -18,8 +19,18 @@ interface ReceiptPageProps {
 export default function ReceiptPage({ paymentId }: ReceiptPageProps) {
   const { t } = useTranslation('payments')
   const navigate = useNavigate()
+  // M1.5-FU.1 — the backend's GET /payments/:id/receipt requires a
+  // `?schoolId=` query param to construct the DDB key
+  // `PAYMENT#{schoolId}#{paymentId}`. Without it, the lookup builds
+  // `PAYMENT#undefined#<id>` and 404s on every fetch. M1.5-FU.2+ will
+  // move this page into Finance MFE where the school context is
+  // structural; this hotpatch keeps it working in shell in the meantime.
+  const { activeSchoolId } = useActiveSchool()
 
-  const { data: receipt, isLoading, error } = usePaymentReceipt(paymentId)
+  const { data: receipt, isLoading, error } = usePaymentReceipt(
+    paymentId,
+    activeSchoolId,
+  )
 
   if (isLoading) {
     return (
