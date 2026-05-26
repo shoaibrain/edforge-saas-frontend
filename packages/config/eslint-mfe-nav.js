@@ -2,23 +2,25 @@
  * @edforge/config — MFE navigation lint rule.
  *
  * Forbids hard-coded shell-owned route patterns inside `navigate({to: ...})`
- * calls made from non-shell MFE source files. The exact bug this catches:
+ * calls made from non-shell MFE source files.
  *
- *   // apps/finance/src/... — Finance's router has basepath: '/finance'
- *   navigate({ to: '/payments/${id}/receipt' })
- *   // resolves against the local basepath → /finance/payments/.../receipt
- *   // → no such route → MfeNotFoundBoundary (M0.5) renders the 404 panel
- *
- * That regression (PR #64 on this repo, pre-M0.5) was the trigger for
- * the whole PDF service MFE integration plan. M1.2 fixed the View
- * Receipt call site; this rule prevents the same shape from being
- * reintroduced anywhere else.
- *
- * Implements ticket M0.7 of the plan
+ * Implements ticket M0.7 of the PDF service MFE integration plan
  * (`docs/pilot-greenlight/pdf-service-mfe-integration-plan.md` §2).
  *
+ * **History of the receipt rule:**
+ * The very first version of this rule (M0.7) blocked
+ * `/payments/<id>/receipt` from MFE navigates, because the receipt
+ * page was shell-owned at the time. M1.5-FU.2 moved the receipt
+ * page INTO Finance MFE — Finance now owns `/payments/$paymentId/receipt`
+ * resolved through `basepath: '/finance'`. So an MFE-side
+ * `navigate({to: '/payments/${id}/receipt'})` from inside Finance is
+ * now CORRECT (Invoice list + Payments list eye-icons do exactly this).
+ * The receipt-specific selectors were removed in M1.5-FU.6; the rule
+ * keeps catching `/settings/...` and `/home/...` from MFE code
+ * because those roots remain shell-owned and have no in-MFE equivalent.
+ *
  * Why scoped to MFEs only, not Shell:
- *   Shell IS the host. `navigate({to: '/payments/...'})` is correct
+ *   Shell IS the host. `navigate({to: '/settings/...'})` is correct
  *   inside `apps/shell`. Only NON-shell MFEs need the guard.
  *
  * Why route-PATTERNS, not prefixes:
@@ -26,28 +28,22 @@
  *   router's basepath strips the MFE prefix. Examples (inventoried
  *   2026-05-26 against actual apps/<name>/src/router.tsx files):
  *     - apps/finance owns `/payments` + `/payments/record` (→ /finance/...)
+ *     - apps/finance owns `/payments/$paymentId/receipt` (post-M1.5-FU.2)
  *     - apps/finance owns `/dashboard`
  *     - apps/analytics owns `/dashboard` + `/finance` (sub-page!) + `/reports`
  *     - apps/academics owns `/students` + `/grades` + `/attendance`
  *   So a coarse "block /payments" rule would false-positive on
- *   finance's perfectly-valid `/payments/record`. The blocklist below
- *   matches SPECIFIC shell-owned routes, not loose prefixes.
+ *   finance's perfectly-valid routes. The blocklist below targets
+ *   only the still-shell-owned roots.
  *
  * Blocked patterns (regex, anchored):
- *   - "^/payments/:id/receipt(?:/...)?$" — shell receipt page
- *                                            (the actual M1.2 target;
- *                                            finance's own /payments
- *                                            and /payments/record are
- *                                            NOT matched because they
- *                                            don't have a 3rd segment)
- *   - `^/settings(?:/.*)?$`                — shell settings hub
- *                                            (no MFE owns /settings)
- *   - `^/home(?:/.*)?$`                    — shell home
- *                                            (no MFE owns /home)
+ *   - `^/settings(?:/.*)?$` — shell settings hub (no MFE owns /settings)
+ *   - `^/home(?:/.*)?$`     — shell home (no MFE owns /home)
  *
  * NOT blocked (deliberately):
+ *   - `/payments/<id>/receipt` — Finance owns this now (M1.5-FU.2)
  *   - `/dashboard` — finance + analytics own this locally
- *   - `/payments` (no 3rd-segment suffix) — finance owns it
+ *   - `/payments` (any depth) — finance-owned
  *   - `/login`, `/onboarding`, `/auth/callback` — MFE code shouldn't
  *     route here, but blocklisting them adds false-positive surface
  *     for marginal value; rely on code review
@@ -55,81 +51,41 @@
  *     false-positive risk; the M0.5 404 boundary surfaces these at
  *     runtime
  *
- * If you NEED to navigate to a shell-owned route from an MFE, use
- * the M1.1 helpers from `@edforge/finance-services`:
- *
- *   import { viewDocument, receiptHref } from '@edforge/finance-services'
- *   viewDocument(receiptHref(paymentId))
- *
- * The helpers do a full-page `window.location.href` nav that bypasses
- * the local MFE router's basepath — which is the only correct way to
- * reach a shell-owned route from inside an MFE.
+ * If you genuinely need to navigate to a shell-owned `/settings/` or
+ * `/home/` route from an MFE (rare — usually a sign of architectural
+ * confusion), use `window.location.href = '/settings/...'` and document
+ * the reason in a comment so the next reader knows it was intentional.
  */
 
-// Patterns are written for ESQuery's `[attr=/regex/]` syntax — standard
-// JS regex semantics. The leading `^` + trailing `(?:/.*)?$` anchors
-// keep the match tight: `/payments` (no 3rd segment) does NOT match
-// the receipt pattern, but `/payments/abc/receipt` does.
-const RECEIPT_PATTERN = '\\/payments\\/[^\\/]+\\/receipt(?:\\/.*)?'
 const SETTINGS_PATTERN = '\\/settings(?:\\/.*)?'
 const HOME_PATTERN = '\\/home(?:\\/.*)?'
 
 // Combined alternation — the value (string or template-literal raw) must
 // match exactly one of these patterns from start to end.
-const SHELL_ROUTE_REGEX = `^(${RECEIPT_PATTERN}|${SETTINGS_PATTERN}|${HOME_PATTERN})$`
+const SHELL_ROUTE_REGEX = `^(${SETTINGS_PATTERN}|${HOME_PATTERN})$`
 
 const MFE_NAV_MESSAGE = [
   'Do not navigate to shell-owned routes from inside an MFE.',
   '`navigate({to: ...})` resolves against the local MFE router\'s basepath,',
-  'so a route like `/payments/${id}/receipt` becomes `/finance/payments/.../receipt`',
+  'so a route like `/settings/branding` becomes `/finance/settings/branding`',
   'and 404s into MfeNotFoundBoundary.',
   '',
-  'Use the cross-MFE helpers from @edforge/finance-services instead:',
-  '  import { viewDocument, receiptHref } from "@edforge/finance-services"',
-  '  viewDocument(receiptHref(paymentId))',
+  'If you genuinely need a shell-owned route from MFE code (rare —',
+  'usually a sign of architectural confusion), use',
+  '`window.location.href = "/settings/..."` and document the reason.',
 ].join(' ')
 
 /**
- * Four selectors cover the common shapes:
- *   A. String literal:   navigate({to: '/payments/abc/receipt'})
- *   B. Template literal interpolated payment id:
- *                        navigate({to: `/payments/${id}/receipt`})
- *   C. Template literal under /settings or /home:
- *                        navigate({to: `/settings/${section}`})
- *   D. Template literal with the receipt path baked into the first
- *      quasi (no interpolation OR receipt path before any expression):
- *                        navigate({to: `/payments/abc/receipt`})
- *                        navigate({to: `/payments/abc/receipt/${x}`})
+ * Two selectors cover the common shapes for the still-blocked
+ * `/settings/...` and `/home/...` roots:
+ *   A. String literal:    navigate({to: '/settings/branding'})
+ *   B. Template literal:  navigate({to: `/settings/${section}`})
  *
  * For TemplateLiteral nodes, `quasis.0.value.raw` is the first chunk
- * before any `${}`. For `/payments/${id}/receipt` it is `/payments/`;
- * for `/payments/${id}` it is ALSO `/payments/`. A naive prefix match
- * on the first quasi would false-positive on the latter (which is
- * finance-MFE-owned, NOT a shell route).
- *
- * Selector B inspects BOTH quasis: requires the first to be exactly
- * `/payments/` AND the second to start with `/receipt`. That uniquely
- * identifies the shell receipt shape — interpolated payment-detail
- * routes like `/payments/${id}` (no second quasi) and arbitrary
- * extensions like `/payments/${id}/refund` are NOT flagged.
- *
- * Selector C keeps the simple first-quasi prefix match for /settings
- * and /home because no MFE owns those roots — anything starting with
- * those prefixes from inside an MFE is a real bug.
- *
- * Cases this DOES NOT catch (deliberately):
- *   - Templates that build the prefix dynamically:
- *     `${base}/payments/${id}/receipt`. Lint can't statically resolve
- *     ${base}; code review + the M0.5 boundary catch this.
+ * before any `${}`. The receipt-specific selectors that used to live
+ * here (matching `/payments/.../receipt`) were removed in M1.5-FU.6
+ * when receipt moved into Finance MFE.
  */
-// Exact-string equality in esquery uses literal quoted values — no
-// regex escaping needed for the first-quasi check below. The
-// second-quasi check uses a regex; backslashes in regex syntax are
-// doubled because we're embedding the regex inside a JS string.
-const PAYMENTS_FIRST_QUASI_VALUE = '/payments/'
-const RECEIPT_SECOND_QUASI_REGEX = '^\\/receipt(\\/|$)'
-const SETTINGS_HOME_PREFIX_REGEX = '^\\/(settings|home)(\\/|$)'
-
 const restrictedSyntaxRule = [
   'error',
   // A. String literal — full path is known, anchored regex.
@@ -137,31 +93,10 @@ const restrictedSyntaxRule = [
     selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > Literal[value=/${SHELL_ROUTE_REGEX}/]`,
     message: MFE_NAV_MESSAGE,
   },
-  // B. Template literal: `/payments/${id}/receipt[...]` — requires
-  //    BOTH quasis to match. The first quasi must be EXACTLY
-  //    "/payments/" (string equality); the second must START with
-  //    "/receipt" (regex). So `/payments/${id}` alone — which has
-  //    no second quasi — is NOT flagged.
-  {
-    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw='${PAYMENTS_FIRST_QUASI_VALUE}'][quasis.1.value.raw=/${RECEIPT_SECOND_QUASI_REGEX}/]`,
-    message: MFE_NAV_MESSAGE,
-  },
-  // C. Template literal: `/settings/...` or `/home/...` — first-quasi
+  // B. Template literal: `/settings/...` or `/home/...` — first-quasi
   //    prefix is sufficient because no MFE owns these roots.
   {
-    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/${SETTINGS_HOME_PREFIX_REGEX}/]`,
-    message: MFE_NAV_MESSAGE,
-  },
-  // D. Template literal with the full payments-receipt path baked into
-  //    the first quasi: matches `\`/payments/abc/receipt\`` (no
-  //    interpolation — sometimes wrapped in backticks unintentionally),
-  //    as well as multi-quasi templates whose first quasi already
-  //    contains the receipt path (e.g. `\`/payments/abc/receipt/${x}\``).
-  //    The anchored receipt regex requires a non-empty id segment,
-  //    so it does NOT overlap with Selector B (which targets
-  //    `\`/payments/${id}/receipt\`` — first quasi exactly "/payments/").
-  {
-    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/^\\/payments\\/[^\\/]+\\/receipt(\\/.*)?$/]`,
+    selector: `CallExpression[callee.name='navigate'] > ObjectExpression > Property[key.name='to'] > TemplateLiteral[quasis.0.value.raw=/${SHELL_ROUTE_REGEX.replace('$', '')}/]`,
     message: MFE_NAV_MESSAGE,
   },
 ]
@@ -170,7 +105,7 @@ const restrictedSyntaxRule = [
  * Returns the flat-config block to merge into `eslint.config.js`.
  *
  * The `files` glob targets every non-shell MFE under `apps/`. Shell's
- * own router intentionally uses `navigate({to: '/payments/...'})` so
+ * own router intentionally uses `navigate({to: '/settings/...'})` so
  * the rule must NOT apply there.
  */
 export default {
