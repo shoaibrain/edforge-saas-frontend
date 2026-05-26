@@ -244,7 +244,21 @@ export async function downloadReceiptPdf(
       let parsedMessage: string | undefined
       try {
         const parsed = JSON.parse(text)
-        parsedMessage = parsed?.message
+        // Backend convention is `{ message: string }`, but a future
+        // ValidationException could surface `message` as a structured
+        // object (e.g. `{ message: { field: 'x', error: 'y' } }`). Guard
+        // the type so `new Error(...)` never receives a non-string —
+        // otherwise the UI would show `"[object Object]"`.
+        const candidate = parsed?.message
+        if (typeof candidate === 'string') {
+          parsedMessage = candidate
+        } else if (candidate != null) {
+          try {
+            parsedMessage = JSON.stringify(candidate)
+          } catch {
+            // Circular ref or BigInt — fall through to the raw text.
+          }
+        }
       } catch {
         // Not JSON — fall through with `parsedMessage` undefined so we
         // use the raw text or the generic fallback below.
