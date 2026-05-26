@@ -46,6 +46,44 @@ describe('ABAC Engine', () => {
       ).toBe(true)
     })
 
+    // M2 / M0.10 — branding permissions added in Sprint M2.
+    it('should allow TenantAdmin to view + configure branding (globalRole bypass)', () => {
+      const user = mockUser('TenantAdmin')
+      expect(can(user, { action: 'view', resource: 'branding' })).toBe(true)
+      expect(can(user, { action: 'configure', resource: 'branding' })).toBe(true)
+    })
+
+    it('should allow Principal to view + configure branding at their school', () => {
+      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      expect(
+        can(user, { action: 'view', resource: 'branding', schoolId: 'school-1' }),
+      ).toBe(true)
+      expect(
+        can(user, { action: 'configure', resource: 'branding', schoolId: 'school-1' }),
+      ).toBe(true)
+    })
+
+    it('should deny non-privileged roles from branding actions', () => {
+      // Teacher / Accountant / Counselor / Student / Parent / Staff / Nurse
+      // none have a branding grant. Spot-check a representative subset.
+      for (const role of ['Teacher', 'Accountant', 'Counselor', 'Student'] as const) {
+        const user = mockUser('StandardUser', { 'school-1': role })
+        expect(
+          can(user, { action: 'view', resource: 'branding', schoolId: 'school-1' }),
+        ).toBe(false)
+        expect(
+          can(user, { action: 'configure', resource: 'branding', schoolId: 'school-1' }),
+        ).toBe(false)
+      }
+    })
+
+    it('should deny Principal from configuring branding at a school they are NOT assigned to', () => {
+      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      expect(
+        can(user, { action: 'configure', resource: 'branding', schoolId: 'school-2' }),
+      ).toBe(false)
+    })
+
     it('should deny Teacher from deleting students', () => {
       const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
       expect(

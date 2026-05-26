@@ -68,6 +68,7 @@ import {
   EducationOrgDetailPage,
   RBACSecurityPage,
   PeopleSettingsPage,
+  BrandingSettingsPage,
 } from './pages/settings'
 import { loadRemote } from '@module-federation/enhanced/runtime'
 import React, { lazy } from 'react'
@@ -541,6 +542,17 @@ const settingsAuthDebugRoute = createRoute({
   component: AuthDebugPage,
 })
 
+// Sprint M2 — Branding read. M3 will extend the same route into a
+// read-or-edit toggle UI (no new route, no new page-shell breadcrumb
+// breakage). Permission gate lives inside the page (mirrors
+// settings/security-policies pattern, not the route `beforeLoad`
+// short-circuit pattern used by /notifications).
+const settingsBrandingRoute = createRoute({
+  getParentRoute: () => settingsRoute,
+  path: '/branding',
+  component: BrandingSettingsPage,
+})
+
 const settingsOrganizationRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/organization',
@@ -871,6 +883,7 @@ const routeTree = rootRoute.addChildren([
       settingsAccessRoute,
       settingsSecurityPoliciesRoute,
       settingsAuthDebugRoute,
+      settingsBrandingRoute,
     ]),
     academicsRoute,
     financeRoute,
