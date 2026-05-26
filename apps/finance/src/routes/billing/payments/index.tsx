@@ -28,13 +28,16 @@ import {
   DollarSign,
   TrendingUp,
   Receipt,
+  Download,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useSchoolPayments,
   useVoidPayment,
   useCreateRefund,
   useExportPaymentsCsv,
+  useDownloadReceiptPdf,
 } from '@edforge/finance-services'
 import { formatGatewayLabel } from '@edforge/types'
 import type { Payment } from '@edforge/types'
@@ -408,6 +411,62 @@ function RefundPaymentDialog({
 }
 
 // ============================================================================
+// PER-ROW DOWNLOAD BUTTON (M1.5-FU.4)
+// ============================================================================
+
+/**
+ * Per-row Download PDF icon button for the Payments list (M1.5-FU.4).
+ *
+ * Lives as its own component (not inline JSX) so each row gets its OWN
+ * `useDownloadReceiptPdf` hook instance — `mutation.isPending` is then
+ * naturally scoped per-row. Inline JSX with a single hoisted mutation
+ * would make clicking row N's button disable EVERY row's button.
+ *
+ * Symmetric to `InvoiceDownloadIconButton` on the Invoice list (M1.6).
+ * Style mirrors the surrounding View/Void/Refund icon buttons so the
+ * actions column reads as a coherent group.
+ *
+ * Only rendered when `payment.receiptNumber` is set (i.e., the payment
+ * is completed and has a receipt to download). Draft/cancelled rows
+ * skip this button — see the actions-column cell below.
+ */
+function ReceiptDownloadIconButton({
+  schoolId,
+  paymentId,
+  receiptNumber,
+}: {
+  schoolId: string
+  paymentId: string
+  receiptNumber?: string | null
+}) {
+  const downloadReceipt = useDownloadReceiptPdf()
+  const { t } = useTranslation('payments')
+  const label = t('actions.downloadPdf')
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        downloadReceipt.mutate({
+          schoolId,
+          paymentId,
+          receiptNumber: receiptNumber ?? undefined,
+        })
+      }
+      disabled={downloadReceipt.isPending}
+      className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
+      title={label}
+      aria-label={label}
+    >
+      {downloadReceipt.isPending ? (
+        <Loader2 className="w-4 h-4 animate-spin" data-testid={`receipt-download-spinner-${paymentId}`} />
+      ) : (
+        <Download className="w-4 h-4" data-testid={`receipt-download-icon-${paymentId}`} />
+      )}
+    </button>
+  )
+}
+
+// ============================================================================
 // COLUMN DEFINITIONS
 // ============================================================================
 
@@ -422,6 +481,12 @@ function usePaymentColumns(
   // navigate in-MFE to /finance/payments/$paymentId/receipt instead
   // of the prior cross-MFE viewDocument shim.
   const navigate = useNavigate()
+  // M1.5-FU.4 — used by the per-row Download PDF button. Reading
+  // here (not via a prop) keeps the column hook's signature
+  // small + symmetric to `navigate` above. The cell renders the
+  // button only when schoolId is set, mirroring the rest of the
+  // Payments page (queries are gated on schoolId too).
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   return useMemo(
     () => [
       {
@@ -530,6 +595,20 @@ function usePaymentColumns(
                   <Eye className="w-4 h-4" />
                 </button>
               )}
+              {/*
+                M1.5-FU.4 — per-row Download PDF action. Symmetric to
+                M1.6 on the Invoice list. Only rendered when both
+                schoolId is resolved AND the row has a receipt
+                (completed payments). The hook is per-row-isolated
+                so clicking row N doesn't disable rows ≠ N.
+              */}
+              {activeSchoolId && payment.receiptNumber && (
+                <ReceiptDownloadIconButton
+                  schoolId={activeSchoolId}
+                  paymentId={payment.id}
+                  receiptNumber={payment.receiptNumber}
+                />
+              )}
               {/* Void (for completed only) */}
               {payment.status === 'completed' && (
                 <button
@@ -557,7 +636,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId],
   )
 }
 
