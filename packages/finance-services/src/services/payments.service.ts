@@ -196,6 +196,82 @@ export async function exportPaymentsCsv(schoolId: string): Promise<Blob> {
 }
 
 // ============================================================================
+// RECEIPT PDF DOWNLOAD (Sprint C.1.6 frontend)
+// ============================================================================
+
+/**
+ * Download the payment receipt PDF as a Blob.
+ *
+ * Calls the backend endpoint shipped in Sprint C.1.6 (PR #202):
+ *   GET /finance/payments/{paymentId}/receipt/pdf?schoolId=<sid>
+ *
+ * Backend renders the receipt server-side via `@aibrains/pdf-renderer` —
+ * the returned PDF has selectable text + embedded fonts (Devanagari for
+ * PABSON tenants), unlike the prior jspdf+html2canvas client-side raster
+ * approach this replaces.
+ *
+ * The 5xx fallback chain lives entirely on the backend (graceful
+ * degradation to descriptor defaults when identity is mid-deploy); from
+ * the frontend's POV this is either a 200 + Blob or an error to surface.
+ */
+export async function downloadReceiptPdf(
+  paymentId: string,
+  schoolId: string,
+): Promise<Blob> {
+  try {
+    const response = await api.get(`/finance/payments/${paymentId}/receipt/pdf`, {
+      params: { schoolId },
+      responseType: 'blob',
+    })
+    if (!response.data || !(response.data instanceof Blob)) {
+      throw new Error('Server returned an invalid response for receipt PDF')
+    }
+    return response.data
+  } catch (error: any) {
+    // If the error response is a blob (server sent application/json error
+    // wrapped in blob because we set responseType:'blob'), parse + surface
+    // the backend's `message` field.
+    //
+    // **Important:** the `throw` must happen OUTSIDE the JSON.parse try
+    // block — if it's inside, the surrounding `catch` swallows our thrown
+    // error and re-throws with the raw text, defeating the parse. This
+    // bug shape exists in the pre-existing exportInvoicesCsv +
+    // exportPaymentsCsv blocks above; intentionally NOT fixing those
+    // here per minimal-changes (separate cleanup PR). Fixing only this
+    // C.1.6 block which I authored.
+    if (error?.response?.data instanceof Blob) {
+      const text = await error.response.data.text()
+      let parsedMessage: string | undefined
+      try {
+        const parsed = JSON.parse(text)
+        // Backend convention is `{ message: string }`, but a future
+        // ValidationException could surface `message` as a structured
+        // object (e.g. `{ message: { field: 'x', error: 'y' } }`). Guard
+        // the type so `new Error(...)` never receives a non-string —
+        // otherwise the UI would show `"[object Object]"`.
+        const candidate = parsed?.message
+        if (typeof candidate === 'string') {
+          parsedMessage = candidate
+        } else if (candidate != null) {
+          try {
+            parsedMessage = JSON.stringify(candidate)
+          } catch {
+            // Circular ref or BigInt — fall through to the raw text.
+          }
+        }
+      } catch {
+        // Not JSON — fall through with `parsedMessage` undefined so we
+        // use the raw text or the generic fallback below.
+      }
+      throw new Error(parsedMessage || text || 'Failed to download receipt PDF')
+    }
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to download receipt PDF')
+  }
+}
+
+// ============================================================================
 // CONVENIENCE EXPORT
 // ============================================================================
 
@@ -211,4 +287,5 @@ export const paymentsService = {
   getDashboardSummary,
   exportInvoicesCsv,
   exportPaymentsCsv,
+  downloadReceiptPdf,
 }
