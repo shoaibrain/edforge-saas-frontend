@@ -33,14 +33,42 @@
  * the call is a no-op. happy-dom + jsdom both provide `window`, so
  * normal browser code paths always fire the redirect.
  *
+ * **Same-origin guard (security):** rejects any `href` whose resolved
+ * origin differs from `window.location.origin`. This blocks:
+ *   - protocol-relative URLs   (`//evil.com/foo`)
+ *   - cross-origin absolute    (`https://evil.com/foo`)
+ *   - opaque-origin schemes    (`javascript:`, `data:`, `mailto:`, …)
+ * `new URL(href, window.location.origin)` resolves relative paths
+ * against the current origin, so legitimate routes like
+ * `/payments/${id}/receipt` always pass. Unsafe inputs surface a
+ * `console.warn` so the caller's bug is grep-able.
+ *
  * Intentionally NOT a wrapper around `<a href>` — this is for
  * programmatic navigation triggered by click handlers; the anchor
  * approach loses our type-safety + can be confused with download
  * anchors.
  */
 export function viewDocument(href: string): void {
-  if (typeof window !== 'undefined') {
-    window.location.href = href
+  if (typeof window === 'undefined') return
+
+  try {
+    const target = new URL(href, window.location.origin)
+    if (target.origin === window.location.origin) {
+      window.location.href = href
+      return
+    }
+  } catch {
+    // Malformed URL — fall through to the refuse path.
+  }
+
+  // Cross-origin / opaque / malformed — refuse + warn. Refusing
+  // silently would hide the caller's bug; warning + no-op keeps
+  // the page safe while making the regression easy to spot in
+  // browser devtools.
+  if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+    console.warn(
+      `[viewDocument] Refusing to navigate to "${href}" — only same-origin URLs are allowed.`,
+    )
   }
 }
 
