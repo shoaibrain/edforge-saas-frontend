@@ -28,10 +28,15 @@ export type {
   SchoolBrandingDto,
   BrandingAssetUrls,
   BrandingResponse,
+  UpdateBrandingRequest,
 } from './types'
 
 // Services
-export { getBranding } from './services/branding.service'
+export { getBranding, updateBranding } from './services/branding.service'
 
 // Hooks
-export { brandingKeys, useSchoolBranding } from './hooks/useBranding'
+export {
+  brandingKeys,
+  useSchoolBranding,
+  useUpdateBranding,
+} from './hooks/useBranding'

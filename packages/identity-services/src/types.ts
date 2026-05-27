@@ -116,3 +116,20 @@ export interface BrandingResponse {
   branding: SchoolBrandingDto | null
   urls?: BrandingAssetUrls
 }
+
+// ============================================================================
+// UpdateBrandingRequest (PATCH /schools/:schoolId/branding)
+// ============================================================================
+
+/**
+ * Body for `PATCH /schools/:schoolId/branding` (Sprint M3 — Branding write).
+ *
+ * Server schema: `schoolBrandingSchema.omit({ brandingVersionId: true }).partial()`
+ * — every field is optional (partial update); `brandingVersionId` is
+ * server-generated and cannot be set by the client.
+ *
+ * Phase 1 (M3 first PR) only sends the text + color fields; the
+ * `*S3Key` fields are wired in phase 2 alongside the presigned-PUT
+ * upload pipeline.
+ */
+export type UpdateBrandingRequest = Partial<Omit<SchoolBrandingDto, 'brandingVersionId'>>

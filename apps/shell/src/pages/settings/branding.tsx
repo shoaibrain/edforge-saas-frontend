@@ -1,17 +1,26 @@
 /**
- * Settings — Branding (Sprint M2 — Branding read).
+ * Settings — Branding (Sprint M2 — read; Sprint M3 phase 1 — write).
  *
- * Read-only branding viewer at `/settings/branding`. Reads the active
- * school's branding via `useSchoolBranding` and renders it through
- * `BrandingDisplay`. Sprint M3 will add an "Edit" affordance that
- * toggles into a form mode.
+ * Read viewer + edit form at `/settings/branding`. Edit affordance is
+ * gated on `usePermission('configure', 'branding')` — non-configurable
+ * users (e.g., a TenantAdmin viewing a different school they don't have
+ * configure on — rare in practice with globalRole; Principals at
+ * another school) see the Display only, no Edit button.
  *
- * **Permission gate:** `usePermission('view', 'branding')`. The ABAC
- * grants in `packages/abac/src/permissions.ts` give TenantAdmin (via
- * globalRole) + Principal explicit `view` + `configure` rights;
- * everyone else hits the deny branch and is redirected to settings
- * overview (mirrors the pattern used by other restricted settings
- * pages — workspace, security-policies).
+ * **Mode swap shape:** local `isEditing` state. The form's `onCancel`
+ * is wired through `useFormDirtyGuard` inside `BrandingForm`, so an
+ * accidental cancel with unsaved changes prompts before mode-swap.
+ * `onSaved` fires after a successful PATCH (and after the mutation's
+ * onSuccess has already eager-written the response to the query cache),
+ * so the swap-back to Display renders the new branding instantly with
+ * no spinner gap.
+ *
+ * **Permission gates:**
+ *   - `canView`: gates the entire page (forbidden UI below). Also gates
+ *     the `useSchoolBranding` hook arg so non-viewers never trigger a
+ *     network round-trip that would 403.
+ *   - `canConfigure`: gates the Edit button. Backend re-checks via
+ *     `@RequirePermission('configure')` on the PATCH; this is just UX.
  *
  * **Loading + error states:** `isLoading || isPending` covers the
  * pre-school-context idle window the same way the M1.5-FU.1 fix on
@@ -21,12 +30,14 @@
  * encounter most often in this surface.
  */
 
-import { Loader2, AlertTriangle, ArrowLeft, Paintbrush } from 'lucide-react'
+import { useState } from 'react'
+import { Loader2, AlertTriangle, ArrowLeft, Paintbrush, Pencil } from 'lucide-react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
 import { usePermission } from '@edforge/abac'
 import { useSchoolBranding } from '@edforge/identity-services'
 import { BrandingDisplay } from '../../components/branding/BrandingDisplay'
+import { BrandingForm } from '../../components/branding/BrandingForm'
 import { useActiveSchool } from '../../lib/shell-context'
 
 export function BrandingSettingsPage() {
@@ -34,6 +45,8 @@ export function BrandingSettingsPage() {
   const navigate = useNavigate()
   const { activeSchoolId, activeSchool } = useActiveSchool()
   const canView = usePermission('view', 'branding')
+  const canConfigure = usePermission('configure', 'branding')
+  const [isEditing, setIsEditing] = useState(false)
 
   // PR #88 review-fix — gate the hook's schoolId arg on `canView` so
   // non-privileged users never trigger a network request that would
@@ -95,13 +108,31 @@ export function BrandingSettingsPage() {
             </p>
           </div>
         </div>
-        <Link
-          to="/settings"
-          className="inline-flex items-center gap-1.5 text-xs text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          {t('page.backToSettings')}
-        </Link>
+        <div className="flex items-center gap-3">
+          {/*
+            Edit affordance — only when (a) we have data loaded
+            (an empty-state can also be edited to first-time-configure
+            branding, so `!error && !!data` suffices), (b) the user is
+            not currently editing, and (c) ABAC grants configure.
+          */}
+          {canConfigure && !isEditing && !error && data && (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              {t('actions.edit')}
+            </button>
+          )}
+          <Link
+            to="/settings"
+            className="inline-flex items-center gap-1.5 text-xs text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            {t('page.backToSettings')}
+          </Link>
+        </div>
       </header>
 
       {/* Body */}
@@ -123,6 +154,13 @@ export function BrandingSettingsPage() {
             {t('error.retry')}
           </button>
         </div>
+      ) : isEditing ? (
+        <BrandingForm
+          schoolId={activeSchoolId}
+          data={data}
+          onCancel={() => setIsEditing(false)}
+          onSaved={() => setIsEditing(false)}
+        />
       ) : (
         <BrandingDisplay data={data} />
       )}
