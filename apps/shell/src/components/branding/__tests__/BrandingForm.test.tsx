@@ -335,7 +335,16 @@ describe('BrandingForm (M3.4)', () => {
     expect(address.value).toBe('')
   })
 
-  it('renders the Assets section with 3 file fields (logo / signature / letterhead)', () => {
+  // Sprint C.1.10 (Path E, 2026-05-27 PM) — the letterhead slot is
+  // removed from V1 (operator-uploaded letterheads produce poor
+  // rendering without a preview-before-save UX that ships in V1.5
+  // with the C.2 Template Editor). These specs now assert that only
+  // logo + signature render and that the letterhead test-id is
+  // ABSENT — a regression guard against accidentally re-adding the
+  // slot. `letterheadBackgroundS3Key` stays on form state (and the
+  // BrandingFileField component, the BRANDING_ASSET_TYPES enum, and
+  // the MIME allowlist are all unchanged) for forward-compat.
+  it('renders the Assets section with 2 file fields (logo + signature only) — letterhead V1.5-deferred', () => {
     setupMutation()
     render(
       <Wrapper>
@@ -349,16 +358,22 @@ describe('BrandingForm (M3.4)', () => {
     )
     expect(screen.getByTestId('file-field-logoS3Key')).toBeInTheDocument()
     expect(screen.getByTestId('file-field-principalSignatureS3Key')).toBeInTheDocument()
-    expect(screen.getByTestId('file-field-letterheadBackgroundS3Key')).toBeInTheDocument()
+    // Letterhead slot must NOT appear in the V1 form (regression guard).
+    expect(
+      screen.queryByTestId('file-field-letterheadBackgroundS3Key'),
+    ).not.toBeInTheDocument()
   })
 
-  it('wires the right (assetType, currentUrl) to each FileField from data.urls', () => {
+  it('wires the right (assetType, currentUrl) to logo + signature FileFields from data.urls', () => {
     setupMutation()
     const data: BrandingResponse = {
       branding: { formalName: 'School' },
       urls: {
         logo: 'https://s3/signed/logo.png',
         principalSignature: 'https://s3/signed/sig.png',
+        // letterheadBackground url may still be present in data.urls
+        // (server-side persisted from a pre-C.1.10 upload) but the
+        // form no longer reads it.
         letterheadBackground: 'https://s3/signed/letterhead.pdf',
       },
     }
@@ -376,12 +391,10 @@ describe('BrandingForm (M3.4)', () => {
     expect(sigField).toHaveAttribute('data-asset-type', 'signature')
     expect(sigField).toHaveAttribute('data-current-url', 'https://s3/signed/sig.png')
 
-    const letterheadField = screen.getByTestId('file-field-letterheadBackgroundS3Key')
-    expect(letterheadField).toHaveAttribute('data-asset-type', 'letterhead')
-    expect(letterheadField).toHaveAttribute(
-      'data-current-url',
-      'https://s3/signed/letterhead.pdf',
-    )
+    // Persisted letterhead URL is intentionally NOT rendered as a slot in V1.
+    expect(
+      screen.queryByTestId('file-field-letterheadBackgroundS3Key'),
+    ).not.toBeInTheDocument()
   })
 
   it('asset section file fields are empty-data-current-url when data.urls is absent', () => {
@@ -398,10 +411,6 @@ describe('BrandingForm (M3.4)', () => {
     )
     expect(screen.getByTestId('file-field-logoS3Key')).toHaveAttribute('data-current-url', '')
     expect(screen.getByTestId('file-field-principalSignatureS3Key')).toHaveAttribute(
-      'data-current-url',
-      '',
-    )
-    expect(screen.getByTestId('file-field-letterheadBackgroundS3Key')).toHaveAttribute(
       'data-current-url',
       '',
     )

@@ -368,24 +368,11 @@ function BrandingFileFieldInner({
         })}
       </p>
 
-      {/* Sprint C.1.9 — letterhead-specific operator guidance.
-          When a letterhead is uploaded, the server-side renderer
-          (`@aibrains/pdf-renderer@^0.8.0`) suppresses its own
-          BrandedHeader + BrandedFooter and pushes content into the
-          letterhead's safe-area band. Operators need to know what to
-          design for. Only renders on the letterhead slot — logo +
-          signature have no such contract. */}
-      {assetType === 'letterhead' && (
-        <p
-          className="text-[10px] text-[rgb(var(--text-tertiary))] leading-relaxed"
-          role="note"
-        >
-          {t('form.upload.letterheadGuidance', {
-            defaultValue:
-              'Design for A4 portrait (210×297mm). Keep the center ~150mm clean — that is where invoice + receipt content sits. When a letterhead is set, the school name + logo from your branding settings are not added by the renderer; the letterhead provides them.',
-          })}
-        </p>
-      )}
+      {/* (Sprint C.1.10, Path E, 2026-05-27 PM) The letterhead-specific
+          helper text branch from C.1.9 has been removed alongside the
+          slot itself in BrandingForm. The component remains generic
+          across logo + signature; letterhead support returns in V1.5
+          alongside the C.2 Template Editor. */}
     </div>
   )
 }

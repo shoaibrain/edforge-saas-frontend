@@ -26,8 +26,7 @@
       "constraints": "Allowed: {{allowed}} · Max {{max}}",
       "mimeError": "Unsupported file type. Allowed: {{allowed}}",
       "sizeError": "File too large. Max: {{max}}",
-      "serverError": "Upload failed. Please try again.",
-      "letterheadGuidance": "Design for A4 portrait (210×297mm). Keep the center ~150mm clean — that is where invoice + receipt content sits. When a letterhead is set, the school name + logo from your branding settings are not added by the renderer; the letterhead provides them."
+      "serverError": "Upload failed. Please try again."
     }
   },
   "sections": {

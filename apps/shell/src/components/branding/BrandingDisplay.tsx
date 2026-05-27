@@ -96,9 +96,14 @@ export function BrandingDisplay({ data }: BrandingDisplayProps) {
         )}
       </Section>
 
-      {/* Assets — logo + signature + letterhead */}
+      {/* Assets — logo + signature. (Sprint C.1.10 Path E 2026-05-27 PM)
+          The letterhead preview row was removed alongside the upload slot
+          in BrandingForm: operator-uploaded letterheads are not used by
+          the V1 PDF renderer, so showing them in the read-only display
+          would mislead the operator into thinking they're in effect.
+          Letterhead returns in V1.5 with the C.2 Template Editor. */}
       <Section icon={ImageIcon} title={t('sections.assets')}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <AssetPreview
             label={t('fields.logo')}
             url={urls?.logo}
@@ -108,12 +113,6 @@ export function BrandingDisplay({ data }: BrandingDisplayProps) {
             label={t('fields.principalSignature')}
             url={urls?.principalSignature}
             emptyText={t('emptyField.principalSignature')}
-          />
-          <AssetPreview
-            label={t('fields.letterheadBackground')}
-            url={urls?.letterheadBackground}
-            emptyText={t('emptyField.letterheadBackground')}
-            isPdfPossible
           />
         </div>
       </Section>
