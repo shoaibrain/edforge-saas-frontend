@@ -73,6 +73,23 @@ function formatBytes(bytes: number): string {
 }
 
 /**
+ * Operator-readable label for a MIME type. The naive
+ * `m.split('/')[1].toUpperCase()` approach produces `SVG+XML` for
+ * `image/svg+xml` — accurate but ugly. Map the common ones explicitly;
+ * fall back to the subtype-uppercase for anything not listed.
+ */
+const MIME_LABELS: Record<string, string> = {
+  'image/png': 'PNG',
+  'image/jpeg': 'JPEG',
+  'image/svg+xml': 'SVG',
+  'application/pdf': 'PDF',
+}
+
+function labelMime(mime: string): string {
+  return MIME_LABELS[mime] ?? mime.split('/')[1].toUpperCase()
+}
+
+/**
  * Best-effort PDF detection from the signed URL. Letterhead may be a
  * PDF; rendering it as <img> shows broken-image. Falls back to <img>
  * on parse failure (acceptable — alt text handles the broken state).
@@ -147,11 +164,14 @@ function BrandingFileFieldInner({
   const upload = usePresignedAssetUpload()
 
   const stagedKey: string = typeof field.value === 'string' ? field.value : ''
-  const hasStagedUpload = stagedKey !== '' && stagedKey !== (currentUrl ? '__stub_current__' : '')
-  // We track whether the staged key is NEW (operator picked a file this
-  // session) vs the initial value (server-returned existing key) by
-  // comparing field.value to the form's initial default. Simpler proxy:
-  // show "Replaced" pill when upload mutation has succeeded this session.
+  // Operator has staged SOME key in this form session (either initial
+  // server-returned OR newly uploaded). Drives "Replace" vs
+  // "Choose file" button label.
+  const hasStagedUpload = stagedKey !== ''
+  // Specifically tracks whether the upload mutation succeeded in this
+  // session (i.e., operator just uploaded a NEW file). Drives the
+  // "Uploaded — Save to apply" status pill so the operator knows to
+  // click Save next. Resets to false on the next pick.
   const justUploaded = upload.isSuccess && !!upload.data?.s3Key
 
   const allowlist = BRANDING_ASSET_MIME_ALLOWLIST[assetType]
@@ -297,9 +317,9 @@ function BrandingFileFieldInner({
 
       <p id={`${id}-help`} className="text-[10px] text-[rgb(var(--text-tertiary))]">
         {t('form.upload.constraints', {
-          allowed: allowlist.map((m) => m.split('/')[1].toUpperCase()).join(', '),
+          allowed: allowlist.map(labelMime).join(', '),
           max: formatBytes(maxBytes),
-          defaultValue: `Allowed: ${allowlist.map((m) => m.split('/')[1].toUpperCase()).join(', ')} · Max ${formatBytes(maxBytes)}`,
+          defaultValue: `Allowed: ${allowlist.map(labelMime).join(', ')} · Max ${formatBytes(maxBytes)}`,
         })}
       </p>
     </div>
