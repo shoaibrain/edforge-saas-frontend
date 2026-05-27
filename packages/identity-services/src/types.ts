@@ -127,9 +127,65 @@ export interface BrandingResponse {
  * Server schema: `schoolBrandingSchema.omit({ brandingVersionId: true }).partial()`
  * — every field is optional (partial update); `brandingVersionId` is
  * server-generated and cannot be set by the client.
- *
- * Phase 1 (M3 first PR) only sends the text + color fields; the
- * `*S3Key` fields are wired in phase 2 alongside the presigned-PUT
- * upload pipeline.
  */
 export type UpdateBrandingRequest = Partial<Omit<SchoolBrandingDto, 'brandingVersionId'>>
+
+// ============================================================================
+// Asset upload types (Sprint M3 phase 2)
+// ============================================================================
+
+/**
+ * The three branding asset slots a school can populate. Naming intentionally
+ * differs from the schema fields they ultimately populate:
+ *   'logo'       → `logoS3Key`
+ *   'signature'  → `principalSignatureS3Key`
+ *   'letterhead' → `letterheadBackgroundS3Key`
+ * This mirrors the server-side `BRANDING_ASSET_TYPES` enum at
+ * `server/.../identity/src/branding/branding.types.ts:13`.
+ */
+export const BRANDING_ASSET_TYPES = ['logo', 'signature', 'letterhead'] as const
+export type BrandingAssetType = (typeof BRANDING_ASSET_TYPES)[number]
+
+/**
+ * Per-asset-type MIME allowlist. Mirrored from server `ASSET_MIME_ALLOWLIST`.
+ *
+ * Client-side validation is a UX fail-fast, NOT a security boundary —
+ * the server re-enforces the allowlist on the presign request + S3 enforces
+ * the signed `Content-Type` header on the actual PUT. Keep this in sync with
+ * the server map; a divergence here just means the operator gets the error
+ * later (after the round-trip) instead of synchronously at the file picker.
+ */
+export const BRANDING_ASSET_MIME_ALLOWLIST: Record<
+  BrandingAssetType,
+  readonly string[]
+> = {
+  logo: ['image/png', 'image/jpeg', 'image/svg+xml'],
+  signature: ['image/png', 'image/jpeg'],
+  letterhead: ['image/png', 'image/jpeg', 'application/pdf'],
+}
+
+/**
+ * Per-asset-type byte ceiling. Mirrored from server `ASSET_MAX_BYTES`.
+ */
+export const BRANDING_ASSET_MAX_BYTES: Record<BrandingAssetType, number> = {
+  logo: 2 * 1024 * 1024,
+  signature: 1 * 1024 * 1024,
+  letterhead: 5 * 1024 * 1024,
+}
+
+/** Body for `POST /schools/:schoolId/branding/assets/upload-url`. */
+export interface PresignedUploadRequest {
+  assetType: BrandingAssetType
+  contentType: string
+  contentLength: number
+}
+
+/** Response from `POST /schools/:schoolId/branding/assets/upload-url`. */
+export interface PresignedUploadResponse {
+  /** Short-lived signed PUT URL the browser uploads to directly. */
+  uploadUrl: string
+  /** S3 key the operator should assign to the matching `*S3Key` schema field. */
+  key: string
+  /** TTL (informational; the browser doesn't enforce, S3 rejects expired). */
+  expiresInSeconds: number
+}

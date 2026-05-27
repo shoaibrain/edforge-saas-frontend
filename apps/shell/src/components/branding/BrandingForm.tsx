@@ -1,15 +1,14 @@
 /**
- * BrandingForm — editable branding card (Sprint M3 phase 1).
+ * BrandingForm — editable branding card (Sprint M3 phase 1 + 2).
  *
- * Scope (phase 1 — text + colors only):
+ * Scope (phases 1 + 2):
  *   - Identity: formalName, tagline, panNumber, vatNumber
  *   - Contact: phone, email, addressLines (textarea, one line per row,
  *     max 4 lines)
  *   - Colors: primary, accent (BrandingColorPicker each)
- *
- * Phase 2 (separate PR) will add the asset section (logo, signature,
- * letterhead) via the presigned-PUT pipeline. Form-shape is forward-
- * compatible — adding sections in phase 2 doesn't require restructuring.
+ *   - Assets: logo, principalSignature, letterheadBackground via the
+ *     `BrandingFileField` (eager-upload to S3 then S3 key staged in
+ *     form state; Save fires the PATCH including the staged keys).
  *
  * **Submission semantics:** the server treats `PATCH /schools/:id/branding`
  * as a partial merge. The client computes the diff against the
@@ -39,6 +38,7 @@ import type {
 import { z } from 'zod'
 import { useFormDirtyGuard } from '../../hooks/useFormDirtyGuard'
 import { BrandingColorPicker } from './BrandingColorPicker'
+import { BrandingFileField } from './BrandingFileField'
 
 // ============================================================================
 // FORM SCHEMA
@@ -59,6 +59,12 @@ const hexOrEmpty = z
   .regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a 6-digit hex color in the form #RRGGBB')
   .or(z.literal(''))
 
+// S3 key fields (phase 2): the form holds the staged key (string) per
+// asset slot. Empty string means "no staged change for this slot."
+// The diff helper compares against initialBranding to decide whether
+// to include the key in the PATCH body.
+const s3KeyOrEmpty = z.string().max(500).or(z.literal(''))
+
 const brandingFormSchema = z
   .object({
     formalName: z.string().max(200).or(z.literal('')),
@@ -70,6 +76,9 @@ const brandingFormSchema = z
     addressLinesText: z.string(),
     primaryColor: hexOrEmpty,
     accentColor: hexOrEmpty,
+    logoS3Key: s3KeyOrEmpty,
+    principalSignatureS3Key: s3KeyOrEmpty,
+    letterheadBackgroundS3Key: s3KeyOrEmpty,
   })
   .refine(
     (data) => {
@@ -123,6 +132,9 @@ function formValuesFromBranding(b: SchoolBrandingDto | null): BrandingFormValues
     addressLinesText: (b?.addressLines ?? []).join('\n'),
     primaryColor: b?.colorPalette?.primary ?? '',
     accentColor: b?.colorPalette?.accent ?? '',
+    logoS3Key: b?.logoS3Key ?? '',
+    principalSignatureS3Key: b?.principalSignatureS3Key ?? '',
+    letterheadBackgroundS3Key: b?.letterheadBackgroundS3Key ?? '',
   }
 }
 
@@ -145,14 +157,7 @@ function formToPatch(
   const patch: UpdateBrandingRequest = {}
 
   const stringField = (
-    key: keyof Omit<
-      UpdateBrandingRequest,
-      | 'addressLines'
-      | 'colorPalette'
-      | 'logoS3Key'
-      | 'principalSignatureS3Key'
-      | 'letterheadBackgroundS3Key'
-    >,
+    key: keyof Omit<UpdateBrandingRequest, 'addressLines' | 'colorPalette'>,
     formValue: string,
     initialValue: string | undefined,
   ) => {
@@ -168,6 +173,29 @@ function formToPatch(
   stringField('vatNumber', values.vatNumber, initial?.vatNumber)
   stringField('phone', values.phone, initial?.phone)
   stringField('email', values.email, initial?.email)
+
+  // Asset S3 keys (Sprint M3 phase 2). The form's value is the staged
+  // key from a successful upload, OR the initial server-returned key
+  // if the operator didn't touch the slot. Diff against initial so
+  // unchanged slots are omitted from the PATCH (server treats omitted
+  // as "leave alone"). Empty staged key vs unset initial means the
+  // operator never picked a file — still omit.
+  // NOTE phase-2 limitation: there's no "Remove existing asset" path
+  // because the server's Zod schema for `*S3Key` uses `.min(1).optional()`
+  // — sending empty string fails validation, and sending undefined is
+  // indistinguishable from "no change." A dedicated remove-asset flow
+  // is phase-3 work and requires server changes.
+  stringField('logoS3Key', values.logoS3Key, initial?.logoS3Key)
+  stringField(
+    'principalSignatureS3Key',
+    values.principalSignatureS3Key,
+    initial?.principalSignatureS3Key,
+  )
+  stringField(
+    'letterheadBackgroundS3Key',
+    values.letterheadBackgroundS3Key,
+    initial?.letterheadBackgroundS3Key,
+  )
 
   const nextAddressLines = parseAddressLines(values.addressLinesText)
   const initialAddressLines = initial?.addressLines ?? []
@@ -387,6 +415,48 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
             <BrandingColorPicker name="accentColor" label={t('fields.accentColor')} />
           </div>
           {/* Surface the cross-field refinement error on accentColor's row. */}
+        </section>
+
+        {/* Assets section — Sprint M3 phase 2.
+            Each FileField runs its own usePresignedAssetUpload mutation,
+            so uploads are per-slot isolated. Upload happens eagerly on
+            file pick; the resulting S3 key is staged in form state and
+            included in the PATCH on Save. The current asset URL (from
+            BrandingResponse.urls) is shown as a thumbnail so the
+            operator can see what's currently set. */}
+        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] p-5 space-y-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] pb-2 border-b border-[rgb(var(--border-primary))]">
+            {t('sections.assets')}
+          </h3>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">
+            {t('form.assetsHelper')}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <BrandingFileField
+              name="logoS3Key"
+              assetType="logo"
+              schoolId={schoolId}
+              label={t('fields.logo')}
+              currentUrl={data.urls?.logo}
+              disabled={mutation.isPending}
+            />
+            <BrandingFileField
+              name="principalSignatureS3Key"
+              assetType="signature"
+              schoolId={schoolId}
+              label={t('fields.principalSignature')}
+              currentUrl={data.urls?.principalSignature}
+              disabled={mutation.isPending}
+            />
+            <BrandingFileField
+              name="letterheadBackgroundS3Key"
+              assetType="letterhead"
+              schoolId={schoolId}
+              label={t('fields.letterheadBackground')}
+              currentUrl={data.urls?.letterheadBackground}
+              disabled={mutation.isPending}
+            />
+          </div>
         </section>
 
         {/* Footer */}

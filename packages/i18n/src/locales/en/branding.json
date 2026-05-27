@@ -16,7 +16,18 @@
     "saveError": "We couldn't save your branding changes. Please try again.",
     "addressLinesPlaceholder": "One address line per row (max 4 lines)",
     "addressLinesHelper": "Up to 4 lines, each at most 120 characters. Appears on the letterhead.",
-    "colorsHelper": "Both primary and accent are required when a palette is set. Use 6-digit hex (e.g. #1F4E79). Leave both empty to use defaults."
+    "colorsHelper": "Both primary and accent are required when a palette is set. Use 6-digit hex (e.g. #1F4E79). Leave both empty to use defaults.",
+    "assetsHelper": "Upload your school's branding assets. Files upload immediately; click Save to apply.",
+    "upload": {
+      "choose": "Choose file",
+      "replace": "Replace",
+      "uploading": "Uploading…",
+      "uploaded": "Uploaded — Save to apply",
+      "constraints": "Allowed: {{allowed}} · Max {{max}}",
+      "mimeError": "Unsupported file type. Allowed: {{allowed}}",
+      "sizeError": "File too large. Max: {{max}}",
+      "serverError": "Upload failed. Please try again."
+    }
   },
   "sections": {
     "identity": "School Identity",
