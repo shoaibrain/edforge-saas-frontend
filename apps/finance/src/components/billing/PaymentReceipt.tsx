@@ -30,7 +30,11 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
 import { useDownloadReceiptPdf } from '@edforge/finance-services'
-import { CheckCircle2, Printer, ArrowLeft, Download, Loader2 } from 'lucide-react'
+// Sprint M1.5-FU.7.4 — removed `Printer` from imports; HTML `window.print()`
+// button retired in favour of the canonical Download → OS print dialog flow.
+// One source of truth for printed output (the server-rendered PABSON-branded
+// PDF), not two diverging ones (HTML chrome-included print vs. clean PDF).
+import { CheckCircle2, ArrowLeft, Download, Loader2 } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
@@ -94,16 +98,6 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
               <Download className="w-3.5 h-3.5" />
             )}
             {downloading ? t('receipt.generating') : t('receipt.download')}
-          </button>
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-              border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))]
-              hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            {t('receipt.print')}
           </button>
         </div>
       </div>

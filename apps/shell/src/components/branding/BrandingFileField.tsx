@@ -31,7 +31,7 @@
  * materializes; mirrors the BrandingColorPicker rationale.
  */
 
-import { useRef, useId, useState, useCallback } from 'react'
+import { useRef, useId, useState, useCallback, useEffect } from 'react'
 import { Controller } from '@edforge/forms'
 import { useTranslation } from '@edforge/i18n'
 import {
@@ -160,6 +160,35 @@ function BrandingFileFieldInner({
   const id = useId()
   const [localError, setLocalError] = useState<string | null>(null)
 
+  // Sprint M3-phase-3 — eager preview (closes Issue #25 from
+  // pdf-service-mfe-integration-plan.md §0.3). After a successful
+  // upload we hold a `URL.createObjectURL(file)` blob so the
+  // preview reflects the just-picked file immediately, BEFORE the
+  // form is saved and `currentUrl` refetches with the new signed
+  // GET URL. Without this, the preview kept showing the prior
+  // asset until Save → refetch, which the operator (correctly)
+  // read as "the upload didn't take effect."
+  //
+  // Lifecycle:
+  //   - On successful upload, set { url: createObjectURL(file), isPdf }
+  //   - On subsequent re-pick, revoke previous + create new
+  //   - On unmount, revoke whatever's current (useEffect cleanup)
+  //   - When `currentUrl` updates from a refetch we COULD revoke
+  //     here, but it's harmless to keep the blob until unmount —
+  //     and `eagerPreview` takes priority anyway, so we don't
+  //     even need to gate on it.
+  const [eagerPreview, setEagerPreview] = useState<
+    { url: string; isPdf: boolean } | null
+  >(null)
+  useEffect(() => {
+    return () => {
+      if (eagerPreview) URL.revokeObjectURL(eagerPreview.url)
+    }
+    // We deliberately depend on the url so a fresh blob revokes the
+    // previous one when the operator re-picks; mount-time effect run
+    // with `eagerPreview === null` is a no-op.
+  }, [eagerPreview])
+
   // Per-slot upload mutation.
   const upload = usePresignedAssetUpload()
 
@@ -185,6 +214,14 @@ function BrandingFileFieldInner({
       try {
         const result = await upload.mutateAsync({ schoolId, assetType, file })
         field.onChange(result.s3Key)
+        // Eager preview — synthesize a local blob URL from the file so
+        // the operator sees the new asset reflected immediately. The
+        // useEffect cleanup on `eagerPreview` revokes the prior URL
+        // when this one replaces it.
+        setEagerPreview({
+          url: URL.createObjectURL(file),
+          isPdf: file.type === 'application/pdf',
+        })
       } catch (e) {
         const code = (e as { code?: string }).code
         if (code === 'mime') {
@@ -225,11 +262,19 @@ function BrandingFileFieldInner({
     inputRef.current?.click()
   }
 
-  const showPdfPreview = currentUrl && isLikelyPdf(currentUrl)
-  const preview = currentUrl ? (
-    showPdfPreview ? (
+  // Eager preview takes priority over the server-supplied `currentUrl`.
+  // After a successful upload the operator sees the new asset
+  // immediately; after Save → refetch, `currentUrl` updates with the
+  // new signed URL and continues to work (the blob URL stays valid
+  // until unmount but the eager value is the correct preview).
+  const previewSrc = eagerPreview?.url ?? currentUrl ?? null
+  const previewIsPdf = eagerPreview
+    ? eagerPreview.isPdf
+    : !!currentUrl && isLikelyPdf(currentUrl)
+  const preview = previewSrc ? (
+    previewIsPdf ? (
       <a
-        href={currentUrl}
+        href={previewSrc}
         target="_blank"
         rel="noopener noreferrer"
         className="aspect-video rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors flex items-center justify-center text-xs text-[rgb(var(--text-secondary))] font-medium"
@@ -238,7 +283,7 @@ function BrandingFileFieldInner({
       </a>
     ) : (
       <img
-        src={currentUrl}
+        src={previewSrc}
         alt={label}
         className="block w-full aspect-video object-contain rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
       />

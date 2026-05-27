@@ -13,7 +13,6 @@ import {
   Outlet,
   redirect,
   useNavigate,
-  useParams,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
@@ -56,7 +55,6 @@ import ParentAttendancePage from './pages/parent-portal/ParentAttendancePage'
 import ParentSchedulePage from './pages/parent-portal/ParentSchedulePage'
 import FeePaymentPage from './pages/parent-portal/FeePaymentPage'
 import PaymentCallbackPage from './pages/payments/callback'
-import ReceiptPage from './pages/payments/receipt'
 import {
   AccountPage,
   SecurityPage,
@@ -835,17 +833,15 @@ const paymentCallbackRoute = createRoute({
   errorComponent: PortalPageError,
 })
 
-const paymentReceiptRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: '/payments/$paymentId/receipt',
-  component: PaymentReceiptRouteComponent,
-  errorComponent: PortalPageError,
-})
-
-function PaymentReceiptRouteComponent() {
-  const params = useParams({ strict: false }) as { paymentId?: string }
-  return <ReceiptPage paymentId={params.paymentId ?? ''} />
-}
+// Sprint M1.5-FU.2 moved the receipt page into Finance MFE at
+// `/finance/payments/$paymentId/receipt`. The shell-side route + page +
+// component artifacts (paymentReceiptRoute, ReceiptPage,
+// PaymentReceiptRouteComponent, the local PaymentReceipt component, and
+// the shell-side `usePaymentReceipt` re-export) were left behind by that
+// sprint as dead code. Sprint M1.5-FU.7 closeout housekeeping (2026-05-27)
+// removes them: anyone navigating to the bare shell path now hits
+// MfeNotFoundBoundary (M0.5) cleanly. No prod callers remain — the Finance
+// eye-icon and per-row Download both target the in-MFE route.
 
 // ============================================================================
 // ROUTE TREE
@@ -890,7 +886,6 @@ const routeTree = rootRoute.addChildren([
     peopleRoute,
     analyticsRoute,
     paymentCallbackRoute,
-    paymentReceiptRoute,
     studentPortalRoute.addChildren([
       studentPortalIndexRoute,
       studentPortalGradesRoute,

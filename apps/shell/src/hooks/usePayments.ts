@@ -15,7 +15,9 @@ export {
   useInvoicePayments,
   useInitiatePayment,
   useVerifyPayment,
-  usePaymentReceipt,
+  // `usePaymentReceipt` re-export removed in Sprint M1.5-FU.7 closeout —
+  // shell no longer renders a receipt page (moved to Finance MFE in
+  // M1.5-FU.2). Any future shell-side consumer should re-add the export.
   useStudentAccounts,
   useStudentLedger,
   useSchoolPayments,
