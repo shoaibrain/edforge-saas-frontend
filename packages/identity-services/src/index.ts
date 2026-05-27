@@ -29,10 +29,25 @@ export type {
   BrandingAssetUrls,
   BrandingResponse,
   UpdateBrandingRequest,
+  BrandingAssetType,
+  PresignedUploadRequest,
+  PresignedUploadResponse,
+} from './types'
+// Constants — kept as values not types so consumers can read the
+// allowlist + size caps without re-declaring.
+export {
+  BRANDING_ASSET_TYPES,
+  BRANDING_ASSET_MIME_ALLOWLIST,
+  BRANDING_ASSET_MAX_BYTES,
 } from './types'
 
 // Services
-export { getBranding, updateBranding } from './services/branding.service'
+export {
+  getBranding,
+  updateBranding,
+  presignBrandingUpload,
+  uploadAssetToS3,
+} from './services/branding.service'
 
 // Hooks
 export {
@@ -40,3 +55,9 @@ export {
   useSchoolBranding,
   useUpdateBranding,
 } from './hooks/useBranding'
+export {
+  usePresignedAssetUpload,
+  runAssetUpload,
+  type AssetUploadVariables,
+  type AssetUploadResult,
+} from './hooks/usePresignedAssetUpload'

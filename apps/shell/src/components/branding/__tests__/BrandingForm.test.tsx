@@ -29,6 +29,55 @@ const toastErrorMock = vi.fn()
 
 vi.mock('@edforge/identity-services', () => ({
   useUpdateBranding: (...args: unknown[]) => useUpdateBrandingMock(...args),
+  // BrandingFileField imports these; the FileField is mocked below to a
+  // no-op component, but the module-import-graph still needs these
+  // symbols to resolve. Stub minimally.
+  usePresignedAssetUpload: () => ({
+    mutate: vi.fn(),
+    mutateAsync: vi.fn().mockResolvedValue({ s3Key: 'unused' }),
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    data: undefined,
+    error: null,
+    reset: vi.fn(),
+  }),
+  BRANDING_ASSET_MIME_ALLOWLIST: {
+    logo: ['image/png', 'image/jpeg', 'image/svg+xml'],
+    signature: ['image/png', 'image/jpeg'],
+    letterhead: ['image/png', 'image/jpeg', 'application/pdf'],
+  },
+  BRANDING_ASSET_MAX_BYTES: {
+    logo: 2 * 1024 * 1024,
+    signature: 1 * 1024 * 1024,
+    letterhead: 5 * 1024 * 1024,
+  },
+}))
+
+// Heavy-mount avoidance: BrandingFileField has its own dedicated specs
+// at BrandingFileField.test.tsx — rendering it here would just inflate
+// the test's dependency surface (per-field useId + Controller wiring +
+// upload mutation lifecycle). Stub to a marker so the BrandingForm
+// tests stay focused on form-level behavior.
+vi.mock('../BrandingFileField', () => ({
+  BrandingFileField: ({
+    name,
+    label,
+    assetType,
+    currentUrl,
+  }: {
+    name: string
+    label: string
+    assetType: string
+    currentUrl?: string
+  }) => (
+    <div
+      data-testid={`file-field-${name}`}
+      data-label={label}
+      data-asset-type={assetType}
+      data-current-url={currentUrl ?? ''}
+    />
+  ),
 }))
 
 vi.mock('@edforge/i18n', () => ({
@@ -284,6 +333,78 @@ describe('BrandingForm (M3.4)', () => {
     // The address textarea is empty.
     const address = screen.getByLabelText('fields.addressLines') as HTMLTextAreaElement
     expect(address.value).toBe('')
+  })
+
+  it('renders the Assets section with 3 file fields (logo / signature / letterhead)', () => {
+    setupMutation()
+    render(
+      <Wrapper>
+        <BrandingForm
+          schoolId="s-1"
+          data={makeData()}
+          onCancel={vi.fn()}
+          onSaved={vi.fn()}
+        />
+      </Wrapper>,
+    )
+    expect(screen.getByTestId('file-field-logoS3Key')).toBeInTheDocument()
+    expect(screen.getByTestId('file-field-principalSignatureS3Key')).toBeInTheDocument()
+    expect(screen.getByTestId('file-field-letterheadBackgroundS3Key')).toBeInTheDocument()
+  })
+
+  it('wires the right (assetType, currentUrl) to each FileField from data.urls', () => {
+    setupMutation()
+    const data: BrandingResponse = {
+      branding: { formalName: 'School' },
+      urls: {
+        logo: 'https://s3/signed/logo.png',
+        principalSignature: 'https://s3/signed/sig.png',
+        letterheadBackground: 'https://s3/signed/letterhead.pdf',
+      },
+    }
+    render(
+      <Wrapper>
+        <BrandingForm schoolId="s-1" data={data} onCancel={vi.fn()} onSaved={vi.fn()} />
+      </Wrapper>,
+    )
+
+    const logoField = screen.getByTestId('file-field-logoS3Key')
+    expect(logoField).toHaveAttribute('data-asset-type', 'logo')
+    expect(logoField).toHaveAttribute('data-current-url', 'https://s3/signed/logo.png')
+
+    const sigField = screen.getByTestId('file-field-principalSignatureS3Key')
+    expect(sigField).toHaveAttribute('data-asset-type', 'signature')
+    expect(sigField).toHaveAttribute('data-current-url', 'https://s3/signed/sig.png')
+
+    const letterheadField = screen.getByTestId('file-field-letterheadBackgroundS3Key')
+    expect(letterheadField).toHaveAttribute('data-asset-type', 'letterhead')
+    expect(letterheadField).toHaveAttribute(
+      'data-current-url',
+      'https://s3/signed/letterhead.pdf',
+    )
+  })
+
+  it('asset section file fields are empty-data-current-url when data.urls is absent', () => {
+    setupMutation()
+    render(
+      <Wrapper>
+        <BrandingForm
+          schoolId="s-1"
+          data={{ branding: null }}
+          onCancel={vi.fn()}
+          onSaved={vi.fn()}
+        />
+      </Wrapper>,
+    )
+    expect(screen.getByTestId('file-field-logoS3Key')).toHaveAttribute('data-current-url', '')
+    expect(screen.getByTestId('file-field-principalSignatureS3Key')).toHaveAttribute(
+      'data-current-url',
+      '',
+    )
+    expect(screen.getByTestId('file-field-letterheadBackgroundS3Key')).toHaveAttribute(
+      'data-current-url',
+      '',
+    )
   })
 
   it('submits address lines as an array (split on newlines, trimmed, filtered)', async () => {
