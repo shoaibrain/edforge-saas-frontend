@@ -454,7 +454,12 @@ function ReceiptDownloadIconButton({
       }
       disabled={downloadReceipt.isPending}
       className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
-      title={label}
+      // Sprint M1.5-FU.7.5 — `title=` removed; the browser-native tooltip
+      // it produced orphaned in the top-left of the page when this row
+      // unmounted mid-hover (Issue #22 Hypothesis 2). `aria-label` keeps
+      // the accessible name for screen readers. If we ever want a
+      // sighted-user tooltip back, mount a Radix Tooltip primitive whose
+      // lifecycle is scoped to this row.
       aria-label={label}
     >
       {downloadReceipt.isPending ? (
@@ -570,16 +575,21 @@ function usePaymentColumns(
           const payment = row.original
           return (
             <div className="flex items-center justify-end gap-1">
-              {/* View receipt */}
-              {payment.receiptNumber && (
-                // M1.5-FU.3 — in-MFE navigate now that the receipt page
-                // lives at `/payments/$paymentId/receipt` inside Finance
-                // MFE (M1.5-FU.2). Resolves through Finance's
-                // `basepath: '/finance'` to
-                // `/finance/payments/<id>/receipt` — no full-page reload,
-                // no cross-MFE shim. Previously used
-                // `viewDocument(receiptHref(...))` to jump to a shell-
-                // owned route; that shim retires in M1.5-FU.6.
+              {/* View receipt + Download PDF — Sprint M1.5-FU.7.2:
+                  BOTH buttons require status === 'completed' (not just
+                  receiptNumber). Refunded / voided / failed payments
+                  may carry a stale receiptNumber from when they were
+                  briefly completed, but the backend rejects
+                  /payments/:id/receipt + /payments/:id/receipt/pdf
+                  with 400 BAD_REQUEST 'Receipt is only available for
+                  completed payments'. Hiding the buttons prevents the
+                  operator from ever seeing a 400 — a refunded payment
+                  has no operator-actionable receipt path anyway.
+                  Symmetric for both the View eye-icon (M1.5-FU.3
+                  origin) and the Download action (M1.5-FU.4 origin).
+                  User-reported "Its not consistently working for all
+                  the payments" resolves on the spot (Issue #19). */}
+              {payment.status === 'completed' && payment.receiptNumber && (
                 <button
                   type="button"
                   onClick={() =>
@@ -589,26 +599,23 @@ function usePaymentColumns(
                     })
                   }
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
-                  title="View Receipt"
+                  // Sprint M1.5-FU.7.5 — `title=` removed for the same
+                  // reason as ReceiptDownloadIconButton; aria-label
+                  // preserves the accessible name.
                   aria-label="View receipt"
                 >
                   <Eye className="w-4 h-4" />
                 </button>
               )}
-              {/*
-                M1.5-FU.4 — per-row Download PDF action. Symmetric to
-                M1.6 on the Invoice list. Only rendered when both
-                schoolId is resolved AND the row has a receipt
-                (completed payments). The hook is per-row-isolated
-                so clicking row N doesn't disable rows ≠ N.
-              */}
-              {activeSchoolId && payment.receiptNumber && (
-                <ReceiptDownloadIconButton
-                  schoolId={activeSchoolId}
-                  paymentId={payment.id}
-                  receiptNumber={payment.receiptNumber}
-                />
-              )}
+              {activeSchoolId &&
+                payment.status === 'completed' &&
+                payment.receiptNumber && (
+                  <ReceiptDownloadIconButton
+                    schoolId={activeSchoolId}
+                    paymentId={payment.id}
+                    receiptNumber={payment.receiptNumber}
+                  />
+                )}
               {/* Void (for completed only) */}
               {payment.status === 'completed' && (
                 <button

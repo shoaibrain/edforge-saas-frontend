@@ -294,4 +294,57 @@ describe('BrandingFileField (M3 phase 2)', () => {
     )
     expect(screen.getByRole('button', { name: /form\.upload\.choose/i })).toBeDisabled()
   })
+
+  // Sprint M3-phase-3 / Issue #25 — eager-preview behavior. After a
+  // successful upload the preview switches from the prior
+  // server-supplied `currentUrl` to a `blob:` URL synthesized via
+  // `URL.createObjectURL(file)`, so the operator sees the new asset
+  // immediately (BEFORE Save → refetch lands the new signed GET URL).
+  it('replaces the preview src with a blob URL after a successful upload (M3-phase-3 eager preview)', async () => {
+    const mutateAsync = vi.fn().mockResolvedValue({ s3Key: 'tenants/t/s/logo-2.png' })
+    usePresignedAssetUploadMock.mockReturnValue({
+      mutate: vi.fn(),
+      mutateAsync,
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+      data: { s3Key: 'tenants/t/s/logo-2.png' },
+      error: null,
+      reset: vi.fn(),
+    })
+
+    render(
+      <Harness>
+        <BrandingFileField
+          name="logoS3Key"
+          assetType="logo"
+          schoolId="s-1"
+          label="Logo"
+          // Pre-existing asset is rendered with the signed URL.
+          currentUrl="https://example.s3/signed/old-logo.png"
+        />
+      </Harness>,
+    )
+
+    // Sanity: initial preview shows the prior server-supplied signed URL.
+    expect(screen.getByRole('img', { name: 'Logo' })).toHaveAttribute(
+      'src',
+      'https://example.s3/signed/old-logo.png',
+    )
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const file = makeFile({ type: 'image/png', sizeBytes: 1024 })
+
+    await act(async () => {
+      fireEvent.change(fileInput, { target: { files: [file] } })
+    })
+
+    // After the upload resolves, the preview src must point at a
+    // blob URL synthesized from the picked file — NOT the stale
+    // server-supplied URL.
+    await waitFor(() => {
+      const img = screen.getByRole('img', { name: 'Logo' }) as HTMLImageElement
+      expect(img.getAttribute('src')).toMatch(/^blob:/)
+    })
+  })
 })
