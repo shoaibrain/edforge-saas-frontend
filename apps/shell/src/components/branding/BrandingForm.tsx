@@ -431,7 +431,22 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
           <p className="text-xs text-[rgb(var(--text-tertiary))]">
             {t('form.assetsHelper')}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Sprint C.1.10 (Path E, 2026-05-27 PM) — letterhead upload slot
+              removed from V1. Operator-uploaded letterhead PNGs produced
+              unprofessional rendering regardless of `objectFit` strategy
+              because typical operator-designed letterheads (non-A4-portrait
+              aspect ratio, internal header band + center watermark)
+              compete with the EdForge-rendered content. The renderer
+              cannot fix bad source images; this needs a preview-before-
+              save UX which ships in V1.5 with the C.2 Template Editor.
+              Logo + signature stay (raster, no layout collision). The
+              BrandingFileField component, the `letterhead` entry in
+              `BRANDING_ASSET_TYPES`, and `letterheadBackgroundS3Key` on
+              the form state all remain — only the slot is gone. Saved
+              S3 keys on existing tenants persist in DDB but the server
+              no longer forwards them to the renderer (see C.1.10 in
+              v1-master-epic-breakdown.md). */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BrandingFileField
               name="logoS3Key"
               assetType="logo"
@@ -446,14 +461,6 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
               schoolId={schoolId}
               label={t('fields.principalSignature')}
               currentUrl={data.urls?.principalSignature}
-              disabled={mutation.isPending}
-            />
-            <BrandingFileField
-              name="letterheadBackgroundS3Key"
-              assetType="letterhead"
-              schoolId={schoolId}
-              label={t('fields.letterheadBackground')}
-              currentUrl={data.urls?.letterheadBackground}
               disabled={mutation.isPending}
             />
           </div>

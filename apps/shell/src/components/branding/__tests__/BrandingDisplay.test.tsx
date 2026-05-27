@@ -67,10 +67,13 @@ describe('BrandingDisplay (M2.4)', () => {
     expect(screen.getAllByText('#1D9E75').length).toBeGreaterThan(0)
     expect(screen.getAllByText('#378ADD').length).toBeGreaterThan(0)
 
-    // Assets — logo + signature should render as <img>; letterhead (PDF) as link.
+    // Assets — logo + signature render as <img>. (Sprint C.1.10 Path E
+    // 2026-05-27 PM) The letterhead preview row was removed alongside the
+    // upload slot in BrandingForm; the BrandingDisplay shows logo +
+    // signature only.
     const images = screen.getAllByRole('img')
-    // Color swatches also use role=img — count includes them. At minimum we have
-    // the 2 swatches + 2 photo assets = 4 (PDF letterhead is a link, not img).
+    // Color swatches also use role=img — count includes them. At minimum
+    // we have the 2 swatches + 2 photo assets = 4.
     expect(images.length).toBeGreaterThanOrEqual(4)
 
     // Version
@@ -97,9 +100,11 @@ describe('BrandingDisplay (M2.4)', () => {
     expect(screen.getAllByText('#FF0000').length).toBeGreaterThan(0)
 
     // Asset slots show their empty placeholders (no <img> for missing URLs).
+    // (C.1.10 Path E) Letterhead slot is removed; only logo + signature
+    // empty-states render.
     expect(screen.getByText('emptyField.logo')).toBeInTheDocument()
     expect(screen.getByText('emptyField.principalSignature')).toBeInTheDocument()
-    expect(screen.getByText('emptyField.letterheadBackground')).toBeInTheDocument()
+    expect(screen.queryByText('emptyField.letterheadBackground')).not.toBeInTheDocument()
   })
 
   it('renders the empty-state when branding is null', () => {
@@ -131,15 +136,18 @@ describe('BrandingDisplay (M2.4)', () => {
     expect(logoImg).toHaveAttribute('src', 'https://example.s3.amazonaws.com/signed/logo.png')
   })
 
-  it('renders the letterhead PDF as a link, not as an <img>', () => {
+  // (Sprint C.1.10 Path E 2026-05-27 PM) The original C.0-followup spec
+  // here asserted that a `.pdf` letterhead URL renders as an anchor
+  // labelled "PDF" instead of a broken `<img>`. With the letterhead row
+  // removed from BrandingDisplay, the spec is replaced with a regression
+  // guard: even if the response carries a `letterheadBackground` URL,
+  // BrandingDisplay does not render a slot for it (operator should not
+  // see a stale preview of a V1.5-deferred feature).
+  it('does NOT render a letterhead slot even when data.urls.letterheadBackground is present (V1.5-deferred)', () => {
     const data = makeFullResponse()
     render(<BrandingDisplay data={data} />)
-    // The component detects .pdf extensions and renders an anchor with
-    // the text "PDF" instead of an <img> (which would broken-image).
-    const pdfLink = screen.getByRole('link', { name: 'PDF' })
-    expect(pdfLink).toHaveAttribute(
-      'href',
-      'https://example.s3.amazonaws.com/signed/letterhead.pdf',
-    )
+    // The slot is removed; the PDF anchor that used to render isn't here.
+    expect(screen.queryByRole('link', { name: 'PDF' })).not.toBeInTheDocument()
+    expect(screen.queryByText('fields.letterheadBackground')).not.toBeInTheDocument()
   })
 })
