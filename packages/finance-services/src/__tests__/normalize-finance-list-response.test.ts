@@ -31,4 +31,13 @@ describe('normalizeFinanceListResponse', () => {
     expect(normalizeFinanceListResponse(null)).toEqual({ items: [], hasMore: false })
     expect(normalizeFinanceListResponse(undefined)).toEqual({ items: [], hasMore: false })
   })
+
+  it('infers hasMore from lastEvaluatedKey when hasMore is omitted', () => {
+    const result = normalizeFinanceListResponse({
+      items: [{ id: '1' }],
+      lastEvaluatedKey: 'cursor-abc',
+    } as { items: { id: string }[]; lastEvaluatedKey: string })
+    expect(result.hasMore).toBe(true)
+    expect(result.lastEvaluatedKey).toBe('cursor-abc')
+  })
 })

@@ -13,15 +13,14 @@ import type {
   StudentAccount,
   StudentLedgerEntry,
 } from '@edforge/types'
-import type { FinanceListQueryParams, StudentAccountListParams } from '../types/pagination'
+import type {
+  FinanceListQueryParams,
+  FinancePaginatedResponse,
+  StudentAccountListParams,
+} from '../types/pagination'
 import { normalizeFinanceListResponse } from '../utils/normalize-finance-list-response'
 
-/** Backend finance pagination shape: { items, hasMore, lastEvaluatedKey? } */
-export interface FinancePaginatedResponse<T> {
-  items: T[]
-  hasMore: boolean
-  lastEvaluatedKey?: string
-}
+export type { FinancePaginatedResponse } from '../types/pagination'
 
 export type InvoiceListParams = InvoiceFilterDto & FinanceListQueryParams
 

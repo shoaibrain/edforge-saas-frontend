@@ -3,7 +3,7 @@ import { renderHook, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { useFinancePaginatedQuery } from '../hooks/useFinancePaginatedQuery'
-import type { FinancePaginatedResponse } from '../services/invoices.service'
+import type { FinancePaginatedResponse } from '../types/pagination'
 
 function wrapper(client: QueryClient) {
   return function Wrapper({ children }: { children: ReactNode }) {

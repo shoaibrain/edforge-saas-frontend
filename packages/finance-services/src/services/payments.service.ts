@@ -20,7 +20,7 @@ import type {
   DashboardSummary,
 } from '@edforge/types'
 import type { FinanceListQueryParams } from '../types/pagination'
-import type { FinancePaginatedResponse } from './invoices.service'
+import type { FinancePaginatedResponse } from '../types/pagination'
 import { normalizeFinanceListResponse } from '../utils/normalize-finance-list-response'
 
 export type SchoolPaymentListParams = FinanceListQueryParams & {

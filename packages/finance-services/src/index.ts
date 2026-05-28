@@ -21,7 +21,6 @@ export {
   invoicesService,
 } from './services/invoices.service'
 export type {
-  FinancePaginatedResponse,
   InvoiceListParams,
   BulkGenerateInvoiceResponse,
   BulkGenerateInvoiceDto,
@@ -29,6 +28,7 @@ export type {
   BulkIssueInvoicesResponse,
 } from './services/invoices.service'
 export type {
+  FinancePaginatedResponse,
   FinanceListQueryParams,
   StudentAccountListParams,
 } from './types/pagination'

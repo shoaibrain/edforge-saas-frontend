@@ -5,7 +5,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useMemo, useCallback } from 'react'
-import type { FinancePaginatedResponse } from '../services/invoices.service'
+import type { FinancePaginatedResponse } from '../types/pagination'
 import { flattenFinancePages } from '../utils/flatten-finance-pages'
 
 export interface UseFinancePaginatedQueryOptions<T, TFilters = Record<string, unknown>> {

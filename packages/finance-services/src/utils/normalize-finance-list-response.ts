@@ -1,4 +1,4 @@
-import type { FinancePaginatedResponse } from '../services/invoices.service'
+import type { FinancePaginatedResponse } from '../types/pagination'
 
 /**
  * Unwrap finance list API responses: paginated object vs legacy bare array.
@@ -14,7 +14,7 @@ export function normalizeFinanceListResponse<T>(
   }
   return {
     items: response.items ?? [],
-    hasMore: response.hasMore ?? false,
+    hasMore: response.hasMore ?? response.lastEvaluatedKey != null,
     lastEvaluatedKey: response.lastEvaluatedKey,
   }
 }

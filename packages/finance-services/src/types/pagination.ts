@@ -3,6 +3,13 @@
  * Backend query param: `cursor` (base64 JSON). Response field: `lastEvaluatedKey`.
  */
 
+/** Backend finance list pagination shape: { items, hasMore, lastEvaluatedKey? } */
+export interface FinancePaginatedResponse<T> {
+  items: T[]
+  hasMore: boolean
+  lastEvaluatedKey?: string
+}
+
 export interface FinanceListQueryParams {
   limit?: number
   cursor?: string

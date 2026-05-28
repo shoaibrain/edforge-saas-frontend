@@ -1,5 +1,5 @@
 import type { InfiniteData } from '@tanstack/react-query'
-import type { FinancePaginatedResponse } from '../services/invoices.service'
+import type { FinancePaginatedResponse } from '../types/pagination'
 
 /**
  * Flatten infinite-query pages into a single items array.
