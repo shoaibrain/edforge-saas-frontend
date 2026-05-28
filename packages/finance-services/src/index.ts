@@ -22,11 +22,17 @@ export {
 } from './services/invoices.service'
 export type {
   FinancePaginatedResponse,
+  InvoiceListParams,
   BulkGenerateInvoiceResponse,
   BulkGenerateInvoiceDto,
   BulkIssueInvoicesDto,
   BulkIssueInvoicesResponse,
 } from './services/invoices.service'
+export type {
+  FinanceListQueryParams,
+  StudentAccountListParams,
+} from './types/pagination'
+export type { SchoolPaymentListParams } from './services/payments.service'
 
 export {
   initiatePayment,
@@ -74,6 +80,7 @@ export {
 export {
   feeStructureKeys,
   useFeeStructures,
+  useFeeStructuresInfinite,
   useCreateFeeStructure,
   useUpdateFeeStructure,
   useDeleteFeeStructure,
@@ -82,6 +89,7 @@ export {
 export {
   paymentKeys,
   useInvoices,
+  useInvoicesInfinite,
   useInvoice,
   useGenerateInvoice,
   useIssueInvoice,
@@ -91,8 +99,11 @@ export {
   useVerifyPayment,
   usePaymentReceipt,
   useStudentAccounts,
+  useStudentAccountsInfinite,
   useStudentLedger,
+  useStudentLedgerInfinite,
   useSchoolPayments,
+  useSchoolPaymentsInfinite,
   useRecordManualPayment,
   useVoidPayment,
   useCreateRefund,
@@ -128,3 +139,14 @@ export {
 
 // PDF error-toast helper (M1.11)
 export { usePdfErrorToast, type PdfDocType } from './hooks/usePdfErrorToast'
+
+// Pagination foundation (Sprint 0)
+export { useFinancePaginatedQuery } from './hooks/useFinancePaginatedQuery'
+export type {
+  UseFinancePaginatedQueryOptions,
+  UseFinancePaginatedQueryResult,
+} from './hooks/useFinancePaginatedQuery'
+export { normalizeFinanceListResponse } from './utils/normalize-finance-list-response'
+export { flattenFinancePages } from './utils/flatten-finance-pages'
+export { buildServerPaginationProps } from './utils/build-server-pagination-props'
+export type { FinanceServerPaginationConfig } from './utils/build-server-pagination-props'

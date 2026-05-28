@@ -39,7 +39,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import {
-  useInvoices,
+  useInvoicesInfinite,
+  useDashboardSummary,
+  buildServerPaginationProps,
   useGenerateInvoice,
   useIssueInvoice,
   useCancelInvoice,
@@ -134,31 +136,49 @@ export default function InvoicesPage() {
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
 
-  const { data: invoiceData, isLoading } = useInvoices(schoolId ?? '', {
-    ...(statusFilter && { status: statusFilter as any }),
+  const invoiceFilters = useMemo(
+    () => ({ ...(statusFilter && { status: statusFilter as Invoice['status'] }) }),
+    [statusFilter],
+  )
+
+  const {
+    items: invoices,
+    isLoading,
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+    totalLoaded,
+  } = useInvoicesInfinite(schoolId ?? '', invoiceFilters)
+
+  const { data: dashboard, isLoading: dashboardLoading } = useDashboardSummary(schoolId ?? '')
+
+  const { serverPagination, isFetching } = buildServerPaginationProps({
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
   })
+
   const issueMutation = useIssueInvoice(schoolId ?? '')
   const cancelMutation = useCancelInvoice(schoolId ?? '')
   const bulkIssueMutation = useBulkIssueInvoices(schoolId ?? '')
 
-  const invoices = invoiceData?.items ?? []
-
-  // KPI values derived from invoice data
+  const countSuffix = hasMore ? '+' : ''
   const kpi = useMemo(() => {
-    const totalInvoiced = invoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0)
-    const totalCollected = invoices.reduce((sum, inv) => sum + (inv.amountPaid || 0), 0)
-    const outstanding = invoices
-      .filter((inv) => inv.status !== 'cancelled' && inv.status !== 'paid')
-      .reduce((sum, inv) => sum + (inv.amountDue || 0), 0)
-    const overdue = invoices
-      .filter((inv) => inv.status === 'overdue')
-      .reduce((sum, inv) => sum + (inv.amountDue || 0), 0)
-    const overdueCount = invoices.filter((inv) => inv.status === 'overdue').length
-    const draftCount = invoices.filter((inv) => inv.status === 'draft').length
-    const paidCount = invoices.filter((inv) => inv.status === 'paid').length
-    const collectionRate = totalInvoiced > 0 ? (totalCollected / totalInvoiced) * 100 : 0
-    return { totalInvoiced, totalCollected, outstanding, overdue, overdueCount, draftCount, paidCount, collectionRate }
-  }, [invoices])
+    const summary = dashboard
+    const overdueCount = summary?.invoicesByStatus?.overdue ?? 0
+    const draftCount = summary?.invoicesByStatus?.draft ?? 0
+    const paidCount = summary?.invoicesByStatus?.paid ?? 0
+    return {
+      totalInvoiced: summary?.totalInvoiced ?? 0,
+      totalCollected: summary?.totalCollected ?? 0,
+      outstanding: summary?.outstanding ?? 0,
+      overdue: summary?.overdue ?? 0,
+      overdueCount,
+      draftCount,
+      paidCount,
+      collectionRate: summary?.collectionRate ?? 0,
+    }
+  }, [dashboard])
 
   // Selected draft invoice IDs for bulk issue
   const selectedDraftIds = useMemo(() => {
@@ -427,8 +447,8 @@ export default function InvoicesPage() {
             accentColor="rgba(55, 138, 221, 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
-            tag={{ text: `${invoices.length} invoices`, color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
-            loading={isLoading}
+            tag={{ text: `${totalLoaded}${countSuffix} invoices`, color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            loading={isLoading || dashboardLoading}
           />
           <StatCard
             label="Collected"
@@ -438,7 +458,7 @@ export default function InvoicesPage() {
             iconColor="#1D9E75"
             barColor="#1D9E75"
             tag={{ text: `${kpi.paidCount} paid`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
+            loading={isLoading || dashboardLoading}
             valueColor="#1D9E75"
           />
           <StatCard
@@ -448,8 +468,8 @@ export default function InvoicesPage() {
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
-            tag={{ text: `${invoices.filter(i => i.status !== 'paid' && i.status !== 'cancelled').length} awaiting`, color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            loading={isLoading}
+            tag={{ text: `${totalLoaded}${countSuffix} loaded`, color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            loading={isLoading || dashboardLoading}
           />
           <StatCard
             label="Overdue"
@@ -458,8 +478,8 @@ export default function InvoicesPage() {
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"
-            tag={{ text: `${kpi.overdueCount} invoices`, color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
-            loading={isLoading}
+            tag={{ text: `${kpi.overdueCount} overdue`, color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
+            loading={isLoading || dashboardLoading}
           />
         </div>
       </WidgetErrorBoundaryV2>
@@ -475,17 +495,26 @@ export default function InvoicesPage() {
       </div>
 
       {/* DataTable */}
+      {Object.keys(rowSelection).some((id) => rowSelection[id]) && hasMore && (
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">
+          Selection applies to loaded records only ({totalLoaded}
+          {countSuffix} shown). Load more pages to include additional invoices.
+        </p>
+      )}
+
       <TanstackDataTable<Invoice>
         className="min-h-[400px]"
         columns={columns}
         data={invoices}
         getRowId={(row) => row.id}
         isLoading={isLoading}
+        isFetching={isFetching}
         enableRowSelection={true}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         enableSorting={true}
         pagination={{ pageSize: 20 }}
+        serverPagination={serverPagination}
         searchPlaceholder="Search by invoice # or student..."
         bulkActions={[
           {

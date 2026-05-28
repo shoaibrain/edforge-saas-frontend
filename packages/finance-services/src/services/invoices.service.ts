@@ -13,6 +13,8 @@ import type {
   StudentAccount,
   StudentLedgerEntry,
 } from '@edforge/types'
+import type { FinanceListQueryParams, StudentAccountListParams } from '../types/pagination'
+import { normalizeFinanceListResponse } from '../utils/normalize-finance-list-response'
 
 /** Backend finance pagination shape: { items, hasMore, lastEvaluatedKey? } */
 export interface FinancePaginatedResponse<T> {
@@ -21,25 +23,26 @@ export interface FinancePaginatedResponse<T> {
   lastEvaluatedKey?: string
 }
 
+export type InvoiceListParams = InvoiceFilterDto & FinanceListQueryParams
+
 // ============================================================================
 // INVOICE QUERIES
 // ============================================================================
 
 export async function getInvoices(
   schoolId: string,
-  filters?: InvoiceFilterDto
+  filters?: InvoiceListParams,
 ): Promise<FinancePaginatedResponse<Invoice>> {
   const response = await apiGet<FinancePaginatedResponse<Invoice> | Invoice[]>(
     `/finance/schools/${schoolId}/invoices`,
-    filters as Record<string, unknown>
+    filters as Record<string, unknown>,
   )
-  if (Array.isArray(response)) return { items: response, hasMore: false }
-  return { items: response?.items ?? [], hasMore: response?.hasMore ?? false }
+  return normalizeFinanceListResponse(response)
 }
 
 export async function getInvoice(
   schoolId: string,
-  invoiceId: string
+  invoiceId: string,
 ): Promise<Invoice> {
   return apiGet<Invoice>(`/finance/schools/${schoolId}/invoices/${invoiceId}`)
 }
@@ -50,43 +53,43 @@ export async function getInvoice(
 
 export async function generateInvoice(
   schoolId: string,
-  data: GenerateInvoiceDto
+  data: GenerateInvoiceDto,
 ): Promise<Invoice> {
   return apiPost<Invoice, GenerateInvoiceDto>(
     `/finance/schools/${schoolId}/invoices`,
-    data
+    data,
   )
 }
 
 export async function updateInvoice(
   schoolId: string,
   invoiceId: string,
-  data: UpdateInvoiceDto
+  data: UpdateInvoiceDto,
 ): Promise<Invoice> {
   return apiPatch<Invoice, UpdateInvoiceDto>(
     `/finance/schools/${schoolId}/invoices/${invoiceId}`,
-    data
+    data,
   )
 }
 
 export async function issueInvoice(
   schoolId: string,
-  invoiceId: string
+  invoiceId: string,
 ): Promise<Invoice> {
   return apiPost<Invoice, undefined>(
     `/finance/schools/${schoolId}/invoices/${invoiceId}/issue`,
-    undefined as any
+    undefined as any,
   )
 }
 
 export async function cancelInvoice(
   schoolId: string,
   invoiceId: string,
-  reason?: string
+  reason?: string,
 ): Promise<Invoice> {
   return apiPatch<Invoice, { status: string; notes?: string }>(
     `/finance/schools/${schoolId}/invoices/${invoiceId}`,
-    { status: 'cancelled', ...(reason && { notes: reason }) }
+    { status: 'cancelled', ...(reason && { notes: reason }) },
   )
 }
 
@@ -94,30 +97,32 @@ export async function cancelInvoice(
 // STUDENT ACCOUNTS
 // ============================================================================
 
+/**
+ * List student billing accounts. Backend supports searchTerm (name filter),
+ * not studentId — do not send studentId (B-2).
+ */
 export async function getStudentAccounts(
   schoolId: string,
-  params?: { studentId?: string }
-): Promise<StudentAccount[]> {
-  const response = await apiGet<{ items: StudentAccount[]; hasMore: boolean } | StudentAccount[]>(
-    `/finance/schools/${schoolId}/student-accounts`,
-    params as Record<string, unknown>
-  )
-  if (Array.isArray(response)) return response
-  return response?.items ?? []
+  params?: StudentAccountListParams,
+): Promise<FinancePaginatedResponse<StudentAccount>> {
+  const response = await apiGet<
+    FinancePaginatedResponse<StudentAccount> | StudentAccount[]
+  >(`/finance/schools/${schoolId}/student-accounts`, params as Record<string, unknown>)
+  return normalizeFinanceListResponse(response)
 }
 
 export async function getStudentLedger(
   schoolId: string,
-  accountId: string
-): Promise<StudentLedgerEntry[]> {
-  // Backend returns the FinancePaginatedResponse shape ({ items, hasMore });
-  // older callers also tolerate a bare array. Mirror the unwrap pattern used
-  // by getInvoices / getStudentAccounts above so the consumer always sees an array.
-  const response = await apiGet<FinancePaginatedResponse<StudentLedgerEntry> | StudentLedgerEntry[]>(
-    `/finance/schools/${schoolId}/student-accounts/${accountId}/ledger`
+  accountId: string,
+  params?: FinanceListQueryParams,
+): Promise<FinancePaginatedResponse<StudentLedgerEntry>> {
+  const response = await apiGet<
+    FinancePaginatedResponse<StudentLedgerEntry> | StudentLedgerEntry[]
+  >(
+    `/finance/schools/${schoolId}/student-accounts/${accountId}/ledger`,
+    params as Record<string, unknown>,
   )
-  if (Array.isArray(response)) return response
-  return response?.items ?? []
+  return normalizeFinanceListResponse(response)
 }
 
 // ============================================================================
@@ -142,11 +147,11 @@ export interface BulkGenerateInvoiceDto {
 
 export async function bulkGenerateInvoices(
   schoolId: string,
-  data: BulkGenerateInvoiceDto
+  data: BulkGenerateInvoiceDto,
 ): Promise<BulkGenerateInvoiceResponse> {
   return apiPost<BulkGenerateInvoiceResponse, BulkGenerateInvoiceDto>(
     `/finance/schools/${schoolId}/invoices/bulk-generate`,
-    data
+    data,
   )
 }
 
@@ -162,11 +167,11 @@ export interface BulkIssueInvoicesResponse {
 
 export async function bulkIssueInvoices(
   schoolId: string,
-  data: BulkIssueInvoicesDto
+  data: BulkIssueInvoicesDto,
 ): Promise<BulkIssueInvoicesResponse> {
   return apiPost<BulkIssueInvoicesResponse, BulkIssueInvoicesDto>(
     `/finance/schools/${schoolId}/invoices/bulk-issue`,
-    data
+    data,
   )
 }
 
@@ -174,22 +179,6 @@ export async function bulkIssueInvoices(
 // INVOICE PDF DOWNLOAD (Sprint M1.3 — frontend half of C.1.5)
 // ============================================================================
 
-/**
- * Download the invoice PDF as a Blob.
- *
- * Calls the backend endpoint shipped in Sprint C.1.5 (server PR #201):
- *   GET /finance/schools/{schoolId}/invoices/{invoiceId}/pdf
- *
- * Backend renders the invoice server-side via `@aibrains/pdf-renderer` —
- * the returned PDF has selectable text + embedded fonts (Devanagari for
- * PABSON tenants) + tenant-customized branding. From the frontend's
- * POV this is either a 200 + Blob or an error to surface.
- *
- * Mirrors the shape of `downloadReceiptPdf` in payments.service.ts:
- * returns the raw Blob and lets the consuming hook (M1.4
- * `useDownloadInvoicePdf`) handle filename construction + the
- * anchor-blob download dance.
- */
 export async function downloadInvoicePdf(
   schoolId: string,
   invoiceId: string,
@@ -204,25 +193,11 @@ export async function downloadInvoicePdf(
     }
     return response.data
   } catch (error: any) {
-    // If the error response is a blob (server sent application/json
-    // error wrapped in blob because we set responseType: 'blob'),
-    // parse + surface the backend's `message` field.
-    //
-    // **Important:** the `throw` must happen OUTSIDE the JSON.parse
-    // try block — if it's inside, the surrounding `catch` swallows
-    // our thrown error and re-throws with the raw text, defeating
-    // the parse. Same bug-shape that exists in the older
-    // exportInvoicesCsv / exportPaymentsCsv blocks; intentionally
-    // mirrored from the C.1.6 downloadReceiptPdf which got it right.
     if (error?.response?.data instanceof Blob) {
       const text = await error.response.data.text()
       let parsedMessage: string | undefined
       try {
         const parsed = JSON.parse(text)
-        // Backend convention is `{ message: string }`, but a future
-        // ValidationException could surface `message` as a structured
-        // object. Guard the type so `new Error(...)` never receives a
-        // non-string — otherwise the UI would show `"[object Object]"`.
         const candidate = parsed?.message
         if (typeof candidate === 'string') {
           parsedMessage = candidate
@@ -230,12 +205,11 @@ export async function downloadInvoicePdf(
           try {
             parsedMessage = JSON.stringify(candidate)
           } catch {
-            // Circular ref or BigInt — fall through to the raw text.
+            // fall through
           }
         }
       } catch {
-        // Not JSON — fall through with `parsedMessage` undefined so
-        // we use the raw text or the generic fallback below.
+        // not JSON
       }
       throw new Error(parsedMessage || text || 'Failed to download invoice PDF')
     }
@@ -244,10 +218,6 @@ export async function downloadInvoicePdf(
       : new Error('Failed to download invoice PDF')
   }
 }
-
-// ============================================================================
-// CONVENIENCE EXPORT
-// ============================================================================
 
 export const invoicesService = {
   getInvoices,

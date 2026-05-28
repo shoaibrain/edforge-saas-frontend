@@ -6,6 +6,10 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInvoicesInfinite } from './useInvoicesInfinite'
+import { useSchoolPaymentsInfinite } from './useSchoolPaymentsInfinite'
+import { useStudentAccountsInfinite } from './useStudentAccountsInfinite'
+import { useStudentLedgerInfinite } from './useStudentLedgerInfinite'
 import type {
   InvoiceFilterDto,
   GenerateInvoiceDto,
@@ -15,13 +19,10 @@ import type {
   CreateRefundDto,
 } from '@edforge/types'
 import {
-  getInvoices,
   getInvoice,
   generateInvoice,
   issueInvoice,
   cancelInvoice,
-  getStudentAccounts,
-  getStudentLedger,
   bulkGenerateInvoices,
   bulkIssueInvoices,
   downloadInvoicePdf,
@@ -34,7 +35,6 @@ import {
   initiatePayment,
   verifyPayment,
   getInvoicePayments,
-  getSchoolPayments,
   getPaymentReceipt,
   recordManualPayment,
   voidPayment,
@@ -97,20 +97,26 @@ export const paymentKeys = {
 // INVOICE QUERIES
 // ============================================================================
 
+/** Cursor-aware invoice list — wraps useInvoicesInfinite for shell + finance MFEs. */
 export function useInvoices(schoolId: string, filters?: InvoiceFilterDto) {
-  // If a studentId filter is provided but falsy (e.g. undefined during parent portal
-  // first render before activeChild resolves), disable the query to prevent fetching
-  // without the required student scope.
-  const studentIdGate = 'studentId' in (filters ?? {})
-    ? !!filters?.studentId
-    : true
-  return useQuery({
-    queryKey: paymentKeys.invoiceList(schoolId, filters),
-    queryFn: () => getInvoices(schoolId, filters),
-    enabled: !!schoolId && studentIdGate,
-    staleTime: 30 * 1000,
-  })
+  const paginated = useInvoicesInfinite(schoolId, filters)
+  return {
+    data:
+      paginated.isLoading && paginated.items.length === 0
+        ? undefined
+        : { items: paginated.items, hasMore: paginated.hasMore },
+    isLoading: paginated.isLoading,
+    isFetching: paginated.isFetchingNextPage,
+    error: paginated.error,
+    refetch: paginated.refetch,
+    hasMore: paginated.hasMore,
+    loadMore: paginated.loadMore,
+    isFetchingNextPage: paginated.isFetchingNextPage,
+    totalLoaded: paginated.totalLoaded,
+  }
 }
+
+export { useInvoicesInfinite } from './useInvoicesInfinite'
 
 export function useInvoice(schoolId: string, invoiceId: string) {
   return useQuery({
@@ -235,25 +241,41 @@ export function usePaymentReceipt(
 // STUDENT ACCOUNTS
 // ============================================================================
 
-export function useStudentAccounts(schoolId: string, studentId?: string) {
-  return useQuery({
-    queryKey: studentId
-      ? paymentKeys.studentAccount(schoolId, studentId)
-      : paymentKeys.studentAccounts(schoolId),
-    queryFn: () => getStudentAccounts(schoolId, studentId ? { studentId } : undefined),
-    enabled: !!schoolId,
-    staleTime: 60 * 1000,
-  })
+export function useStudentAccounts(
+  schoolId: string,
+  filters?: { searchTerm?: string; hasOutstandingBalance?: boolean },
+) {
+  const paginated = useStudentAccountsInfinite(schoolId, filters)
+  return {
+    data: paginated.items,
+    isLoading: paginated.isLoading,
+    error: paginated.error,
+    refetch: paginated.refetch,
+    hasMore: paginated.hasMore,
+    loadMore: paginated.loadMore,
+    isFetchingNextPage: paginated.isFetchingNextPage,
+    totalLoaded: paginated.totalLoaded,
+  }
 }
 
+export { useStudentAccountsInfinite } from './useStudentAccountsInfinite'
+
 export function useStudentLedger(schoolId: string, accountId: string) {
-  return useQuery({
-    queryKey: paymentKeys.ledger(schoolId, accountId),
-    queryFn: () => getStudentLedger(schoolId, accountId),
-    enabled: !!schoolId && !!accountId,
-    staleTime: 30 * 1000,
-  })
+  const paginated = useStudentLedgerInfinite(schoolId, accountId)
+  return {
+    data: paginated.items,
+    isLoading: paginated.isLoading,
+    isError: !!paginated.error,
+    error: paginated.error,
+    refetch: paginated.refetch,
+    hasMore: paginated.hasMore,
+    loadMore: paginated.loadMore,
+    isFetchingNextPage: paginated.isFetchingNextPage,
+    totalLoaded: paginated.totalLoaded,
+  }
 }
+
+export { useStudentLedgerInfinite } from './useStudentLedgerInfinite'
 
 // ============================================================================
 // SCHOOL-WIDE PAYMENTS
@@ -261,15 +283,22 @@ export function useStudentLedger(schoolId: string, accountId: string) {
 
 export function useSchoolPayments(
   schoolId: string,
-  params?: { status?: string; gateway?: string; limit?: number }
+  params?: { status?: string; gateway?: string },
 ) {
-  return useQuery({
-    queryKey: paymentKeys.schoolPayments(schoolId, params),
-    queryFn: () => getSchoolPayments(schoolId, params),
-    enabled: !!schoolId,
-    staleTime: 30 * 1000,
-  })
+  const paginated = useSchoolPaymentsInfinite(schoolId, params)
+  return {
+    data: paginated.items,
+    isLoading: paginated.isLoading,
+    error: paginated.error,
+    refetch: paginated.refetch,
+    hasMore: paginated.hasMore,
+    loadMore: paginated.loadMore,
+    isFetchingNextPage: paginated.isFetchingNextPage,
+    totalLoaded: paginated.totalLoaded,
+  }
 }
+
+export { useSchoolPaymentsInfinite } from './useSchoolPaymentsInfinite'
 
 // ============================================================================
 // RECORD MANUAL PAYMENT

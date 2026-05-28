@@ -187,10 +187,9 @@ export interface InvoiceFilterDto {
   status?: InvoiceStatus | InvoiceStatus[]
   studentId?: string
   academicYear?: string
-  dueDateFrom?: string
-  dueDateTo?: string
-  page?: number
-  pageSize?: number
+  /** Server-side cursor pagination — prefer over deprecated page/pageSize. */
+  limit?: number
+  cursor?: string
 }
 
 export interface UpdateInvoiceDto {
