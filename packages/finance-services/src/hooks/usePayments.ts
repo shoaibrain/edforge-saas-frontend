@@ -537,7 +537,7 @@ export function useDownloadReceiptPdf() {
       // M1.10 telemetry — emit `started` at mutation kickoff so the
       // pipeline sees the click even if the network call hangs.
       trackPdfDownloadStarted({ docType: 'receipt', schoolId: vars.schoolId })
-      return downloadReceiptPdf(vars.schoolId, vars.paymentId)
+      return downloadReceiptPdf(vars.paymentId, vars.schoolId)
     },
     onSuccess: (blob, vars) => {
       trackPdfDownloadSucceeded({

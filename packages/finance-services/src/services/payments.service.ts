@@ -169,14 +169,14 @@ export async function exportPaymentsCsv(
 }
 
 export async function downloadReceiptPdf(
-  schoolId: string,
   paymentId: string,
+  schoolId: string,
 ): Promise<Blob> {
   try {
-    const response = await api.get(
-      `/finance/schools/${schoolId}/payments/${paymentId}/receipt/pdf`,
-      { responseType: 'blob' },
-    )
+    const response = await api.get(`/finance/payments/${paymentId}/receipt/pdf`, {
+      params: { schoolId },
+      responseType: 'blob',
+    })
     if (!response.data || !(response.data instanceof Blob)) {
       throw new Error('Server returned an invalid response for receipt PDF')
     }
