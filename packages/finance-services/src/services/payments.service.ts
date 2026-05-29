@@ -83,13 +83,24 @@ export async function getSchoolPayments(
 // RECEIPT
 // ============================================================================
 
+/**
+ * Fetch the JSON receipt for a completed payment.
+ *
+ * `schoolId` is a QUERY PARAM, not a path segment. The backend route is
+ * `GET /finance/payments/:paymentId/receipt?schoolId=<sid>`
+ * (payments.controller.ts:179). There is NO `/finance/schools/:schoolId/...`
+ * variant — calling one produces a 403 SigV4 (API Gateway has no such
+ * route and falls through to its IAM auth default). The controller
+ * resolves the payment via SK `PAYMENT#{schoolId}#{paymentId}`, so a
+ * missing schoolId yields `PAYMENT#undefined#...` → null → 404.
+ */
 export async function getPaymentReceipt(
   paymentId: string,
   schoolId: string,
 ): Promise<Receipt> {
-  return apiGet<Receipt>(
-    `/finance/schools/${schoolId}/payments/${paymentId}/receipt`,
-  )
+  return apiGet<Receipt>(`/finance/payments/${paymentId}/receipt`, {
+    schoolId,
+  })
 }
 
 // ============================================================================
@@ -101,7 +112,7 @@ export async function recordManualPayment(
   data: RecordManualPaymentDto,
 ): Promise<Payment> {
   return apiPost<Payment, RecordManualPaymentDto>(
-    `/finance/schools/${schoolId}/payments/record`,
+    `/finance/schools/${schoolId}/payments/manual`,
     data,
   )
 }
