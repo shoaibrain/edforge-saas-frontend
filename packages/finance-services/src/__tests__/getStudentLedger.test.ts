@@ -1,16 +1,3 @@
-/**
- * Tests for getStudentLedger — Sprint C1.T1.
- *
- * Until 0.36.0 of the frontend bundle, getStudentLedger declared
- * Promise<StudentLedgerEntry[]> but the backend has always returned the
- * { items, hasMore } pagination shape. The component fell back to [] via an
- * Array.isArray() guard, so the Ledger tab silently rendered "No ledger
- * entries yet." — even though the API returned 3 entries.
- *
- * This test locks the unwrap behaviour to mirror getInvoices /
- * getStudentAccounts in the same module.
- */
-
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@edforge/api-client', () => ({
@@ -45,68 +32,37 @@ describe('getStudentLedger', () => {
     vi.clearAllMocks()
   })
 
-  it('unwraps paginated response { items, hasMore } — the bug case', async () => {
-    mockApiGet.mockResolvedValue({ items: [ENTRY_FIXTURE], hasMore: false })
+  it('returns paginated response with lastEvaluatedKey', async () => {
+    mockApiGet.mockResolvedValue({
+      items: [ENTRY_FIXTURE],
+      hasMore: true,
+      lastEvaluatedKey: 'ledger-cursor',
+    })
 
     const result = await getStudentLedger(SCHOOL_ID, ACCOUNT_ID)
 
-    expect(Array.isArray(result)).toBe(true)
-    expect(result).toHaveLength(1)
-    expect(result[0]).toEqual(ENTRY_FIXTURE)
+    expect(result.items).toHaveLength(1)
+    expect(result.lastEvaluatedKey).toBe('ledger-cursor')
+    expect(result.hasMore).toBe(true)
+  })
+
+  it('forwards cursor param', async () => {
+    mockApiGet.mockResolvedValue({ items: [], hasMore: false })
+
+    await getStudentLedger(SCHOOL_ID, ACCOUNT_ID, { cursor: 'ledger-cursor', limit: 50 })
+
     expect(mockApiGet).toHaveBeenCalledWith(
       `/finance/schools/${SCHOOL_ID}/student-accounts/${ACCOUNT_ID}/ledger`,
+      { cursor: 'ledger-cursor', limit: 50 },
     )
   })
 
-  it('returns the same 3-entry payload that prod returned for Lilia Rain (regression)', async () => {
-    const liliaPayload = {
-      items: [
-        ENTRY_FIXTURE,
-        { ...ENTRY_FIXTURE, id: 'f6f37114-5c75-4133-9861-cafae182137b', credit: 4000, balance: 0 },
-        {
-          id: 'inv-1',
-          studentAccountId: ACCOUNT_ID,
-          entryType: 'invoice' as const,
-          referenceId: '74db7ac8-8495-494b-89ae-99434cf3ed52',
-          description: 'Invoice INV-6D0-2604-0001 auto-issued on enrollment',
-          debit: 10000,
-          credit: 0,
-          balance: 10000,
-          date: '2026-04-02',
-          createdAt: '2026-04-02T23:44:10.676Z',
-        },
-      ],
-      hasMore: false,
-    }
-    mockApiGet.mockResolvedValue(liliaPayload)
-
-    const result = await getStudentLedger(SCHOOL_ID, ACCOUNT_ID)
-
-    expect(result).toHaveLength(3)
-    expect(result.map((e) => e.entryType)).toEqual(['payment', 'payment', 'invoice'])
-  })
-
-  it('returns raw array response as-is (legacy / mock back-compat)', async () => {
+  it('unwraps legacy array', async () => {
     mockApiGet.mockResolvedValue([ENTRY_FIXTURE])
 
     const result = await getStudentLedger(SCHOOL_ID, ACCOUNT_ID)
 
-    expect(result).toEqual([ENTRY_FIXTURE])
-  })
-
-  it('returns empty array for an empty paginated response', async () => {
-    mockApiGet.mockResolvedValue({ items: [], hasMore: false })
-
-    const result = await getStudentLedger(SCHOOL_ID, ACCOUNT_ID)
-
-    expect(result).toEqual([])
-  })
-
-  it('returns empty array when response is null/undefined', async () => {
-    mockApiGet.mockResolvedValue(null as unknown as { items: typeof ENTRY_FIXTURE[]; hasMore: boolean })
-
-    const result = await getStudentLedger(SCHOOL_ID, ACCOUNT_ID)
-
-    expect(result).toEqual([])
+    expect(result.items).toEqual([ENTRY_FIXTURE])
+    expect(result.hasMore).toBe(false)
   })
 })

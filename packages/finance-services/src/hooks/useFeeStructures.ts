@@ -12,6 +12,7 @@ import {
   updateFeeStructure,
   deleteFeeStructure,
 } from '../services/fee-structures.service'
+import { useFinancePaginatedQuery } from './useFinancePaginatedQuery'
 
 // ============================================================================
 // QUERY KEY FACTORY
@@ -28,12 +29,27 @@ export const feeStructureKeys = {
 // QUERIES
 // ============================================================================
 
+/** First page only — prefer useFeeStructuresInfinite for tables with load-more. */
 export function useFeeStructures(schoolId: string) {
   return useQuery({
     queryKey: feeStructureKeys.list(schoolId),
-    queryFn: () => getFeeStructures(schoolId),
+    queryFn: async () => {
+      const response = await getFeeStructures(schoolId, { limit: 50 })
+      return response.items
+    },
     enabled: !!schoolId,
-    staleTime: 5 * 60 * 1000, // 5 min — fee structures change rarely
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useFeeStructuresInfinite(schoolId: string) {
+  return useFinancePaginatedQuery({
+    queryKey: [...feeStructureKeys.list(schoolId), 'infinite'] as const,
+    queryFn: (params) => getFeeStructures(schoolId, params),
+    filters: {},
+    limit: 50,
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -48,7 +64,7 @@ export function useCreateFeeStructure(schoolId: string) {
     mutationFn: (data: CreateFeeStructureDto) =>
       createFeeStructure(schoolId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: feeStructureKeys.list(schoolId) })
+      queryClient.invalidateQueries({ queryKey: feeStructureKeys.all })
     },
   })
 }
@@ -60,7 +76,7 @@ export function useUpdateFeeStructure(schoolId: string) {
     mutationFn: ({ id, data }: { id: string; data: UpdateFeeStructureDto }) =>
       updateFeeStructure(schoolId, id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: feeStructureKeys.list(schoolId) })
+      queryClient.invalidateQueries({ queryKey: feeStructureKeys.all })
     },
   })
 }
@@ -71,7 +87,7 @@ export function useDeleteFeeStructure(schoolId: string) {
   return useMutation({
     mutationFn: (id: string) => deleteFeeStructure(schoolId, id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: feeStructureKeys.list(schoolId) })
+      queryClient.invalidateQueries({ queryKey: feeStructureKeys.all })
     },
   })
 }

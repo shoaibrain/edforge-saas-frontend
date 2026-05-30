@@ -19,6 +19,14 @@ import type {
   Refund,
   DashboardSummary,
 } from '@edforge/types'
+import type { FinanceListQueryParams } from '../types/pagination'
+import type { FinancePaginatedResponse } from '../types/pagination'
+import { normalizeFinanceListResponse } from '../utils/normalize-finance-list-response'
+
+export type SchoolPaymentListParams = FinanceListQueryParams & {
+  status?: string
+  gateway?: string
+}
 
 // ============================================================================
 // PAYMENT INITIATION
@@ -26,11 +34,11 @@ import type {
 
 export async function initiatePayment(
   schoolId: string,
-  request: InitiatePaymentRequest
+  request: InitiatePaymentRequest,
 ): Promise<InitiatePaymentResponse> {
   return apiPost<InitiatePaymentResponse, InitiatePaymentRequest>(
     `/finance/schools/${schoolId}/payments/initiate`,
-    request
+    request,
   )
 }
 
@@ -40,7 +48,7 @@ export async function initiatePayment(
 
 export async function verifyPayment(
   sessionId: string,
-  callbackParams?: Record<string, string>
+  callbackParams?: Record<string, string>,
 ): Promise<VerifyPaymentResponse> {
   const params = callbackParams
     ? new URLSearchParams(callbackParams).toString()
@@ -55,21 +63,20 @@ export async function verifyPayment(
 
 export async function getInvoicePayments(
   schoolId: string,
-  invoiceId: string
+  invoiceId: string,
 ): Promise<Payment[]> {
   return apiGet<Payment[]>(`/finance/schools/${schoolId}/invoices/${invoiceId}/payments`)
 }
 
 export async function getSchoolPayments(
   schoolId: string,
-  params?: { status?: string; limit?: number; cursor?: string }
-): Promise<Payment[]> {
-  const response = await apiGet<Payment[] | { items: Payment[]; hasMore: boolean }>(
+  params?: SchoolPaymentListParams,
+): Promise<FinancePaginatedResponse<Payment>> {
+  const response = await apiGet<FinancePaginatedResponse<Payment> | Payment[]>(
     `/finance/schools/${schoolId}/payments`,
-    params as Record<string, unknown>
+    params as Record<string, unknown>,
   )
-  if (Array.isArray(response)) return response
-  return response?.items ?? []
+  return normalizeFinanceListResponse(response)
 }
 
 // ============================================================================
@@ -79,19 +86,13 @@ export async function getSchoolPayments(
 /**
  * Fetch the JSON receipt for a completed payment.
  *
- * The backend (payments.controller.ts:179 — Sprint C.1.6 era) requires
- * `?schoolId=<sid>` as a query parameter. Internally, the controller
- * resolves the payment via `EntityKeyBuilder.payment(schoolId, paymentId)`
- * → DDB SK `PAYMENT#{schoolId}#{paymentId}`. When schoolId is missing,
- * the key becomes `PAYMENT#undefined#<paymentId>` and the lookup
- * returns null → 404 "Payment not found" — even though the payment
- * exists in DynamoDB.
- *
- * This signature was missing the schoolId param when the shell-owned
- * receipt page shipped, because that page had no natural source of
- * school context. M1.5-FU.1 fixes the symptom (this file). M1.5-FU.2+
- * fixes the root cause (moves the page into Finance MFE where
- * `useAppStore().activeSchoolId` is the obvious source).
+ * `schoolId` is a QUERY PARAM, not a path segment. The backend route is
+ * `GET /finance/payments/:paymentId/receipt?schoolId=<sid>`
+ * (payments.controller.ts:179). There is NO `/finance/schools/:schoolId/...`
+ * variant — calling one produces a 403 SigV4 (API Gateway has no such
+ * route and falls through to its IAM auth default). The controller
+ * resolves the payment via SK `PAYMENT#{schoolId}#{paymentId}`, so a
+ * missing schoolId yields `PAYMENT#undefined#...` → null → 404.
  */
 export async function getPaymentReceipt(
   paymentId: string,
@@ -103,56 +104,48 @@ export async function getPaymentReceipt(
 }
 
 // ============================================================================
-// RECORD MANUAL PAYMENT
+// MANUAL PAYMENT / VOID / REFUND
 // ============================================================================
 
 export async function recordManualPayment(
   schoolId: string,
-  data: RecordManualPaymentDto
+  data: RecordManualPaymentDto,
 ): Promise<Payment> {
   return apiPost<Payment, RecordManualPaymentDto>(
     `/finance/schools/${schoolId}/payments/manual`,
-    data
+    data,
   )
 }
-
-// ============================================================================
-// VOID PAYMENT
-// ============================================================================
 
 export async function voidPayment(
   schoolId: string,
   paymentId: string,
-  data: VoidPaymentDto
+  data: VoidPaymentDto,
 ): Promise<Payment> {
   return apiPost<Payment, VoidPaymentDto>(
     `/finance/schools/${schoolId}/payments/${paymentId}/void`,
-    data
+    data,
   )
 }
-
-// ============================================================================
-// REFUND
-// ============================================================================
 
 export async function createRefund(
   schoolId: string,
   paymentId: string,
-  data: CreateRefundDto
+  data: CreateRefundDto,
 ): Promise<Refund> {
   return apiPost<Refund, CreateRefundDto>(
     `/finance/schools/${schoolId}/payments/${paymentId}/refund`,
-    data
+    data,
   )
 }
 
 // ============================================================================
-// DASHBOARD SUMMARY
+// DASHBOARD
 // ============================================================================
 
 export async function getDashboardSummary(
   schoolId: string,
-  filters?: { from?: string; to?: string; academicYear?: string }
+  filters?: { from?: string; to?: string; academicYear?: string },
 ): Promise<DashboardSummary> {
   return apiGet<DashboardSummary>(
     `/finance/schools/${schoolId}/dashboard/summary`,
@@ -161,81 +154,31 @@ export async function getDashboardSummary(
 }
 
 // ============================================================================
-// EXPORT (CSV)
+// CSV EXPORT
 // ============================================================================
 
-export async function exportInvoicesCsv(schoolId: string): Promise<Blob> {
-  try {
-    const response = await api.get(`/finance/schools/${schoolId}/invoices/export`, {
-      params: { format: 'csv' },
-      responseType: 'blob',
-    })
-    if (!response.data || !(response.data instanceof Blob)) {
-      throw new Error('Server returned an invalid response for CSV export')
-    }
-    return response.data
-  } catch (error: any) {
-    // If the error response is a blob (e.g. JSON error wrapped in blob), parse it
-    if (error?.response?.data instanceof Blob) {
-      const text = await error.response.data.text()
-      try {
-        const parsed = JSON.parse(text)
-        throw new Error(parsed.message || 'Failed to export invoices')
-      } catch {
-        throw new Error(text || 'Failed to export invoices')
-      }
-    }
-    throw error instanceof Error
-      ? error
-      : new Error('Failed to export invoices CSV')
-  }
+export async function exportInvoicesCsv(
+  schoolId: string,
+  filters?: Record<string, unknown>,
+): Promise<Blob> {
+  const response = await api.get(
+    `/finance/schools/${schoolId}/invoices/export`,
+    { params: filters, responseType: 'blob' },
+  )
+  return response.data
 }
 
-export async function exportPaymentsCsv(schoolId: string): Promise<Blob> {
-  try {
-    const response = await api.get(`/finance/schools/${schoolId}/payments/export`, {
-      params: { format: 'csv' },
-      responseType: 'blob',
-    })
-    if (!response.data || !(response.data instanceof Blob)) {
-      throw new Error('Server returned an invalid response for CSV export')
-    }
-    return response.data
-  } catch (error: any) {
-    if (error?.response?.data instanceof Blob) {
-      const text = await error.response.data.text()
-      try {
-        const parsed = JSON.parse(text)
-        throw new Error(parsed.message || 'Failed to export payments')
-      } catch {
-        throw new Error(text || 'Failed to export payments')
-      }
-    }
-    throw error instanceof Error
-      ? error
-      : new Error('Failed to export payments CSV')
-  }
+export async function exportPaymentsCsv(
+  schoolId: string,
+  filters?: Record<string, unknown>,
+): Promise<Blob> {
+  const response = await api.get(
+    `/finance/schools/${schoolId}/payments/export`,
+    { params: filters, responseType: 'blob' },
+  )
+  return response.data
 }
 
-// ============================================================================
-// RECEIPT PDF DOWNLOAD (Sprint C.1.6 frontend)
-// ============================================================================
-
-/**
- * Download the payment receipt PDF as a Blob.
- *
- * Calls the backend endpoint shipped in Sprint C.1.6 (PR #202):
- *   GET /finance/payments/{paymentId}/receipt/pdf?schoolId=<sid>
- *
- * Backend renders the receipt server-side via `@aibrains/pdf-renderer` —
- * the returned PDF has selectable text + embedded fonts (Devanagari for
- * PABSON tenants), unlike the prior jspdf+html2canvas client-side raster
- * approach this replaces.
- *
- * The 5xx fallback chain lives entirely on the backend (graceful
- * degradation to descriptor defaults when identity is mid-deploy); from
- * the frontend's POV this is either a 200 + Blob or an error to surface.
- */
 export async function downloadReceiptPdf(
   paymentId: string,
   schoolId: string,
@@ -250,27 +193,11 @@ export async function downloadReceiptPdf(
     }
     return response.data
   } catch (error: any) {
-    // If the error response is a blob (server sent application/json error
-    // wrapped in blob because we set responseType:'blob'), parse + surface
-    // the backend's `message` field.
-    //
-    // **Important:** the `throw` must happen OUTSIDE the JSON.parse try
-    // block — if it's inside, the surrounding `catch` swallows our thrown
-    // error and re-throws with the raw text, defeating the parse. This
-    // bug shape exists in the pre-existing exportInvoicesCsv +
-    // exportPaymentsCsv blocks above; intentionally NOT fixing those
-    // here per minimal-changes (separate cleanup PR). Fixing only this
-    // C.1.6 block which I authored.
     if (error?.response?.data instanceof Blob) {
       const text = await error.response.data.text()
       let parsedMessage: string | undefined
       try {
         const parsed = JSON.parse(text)
-        // Backend convention is `{ message: string }`, but a future
-        // ValidationException could surface `message` as a structured
-        // object (e.g. `{ message: { field: 'x', error: 'y' } }`). Guard
-        // the type so `new Error(...)` never receives a non-string —
-        // otherwise the UI would show `"[object Object]"`.
         const candidate = parsed?.message
         if (typeof candidate === 'string') {
           parsedMessage = candidate
@@ -278,12 +205,11 @@ export async function downloadReceiptPdf(
           try {
             parsedMessage = JSON.stringify(candidate)
           } catch {
-            // Circular ref or BigInt — fall through to the raw text.
+            // fall through
           }
         }
       } catch {
-        // Not JSON — fall through with `parsedMessage` undefined so we
-        // use the raw text or the generic fallback below.
+        // not JSON
       }
       throw new Error(parsedMessage || text || 'Failed to download receipt PDF')
     }
@@ -292,10 +218,6 @@ export async function downloadReceiptPdf(
       : new Error('Failed to download receipt PDF')
   }
 }
-
-// ============================================================================
-// CONVENIENCE EXPORT
-// ============================================================================
 
 export const paymentsService = {
   initiatePayment,

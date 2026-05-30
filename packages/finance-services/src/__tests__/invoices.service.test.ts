@@ -1,13 +1,9 @@
 /**
- * Tests for invoices.service.ts
- *
- * Verifies getStudentAccounts correctly unwraps both paginated
- * { items, hasMore } and raw array API responses.
+ * Tests for invoices.service.ts — student accounts list pagination.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock @edforge/api-client before importing the service
 vi.mock('@edforge/api-client', () => ({
   apiGet: vi.fn(),
   apiPost: vi.fn(),
@@ -24,65 +20,72 @@ describe('getStudentAccounts', () => {
     vi.clearAllMocks()
   })
 
-  it('unwraps paginated response { items, hasMore }', async () => {
+  it('returns paginated response with lastEvaluatedKey', async () => {
     const accounts = [
-      { id: 'acc-1', studentId: 's-1', schoolId: 'sch-1', studentName: 'Alice', balance: 500, totalPaid: 1000, lastPaymentDate: '2026-03-16', createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-03-16T00:00:00Z' },
-      { id: 'acc-2', studentId: 's-2', schoolId: 'sch-1', studentName: 'Bob', balance: 0, totalPaid: 2000, lastPaymentDate: '2026-03-15', createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-03-15T00:00:00Z' },
+      {
+        id: 'acc-1',
+        studentId: 's-1',
+        schoolId: 'sch-1',
+        studentName: 'Alice',
+        balance: 500,
+        totalPaid: 1000,
+        lastPaymentDate: '2026-03-16',
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-03-16T00:00:00Z',
+      },
     ]
-    mockApiGet.mockResolvedValue({ items: accounts, hasMore: false })
+    mockApiGet.mockResolvedValue({
+      items: accounts,
+      hasMore: true,
+      lastEvaluatedKey: 'acc-cursor',
+    })
 
     const result = await getStudentAccounts('sch-1')
 
-    expect(result).toEqual(accounts)
-    expect(result).toHaveLength(2)
-    expect(mockApiGet).toHaveBeenCalledWith('/finance/schools/sch-1/student-accounts', undefined)
+    expect(result.items).toEqual(accounts)
+    expect(result.hasMore).toBe(true)
+    expect(result.lastEvaluatedKey).toBe('acc-cursor')
   })
 
-  it('returns raw array response as-is', async () => {
+  it('forwards cursor and searchTerm (not studentId — B-2)', async () => {
+    mockApiGet.mockResolvedValue({ items: [], hasMore: false })
+
+    await getStudentAccounts('sch-1', {
+      searchTerm: 'Alice',
+      cursor: 'acc-cursor',
+      limit: 50,
+    })
+
+    expect(mockApiGet).toHaveBeenCalledWith('/finance/schools/sch-1/student-accounts', {
+      searchTerm: 'Alice',
+      cursor: 'acc-cursor',
+      limit: 50,
+    })
+    expect(mockApiGet).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ studentId: expect.anything() }),
+    )
+  })
+
+  it('unwraps legacy array response', async () => {
     const accounts = [
-      { id: 'acc-1', studentId: 's-1', schoolId: 'sch-1', studentName: 'Alice', balance: 500, totalPaid: 1000, lastPaymentDate: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
+      {
+        id: 'acc-1',
+        studentId: 's-1',
+        schoolId: 'sch-1',
+        studentName: 'Alice',
+        balance: 0,
+        totalPaid: 0,
+        lastPaymentDate: null,
+        createdAt: '2026-01-01T00:00:00Z',
+        updatedAt: '2026-01-01T00:00:00Z',
+      },
     ]
     mockApiGet.mockResolvedValue(accounts)
 
     const result = await getStudentAccounts('sch-1')
 
-    expect(result).toEqual(accounts)
-    expect(result).toHaveLength(1)
-  })
-
-  it('returns empty array for empty paginated response', async () => {
-    mockApiGet.mockResolvedValue({ items: [], hasMore: false })
-
-    const result = await getStudentAccounts('sch-1')
-
-    expect(result).toEqual([])
-    expect(result).toHaveLength(0)
-  })
-
-  it('returns empty array for undefined response', async () => {
-    mockApiGet.mockResolvedValue(undefined)
-
-    const result = await getStudentAccounts('sch-1')
-
-    expect(result).toEqual([])
-  })
-
-  it('returns empty array for null response', async () => {
-    mockApiGet.mockResolvedValue(null)
-
-    const result = await getStudentAccounts('sch-1')
-
-    expect(result).toEqual([])
-  })
-
-  it('passes studentId params to API', async () => {
-    mockApiGet.mockResolvedValue({ items: [], hasMore: false })
-
-    await getStudentAccounts('sch-1', { studentId: 's-1' })
-
-    expect(mockApiGet).toHaveBeenCalledWith(
-      '/finance/schools/sch-1/student-accounts',
-      { studentId: 's-1' }
-    )
+    expect(result.items).toEqual(accounts)
+    expect(result.hasMore).toBe(false)
   })
 })
