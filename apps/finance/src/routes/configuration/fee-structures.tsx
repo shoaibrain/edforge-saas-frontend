@@ -18,6 +18,11 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../layouts/FinanceLayout'
 import { apiGet } from '@edforge/api-client'
 import type { AxiosError } from '@edforge/api-client'
+import {
+  GRADE_LEVEL_OPTIONS,
+  getGradeLevelsInRange,
+  type GradeLevel,
+} from '@aibrains/shared-types'
 import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { Plus, AlertTriangle, DollarSign, Layers, Settings2, TrendingUp } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
@@ -47,17 +52,18 @@ interface AcademicYearApiItem {
 
 interface SchoolApiResponse {
   gradeRange?: { start: string; end: string }
+  /**
+   * P1: school's chosen subset of the global grade-level catalog. Preferred
+   * over `gradeRange` for picking which grade codes a fee structure can be
+   * assigned to. Falls back to `gradeRange`-derived options for legacy rows.
+   */
+  enabledGradeLevels?: string[]
   [key: string]: unknown
 }
 
 /* ------------------------------------------------------------------ */
 /*  Constants & Helpers                                                */
 /* ------------------------------------------------------------------ */
-
-/** Canonical grade ordering (mirrors @aibrains/shared-types ORDERED_GRADES) */
-const ORDERED_GRADES = [
-  'PK', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-] as const
 
 function extractApiErrorMessage(error: unknown): string | null {
   const axiosErr = error as AxiosError<{ message?: string; errors?: Array<{ message?: string }> }>
@@ -70,11 +76,32 @@ function extractApiErrorMessage(error: unknown): string | null {
   return null
 }
 
-function gradeRangeToOptions(start: string, end: string): string[] {
-  const startIdx = ORDERED_GRADES.indexOf(start as typeof ORDERED_GRADES[number])
-  const endIdx = ORDERED_GRADES.indexOf(end as typeof ORDERED_GRADES[number])
-  if (startIdx === -1 || endIdx === -1 || startIdx > endIdx) return [...ORDERED_GRADES]
-  return ORDERED_GRADES.slice(startIdx, endIdx + 1) as unknown as string[]
+/**
+ * Derive the array of grade codes a fee structure can be assigned to for
+ * this school. Mirrors the academics-app `useSchoolEnabledGradeOptions`
+ * resolution order:
+ *   1. Non-empty `enabledGradeLevels` → use it (filtered to known catalog
+ *      codes, in canonical order)
+ *   2. Else `gradeRange` → derive via shared-types' `getGradeLevelsInRange`
+ *   3. Else → full 20-code catalog
+ */
+function deriveSchoolGradeCodes(school: SchoolApiResponse | undefined): string[] {
+  const enabled = school?.enabledGradeLevels
+  if (Array.isArray(enabled) && enabled.length > 0) {
+    const enabledSet = new Set<string>(enabled.map(String))
+    const filtered = GRADE_LEVEL_OPTIONS.map((o) => o.value).filter((v) => enabledSet.has(v))
+    if (filtered.length > 0) return filtered
+  }
+  const range = school?.gradeRange
+  if (range) {
+    try {
+      const codes = getGradeLevelsInRange(range.start as GradeLevel, range.end as GradeLevel)
+      if (codes.length > 0) return [...codes]
+    } catch {
+      // fall through
+    }
+  }
+  return GRADE_LEVEL_OPTIONS.map((o) => o.value)
 }
 
 /* ------------------------------------------------------------------ */
@@ -142,12 +169,23 @@ export default function FeeStructuresPage() {
     staleTime: 10 * 60 * 1000,
   })
 
-  const gradeOptions = useMemo(() => {
-    if (schoolData?.gradeRange) {
-      return gradeRangeToOptions(schoolData.gradeRange.start, schoolData.gradeRange.end)
-    }
-    return [...ORDERED_GRADES] as string[]
-  }, [schoolData])
+  const gradeOptions = useMemo(() => deriveSchoolGradeCodes(schoolData), [schoolData])
+
+  /**
+   * When editing, surface any codes the saved fee structure references that
+   * aren't in the school's current `enabledGradeLevels` / `gradeRange` so the
+   * operator can SEE them in the picker (and choose to drop them) rather
+   * than have them silently disappear from the UI and get clobbered by the
+   * "All Grades" toggle. Matches the academics `extraOpt` pattern in
+   * EditStudentModal — see CLAUDE.md P3 architectural decision #2
+   * ("permissive on out-of-range data").
+   */
+  const editGradeOptions = useMemo(() => {
+    if (!editingFee?.gradeLevels?.length) return gradeOptions
+    const inDerived = new Set(gradeOptions)
+    const extras = editingFee.gradeLevels.filter((g) => !inDerived.has(g))
+    return extras.length > 0 ? [...gradeOptions, ...extras] : gradeOptions
+  }, [gradeOptions, editingFee])
 
   // Resolve academic year name from ID
   const getAcademicYearName = (yearId: string): string => {
@@ -354,7 +392,7 @@ export default function FeeStructuresPage() {
         <FeeStructureForm
           feeStructure={editingFee}
           academicYears={academicYears}
-          gradeOptions={gradeOptions}
+          gradeOptions={editGradeOptions}
           onSubmit={handleUpdate}
           onClose={() => setEditingFee(null)}
           isSubmitting={updateMutation.isPending}

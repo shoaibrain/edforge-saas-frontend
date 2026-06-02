@@ -426,7 +426,21 @@ function GradeLevelSelect({
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  const allSelected = value.length === gradeOptions.length && gradeOptions.length > 0
+  // True iff `value` is the same SET as `gradeOptions` — not just same length.
+  // Length-equality was wrong: if value contained a code outside gradeOptions
+  // (e.g., a saved fee referencing a now-disabled grade level surfaced via
+  // the page's union with `editingFee.gradeLevels`), or if value happened to
+  // be the same length but a different set, "All Grades" would render or
+  // mis-fire. The page guarantees value ⊆ gradeOptions in the happy path,
+  // so this check normally collapses to length equality, but the defensive
+  // form makes the picker robust to drift.
+  const allSelected = (() => {
+    if (gradeOptions.length === 0) return false
+    const valueSet = new Set(value)
+    if (!gradeOptions.every((g) => valueSet.has(g))) return false
+    const optSet = new Set(gradeOptions)
+    return value.every((v) => optSet.has(v))
+  })()
 
   const toggleGrade = (grade: string) => {
     if (value.includes(grade)) {

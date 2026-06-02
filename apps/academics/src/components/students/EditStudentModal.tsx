@@ -17,8 +17,7 @@ import { Modal, ModalFooter, Button } from '@edforge/ui'
 import { useUpdateStudent } from '../../hooks'
 import { parseApiError } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
-import { useSchoolGradeRange } from '../../hooks/useSchool'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
@@ -72,8 +71,7 @@ export function EditStudentModal({
   const firstInputRef = useRef<HTMLInputElement>(null)
   const updateMutation = useUpdateStudent()
   const schoolId = useActiveSchoolId()
-  const { gradeRange } = useSchoolGradeRange(schoolId)
-  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
+  const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId)
 
   // Include student's current grade even if outside school range
   const gradeOptions = useMemo(() => {
