@@ -48,6 +48,7 @@ import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
 
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 
 // --- Section-scoped attendance ---
 import { SectionAttendanceWrapper } from '../../components/attendance/SectionAttendanceWrapper'
@@ -217,11 +218,10 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
 
   if (!currentYear?.yearId) {
     return (
-      <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
-        <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">No Academic Year Configured</h4>
-        <p className="text-text-secondary max-w-md mx-auto">Set up an academic year before recording grades.</p>
-      </div>
+      <NoCurrentAcademicYearEmptyState
+        variant="subtle"
+        secondaryMessage="Set up an academic year before recording grades."
+      />
     )
   }
 

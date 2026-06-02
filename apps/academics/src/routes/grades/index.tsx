@@ -33,6 +33,7 @@ import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
 import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
 import { GradeOverview } from './overview'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 
 // ============================================================================
 // TYPES
@@ -154,6 +155,18 @@ export function GradesModule() {
     },
     [navigate]
   )
+
+  // Sprint 1 / Ticket 1.5: page-level gate. All hooks above remain defensive
+  // (`!!currentYear?.yearId` guards each query), but downstream UI is
+  // meaningless without a current AY — empty section selectors, no term
+  // chips, etc. Render the shared empty state instead.
+  if (!currentYear?.yearId) {
+    return (
+      <div className="p-6">
+        <NoCurrentAcademicYearEmptyState />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-full">

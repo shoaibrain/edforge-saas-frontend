@@ -66,6 +66,7 @@ import { GradeOverview } from '../grades/overview'
 
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 
@@ -356,13 +357,7 @@ function GradebookTab() {
   )
 
   if (!currentYear?.yearId) {
-    return (
-      <div className="bg-caramel-50/40 dark:bg-caramel-500/8 rounded-xl border border-caramel-300/25 dark:border-caramel-400/15 p-12 text-center">
-        <GraduationCap className="w-12 h-12 mx-auto text-golden-400 mb-4" />
-        <h4 className="text-lg font-medium text-text-primary mb-2">No Academic Year Configured</h4>
-        <p className="text-text-secondary max-w-md mx-auto">Set up an academic year in school settings before recording grades.</p>
-      </div>
-    )
+    return <NoCurrentAcademicYearEmptyState />
   }
 
   return (

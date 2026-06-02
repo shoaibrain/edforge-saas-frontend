@@ -22,16 +22,24 @@ export interface GradingPolicyCategory {
   dropLowest?: number
 }
 
+/**
+ * Sprint 1 / Ticket 1.8 — `gradingScale` renamed to `letterGrades` in
+ * shared-types D.1.1. The portal grade pages do not currently consume the
+ * letter-grade entries (they only use category weights), but keep the
+ * field aligned with the backend response so future portal-side reads
+ * don't repeat the academics-MFE crash.
+ */
 export interface GradingPolicy {
   id: string
   schoolId: string
   name: string
   description?: string
-  gradingScale: Array<{
+  letterGrades: Array<{
     letter: string
     minPercentage: number
     maxPercentage: number
     gpaPoints: number
+    isPassing: boolean
   }>
   categoryWeights: GradingPolicyCategory[]
   isDefault: boolean

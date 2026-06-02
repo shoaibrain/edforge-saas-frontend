@@ -1001,7 +1001,13 @@ export function AttendanceDashboard({
   // Scope indicator
   const isSchoolWide = usePermission('manage', 'attendance')
 
-  // Single aggregate data source
+  // Single aggregate data source. Sprint 1 / Ticket 1.3b: the parent
+  // `AttendanceModule` gates on the current AY, so `academicYearId` is
+  // guaranteed non-empty here. Previously `isLoading = queryLoading || !queryEnabled`
+  // permanently rendered skeletons whenever the AY was missing — the
+  // original "skeleton forever" bug. If `academicYearId` somehow arrives
+  // empty (programmer error from a future caller), the query is disabled
+  // and the dashboard renders no-data states instead of spinning forever.
   const queryEnabled = !!schoolId && !!academicYearId
   const {
     data,
@@ -1013,7 +1019,7 @@ export function AttendanceDashboard({
     date: currentDate,
     enabled: queryEnabled,
   })
-  const isLoading = queryLoading || !queryEnabled
+  const isLoading = queryLoading
 
   const summary = data?.todaySummary
 

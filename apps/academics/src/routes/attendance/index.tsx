@@ -43,6 +43,7 @@ import { DateSelector } from '../../components/attendance/DateSelector'
 import { AttendanceGrid } from '../../components/attendance/AttendanceGrid'
 import { DailySummary } from '../../components/attendance/DailySummary'
 import { AttendanceDashboard } from './dashboard'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import type { AttendanceStatus } from '../../services/academics.service'
 
 type TabId = 'overview' | 'daily-entry'
@@ -236,8 +237,48 @@ function SectionSelector({
 // ATTENDANCE MODULE
 // ============================================================================
 
+/**
+ * Thin gate component. Splits the entry-level current-AY check from the
+ * content component so the rules-of-hooks ordering in `AttendanceModuleContent`
+ * stays simple — the inner component never has to deal with an undefined
+ * `currentYear`. Falls back to the shared empty state when no AY is current.
+ *
+ * Sprint 1 / Ticket 1.3a (academic-year-current-flag-bug).
+ */
 export function AttendanceModule() {
   const schoolId = useActiveSchoolId() || ''
+  const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
+
+  if (yearLoading) {
+    return (
+      <div className="space-y-3" style={{ padding: '0 24px' }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-24 bg-surface-secondary rounded-xl animate-pulse" />
+        ))}
+      </div>
+    )
+  }
+
+  if (!currentYear?.yearId) {
+    return (
+      <div style={{ padding: '24px' }}>
+        <NoCurrentAcademicYearEmptyState
+          secondaryMessage="Set up an academic year in school settings before recording attendance."
+        />
+      </div>
+    )
+  }
+
+  return <AttendanceModuleContent schoolId={schoolId} currentYearId={currentYear.yearId} currentYearName={currentYear.name} />
+}
+
+interface AttendanceModuleContentProps {
+  schoolId: string
+  currentYearId: string
+  currentYearName: string
+}
+
+function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: AttendanceModuleContentProps) {
   const selectedDate = useAttendanceStore((s) => s.selectedDate)
   const selectedSectionId = useAttendanceStore((s) => s.selectedSectionId)
   const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
@@ -248,8 +289,9 @@ export function AttendanceModule() {
   const canCreateAttendance = usePermission('create', 'attendance')
   const exportPortalRef = useRef<HTMLDivElement>(null)
 
-  // Fetch current academic year for sections query
-  const { data: currentYear } = useCurrentAcademicYear(schoolId)
+  // currentYearId / currentYearName are guaranteed non-empty by the gate in
+  // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
+  // defaults on `currentYear` were removed in Ticket 1.3b.
 
   // Fetch all active sections
   const {
@@ -259,7 +301,7 @@ export function AttendanceModule() {
     schoolId,
     filters: {
       isActive: true,
-      academicYearId: currentYear?.yearId,
+      academicYearId: currentYearId,
     },
     enabled: !!schoolId,
   })
@@ -277,7 +319,7 @@ export function AttendanceModule() {
   const { data: summary, isLoading: summaryLoading } = useAttendanceSummary({
     schoolId,
     date: selectedDate,
-    academicYearId: currentYear?.yearId,
+    academicYearId: currentYearId,
     enabled: !!schoolId,
   })
 
@@ -315,9 +357,9 @@ export function AttendanceModule() {
   // Task 4.1: Fetch overview for section completion indicators
   const { data: overviewData } = useAttendanceOverview({
     schoolId,
-    academicYearId: currentYear?.yearId || '',
+    academicYearId: currentYearId,
     date: selectedDate,
-    enabled: !!schoolId && !!currentYear?.yearId && activeTab === 'daily-entry',
+    enabled: !!schoolId && activeTab === 'daily-entry',
   })
 
   // Task 4.1: Build completed section IDs set
@@ -402,7 +444,7 @@ export function AttendanceModule() {
             <div>
               <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px', color: 'var(--v2-text-primary, #e8eaf0)' }}>Attendance</div>
               <div style={{ fontSize: 10, color: 'var(--v2-text-hint, #4a5068)' }}>
-                Record and review attendance by class section{currentYear ? ` · ${currentYear.name || 'Academic Year'}` : ''}
+                Record and review attendance by class section · {currentYearName || 'Academic Year'}
               </div>
             </div>
           </div>
@@ -456,7 +498,7 @@ export function AttendanceModule() {
             {activeTab === 'overview' && (
               <AttendanceDashboard
                 schoolId={schoolId}
-                academicYearId={currentYear?.yearId || ''}
+                academicYearId={currentYearId}
                 currentDate={selectedDate}
                 exportPortalRef={exportPortalRef}
               />

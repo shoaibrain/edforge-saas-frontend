@@ -21,6 +21,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
 import { useStudentGrades } from '../../hooks/useGrades'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 
 // ============================================================================
 // HELPERS
@@ -105,6 +106,21 @@ export function ReportCardPage() {
           <ArrowLeft className="w-4 h-4" />
           Go to Students
         </button>
+      </div>
+    )
+  }
+
+  // Sprint 1 / Ticket 1.5: report cards require a current AY (grades are
+  // queried by `academicYearId`). Without one, the rendered card would show
+  // an empty term-selector and no grades — confusing for the operator
+  // versus a clear "configure AY" prompt.
+  if (!currentYear?.yearId) {
+    return (
+      <div className="p-6">
+        <NoCurrentAcademicYearEmptyState
+          variant="subtle"
+          secondaryMessage="Set up an academic year before generating report cards."
+        />
       </div>
     )
   }

@@ -13,9 +13,12 @@ import {
   Scale,
 } from 'lucide-react'
 import { useResourcePermissions } from '@edforge/abac'
+import type { LetterGradeEntryDto } from '@aibrains/shared-types'
 import { useGradingPolicies } from '../../hooks/useGrades'
+import { useCurrentAcademicYear } from '../../hooks/useSchool'
 import { useActiveSchoolId } from '../../stores/app.store'
 import type { GradingPolicyResponse } from '../../services/academics.service'
+import { NoCurrentAcademicYearEmptyState } from '../common'
 import { GradingPolicyForm } from './GradingPolicyForm'
 
 // ============================================================================
@@ -56,10 +59,17 @@ function PolicyCard({
       </div>
 
       {/* Grade Scale Preview */}
+      {/*
+        Sprint 1 / Ticket 1.6: shared-types renamed `gradingScale` →
+        `letterGrades` in D.1.1 (2026-05-22). PolicyCard read the old name
+        and crashed every Grading Policies tab render. Explicit
+        `LetterGradeEntryDto` typing here will surface future renames at
+        compile time.
+      */}
       <div className="mb-3">
         <p className="text-xs text-text-tertiary mb-1.5">Grade Scale</p>
         <div className="flex flex-wrap gap-1">
-          {policy.gradingScale.map((entry, idx) => (
+          {policy.letterGrades.map((entry: LetterGradeEntryDto, idx: number) => (
             <span
               key={`${entry.letter}-${idx}`}
               className="px-2 py-0.5 text-xs font-medium bg-surface-hover rounded text-text-secondary"
@@ -108,11 +118,17 @@ function PolicyCard({
 export function GradingPolicyList() {
   const schoolId = useActiveSchoolId() || ''
   const gradePerms = useResourcePermissions('grades')
-  const { data: policies, isLoading } = useGradingPolicies(schoolId)
+  // Grading Policies are scoped to a school but the page-level UX requires
+  // a current academic year (the policies are applied per-AY at grade-record
+  // time). When no current AY exists the tab cannot meaningfully operate;
+  // render the same empty state Gradebook / Attendance use so the operator
+  // sees a consistent recovery prompt.
+  const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
+  const { data: policies, isLoading: policiesLoading } = useGradingPolicies(schoolId)
   const [editingPolicy, setEditingPolicy] = useState<GradingPolicyResponse | null>(null)
   const [showCreate, setShowCreate] = useState(false)
 
-  if (isLoading) {
+  if (yearLoading || policiesLoading) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 2 }).map((_, i) => (
@@ -120,6 +136,10 @@ export function GradingPolicyList() {
         ))}
       </div>
     )
+  }
+
+  if (!currentYear?.yearId) {
+    return <NoCurrentAcademicYearEmptyState />
   }
 
   return (

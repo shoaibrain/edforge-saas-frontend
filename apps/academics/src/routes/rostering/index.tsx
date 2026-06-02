@@ -28,6 +28,7 @@ import {
   useBulkSectionRosters,
 } from '../../hooks/useSections'
 import { parseApiError } from '../../services/academics.service'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 
 // ============================================================================
 // TYPES
@@ -648,6 +649,20 @@ export function BulkRosteringPage() {
   // Loading state
   // ---------------------------------------------------------------------------
   const isInitialLoading = yearLoading || studentsLoading || sectionsLoading || rostersLoading
+
+  // Sprint 1 / Ticket 1.5: bulk rostering requires a current AY to know
+  // which sections to roster into. The downstream sections query is already
+  // gated by `!!currentYear?.yearId`, but without a gate the user sees an
+  // empty grid with no guidance. Render the shared empty state instead.
+  if (!yearLoading && !currentYear?.yearId) {
+    return (
+      <div className="p-6">
+        <NoCurrentAcademicYearEmptyState
+          secondaryMessage="Set up an academic year in school settings before rostering students."
+        />
+      </div>
+    )
+  }
 
   // ---------------------------------------------------------------------------
   // Render
