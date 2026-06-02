@@ -171,6 +171,22 @@ export default function FeeStructuresPage() {
 
   const gradeOptions = useMemo(() => deriveSchoolGradeCodes(schoolData), [schoolData])
 
+  /**
+   * When editing, surface any codes the saved fee structure references that
+   * aren't in the school's current `enabledGradeLevels` / `gradeRange` so the
+   * operator can SEE them in the picker (and choose to drop them) rather
+   * than have them silently disappear from the UI and get clobbered by the
+   * "All Grades" toggle. Matches the academics `extraOpt` pattern in
+   * EditStudentModal — see CLAUDE.md P3 architectural decision #2
+   * ("permissive on out-of-range data").
+   */
+  const editGradeOptions = useMemo(() => {
+    if (!editingFee?.gradeLevels?.length) return gradeOptions
+    const inDerived = new Set(gradeOptions)
+    const extras = editingFee.gradeLevels.filter((g) => !inDerived.has(g))
+    return extras.length > 0 ? [...gradeOptions, ...extras] : gradeOptions
+  }, [gradeOptions, editingFee])
+
   // Resolve academic year name from ID
   const getAcademicYearName = (yearId: string): string => {
     const year = academicYears.find((y) => y.id === yearId)
@@ -376,7 +392,7 @@ export default function FeeStructuresPage() {
         <FeeStructureForm
           feeStructure={editingFee}
           academicYears={academicYears}
-          gradeOptions={gradeOptions}
+          gradeOptions={editGradeOptions}
           onSubmit={handleUpdate}
           onClose={() => setEditingFee(null)}
           isSubmitting={updateMutation.isPending}
