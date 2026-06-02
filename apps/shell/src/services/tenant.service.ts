@@ -118,7 +118,9 @@ function mapApiSchool(apiSchool: any, tenantId?: string): School {
     email: apiSchool.email,
     calendarSystem: apiSchool.calendarSystem,
     currentAcademicYearId: apiSchool.currentAcademicYearId,
-    enabledGradeLevels: apiSchool.enabledGradeLevels,
+    enabledGradeLevels: Array.isArray(apiSchool.enabledGradeLevels)
+      ? apiSchool.enabledGradeLevels.map((v: unknown) => String(v))
+      : undefined,
   }
 }
 

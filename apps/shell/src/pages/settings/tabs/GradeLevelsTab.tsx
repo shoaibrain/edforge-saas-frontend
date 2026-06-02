@@ -9,8 +9,10 @@
  * read-only pill on every entry so operators understand how each code
  * collapses for IEMIS/Ed-Fi reporting (PG/NUR → ECD, LKG/UKG → PPC, etc.).
  *
- * ABAC: tab is mounted only when caller has `gradelevels:view`; controls
- * are disabled (read-only mode) when caller lacks `gradelevels:edit`.
+ * ABAC: the tab is mounted unconditionally (matches the rest of
+ * school-detail.tsx — the school page itself is the gate). This component
+ * enforces `gradelevels:edit` locally: when missing, a read-only banner
+ * is shown and every checkbox + Save are disabled.
  */
 
 import { useMemo, useState } from 'react'

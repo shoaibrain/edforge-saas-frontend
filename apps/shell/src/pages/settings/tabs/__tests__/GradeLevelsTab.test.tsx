@@ -19,6 +19,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import type { School, UserIdentity } from '@edforge/types'
 import { ABACContext } from '@edforge/abac'
+import { GRADE_LEVEL_OPTIONS } from '@aibrains/shared-types'
 
 // Toast: capture calls without hitting sonner internals.
 vi.mock('sonner', () => ({
@@ -178,5 +179,35 @@ describe('GradeLevelsTab', () => {
 
     const lkgRow = screen.getByLabelText('Lower KG (LKG)').closest('label') as HTMLElement
     expect(within(lkgRow).getByText(/PrePrimaryClass/)).toBeInTheDocument()
+  })
+
+  /**
+   * Guard against catalog/BANDS drift. If a future shared-types release adds
+   * a new code to GRADE_LEVEL_OPTIONS, the UI grouping in BANDS must be
+   * updated too — otherwise the code is silently invisible: an operator
+   * can't toggle it, and any pre-existing enabledGradeLevels containing it
+   * stays unchanged but unrenderable. Reverse direction guards the opposite
+   * mistake (a code in BANDS that isn't a real catalog value).
+   */
+  it('every catalog code is rendered in exactly one band (no UI/catalog drift)', () => {
+    renderWithProviders(
+      <GradeLevelsTab
+        schoolId={SCHOOL_ID}
+        school={makeSchool({ enabledGradeLevels: [] })}
+      />,
+      PRINCIPAL_USER
+    )
+
+    // Sanity: 20 checkboxes rendered (one per catalog code) — same shape the
+    // first test asserts but with a clearer failure message for the drift case.
+    const checkboxes = screen.getAllByRole('checkbox')
+    expect(checkboxes).toHaveLength(GRADE_LEVEL_OPTIONS.length)
+
+    for (const option of GRADE_LEVEL_OPTIONS) {
+      expect(
+        screen.queryByLabelText(option.label),
+        `Catalog code "${option.value}" (${option.label}) is in GRADE_LEVEL_OPTIONS but missing from BANDS in GradeLevelsTab.tsx — add it to the correct band or this code is invisible to operators.`
+      ).toBeInTheDocument()
+    }
   })
 })
