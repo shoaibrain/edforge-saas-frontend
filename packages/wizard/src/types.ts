@@ -108,6 +108,23 @@ export interface WizardContextValue {
   getStepStatus: (index: number) => WizardStepStatus
   /** Check if can go to step */
   canGoToStep: (index: number) => boolean
+  /**
+   * P4 / T1.4 — Register a function that returns the current step's
+   * live form values. Used by `useWizardForm` to expose
+   * `form.getValues()` to the wizard's `validateStep` / `goToNext` /
+   * `submit` so a fast user navigation flushes RHF state into the
+   * wizard's `formDataRef` synchronously BEFORE Zod parsing. Closes
+   * the "Please select an academic year" heisenbug where `form.watch`
+   * had queued an `updateData` but React hadn't run the setFormData
+   * updater before the user clicked Continue.
+   *
+   * Returns a cleanup function that unregisters when the step's
+   * `FormProvider` unmounts. Only ONE provider is active at a time —
+   * subsequent registrations replace the previous reference.
+   */
+  registerStepDataProvider: (
+    provider: () => Record<string, unknown>,
+  ) => () => void
 }
 
 // ============================================================================

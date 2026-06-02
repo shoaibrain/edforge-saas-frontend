@@ -58,6 +58,19 @@ export function WizardProvider({
     return 0
   })
   const formDataRef = useRef<Record<string, unknown>>(initialData)
+  /**
+   * P4 / T1.4 — Step data provider.
+   * The current step's `FormProvider` (via `useWizardForm`) registers a
+   * function that returns `form.getValues()`. `validateStep` /
+   * `goToNext` / `submit` call it synchronously at the top to flush
+   * live RHF values into `formDataRef` BEFORE Zod parses — closes the
+   * race where `form.watch` had queued an updateData but React hadn't
+   * yet run the setFormData updater when the user clicked Continue.
+   * Only ONE provider is active at a time (the current step's). Step
+   * components unmount their FormProvider on navigate, which calls the
+   * cleanup returned by `registerStepDataProvider`.
+   */
+  const stepDataProviderRef = useRef<(() => Record<string, unknown>) | null>(null)
   const [formData, setFormData] = useState<Record<string, unknown>>(() => {
     if (!autoSaveKey) {
       formDataRef.current = initialData
@@ -91,13 +104,103 @@ export function WizardProvider({
 
   const currentStepData = steps[currentStep]
 
-  // Validate current step data (reads from ref to avoid stale closures)
+  // Update form data (deep merge for nested objects to prevent data loss).
+  //
+  // P4 / T1.3 — Synchronous ref update. Previously the `formDataRef.current
+  // = merged` assignment lived INSIDE the `setFormData((prev) => ...)`
+  // updater, which React invokes asynchronously. Any synchronous reader of
+  // the ref between an `updateData(...)` call and the next React render
+  // would see stale data — which is exactly the "Please select an academic
+  // year" heisenbug: a SelectField change fires form.watch → updateData
+  // (ref-write queued), then the user clicks Continue → validateStep reads
+  // the ref synchronously → still empty.
+  //
+  // Fix: compute `merged` from `formDataRef.current` synchronously, assign
+  // the ref synchronously, THEN schedule the React state update. The React
+  // semantics for consumers (formData prop, re-render) are unchanged; only
+  // the timing of the ref write moves earlier.
+  const updateData = useCallback((data: Record<string, unknown>) => {
+    const prev = formDataRef.current
+    const merged: Record<string, unknown> = { ...prev }
+    for (const key of Object.keys(data)) {
+      const incoming = data[key]
+      const existing = prev[key]
+      // Deep merge plain objects (not arrays, dates, or null)
+      if (
+        incoming != null &&
+        existing != null &&
+        typeof incoming === 'object' &&
+        typeof existing === 'object' &&
+        !Array.isArray(incoming) &&
+        !Array.isArray(existing) &&
+        !(incoming instanceof Date) &&
+        !(existing instanceof Date)
+      ) {
+        merged[key] = {
+          ...(existing as Record<string, unknown>),
+          ...(incoming as Record<string, unknown>),
+        }
+      } else {
+        merged[key] = incoming
+      }
+    }
+    formDataRef.current = merged
+    setFormData(merged)
+  }, [])
+
+  /**
+   * P4 / T1.4 — Register a function that returns the current step's live
+   * form values. Called by `useWizardForm` on mount. Returns a cleanup
+   * function that unregisters when the FormProvider unmounts (e.g., the
+   * step navigates away). Only ONE provider can be active at a time —
+   * subsequent registrations replace the previous reference.
+   */
+  const registerStepDataProvider = useCallback(
+    (provider: () => Record<string, unknown>): (() => void) => {
+      stepDataProviderRef.current = provider
+      return () => {
+        if (stepDataProviderRef.current === provider) {
+          stepDataProviderRef.current = null
+        }
+      }
+    },
+    [],
+  )
+
+  /**
+   * Internal helper used by validateStep / goToNext / submit. Pulls the
+   * current step's live values via the registered provider and merges
+   * them into formDataRef SYNCHRONOUSLY before Zod parsing. No-op if no
+   * provider is registered (e.g., steps that don't use useWizardForm).
+   */
+  const flushCurrentStep = useCallback(() => {
+    const provider = stepDataProviderRef.current
+    if (provider) {
+      updateData(provider())
+    }
+  }, [updateData])
+
+  // Validate current step data.
+  //
+  // P4 / T1.4 — Flushes the current step's live RHF values into
+  // `formDataRef` synchronously BEFORE Zod parses + BEFORE the first
+  // `await`. This closes the race where a fast click on Continue right
+  // after a SelectField change would see a stale ref (form.watch had
+  // queued the updateData but React hadn't run the updater yet).
+  // Capturing `snapshot` after the flush, then passing it directly into
+  // `parseAsync`, also defends against the parallel case where another
+  // updateData call lands DURING the async parse — we validate exactly
+  // the state we just flushed, not "whatever the ref happens to hold
+  // when await resumes".
   const validateStep = useCallback(async (stepIndex: number): Promise<boolean> => {
     const step = steps[stepIndex]
     if (!step.schema) return true
 
+    flushCurrentStep()
+    const snapshot = formDataRef.current
+
     try {
-      await step.schema.parseAsync(formDataRef.current)
+      await step.schema.parseAsync(snapshot)
       setErrors({})
       return true
     } catch (error) {
@@ -113,7 +216,7 @@ export function WizardProvider({
       }
       return false
     }
-  }, [steps])
+  }, [steps, flushCurrentStep, onValidationError])
 
   // Go to next step
   const goToNext = useCallback(async (): Promise<boolean> => {
@@ -146,39 +249,15 @@ export function WizardProvider({
     }
   }, [steps.length])
 
-  // Update form data (deep merge for nested objects to prevent data loss)
-  const updateData = useCallback((data: Record<string, unknown>) => {
-    setFormData((prev) => {
-      const merged = { ...prev }
-      for (const key of Object.keys(data)) {
-        const incoming = data[key]
-        const existing = prev[key]
-        // Deep merge plain objects (not arrays, dates, or null)
-        if (
-          incoming != null &&
-          existing != null &&
-          typeof incoming === 'object' &&
-          typeof existing === 'object' &&
-          !Array.isArray(incoming) &&
-          !Array.isArray(existing) &&
-          !(incoming instanceof Date) &&
-          !(existing instanceof Date)
-        ) {
-          merged[key] = {
-            ...(existing as Record<string, unknown>),
-            ...(incoming as Record<string, unknown>),
-          }
-        } else {
-          merged[key] = incoming
-        }
-      }
-      formDataRef.current = merged
-      return merged
-    })
-  }, [])
-
-  // Submit wizard
+  // Submit wizard.
+  //
+  // P4 / T1.4 — Flush the current step's live values FIRST (same race
+  // as goToNext / validateStep), then validate all steps. Earlier steps
+  // rely on their values already having been merged when the user
+  // navigated past them; the current step is the only one with a live
+  // provider, so flushing it covers the "type then submit" path.
   const submit = useCallback(async () => {
+    flushCurrentStep()
     // Validate all steps
     for (let i = 0; i < steps.length; i++) {
       const isValid = await validateStep(i)
@@ -209,7 +288,7 @@ export function WizardProvider({
     } finally {
       setIsSubmitting(false)
     }
-  }, [steps.length, validateStep, onSubmit, autoSaveKey])
+  }, [steps.length, validateStep, onSubmit, autoSaveKey, flushCurrentStep])
 
   // Clear specific error
   const clearError = useCallback((field: string) => {
@@ -272,6 +351,7 @@ export function WizardProvider({
       reset,
       getStepStatus,
       canGoToStep,
+      registerStepDataProvider,
     }),
     [
       steps,
@@ -290,6 +370,7 @@ export function WizardProvider({
       reset,
       getStepStatus,
       canGoToStep,
+      registerStepDataProvider,
     ]
   )
 
