@@ -160,16 +160,20 @@ describe('WizardContext — heisenbug race regression (P4 T1.3 + T1.4)', () => {
     expect(onValidationError).toHaveBeenCalledTimes(1)
   })
 
-  it('T1.4: provider unregister cleans up — second goToNext after unmount sees stale data, not the unmounted provider', async () => {
+  it('T1.4: provider unregister cleans up — post-unmount goToNext does NOT call the provider (counter), and formData stays stable', async () => {
     let ctxRef!: ReturnType<typeof useWizard>
     let showProbe = true
     let renderProbeUpdate!: () => void
+    let providerCallCount = 0
 
     function Probe() {
       const ctx = useWizard()
       ctxRef = ctx
       useEffect(() => {
-        return ctx.registerStepDataProvider(() => ({ academicYearId: 'ay-live' }))
+        return ctx.registerStepDataProvider(() => {
+          providerCallCount += 1
+          return { academicYearId: 'ay-live' }
+        })
       }, [ctx])
       return null
     }
@@ -188,21 +192,36 @@ describe('WizardContext — heisenbug race regression (P4 T1.3 + T1.4)', () => {
       </WizardProvider>,
     )
 
-    // First navigation — provider is active, validation passes
+    // First navigation — provider is active, validation passes, counter ticks
     await act(async () => {
       const ok = await ctxRef.goToNext()
       expect(ok).toBe(true)
     })
+    expect(providerCallCount).toBe(1)
+    expect(ctxRef.formData).toEqual({ academicYearId: 'ay-live' })
 
-    // Unmount the probe so the provider unregisters
+    // Unmount the probe so the provider unregisters via the cleanup
+    // returned by registerStepDataProvider.
     showProbe = false
     await act(async () => {
       renderProbeUpdate()
     })
 
-    // formData still reflects the previous flush — provider went away but
-    // the values it already pushed remain. A subsequent validation reads
-    // formDataRef without a provider call.
+    // Snapshot counter immediately AFTER unmount, before any navigation.
+    // The unregister cleanup itself must not call the provider.
+    const counterAfterUnmount = providerCallCount
+    expect(counterAfterUnmount).toBe(1)
+
+    // Second navigation AFTER unmount — the unregistered provider must
+    // NOT be invoked. validateStep should still pass because formDataRef
+    // already holds the value from the first flush.
+    let secondOk: boolean | undefined
+    await act(async () => {
+      secondOk = await ctxRef.goToNext()
+    })
+
+    expect(providerCallCount).toBe(counterAfterUnmount) // unchanged → unregister worked
+    expect(secondOk).toBe(true)                          // formData survives unmount
     expect(ctxRef.formData).toEqual({ academicYearId: 'ay-live' })
   })
 })
