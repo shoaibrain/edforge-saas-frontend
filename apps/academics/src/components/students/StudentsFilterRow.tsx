@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 import { Search, X, Loader2, Download } from 'lucide-react'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import {
   useStudentFilters,
   useStudentFilterActions,
@@ -53,18 +53,21 @@ interface StudentsFilterRowProps {
   isExporting: boolean
   hasAcademicYear: boolean
   onExport: () => void
-  /** School's configured grade range — drives the Grade filter dropdown options. */
-  schoolGradeRange?: { start: string; end: string } | null
+  /**
+   * Active school. The Grade filter dropdown reads `enabledGradeLevels`
+   * (with `gradeRange` fallback) via `useSchoolEnabledGradeOptions`.
+   */
+  schoolId: string | null
 }
 
 export function StudentsFilterRow({
   isExporting,
   hasAcademicYear,
   onExport,
-  schoolGradeRange,
+  schoolId,
 }: StudentsFilterRowProps) {
   const filters = useStudentFilters()
-  const gradeOptions = useFilteredGradeOptions(schoolGradeRange)
+  const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
   const {
     setSearchTerm,
     setGradeLevel,

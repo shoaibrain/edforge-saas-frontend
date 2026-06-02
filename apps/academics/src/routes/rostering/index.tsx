@@ -17,8 +17,7 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import { Grid3x3, Loader2, AlertTriangle, Check, Plus, Minus, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { useActiveSchoolId } from '../../stores/app.store'
-import { useSchoolGradeRange } from '../../hooks/useSchool'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks'
 import { useStudents, flattenStudentPages } from '../../hooks/useStudents'
 import {
@@ -385,8 +384,7 @@ function SummaryBar({
 export function BulkRosteringPage() {
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
-  const { gradeRange } = useSchoolGradeRange(schoolId || null)
-  const gradeLevelOptions = useFilteredGradeOptions(gradeRange)
+  const { options: gradeLevelOptions } = useSchoolEnabledGradeOptions(schoolId || null)
 
   // ---------------------------------------------------------------------------
   // Filters

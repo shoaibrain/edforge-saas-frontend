@@ -25,7 +25,6 @@ import {
   X,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
-import { useSchoolGradeRange } from '../../hooks/useSchool'
 import {
   useEnrollmentStore,
   useEnrollmentFilters,
@@ -107,7 +106,6 @@ export function EnrollmentModule() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<EnrollmentTab>(getInitialTab)
   const schoolId = useActiveSchoolId() || ''
-  const { gradeRange } = useSchoolGradeRange(schoolId || null)
 
   // ABAC: check enrollment permissions
   const enrollPerms = useResourcePermissions('enrollment')
@@ -455,7 +453,7 @@ export function EnrollmentModule() {
                   onWithdraw={enrollPerms.edit ? setWithdrawTarget : undefined}
                   onTransfer={enrollPerms.edit ? setTransferTarget : undefined}
                   onMarkNoShow={enrollPerms.edit ? handleMarkNoShow : undefined}
-                  schoolGradeRange={gradeRange}
+                  schoolId={schoolId || null}
                 />
               </div>
             )}

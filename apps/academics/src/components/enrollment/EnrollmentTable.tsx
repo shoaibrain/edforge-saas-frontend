@@ -26,7 +26,7 @@ import {
   type ColumnDef,
 } from '@edforge/ui'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -47,7 +47,11 @@ interface EnrollmentTableProps {
   onWithdraw?: (enrollment: EnrollmentResponseDto) => void
   onTransfer?: (enrollment: EnrollmentResponseDto) => void
   onMarkNoShow?: (enrollment: EnrollmentResponseDto) => void
-  schoolGradeRange?: { start: string; end: string } | null
+  /**
+   * Active school. The Grade filter dropdown reads `enabledGradeLevels`
+   * (with `gradeRange` fallback) via `useSchoolEnabledGradeOptions`.
+   */
+  schoolId: string | null
 }
 
 const statusOptions = [
@@ -211,9 +215,9 @@ export function EnrollmentTable({
   onWithdraw,
   onTransfer,
   onMarkNoShow,
-  schoolGradeRange,
+  schoolId,
 }: EnrollmentTableProps) {
-  const gradeLevelOptions = useFilteredGradeOptions(schoolGradeRange)
+  const { options: gradeLevelOptions } = useSchoolEnabledGradeOptions(schoolId)
   const hasActions = !!(onWithdraw || onTransfer || onMarkNoShow)
 
   const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(() => {
