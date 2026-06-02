@@ -84,12 +84,20 @@ export function EnrollmentStep({
     return eligibleYears.find((y) => y.yearId === selectedYearId) ?? null
   }, [selectedYearId, eligibleYears])
 
-  // Auto-select if only one active year exists
+  // Auto-select if only one active year exists.
+  // P4 / T1.5 — `shouldDirty: true` marks the field as user-touched so
+  // RHF's watch subscription syncs it through to the wizard's
+  // formDataRef on the next tick. Without this flag, the auto-select
+  // could land before the watcher subscribed (race during initial
+  // mount) and the wizard's view of the field stayed empty — a known
+  // path into the "Please select an academic year" heisenbug.
   useEffect(() => {
     if (!selectedYearId && eligibleYears.length > 0) {
       const activeYears = eligibleYears.filter((y) => y.status === 'active')
       if (activeYears.length === 1) {
-        form.setValue('enrollment.academicYearId', activeYears[0].yearId)
+        form.setValue('enrollment.academicYearId', activeYears[0].yearId, {
+          shouldDirty: true,
+        })
       }
     }
   }, [eligibleYears, selectedYearId, form])

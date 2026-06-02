@@ -5,10 +5,16 @@
  * This allows step components to use @edforge/forms field components
  * (which depend on useFormContext) while keeping the wizard context
  * as the source of truth for data and navigation.
+ *
+ * P4 / T1.4 — Also registers a "step data provider" with the wizard so
+ * `validateStep` / `goToNext` / `submit` can flush live RHF values into
+ * `formDataRef` synchronously before Zod parsing. Closes the "Please
+ * select an academic year" heisenbug.
  */
 
 import { useEffect, useRef } from 'react'
 import { useForm, type UseFormReturn, type FieldValues, type DefaultValues } from 'react-hook-form'
+import { useWizard } from '@edforge/wizard'
 
 interface UseWizardFormOptions {
   /** Current wizard form data */
@@ -49,6 +55,16 @@ export function useWizardForm({
     defaultValues: data as DefaultValues<FieldValues>,
     mode: 'onBlur',
   })
+
+  // P4 / T1.4 — Register a provider so wizard validateStep/goToNext/submit
+  // can flush this step's live RHF values synchronously before parsing.
+  // The cleanup runs on step navigation (FormProvider unmount), so only
+  // ONE provider is registered at a time (the current step's).
+  const { registerStepDataProvider } = useWizard()
+  useEffect(() => {
+    const unregister = registerStepDataProvider(() => form.getValues())
+    return unregister
+  }, [form, registerStepDataProvider])
 
   // Sync form changes → wizard data AND clear errors for changed fields.
   //
