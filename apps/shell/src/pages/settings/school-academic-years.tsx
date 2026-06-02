@@ -1,8 +1,20 @@
 /**
- * School Academic Years Page
- * 
- * Manage academic years and their lifecycle for a school.
- * Academic years are critical temporal boundaries for all school data.
+ * School Academic Years Page — ORPHANED / DEPRECATED.
+ *
+ * ⚠️ This file is NOT imported by any production route. The school
+ * Academic Setup UI users see at
+ *   /settings/organization/schools/:id?tab=academic-setup
+ * is rendered by `apps/shell/src/pages/settings/tabs/AcademicSetupTab.tsx`,
+ * which is mounted via `school-detail.tsx`.
+ *
+ * This component is preserved temporarily because it carries Sprint 2 of
+ * the academic-year `isCurrent` flag drift fix (PR #100). Sprint 2 added
+ * `isCurrent`-aware UI here in error — the changes never reached users
+ * because nothing imports this file. The Set-as-Current UI was reimplemented
+ * directly in `AcademicSetupTab.tsx` in a follow-up PR.
+ *
+ * Do NOT add new code here. Delete this file (and its test) when the
+ * follow-up PR has soaked in prod for a sprint cycle.
  */
 
 import { useState, useEffect } from 'react'
