@@ -67,7 +67,9 @@ export function StudentsFilterRow({
   schoolId,
 }: StudentsFilterRowProps) {
   const filters = useStudentFilters()
-  const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
+  // Gate dropdown on profile-load — see EnrollmentTable comment.
+  const { options: gradeOptions, isLoading: gradeOptionsLoading } =
+    useSchoolEnabledGradeOptions(schoolId)
   const {
     setSearchTerm,
     setGradeLevel,
@@ -148,11 +150,12 @@ export function StudentsFilterRow({
       <select
         value={filters.gradeLevel ?? ''}
         onChange={(e) => setGradeLevel(e.target.value || null)}
-        className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+        disabled={gradeOptionsLoading}
+        className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30 disabled:opacity-60 disabled:cursor-not-allowed"
         style={inputStyle}
       >
-        <option value="">All Grades</option>
-        {gradeOptions.map((g) => (
+        <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
+        {!gradeOptionsLoading && gradeOptions.map((g) => (
           <option key={g.value} value={g.value}>{g.label}</option>
         ))}
       </select>
