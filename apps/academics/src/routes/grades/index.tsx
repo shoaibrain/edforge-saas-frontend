@@ -33,6 +33,7 @@ import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
 import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
 import { GradeOverview } from './overview'
+import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 
 // ============================================================================
 // TYPES
@@ -154,6 +155,18 @@ export function GradesModule() {
     },
     [navigate]
   )
+
+  // Sprint 1 / Ticket 1.5: page-level gate. All hooks above remain defensive
+  // (`!!currentYear?.yearId` guards each query), but downstream UI is
+  // meaningless without a current AY — empty section selectors, no term
+  // chips, etc. Render the shared empty state instead.
+  if (!currentYear?.yearId) {
+    return (
+      <div className="p-6">
+        <NoCurrentAcademicYearEmptyState />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-full">
@@ -345,18 +358,12 @@ export function GradesModule() {
                   </div>
                 )}
 
-                {/* Gradebook Content */}
-                {!currentYear?.yearId ? (
-                  <div className="bg-caramel-50/40 dark:bg-caramel-500/8 rounded-xl border border-caramel-300/25 dark:border-caramel-400/15 p-12 text-center">
-                    <GraduationCap className="w-12 h-12 mx-auto text-golden-400 mb-4" />
-                    <h4 className="text-lg font-medium text-text-primary mb-2">
-                      No Academic Year Configured
-                    </h4>
-                    <p className="text-text-secondary max-w-md mx-auto">
-                      Set up an academic year in school settings before recording grades.
-                    </p>
-                  </div>
-                ) : !selectedSectionId ? (
+                {/* Gradebook Content. The earlier function-level
+                    `!currentYear?.yearId` guard short-circuits the entire
+                    render to <NoCurrentAcademicYearEmptyState/>, so the
+                    inline no-AY branch this ternary used to carry was
+                    dead code and was removed. */}
+                {!selectedSectionId ? (
                   <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
                     <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
                     <h4 className="text-lg font-medium text-text-primary mb-2">
@@ -376,7 +383,7 @@ export function GradesModule() {
                     courseName={selectedSection?.courseName}
                     schoolId={schoolId}
                     termId={effectiveTermId || ''}
-                    academicYearId={currentYear?.yearId}
+                    academicYearId={currentYear.yearId}
                     teacherId={selectedSection?.primaryTeacherId}
                     disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
                     onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}

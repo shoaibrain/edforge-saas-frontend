@@ -390,7 +390,13 @@ function mapApiDepartment(apiDept: any, tenantId?: string): Department {
   }
 }
 
-// Helper to map API academic year format to Frontend AcademicYear interface
+// Helper to map API academic year format to Frontend AcademicYear interface.
+//
+// Sprint 2 / Ticket 2.1 — `isCurrent` is now passed through explicitly.
+// Previously this mapper discarded the field entirely (a stale "Map isCurrent
+// to isLocked" comment claimed it mapped to a different concept, but didn't).
+// `isLocked` and `isCurrent` are independent: lock follows the lifecycle
+// stage, current designates which AY anchors `/academic-years/current`.
 function mapApiAcademicYear(apiYear: any, schoolId?: string, tenantId?: string): AcademicYear {
   return {
     // API returns 'yearId', fallback to 'academicYearId' or 'id' for compatibility
@@ -401,8 +407,14 @@ function mapApiAcademicYear(apiYear: any, schoolId?: string, tenantId?: string):
     name: apiYear.name,
     startDate: apiYear.startDate,
     endDate: apiYear.endDate,
+    startDateBS: apiYear.startDateBS,
+    endDateBS: apiYear.endDateBS,
     status: apiYear.status,
-    // Map isCurrent to isLocked for backward compatibility
+    // Defensive default: legacy rows or partial payloads should not be assumed
+    // current. Operators must explicitly set-current via the new UI.
+    isCurrent: apiYear.isCurrent === true,
+    // Lock follows the lifecycle stage. Active/completed AYs can't have
+    // their dates edited; planning AYs are mutable.
     isLocked: apiYear.isLocked ?? (apiYear.status === 'active' || apiYear.status === 'completed'),
     terms: apiYear.terms || [],
     activatedAt: apiYear.activatedAt,
@@ -566,6 +578,28 @@ export async function updateAcademicYearStatus(
   const result = await apiPut<any, UpdateAcademicYearStatusDto>(
     `/schools/${schoolId}/academic-years/${academicYearId}/status`,
     data
+  )
+  return mapApiAcademicYear(result, schoolId)
+}
+
+/**
+ * Designate an academic year as the school's CURRENT year. Flips
+ * `isCurrent=true` on the target and `isCurrent=false` on any other
+ * AY for the school (single-current invariant).
+ *
+ * Sprint 2 / Ticket 2.2 (academic-year-current-flag-bug). Backend route
+ * is registered in `server/lib/tenant-api-prod.json:2440`. The route
+ * has been live since Sprint C3 but the shell had no UI to call it,
+ * leaving operators with no way to recover from drifted state.
+ *
+ * PUT /schools/{schoolId}/academic-years/{yearId}/set-current
+ */
+export async function setCurrentAcademicYear(
+  schoolId: string,
+  academicYearId: string
+): Promise<AcademicYear> {
+  const result = await apiPut<any>(
+    `/schools/${schoolId}/academic-years/${academicYearId}/set-current`,
   )
   return mapApiAcademicYear(result, schoolId)
 }
@@ -912,6 +946,7 @@ export const tenantService = {
   createAcademicYear,
   updateAcademicYear,
   updateAcademicYearStatus,
+  setCurrentAcademicYear,
   deleteAcademicYear,
 
   // Grading Periods

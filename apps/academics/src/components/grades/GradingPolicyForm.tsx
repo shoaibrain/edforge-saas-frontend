@@ -13,9 +13,9 @@ import {
 } from '../../hooks/useGrades'
 import type {
   GradingPolicyResponse,
-  GradingScaleEntry,
   CategoryWeight,
 } from '../../services/academics.service'
+import type { LetterGradeEntryDto, GpaScale } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES
@@ -26,12 +26,16 @@ interface GradingPolicyFormProps {
   onClose: () => void
 }
 
-const defaultScale: GradingScaleEntry[] = [
-  { letter: 'A', minPercentage: 90, maxPercentage: 100, gpaPoints: 4.0 },
-  { letter: 'B', minPercentage: 80, maxPercentage: 89, gpaPoints: 3.0 },
-  { letter: 'C', minPercentage: 70, maxPercentage: 79, gpaPoints: 2.0 },
-  { letter: 'D', minPercentage: 60, maxPercentage: 69, gpaPoints: 1.0 },
-  { letter: 'F', minPercentage: 0, maxPercentage: 59, gpaPoints: 0.0 },
+// Sprint 1 / Ticket 1.7 — shape matches `LetterGradeEntryDto` from
+// @aibrains/shared-types (D.1.1 rename from `gradingScale`). `isPassing` is
+// required by the schema; we initialize per US-default convention
+// (>=60% passes) and let the user adjust.
+const defaultLetterGrades: LetterGradeEntryDto[] = [
+  { letter: 'A', minPercentage: 90, maxPercentage: 100, gpaPoints: 4.0, isPassing: true },
+  { letter: 'B', minPercentage: 80, maxPercentage: 89, gpaPoints: 3.0, isPassing: true },
+  { letter: 'C', minPercentage: 70, maxPercentage: 79, gpaPoints: 2.0, isPassing: true },
+  { letter: 'D', minPercentage: 60, maxPercentage: 69, gpaPoints: 1.0, isPassing: true },
+  { letter: 'F', minPercentage: 0, maxPercentage: 59, gpaPoints: 0.0, isPassing: false },
 ]
 
 const defaultCategories: CategoryWeight[] = [
@@ -61,8 +65,9 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
     policy?.minimumPassingGrade ?? 60
   )
   const [isDefault, setIsDefault] = useState(policy?.isDefault ?? false)
-  const [scale, setScale] = useState<GradingScaleEntry[]>(
-    policy?.gradingScale ?? defaultScale
+  const [gpaScale, setGpaScale] = useState<GpaScale>(policy?.gpaScale ?? '4.0')
+  const [letterGrades, setLetterGrades] = useState<LetterGradeEntryDto[]>(
+    policy?.letterGrades ?? defaultLetterGrades
   )
   const [categories, setCategories] = useState<CategoryWeight[]>(
     policy?.categoryWeights ?? defaultCategories
@@ -74,8 +79,12 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   )
   const isWeightValid = totalWeight === 100
 
-  const handleScaleChange = (index: number, field: keyof GradingScaleEntry, value: string | number) => {
-    setScale((prev) =>
+  const handleLetterGradeChange = (
+    index: number,
+    field: keyof LetterGradeEntryDto,
+    value: string | number | boolean,
+  ) => {
+    setLetterGrades((prev) =>
       prev.map((entry, i) =>
         i === index ? { ...entry, [field]: value } : entry
       )
@@ -104,11 +113,27 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   const handleSubmit = async () => {
     if (!policyName.trim() || !isWeightValid) return
 
+    // Sprint 1 / Ticket 1.7 — recompute `isPassing` from the current passing
+    // threshold on submit. Keeps the per-row flag in sync with what the
+    // operator just edited, so an updated `minimumPassingGrade` doesn't
+    // leave stale `isPassing` values on the saved rows.
+    //
+    // Use the entry's *lower* bound so a letter is passing only when EVERY
+    // score in its range clears the threshold. Using `maxPercentage` would
+    // wrongly tag straddle ranges (e.g. D = 60-69 with passing=65) as
+    // passing — students scoring 60-64 in that range would be tagged
+    // "passing" despite scoring below the threshold.
+    const normalizedLetterGrades: LetterGradeEntryDto[] = letterGrades.map((entry) => ({
+      ...entry,
+      isPassing: entry.minPercentage >= minimumPassingGrade,
+    }))
+
     const payload = {
       schoolId,
       policyName: policyName.trim(),
       description: description.trim() || undefined,
-      gradingScale: scale,
+      gpaScale,
+      letterGrades: normalizedLetterGrades,
       categoryWeights: categories,
       roundingRule,
       minimumPassingGrade,
@@ -122,7 +147,8 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
         data: {
           policyName: payload.policyName,
           description: payload.description,
-          gradingScale: payload.gradingScale,
+          gpaScale: payload.gpaScale,
+          letterGrades: payload.letterGrades,
           categoryWeights: payload.categoryWeights,
           roundingRule: payload.roundingRule,
           minimumPassingGrade: payload.minimumPassingGrade,
@@ -228,21 +254,34 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
 
           {/* Grade Scale */}
           <div>
-            <h4 className="text-sm font-semibold text-text-primary mb-3">Grade Scale</h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-text-primary">Letter Grades</h4>
+              <label className="flex items-center gap-2 text-xs text-text-tertiary">
+                GPA scale
+                <select
+                  value={gpaScale}
+                  onChange={(e) => setGpaScale(e.target.value as GpaScale)}
+                  className="px-2 py-1 bg-surface-secondary border border-border-secondary rounded text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                >
+                  <option value="4.0">4.0</option>
+                  <option value="5.0">5.0</option>
+                </select>
+              </label>
+            </div>
             <div className="space-y-2">
-              {scale.map((entry, i) => (
+              {letterGrades.map((entry, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <input
                     type="text"
                     value={entry.letter}
-                    onChange={(e) => handleScaleChange(i, 'letter', e.target.value)}
+                    onChange={(e) => handleLetterGradeChange(i, 'letter', e.target.value)}
                     className="w-16 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     placeholder="A"
                   />
                   <input
                     type="number"
                     value={entry.minPercentage}
-                    onChange={(e) => handleScaleChange(i, 'minPercentage', Number(e.target.value))}
+                    onChange={(e) => handleLetterGradeChange(i, 'minPercentage', Number(e.target.value))}
                     className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     min={0}
                     max={100}
@@ -251,7 +290,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                   <input
                     type="number"
                     value={entry.maxPercentage}
-                    onChange={(e) => handleScaleChange(i, 'maxPercentage', Number(e.target.value))}
+                    onChange={(e) => handleLetterGradeChange(i, 'maxPercentage', Number(e.target.value))}
                     className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     min={0}
                     max={100}
@@ -260,11 +299,11 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                   <input
                     type="number"
                     value={entry.gpaPoints}
-                    onChange={(e) => handleScaleChange(i, 'gpaPoints', Number(e.target.value))}
+                    onChange={(e) => handleLetterGradeChange(i, 'gpaPoints', Number(e.target.value))}
                     className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     step={0.1}
                     min={0}
-                    max={5}
+                    max={parseFloat(gpaScale)}
                     placeholder="GPA"
                   />
                 </div>
