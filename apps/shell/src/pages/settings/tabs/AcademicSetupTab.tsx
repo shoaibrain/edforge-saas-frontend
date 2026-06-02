@@ -11,7 +11,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Plus, AlertCircle, Lock } from 'lucide-react'
+import { Plus, AlertCircle, Lock, Star } from 'lucide-react'
 import type { School } from '@edforge/types'
 import type { CreateAcademicYearDto, UpdateAcademicYearDto } from '@aibrains/shared-types'
 import { tenantService, type CreateGradingPeriodDto } from '@/services/tenant.service'
@@ -161,8 +161,17 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
   })
 
   const years = Array.isArray(academicYears) ? academicYears : (academicYears as any)?.data ?? []
+  // `activeYear` is the year we *operate* on (sessions, calendar, bell schedule
+  // anchor here). `currentYear` is the one designated for downstream reads
+  // (`/academic-years/current`, dashboards, attendance). They CAN diverge —
+  // when they do, `driftedActiveYear` carries the year that has `status='active'`
+  // without the `isCurrent` flag set, so the UI can surface the recovery path.
   const activeYear = years.find((y: any) => y.status === 'active') || years[0]
   const activeYearId = activeYear?.yearId || activeYear?.id || ''
+  const currentYear = years.find((y: any) => y.isCurrent === true)
+  const driftedActiveYear = years.find(
+    (y: any) => y.status === 'active' && y.isCurrent !== true,
+  )
 
   // Academic year mutations
   const createYearMutation = useMutation({
@@ -198,6 +207,35 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
       setYearToActivate(null)
+    },
+  })
+
+  // Set-as-Current mutation. Flips `isCurrent=true` on the target year and
+  // clears it on any other AY for the school (backend enforces the
+  // single-current invariant). Invalidates both the local list AND the
+  // academics MFE's `['school', 'current-year', schoolId]` cache so the
+  // attendance / grades / report-card tabs re-resolve in the same tick.
+  const setCurrentYearMutation = useMutation({
+    mutationFn: (yearId: string) =>
+      tenantService.setCurrentAcademicYear(schoolId, yearId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      queryClient.invalidateQueries({ queryKey: ['school', 'current-year', schoolId] })
+      toast.success('Academic year set as current')
+    },
+    // React Query's onError receives whatever was thrown — could be an
+    // axios error, a fetch TypeError, a plain object, a string, undefined.
+    // The `Error` type annotation is convenience, not a runtime guarantee.
+    // Defensively coerce to a string so the toast never renders "undefined".
+    onError: (err: unknown) => {
+      const fallback = 'Failed to set academic year as current'
+      const msg =
+        err && typeof err === 'object' && 'message' in err && typeof (err as { message?: unknown }).message === 'string'
+          ? (err as { message: string }).message
+          : typeof err === 'string'
+            ? err
+            : fallback
+      toast.error(msg || fallback)
     },
   })
 
@@ -278,9 +316,33 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
             years={years}
             isLoading={yearsLoading}
             calendarSystem={schoolCalendarSystem}
+            currentYear={currentYear}
+            driftedActiveYear={driftedActiveYear}
             onCreateYear={() => setIsCreateYearOpen(true)}
             onEditYear={(year: any) => setYearToEdit(year)}
             onActivateYear={(year: any) => setYearToActivate(year)}
+            onSetCurrentYear={(year: any) => {
+              const yid = year?.yearId || year?.id
+              // Defense-in-depth: should never fire — every AY in the
+              // list comes from `tenantService.getAcademicYears` which
+              // guarantees `yearId`. But silent failure leaves the
+              // operator confused (button click → nothing happens). If
+              // a future API change drops the field, surface it.
+              if (!yid) {
+                toast.error('Unable to update year: missing yearId')
+                return
+              }
+              const otherCurrent = years.find(
+                (y: any) => y.isCurrent === true && (y.yearId || y.id) !== yid,
+              )
+              const message = otherCurrent
+                ? `Make "${year.name}" the current academic year? "${otherCurrent.name}" will no longer be marked current.`
+                : `Make "${year.name}" the current academic year? Dashboards, attendance, and grades will anchor on this year.`
+              if (confirm(message)) {
+                setCurrentYearMutation.mutate(yid)
+              }
+            }}
+            setCurrentPending={setCurrentYearMutation.isPending}
           />
         )}
         {activeStep === 'sessions' && (
@@ -643,13 +705,28 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: {
 // STEP 1: ACADEMIC YEARS
 // ============================================================================
 
-function YearsStep({ years, isLoading, calendarSystem, onCreateYear, onEditYear, onActivateYear }: {
+function YearsStep({
+  years,
+  isLoading,
+  calendarSystem,
+  currentYear,
+  driftedActiveYear,
+  onCreateYear,
+  onEditYear,
+  onActivateYear,
+  onSetCurrentYear,
+  setCurrentPending,
+}: {
   years: any[]
   isLoading: boolean
   calendarSystem: string
+  currentYear: any | undefined
+  driftedActiveYear: any | undefined
   onCreateYear: () => void
   onEditYear: (year: any) => void
   onActivateYear: (year: any) => void
+  onSetCurrentYear: (year: any) => void
+  setCurrentPending: boolean
 }) {
   const isBikramSambat = calendarSystem === 'bikram_sambat'
 
@@ -664,6 +741,33 @@ function YearsStep({ years, isLoading, calendarSystem, onCreateYear, onEditYear,
           <Plus className="w-3.5 h-3.5" /> New Academic Year
         </button>
       </div>
+
+      {/* Drift callout — surfaces the bug where an AY is active but no year
+          is designated `isCurrent=true`, leaving `/academic-years/current`
+          to 404 and breaking downstream tabs (attendance, grades, etc.).
+          One-click recovery via the inline Set as Current button. */}
+      {!currentYear && driftedActiveYear && (
+        <div className="flex items-start gap-2.5 bg-[rgba(239,159,39,0.08)] border border-[rgba(239,159,39,0.25)] rounded-xl p-3 mb-3">
+          <AlertCircle className="w-4 h-4 text-[#EF9F27] flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-[12px] font-semibold text-[rgb(var(--text-primary))]">
+              &quot;{driftedActiveYear.name}&quot; is active but no year is designated as current.
+            </p>
+            <p className="text-[11px] text-[rgb(var(--text-tertiary))] mt-0.5">
+              Dashboards, attendance, and grades depend on a designated current year.
+            </p>
+            <button
+              type="button"
+              onClick={() => onSetCurrentYear(driftedActiveYear)}
+              disabled={setCurrentPending}
+              className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-lg bg-[#1D9E75] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              <Star className="w-3 h-3" />
+              Set as Current
+            </button>
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="space-y-3 animate-pulse">
@@ -711,14 +815,48 @@ function YearsStep({ years, isLoading, calendarSystem, onCreateYear, onEditYear,
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${status.bg} ${status.text}`}>
                       <span className="w-[5px] h-[5px] rounded-full bg-current" />
                       {status.label}
                     </span>
+                    {/* `Current` pill — designation for downstream reads. */}
+                    {year.isCurrent === true && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[rgba(55,138,221,0.12)] text-[#378ADD]"
+                        title="This year anchors dashboards, attendance, and grades."
+                      >
+                        <Star className="w-2.5 h-2.5" />
+                        Current
+                      </span>
+                    )}
+                    {/* Drift pill — active but not designated current. */}
+                    {year.status === 'active' && year.isCurrent !== true && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[rgba(239,159,39,0.12)] text-[#EF9F27]"
+                        title="This year is active but no year is designated as current. Use 'Set as Current' to fix."
+                      >
+                        <AlertCircle className="w-2.5 h-2.5" />
+                        Not current
+                      </span>
+                    )}
                     <button onClick={() => onEditYear(year)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] transition-all">
                       Edit
                     </button>
+                    {/* Set as Current — operator self-recovery for the
+                        drift state. Hidden for the year already current
+                        and for completed years (operationally invalid). */}
+                    {year.isCurrent !== true && year.status !== 'completed' && (
+                      <button
+                        onClick={() => onSetCurrentYear(year)}
+                        disabled={setCurrentPending}
+                        className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(55,138,221,0.25)] text-[#378ADD] hover:bg-[rgba(55,138,221,0.06)] transition-all disabled:opacity-50 inline-flex items-center gap-1"
+                        title="Designate as the current academic year"
+                      >
+                        <Star className="w-3 h-3" />
+                        Set as Current
+                      </button>
+                    )}
                     {year.status === 'planning' && (
                       <button onClick={() => onActivateYear(year)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 transition-opacity">
                         Activate
