@@ -223,8 +223,19 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
       queryClient.invalidateQueries({ queryKey: ['school', 'current-year', schoolId] })
       toast.success('Academic year set as current')
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to set academic year as current')
+    // React Query's onError receives whatever was thrown — could be an
+    // axios error, a fetch TypeError, a plain object, a string, undefined.
+    // The `Error` type annotation is convenience, not a runtime guarantee.
+    // Defensively coerce to a string so the toast never renders "undefined".
+    onError: (err: unknown) => {
+      const fallback = 'Failed to set academic year as current'
+      const msg =
+        err && typeof err === 'object' && 'message' in err && typeof (err as { message?: unknown }).message === 'string'
+          ? (err as { message: string }).message
+          : typeof err === 'string'
+            ? err
+            : fallback
+      toast.error(msg || fallback)
     },
   })
 
@@ -312,7 +323,15 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
             onActivateYear={(year: any) => setYearToActivate(year)}
             onSetCurrentYear={(year: any) => {
               const yid = year?.yearId || year?.id
-              if (!yid) return
+              // Defense-in-depth: should never fire — every AY in the
+              // list comes from `tenantService.getAcademicYears` which
+              // guarantees `yearId`. But silent failure leaves the
+              // operator confused (button click → nothing happens). If
+              // a future API change drops the field, surface it.
+              if (!yid) {
+                toast.error('Unable to update year: missing yearId')
+                return
+              }
               const otherCurrent = years.find(
                 (y: any) => y.isCurrent === true && (y.yearId || y.id) !== yid,
               )

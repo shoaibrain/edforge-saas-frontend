@@ -98,10 +98,13 @@ vi.mock('@/components/calendar/single-day-curated-options', () => ({
   getCuratedMeta: () => null,
 }))
 
+const mockToastError = vi.fn()
+const mockToastSuccess = vi.fn()
+
 vi.mock('sonner', () => ({
   toast: {
-    success: vi.fn(),
-    error: vi.fn(),
+    success: (...a: unknown[]) => mockToastSuccess(...a),
+    error: (...a: unknown[]) => mockToastError(...a),
   },
 }))
 
@@ -263,6 +266,26 @@ describe('AcademicSetupTab — Set-as-Current button', () => {
       ay({ yearId: 'b', name: 'AY 2027', status: 'planning', isCurrent: false }),
     ])
     fireEvent.click(getAllByText('Set as Current')[0])
+    expect(mockSetCurrentAcademicYear).not.toHaveBeenCalled()
+  })
+})
+
+// Defense-in-depth tests for the review findings on PR #101. These cover
+// runtime edge cases that the happy-path tests above don't exercise but
+// that operators would see if anything ever goes wrong (silent failures
+// are the worst UX).
+describe('AcademicSetupTab — defensive error handling (PR #101 review)', () => {
+  it('surfaces a toast.error when an AY without yearId/id is clicked (Finding 2)', () => {
+    // Seed a year that is missing BOTH yearId and id. Can't happen with
+    // the current API, but we want the operator to see a clear error
+    // rather than a silently-broken button if it ever does.
+    const { getAllByText } = renderTab([
+      ay({ yearId: undefined, id: undefined, name: 'AY broken', status: 'planning', isCurrent: false }),
+    ])
+    fireEvent.click(getAllByText('Set as Current')[0])
+    expect(mockToastError).toHaveBeenCalledWith(
+      expect.stringContaining('missing yearId'),
+    )
     expect(mockSetCurrentAcademicYear).not.toHaveBeenCalled()
   })
 })
