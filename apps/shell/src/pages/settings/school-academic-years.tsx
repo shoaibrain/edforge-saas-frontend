@@ -19,10 +19,11 @@ import {
   CalendarDays,
   Milestone,
   Edit,
+  Star,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService, type CreateGradingPeriodDto } from '@/services/tenant.service'
-import type { Term } from '@edforge/types'
+import type { AcademicYear, Term } from '@edforge/types'
 import type {
   CreateAcademicYearDto,
   UpdateAcademicYearDto,
@@ -42,26 +43,11 @@ import { TenantDateRange } from '@/components/common/TenantDate'
 // LOCAL TYPES
 // ============================================================================
 
-type AcademicYearStatus = 'planning' | 'active' | 'completed'
+// AcademicYear is the canonical type from @edforge/types (imported above).
+// Sprint 2 / Ticket 2.1 removed the locally-duplicated copy that was
+// missing the `isCurrent` field.
 
-interface AcademicYear {
-  id: string
-  tenantId: string
-  schoolId: string
-  schoolName?: string
-  name: string
-  startDate: string
-  endDate: string
-  startDateBS?: string
-  endDateBS?: string
-  status: AcademicYearStatus
-  terms: Term[]
-  isLocked: boolean
-  activatedAt?: string
-  completedAt?: string
-  createdAt: string
-  updatedAt: string
-}
+type AcademicYearStatus = AcademicYear['status']
 
 // Extended type for internal use that includes schoolId (for routing) and generated terms
 interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
@@ -96,6 +82,41 @@ function StatusBadge({ status }: StatusBadgeProps) {
     `}>
       <Icon className="w-3 h-3" />
       {config.label}
+    </span>
+  )
+}
+
+// ============================================================================
+// CURRENT / DRIFT PILLS  (Sprint 2 / Tickets 2.3, 2.5)
+// ============================================================================
+
+/** Renders when `year.isCurrent === true`. Visually distinct from StatusBadge. */
+function CurrentPill() {
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-teal-500/20 text-teal-700 dark:text-teal-400"
+      title="Anchors dashboards, attendance, and grades"
+    >
+      <Star className="w-3 h-3" />
+      Current
+    </span>
+  )
+}
+
+/**
+ * Renders when `year.status === 'active' && !year.isCurrent`. Operator-
+ * facing remediation signal: the year is operationally active but no AY
+ * is designated as current. The "Set as Current" button alongside the
+ * row fixes the state.
+ */
+function ActiveNotCurrentPill() {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-golden-500/10 text-golden-700 dark:text-golden-400"
+      title="This year is active but no year is designated as current. Use 'Set as Current' to fix."
+    >
+      <AlertCircle className="w-3 h-3" />
+      Active, not current
     </span>
   )
 }
@@ -151,13 +172,17 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
               `}>
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="font-semibold text-[rgb(var(--text-primary))]">
                         {year.startDateBS
                           ? `BS ${year.startDateBS.split('/')[0]}/${(parseInt(year.startDateBS.split('/')[0], 10) + 1)}`
                           : year.name}
                       </h4>
                       <StatusBadge status={year.status} />
+                      {/* Sprint 2 / Tickets 2.3 + 2.5: surface the isCurrent
+                          state independently of status. */}
+                      {year.isCurrent && <CurrentPill />}
+                      {year.status === 'active' && !year.isCurrent && <ActiveNotCurrentPill />}
                       {year.isLocked && <Lock className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />}
                     </div>
                     <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
@@ -667,10 +692,29 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
     },
   })
 
+  // Sprint 2 / Ticket 2.4 — Set-as-Current mutation. Flips `isCurrent=true`
+  // on the target AY and clears it on any other AY for the school.
+  // Invalidates both ['academicYears', schoolId] (this page) and
+  // ['school', 'current-year', schoolId] (the academics MFE's hook).
+  const setCurrentMutation = useMutation({
+    mutationFn: (academicYearId: string) =>
+      tenantService.setCurrentAcademicYear(schoolId, academicYearId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicYears', schoolId] })
+      queryClient.invalidateQueries({ queryKey: ['school', 'current-year', schoolId] })
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    },
+    onError: (err: Error) => {
+      setSaveError(err.message || 'Failed to set academic year as current')
+    },
+  })
+
   // Note: Academic years cannot be deleted by design
   // This preserves historical data integrity
 
-  // Mock data if API fails
+  // Mock data if API fails — dev-only fallback. Sprint 2 / Ticket 2.6:
+  // include `isCurrent` so the dev-mode UI exercises the new pills + button.
   const displayYears: AcademicYear[] = academicYears || [
     {
       id: 'ay-1',
@@ -680,6 +724,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
       startDate: '2024-08-15',
       endDate: '2025-06-15',
       status: 'active',
+      isCurrent: true,
       terms: [
         { id: 't1', name: 'Fall Semester', startDate: '2024-08-15', endDate: '2024-12-20', type: 'semester' },
         { id: 't2', name: 'Spring Semester', startDate: '2025-01-06', endDate: '2025-06-15', type: 'semester' },
@@ -697,6 +742,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
       startDate: '2025-08-15',
       endDate: '2026-06-15',
       status: 'planning',
+      isCurrent: false,
       terms: [
         { id: 't3', name: 'Fall Semester', startDate: '2025-08-15', endDate: '2025-12-20', type: 'semester' },
         { id: 't4', name: 'Spring Semester', startDate: '2026-01-06', endDate: '2026-06-15', type: 'semester' },
@@ -713,6 +759,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
       startDate: '2023-08-15',
       endDate: '2024-06-15',
       status: 'completed',
+      isCurrent: false,
       terms: [
         { id: 't5', name: 'Fall Semester', startDate: '2023-08-15', endDate: '2023-12-20', type: 'semester' },
         { id: 't6', name: 'Spring Semester', startDate: '2024-01-06', endDate: '2024-06-15', type: 'semester' },
@@ -725,7 +772,17 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
     },
   ]
 
-  const activeYear = displayYears.find((y) => y.status === 'active')
+  // Sprint 2 / Ticket 2.3 — bind to `isCurrent`, not `status === 'active'`.
+  // The two are independent: an AY can be active without being designated
+  // current (e.g. during a transition window or as a result of the bug
+  // this sprint fixes).
+  const currentYear = displayYears.find((y) => y.isCurrent)
+  // Drift state: active AYs that are NOT current. Surfaces the bug
+  // operators are most likely to encounter so they can self-recover via
+  // the "Set as Current" button added in Ticket 2.4.
+  const driftedActiveYear = displayYears.find(
+    (y) => y.status === 'active' && !y.isCurrent
+  )
   const planningYears = displayYears.filter((y) => y.status === 'planning')
 
   return (
@@ -769,29 +826,29 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
         </Button>
       </motion.div>
 
-      {/* Current Active Year Highlight */}
-      {activeYear && (
+      {/* Current Academic Year Highlight (Ticket 2.3 — bound to isCurrent) */}
+      {currentYear && (
         <SettingsSection
           title="Current Academic Year"
           icon={Play}
-          description="Currently active year for all school operations"
+          description="The year that anchors all downstream reads (dashboards, attendance, grades)"
         >
           <div className="p-4 rounded-xl bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/20">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="text-lg font-bold text-[rgb(var(--text-primary))]">{activeYear.name}</h4>
-                  <StatusBadge status={activeYear.status} />
+                  <h4 className="text-lg font-bold text-[rgb(var(--text-primary))]">{currentYear.name}</h4>
+                  <StatusBadge status={currentYear.status} />
                   <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-500/20 text-teal-700 dark:text-teal-400">
                     Current
                   </span>
                 </div>
                 <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-                  {new Date(activeYear.startDate).toLocaleDateString()} - {new Date(activeYear.endDate).toLocaleDateString()}
+                  {new Date(currentYear.startDate).toLocaleDateString()} - {new Date(currentYear.endDate).toLocaleDateString()}
                 </p>
-                {activeYear.terms && (
+                {currentYear.terms && (
                   <div className="flex items-center gap-4 mt-3">
-                    {activeYear.terms.map((term: Term) => (
+                    {currentYear.terms.map((term: Term) => (
                       <div key={term.id} className="text-xs">
                         <span className="font-medium text-[rgb(var(--text-secondary))]">{term.name}</span>
                         <span className="text-[rgb(var(--text-tertiary))] ml-1">
@@ -803,24 +860,65 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm(`Mark "${activeYear.name}" as completed? This will end the current academic year.`)) {
-                      completeMutation.mutate(activeYear.id)
-                    }
-                  }}
-                  disabled={completeMutation.isPending}
-                >
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Complete Year
-                </Button>
+                {currentYear.status === 'active' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm(`Mark "${currentYear.name}" as completed? This will end the current academic year.`)) {
+                        completeMutation.mutate(currentYear.id)
+                      }
+                    }}
+                    disabled={completeMutation.isPending}
+                  >
+                    <CheckCircle className="w-4 h-4 mr-1" />
+                    Complete Year
+                  </Button>
+                )}
                 <Lock className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
               </div>
             </div>
           </div>
         </SettingsSection>
+      )}
+
+      {/* Drift-state callout (Tickets 2.3 + 2.5) — surfaces the bug when a
+          year is active but not designated current. Sprint 4 (backend
+          auto-promote) eventually prevents new schools from landing here,
+          but until then the operator can self-recover with one click. */}
+      {!currentYear && driftedActiveYear && (
+        <motion.div variants={fadeInUp}>
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-golden-500/10 border border-golden-500/30">
+            <AlertCircle className="w-5 h-5 text-golden-600 dark:text-golden-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 text-sm">
+              <p className="font-medium text-[rgb(var(--text-primary))]">
+                Academic year &quot;{driftedActiveYear.name}&quot; is active but no year is designated as current.
+              </p>
+              <p className="text-[rgb(var(--text-tertiary))] mt-1">
+                Dashboards, attendance, and grades depend on a designated current year.
+              </p>
+              <div className="mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (
+                      confirm(
+                        `Make "${driftedActiveYear.name}" the current academic year? This will anchor dashboards, attendance, and grades on this year.`
+                      )
+                    ) {
+                      setCurrentMutation.mutate(driftedActiveYear.id)
+                    }
+                  }}
+                  disabled={setCurrentMutation.isPending}
+                >
+                  <Star className="w-4 h-4 mr-1" />
+                  Set as Current
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
 
       {/* Planning Years - Actionable */}
@@ -840,9 +938,14 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="font-semibold text-[rgb(var(--text-primary))]">{year.name}</h4>
                       <StatusBadge status={year.status} />
+                      {/* A planning AY *can* be the designated current year
+                          (e.g. the upcoming year is pre-designated). Surface
+                          the flag here too so the planning section stays
+                          truthful. */}
+                      {year.isCurrent && <CurrentPill />}
                     </div>
                     <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
                       {new Date(year.startDate).toLocaleDateString()} - {new Date(year.endDate).toLocaleDateString()}
@@ -856,6 +959,32 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                     >
                       <Edit className="w-4 h-4" />
                     </button>
+                    {/* Sprint 2 / Ticket 2.4: Set as Current — hidden when
+                        already current. Confirms intent before flipping
+                        (clearing any other AY's isCurrent is a one-way
+                        observable change for downstream dashboards). */}
+                    {!year.isCurrent && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const otherCurrent = displayYears.find(
+                            (y) => y.isCurrent && y.id !== year.id
+                          )
+                          const message = otherCurrent
+                            ? `Make "${year.name}" the current academic year? "${otherCurrent.name}" will no longer be marked current.`
+                            : `Make "${year.name}" the current academic year? Dashboards, attendance, and grades will anchor on this year.`
+                          if (confirm(message)) {
+                            setCurrentMutation.mutate(year.id)
+                          }
+                        }}
+                        disabled={setCurrentMutation.isPending}
+                        title="Designate as the current academic year"
+                      >
+                        <Star className="w-4 h-4 mr-1" />
+                        Set as Current
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"

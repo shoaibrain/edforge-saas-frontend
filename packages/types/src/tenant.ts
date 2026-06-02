@@ -357,7 +357,15 @@ export interface UpdateDepartmentDto {
 export type AcademicYearStatus = 'planning' | 'active' | 'completed'
 
 /**
- * Enhanced academic year with school association and status management
+ * Enhanced academic year with school association and status management.
+ *
+ * `status` and `isCurrent` are orthogonal:
+ *   - `status` describes the lifecycle stage (planning / active / completed).
+ *   - `isCurrent` designates the ONE academic year that anchors all downstream
+ *     reads (`GET /academic-years/current`, dashboards, attendance, grades).
+ * A school MAY temporarily have `status='active'` with `isCurrent=false`
+ * during a transition; the school-academic-years UI surfaces this state as
+ * a drift warning so an operator can use "Set as Current" to recover.
  */
 export interface AcademicYear {
   id: string
@@ -374,6 +382,12 @@ export interface AcademicYear {
   endDateBS?: string
   /** Current status */
   status: AcademicYearStatus
+  /**
+   * Whether this AY is designated as the "current" year for the school.
+   * Independent of `status` — Sprint 1+2 of academic-year-current-flag-bug.
+   * Exactly one AY per school should have this set at any time.
+   */
+  isCurrent: boolean
   /** Terms/grading periods within this academic year */
   terms: Term[]
   /** Lock flag - active/completed years have certain fields locked */
