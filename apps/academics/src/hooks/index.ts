@@ -60,7 +60,7 @@ export {
   useUpdateAcademicYearStatus,
   schoolKeys,
 } from './useSchool'
-export { useFilteredGradeOptions } from './useGradeOptions'
+export { useSchoolEnabledGradeOptions } from './useGradeOptions'
 export {
   useAttendanceSummary,
   useStudentAttendance,

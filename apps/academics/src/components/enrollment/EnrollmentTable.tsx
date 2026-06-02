@@ -26,7 +26,7 @@ import {
   type ColumnDef,
 } from '@edforge/ui'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -47,7 +47,11 @@ interface EnrollmentTableProps {
   onWithdraw?: (enrollment: EnrollmentResponseDto) => void
   onTransfer?: (enrollment: EnrollmentResponseDto) => void
   onMarkNoShow?: (enrollment: EnrollmentResponseDto) => void
-  schoolGradeRange?: { start: string; end: string } | null
+  /**
+   * Active school. The Grade filter dropdown reads `enabledGradeLevels`
+   * (with `gradeRange` fallback) via `useSchoolEnabledGradeOptions`.
+   */
+  schoolId: string | null
 }
 
 const statusOptions = [
@@ -211,9 +215,15 @@ export function EnrollmentTable({
   onWithdraw,
   onTransfer,
   onMarkNoShow,
-  schoolGradeRange,
+  schoolId,
 }: EnrollmentTableProps) {
-  const gradeLevelOptions = useFilteredGradeOptions(schoolGradeRange)
+  // Gate the dropdown on profile-load so the user doesn't see the full
+  // 20-code catalog flash before the school's enabledGradeLevels resolve.
+  // When schoolId is null the underlying query is disabled → isLoading=false
+  // → the picker stays interactive and shows the full catalog, which is the
+  // correct behavior for "no active school context".
+  const { options: gradeLevelOptions, isLoading: gradeOptionsLoading } =
+    useSchoolEnabledGradeOptions(schoolId)
   const hasActions = !!(onWithdraw || onTransfer || onMarkNoShow)
 
   const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(() => {
@@ -349,15 +359,16 @@ export function EnrollmentTable({
           <select
             value={gradeLevel ?? ''}
             onChange={(e) => onGradeLevelChange(e.target.value || null)}
-            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none"
+            disabled={gradeOptionsLoading}
+            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               background: 'rgba(255, 255, 255, 0.04)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
               color: 'var(--v2-text-secondary)',
             }}
           >
-            <option value="">All Grades</option>
-            {gradeLevelOptions.map((opt) => (
+            <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
+            {!gradeOptionsLoading && gradeLevelOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>

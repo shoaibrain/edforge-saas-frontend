@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 import { Search, X, Loader2, Download } from 'lucide-react'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import {
   useStudentFilters,
   useStudentFilterActions,
@@ -53,18 +53,23 @@ interface StudentsFilterRowProps {
   isExporting: boolean
   hasAcademicYear: boolean
   onExport: () => void
-  /** School's configured grade range — drives the Grade filter dropdown options. */
-  schoolGradeRange?: { start: string; end: string } | null
+  /**
+   * Active school. The Grade filter dropdown reads `enabledGradeLevels`
+   * (with `gradeRange` fallback) via `useSchoolEnabledGradeOptions`.
+   */
+  schoolId: string | null
 }
 
 export function StudentsFilterRow({
   isExporting,
   hasAcademicYear,
   onExport,
-  schoolGradeRange,
+  schoolId,
 }: StudentsFilterRowProps) {
   const filters = useStudentFilters()
-  const gradeOptions = useFilteredGradeOptions(schoolGradeRange)
+  // Gate dropdown on profile-load — see EnrollmentTable comment.
+  const { options: gradeOptions, isLoading: gradeOptionsLoading } =
+    useSchoolEnabledGradeOptions(schoolId)
   const {
     setSearchTerm,
     setGradeLevel,
@@ -145,11 +150,12 @@ export function StudentsFilterRow({
       <select
         value={filters.gradeLevel ?? ''}
         onChange={(e) => setGradeLevel(e.target.value || null)}
-        className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+        disabled={gradeOptionsLoading}
+        className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30 disabled:opacity-60 disabled:cursor-not-allowed"
         style={inputStyle}
       >
-        <option value="">All Grades</option>
-        {gradeOptions.map((g) => (
+        <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
+        {!gradeOptionsLoading && gradeOptions.map((g) => (
           <option key={g.value} value={g.value}>{g.label}</option>
         ))}
       </select>

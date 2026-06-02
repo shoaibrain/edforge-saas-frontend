@@ -17,8 +17,7 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import { Grid3x3, Loader2, AlertTriangle, Check, Plus, Minus, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { useActiveSchoolId } from '../../stores/app.store'
-import { useSchoolGradeRange } from '../../hooks/useSchool'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks'
 import { useStudents, flattenStudentPages } from '../../hooks/useStudents'
 import {
@@ -385,8 +384,9 @@ function SummaryBar({
 export function BulkRosteringPage() {
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
-  const { gradeRange } = useSchoolGradeRange(schoolId || null)
-  const gradeLevelOptions = useFilteredGradeOptions(gradeRange)
+  // Gate dropdown on profile-load — see EnrollmentTable comment.
+  const { options: gradeLevelOptions, isLoading: gradeOptionsLoading } =
+    useSchoolEnabledGradeOptions(schoolId || null)
 
   // ---------------------------------------------------------------------------
   // Filters
@@ -689,10 +689,11 @@ export function BulkRosteringPage() {
               setGradeLevelFilter(e.target.value)
               studentsLoadedRef.current = false
             }}
-            className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+            disabled={gradeOptionsLoading}
+            className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <option value="">All Grades</option>
-            {gradeLevelOptions.map((opt) => (
+            <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
+            {!gradeOptionsLoading && gradeLevelOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
