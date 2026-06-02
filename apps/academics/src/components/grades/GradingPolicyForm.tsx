@@ -117,9 +117,15 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
     // threshold on submit. Keeps the per-row flag in sync with what the
     // operator just edited, so an updated `minimumPassingGrade` doesn't
     // leave stale `isPassing` values on the saved rows.
+    //
+    // Use the entry's *lower* bound so a letter is passing only when EVERY
+    // score in its range clears the threshold. Using `maxPercentage` would
+    // wrongly tag straddle ranges (e.g. D = 60-69 with passing=65) as
+    // passing — students scoring 60-64 in that range would be tagged
+    // "passing" despite scoring below the threshold.
     const normalizedLetterGrades: LetterGradeEntryDto[] = letterGrades.map((entry) => ({
       ...entry,
-      isPassing: entry.maxPercentage >= minimumPassingGrade,
+      isPassing: entry.minPercentage >= minimumPassingGrade,
     }))
 
     const payload = {
