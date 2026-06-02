@@ -61,8 +61,6 @@ interface CourseDrawerProps {
   course?: CourseResponseDto | null
   /** Callback when mode changes */
   onModeChange?: (mode: DrawerMode) => void
-  /** School's configured grade range for filtering grade options */
-  schoolGradeRange?: { start: string; end: string } | null
 }
 
 // ============================================================================
@@ -278,13 +276,11 @@ function CourseFormView({
   mode,
   onClose,
   onSuccess,
-  schoolGradeRange,
 }: {
   course?: CourseResponseDto | null
   mode: 'create' | 'edit'
   onClose: () => void
   onSuccess: () => void
-  schoolGradeRange?: { start: string; end: string } | null
 }) {
   const schoolId = useActiveSchoolId()
   const createMutation = useCreateCourse()
@@ -378,7 +374,7 @@ function CourseFormView({
       >
         {/* Scrollable form content */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <CourseForm isEdit={mode === 'edit'} schoolGradeRange={schoolGradeRange} />
+          <CourseForm isEdit={mode === 'edit'} schoolId={schoolId} />
         </div>
 
         {/* Footer — always visible at bottom */}
@@ -423,7 +419,6 @@ export function CourseDrawer({
   mode: initialMode,
   course,
   onModeChange: _onModeChange,
-  schoolGradeRange,
 }: CourseDrawerProps) {
   const [internalMode, setInternalMode] = useState<DrawerMode>(initialMode)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -571,7 +566,6 @@ export function CourseDrawer({
                     mode={internalMode === 'edit' ? 'edit' : 'create'}
                     onClose={handleClose}
                     onSuccess={handleSuccess}
-                    schoolGradeRange={schoolGradeRange}
                   />
                 ) : (
                   <div className="flex-1 flex items-center justify-center text-text-tertiary">

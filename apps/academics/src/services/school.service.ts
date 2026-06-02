@@ -149,6 +149,14 @@ export interface SchoolProfileDto {
   emisSchoolCode?: string
   schoolType: string
   gradeRange?: { start: string; end: string }
+  /**
+   * P1: school's chosen subset of the global grade-level catalog. Always
+   * populated by the backend (`schoolEntityToDto` backfills it from
+   * `gradeRange` for legacy rows lacking the column). Prefer reading this
+   * over `gradeRange` in new code — `useSchoolEnabledGradeOptions()`
+   * handles the fallback.
+   */
+  enabledGradeLevels?: string[]
   status: string
 }
 

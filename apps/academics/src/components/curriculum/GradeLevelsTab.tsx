@@ -17,8 +17,8 @@ import {
 } from 'lucide-react'
 import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
-import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -31,8 +31,12 @@ interface GradeLevelsTabProps {
   isLoading?: boolean
   /** Callback when a course is clicked inside the drawer */
   onViewCourse?: (course: CourseResponseDto) => void
-  /** Optional school grade range to filter displayed grades (e.g., { start: '9', end: '12' }) */
-  schoolGradeRange?: { start: string; end: string }
+  /**
+   * Active school. The grade rows shown are derived from the school's
+   * `enabledGradeLevels` (with `gradeRange` fallback) so this view matches
+   * the rest of the Curriculum / Enrollment / Student forms.
+   */
+  schoolId: string | null
   /** Per-grade enrollment counts from the current academic year (canonical Space A keys). */
   enrollmentByGradeLevel?: Record<string, number> | null
   /** True while the enrollment query is in flight on first paint. */
@@ -128,7 +132,7 @@ export function GradeLevelsTab({
   courses,
   isLoading,
   onViewCourse,
-  schoolGradeRange,
+  schoolId,
   enrollmentByGradeLevel,
   enrollmentLoading = false,
   hasCurrentAY = true,
@@ -137,15 +141,7 @@ export function GradeLevelsTab({
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedGrade, setSelectedGrade] = useState<GradeLevelData | null>(null)
 
-  // Filter grade options to the school's grade range if provided
-  const filteredGradeOptions = useMemo(() => {
-    if (!schoolGradeRange) return GRADE_LEVEL_OPTIONS
-    const allValues: string[] = GRADE_LEVEL_OPTIONS.map((o) => o.value)
-    const startIdx = allValues.indexOf(schoolGradeRange.start)
-    const endIdx = allValues.indexOf(schoolGradeRange.end)
-    if (startIdx === -1 || endIdx === -1 || startIdx > endIdx) return GRADE_LEVEL_OPTIONS
-    return GRADE_LEVEL_OPTIONS.slice(startIdx, endIdx + 1)
-  }, [schoolGradeRange])
+  const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId)
 
   // Derive enriched grade level data with associated courses
   const gradeData: GradeLevelData[] = useMemo(() => {

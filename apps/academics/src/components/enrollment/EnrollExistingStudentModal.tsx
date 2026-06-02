@@ -25,8 +25,7 @@ import {
   RESIDENCY_STATUS_OPTIONS,
 } from '../../schemas/edfi-descriptors'
 import { parseApiError } from '../../services/academics.service'
-import { useSchoolGradeRange } from '../../hooks/useSchool'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { GRADE_LEVEL_OPTIONS } from '../../schemas/course.form'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
@@ -79,8 +78,7 @@ export function EnrollExistingStudentModal({
   const schoolId = useActiveSchoolId() || ''
   const firstInputRef = useRef<HTMLSelectElement>(null)
   const enrollMutation = useCreateEnrollment()
-  const { gradeRange } = useSchoolGradeRange(schoolId || null)
-  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
+  const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId || null)
 
   // Include student's current grade even if outside school range
   const gradeOptions = useMemo(() => {

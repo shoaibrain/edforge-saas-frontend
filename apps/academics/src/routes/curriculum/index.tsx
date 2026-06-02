@@ -21,7 +21,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
-import { useSchoolGradeRange, useCurrentAcademicYear } from '../../hooks/useSchool'
+import { useCurrentAcademicYear } from '../../hooks/useSchool'
 import { useAcademicsOverview } from '../../hooks/useAcademicsOverview'
 import { useCourseFilters } from '../../stores/courses.store'
 import {
@@ -167,7 +167,6 @@ export function CurriculumModule() {
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
-  const { gradeRange } = useSchoolGradeRange(schoolId)
 
   // Current academic year + per-grade enrollment counts (reuses unified dashboard
   // query — cached & deduped with the Overview / Students pages).
@@ -567,7 +566,7 @@ export function CurriculumModule() {
               courses={courses}
               isLoading={isLoading}
               onViewCourse={openViewDrawer}
-              schoolGradeRange={gradeRange ?? undefined}
+              schoolId={schoolId}
               enrollmentByGradeLevel={overview.enrollmentByGradeLevel}
               enrollmentLoading={yearLoading || overview.isLoading}
               hasCurrentAY={!!currentYear?.yearId}
@@ -585,7 +584,6 @@ export function CurriculumModule() {
         mode={drawerMode}
         course={selectedCourse}
         onModeChange={setDrawerMode}
-        schoolGradeRange={gradeRange}
       />
     </div>
   )

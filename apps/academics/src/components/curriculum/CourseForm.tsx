@@ -31,7 +31,7 @@ import {
   GRADE_LEVEL_OPTIONS,
   MATERIAL_TYPE_OPTIONS,
 } from '../../schemas/course.form'
-import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -40,8 +40,12 @@ import { useFilteredGradeOptions } from '../../hooks/useGradeOptions'
 interface CourseFormProps {
   /** Whether course code field is locked (edit mode) */
   isEdit?: boolean
-  /** School's configured grade range for filtering grade options */
-  schoolGradeRange?: { start: string; end: string } | null
+  /**
+   * School ID. The grade-level multi-select reads
+   * `school.enabledGradeLevels` (with `gradeRange` fallback) to scope the
+   * pickable codes. Pass null when no school is active.
+   */
+  schoolId: string | null
 }
 
 // ============================================================================
@@ -49,13 +53,13 @@ interface CourseFormProps {
 // ============================================================================
 
 function GradeLevelSelector({
-  schoolGradeRange,
+  schoolId,
 }: {
-  schoolGradeRange?: { start: string; end: string } | null
+  schoolId: string | null
 }) {
   const { watch, setValue, formState: { errors } } = useFormContext()
   const selected: string[] = watch('gradeLevels') ?? []
-  const baseOptions = useFilteredGradeOptions(schoolGradeRange)
+  const { options: baseOptions } = useSchoolEnabledGradeOptions(schoolId)
 
   // Include any already-selected grades that fall outside the school range
   // (edge case: school range narrowed after course creation)
@@ -297,7 +301,7 @@ function MaterialsList() {
 // COURSE FORM
 // ============================================================================
 
-export function CourseForm({ isEdit = false, schoolGradeRange }: CourseFormProps) {
+export function CourseForm({ isEdit = false, schoolId }: CourseFormProps) {
   return (
     <div className="space-y-8">
       {/* Section 1: Identity */}
@@ -375,7 +379,7 @@ export function CourseForm({ isEdit = false, schoolGradeRange }: CourseFormProps
         title="Grade Levels"
         description="Select which grade levels this course is offered to."
       >
-        <GradeLevelSelector schoolGradeRange={schoolGradeRange} />
+        <GradeLevelSelector schoolId={schoolId} />
       </FormSection>
 
       {/* Section 4: Description & Objectives */}

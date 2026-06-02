@@ -14,8 +14,7 @@ import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { GENDER_OPTIONS } from '../../../../schemas/student.form'
 import { useActiveSchoolId } from '../../../../stores/app.store'
-import { useSchoolGradeRange } from '../../../../hooks/useSchool'
-import { useFilteredGradeOptions } from '../../../../hooks/useGradeOptions'
+import { useSchoolEnabledGradeOptions } from '../../../../hooks/useGradeOptions'
 import { CollapsibleSection } from '../CollapsibleSection'
 
 // Age bounds for date field (3–22 years)
@@ -35,8 +34,7 @@ export function PersonalInfoStep({
 }: WizardStepProps) {
   const form = useWizardForm({ data, updateData, errors, clearError })
   const schoolId = useActiveSchoolId()
-  const { gradeRange } = useSchoolGradeRange(schoolId)
-  const filteredGradeOptions = useFilteredGradeOptions(gradeRange)
+  const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId)
 
   return (
     <FormProvider {...form}>

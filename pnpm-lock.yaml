@@ -344,6 +344,9 @@ importers:
 
   apps/finance:
     dependencies:
+      '@aibrains/shared-types':
+        specifier: ^0.63.0
+        version: 0.63.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
