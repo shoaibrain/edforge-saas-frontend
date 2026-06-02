@@ -40,6 +40,7 @@ import { Button } from '@edforge/ui'
 import ConfigurationTab from './tabs/ConfigurationTab'
 import AcademicSetupTab from './tabs/AcademicSetupTab'
 import StructureTab from './tabs/StructureTab'
+import GradeLevelsTab from './tabs/GradeLevelsTab'
 import AuditLogTab from './tabs/AuditLogTab'
 import { IemisCodeBadge } from '@/components/settings/IemisCodeBadge'
 
@@ -127,16 +128,17 @@ const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: School
 // V2 TAB CONFIG
 // ============================================================================
 
-type SchoolTab = 'config' | 'academic-setup' | 'structure' | 'audit-log'
+type SchoolTab = 'config' | 'academic-setup' | 'structure' | 'grade-levels' | 'audit-log'
 
 const TABS: { id: SchoolTab; label: string; emoji: string }[] = [
   { id: 'config', label: 'Configuration', emoji: '⚙️' },
   { id: 'academic-setup', label: 'Academic Setup', emoji: '📅' },
   { id: 'structure', label: 'Structure', emoji: '🏛️' },
+  { id: 'grade-levels', label: 'Grade Levels', emoji: '🎯' },
   { id: 'audit-log', label: 'Audit Log', emoji: '🛡️' },
 ]
 
-const VALID_TABS = new Set<string>(['config', 'academic-setup', 'structure', 'audit-log'])
+const VALID_TABS = new Set<string>(['config', 'academic-setup', 'structure', 'grade-levels', 'audit-log'])
 
 // ============================================================================
 // SETUP TASKS
@@ -699,6 +701,9 @@ export default function SchoolDetailPage() {
               )}
               {activeTab === 'structure' && (
                 <StructureTab schoolId={schoolId} />
+              )}
+              {activeTab === 'grade-levels' && (
+                <GradeLevelsTab schoolId={schoolId} school={displaySchool} />
               )}
               {activeTab === 'audit-log' && (
                 <AuditLogTab schoolId={schoolId} />

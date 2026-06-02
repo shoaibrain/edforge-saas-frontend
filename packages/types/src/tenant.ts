@@ -106,6 +106,15 @@ export interface School {
   isActive: boolean
   calendarSystem?: 'gregorian' | 'bikram_sambat'
   currentAcademicYearId?: string
+  /**
+   * Catalog of grade levels this school is configured to offer. Codes are from
+   * the immutable global catalog (`GRADE_LEVEL_OPTIONS` in `@aibrains/shared-types`).
+   * Managed via `PATCH /schools/{id}/grade-levels` (Phase 1 of the Saraswati
+   * grade-levels unblock). The backend backfills legacy rows from `gradeRange`
+   * at read time, so this field is always populated for schools created
+   * before Phase 1 too.
+   */
+  enabledGradeLevels?: string[]
 }
 
 /**

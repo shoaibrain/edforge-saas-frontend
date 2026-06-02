@@ -19,6 +19,7 @@ import type { SchoolAssignment } from '@edforge/auth'
 import type {
   CreateSchoolDto,
   UpdateSchoolDto,
+  UpdateSchoolGradeLevelsDto,
   CreateDepartmentDto,
   UpdateDepartmentDto,
   CreateAcademicYearDto,
@@ -117,6 +118,9 @@ function mapApiSchool(apiSchool: any, tenantId?: string): School {
     email: apiSchool.email,
     calendarSystem: apiSchool.calendarSystem,
     currentAcademicYearId: apiSchool.currentAcademicYearId,
+    enabledGradeLevels: Array.isArray(apiSchool.enabledGradeLevels)
+      ? apiSchool.enabledGradeLevels.map((v: unknown) => String(v))
+      : undefined,
   }
 }
 
@@ -197,6 +201,25 @@ export async function updateSchool(schoolId: string, data: UpdateSchoolDto): Pro
 export async function transitionSchoolStatus(schoolId: string, status: string): Promise<School> {
   const data = await apiPatch<any>(`/schools/${schoolId}/status`, { status })
   return mapApiSchool(data)
+}
+
+/**
+ * Update a school's enabled grade levels (P2 of the Saraswati grade-levels unblock).
+ * PATCH /schools/{schoolId}/grade-levels
+ *
+ * Requires `gradelevels:edit` ABAC permission server-side. The set of valid
+ * codes is the immutable global catalog (`GRADE_LEVEL_OPTIONS` in
+ * `@aibrains/shared-types`); the backend rejects unknown codes with 400.
+ */
+export async function patchSchoolGradeLevels(
+  schoolId: string,
+  data: UpdateSchoolGradeLevelsDto
+): Promise<School> {
+  const result = await apiPatch<any, UpdateSchoolGradeLevelsDto>(
+    `/schools/${schoolId}/grade-levels`,
+    data
+  )
+  return mapApiSchool(result)
 }
 
 // ============================================================================
@@ -867,6 +890,7 @@ export const tenantService = {
   createSchool,
   updateSchool,
   transitionSchoolStatus,
+  patchSchoolGradeLevels,
   deleteSchool,
   getActivationRequirements, // S0.6/S0.7 — archetype-aware gate readout
 
