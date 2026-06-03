@@ -24,3 +24,10 @@ export {
   REGISTERED_ARCHETYPES,
   ENTITY_KINDS,
 } from './registry'
+
+export {
+  resolveIdentifier,
+  serializeIdentifier,
+  type ResolvedIdentifier,
+  type IdentifierContext,
+} from './resolveIdentifier'
