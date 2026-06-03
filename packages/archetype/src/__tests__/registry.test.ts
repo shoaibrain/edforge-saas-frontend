@@ -100,3 +100,96 @@ describe('conformance — every registered archetype is fully wired', () => {
     }
   })
 })
+
+// ─── Additional registry detail tests ────────────────────────────────────────
+
+describe('getIdentifierSpec — country parameter tiebreak', () => {
+  it('returns PABSON student spec when country=NPL and archetype is absent', () => {
+    const spec = getIdentifierSpec('student', null, 'NPL')
+    expect(spec.primaryField).toBe('emisStudentId')
+    expect(spec.sensitive).toBe(true)
+  })
+
+  it('returns GENERIC student spec when country is not NPL and archetype is absent', () => {
+    const spec = getIdentifierSpec('student', null, 'USA')
+    expect(spec.primaryField).toBe('studentNumber')
+    expect(spec.sensitive).toBeUndefined()
+  })
+
+  it('archetype beats country: GENERIC + NPL → GENERIC spec', () => {
+    const spec = getIdentifierSpec('student', 'GENERIC', 'NPL')
+    expect(spec.primaryField).toBe('studentNumber')
+  })
+})
+
+describe('GENERIC identifier specs — per-entity fallback field is always id', () => {
+  it.each(ENTITY_KINDS as unknown as string[])(
+    'GENERIC %s has fallbackField "id" (or uuid-short entities use id as last resort)',
+    (entity) => {
+      const spec = getIdentifierSpec(entity as (typeof ENTITY_KINDS)[number], 'GENERIC')
+      expect(spec.fallbackField).toBe('id')
+    },
+  )
+})
+
+describe('GENERIC identifier specs — uuid-short entities', () => {
+  it('enrollment is uuid-short + copyable (same pattern as transaction)', () => {
+    const spec = getIdentifierSpec('enrollment', 'GENERIC')
+    expect(spec.format).toBe('uuid-short')
+    expect(spec.copyable).toBe(true)
+    expect(spec.primaryField).toBe('enrollmentId')
+  })
+
+  it('transaction and enrollment are the only uuid-short entities in GENERIC', () => {
+    const uuidShortEntities = ENTITY_KINDS.filter(
+      (e) => ARCHETYPE_REGISTRY['GENERIC'].identifiers[e].format === 'uuid-short',
+    )
+    expect(uuidShortEntities.sort()).toEqual(['enrollment', 'transaction'])
+  })
+})
+
+describe('PABSON identifier specs — non-student entities inherit from GENERIC', () => {
+  it.each(['payment', 'invoice', 'account', 'user', 'receipt', 'transaction', 'enrollment'] as const)(
+    'PABSON %s spec is identical to GENERIC %s spec',
+    (entity) => {
+      expect(getIdentifierSpec(entity, 'PABSON')).toEqual(getIdentifierSpec(entity, 'GENERIC'))
+    },
+  )
+})
+
+describe('GENERIC identifier specs — per-entity primary fields', () => {
+  it('user entity uses displayName as primary (not userId or username)', () => {
+    const spec = getIdentifierSpec('user', 'GENERIC')
+    expect(spec.primaryField).toBe('displayName')
+    expect(spec.labelKey).toBe('identifiers.userId')
+  })
+
+  it('account entity uses accountNumber as primary', () => {
+    const spec = getIdentifierSpec('account', 'GENERIC')
+    expect(spec.primaryField).toBe('accountNumber')
+  })
+
+  it('invoice entity uses invoiceNumber as primary', () => {
+    const spec = getIdentifierSpec('invoice', 'GENERIC')
+    expect(spec.primaryField).toBe('invoiceNumber')
+  })
+})
+
+describe('REGISTERED_ARCHETYPES and ENTITY_KINDS exports', () => {
+  it('REGISTERED_ARCHETYPES contains GENERIC and PABSON', () => {
+    expect(REGISTERED_ARCHETYPES).toContain('GENERIC')
+    expect(REGISTERED_ARCHETYPES).toContain('PABSON')
+  })
+
+  it('ENTITY_KINDS contains all 8 expected entity types', () => {
+    expect(ENTITY_KINDS).toHaveLength(8)
+    expect(ENTITY_KINDS).toContain('student')
+    expect(ENTITY_KINDS).toContain('payment')
+    expect(ENTITY_KINDS).toContain('invoice')
+    expect(ENTITY_KINDS).toContain('account')
+    expect(ENTITY_KINDS).toContain('user')
+    expect(ENTITY_KINDS).toContain('receipt')
+    expect(ENTITY_KINDS).toContain('transaction')
+    expect(ENTITY_KINDS).toContain('enrollment')
+  })
+})

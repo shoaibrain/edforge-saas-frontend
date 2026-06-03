@@ -101,4 +101,117 @@ describe('serializeIdentifier — CSV/PDF parity', () => {
       'identifiers.studentNumber',
     )
   })
+
+  it('handles null data without crashing and returns empty value', () => {
+    const result = serializeIdentifier('payment', null, GENERIC)
+    expect(result.value).toBe('')
+    expect(result.label).toBe('identifiers.receiptNumber')
+  })
+
+  it('parity holds for GENERIC payment: receiptNumber primary', () => {
+    const data = { receiptNumber: 'REC-2026-0001', id: 'uuid' }
+    const onScreen = resolveIdentifier('payment', data, GENERIC)
+    const serialized = serializeIdentifier('payment', data, GENERIC)
+    expect(serialized.value).toBe(onScreen.value)
+    expect(serialized.value).toBe('REC-2026-0001')
+  })
+})
+
+// ─── Additional entity kinds ──────────────────────────────────────────────────
+
+describe('resolveIdentifier — all GENERIC entity kinds', () => {
+  it('payment: resolves receiptNumber as primary, id as fallback', () => {
+    const r = resolveIdentifier('payment', { receiptNumber: 'REC-001', id: 'uuid' }, GENERIC)
+    expect(r.field).toBe('receiptNumber')
+    expect(r.value).toBe('REC-001')
+    expect(r.format).toBe('plain')
+    expect(r.copyable).toBe(false)
+    expect(r.entity).toBe('payment')
+  })
+
+  it('invoice: resolves invoiceNumber as primary', () => {
+    const r = resolveIdentifier('invoice', { invoiceNumber: 'INV-001', id: 'uuid' }, GENERIC)
+    expect(r.field).toBe('invoiceNumber')
+    expect(r.value).toBe('INV-001')
+    expect(r.format).toBe('plain')
+  })
+
+  it('account: resolves accountNumber as primary', () => {
+    const r = resolveIdentifier('account', { accountNumber: 'ACC-001', id: 'uuid' }, GENERIC)
+    expect(r.field).toBe('accountNumber')
+    expect(r.value).toBe('ACC-001')
+  })
+
+  it('user: resolves displayName as primary', () => {
+    const r = resolveIdentifier('user', { displayName: 'Alice Smith', id: 'uuid' }, GENERIC)
+    expect(r.field).toBe('displayName')
+    expect(r.value).toBe('Alice Smith')
+  })
+
+  it('receipt: resolves receiptNumber as primary', () => {
+    const r = resolveIdentifier('receipt', { receiptNumber: 'RCPT-007', id: 'uuid' }, GENERIC)
+    expect(r.field).toBe('receiptNumber')
+    expect(r.value).toBe('RCPT-007')
+  })
+
+  it('transaction: resolves transactionId as primary with uuid-short format and copyable', () => {
+    const txId = 'aaaabbbb-cccc-dddd-eeee-ffffffffffff'
+    const r = resolveIdentifier('transaction', { transactionId: txId }, GENERIC)
+    expect(r.field).toBe('transactionId')
+    expect(r.value).toBe(txId)
+    expect(r.format).toBe('uuid-short')
+    expect(r.copyable).toBe(true)
+    expect(r.sensitive).toBe(false)
+  })
+
+  it('enrollment: resolves enrollmentId as primary with uuid-short format and copyable', () => {
+    const enrolId = 'aaaabbbb-cccc-dddd-eeee-000000000001'
+    const r = resolveIdentifier('enrollment', { enrollmentId: enrolId }, GENERIC)
+    expect(r.field).toBe('enrollmentId')
+    expect(r.value).toBe(enrolId)
+    expect(r.format).toBe('uuid-short')
+    expect(r.copyable).toBe(true)
+  })
+})
+
+describe('resolveIdentifier — country-only context (NPL → PABSON tiebreak)', () => {
+  it('resolves to PABSON profile when no archetype but country=NPL', () => {
+    const r = resolveIdentifier(
+      'student',
+      { emisStudentId: '1708400128200043', studentNumber: 'SN' },
+      { country: 'NPL' },
+    )
+    expect(r.archetype).toBe('PABSON')
+    expect(r.field).toBe('emisStudentId')
+    expect(r.sensitive).toBe(true)
+  })
+
+  it('resolves to GENERIC when country is not NPL and archetype is absent', () => {
+    const r = resolveIdentifier('student', { studentNumber: 'S-1' }, { country: 'USA' })
+    expect(r.archetype).toBe('GENERIC')
+    expect(r.field).toBe('studentNumber')
+  })
+})
+
+describe('resolveIdentifier — ResolvedIdentifier shape completeness', () => {
+  it('always includes the entity field in the result', () => {
+    const r = resolveIdentifier('invoice', { invoiceNumber: 'INV-001' }, GENERIC)
+    expect(r.entity).toBe('invoice')
+  })
+
+  it('copyable defaults to false for non-copyable specs', () => {
+    const r = resolveIdentifier('student', { studentNumber: 'S-1' }, GENERIC)
+    expect(r.copyable).toBe(false)
+  })
+
+  it('copyable is true for transaction (uuid-short, copyable)', () => {
+    const r = resolveIdentifier('transaction', { transactionId: 'tx-id' }, GENERIC)
+    expect(r.copyable).toBe(true)
+  })
+
+  it('secondary is undefined when no secondaryField is configured (GENERIC student)', () => {
+    const r = resolveIdentifier('student', { studentNumber: 'S-1', id: 'uuid' }, GENERIC)
+    // GENERIC student has no secondaryField
+    expect(r.secondary).toBeUndefined()
+  })
 })
