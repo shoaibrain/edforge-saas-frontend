@@ -828,9 +828,15 @@ importers:
 
   packages/archetype:
     dependencies:
+      '@edforge/forms':
+        specifier: workspace:*
+        version: link:../forms
       react:
         specifier: ^19.0.0
         version: 19.2.5
+      react-i18next:
+        specifier: ^16.5.4
+        version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.9.3)
     devDependencies:
       '@types/react':
         specifier: ^19.0.0

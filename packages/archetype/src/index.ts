@@ -31,3 +31,8 @@ export {
   type ResolvedIdentifier,
   type IdentifierContext,
 } from './resolveIdentifier'
+
+// React layer (GF1c)
+export { useArchetypeIdentifier } from './components/useArchetypeIdentifier'
+export { EntityIdDisplay, type EntityIdDisplayProps } from './components/EntityIdDisplay'
+export { UuidBadge, type UuidBadgeProps } from './components/UuidBadge'

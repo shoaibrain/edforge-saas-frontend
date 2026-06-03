@@ -15,8 +15,12 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@edforge/forms": "workspace:*"
+  },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-i18next": "^16.5.4"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
