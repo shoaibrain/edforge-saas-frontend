@@ -13,5 +13,8 @@
   "paidBy": "भुक्तानीकर्ता",
   "copy": "प्रतिलिपि",
   "copied": "प्रतिलिपि भयो",
-  "unverifiedFormat": "अप्रमाणित ढाँचा"
+  "unverifiedFormat": "अप्रमाणित ढाँचा",
+  "maskedIdentifier": "लुकाइएको परिचयांक",
+  "hidden": "लुकाइएको",
+  "none": "कुनै छैन"
 }

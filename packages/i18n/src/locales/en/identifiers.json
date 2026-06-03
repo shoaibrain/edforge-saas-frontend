@@ -13,5 +13,8 @@
   "paidBy": "Paid By",
   "copy": "Copy",
   "copied": "Copied",
-  "unverifiedFormat": "Unverified format"
+  "unverifiedFormat": "Unverified format",
+  "maskedIdentifier": "Masked identifier",
+  "hidden": "hidden",
+  "none": "none"
 }

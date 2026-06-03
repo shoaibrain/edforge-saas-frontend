@@ -89,6 +89,9 @@ importers:
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
+      '@edforge/archetype':
+        specifier: workspace:*
+        version: link:../../packages/archetype
       '@edforge/auth':
         specifier: workspace:*
         version: link:../../packages/auth

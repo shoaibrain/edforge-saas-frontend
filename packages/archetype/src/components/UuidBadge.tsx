@@ -28,7 +28,7 @@ export function UuidBadge({ value, masked = false }: UuidBadgeProps) {
   if (!value) return <span className="text-muted-foreground">—</span>
   if (masked) {
     return (
-      <span className="font-mono" aria-label="masked identifier">
+      <span className="font-mono" aria-label={t('maskedIdentifier')}>
         {MASK}
       </span>
     )

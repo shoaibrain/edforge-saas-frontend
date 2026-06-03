@@ -39,7 +39,7 @@ export function EntityIdDisplay({
   let valueNode
   if (hidden) {
     valueNode = (
-      <span className="font-mono" aria-label="masked identifier">
+      <span className="font-mono" aria-label={t('maskedIdentifier')}>
         {SENSITIVE_MASK}
       </span>
     )
@@ -64,7 +64,7 @@ export function EntityIdDisplay({
       </span>
     ) : null
 
-  const ariaLabel = `${label}, ${hidden ? 'hidden' : resolved.value || 'none'}`
+  const ariaLabel = `${label}, ${hidden ? t('hidden') : resolved.value || t('none')}`
 
   if (variant === 'stacked') {
     return (
