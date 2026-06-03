@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
 import { DateDisplay } from '@edforge/ui'
+import { EntityIdDisplay } from '@edforge/archetype'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -337,7 +338,15 @@ export function ProfileTab({ student }: ProfileTabProps) {
             }
           />
           <DataField label={t('fields.enrollmentDate')} value={student.enrollmentDate ? <DateDisplay date={student.enrollmentDate} format="long" /> : undefined} />
-          <DataField label={t('fields.studentNumber')} value={student.studentNumber} />
+          {/* Governance-aware student identifier: PABSON → EMIS Student ID (government
+              PII, honors the privacy toggle) with the school-local studentNumber as
+              secondary; GENERIC → studentNumber. Resolved via @edforge/archetype. */}
+          <EntityIdDisplay
+            entity="student"
+            data={student}
+            variant="stacked"
+            masked={!showSensitive}
+          />
           <DataField label={t('fields.stateStudentId')} value={student.stateStudentId} />
           {student.previousSchool && (
             <DataField label={t('fields.previousSchool')} value={student.previousSchool} />

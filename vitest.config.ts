@@ -30,6 +30,7 @@ export default defineConfig({
       '@edforge/theme': resolve(__dirname, 'packages/theme/src'),
       '@edforge/i18n': resolve(__dirname, 'packages/i18n/src'),
       '@edforge/date-utils': resolve(__dirname, 'packages/date-utils/src'),
+      '@edforge/archetype': resolve(__dirname, 'packages/archetype/src'),
       // `@edforge/config` is published with an exports map (no `main`)
       // that puts every subpath under `./src/`. Aliasing to `packages/config`
       // here means subpaths like `@edforge/config/school-context-channel`

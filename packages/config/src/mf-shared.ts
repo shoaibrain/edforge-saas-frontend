@@ -56,6 +56,12 @@ export function getMFSharedConfig(_role: 'host' | 'remote'): MFSharedConfig {
     // module instance to interop with react-hook-form's FormProvider context.
     '@edforge/forms': { singleton: true, requiredVersion: '0.0.1', eager: true },
 
+    // @edforge/archetype — CRITICAL singleton, same rationale as @edforge/config:
+    // it holds the governance-body profile registry. If each MFE bundled its own
+    // copy, archetype-resolution could diverge across MFEs (and a future
+    // module-level configured singleton would split-brain). One instance only.
+    '@edforge/archetype': { singleton: true, requiredVersion: '0.0.1', eager: true },
+
     // i18n — singleton so language changes propagate across all modules
     '@edforge/i18n': { singleton: true, requiredVersion: '0.0.1', eager: true },
     i18next: { singleton: true, eager: true },
