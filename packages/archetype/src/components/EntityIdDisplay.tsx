@@ -33,7 +33,12 @@ export function EntityIdDisplay({
 }: EntityIdDisplayProps) {
   const resolved = useArchetypeIdentifier(entity, data)
   const { t } = useTranslation('identifiers')
-  const label = t(resolved.labelKey)
+  // labelKey is namespace-qualified (`identifiers.<key>`) as a self-documenting
+  // anchor, but `t` is already scoped to that namespace — so strip the prefix
+  // before lookup (mirrors the i18n coverage test's stripNs). Without this,
+  // i18next reads the dotted key as a nested path and echoes the raw key,
+  // surfacing `identifiers.emisStudentId` verbatim in the UI.
+  const label = t(resolved.labelKey.replace(/^identifiers\./, ''))
   const hidden = masked && resolved.sensitive
 
   let valueNode

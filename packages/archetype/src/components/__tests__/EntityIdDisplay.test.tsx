@@ -34,7 +34,10 @@ describe('<EntityIdDisplay> — PABSON student', () => {
     )
     const root = getByTestId('entity-id-display')
     expect(root.textContent).toContain('1708400128200043')
-    expect(root.textContent).toContain('identifiers.emisStudentId') // label
+    // label is looked up with the namespace prefix stripped (t is scoped to
+    // `identifiers`), so the bare key reaches the translator
+    expect(root.textContent).toContain('emisStudentId')
+    expect(root.textContent).not.toContain('identifiers.emisStudentId')
     expect(getByTestId('entity-id-secondary').textContent).toBe('SSSEB-2026-00044')
   })
 
