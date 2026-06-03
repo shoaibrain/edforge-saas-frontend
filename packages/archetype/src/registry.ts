@@ -1,0 +1,158 @@
+/**
+ * Archetype profile registry — GENERIC base + per-archetype delta overlays.
+ *
+ * Resolution mirrors the shipped `resolveAddressVariant(archetype, country)`
+ * precedent exactly (packages/forms/src/sections/AddressFields.tsx):
+ *   1. a known archetype wins outright (archetype beats country);
+ *   2. otherwise `country === 'NPL'` falls back to the PABSON profile
+ *      (a Nepal tenant with no/unknown archetype still gets Nepal-shaped UI);
+ *   3. otherwise GENERIC.
+ *
+ * Adding a new governance body = add its overlay + a REGISTRY entry. No
+ * call-site edits. The conformance test in __tests__/registry.test.ts fails
+ * if a registered archetype is missing any EntityKind.
+ */
+
+import {
+  ENTITY_KINDS,
+  type ArchetypeUiProfile,
+  type EntityKind,
+  type IdentifierSpec,
+} from './types'
+
+/**
+ * GENERIC base — every entity resolves to its human-readable number with the
+ * internal `id` as the (never-raw) fallback. UUID-shaped fields render as a
+ * truncated, copyable badge, never a raw `id.slice(0, 8)` fragment.
+ */
+const GENERIC_IDENTIFIERS: Record<EntityKind, IdentifierSpec> = {
+  student: {
+    primaryField: 'studentNumber',
+    fallbackField: 'id',
+    labelKey: 'identifiers.studentNumber',
+    format: 'plain',
+  },
+  payment: {
+    primaryField: 'receiptNumber',
+    fallbackField: 'id',
+    labelKey: 'identifiers.receiptNumber',
+    format: 'plain',
+  },
+  invoice: {
+    primaryField: 'invoiceNumber',
+    fallbackField: 'id',
+    labelKey: 'identifiers.invoiceNumber',
+    format: 'plain',
+  },
+  account: {
+    primaryField: 'accountNumber',
+    fallbackField: 'id',
+    labelKey: 'identifiers.accountNumber',
+    format: 'plain',
+  },
+  user: {
+    primaryField: 'displayName',
+    fallbackField: 'id',
+    labelKey: 'identifiers.userId',
+    format: 'plain',
+  },
+  receipt: {
+    primaryField: 'receiptNumber',
+    fallbackField: 'id',
+    labelKey: 'identifiers.receiptNumber',
+    format: 'plain',
+  },
+  transaction: {
+    primaryField: 'transactionId',
+    fallbackField: 'id',
+    labelKey: 'identifiers.transactionId',
+    format: 'uuid-short',
+    copyable: true,
+  },
+  enrollment: {
+    primaryField: 'enrollmentId',
+    fallbackField: 'id',
+    labelKey: 'identifiers.enrollmentId',
+    format: 'uuid-short',
+    copyable: true,
+  },
+}
+
+/**
+ * PABSON delta — the one governance-specific override that matters today:
+ * a PABSON student's government-registered CEHRD/IEMIS `emisStudentId` is the
+ * primary identifier (it's PII → `sensitive`), with the school-local
+ * `studentNumber` as secondary + fallback. Everything else inherits GENERIC.
+ */
+const PABSON_OVERLAY: Partial<Record<EntityKind, IdentifierSpec>> = {
+  student: {
+    primaryField: 'emisStudentId',
+    secondaryField: 'studentNumber',
+    fallbackField: 'studentNumber',
+    labelKey: 'identifiers.emisStudentId',
+    format: 'iemis',
+    copyable: true,
+    sensitive: true,
+  },
+}
+
+function buildProfile(
+  archetype: string,
+  addressVariant: ArchetypeUiProfile['addressVariant'],
+  calendarSystem: ArchetypeUiProfile['calendarSystem'],
+  overlay: Partial<Record<EntityKind, IdentifierSpec>> = {},
+): ArchetypeUiProfile {
+  return {
+    archetype,
+    addressVariant,
+    calendarSystem,
+    identifiers: { ...GENERIC_IDENTIFIERS, ...overlay },
+  }
+}
+
+const GENERIC_PROFILE = buildProfile('GENERIC', 'legacy', 'gregorian')
+const PABSON_PROFILE = buildProfile('PABSON', 'nepal', 'bikram_sambat', PABSON_OVERLAY)
+
+/**
+ * The runtime-active registry. V1 governance bodies only. Reserved archetypes
+ * (`CBSE_IN`, `NAIS_US`, `GEMS_UAE`) and future ones (`CBS`, `NGO_RUN`) are
+ * deliberately NOT here yet — they're added when their pilot is funded
+ * (see the framework execution doc, Wave 4). `getArchetypeProfile` degrades
+ * any unregistered archetype to GENERIC, so this is safe.
+ */
+export const ARCHETYPE_REGISTRY: Readonly<Record<string, ArchetypeUiProfile>> = {
+  GENERIC: GENERIC_PROFILE,
+  PABSON: PABSON_PROFILE,
+}
+
+/**
+ * Resolve the UI profile for a tenant. Archetype beats country; an unknown
+ * archetype in Nepal falls back to PABSON; everything else is GENERIC. Never
+ * throws — an unrecognized archetype degrades to GENERIC.
+ */
+export function getArchetypeProfile(
+  archetype?: string | null,
+  country?: string | null,
+): ArchetypeUiProfile {
+  if (archetype && ARCHETYPE_REGISTRY[archetype]) {
+    return ARCHETYPE_REGISTRY[archetype]
+  }
+  if (country === 'NPL') {
+    return ARCHETYPE_REGISTRY.PABSON
+  }
+  return ARCHETYPE_REGISTRY.GENERIC
+}
+
+/** The identifier spec for one entity under one governance body. */
+export function getIdentifierSpec(
+  entity: EntityKind,
+  archetype?: string | null,
+  country?: string | null,
+): IdentifierSpec {
+  return getArchetypeProfile(archetype, country).identifiers[entity]
+}
+
+/** Active archetype labels the registry knows about (for conformance tests). */
+export const REGISTERED_ARCHETYPES: readonly string[] = Object.keys(ARCHETYPE_REGISTRY)
+
+export { ENTITY_KINDS }
