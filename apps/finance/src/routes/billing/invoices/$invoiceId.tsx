@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
+import { UuidBadge } from '@edforge/archetype'
 import { ArrowLeft, Check, X, Loader2, Printer, Download, AlertTriangle } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
@@ -87,7 +88,11 @@ export default function InvoiceDetailPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-              {invoice.invoiceNumber || `Invoice ${invoice.id.slice(0, 8)}`}
+              {invoice.invoiceNumber || (
+                <>
+                  Invoice <UuidBadge value={invoice.id} />
+                </>
+              )}
             </h1>
             <StatusBadge status={invoice.status} />
           </div>
@@ -268,6 +273,7 @@ export default function InvoiceDetailPage() {
       <AnimatePresence>
         {showCancelDialog && (
           <CancelInvoiceDialog
+            // eslint-disable-next-line edforge/no-id-slice-in-jsx -- dialog prop needs a plain string label; rare no-number fallback, not a rendered UUID
             invoiceNumber={invoice.invoiceNumber || `Invoice ${invoice.id.slice(0, 8)}`}
             isPending={cancelMutation.isPending}
             onConfirm={handleConfirmCancel}

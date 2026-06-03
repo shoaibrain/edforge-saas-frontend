@@ -13,6 +13,7 @@ import {
   BookOpen,
   Lock,
 } from 'lucide-react'
+import { UuidBadge } from '@edforge/archetype'
 import { useStudentGrades } from '../../hooks/useGrades'
 
 // ============================================================================
@@ -136,7 +137,7 @@ export function StudentGradesView({
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-text-tertiary" />
                     <span className="font-medium text-text-primary">
-                      {grade.courseName || grade.courseId.slice(0, 12)}
+                      {grade.courseName || <UuidBadge value={grade.courseId} />}
                     </span>
                   </div>
                 </td>

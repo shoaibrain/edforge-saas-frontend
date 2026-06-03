@@ -571,6 +571,7 @@ function CourseGradeCards({
           <CourseGradeCard
             key={g.gradeId}
             grade={g}
+            // eslint-disable-next-line edforge/no-id-slice-in-jsx -- string-typed prop; courseId fallback only when neither name source resolves
             courseName={g.courseName || courseNameMap.get(g.courseId) || g.courseId.slice(0, 12)}
           />
         ))}
