@@ -8,6 +8,11 @@
 > is re-sequenced here as the first consumer of the archetype profile registry.
 > This plan does **not** rewrite PR #95's ~55 tickets; it cites their IDs.
 >
+> **Execution order + edge cases + cross-repo agent orchestration** live in the
+> backend repo at `edforge/docs/archetype-framework/execution-and-orchestration.md`
+> — it value-orders these sprints (GF1–GF2 identifier display ship **first**;
+> GF5 CBS is deferred until a CBS pilot is funded). Read it before starting.
+>
 > Six sprints, ~30 atomic tickets (plus PR #95's tickets it sequences). Every
 > ticket is one commit + one PR with a `Validation:` line. Every sprint ends in a
 > runnable demo (`pnpm dev:shell` / `pnpm dev:mvp`, a dev route, or a Vercel
