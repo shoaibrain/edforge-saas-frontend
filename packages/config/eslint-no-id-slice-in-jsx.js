@@ -44,12 +44,26 @@ function receiverName(object) {
   return null
 }
 
+/**
+ * True when `node` is rendered directly inside a JSX expression container —
+ * i.e. the ancestor walk reaches a `JSXExpressionContainer` BEFORE crossing a
+ * function boundary. A `.slice` inside a callback (e.g.
+ * `onClick={() => id.slice(0, 8)}`) is a handler, not a render, so we stop at
+ * the first function node and return false. A child-element render such as
+ * `rows.map(r => <td>{r.id.slice(0, 8)}</td>)` still trips the rule because the
+ * inner `{…}` container is hit before the `.map` arrow.
+ */
 function insideJsxExpression(node) {
   let p = node.parent
   while (p) {
     if (p.type === 'JSXExpressionContainer') return true
-    // Stop climbing at a function boundary that isn't itself rendered inline —
-    // a `.slice` inside a nested non-arrow callback isn't a direct JSX render.
+    if (
+      p.type === 'ArrowFunctionExpression' ||
+      p.type === 'FunctionExpression' ||
+      p.type === 'FunctionDeclaration'
+    ) {
+      return false
+    }
     p = p.parent
   }
   return false
