@@ -36,6 +36,13 @@ describe('getArchetypeProfile — resolution (mirrors resolveAddressVariant)', (
     expect(getArchetypeProfile(undefined, undefined).archetype).toBe('GENERIC')
     expect(getArchetypeProfile(null, 'USA').archetype).toBe('GENERIC')
   })
+
+  it('does not treat inherited prototype keys as archetypes (tenant-data safety)', () => {
+    expect(getArchetypeProfile('toString').archetype).toBe('GENERIC')
+    expect(getArchetypeProfile('__proto__').archetype).toBe('GENERIC')
+    expect(getArchetypeProfile('constructor').archetype).toBe('GENERIC')
+    expect(getArchetypeProfile('hasOwnProperty', 'NPL').archetype).toBe('PABSON')
+  })
 })
 
 describe('identifier specs — governance-specific overrides', () => {

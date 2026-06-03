@@ -134,7 +134,11 @@ export function getArchetypeProfile(
   archetype?: string | null,
   country?: string | null,
 ): ArchetypeUiProfile {
-  if (archetype && ARCHETYPE_REGISTRY[archetype]) {
+  // Own-property check: `archetype` can originate from tenant data, so a bare
+  // bracket lookup would resolve inherited Object.prototype members
+  // ('toString', '__proto__', etc.) and break the "always degrade to GENERIC"
+  // contract.
+  if (archetype && Object.hasOwn(ARCHETYPE_REGISTRY, archetype)) {
     return ARCHETYPE_REGISTRY[archetype]
   }
   if (country === 'NPL') {

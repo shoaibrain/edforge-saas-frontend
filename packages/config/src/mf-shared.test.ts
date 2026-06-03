@@ -8,6 +8,8 @@ describe('mf-shared — governance-body archetype registry singleton', () => {
       const entry = cfg['@edforge/archetype']
       expect(entry, '@edforge/archetype missing from MF shared config').toBeDefined()
       expect(entry.singleton, '@edforge/archetype must be a singleton').toBe(true)
+      expect(entry.eager, '@edforge/archetype should stay eager-loaded').toBe(true)
+      expect(entry.requiredVersion, '@edforge/archetype requiredVersion drifted').toBe('0.0.1')
     }
   })
 
