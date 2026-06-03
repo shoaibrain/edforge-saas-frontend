@@ -17,6 +17,7 @@ import {
   WidgetErrorBoundaryV2,
 } from '@edforge/ui'
 import type { ColumnDef } from '@edforge/ui'
+import { EntityIdDisplay } from '@edforge/archetype'
 import {
   Loader2,
   CreditCard,
@@ -499,7 +500,7 @@ function usePaymentColumns(
         header: 'Receipt #',
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
-            {row.original.receiptNumber || row.original.id.slice(0, 8)}
+            <EntityIdDisplay entity="payment" data={row.original} variant="inline" />
           </span>
         ),
         enableSorting: true,
@@ -519,10 +520,11 @@ function usePaymentColumns(
         header: 'Invoice #',
         cell: ({ row }) => (
           <span className="text-[rgb(var(--text-secondary))]">
-            {row.original.invoiceNumber ||
-              (row.original.invoiceId
-                ? row.original.invoiceId.slice(0, 8)
-                : '-')}
+            <EntityIdDisplay
+              entity="invoice"
+              data={{ invoiceNumber: row.original.invoiceNumber, id: row.original.invoiceId }}
+              variant="inline"
+            />
           </span>
         ),
         enableSorting: false,

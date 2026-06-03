@@ -38,6 +38,7 @@ import {
   useAcademicYears,
 } from '@edforge/finance-services'
 import type { StudentSearchResult } from '@edforge/finance-services'
+import { UuidBadge } from '@edforge/archetype'
 import { formatDate } from '../../utils/format-date'
 
 // ============================================================================
@@ -328,7 +329,11 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                       return (
                         <tr key={i} className="hover:bg-[rgb(var(--surface-secondary))]">
                           <td className="px-3 py-2 text-sm text-[rgb(var(--text-primary))]">
-                            {student?.fullName || `Student ${err.studentId.slice(0, 8)}...`}
+                            {student?.fullName || (
+                              <>
+                                Student <UuidBadge value={err.studentId} />
+                              </>
+                            )}
                           </td>
                           <td className="px-3 py-2 text-sm text-red-600 dark:text-red-400">
                             {err.reason}

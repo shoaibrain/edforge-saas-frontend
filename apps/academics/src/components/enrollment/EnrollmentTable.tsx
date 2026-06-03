@@ -25,6 +25,7 @@ import {
   createActionsColumn,
   type ColumnDef,
 } from '@edforge/ui'
+import { UuidBadge } from '@edforge/archetype'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
@@ -230,17 +231,16 @@ export function EnrollmentTable({
     const cols: ColumnDef<EnrollmentResponseDto, unknown>[] = [
       {
         accessorFn: (row) =>
-          (row as Record<string, unknown>).studentName as string ||
-          row.studentId.slice(0, 8),
+          ((row as Record<string, unknown>).studentName as string) || '',
         id: 'studentName',
         header: 'Student',
         enableSorting: true,
-        cell: ({ getValue }) => (
+        cell: ({ getValue, row }) => (
           <span
             className="font-medium"
             style={{ fontSize: 12, color: 'var(--v2-text-primary)' }}
           >
-            {getValue<string>()}
+            {getValue<string>() || <UuidBadge value={row.original.studentId} />}
           </span>
         ),
       },

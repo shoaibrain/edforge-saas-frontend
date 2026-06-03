@@ -18,6 +18,7 @@ import {
   WidgetErrorBoundaryV2,
   type ColumnDef,
 } from '@edforge/ui'
+import { EntityIdDisplay, UuidBadge } from '@edforge/archetype'
 import {
   Plus,
   FileText,
@@ -241,7 +242,7 @@ export default function InvoicesPage() {
         header: 'Invoice #',
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
-            {row.original.invoiceNumber || row.original.id.slice(0, 8)}
+            <EntityIdDisplay entity="invoice" data={row.original} variant="inline" />
           </span>
         ),
         enableSorting: true,
@@ -254,11 +255,8 @@ export default function InvoicesPage() {
           return invoice.studentName ? (
             <span className="text-[rgb(var(--text-secondary))]">{invoice.studentName}</span>
           ) : (
-            <span
-              className="text-[rgb(var(--text-tertiary))] font-mono text-xs"
-              title={invoice.studentId}
-            >
-              {invoice.studentId?.slice(0, 8) || '-'}
+            <span className="text-[rgb(var(--text-tertiary))] text-xs">
+              <UuidBadge value={invoice.studentId ?? ''} />
             </span>
           )
         },

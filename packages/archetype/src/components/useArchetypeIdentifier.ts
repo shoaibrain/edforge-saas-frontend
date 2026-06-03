@@ -11,7 +11,7 @@ import type { EntityKind } from '../types'
  */
 export function useArchetypeIdentifier(
   entity: EntityKind,
-  data: Record<string, unknown> | null | undefined,
+  data: object | null | undefined,
 ): ResolvedIdentifier {
   const { archetype, country } = useTenantContext()
   return useMemo(

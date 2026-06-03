@@ -65,12 +65,13 @@ function readField(
  */
 export function resolveIdentifier(
   entity: EntityKind,
-  data: Record<string, unknown> | null | undefined,
+  data: object | null | undefined,
   ctx: IdentifierContext = {},
 ): ResolvedIdentifier {
   const profile = getArchetypeProfile(ctx.archetype, ctx.country)
   const spec = profile.identifiers[entity]
-  const safeData = data ?? {}
+  // Accept any object (typed DTOs/interfaces included) and read by key.
+  const safeData = (data ?? {}) as Record<string, unknown>
 
   const primary = readField(safeData, spec.primaryField)
   const fallbackField = spec.fallbackField ?? 'id'
@@ -112,7 +113,7 @@ export function resolveIdentifier(
  */
 export function serializeIdentifier(
   entity: EntityKind,
-  data: Record<string, unknown> | null | undefined,
+  data: object | null | undefined,
   ctx: IdentifierContext = {},
   translate?: (key: string) => string,
 ): { label: string; value: string } {

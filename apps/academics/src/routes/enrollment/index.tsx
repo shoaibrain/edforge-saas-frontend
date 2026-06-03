@@ -167,7 +167,7 @@ export function EnrollmentModule() {
 
   // Handlers
   const handleMarkNoShow = useCallback((enrollment: EnrollmentResponseDto) => {
-    const studentName = (enrollment as Record<string, unknown>).studentName || enrollment.studentId.slice(0, 8)
+    const studentName = (enrollment as Record<string, unknown>).studentName || 'this student'
     if (!window.confirm(`Mark ${studentName} as no-show? This will withdraw the enrollment.`)) return
     markNoShowMutation.mutate({
       schoolId,

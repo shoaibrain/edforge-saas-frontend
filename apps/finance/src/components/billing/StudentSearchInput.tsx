@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Search, Loader2, X } from 'lucide-react'
 import { useSearchStudents } from '@edforge/finance-services'
 import type { StudentSearchResult } from '@edforge/finance-services'
+import { UuidBadge } from '@edforge/archetype'
 
 interface StudentSearchInputProps {
   schoolId: string
@@ -68,8 +69,8 @@ export function StudentSearchInput({
       <div className="flex items-center gap-2 px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))]">
         <div className="flex-1 min-w-0">
           <span className="text-[rgb(var(--text-primary))] font-medium">{value.studentName}</span>
-          <span className="text-[rgb(var(--text-tertiary))] ml-2 text-xs font-mono">
-            {value.studentId.slice(0, 8)}
+          <span className="text-[rgb(var(--text-tertiary))] ml-2 text-xs">
+            <UuidBadge value={value.studentId} />
           </span>
         </div>
         <button

@@ -18,6 +18,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { UuidBadge } from '@edforge/archetype'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
 import { useStudentGrades } from '../../hooks/useGrades'
@@ -259,7 +260,7 @@ export function ReportCardPage() {
                         <div className="flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-text-tertiary print:hidden" />
                           <span className="font-medium text-text-primary print:text-gray-900">
-                            {grade.courseName || grade.courseId.slice(0, 12)}
+                            {grade.courseName || <UuidBadge value={grade.courseId} />}
                           </span>
                         </div>
                       </td>
