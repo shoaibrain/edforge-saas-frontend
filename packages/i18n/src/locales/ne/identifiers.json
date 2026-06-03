@@ -1,0 +1,17 @@
+{
+  "emisStudentId": "EMIS विद्यार्थी आईडी",
+  "studentNumber": "विद्यार्थी नम्बर",
+  "stateStudentId": "राज्य विद्यार्थी आईडी",
+  "receiptNumber": "रसिद नम्बर",
+  "invoiceNumber": "बिजक नम्बर",
+  "invoiceId": "बिजक आईडी",
+  "accountNumber": "खाता नम्बर",
+  "transactionId": "कारोबार आईडी",
+  "paymentId": "भुक्तानी आईडी",
+  "enrollmentId": "भर्ना आईडी",
+  "userId": "प्रयोगकर्ता आईडी",
+  "paidBy": "भुक्तानीकर्ता",
+  "copy": "प्रतिलिपि",
+  "copied": "प्रतिलिपि भयो",
+  "unverifiedFormat": "अप्रमाणित ढाँचा"
+}

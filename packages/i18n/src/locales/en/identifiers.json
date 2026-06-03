@@ -1,0 +1,17 @@
+{
+  "emisStudentId": "EMIS Student ID",
+  "studentNumber": "Student Number",
+  "stateStudentId": "State Student ID",
+  "receiptNumber": "Receipt Number",
+  "invoiceNumber": "Invoice Number",
+  "invoiceId": "Invoice ID",
+  "accountNumber": "Account Number",
+  "transactionId": "Transaction ID",
+  "paymentId": "Payment ID",
+  "enrollmentId": "Enrollment ID",
+  "userId": "User ID",
+  "paidBy": "Paid By",
+  "copy": "Copy",
+  "copied": "Copied",
+  "unverifiedFormat": "Unverified format"
+}
