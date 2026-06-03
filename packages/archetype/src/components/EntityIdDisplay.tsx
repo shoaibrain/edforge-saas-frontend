@@ -7,7 +7,7 @@ const SENSITIVE_MASK = '••••••••••••'
 
 export interface EntityIdDisplayProps {
   entity: EntityKind
-  data: Record<string, unknown> | null | undefined
+  data: object | null | undefined
   /** `inline` (value only) or `stacked` (label + value + secondary). */
   variant?: 'inline' | 'stacked'
   /**

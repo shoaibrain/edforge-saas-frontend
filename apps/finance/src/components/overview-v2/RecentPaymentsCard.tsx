@@ -7,6 +7,7 @@
 import { Banknote, FileText, Building2, Smartphone, CreditCard, type LucideIcon } from 'lucide-react'
 import { formatGatewayLabel, formatRelativeDate } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
+import { EntityIdDisplay } from '@edforge/archetype'
 import { useFinanceSettings } from '../../layouts/FinanceLayout'
 
 const GATEWAY_ICONS: Record<string, LucideIcon> = {
@@ -116,7 +117,7 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
                 {/* Details */}
                 <div className="flex-1 min-w-0">
                   <div className="text-[11px] font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
-                    {payment.receiptNumber || payment.id.slice(0, 8)}
+                    <EntityIdDisplay entity="payment" data={payment} variant="inline" />
                   </div>
                   <div className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
                     {formatGatewayLabel(payment.gateway)} · {formatRelativeDate(dateStr)}

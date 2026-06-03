@@ -26,6 +26,7 @@ import {
   StatCard,
   WidgetErrorBoundaryV2,
 } from '@edforge/ui'
+import { UuidBadge } from '@edforge/archetype'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useStudentAccounts,
@@ -428,8 +429,8 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
           </div>
           <span className="font-medium text-[rgb(var(--text-primary))]">
             {account.studentName || (
-              <span className="text-[rgb(var(--text-tertiary))] font-mono text-xs" title={account.studentId}>
-                {account.studentId?.slice(0, 8) || '-'}
+              <span className="text-[rgb(var(--text-tertiary))] text-xs">
+                <UuidBadge value={account.studentId ?? ''} />
               </span>
             )}
           </span>
