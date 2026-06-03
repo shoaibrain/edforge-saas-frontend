@@ -35,12 +35,15 @@ export function UuidBadge({ value, masked = false }: UuidBadgeProps) {
   }
 
   const onCopy = async () => {
+    // Guard on API presence: optional-chaining alone would resolve to undefined
+    // in insecure contexts, falsely flashing "copied" without writing anything.
+    if (!navigator.clipboard?.writeText) return
     try {
-      await navigator.clipboard?.writeText(value)
+      await navigator.clipboard.writeText(value)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
-      // clipboard unavailable (e.g. insecure context) — silently no-op
+      // clipboard write rejected (e.g. permission denied) — silently no-op
     }
   }
 
