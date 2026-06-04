@@ -99,6 +99,8 @@
     "paymentMethod": "भुक्तानी विधि",
     "paidBy": "भुक्तानीकर्ता",
     "studentName": "विद्यार्थी",
+    "studentNumber": "विद्यार्थी नं.",
+    "emisStudentId": "EMIS ID",
     "schoolName": "विद्यालय",
     "downloadPdf": "PDF डाउनलोड गर्नुहोस्",
     "emailReceipt": "रसिद इमेल गर्नुहोस्",

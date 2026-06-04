@@ -135,6 +135,20 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
         {/* Receipt fields */}
         <div className="space-y-2 text-sm mb-6">
           <ReceiptField label={t('receipt.studentName')} value={receipt.studentName} />
+          {receipt.studentNumber && (
+            <ReceiptField
+              label={t('receipt.studentNumber')}
+              value={receipt.studentNumber}
+              mono
+            />
+          )}
+          {receipt.emisStudentId && (
+            <ReceiptField
+              label={t('receipt.emisStudentId')}
+              value={receipt.emisStudentId}
+              mono
+            />
+          )}
           <ReceiptField
             label={t('receipt.paymentDate')}
             value={<DateDisplay date={receipt.paidDate} format="long" showDual />}

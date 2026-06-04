@@ -99,6 +99,8 @@
     "paymentMethod": "Payment Method",
     "paidBy": "Paid By",
     "studentName": "Student",
+    "studentNumber": "Student No.",
+    "emisStudentId": "EMIS ID",
     "schoolName": "School",
     "downloadPdf": "Download PDF",
     "emailReceipt": "Email Receipt",

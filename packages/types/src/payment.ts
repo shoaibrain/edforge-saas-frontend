@@ -266,6 +266,8 @@ export interface Receipt {
   transactionId: string // Gateway transaction ID
   studentName: string
   studentId: string
+  studentNumber?: string // School's operator-facing roll number — primary on-receipt identifier
+  emisStudentId?: string // CEHRD/IEMIS government identifier — secondary, for official reconciliation
   schoolName: string
   schoolAddress?: string
   schoolPhone?: string
