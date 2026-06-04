@@ -97,7 +97,7 @@
     "transactionId": "कारोबार ID",
     "paymentDate": "भुक्तानी मिति",
     "paymentMethod": "भुक्तानी विधि",
-    "paidBy": "भुक्तानीकर्ता",
+    "paidBy": "अभिलेखकर्ता",
     "studentName": "विद्यार्थी",
     "studentNumber": "विद्यार्थी नं.",
     "emisStudentId": "EMIS ID",
