@@ -173,21 +173,28 @@ the PABSON tenant via `pnpm dev:shell`; GENERIC unchanged.
 PDF receipt) and ship the hardening gates. This is PR #95 Sprints 6–7, with the
 backend handshake coordinated against the `edforge` repo.
 
-**Demo.** Downloaded PDF receipt for a PABSON tenant shows `Student ID:
-1708400128200043` (EMIS) + `Paid By: <resolved name>` — matching the on-screen
-receipt from GF2.2. Dashboards show 0% raw-UUID render events; a11y + Playwright
-e2e green.
+**Demo.** Downloaded PDF receipt for a PABSON tenant shows `Student No.` +
+`EMIS ID: 1708400128200043` + `Recorded By: <resolved name>` — matching the
+on-screen receipt from GF2.2. Dashboards show 0% raw-UUID render events; a11y +
+Playwright e2e green.
 
 | # | Title | Validation |
 |---|---|---|
-| GF4.1 | Execute PR #95 **S6-T1/T2/T3** (define `IdentifierDisplayPayload` contract with backend; `useDownloadReceiptPdf` accepts `displayIdentifiers`; `PaymentReceipt.tsx` pre-computes them via `resolveIdentifier` + `usePaidByUser`). File the backend ticket in `edforge` for the PDF generator. | Per PR #95 S6 validations; contract doc; mutation snapshot test; manual PDF download shows correct values. |
+| GF4.1 | **SHIPPED EARLY, BE-led (2026-06-04)** — supersedes the FE-pre-computed `IdentifierDisplayPayload` originally sketched here. Receipt identifiers resolve server-side (a receipt is a legal document the server must own; V1.5 server-initiated receipts have no browser to pre-compute). BE [shoaibrain/edforge#238](https://github.com/shoaibrain/edforge/pull/238) (merged+deployed): `ReceiptPdf` renders school No. + EMIS, drops the `studentId` UUID; `payments.service` resolves them + the recorder name via `GET /users/:id/display-name`; "Paid By" → "Recorded By". FE PR #106: on-screen `studentNumber`/`emisStudentId` rows + relabel. | Verified in prod (PDF: Student No. + EMIS ID + human Recorded By); #106 visual smoke → merge. |
 | GF4.2 | Execute PR #95 **S6-T4** (verify PDF e2e on PABSON tenant; GENERIC unchanged). | Manual PDF review attached; backend integration test green. |
 | GF4.3 | Execute PR #95 **S7** (a11y audit, perf/re-render budget on 100-row lists, `identifier.fallback_used` telemetry, Playwright `identifier-display.spec.ts`, S0 audit closeout). | Per PR #95 S7 validations; axe-core CI green; Playwright green; telemetry tile live. |
 
-> PR #95 **S6-T5** (extract the shared registry into `@aibrains/shared-types` so
-> backend imports the same identifier source of truth) is the cross-repo
-> convergence point: it aligns with backend GB0's `GovernanceProfile`. Track it as
-> the post-GF5 convergence initiative, not a GF4 ticket.
+> **GF4.1b (convergence) — was PR #95 S6-T5, now pulled forward.** GF4.1 shipped
+> BE-led, so the backend resolves the identifier *selection* (PABSON → studentNumber
+> + EMIS) independently of the FE `@edforge/archetype` registry — two implementations
+> of one rule. Converge onto ONE published source: extract the React-free core of
+> `@edforge/archetype` (`registry.ts` / `resolveIdentifier.ts` / `types.ts`) to a
+> published package, or fold the selection rules into `@aibrains/shared-types`
+> (already a backend consumer), so the BE receipt resolver and the FE on-screen path
+> read the same registry. **Low urgency at one archetype (drift ~0); do before Wave
+> 4 / CBS.** Acceptance: adding a governance body edits the registry only — PDF +
+> screen update with no BE PDF-generator change. Aligns with backend GB0. See
+> `edforge` `execution-and-orchestration.md` §2.1.
 
 **Demo gate (Sprint GF4):** PR #95 Sprint 6 + 7 verification flows.
 

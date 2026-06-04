@@ -14,14 +14,9 @@
  * `FinanceLayout`'s `useFinanceSettings` directly — no shell-context
  * dependency, no cross-MFE source imports.
  *
- * A near-identical copy still lives at
- *   `apps/shell/src/components/payments/PaymentReceipt.tsx`
- * to keep the parent portal flows working untouched. The two will
- * converge once parent portal is officially deprecated or moved into
- * its own MFE with its own receipt view.
- *
- * If you're patching one, consider patching the other too — they're
- * intentionally duplicated, not accidentally so.
+ * This is the only PaymentReceipt component in the tree today — there is no
+ * shell-side duplicate to keep in sync. If a parent-portal receipt view
+ * returns, it should be its own component, not a hand-synced copy.
  */
 
 import { useCallback } from 'react'
