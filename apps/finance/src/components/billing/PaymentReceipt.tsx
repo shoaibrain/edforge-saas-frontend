@@ -14,14 +14,9 @@
  * `FinanceLayout`'s `useFinanceSettings` directly — no shell-context
  * dependency, no cross-MFE source imports.
  *
- * A near-identical copy still lives at
- *   `apps/shell/src/components/payments/PaymentReceipt.tsx`
- * to keep the parent portal flows working untouched. The two will
- * converge once parent portal is officially deprecated or moved into
- * its own MFE with its own receipt view.
- *
- * If you're patching one, consider patching the other too — they're
- * intentionally duplicated, not accidentally so.
+ * This is the only PaymentReceipt component in the tree today — there is no
+ * shell-side duplicate to keep in sync. If a parent-portal receipt view
+ * returns, it should be its own component, not a hand-synced copy.
  */
 
 import { useCallback } from 'react'
@@ -135,6 +130,20 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
         {/* Receipt fields */}
         <div className="space-y-2 text-sm mb-6">
           <ReceiptField label={t('receipt.studentName')} value={receipt.studentName} />
+          {receipt.studentNumber && (
+            <ReceiptField
+              label={t('receipt.studentNumber')}
+              value={receipt.studentNumber}
+              mono
+            />
+          )}
+          {receipt.emisStudentId && (
+            <ReceiptField
+              label={t('receipt.emisStudentId')}
+              value={receipt.emisStudentId}
+              mono
+            />
+          )}
           <ReceiptField
             label={t('receipt.paymentDate')}
             value={<DateDisplay date={receipt.paidDate} format="long" showDual />}
