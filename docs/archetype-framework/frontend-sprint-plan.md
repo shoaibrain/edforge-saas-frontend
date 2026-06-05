@@ -177,19 +177,22 @@ path remains for unconstrained operators (per P2.2's anti-rigidity note).
 > archetype (degrade rules intact: NPL→PABSON, unknown→GENERIC) and the
 > currency/timezone/calendar defaults the governance body locks — read straight
 > from the GF3.1 matrix (`getArchetypeProfile` + `allowedValuesFor`), so it gives
-> the constrained dropdowns below a visible "why". Component test 6/6; the
-> **`pnpm dev:shell` visual smoke is the operator-facing confirmation step**.
-> **GF3.5 remains** — the panel uses plain-English strings to match the rest of
-> the (not-yet-i18n'd) workspace page; GF3.5 lifts the whole Regional/Governance
-> region into `en`+`ne` keys in one pass, gated by GF0.8 coverage.
+> the constrained dropdowns below a visible "why". Component test 6/6; **visual
+> smoke confirmed on the live Saraswati PABSON tenant [2026-06-05]** — card
+> renders `PABSON — Private & Boarding Schools, Nepal` + 🔒 NPR / 🔒 Asia/Kathmandu
+> / 🔒 Bikram Sambat (BS), with the Regional dropdowns below correctly narrowed.
+> **GF3.5 shipped** — the `GovernanceProfileCard` strings are now i18n keys under
+> the `settings` namespace (`workspace.governanceProfile.*`) in both `en` and
+> `ne`, with English `defaultValue` fallbacks; the `@edforge/i18n` locale-parity
+> test (GF0.8 gate) keeps the two locales in lockstep. **This closes Sprint GF3.**
 
 | # | Title | Validation |
 |---|---|---|
 | GF3.1 | Define `ArchetypeFeatureMatrix` semantics in `@edforge/archetype`: per-field `required` / `optional` / `hidden` and per-control `allowedValues`. Populate PABSON (NPR/Asia-Kathmandu/bikram_sambat; `emisSchoolCode` required) + GENERIC (open). | Unit test: matrix lookups for PABSON vs GENERIC; conformance suite (GF0.8) now also asserts matrix completeness. |
-| GF3.2 | **✅ SHIPPED [2026-06-05].** Workspace-settings dropdowns (`apps/shell/src/pages/settings/workspace.tsx` → `WorkspaceSettingsPage`) source options via `constrainOptionsByArchetype` (backed by `allowedValuesFor`): PABSON → NPR / Asia-Kathmandu / Bikram-Sambat only, GENERIC → full list, with the saved value always preserved (no silent switch). | Route-trace in commit body; logic unit test 6/6 (PABSON-narrow / GENERIC-full / preserve-legacy); **operator-facing `pnpm dev:shell` visual smoke pending**. |
+| GF3.2 | **✅ SHIPPED [2026-06-05].** Workspace-settings dropdowns (`apps/shell/src/pages/settings/workspace.tsx` → `WorkspaceSettingsPage`) source options via `constrainOptionsByArchetype` (backed by `allowedValuesFor`): PABSON → NPR / Asia-Kathmandu / Bikram-Sambat only, GENERIC → full list, with the saved value always preserved (no silent switch). | Route-trace in commit body; logic unit test 6/6 (PABSON-narrow / GENERIC-full / preserve-legacy); **visual smoke confirmed on live Saraswati tenant [2026-06-05]** (Currency → NPR only, Calendar → Bikram Sambat). |
 | GF3.3 | **✅ SHIPPED [2026-06-05].** The school-create wizard already required `emisSchoolCode` for PABSON (Sprint C Gap 3); converged so the required-ness is read from the GF3.1 matrix (`fieldRequirement('emisSchoolCode', archetype) === 'required'`) in both `school-wizard.schemas.ts` and `BasicInfoStep.tsx` — a future required field is now a data change, not code. | Route-trace; existing `school-wizard.schemas.test.ts` (PABSON-required / GENERIC-optional) green; **`pnpm dev:shell` visual smoke pending**. |
-| GF3.4 | **✅ SHIPPED [2026-06-05].** `GovernanceProfileCard` on `/settings/workspace` (above Regional Settings) shows the resolved archetype + the currency/timezone/calendar defaults the governance body locks, read from the GF3.1 matrix (`getArchetypeProfile` + `allowedValuesFor`); each locked control carries a `Locked by governance body` a11y label. | Component test 6/6 (PABSON-locked / GENERIC-open / NPL→PABSON degrade / unknown→GENERIC / lock-indicator count); **`pnpm dev:shell` visual smoke pending**. |
-| GF3.5 | i18n: add `ne` + `en` strings for all new matrix labels; GF0.8 coverage test gates it. | Coverage test green; missing `ne` string fails red. |
+| GF3.4 | **✅ SHIPPED [2026-06-05].** `GovernanceProfileCard` on `/settings/workspace` (above Regional Settings) shows the resolved archetype + the currency/timezone/calendar defaults the governance body locks, read from the GF3.1 matrix (`getArchetypeProfile` + `allowedValuesFor`); each locked control carries a `Locked by governance body` a11y label. | Component test 6/6 (PABSON-locked / GENERIC-open / NPL→PABSON degrade / unknown→GENERIC / lock-indicator count); **visual smoke confirmed on live Saraswati tenant [2026-06-05]**. |
+| GF3.5 | **✅ SHIPPED [2026-06-05].** `GovernanceProfileCard` strings lifted into `en`+`ne` i18n keys under `settings` → `workspace.governanceProfile.*` (title, subtitle, field labels, `operatorChoice`, locked a11y label, archetype + calendar value labels), each with an English `defaultValue` fallback. | `@edforge/i18n` locale-parity test (GF0.8 gate) green — en↔ne key parity + non-empty `ne` values; card component test 6/6 (i18n mocked to `defaultValue`). |
 
 **Demo gate (Sprint GF3):** archetype-gated dropdowns + required-field behavior on
 the PABSON tenant via `pnpm dev:shell`; GENERIC unchanged.

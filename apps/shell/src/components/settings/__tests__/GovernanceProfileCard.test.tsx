@@ -1,5 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, cleanup, within } from '@testing-library/react'
+
+// i18n is mocked the way the rest of the shell mocks it (see branding tests):
+// `t` returns the English `defaultValue` the component passes, so these tests
+// assert the operator-facing copy without standing up an i18next instance.
+vi.mock('@edforge/i18n', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key,
+  }),
+}))
+
 import { GovernanceProfileCard } from '../GovernanceProfileCard'
 
 /**

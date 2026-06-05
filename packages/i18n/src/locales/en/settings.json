@@ -80,7 +80,25 @@
   },
   "workspace": {
     "title": "Workspace",
-    "description": "Manage workspace settings"
+    "description": "Manage workspace settings",
+    "governanceProfile": {
+      "title": "Governance Profile",
+      "subtitle": "Regional defaults your governance body locks. Set at provisioning, applied tenant-wide.",
+      "governanceBody": "Governance Body",
+      "currency": "Currency",
+      "timezone": "Timezone",
+      "calendar": "Calendar",
+      "operatorChoice": "Operator's choice",
+      "locked": "Locked by governance body",
+      "archetype": {
+        "PABSON": "PABSON — Private & Boarding Schools, Nepal",
+        "GENERIC": "Generic"
+      },
+      "calendarValue": {
+        "gregorian": "Gregorian",
+        "bikram_sambat": "Bikram Sambat (BS)"
+      }
+    }
   },
   "organization": {
     "title": "Organization",
