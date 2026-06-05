@@ -134,6 +134,16 @@ interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
   generatedTerms?: CreateGradingPeriodDto[]
 }
 
+/**
+ * Period count for a bell-schedule row, tolerant of the field shapes the API
+ * returns (`periodCount`, or the `classPeriods` / `periods` arrays). Single
+ * source for the C.4/C.5 "real default" predicate so the step-completion check
+ * and the placeholder chip can't drift apart.
+ */
+function getPeriodCount(schedule: any): number {
+  return schedule.periodCount ?? schedule.classPeriods?.length ?? schedule.periods?.length ?? 0
+}
+
 export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabProps) {
   const localeDefaults = useLocaleDefaults()
   const queryClient = useQueryClient()
@@ -251,12 +261,21 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
   const bellSchedules = (bellSchedulesData as any)?.items || (bellSchedulesData as any)?.data || (Array.isArray(bellSchedulesData) ? bellSchedulesData : [])
 
   // Wizard step completion
+  // C.5 follow-up — the bell-schedule step mirrors the backend C.4 activation
+  // predicate exactly (default + multi-period, with active schools
+  // grandfathered) so this in-tab checkmark can't disagree with the
+  // school-detail activation gate. A loose `length > 0` here showed ✓ while
+  // the gate refused activation on a placeholder default — the contradiction
+  // the C.5 chip surfaced but didn't resolve.
+  const hasRealDefaultBell = bellSchedules.some(
+    (b: any) => b.isDefault && getPeriodCount(b) > 1,
+  )
   const steps: WizardStepConfig[] = useMemo(() => [
     { id: 'years', label: 'Academic Years', completed: years.length > 0 },
     { id: 'sessions', label: 'Sessions & Terms', completed: sessions.length > 0 },
     { id: 'calendar', label: 'Calendar', completed: (calendarStats as any)?.totalDays > 0 },
-    { id: 'bell-schedule', label: 'Bell Schedule', completed: bellSchedules.length > 0 },
-  ], [years, sessions, calendarStats, bellSchedules])
+    { id: 'bell-schedule', label: 'Bell Schedule', completed: school?.status === 'active' || hasRealDefaultBell },
+  ], [years, sessions, calendarStats, hasRealDefaultBell, school?.status])
 
   // Default to first incomplete step
   const firstIncomplete = steps.find(s => !s.completed)?.id || 'years'
@@ -2645,13 +2664,30 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       {/* Bell Schedule list or empty state */}
       {bellSchedules.length > 0 ? (
         <div className="space-y-2">
-          {bellSchedules.map((sched: any) => (
+          {bellSchedules.map((sched: any) => {
+            // C.5 — flag a default bell-schedule that's a single-period
+            // placeholder (e.g. "Regular Day"). The backend C.4 predicate
+            // rejects such rows from satisfying the bell_schedule activation
+            // gate, so giving the operator a visible cue here lets them fix
+            // it before they hit the activation refusal. Predicate mirrors
+            // backend exactly: isDefault && periodCount <= 1.
+            const isPlaceholderDefault = sched.isDefault && getPeriodCount(sched) <= 1
+            return (
             <div key={sched.bellScheduleId || sched.id} className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg overflow-hidden">
               <div className="px-3 py-2.5 flex items-center justify-between border-b border-[rgba(255,255,255,0.04)]">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">{sched.bellScheduleName || sched.name}</span>
                   {sched.isDefault && (
                     <span className="text-[9px] font-medium px-1.5 py-px rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.2)]">Default</span>
+                  )}
+                  {isPlaceholderDefault && (
+                    <span
+                      data-testid="bell-schedule-placeholder-chip"
+                      title="This default schedule has only one period. Set a real schedule before activating the academic year."
+                      className="text-[9px] font-medium px-1.5 py-px rounded bg-[rgba(239,159,39,0.12)] text-[#EF9F27] border border-[rgba(239,159,39,0.35)]"
+                    >
+                      Placeholder — set a real schedule before activating AY
+                    </span>
                   )}
                 </div>
                 <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
@@ -2677,7 +2713,8 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                 </div>
               )}
             </div>
-          ))}
+            )
+          })}
         </div>
       ) : (
         <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
