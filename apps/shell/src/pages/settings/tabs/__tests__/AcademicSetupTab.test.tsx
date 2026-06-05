@@ -54,8 +54,11 @@ vi.mock('@/hooks/useCalendar', () => ({
   useCreateAcademicSession: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
+// C.5 — bell-schedule items are wired through a top-level mutable ref so
+// individual tests can seed schedules and assert the placeholder-chip render.
+const mockBellSchedulesRef: { items: unknown[] } = { items: [] }
 vi.mock('@/hooks/useBellSchedules', () => ({
-  useBellSchedules: () => ({ data: { items: [] } }),
+  useBellSchedules: () => ({ data: { items: mockBellSchedulesRef.items } }),
   useCreateBellSchedule: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
@@ -172,6 +175,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  mockBellSchedulesRef.items = []
 })
 
 // ----------------------------------------------------------------------------
@@ -287,5 +291,70 @@ describe('AcademicSetupTab — defensive error handling (PR #101 review)', () =>
       expect.stringContaining('missing yearId'),
     )
     expect(mockSetCurrentAcademicYear).not.toHaveBeenCalled()
+  })
+})
+
+// ============================================================================
+// C.5 — placeholder chip on a single-period default bell-schedule
+// ============================================================================
+describe('AcademicSetupTab — C.5 placeholder chip', () => {
+  function renderBellStep() {
+    const utils = renderTab([ay()])
+    fireEvent.click(utils.getByText('Bell Schedule'))
+    return utils
+  }
+
+  it('renders the yellow Placeholder chip when the default bell-schedule has periodCount <= 1', () => {
+    mockBellSchedulesRef.items = [
+      {
+        bellScheduleId: 'bs-1',
+        bellScheduleName: 'Regular Day',
+        isDefault: true,
+        periodCount: 1,
+        classPeriods: [
+          { classPeriodName: 'Whole Day', periodNumber: 1, periodType: 'instructional', startTime: '08:00', endTime: '15:00', durationMinutes: 420, isAcademic: true },
+        ],
+      },
+    ]
+    const { getByTestId } = renderBellStep()
+    expect(getByTestId('bell-schedule-placeholder-chip').textContent).toMatch(/Placeholder/)
+  })
+
+  it('does NOT render the chip when the default bell-schedule has periodCount > 1', () => {
+    mockBellSchedulesRef.items = [
+      {
+        bellScheduleId: 'bs-2',
+        bellScheduleName: 'Nepal Standard',
+        isDefault: true,
+        periodCount: 8,
+        classPeriods: Array.from({ length: 8 }, (_, i) => ({
+          classPeriodName: `Period ${i + 1}`,
+          periodNumber: i + 1,
+          periodType: 'instructional',
+          startTime: '10:00',
+          endTime: '10:45',
+          durationMinutes: 45,
+          isAcademic: true,
+        })),
+      },
+    ]
+    const { queryByTestId } = renderBellStep()
+    expect(queryByTestId('bell-schedule-placeholder-chip')).toBeNull()
+  })
+
+  it('does NOT render the chip on a non-default schedule even if it has only one period', () => {
+    mockBellSchedulesRef.items = [
+      {
+        bellScheduleId: 'bs-3',
+        bellScheduleName: 'Half Day',
+        isDefault: false,
+        periodCount: 1,
+        classPeriods: [
+          { classPeriodName: 'AM', periodNumber: 1, periodType: 'instructional', startTime: '08:00', endTime: '12:00', durationMinutes: 240, isAcademic: true },
+        ],
+      },
+    ]
+    const { queryByTestId } = renderBellStep()
+    expect(queryByTestId('bell-schedule-placeholder-chip')).toBeNull()
   })
 })
