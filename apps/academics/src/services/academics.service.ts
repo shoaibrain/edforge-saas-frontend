@@ -12,6 +12,8 @@ import type {
   ExamListResponseDto,
   CreateExamDto,
   ExamStatus,
+  ResultCardResponseDto,
+  ResultCardListResponseDto,
 } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -2013,6 +2015,81 @@ export async function createExam(data: CreateExamDto): Promise<ExamResponseDto> 
 }
 
 // ============================================================================
+// RESULT CARDS (Ed-Fi ReportCard — generated when an exam closes)
+// ============================================================================
+
+export interface ResultCardListParams {
+  examId?: string
+  schoolId?: string
+  enrollmentId?: string
+  studentId?: string
+  termId?: string
+  status?: 'draft' | 'published'
+  limit?: number
+  cursor?: string
+}
+
+/**
+ * List result cards. GET /academics/result-cards (scoped by examId here).
+ */
+export async function getResultCards(params: ResultCardListParams): Promise<ResultCardListResponseDto> {
+  const queryParams: Record<string, unknown> = {}
+  if (params.examId) queryParams.examId = params.examId
+  if (params.schoolId) queryParams.schoolId = params.schoolId
+  if (params.enrollmentId) queryParams.enrollmentId = params.enrollmentId
+  if (params.studentId) queryParams.studentId = params.studentId
+  if (params.termId) queryParams.termId = params.termId
+  if (params.status) queryParams.status = params.status
+  if (params.limit) queryParams.limit = params.limit
+  if (params.cursor) queryParams.cursor = params.cursor
+  return apiGet<ResultCardListResponseDto>('/academics/result-cards', queryParams)
+}
+
+/**
+ * Update operator conduct. PATCH /academics/result-cards/{cardId}/conduct?enrollmentId=
+ * `enrollmentId` is required (Invariant 3 — the entity is keyed by it).
+ */
+export async function updateResultCardConduct(
+  cardId: string,
+  enrollmentId: string,
+  conduct: string,
+): Promise<ResultCardResponseDto> {
+  return apiPatch<ResultCardResponseDto>(
+    `/academics/result-cards/${cardId}/conduct?enrollmentId=${encodeURIComponent(enrollmentId)}`,
+    { conduct },
+  )
+}
+
+/**
+ * Update class-teacher remark. PATCH /academics/result-cards/{cardId}/remark?enrollmentId=
+ */
+export async function updateResultCardRemark(
+  cardId: string,
+  enrollmentId: string,
+  classTeacherRemark: string,
+): Promise<ResultCardResponseDto> {
+  return apiPatch<ResultCardResponseDto>(
+    `/academics/result-cards/${cardId}/remark?enrollmentId=${encodeURIComponent(enrollmentId)}`,
+    { classTeacherRemark },
+  )
+}
+
+/**
+ * Publish a result card (terminal). PATCH /academics/result-cards/{cardId}/publish?enrollmentId=
+ * A second publish returns 409 RESULT_ALREADY_PUBLISHED.
+ */
+export async function publishResultCard(
+  cardId: string,
+  enrollmentId: string,
+  notes?: string,
+): Promise<ResultCardResponseDto> {
+  return apiPatch<ResultCardResponseDto>(
+    `/academics/result-cards/${cardId}/publish?enrollmentId=${encodeURIComponent(enrollmentId)}`,
+    notes ? { notes } : {},
+  )
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -2020,6 +2097,10 @@ export const academicsService = {
   getExams,
   getExamPattern,
   createExam,
+  getResultCards,
+  updateResultCardConduct,
+  updateResultCardRemark,
+  publishResultCard,
   // Student CRUD
   getStudents,
   getStudent,

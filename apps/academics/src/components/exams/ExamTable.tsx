@@ -1,6 +1,6 @@
 /**
- * ExamTable — read-only list of exams for a school + academic year.
- * Slice 1: list display. Row actions (open detail) land in a later slice.
+ * ExamTable — list of exams for a school + academic year. Rows open the exam's
+ * result cards (Ed-Fi ReportCard) via onSelectExam.
  */
 
 import { ClipboardList } from 'lucide-react'
@@ -11,6 +11,7 @@ interface ExamTableProps {
   exams: ExamResponseDto[]
   termNameById: Record<string, string>
   isLoading: boolean
+  onSelectExam?: (exam: ExamResponseDto) => void
 }
 
 function StatusBadge({ status }: { status: ExamResponseDto['status'] }) {
@@ -22,7 +23,7 @@ function StatusBadge({ status }: { status: ExamResponseDto['status'] }) {
   )
 }
 
-export function ExamTable({ exams, termNameById, isLoading }: ExamTableProps) {
+export function ExamTable({ exams, termNameById, isLoading, onSelectExam }: ExamTableProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -59,7 +60,18 @@ export function ExamTable({ exams, termNameById, isLoading }: ExamTableProps) {
         </thead>
         <tbody className="divide-y divide-border-secondary">
           {exams.map((exam) => (
-            <tr key={exam.examId} className="bg-surface-primary hover:bg-surface-secondary/50 transition-colors">
+            <tr
+              key={exam.examId}
+              onClick={() => onSelectExam?.(exam)}
+              onKeyDown={(e) => {
+                if (onSelectExam && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  onSelectExam(exam)
+                }
+              }}
+              tabIndex={onSelectExam ? 0 : undefined}
+              className={`bg-surface-primary hover:bg-surface-secondary/50 transition-colors ${onSelectExam ? 'cursor-pointer' : ''}`}
+            >
               <td className="px-4 py-3 font-medium text-text-primary">{exam.examName}</td>
               <td className="px-4 py-3 text-text-secondary">{humanizeExamType(exam.examType)}</td>
               <td className="px-4 py-3 text-text-secondary">{termNameById[exam.termId] ?? '—'}</td>
