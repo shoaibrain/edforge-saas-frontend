@@ -25,7 +25,7 @@ import {
   useLocaleHolidays,
   useCreateAcademicSession,
 } from '@/hooks/useCalendar'
-import { useBellSchedules, useCreateBellSchedule } from '@/hooks/useBellSchedules'
+import { useBellSchedules, useCreateBellSchedule, useSetDefaultBellSchedule } from '@/hooks/useBellSchedules'
 import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
 import { type DayOfWeek, dayToIndex } from '@/utils/localeDefaults'
 import { adToBS, BS_MONTH_NAMES_EN } from '@edforge/date-utils'
@@ -101,6 +101,16 @@ const HIGH_SCHOOL_PRESET = [
   { name: 'Period 5', startTime: '12:25', endTime: '13:15', periodType: 'instructional', sortOrder: 6, isAcademic: true },
   { name: 'Period 6', startTime: '13:20', endTime: '14:10', periodType: 'instructional', sortOrder: 7, isAcademic: true },
   { name: 'Period 7', startTime: '14:15', endTime: '15:05', periodType: 'instructional', sortOrder: 8, isAcademic: true },
+] as const
+
+// PABSON exam-day shift — mirrors the backend ARCHETYPE_BELL_PRESETS PABSON
+// exam_day preset (two long testing blocks + a midday break). TODO(bell-presets):
+// this + NEPAL_PRESET duplicate the backend registry; the planned registry-backed
+// template source removes them and the FE/BE drift with them.
+const NEPAL_EXAM_PRESET = [
+  { name: 'Morning Exam', startTime: '10:00', endTime: '13:00', periodType: 'instructional', sortOrder: 0, isAcademic: true },
+  { name: 'Lunch', startTime: '13:00', endTime: '14:00', periodType: 'lunch', sortOrder: 1, isAcademic: false },
+  { name: 'Afternoon Exam', startTime: '14:00', endTime: '16:00', periodType: 'instructional', sortOrder: 2, isAcademic: true },
 ] as const
 
 // ============================================================================
@@ -2438,11 +2448,29 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
   isNepal: boolean
   activeYear: any
 }) {
-  const [showHowItWorks, setShowHowItWorks] = useState(bellSchedules.length === 0)
-  const [showTemplates, setShowTemplates] = useState(true)
+  // P1 — single predicate used by auto-promote-on-apply, the "no usable
+  // default" banner, AND the setup/manage page mode (below).
+  const hasRealDefaultBell = bellSchedules.some(
+    (b: any) => b.isDefault && getPeriodCount(b) > 1,
+  )
+
+  // Setup vs Manage mode. Until the school has a *usable* default the page is
+  // in first-run setup: templates lead, the explainer is offered. Once a real
+  // default exists it's a management surface — templates + explainer collapse
+  // behind their buttons so the schedule list is the focus. Overrides (null =
+  // follow the data-driven default) let the operator re-open either on demand.
+  // Deriving from live `bellSchedules` rather than a useState captured at mount
+  // also fixes the stale-initial bug where the async-loading empty list left
+  // both panels expanded for schools that already had schedules.
+  const isSetupMode = !hasRealDefaultBell
+  const [showHowItWorksOverride, setShowHowItWorksOverride] = useState<boolean | null>(null)
+  const showHowItWorks = showHowItWorksOverride ?? (bellSchedules.length === 0)
+  const [showTemplatesOverride, setShowTemplatesOverride] = useState<boolean | null>(null)
+  const showTemplates = showTemplatesOverride ?? isSetupMode
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newName, setNewName] = useState('')
   const createBellSchedule = useCreateBellSchedule(schoolId)
+  const setDefaultBell = useSetDefaultBellSchedule(schoolId)
 
   // Fetch school config for default period times
   const { data: schoolConfig } = useQuery<any>({
@@ -2454,12 +2482,17 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
   const defaultStartTime = schoolConfig?.startTime || '08:00'
   const defaultPeriodDuration = schoolConfig?.periodDuration || 45
 
-  const applyTemplate = (name: string, preset: readonly any[]) => {
+  const applyTemplate = (name: string, preset: readonly any[], dayType: 'regular' | 'testing' = 'regular') => {
     createBellSchedule.mutate({
       bellScheduleName: name,
-      dayType: 'regular',
+      dayType,
       effectiveDate: new Date().toISOString().split('T')[0],
-      isDefault: bellSchedules.length === 0,
+      // P1 — auto-promote when there is no *real* default yet. Pre-P1 this
+      // checked only `length === 0`, so applying Nepal Standard with a
+      // single-period "Regular Day" placeholder already present left the
+      // placeholder as the default. The backend's clear-old-when-set-new
+      // semantics handle the demotion safely.
+      isDefault: !hasRealDefaultBell,
       isActive: true,
       classPeriods: preset.map((p, i) => {
         const [sh, sm] = p.startTime.split(':').map(Number)
@@ -2477,37 +2510,51 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
     })
   }
 
-  // Order templates: Nepal first if isNepal
-  const templates = [
-    ...(isNepal ? [{
-      key: 'nepal',
-      name: 'Nepal Standard (Sun–Fri)',
-      desc: '9 periods · 10:00 AM – 3:45 PM · Includes assembly, lunch, recess',
-      preset: NEPAL_PRESET,
-      primary: true,
-    }] : []),
-    {
-      key: 'elementary',
-      name: 'Elementary Schedule (US)',
-      desc: '9 periods · 8:00 AM – 2:00 PM · Includes homeroom, recess, lunch',
-      preset: ELEMENTARY_PRESET,
-      primary: false,
-    },
-    {
-      key: 'highschool',
-      name: 'High School Schedule (US)',
-      desc: '9 periods · 7:30 AM – 3:05 PM · Includes advisory and lunch',
-      preset: HIGH_SCHOOL_PRESET,
-      primary: false,
-    },
-    ...(!isNepal ? [{
-      key: 'nepal',
-      name: 'Nepal Standard (Sun–Fri)',
-      desc: '9 periods · 10:00 AM – 3:45 PM · Includes assembly, lunch, recess',
-      preset: NEPAL_PRESET,
-      primary: false,
-    }] : []),
-  ]
+  // Templates are governance-body-relevant only: a Nepal/PABSON school sees
+  // PABSON shifts, a US school sees the US shifts. Pre-this-change the US
+  // templates were shown to every school (isNepal only changed their *order*),
+  // which surfaced "Elementary Schedule (US)" on a Nepal PABSON pilot — noise
+  // and a wrong-governance-body signal. `isNepal` is the operative V1 signal
+  // (PABSON ⟺ Nepal); the registry-backed follow-up keys on archetype and
+  // sources these from the backend ARCHETYPE_BELL_PRESETS so name + structure
+  // match what school-create seeds.
+  const templates: {
+    key: string; name: string; desc: string; preset: readonly any[];
+    primary: boolean; dayType?: 'regular' | 'testing';
+  }[] = isNepal
+    ? [
+        {
+          key: 'nepal',
+          name: 'Nepal Standard (Sun–Fri)',
+          desc: '9 periods · 10:00 AM – 3:45 PM · Includes assembly, lunch, recess',
+          preset: NEPAL_PRESET,
+          primary: true,
+        },
+        {
+          key: 'nepal-exam',
+          name: 'PABSON Exam Day',
+          desc: '2 exam blocks · 10:00 AM – 4:00 PM · Morning & afternoon exams',
+          preset: NEPAL_EXAM_PRESET,
+          dayType: 'testing',
+          primary: false,
+        },
+      ]
+    : [
+        {
+          key: 'elementary',
+          name: 'Elementary Schedule (US)',
+          desc: '9 periods · 8:00 AM – 2:00 PM · Includes homeroom, recess, lunch',
+          preset: ELEMENTARY_PRESET,
+          primary: false,
+        },
+        {
+          key: 'highschool',
+          name: 'High School Schedule (US)',
+          desc: '9 periods · 7:30 AM – 3:05 PM · Includes advisory and lunch',
+          preset: HIGH_SCHOOL_PRESET,
+          primary: false,
+        },
+      ]
 
   const periodTypeColors: Record<string, { bg: string; text: string }> = {
     instructional: { bg: 'rgba(55,138,221,0.1)', text: '#378ADD' },
@@ -2527,7 +2574,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">Define class periods and time slots for each type of school day.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setShowTemplates(v => !v)} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
+          <button onClick={() => setShowTemplatesOverride(!showTemplates)} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
             Use Template
           </button>
           <button onClick={() => setShowCreateForm(true)} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
@@ -2543,7 +2590,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
             <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-[13px]">💡</div>
             <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">How bell schedules work</h3>
           </div>
-          <button onClick={() => setShowHowItWorks(!showHowItWorks)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]">
+          <button onClick={() => setShowHowItWorksOverride(!showHowItWorks)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]">
             {showHowItWorks ? '▲ Collapse' : '▼ Expand'}
           </button>
         </div>
@@ -2584,7 +2631,8 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                   bellScheduleName: newName.trim(),
                   dayType: 'regular',
                   effectiveDate: activeYear?.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-                  isDefault: bellSchedules.length === 0,
+                  // P1 — same auto-promote rule as applyTemplate.
+                  isDefault: !hasRealDefaultBell,
                   isActive: true,
                   classPeriods: [{
                     classPeriodName: 'Period 1',
@@ -2643,7 +2691,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                 <span className="px-3 py-1.5 text-[11px] font-medium text-[#1D9E75]">✓ Applied</span>
               ) : (
               <button
-                onClick={() => applyTemplate(t.name, t.preset)}
+                onClick={() => applyTemplate(t.name, t.preset, t.dayType ?? 'regular')}
                 disabled={createBellSchedule.isPending}
                 className={`px-3 py-1.5 text-[11px] font-medium rounded-lg transition-all ${
                   t.primary
@@ -2664,6 +2712,19 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       {/* Bell Schedule list or empty state */}
       {bellSchedules.length > 0 ? (
         <div className="space-y-2">
+          {!hasRealDefaultBell && (
+            <div
+              data-testid="bell-schedule-no-default-banner"
+              className="bg-[rgba(239,159,39,0.06)] border border-[rgba(239,159,39,0.35)] text-[#EF9F27] rounded-lg px-3 py-2.5 flex items-start gap-2 text-[11px] leading-relaxed"
+            >
+              <span aria-hidden className="text-sm leading-none mt-px">⚠</span>
+              <div className="flex-1">
+                <span className="font-semibold">No usable default bell schedule.</span>{' '}
+                Activation will be refused until a real (multi-period) schedule is marked as the school's default.
+                Use <span className="font-semibold">Set as default</span> on a schedule below.
+              </div>
+            </div>
+          )}
           {bellSchedules.map((sched: any) => {
             // C.5 — flag a default bell-schedule that's a single-period
             // placeholder (e.g. "Regular Day"). The backend C.4 predicate
@@ -2690,7 +2751,27 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
+                <div className="flex items-center gap-2">
+                  {/* P1 — "Set as default" only appears on rows that aren't already
+                      the default AND have a real schedule shape (multi-period).
+                      Without the periodCount guard, the operator could promote a
+                      placeholder, which the backend C.4 gate would still refuse. */}
+                  {!sched.isDefault && getPeriodCount(sched) > 1 && (
+                    <button
+                      data-testid="bell-schedule-set-default-button"
+                      type="button"
+                      onClick={() => {
+                        const id = sched.bellScheduleId || sched.id
+                        if (id) setDefaultBell.mutate(id)
+                      }}
+                      disabled={setDefaultBell.isPending}
+                      className="text-[10px] font-medium px-2 py-0.5 rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.25)] hover:bg-[rgba(29,158,117,0.14)] disabled:opacity-50 transition-colors"
+                    >
+                      Set as default
+                    </button>
+                  )}
+                  <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
+                </div>
               </div>
               {(sched.classPeriods || sched.periods)?.length > 0 && (
                 <div className="py-1.5">
