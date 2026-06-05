@@ -2,18 +2,20 @@
  * Exams Module
  *
  * School + academic-year scoped exam management. Exams are keyed at the
- * (school, academicYear, term) level — not per-section. Slice 1: list + create.
- * Later slices add exam-courses, score entry, and result cards.
+ * (school, academicYear, term) level — not per-section. Clicking an exam opens
+ * its result cards (Ed-Fi ReportCard).
  */
 
 import { useMemo, useState } from 'react'
 import { ClipboardList, Plus } from 'lucide-react'
 import { usePermission } from '@edforge/abac'
+import type { ExamResponseDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool'
 import { useExams, useExamPattern } from '../../hooks/useExams'
 import { ExamTable } from '../../components/exams/ExamTable'
 import { ExamDrawer } from '../../components/exams/ExamDrawer'
+import { ResultCardsDrawer } from '../../components/exams/ResultCardsDrawer'
 
 interface TermOption {
   periodId: string
@@ -24,6 +26,7 @@ export function ExamsModule() {
   const schoolId = useActiveSchoolId() || ''
   const canCreateExam = usePermission('create', 'assessments')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedExam, setSelectedExam] = useState<ExamResponseDto | null>(null)
 
   const { data: currentYear } = useCurrentAcademicYear(schoolId, !!schoolId)
   const academicYearId = currentYear?.yearId ?? ''
@@ -96,7 +99,12 @@ export function ExamsModule() {
             </p>
           </div>
         ) : (
-          <ExamTable exams={exams} termNameById={termNameById} isLoading={isLoading} />
+          <ExamTable
+            exams={exams}
+            termNameById={termNameById}
+            isLoading={isLoading}
+            onSelectExam={setSelectedExam}
+          />
         )}
       </div>
 
@@ -110,6 +118,12 @@ export function ExamsModule() {
           examPattern={examPattern}
         />
       )}
+
+      <ResultCardsDrawer
+        open={!!selectedExam}
+        onClose={() => setSelectedExam(null)}
+        exam={selectedExam}
+      />
     </div>
   )
 }
