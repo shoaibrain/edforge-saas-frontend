@@ -25,7 +25,7 @@ import {
   useLocaleHolidays,
   useCreateAcademicSession,
 } from '@/hooks/useCalendar'
-import { useBellSchedules, useCreateBellSchedule } from '@/hooks/useBellSchedules'
+import { useBellSchedules, useCreateBellSchedule, useSetDefaultBellSchedule } from '@/hooks/useBellSchedules'
 import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
 import { type DayOfWeek, dayToIndex } from '@/utils/localeDefaults'
 import { adToBS, BS_MONTH_NAMES_EN } from '@edforge/date-utils'
@@ -2443,6 +2443,15 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newName, setNewName] = useState('')
   const createBellSchedule = useCreateBellSchedule(schoolId)
+  const setDefaultBell = useSetDefaultBellSchedule(schoolId)
+
+  // P1 — single predicate used by the auto-promote-on-apply (below) and the
+  // "no usable default" banner. Same shape as the AcademicSetupTab-level
+  // hasRealDefaultBell and as the backend C.4 activation check, so the UI
+  // can't drift from the gate.
+  const hasRealDefaultBell = bellSchedules.some(
+    (b: any) => b.isDefault && getPeriodCount(b) > 1,
+  )
 
   // Fetch school config for default period times
   const { data: schoolConfig } = useQuery<any>({
@@ -2459,7 +2468,12 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       bellScheduleName: name,
       dayType: 'regular',
       effectiveDate: new Date().toISOString().split('T')[0],
-      isDefault: bellSchedules.length === 0,
+      // P1 — auto-promote when there is no *real* default yet. Pre-P1 this
+      // checked only `length === 0`, so applying Nepal Standard with a
+      // single-period "Regular Day" placeholder already present left the
+      // placeholder as the default. The backend's clear-old-when-set-new
+      // semantics handle the demotion safely.
+      isDefault: !hasRealDefaultBell,
       isActive: true,
       classPeriods: preset.map((p, i) => {
         const [sh, sm] = p.startTime.split(':').map(Number)
@@ -2584,7 +2598,8 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                   bellScheduleName: newName.trim(),
                   dayType: 'regular',
                   effectiveDate: activeYear?.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-                  isDefault: bellSchedules.length === 0,
+                  // P1 — same auto-promote rule as applyTemplate.
+                  isDefault: !hasRealDefaultBell,
                   isActive: true,
                   classPeriods: [{
                     classPeriodName: 'Period 1',
@@ -2664,6 +2679,19 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       {/* Bell Schedule list or empty state */}
       {bellSchedules.length > 0 ? (
         <div className="space-y-2">
+          {!hasRealDefaultBell && (
+            <div
+              data-testid="bell-schedule-no-default-banner"
+              className="bg-[rgba(239,159,39,0.06)] border border-[rgba(239,159,39,0.35)] text-[#EF9F27] rounded-lg px-3 py-2.5 flex items-start gap-2 text-[11px] leading-relaxed"
+            >
+              <span aria-hidden className="text-sm leading-none mt-px">⚠</span>
+              <div className="flex-1">
+                <span className="font-semibold">No usable default bell schedule.</span>{' '}
+                Activation will be refused until a real (multi-period) schedule is marked as the school's default.
+                Use <span className="font-semibold">Set as default</span> on a schedule below.
+              </div>
+            </div>
+          )}
           {bellSchedules.map((sched: any) => {
             // C.5 — flag a default bell-schedule that's a single-period
             // placeholder (e.g. "Regular Day"). The backend C.4 predicate
@@ -2690,7 +2718,27 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
+                <div className="flex items-center gap-2">
+                  {/* P1 — "Set as default" only appears on rows that aren't already
+                      the default AND have a real schedule shape (multi-period).
+                      Without the periodCount guard, the operator could promote a
+                      placeholder, which the backend C.4 gate would still refuse. */}
+                  {!sched.isDefault && getPeriodCount(sched) > 1 && (
+                    <button
+                      data-testid="bell-schedule-set-default-button"
+                      type="button"
+                      onClick={() => {
+                        const id = sched.bellScheduleId || sched.id
+                        if (id) setDefaultBell.mutate(id)
+                      }}
+                      disabled={setDefaultBell.isPending}
+                      className="text-[10px] font-medium px-2 py-0.5 rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.25)] hover:bg-[rgba(29,158,117,0.14)] disabled:opacity-50 transition-colors"
+                    >
+                      Set as default
+                    </button>
+                  )}
+                  <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
+                </div>
               </div>
               {(sched.classPeriods || sched.periods)?.length > 0 && (
                 <div className="py-1.5">

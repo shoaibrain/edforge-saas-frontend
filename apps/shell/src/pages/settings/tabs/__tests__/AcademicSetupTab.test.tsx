@@ -57,9 +57,13 @@ vi.mock('@/hooks/useCalendar', () => ({
 // C.5 — bell-schedule items are wired through a top-level mutable ref so
 // individual tests can seed schedules and assert the placeholder-chip render.
 const mockBellSchedulesRef: { items: unknown[] } = { items: [] }
+// P1 — the Set-as-default mutation is captured here so tests can assert the
+// row button fires `setDefault.mutate(bellScheduleId)` exactly once.
+const mockSetDefaultBellMutate = vi.fn()
 vi.mock('@/hooks/useBellSchedules', () => ({
   useBellSchedules: () => ({ data: { items: mockBellSchedulesRef.items } }),
   useCreateBellSchedule: () => ({ mutate: vi.fn(), isPending: false }),
+  useSetDefaultBellSchedule: () => ({ mutate: mockSetDefaultBellMutate, isPending: false }),
 }))
 
 vi.mock('@/hooks/useLocaleDefaults', () => ({
@@ -356,5 +360,56 @@ describe('AcademicSetupTab — C.5 placeholder chip', () => {
     ]
     const { queryByTestId } = renderBellStep()
     expect(queryByTestId('bell-schedule-placeholder-chip')).toBeNull()
+  })
+})
+
+// ============================================================================
+// P1 — Set-as-default action + no-usable-default banner
+// ============================================================================
+describe('AcademicSetupTab — P1 default management', () => {
+  function renderBellStep() {
+    const utils = renderTab([ay()])
+    fireEvent.click(utils.getByText('Bell Schedule'))
+    return utils
+  }
+
+  it('renders the no-usable-default banner when schedules exist but none is a real default', () => {
+    mockBellSchedulesRef.items = [
+      // The exact Saraswati prod shape: a multi-period non-default + a placeholder default.
+      { bellScheduleId: 'f443c546', bellScheduleName: 'Nepal Standard', isDefault: false, periodCount: 9 },
+      { bellScheduleId: '36552907', bellScheduleName: 'Regular Day', isDefault: true, periodCount: 1 },
+    ]
+    const { getByTestId } = renderBellStep()
+    expect(getByTestId('bell-schedule-no-default-banner').textContent).toMatch(/No usable default/)
+  })
+
+  it('hides the banner once a real default exists', () => {
+    mockBellSchedulesRef.items = [
+      { bellScheduleId: 'bs-good', bellScheduleName: 'Nepal Standard', isDefault: true, periodCount: 9 },
+    ]
+    const { queryByTestId } = renderBellStep()
+    expect(queryByTestId('bell-schedule-no-default-banner')).toBeNull()
+  })
+
+  it('shows "Set as default" only on non-default rows with periodCount > 1', () => {
+    mockBellSchedulesRef.items = [
+      { bellScheduleId: 'bs-good', bellScheduleName: 'Nepal Standard', isDefault: false, periodCount: 9 },
+      { bellScheduleId: 'bs-default', bellScheduleName: 'Other Default', isDefault: true, periodCount: 8 },
+      { bellScheduleId: 'bs-placeholder', bellScheduleName: 'Single', isDefault: false, periodCount: 1 },
+    ]
+    const { getAllByTestId } = renderBellStep()
+    const buttons = getAllByTestId('bell-schedule-set-default-button')
+    expect(buttons).toHaveLength(1)
+  })
+
+  it('clicking "Set as default" fires the mutation with that schedule id', () => {
+    mockBellSchedulesRef.items = [
+      { bellScheduleId: 'f443c546', bellScheduleName: 'Nepal Standard', isDefault: false, periodCount: 9 },
+      { bellScheduleId: '36552907', bellScheduleName: 'Regular Day', isDefault: true, periodCount: 1 },
+    ]
+    const { getByTestId } = renderBellStep()
+    fireEvent.click(getByTestId('bell-schedule-set-default-button'))
+    expect(mockSetDefaultBellMutate).toHaveBeenCalledTimes(1)
+    expect(mockSetDefaultBellMutate).toHaveBeenCalledWith('f443c546')
   })
 })
