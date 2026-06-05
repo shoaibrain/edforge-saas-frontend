@@ -53,8 +53,9 @@ interface AttendanceGridProps {
     studentId: string
     status: AttendanceStatus
     notes?: string
+    excuseReason?: string
   }>
-  onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => void
+  onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; excuseReason?: string }>) => void
   isSaving: boolean
   disabled?: boolean
   saveStatus?: SaveStatus
@@ -194,7 +195,7 @@ export function AttendanceGrid({
         studentNumber: s.studentNumber,
         status: (existing?.status ?? null) as AttendanceStatus | null,
         notes: existing?.notes ?? '',
-        excuseType: undefined as string | undefined,
+        excuseType: existing?.excuseReason as string | undefined,
       }
     })
   }, [students, existingRecords])
@@ -210,7 +211,7 @@ export function AttendanceGrid({
         if (entry.status !== null) return entry // User already set a status, don't overwrite
         const existing = existingRecords.find((r) => r.studentId === entry.studentId)
         if (!existing) return entry
-        return { ...entry, status: existing.status as AttendanceStatus, notes: existing.notes ?? '' }
+        return { ...entry, status: existing.status as AttendanceStatus, notes: existing.notes ?? '', excuseType: existing.excuseReason }
       })
     )
   }, [existingRecords])
@@ -234,6 +235,8 @@ export function AttendanceGrid({
       if (!existing && entry.status !== null) return true
       if (existing && entry.status !== existing.status) return true
       if (existing && entry.notes !== (existing.notes ?? '')) return true
+      // Sprint 1.6 — a reason-only edit (status unchanged) is still a change.
+      if (existing && (entry.excuseType ?? '') !== (existing.excuseReason ?? '')) return true
       return false
     })
   }, [entries, existingRecords])
@@ -336,13 +339,18 @@ export function AttendanceGrid({
         if (e.status === null) return false
         const existing = existingRecords.find((r) => r.studentId === e.studentId)
         if (!existing) return true // New record (no prior attendance)
-        // Changed status or notes
-        return e.status !== existing.status || e.notes !== (existing.notes ?? '')
+        // Changed status, notes, or reason
+        return (
+          e.status !== existing.status ||
+          e.notes !== (existing.notes ?? '') ||
+          (e.excuseType ?? '') !== (existing.excuseReason ?? '')
+        )
       })
       .map((e) => ({
         studentId: e.studentId,
         status: e.status as AttendanceStatus,
         notes: e.notes || undefined,
+        excuseReason: e.excuseType || undefined,
       }))
     if (records.length === 0) return
     onSave(records)
@@ -372,7 +380,7 @@ export function AttendanceGrid({
         setEntries((prev) =>
           prev.map((e) =>
             e.studentId === studentId
-              ? { ...e, status: existing.status, notes: existing.notes ?? '' }
+              ? { ...e, status: existing.status, notes: existing.notes ?? '', excuseType: existing.excuseReason }
               : e
           )
         )

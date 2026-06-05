@@ -1030,6 +1030,11 @@ export interface BulkSectionAttendanceRecord {
   studentName?: string
   status: AttendanceStatus
   checkInTime?: string
+  // Sprint 1.5 — carry the attendance reason on the bulk path (shared-types
+  // 0.70.0 added these to bulkSectionAttendanceRecordSchema). Previously dropped
+  // before the request, so the UI-selected reason never reached the server.
+  excuseType?: string
+  excuseReason?: string
   notes?: string
 }
 

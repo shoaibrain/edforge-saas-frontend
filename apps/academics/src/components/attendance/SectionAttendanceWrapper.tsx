@@ -123,6 +123,8 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
       studentId: r.studentId,
       status: r.status as AttendanceStatus,
       notes: r.notes,
+      // Sprint 1.7 — hydrate the reason back into the grid on load/refresh.
+      excuseReason: r.excuseReason,
     }))
   }, [sectionRecords])
 
@@ -181,10 +183,10 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
   })
 
   const handleSave = useCallback(
-    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => {
+    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; excuseReason?: string }>) => {
       if (!schoolId || !sectionId) return
       offlineState.persistLocally(
-        records.map((r) => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '' }))
+        records.map((r) => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '', excuseReason: r.excuseReason }))
       )
       offlineState.save()
     },
@@ -213,7 +215,7 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
           date: selectedDate,
           schoolId,
           sectionId,
-          records: [{ studentId: record.studentId, status: record.status, notes: record.notes }],
+          records: [{ studentId: record.studentId, status: record.status, notes: record.notes, excuseReason: record.excuseType }],
         })
       }
     },
