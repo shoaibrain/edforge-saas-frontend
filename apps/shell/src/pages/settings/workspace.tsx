@@ -31,6 +31,7 @@ import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
 import { useTenant } from '@/lib/shell-context'
+import { constrainOptionsByArchetype } from './archetype-options'
 import { useFieldLockState } from '@/hooks/useFieldLockState'
 import { isWorkspaceFieldLocked } from '@edforge/types'
 import type { FieldLockViolation, WorkspaceLockHolder } from '@edforge/types'
@@ -631,7 +632,7 @@ export default function WorkspaceSettingsPage() {
               disabled={lkTimezone.locked}
               className={SELECT_CLASS}
             >
-              {TIMEZONE_OPTIONS.map((opt) => (
+              {constrainOptionsByArchetype(TIMEZONE_OPTIONS, 'timezone', { archetype, country, current: displaySettings.regional.defaultTimezone }).map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label} ({opt.offset})
                 </option>
@@ -702,7 +703,7 @@ export default function WorkspaceSettingsPage() {
               disabled={lkCurrency.locked}
               className={SELECT_CLASS}
             >
-              {CURRENCY_OPTIONS.map((opt) => (
+              {constrainOptionsByArchetype(CURRENCY_OPTIONS, 'currency', { archetype, country, current: displaySettings.regional.defaultCurrency }).map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
@@ -715,7 +716,7 @@ export default function WorkspaceSettingsPage() {
               disabled={lkCalendarSystem.locked}
               className={SELECT_CLASS}
             >
-              {CALENDAR_SYSTEM_OPTIONS.map((opt) => (
+              {constrainOptionsByArchetype(CALENDAR_SYSTEM_OPTIONS, 'calendarSystem', { archetype, country, current: displaySettings.regional.defaultCalendarSystem }).map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>

@@ -160,11 +160,17 @@ path remains for unconstrained operators (per P2.2's anti-rigidity note).
 > `fieldRequirement` / `allowedValuesFor`, and a 15-test conformance suite
 > (`__tests__/feature-matrix.test.ts`, all green). This is the data foundation the
 > rest of GF3 consumes.
-> GF3.2–GF3.4 are the **UI-wiring tickets** (dropdown migration, required-field
-> binding, governance panel). Each requires the **route→component trace + a
-> `pnpm dev:shell` visual smoke** (CLAUDE.md "route → component" trap), so they are
-> the human-in-the-loop next step — not landed headless. GF3.5 (i18n labels) rides
-> with GF3.4 once the panel introduces operator-facing label keys.
+> **GF3.2 shipped** — the workspace-settings currency/timezone/calendar dropdowns
+> (`apps/shell/src/pages/settings/workspace.tsx`, route `/settings/workspace` →
+> `WorkspaceSettingsPage`) now source their options through
+> `constrainOptionsByArchetype` (consuming `allowedValuesFor`): PABSON → NPR /
+> Asia-Kathmandu / Bikram-Sambat only, GENERIC → full list, with the saved value
+> always preserved (no silent switch). Logic unit-tested (6/6); the rendered-DOM
+> **visual smoke (`pnpm dev:shell`) is the operator-facing confirmation step**.
+> GF3.3–GF3.4 remain (required-field binding in the school-create wizard, the
+> governance panel) — each needs its own route→component trace + visual smoke.
+> GF3.5 (i18n labels) rides with GF3.4 once the panel introduces operator-facing
+> label keys.
 
 | # | Title | Validation |
 |---|---|---|

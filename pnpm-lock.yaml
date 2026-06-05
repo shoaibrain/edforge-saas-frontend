@@ -635,6 +635,9 @@ importers:
       '@edforge/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@edforge/archetype':
+        specifier: workspace:*
+        version: link:../../packages/archetype
       '@edforge/auth':
         specifier: workspace:*
         version: link:../../packages/auth
