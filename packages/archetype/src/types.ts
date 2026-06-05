@@ -75,6 +75,62 @@ export type AddressVariant = 'nepal' | 'legacy'
 export type CalendarSystem = 'bikram_sambat' | 'gregorian'
 
 /**
+ * How a governance body governs an operator form field (GF3 feature matrix).
+ * - `required` — operator must supply it; the form blocks submit when empty.
+ * - `optional` — operator may supply it (the open/GENERIC default).
+ * - `hidden`   — the field is not surfaced for this governance body at all.
+ */
+export type FieldRequirement = 'required' | 'optional' | 'hidden'
+
+/**
+ * Operator form fields whose requirement varies by governance body. Kept small
+ * and explicit (not `keyof` a DTO) so the matrix stays dependency-light; new
+ * governance-gated fields are added here + to every archetype's matrix, and the
+ * conformance test fails until they are. `emisSchoolCode` is the V1 case:
+ * PABSON schools must carry an IEMIS school code (mirrors the backend PABSON
+ * guard in identity `schools.service`); GENERIC leaves it optional.
+ */
+export type FeatureField = 'emisSchoolCode'
+
+export const FEATURE_FIELDS: readonly FeatureField[] = ['emisSchoolCode'] as const
+
+/**
+ * Operator settings controls whose option set a governance body constrains
+ * (GF3 archetype-gated dropdowns). A `null` value-set means "unconstrained —
+ * show every option" (the GENERIC default); a non-empty array restricts the
+ * control to exactly those values (PABSON → NPR / Asia-Kathmandu / Bikram
+ * Sambat). The `OTHER` escape hatch, where a form offers one, is layered by the
+ * consuming page, not encoded here.
+ */
+export type AllowedValueControl = 'currency' | 'timezone' | 'calendarSystem'
+
+export const ALLOWED_VALUE_CONTROLS: readonly AllowedValueControl[] = [
+  'currency',
+  'timezone',
+  'calendarSystem',
+] as const
+
+/**
+ * The governance body's feature matrix: which form fields it requires/hides and
+ * which option sets it locks down. Composes (does not duplicate) the regional
+ * facts already on the profile — `allowedValues.calendarSystem` is the
+ * allowed-set form of the scalar `calendarSystem`.
+ */
+export interface ArchetypeFeatureMatrix {
+  /** Per-field requirement in operator forms. Every `FeatureField` is present. */
+  fields: Record<FeatureField, FieldRequirement>
+  /**
+   * Per-control allowed value-sets. `null` = unconstrained (show all options);
+   * a non-empty readonly array = restrict to exactly those values.
+   */
+  allowedValues: {
+    currency: readonly string[] | null
+    timezone: readonly string[] | null
+    calendarSystem: readonly CalendarSystem[] | null
+  }
+}
+
+/**
  * The complete UI profile for one governance body. New surfaces (feature
  * matrix, allowed-value sets) are added as slots here in later sprints (GF3);
  * GF0 ships the slots the Wave-1 identifier work needs.
@@ -88,4 +144,6 @@ export interface ArchetypeUiProfile {
   calendarSystem: CalendarSystem
   /** Per-entity identifier display rules. */
   identifiers: Record<EntityKind, IdentifierSpec>
+  /** GF3 feature matrix: required/hidden fields + locked-down option sets. */
+  features: ArchetypeFeatureMatrix
 }

@@ -15,8 +15,14 @@
 
 import {
   ENTITY_KINDS,
+  FEATURE_FIELDS,
+  ALLOWED_VALUE_CONTROLS,
   type ArchetypeUiProfile,
+  type ArchetypeFeatureMatrix,
+  type AllowedValueControl,
   type EntityKind,
+  type FeatureField,
+  type FieldRequirement,
   type IdentifierSpec,
 } from './types'
 
@@ -96,22 +102,75 @@ const PABSON_OVERLAY: Partial<Record<EntityKind, IdentifierSpec>> = {
   },
 }
 
+/**
+ * GENERIC feature base — open everywhere: no field is required, and every
+ * settings control is unconstrained (`null` = show all options). A new
+ * governance body overlays only the fields/controls it locks down.
+ */
+const GENERIC_FEATURE_FIELDS: Record<FeatureField, FieldRequirement> = {
+  emisSchoolCode: 'optional',
+}
+
+const GENERIC_ALLOWED_VALUES: ArchetypeFeatureMatrix['allowedValues'] = {
+  currency: null,
+  timezone: null,
+  calendarSystem: null,
+}
+
+/**
+ * PABSON delta — the IEMIS school code is mandatory (it drives CEHRD Flash I/II
+ * reporting; mirrors the backend PABSON guard in identity `schools.service`),
+ * and the regional controls are locked to Nepal: NPR currency, Asia/Kathmandu
+ * timezone, Bikram Sambat calendar. Everything else inherits the GENERIC base.
+ */
+const PABSON_FEATURE_OVERLAY: DeepPartial<ArchetypeFeatureMatrix> = {
+  fields: { emisSchoolCode: 'required' },
+  allowedValues: {
+    currency: ['NPR'],
+    timezone: ['Asia/Kathmandu'],
+    calendarSystem: ['bikram_sambat'],
+  },
+}
+
+type DeepPartial<T> = { [K in keyof T]?: Partial<T[K]> }
+
+/**
+ * Merge a governance-body feature overlay onto the GENERIC base. The spread is
+ * one level deep per slot (`fields`, `allowedValues`) so an overlay only needs
+ * to declare the keys it locks down — every other field/control inherits the
+ * open GENERIC default — mirroring the identifier `buildProfile` overlay idiom.
+ */
+function buildFeatures(overlay: DeepPartial<ArchetypeFeatureMatrix> = {}): ArchetypeFeatureMatrix {
+  return {
+    fields: { ...GENERIC_FEATURE_FIELDS, ...overlay.fields },
+    allowedValues: { ...GENERIC_ALLOWED_VALUES, ...overlay.allowedValues },
+  }
+}
+
 function buildProfile(
   archetype: string,
   addressVariant: ArchetypeUiProfile['addressVariant'],
   calendarSystem: ArchetypeUiProfile['calendarSystem'],
   overlay: Partial<Record<EntityKind, IdentifierSpec>> = {},
+  features: ArchetypeFeatureMatrix = buildFeatures(),
 ): ArchetypeUiProfile {
   return {
     archetype,
     addressVariant,
     calendarSystem,
     identifiers: { ...GENERIC_IDENTIFIERS, ...overlay },
+    features,
   }
 }
 
 const GENERIC_PROFILE = buildProfile('GENERIC', 'legacy', 'gregorian')
-const PABSON_PROFILE = buildProfile('PABSON', 'nepal', 'bikram_sambat', PABSON_OVERLAY)
+const PABSON_PROFILE = buildProfile(
+  'PABSON',
+  'nepal',
+  'bikram_sambat',
+  PABSON_OVERLAY,
+  buildFeatures(PABSON_FEATURE_OVERLAY),
+)
 
 /**
  * The runtime-active registry. V1 governance bodies only. Reserved archetypes
@@ -156,7 +215,38 @@ export function getIdentifierSpec(
   return getArchetypeProfile(archetype, country).identifiers[entity]
 }
 
+/** The GF3 feature matrix (required/hidden fields + locked option sets) for a tenant. */
+export function getArchetypeFeatureMatrix(
+  archetype?: string | null,
+  country?: string | null,
+): ArchetypeFeatureMatrix {
+  return getArchetypeProfile(archetype, country).features
+}
+
+/** Requirement of one operator form field under one governance body. */
+export function fieldRequirement(
+  field: FeatureField,
+  archetype?: string | null,
+  country?: string | null,
+): FieldRequirement {
+  return getArchetypeFeatureMatrix(archetype, country).fields[field]
+}
+
+/**
+ * The allowed value-set for one settings control under one governance body.
+ * `null` = unconstrained (the consumer shows every option); a non-empty array =
+ * restrict to exactly those values. Returned as `readonly string[] | null` so a
+ * dropdown can `.filter(o => allowed === null || allowed.includes(o.value))`.
+ */
+export function allowedValuesFor(
+  control: AllowedValueControl,
+  archetype?: string | null,
+  country?: string | null,
+): readonly string[] | null {
+  return getArchetypeFeatureMatrix(archetype, country).allowedValues[control]
+}
+
 /** Active archetype labels the registry knows about (for conformance tests). */
 export const REGISTERED_ARCHETYPES: readonly string[] = Object.keys(ARCHETYPE_REGISTRY)
 
-export { ENTITY_KINDS }
+export { ENTITY_KINDS, FEATURE_FIELDS, ALLOWED_VALUE_CONTROLS }

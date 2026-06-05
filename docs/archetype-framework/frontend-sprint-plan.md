@@ -154,6 +154,18 @@ offers **NPR only**; timezone offers Asia/Kathmandu; the `emisSchoolCode` field 
 shown **required**. A GENERIC tenant shows the full option set. An `OTHER`/freedom
 path remains for unconstrained operators (per P2.2's anti-rigidity note).
 
+> **Status [2026-06-05].** GF3.1 **shipped** — `ArchetypeFeatureMatrix` (fields +
+> `allowedValues`) added to `@edforge/archetype` (`types.ts` / `registry.ts`) with
+> the GENERIC-base + PABSON-overlay idiom, accessors `getArchetypeFeatureMatrix` /
+> `fieldRequirement` / `allowedValuesFor`, and a 15-test conformance suite
+> (`__tests__/feature-matrix.test.ts`, all green). This is the data foundation the
+> rest of GF3 consumes.
+> GF3.2–GF3.4 are the **UI-wiring tickets** (dropdown migration, required-field
+> binding, governance panel). Each requires the **route→component trace + a
+> `pnpm dev:shell` visual smoke** (CLAUDE.md "route → component" trap), so they are
+> the human-in-the-loop next step — not landed headless. GF3.5 (i18n labels) rides
+> with GF3.4 once the panel introduces operator-facing label keys.
+
 | # | Title | Validation |
 |---|---|---|
 | GF3.1 | Define `ArchetypeFeatureMatrix` semantics in `@edforge/archetype`: per-field `required` / `optional` / `hidden` and per-control `allowedValues`. Populate PABSON (NPR/Asia-Kathmandu/bikram_sambat; `emisSchoolCode` required) + GENERIC (open). | Unit test: matrix lookups for PABSON vs GENERIC; conformance suite (GF0.8) now also asserts matrix completeness. |
