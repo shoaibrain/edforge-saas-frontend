@@ -134,6 +134,12 @@ const PABSON_FEATURE_OVERLAY: DeepPartial<ArchetypeFeatureMatrix> = {
 
 type DeepPartial<T> = { [K in keyof T]?: Partial<T[K]> }
 
+/**
+ * Merge a governance-body feature overlay onto the GENERIC base. The spread is
+ * one level deep per slot (`fields`, `allowedValues`) so an overlay only needs
+ * to declare the keys it locks down — every other field/control inherits the
+ * open GENERIC default — mirroring the identifier `buildProfile` overlay idiom.
+ */
 function buildFeatures(overlay: DeepPartial<ArchetypeFeatureMatrix> = {}): ArchetypeFeatureMatrix {
   return {
     fields: { ...GENERIC_FEATURE_FIELDS, ...overlay.fields },
