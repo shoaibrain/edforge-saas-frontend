@@ -31,6 +31,8 @@ import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
 import { useTenant } from '@/lib/shell-context'
+import { constrainOptionsByArchetype } from './archetype-options'
+import { GovernanceProfileCard } from '@/components/settings/GovernanceProfileCard'
 import { useFieldLockState } from '@/hooks/useFieldLockState'
 import { isWorkspaceFieldLocked } from '@edforge/types'
 import type { FieldLockViolation, WorkspaceLockHolder } from '@edforge/types'
@@ -567,6 +569,12 @@ export default function WorkspaceSettingsPage() {
           createdAt={createdAt}
         />
 
+        {/* Governance Profile (GF3.4) — read-only resolved archetype + the
+            regional defaults the governance body locks. Sits directly above
+            Regional Settings so the constrained dropdowns below (GF3.2) have a
+            visible "why". */}
+        <GovernanceProfileCard archetype={archetype} country={country} />
+
         {/* Note: lock status is now surfaced inside Regional Settings (section-scoped),
             because Regional is the only subtree that actually locks — Tenant Info is
             permanently locked, and Branding/Policies are always editable. */}
@@ -631,7 +639,7 @@ export default function WorkspaceSettingsPage() {
               disabled={lkTimezone.locked}
               className={SELECT_CLASS}
             >
-              {TIMEZONE_OPTIONS.map((opt) => (
+              {constrainOptionsByArchetype(TIMEZONE_OPTIONS, 'timezone', { archetype, country, current: displaySettings.regional.defaultTimezone }).map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label} ({opt.offset})
                 </option>
@@ -702,7 +710,7 @@ export default function WorkspaceSettingsPage() {
               disabled={lkCurrency.locked}
               className={SELECT_CLASS}
             >
-              {CURRENCY_OPTIONS.map((opt) => (
+              {constrainOptionsByArchetype(CURRENCY_OPTIONS, 'currency', { archetype, country, current: displaySettings.regional.defaultCurrency }).map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
@@ -715,7 +723,7 @@ export default function WorkspaceSettingsPage() {
               disabled={lkCalendarSystem.locked}
               className={SELECT_CLASS}
             >
-              {CALENDAR_SYSTEM_OPTIONS.map((opt) => (
+              {constrainOptionsByArchetype(CALENDAR_SYSTEM_OPTIONS, 'calendarSystem', { archetype, country, current: displaySettings.regional.defaultCalendarSystem }).map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>

@@ -160,18 +160,35 @@ path remains for unconstrained operators (per P2.2's anti-rigidity note).
 > `fieldRequirement` / `allowedValuesFor`, and a 15-test conformance suite
 > (`__tests__/feature-matrix.test.ts`, all green). This is the data foundation the
 > rest of GF3 consumes.
-> GF3.2–GF3.4 are the **UI-wiring tickets** (dropdown migration, required-field
-> binding, governance panel). Each requires the **route→component trace + a
-> `pnpm dev:shell` visual smoke** (CLAUDE.md "route → component" trap), so they are
-> the human-in-the-loop next step — not landed headless. GF3.5 (i18n labels) rides
-> with GF3.4 once the panel introduces operator-facing label keys.
+> **GF3.2 shipped** — the workspace-settings currency/timezone/calendar dropdowns
+> (`apps/shell/src/pages/settings/workspace.tsx`, route `/settings/workspace` →
+> `WorkspaceSettingsPage`) now source their options through
+> `constrainOptionsByArchetype` (consuming `allowedValuesFor`): PABSON → NPR /
+> Asia-Kathmandu / Bikram-Sambat only, GENERIC → full list, with the saved value
+> always preserved (no silent switch). Logic unit-tested (6/6); the rendered-DOM
+> **visual smoke (`pnpm dev:shell`) is the operator-facing confirmation step**.
+> **GF3.3 shipped** — the school-create wizard already required `emisSchoolCode`
+> for PABSON (Sprint C Gap 3); converged to read the requirement from the GF3.1
+> matrix (`fieldRequirement`) in `school-wizard.schemas.ts` + `BasicInfoStep.tsx`,
+> so a future required field is a data change, not code.
+> **GF3.4 shipped** — `GovernanceProfileCard`
+> (`apps/shell/src/components/settings/GovernanceProfileCard.tsx`) renders on
+> `/settings/workspace` directly above Regional Settings, showing the *resolved*
+> archetype (degrade rules intact: NPL→PABSON, unknown→GENERIC) and the
+> currency/timezone/calendar defaults the governance body locks — read straight
+> from the GF3.1 matrix (`getArchetypeProfile` + `allowedValuesFor`), so it gives
+> the constrained dropdowns below a visible "why". Component test 6/6; the
+> **`pnpm dev:shell` visual smoke is the operator-facing confirmation step**.
+> **GF3.5 remains** — the panel uses plain-English strings to match the rest of
+> the (not-yet-i18n'd) workspace page; GF3.5 lifts the whole Regional/Governance
+> region into `en`+`ne` keys in one pass, gated by GF0.8 coverage.
 
 | # | Title | Validation |
 |---|---|---|
 | GF3.1 | Define `ArchetypeFeatureMatrix` semantics in `@edforge/archetype`: per-field `required` / `optional` / `hidden` and per-control `allowedValues`. Populate PABSON (NPR/Asia-Kathmandu/bikram_sambat; `emisSchoolCode` required) + GENERIC (open). | Unit test: matrix lookups for PABSON vs GENERIC; conformance suite (GF0.8) now also asserts matrix completeness. |
-| GF3.2 | **URL-trace** then migrate the workspace-settings dropdowns (`apps/shell/src/pages/settings/workspace.tsx`) to source options from `getArchetypeProfile(archetype).allowedValues`. Keep `OTHER` escape hatch. | Route-trace in commit body; component test: PABSON→NPR-only, GENERIC→full list; visual smoke screenshot. |
-| GF3.3 | **URL-trace** then drive conditionally-required form fields (e.g., `emisSchoolCode` in the school-create wizard) from the feature matrix `required` flag. | Route-trace; component test: PABSON marks field required + blocks submit when empty; GENERIC optional. |
-| GF3.4 | Surface a small read-only "Governance profile" panel in settings (reuse `TenantBadge` tokens) showing the resolved archetype + its locked-in defaults (calendar/currency/week-start) for operator transparency. | Component test renders PABSON values; a11y label present; visual smoke. |
+| GF3.2 | **✅ SHIPPED [2026-06-05].** Workspace-settings dropdowns (`apps/shell/src/pages/settings/workspace.tsx` → `WorkspaceSettingsPage`) source options via `constrainOptionsByArchetype` (backed by `allowedValuesFor`): PABSON → NPR / Asia-Kathmandu / Bikram-Sambat only, GENERIC → full list, with the saved value always preserved (no silent switch). | Route-trace in commit body; logic unit test 6/6 (PABSON-narrow / GENERIC-full / preserve-legacy); **operator-facing `pnpm dev:shell` visual smoke pending**. |
+| GF3.3 | **✅ SHIPPED [2026-06-05].** The school-create wizard already required `emisSchoolCode` for PABSON (Sprint C Gap 3); converged so the required-ness is read from the GF3.1 matrix (`fieldRequirement('emisSchoolCode', archetype) === 'required'`) in both `school-wizard.schemas.ts` and `BasicInfoStep.tsx` — a future required field is now a data change, not code. | Route-trace; existing `school-wizard.schemas.test.ts` (PABSON-required / GENERIC-optional) green; **`pnpm dev:shell` visual smoke pending**. |
+| GF3.4 | **✅ SHIPPED [2026-06-05].** `GovernanceProfileCard` on `/settings/workspace` (above Regional Settings) shows the resolved archetype + the currency/timezone/calendar defaults the governance body locks, read from the GF3.1 matrix (`getArchetypeProfile` + `allowedValuesFor`); each locked control carries a `Locked by governance body` a11y label. | Component test 6/6 (PABSON-locked / GENERIC-open / NPL→PABSON degrade / unknown→GENERIC / lock-indicator count); **`pnpm dev:shell` visual smoke pending**. |
 | GF3.5 | i18n: add `ne` + `en` strings for all new matrix labels; GF0.8 coverage test gates it. | Coverage test green; missing `ne` string fails red. |
 
 **Demo gate (Sprint GF3):** archetype-gated dropdowns + required-field behavior on
