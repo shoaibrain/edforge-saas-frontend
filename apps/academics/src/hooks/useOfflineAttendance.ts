@@ -20,6 +20,8 @@ interface AttendanceEntry {
   studentId: string
   status: AttendanceStatus | null
   notes: string
+  // Sprint 1.7 — the reason must survive the localStorage round-trip + reconnect flush.
+  excuseReason?: string
 }
 
 interface OfflineAttendanceState {
@@ -109,7 +111,7 @@ interface UseOfflineAttendanceOptions {
   sectionId: string
   date: string
   // Task 1.15: Updated to return BulkAttendanceResponse so we can inspect errors
-  onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string }>) => Promise<BulkAttendanceResponse | void>
+  onSave: (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string; excuseReason?: string }>) => Promise<BulkAttendanceResponse | void>
 }
 
 export function useOfflineAttendance({
@@ -126,7 +128,7 @@ export function useOfflineAttendance({
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Flush to server
-  const flushToServer = useCallback(async (enrichedRecords?: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string }>) => {
+  const flushToServer = useCallback(async (enrichedRecords?: Array<{ studentId: string; status: AttendanceStatus; notes?: string; studentName?: string; excuseReason?: string }>) => {
     const entries = entriesRef.current
     const records = enrichedRecords || entries
       .filter(e => e.status !== null)
@@ -134,6 +136,7 @@ export function useOfflineAttendance({
         studentId: e.studentId,
         status: e.status as AttendanceStatus,
         notes: e.notes || undefined,
+        excuseReason: e.excuseReason || undefined,
       }))
 
     if (records.length === 0) return
