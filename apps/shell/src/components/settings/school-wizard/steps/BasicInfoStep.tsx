@@ -258,7 +258,13 @@ export function BasicInfoStep({ data, updateData, errors, clearError }: WizardSt
         <AnimatedInput
           label={isPabson ? 'IEMIS School Code' : 'External School Code'}
           required={emisRequired}
-          placeholder={isPabson ? 'e.g., 31012345' : 'Optional district/external code'}
+          placeholder={
+            isPabson
+              ? 'e.g., 31012345'
+              : emisRequired
+                ? 'e.g., DIST-001'
+                : 'Optional district/external code'
+          }
           autoComplete="off"
           maxLength={32}
           value={(data.emisSchoolCode as string) || ''}
@@ -270,7 +276,9 @@ export function BasicInfoStep({ data, updateData, errors, clearError }: WizardSt
           helpText={
             isPabson
               ? 'Required for PABSON tenants. Used for Nepal IEMIS reporting and bulk student import. Cannot change after creation.'
-              : 'Optional. External/district identifier. Cannot change after creation.'
+              : emisRequired
+                ? 'Required. External/district identifier. Cannot change after creation.'
+                : 'Optional. External/district identifier. Cannot change after creation.'
           }
           className="font-mono"
         />

@@ -23,13 +23,22 @@ import { ORDERED_GRADES, validateSchoolTypeGradeRange, getCountryConfig } from '
  * governance body that requires the field is a data change, not a code change.
  */
 export function makeBasicInfoSchema(archetype: string | null) {
+  // Message tracks the field's label, which is archetype-specific: PABSON sees
+  // "IEMIS School Code", every other governance body sees "External School
+  // Code". Requiredness itself is matrix-driven (below), so a future archetype
+  // that the matrix marks required gets the neutral phrasing, not PABSON's.
+  const emisRequiredMessage =
+    archetype === 'PABSON'
+      ? 'IEMIS School Code is required for PABSON tenants'
+      : 'External School Code is required for this tenant'
+
   const emisSchoolCodeField =
     fieldRequirement('emisSchoolCode', archetype) === 'required'
       ? z
-          .string({ required_error: 'IEMIS School Code is required for PABSON tenants' })
-          .min(1, 'IEMIS School Code is required for PABSON tenants')
-          .max(32, 'IEMIS School Code must be 32 characters or fewer')
-      : z.string().max(32, 'IEMIS School Code must be 32 characters or fewer').optional()
+          .string({ required_error: emisRequiredMessage })
+          .min(1, emisRequiredMessage)
+          .max(32, 'School code must be 32 characters or fewer')
+      : z.string().max(32, 'School code must be 32 characters or fewer').optional()
 
   return z
     .object({
