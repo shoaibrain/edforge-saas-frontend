@@ -134,6 +134,16 @@ interface CreateAcademicYearWithTerms extends CreateAcademicYearDto {
   generatedTerms?: CreateGradingPeriodDto[]
 }
 
+/**
+ * Period count for a bell-schedule row, tolerant of the field shapes the API
+ * returns (`periodCount`, or the `classPeriods` / `periods` arrays). Single
+ * source for the C.4/C.5 "real default" predicate so the step-completion check
+ * and the placeholder chip can't drift apart.
+ */
+function getPeriodCount(schedule: any): number {
+  return schedule.periodCount ?? schedule.classPeriods?.length ?? schedule.periods?.length ?? 0
+}
+
 export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabProps) {
   const localeDefaults = useLocaleDefaults()
   const queryClient = useQueryClient()
@@ -258,7 +268,7 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
   // the gate refused activation on a placeholder default — the contradiction
   // the C.5 chip surfaced but didn't resolve.
   const hasRealDefaultBell = bellSchedules.some(
-    (b: any) => b.isDefault && (b.periodCount ?? b.classPeriods?.length ?? b.periods?.length ?? 0) > 1,
+    (b: any) => b.isDefault && getPeriodCount(b) > 1,
   )
   const steps: WizardStepConfig[] = useMemo(() => [
     { id: 'years', label: 'Academic Years', completed: years.length > 0 },
@@ -2661,9 +2671,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
             // gate, so giving the operator a visible cue here lets them fix
             // it before they hit the activation refusal. Predicate mirrors
             // backend exactly: isDefault && periodCount <= 1.
-            const periodCount =
-              sched.periodCount ?? sched.classPeriods?.length ?? sched.periods?.length ?? 0
-            const isPlaceholderDefault = sched.isDefault && periodCount <= 1
+            const isPlaceholderDefault = sched.isDefault && getPeriodCount(sched) <= 1
             return (
             <div key={sched.bellScheduleId || sched.id} className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg overflow-hidden">
               <div className="px-3 py-2.5 flex items-center justify-between border-b border-[rgba(255,255,255,0.04)]">
