@@ -66,10 +66,13 @@ vi.mock('@/hooks/useBellSchedules', () => ({
   useSetDefaultBellSchedule: () => ({ mutate: mockSetDefaultBellMutate, isPending: false }),
 }))
 
+// Mutable so a test can flip the Nepal/PABSON signal that drives which
+// bell-schedule templates render.
+const mockLocaleRef = { isNepal: false }
 vi.mock('@/hooks/useLocaleDefaults', () => ({
   useLocaleDefaults: () => ({
-    calendarSystem: 'gregorian',
-    isNepal: false,
+    calendarSystem: mockLocaleRef.isNepal ? 'bikram_sambat' : 'gregorian',
+    isNepal: mockLocaleRef.isNepal,
     timezone: 'UTC',
     weekStart: 'sunday',
   }),
@@ -180,6 +183,7 @@ afterEach(() => {
   cleanup()
   vi.clearAllMocks()
   mockBellSchedulesRef.items = []
+  mockLocaleRef.isNepal = false
 })
 
 // ----------------------------------------------------------------------------
@@ -411,5 +415,35 @@ describe('AcademicSetupTab — P1 default management', () => {
     fireEvent.click(getByTestId('bell-schedule-set-default-button'))
     expect(mockSetDefaultBellMutate).toHaveBeenCalledTimes(1)
     expect(mockSetDefaultBellMutate).toHaveBeenCalledWith('f443c546')
+  })
+})
+
+// ============================================================================
+// Archetype-relevant templates — a Nepal/PABSON school must not see US presets
+// ============================================================================
+describe('AcademicSetupTab — archetype-relevant templates', () => {
+  function renderBellStep() {
+    // Empty bell-schedules → setup mode → the template gallery is expanded.
+    const utils = renderTab([ay()])
+    fireEvent.click(utils.getByText('Bell Schedule'))
+    return utils
+  }
+
+  it('Nepal/PABSON school shows Nepal + PABSON Exam Day, hides US templates', () => {
+    mockLocaleRef.isNepal = true
+    const { getByText, queryByText } = renderBellStep()
+    expect(getByText(/Nepal Standard/)).toBeTruthy()
+    expect(getByText('PABSON Exam Day')).toBeTruthy()
+    expect(queryByText('Elementary Schedule (US)')).toBeNull()
+    expect(queryByText('High School Schedule (US)')).toBeNull()
+  })
+
+  it('non-Nepal school shows US templates, hides Nepal/PABSON', () => {
+    mockLocaleRef.isNepal = false
+    const { getByText, queryByText } = renderBellStep()
+    expect(getByText('Elementary Schedule (US)')).toBeTruthy()
+    expect(getByText('High School Schedule (US)')).toBeTruthy()
+    expect(queryByText('PABSON Exam Day')).toBeNull()
+    expect(queryByText(/Nepal Standard/)).toBeNull()
   })
 })
