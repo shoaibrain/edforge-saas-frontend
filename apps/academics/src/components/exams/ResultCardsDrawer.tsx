@@ -11,7 +11,7 @@
  * `closed`; a draft/scheduled exam has none yet.
  */
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Loader2, ClipboardList, ArrowLeft, CheckCircle2, Lock } from 'lucide-react'
 import { UuidBadge } from '@edforge/archetype'
@@ -326,10 +326,27 @@ interface ResultCardsDrawerProps {
 
 export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProps) {
   const [selectedCard, setSelectedCard] = useState<ResultCardResponseDto | null>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const prevFocusedRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!open) setSelectedCard(null)
   }, [open])
+
+  // Modal a11y: trap entry focus on open, ESC to close, restore focus on close.
+  useEffect(() => {
+    if (!open) return
+    prevFocusedRef.current = document.activeElement as HTMLElement | null
+    closeButtonRef.current?.focus()
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      prevFocusedRef.current?.focus()
+    }
+  }, [open, onClose])
 
   return (
     <AnimatePresence>
@@ -371,6 +388,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
                   </div>
                   <button
                     type="button"
+                    ref={closeButtonRef}
                     onClick={onClose}
                     className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
                     aria-label="Close drawer"

@@ -63,6 +63,13 @@ export function ExamTable({ exams, termNameById, isLoading, onSelectExam }: Exam
             <tr
               key={exam.examId}
               onClick={() => onSelectExam?.(exam)}
+              onKeyDown={(e) => {
+                if (onSelectExam && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  onSelectExam(exam)
+                }
+              }}
+              tabIndex={onSelectExam ? 0 : undefined}
               className={`bg-surface-primary hover:bg-surface-secondary/50 transition-colors ${onSelectExam ? 'cursor-pointer' : ''}`}
             >
               <td className="px-4 py-3 font-medium text-text-primary">{exam.examName}</td>
