@@ -17,9 +17,10 @@ import {
 // ============================================================================
 
 // `subjectArea` is the Ed-Fi Core rollup. It is no longer operator-entered —
-// the backend derives it from the granular `academicSubject` (the Edge field)
-// at create/update. These constants stay because read surfaces (CourseTable,
-// CourseDrawer detail, ClassroomCard) still render the stored rollup + colours.
+// the form derives it from the granular `academicSubject` (the Edge field)
+// before submit (see deriveSubjectAreaFromAcademicSubject). These constants stay
+// because read surfaces (CourseTable, CourseDrawer detail, ClassroomCard) still
+// render the stored rollup + colours.
 export const SUBJECT_AREA_OPTIONS = [
   { value: 'mathematics', label: 'Mathematics' },
   { value: 'english_language_arts', label: 'English Language Arts' },
@@ -179,9 +180,9 @@ export const courseFormSchema = z.object({
     .min(2, 'Course name must be at least 2 characters')
     .max(200, 'Course name must not exceed 200 characters'),
 
-  // Classification — operator picks the granular Edge subject; the coarse
-  // Ed-Fi `subjectArea` rollup is derived from it server-side (shared-types
-  // 0.70.0 made subjectArea optional; the backend enforces the either-or).
+  // Classification — operator picks the granular Edge subject; the form derives
+  // the required Ed-Fi `subjectArea` rollup from it before submit (the create
+  // contract still requires subjectArea and the service stores it verbatim).
   academicSubject: z.enum(
     ACADEMIC_SUBJECT_DESCRIPTORS as unknown as [AcademicSubjectDescriptor, ...AcademicSubjectDescriptor[]],
     { required_error: 'Academic subject is required' }
