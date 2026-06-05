@@ -6,20 +6,25 @@
  */
 
 import { z } from 'zod'
+import { fieldRequirement } from '@edforge/archetype'
 import { ORDERED_GRADES, validateSchoolTypeGradeRange, getCountryConfig } from './school-wizard.utils'
 
 /**
- * Sprint C Gap 3 — PABSON archetype requires emisSchoolCode at create.
- * Backend enforces the rule with a structured 400 on POST /schools, but we
- * also validate it client-side so the wizard blocks "Continue" on Step 1
- * instead of letting the user fill four more steps before the server
- * rejects the payload. Built as a factory because the archetype is not
- * known at module-load time; SchoolWizard.tsx resolves it from shell
- * context and memoizes the schema on archetype changes.
+ * Sprint C Gap 3 — a governance body can require emisSchoolCode at create
+ * (PABSON does, for CEHRD/IEMIS reporting). Backend enforces the rule with a
+ * structured 400 on POST /schools, but we also validate it client-side so the
+ * wizard blocks "Continue" on Step 1 instead of letting the user fill four more
+ * steps before the server rejects the payload. Built as a factory because the
+ * archetype is not known at module-load time; SchoolWizard.tsx resolves it from
+ * shell context and memoizes the schema on archetype changes.
+ *
+ * GF3.3 — the required-ness is read from the GF3.1 feature matrix
+ * (`fieldRequirement`), not a hardcoded `archetype === 'PABSON'`, so a future
+ * governance body that requires the field is a data change, not a code change.
  */
 export function makeBasicInfoSchema(archetype: string | null) {
   const emisSchoolCodeField =
-    archetype === 'PABSON'
+    fieldRequirement('emisSchoolCode', archetype) === 'required'
       ? z
           .string({ required_error: 'IEMIS School Code is required for PABSON tenants' })
           .min(1, 'IEMIS School Code is required for PABSON tenants')
