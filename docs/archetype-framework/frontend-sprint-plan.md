@@ -64,6 +64,16 @@ from app state.
 
 ## Sprint GF0 — ARCHETYPE_PROFILE registry + conformance harness
 
+> **Status [2026-06-05, evidence-reconciled]:** 🟡 **Thin, not full.** Shipped +
+> green: `@edforge/archetype` scaffold (GF0.2), MF singleton (GF0.3),
+> `getArchetypeProfile` w/ NPL tiebreak + prototype-safety (GF0.7), and the
+> conformance + en/ne i18n-coverage gate (GF0.8, PR #112). **Open:**
+> `useArchetypeProfile()` hook + first-paint skeleton (GF0.9, never built);
+> `phoneFormat` profile slot (GF0.4/0.5, absent — profiles also hardcode literals
+> instead of sourcing `resolveAddressVariant`/`phoneFormatForArchetype`); GF0.1
+> `region-aware-forms-divergence.md` + GF0.10 README (never written); GF0.6
+> CBSE/NAIS/GEMS stubs (only via degrade-to-GENERIC tests).
+
 **Goal.** Generalize the scattered `resolve<X>(archetype, country)` helpers into
 one `ARCHETYPE_PROFILE` registry (delta-overlay on `GENERIC`, the same model PR #95
 uses for identifiers) with a conformance + i18n-coverage test that fails CI if a
@@ -93,6 +103,16 @@ doc merged; `useArchetypeProfile` resolves PABSON vs GENERIC in a unit harness.
 
 ## Sprint GF1 — Identifier-resolver foundation (sequences PR #95 S0–S2)
 
+> **Status [2026-06-05, evidence-reconciled]:** 🟡 **Partial.** Shipped: pure
+> `resolveIdentifier`/`serializeIdentifier` reading specs from the GF0 profile
+> (GF1.2), `useArchetypeIdentifier` hook + `EntityIdDisplay`/`UuidBadge` (GF1.3
+> core), i18n keys + coverage. **Open:** the UUID→display-name layer —
+> `<UserDisplay>`, `configureIdentifierResolver({fetchUser})`, `usePaidByUser`/
+> `useBatchedUsers` — never built; the `/dev/identifiers-demo` demo-gate route is
+> absent. **NB:** the plan's `packages/identifier-resolver` was folded into
+> `@edforge/archetype`; it was never a separate package — treat its sub-tickets as
+> renamed, not missing.
+
 **Goal.** Build PR #95's `packages/identifier-resolver` **as a consumer of the
 GF0 registry** — `identifiers` live in `ArchetypeUiProfile`, so the resolver reads
 the profile instead of holding its own archetype table. Otherwise this is PR #95
@@ -118,6 +138,14 @@ for student/payment/invoice across all archetypes with the archetype toggle;
 ---
 
 ## Sprint GF2 — Thin-slice + cross-MFE sweep (sequences PR #95 S3–S5)
+
+> **Status [2026-06-05, evidence-reconciled]:** 🟡 **Mostly shipped, two tails
+> open.** Real + wired: PABSON Student Profile EMIS (GF2.1), on-screen receipt
+> identifiers (GF2.2, PR #106), academics + finance list sweep, and the
+> `no-id-slice-in-jsx` ESLint CI rule (GF2.5). **Open:** GF2.3 — `serializeIdentifier`
+> is exported but has **zero consumers**, so CSV-matches-screen is unproven; GF2.4
+> — `apps/people` + `apps/shell` were **never swept** (only academics + finance
+> carry the identifier components).
 
 **Goal.** Ship the identifier system on real surfaces and eliminate all 14 raw-UUID
 sites. This is PR #95 Sprints 3–5; the only addition is that every migrated site
@@ -201,6 +229,13 @@ the PABSON tenant via `pnpm dev:shell`; GENERIC unchanged.
 
 ## Sprint GF4 — PDF payload contract + hardening (sequences PR #95 S6–S7)
 
+> **Status [2026-06-05, evidence-reconciled]:** 🟡 **~⅓ done.** GF4.1 receipt
+> identifiers shipped (BE-led, FE PR #106 merged + live). **Open:** GF4.1b registry
+> convergence (low urgency, before Wave 4 — `@edforge/archetype` still
+> workspace-private, no published extraction); GF4.2 PDF e2e verify; GF4.3 a11y
+> audit + perf budget + `fallback_used` telemetry + Playwright `identifier-display.spec.ts`
+> (none started — no axe-core, no telemetry, no Playwright identifier spec).
+
 **Goal.** Close the one surface the frontend can't fully own (the backend-rendered
 PDF receipt) and ship the hardening gates. This is PR #95 Sprints 6–7, with the
 backend handshake coordinated against the `edforge` repo.
@@ -233,6 +268,11 @@ Playwright e2e green.
 ---
 
 ## Sprint GF5 — Add CBS UI profile (extensibility proof)
+
+> **Status [2026-06-05, evidence-reconciled]:** ⏸ **Deferred in full** — gated on
+> a funded CBS pilot, in lockstep with backend GB4. No CBS profile in the registry,
+> no `assert-archetype-data-only.sh` gate; the production active set stays
+> `['PABSON','GENERIC']`. Correct per plan.
 
 **Goal.** Mirror backend GB4: prove that adding a governance body to the frontend
 is a single profile module + locale pack, conformance-gated, **ZERO call-site
