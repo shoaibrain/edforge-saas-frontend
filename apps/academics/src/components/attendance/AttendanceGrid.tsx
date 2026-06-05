@@ -380,7 +380,7 @@ export function AttendanceGrid({
         setEntries((prev) =>
           prev.map((e) =>
             e.studentId === studentId
-              ? { ...e, status: existing.status, notes: existing.notes ?? '' }
+              ? { ...e, status: existing.status, notes: existing.notes ?? '', excuseType: existing.excuseReason }
               : e
           )
         )
