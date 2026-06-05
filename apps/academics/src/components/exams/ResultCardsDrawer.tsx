@@ -294,6 +294,13 @@ function ResultCardList({
               <tr
                 key={card.cardId}
                 onClick={() => onSelect(card)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onSelect(card)
+                  }
+                }}
+                tabIndex={0}
                 className="bg-surface-primary hover:bg-surface-secondary/60 transition-colors cursor-pointer"
               >
                 <td className="px-3 py-2"><UuidBadge value={card.studentId} /></td>
@@ -333,19 +340,26 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
     if (!open) setSelectedCard(null)
   }, [open])
 
-  // Modal a11y: trap entry focus on open, ESC to close, restore focus on close.
+  // Modal a11y: focus the close button on open, restore focus on close.
+  // Keyed only on `open` so a parent re-render (fresh onClose identity) doesn't
+  // yank focus while the drawer stays open.
+  useEffect(() => {
+    if (open) {
+      prevFocusedRef.current = document.activeElement as HTMLElement | null
+      closeButtonRef.current?.focus()
+    } else {
+      prevFocusedRef.current?.focus()
+    }
+  }, [open])
+
+  // ESC to close (separate so its onClose dependency can't disturb focus).
   useEffect(() => {
     if (!open) return
-    prevFocusedRef.current = document.activeElement as HTMLElement | null
-    closeButtonRef.current?.focus()
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleEscape)
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
-      prevFocusedRef.current?.focus()
-    }
+    return () => document.removeEventListener('keydown', handleEscape)
   }, [open, onClose])
 
   return (
