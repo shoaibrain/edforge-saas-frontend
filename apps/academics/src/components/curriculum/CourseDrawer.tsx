@@ -35,7 +35,9 @@ import { DrawerFooterCTA } from '../common/DrawerFooterCTA'
 import {
   courseFormSchema,
   type CourseFormData,
+  deriveSubjectAreaFromAcademicSubject,
   getSubjectAreaLabel,
+  getAcademicSubjectLabel,
   getCourseTypeLabel,
   getCreditTypeLabel,
   getDurationLabel,
@@ -157,7 +159,11 @@ function CourseDetailView({
       <div>
         <SectionHeader icon={GraduationCap} title="Classification" />
         <div className="grid grid-cols-2 gap-4">
-          <DetailField label="Subject Area" value={getSubjectAreaLabel(course.subjectArea)} />
+          <DetailField
+            label="Academic Subject"
+            value={course.academicSubject ? getAcademicSubjectLabel(course.academicSubject) : null}
+          />
+          <DetailField label="Subject Area (Ed-Fi rollup)" value={getSubjectAreaLabel(course.subjectArea)} />
           <DetailField label="Course Type" value={getCourseTypeLabel(course.courseType)} />
           <DetailField label="Credits" value={`${course.credits}${course.creditType ? ` (${getCreditTypeLabel(course.creditType)})` : ''}`} />
           <DetailField label="Duration" value={getDurationLabel(course.typicalDuration)} />
@@ -293,7 +299,7 @@ function CourseFormView({
       ? {
           courseCode: course.courseCode,
           courseName: course.courseName,
-          subjectArea: course.subjectArea,
+          academicSubject: course.academicSubject ?? undefined,
           courseType: course.courseType,
           creditType: course.creditType ?? undefined,
           credits: course.credits,
@@ -322,6 +328,9 @@ function CourseFormView({
         const payload: CreateCourseDto = {
           ...data,
           schoolId: schoolId || '',
+          // Operator picks the granular academicSubject; the required Ed-Fi
+          // subjectArea rollup is derived from it (backend stores it verbatim).
+          subjectArea: deriveSubjectAreaFromAcademicSubject(data.academicSubject),
           description: data.description || undefined,
           creditType: data.creditType ?? undefined,
           periodsPerWeek: data.periodsPerWeek ?? undefined,
@@ -332,7 +341,9 @@ function CourseFormView({
       } else if (course) {
         const payload: UpdateCourseDto = {
           courseName: data.courseName,
-          subjectArea: data.subjectArea,
+          academicSubject: data.academicSubject,
+          // Keep the derived rollup in lockstep with the granular pick.
+          subjectArea: deriveSubjectAreaFromAcademicSubject(data.academicSubject),
           courseType: data.courseType,
           creditType: data.creditType ?? undefined,
           credits: data.credits,

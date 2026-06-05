@@ -6,11 +6,20 @@
  */
 
 import { z } from 'zod'
+import {
+  ACADEMIC_SUBJECT_DESCRIPTORS,
+  type AcademicSubjectDescriptor,
+  type CourseSubjectArea,
+} from '@aibrains/shared-types'
 
 // ============================================================================
 // OPTION CONSTANTS
 // ============================================================================
 
+// `subjectArea` is the Ed-Fi Core rollup. It is no longer operator-entered —
+// the backend derives it from the granular `academicSubject` (the Edge field)
+// at create/update. These constants stay because read surfaces (CourseTable,
+// CourseDrawer detail, ClassroomCard) still render the stored rollup + colours.
 export const SUBJECT_AREA_OPTIONS = [
   { value: 'mathematics', label: 'Mathematics' },
   { value: 'english_language_arts', label: 'English Language Arts' },
@@ -24,6 +33,64 @@ export const SUBJECT_AREA_OPTIONS = [
   { value: 'vocational', label: 'Vocational' },
   { value: 'other', label: 'Other' },
 ] as const
+
+// Granular curriculum subject (the Edge field). Operator-facing single source
+// of subject identity; the coarse `subjectArea` rollup is derived from this
+// server-side. `Record<AcademicSubjectDescriptor, string>` is a compile-time
+// drift guard — adding a descriptor in shared-types without a label fails tsc.
+const ACADEMIC_SUBJECT_LABELS: Record<AcademicSubjectDescriptor, string> = {
+  mathematics: 'Mathematics',
+  science: 'Science',
+  english: 'English',
+  nepali: 'Nepali',
+  social_studies: 'Social Studies',
+  environment_population_health: 'Environment, Population & Health (EPH)',
+  health_physical_creative_arts: 'Health, Physical & Creative Arts',
+  local_subject: 'Local Subject',
+  optional_mathematics: 'Optional Mathematics',
+  optional_computer_science: 'Computer Science (Optional)',
+  optional_economics: 'Economics (Optional)',
+  accounting: 'Accounting',
+  physics: 'Physics',
+  chemistry: 'Chemistry',
+  biology: 'Biology',
+}
+
+export const ACADEMIC_SUBJECT_OPTIONS = ACADEMIC_SUBJECT_DESCRIPTORS.map((value) => ({
+  value,
+  label: ACADEMIC_SUBJECT_LABELS[value],
+}))
+
+// Granular Edge → coarse Ed-Fi Core rollup. MIRROR of the canonical map in
+// server/application/microservices/academics/src/courses/subject-area-mapper.ts
+// — the create contract requires `subjectArea`, the service stores it verbatim,
+// so the form derives it here from the operator's single `academicSubject` pick.
+// `Record<AcademicSubjectDescriptor, …>` makes a missing key a tsc error.
+// Proper fix (fast-follow): lift this map into @aibrains/shared-types so both
+// sides import one source instead of mirroring.
+const ACADEMIC_SUBJECT_TO_SUBJECT_AREA: Record<AcademicSubjectDescriptor, CourseSubjectArea> = {
+  mathematics: 'mathematics',
+  science: 'science',
+  english: 'english_language_arts',
+  nepali: 'world_languages',
+  social_studies: 'social_studies',
+  environment_population_health: 'physical_education',
+  health_physical_creative_arts: 'physical_education',
+  local_subject: 'other',
+  optional_mathematics: 'mathematics',
+  optional_computer_science: 'technology',
+  optional_economics: 'business',
+  accounting: 'business',
+  physics: 'science',
+  chemistry: 'science',
+  biology: 'science',
+}
+
+export function deriveSubjectAreaFromAcademicSubject(
+  descriptor: AcademicSubjectDescriptor,
+): CourseSubjectArea {
+  return ACADEMIC_SUBJECT_TO_SUBJECT_AREA[descriptor]
+}
 
 export const COURSE_TYPE_OPTIONS = [
   { value: 'required', label: 'Required' },
@@ -112,22 +179,12 @@ export const courseFormSchema = z.object({
     .min(2, 'Course name must be at least 2 characters')
     .max(200, 'Course name must not exceed 200 characters'),
 
-  // Classification
-  subjectArea: z.enum(
-    [
-      'mathematics',
-      'english_language_arts',
-      'science',
-      'social_studies',
-      'world_languages',
-      'arts',
-      'physical_education',
-      'technology',
-      'business',
-      'vocational',
-      'other',
-    ],
-    { required_error: 'Subject area is required' }
+  // Classification — operator picks the granular Edge subject; the coarse
+  // Ed-Fi `subjectArea` rollup is derived from it server-side (shared-types
+  // 0.70.0 made subjectArea optional; the backend enforces the either-or).
+  academicSubject: z.enum(
+    ACADEMIC_SUBJECT_DESCRIPTORS as unknown as [AcademicSubjectDescriptor, ...AcademicSubjectDescriptor[]],
+    { required_error: 'Academic subject is required' }
   ),
   courseType: z.enum(
     ['required', 'elective', 'enrichment', 'remedial', 'honors', 'ap', 'ib', 'dual_enrollment', 'vocational'],
@@ -173,7 +230,7 @@ export type CourseFormData = z.infer<typeof courseFormSchema>
 export const defaultCourseFormData: Partial<CourseFormData> = {
   courseCode: '',
   courseName: '',
-  subjectArea: undefined,
+  academicSubject: undefined,
   courseType: undefined,
   creditType: undefined,
   credits: 1,
@@ -191,6 +248,11 @@ export const defaultCourseFormData: Partial<CourseFormData> = {
 
 export function getSubjectAreaLabel(value: string): string {
   const option = SUBJECT_AREA_OPTIONS.find((o) => o.value === value)
+  return option?.label ?? value
+}
+
+export function getAcademicSubjectLabel(value: string): string {
+  const option = ACADEMIC_SUBJECT_OPTIONS.find((o) => o.value === value)
   return option?.label ?? value
 }
 

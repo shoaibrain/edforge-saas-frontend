@@ -24,7 +24,7 @@ import {
   X,
 } from 'lucide-react'
 import {
-  SUBJECT_AREA_OPTIONS,
+  ACADEMIC_SUBJECT_OPTIONS,
   COURSE_TYPE_OPTIONS,
   CREDIT_TYPE_OPTIONS,
   DURATION_OPTIONS,
@@ -329,14 +329,14 @@ export function CourseForm({ isEdit = false, schoolId }: CourseFormProps) {
       {/* Section 2: Classification */}
       <FormSection
         title="Classification"
-        description="Categorize this course by subject, type, and credit level."
+        description="Categorize this course by subject, type, and credit level. The broad Ed-Fi subject area is derived automatically from the academic subject."
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SelectField
-            name="subjectArea"
-            label="Subject Area"
-            placeholder="Select subject area"
-            options={SUBJECT_AREA_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+            name="academicSubject"
+            label="Academic Subject"
+            placeholder="Select academic subject"
+            options={ACADEMIC_SUBJECT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={GraduationCap}
           />
           <SelectField
