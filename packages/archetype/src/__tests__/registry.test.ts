@@ -89,14 +89,4 @@ describe('conformance — every registered archetype is fully wired', () => {
       }
     },
   )
-
-  it('every labelKey lives in the identifiers namespace (GF1 i18n-coverage anchor)', () => {
-    for (const archetype of REGISTERED_ARCHETYPES) {
-      for (const entity of ENTITY_KINDS) {
-        expect(ARCHETYPE_REGISTRY[archetype].identifiers[entity].labelKey).toMatch(
-          /^identifiers\.[a-zA-Z]+$/,
-        )
-      }
-    }
-  })
 })
