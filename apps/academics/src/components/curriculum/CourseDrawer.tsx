@@ -294,6 +294,7 @@ function CourseFormView({
           courseCode: course.courseCode,
           courseName: course.courseName,
           subjectArea: course.subjectArea,
+          academicSubject: course.academicSubject ?? undefined,
           courseType: course.courseType,
           creditType: course.creditType ?? undefined,
           credits: course.credits,
@@ -324,6 +325,7 @@ function CourseFormView({
           schoolId: schoolId || '',
           description: data.description || undefined,
           creditType: data.creditType ?? undefined,
+          academicSubject: data.academicSubject || undefined,
           periodsPerWeek: data.periodsPerWeek ?? undefined,
           objectives: data.objectives && data.objectives.length > 0 ? data.objectives : undefined,
         }
@@ -333,6 +335,7 @@ function CourseFormView({
         const payload: UpdateCourseDto = {
           courseName: data.courseName,
           subjectArea: data.subjectArea,
+          academicSubject: data.academicSubject || undefined,
           courseType: data.courseType,
           creditType: data.creditType ?? undefined,
           credits: data.credits,

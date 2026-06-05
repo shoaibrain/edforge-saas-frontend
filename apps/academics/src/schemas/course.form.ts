@@ -25,6 +25,34 @@ export const SUBJECT_AREA_OPTIONS = [
   { value: 'other', label: 'Other' },
 ] as const
 
+// Granular, curriculum-specific subject identity (distinct from the coarse
+// Ed-Fi `subjectArea` rollup above). When set, the backend derives the coarse
+// `subjectArea` from this authoritatively (createCourse/updateCourse), so the
+// two never drift, and it drives IEMIS/NEB subject mapping.
+//
+// CANONICAL SOURCE: `ACADEMIC_SUBJECT_DESCRIPTORS` in @aibrains/shared-types
+// (descriptors/academic-subject). It is mirrored here because that enum is not
+// re-exported from the package index at the pinned version — same local-options
+// pattern as SUBJECT_AREA_OPTIONS above. TODO(converge): import the canonical
+// list once shared-types re-exports it from the index + the pin is bumped.
+export const ACADEMIC_SUBJECT_OPTIONS = [
+  { value: 'mathematics', label: 'Mathematics' },
+  { value: 'science', label: 'Science' },
+  { value: 'english', label: 'English' },
+  { value: 'nepali', label: 'Nepali' },
+  { value: 'social_studies', label: 'Social Studies' },
+  { value: 'environment_population_health', label: 'Environment, Population & Health (EPH)' },
+  { value: 'health_physical_creative_arts', label: 'Health, Physical & Creative Arts' },
+  { value: 'local_subject', label: 'Local Subject' },
+  { value: 'optional_mathematics', label: 'Optional Mathematics' },
+  { value: 'optional_computer_science', label: 'Optional Computer Science' },
+  { value: 'optional_economics', label: 'Optional Economics' },
+  { value: 'accounting', label: 'Accounting' },
+  { value: 'physics', label: 'Physics' },
+  { value: 'chemistry', label: 'Chemistry' },
+  { value: 'biology', label: 'Biology' },
+] as const
+
 export const COURSE_TYPE_OPTIONS = [
   { value: 'required', label: 'Required' },
   { value: 'elective', label: 'Elective' },
@@ -129,6 +157,27 @@ export const courseFormSchema = z.object({
     ],
     { required_error: 'Subject area is required' }
   ),
+  // Optional granular subject. When set, the backend derives `subjectArea` from
+  // it. Mirrors the creditType optional-enum pattern (default undefined).
+  academicSubject: z
+    .enum([
+      'mathematics',
+      'science',
+      'english',
+      'nepali',
+      'social_studies',
+      'environment_population_health',
+      'health_physical_creative_arts',
+      'local_subject',
+      'optional_mathematics',
+      'optional_computer_science',
+      'optional_economics',
+      'accounting',
+      'physics',
+      'chemistry',
+      'biology',
+    ])
+    .optional(),
   courseType: z.enum(
     ['required', 'elective', 'enrichment', 'remedial', 'honors', 'ap', 'ib', 'dual_enrollment', 'vocational'],
     { required_error: 'Course type is required' }
@@ -174,6 +223,7 @@ export const defaultCourseFormData: Partial<CourseFormData> = {
   courseCode: '',
   courseName: '',
   subjectArea: undefined,
+  academicSubject: undefined,
   courseType: undefined,
   creditType: undefined,
   credits: 1,

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import {
   SUBJECT_AREA_OPTIONS,
+  ACADEMIC_SUBJECT_OPTIONS,
   COURSE_TYPE_OPTIONS,
   CREDIT_TYPE_OPTIONS,
   DURATION_OPTIONS,
@@ -337,6 +338,13 @@ export function CourseForm({ isEdit = false, schoolId }: CourseFormProps) {
             label="Subject Area"
             placeholder="Select subject area"
             options={SUBJECT_AREA_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+            icon={GraduationCap}
+          />
+          <SelectField
+            name="academicSubject"
+            label="Academic Subject (curriculum)"
+            placeholder="Optional — sets Subject Area automatically"
+            options={ACADEMIC_SUBJECT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={GraduationCap}
           />
           <SelectField
