@@ -1,88 +1,115 @@
 /**
- * Exams Module (Legacy Route)
+ * Exams Module
  *
- * High-stakes examination management for the Academics domain.
- * Now consolidated under /academics/grades for unified grading workflow.
+ * School + academic-year scoped exam management. Exams are keyed at the
+ * (school, academicYear, term) level — not per-section. Slice 1: list + create.
+ * Later slices add exam-courses, score entry, and result cards.
  */
 
-import { Calculator, Calendar, Shield, ArrowRight } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
+import { useMemo, useState } from 'react'
+import { ClipboardList, Plus } from 'lucide-react'
+import { usePermission } from '@edforge/abac'
+import { useActiveSchoolId } from '../../stores/app.store'
+import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool'
+import { useExams, useExamPattern } from '../../hooks/useExams'
+import { ExamTable } from '../../components/exams/ExamTable'
+import { ExamDrawer } from '../../components/exams/ExamDrawer'
+
+interface TermOption {
+  periodId: string
+  name: string
+}
 
 export function ExamsModule() {
+  const schoolId = useActiveSchoolId() || ''
+  const canCreateExam = usePermission('create', 'assessments')
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const { data: currentYear } = useCurrentAcademicYear(schoolId, !!schoolId)
+  const academicYearId = currentYear?.yearId ?? ''
+
+  const { data: gradingPeriods } = useGradingPeriods(schoolId, academicYearId, !!schoolId && !!academicYearId)
+  const terms: TermOption[] = useMemo(
+    () =>
+      ((gradingPeriods ?? []) as Array<{ periodId?: string; termId?: string; name: string }>).map((gp) => ({
+        periodId: gp.periodId ?? gp.termId ?? '',
+        name: gp.name,
+      })),
+    [gradingPeriods]
+  )
+  const termNameById = useMemo(
+    () => Object.fromEntries(terms.map((t) => [t.periodId, t.name])),
+    [terms]
+  )
+
+  const { data: examPatternData } = useExamPattern(!!schoolId)
+  const examPattern = examPatternData?.examPattern ?? []
+
+  const { data: examList, isLoading } = useExams(
+    { schoolId, academicYearId },
+    !!schoolId && !!academicYearId
+  )
+  const exams = examList?.items ?? []
+
+  const canOpenDrawer = canCreateExam && terms.length > 0 && examPattern.length > 0
+
   return (
     <div className="min-h-full">
+      {/* Header */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
+        <div className="px-6 py-8 flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-              <Calculator className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <ClipboardList className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Examinations</h1>
               <p className="text-text-secondary mt-1">
-                Midterms, finals, and standardized test management
+                {currentYear?.name
+                  ? `Exams for ${currentYear.name}`
+                  : 'Midterms, finals, and term examinations'}
               </p>
             </div>
           </div>
+          {canCreateExam && (
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              disabled={!canOpenDrawer}
+              title={!canOpenDrawer ? 'An academic year with terms is required first' : undefined}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4" />
+              Create Exam
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Redirect Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-blue-500/20">
-              <ArrowRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-text-primary mb-2">
-                New Consolidated View Available
-              </h3>
-              <p className="text-text-secondary mb-4">
-                Access the Grades & Assessments page for a unified view of gradebooks,
-                assessments, and exams in one place.
-              </p>
-              <Link
-                to="/classrooms"
-                search={{ tab: 'gradebook' }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <span>Go to Grades & Assessments</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+      <div className="p-6">
+        {!academicYearId ? (
+          <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
+            <ClipboardList className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+            <h4 className="text-lg font-medium text-text-primary mb-2">No Active Academic Year</h4>
+            <p className="text-text-secondary max-w-md mx-auto">
+              Set a current academic year for this school to begin scheduling exams.
+            </p>
           </div>
-        </div>
-
-        {/* Product Description */}
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-purple-500/10">
-              <Calculator className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-text-primary mb-2">
-                Examination Management
-              </h3>
-              <p className="text-text-secondary leading-relaxed mb-4">
-                Manage high-stakes examinations including midterms, finals, and state-mandated
-                standardized tests. Track testing accommodations for students with IEPs and
-                504 plans to ensure compliance.
-              </p>
-              <ul className="text-sm text-text-secondary space-y-1">
-                <li className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-amber-500" />
-                  <span>Exam scheduling with room and proctor assignments</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-amber-500" />
-                  <span>Accommodation tracking integrated with Special Programs</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        ) : (
+          <ExamTable exams={exams} termNameById={termNameById} isLoading={isLoading} />
+        )}
       </div>
+
+      {canOpenDrawer && (
+        <ExamDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          schoolId={schoolId}
+          academicYearId={academicYearId}
+          terms={terms}
+          examPattern={examPattern}
+        />
+      )}
     </div>
   )
 }

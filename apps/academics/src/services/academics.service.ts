@@ -7,6 +7,12 @@
 
 import axios from 'axios'
 import { api, apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
+import type {
+  ExamResponseDto,
+  ExamListResponseDto,
+  CreateExamDto,
+  ExamStatus,
+} from '@aibrains/shared-types'
 
 // ============================================================================
 // DEBUG INSTRUMENTATION
@@ -1962,10 +1968,58 @@ export async function reorderClassworkItems(
 }
 
 // ============================================================================
+// EXAMS (school + term scoped)
+// ============================================================================
+
+export interface ExamListParams {
+  schoolId: string
+  academicYearId?: string
+  termId?: string
+  examType?: string
+  status?: ExamStatus
+  isActive?: boolean
+  limit?: number
+  cursor?: string
+}
+
+/**
+ * List exams. GET /academics/exams?schoolId=…
+ */
+export async function getExams(params: ExamListParams): Promise<ExamListResponseDto> {
+  const queryParams: Record<string, unknown> = { schoolId: params.schoolId }
+  if (params.academicYearId) queryParams.academicYearId = params.academicYearId
+  if (params.termId) queryParams.termId = params.termId
+  if (params.examType) queryParams.examType = params.examType
+  if (params.status) queryParams.status = params.status
+  if (params.isActive !== undefined) queryParams.isActive = params.isActive
+  if (params.limit) queryParams.limit = params.limit
+  if (params.cursor) queryParams.cursor = params.cursor
+  return apiGet<ExamListResponseDto>('/academics/exams', queryParams)
+}
+
+/**
+ * Read the tenant archetype's allowed exam types.
+ * GET /academics/exams/exam-pattern
+ */
+export async function getExamPattern(): Promise<{ archetype: string | null; examPattern: string[] }> {
+  return apiGet<{ archetype: string | null; examPattern: string[] }>('/academics/exams/exam-pattern')
+}
+
+/**
+ * Create an exam. POST /academics/exams
+ */
+export async function createExam(data: CreateExamDto): Promise<ExamResponseDto> {
+  return apiPost<ExamResponseDto>('/academics/exams', data)
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
 export const academicsService = {
+  getExams,
+  getExamPattern,
+  createExam,
   // Student CRUD
   getStudents,
   getStudent,
