@@ -15,14 +15,23 @@ export type {
   EntityKind,
   AddressVariant,
   CalendarSystem,
+  ArchetypeFeatureMatrix,
+  FieldRequirement,
+  FeatureField,
+  AllowedValueControl,
 } from './types'
 
 export {
   getArchetypeProfile,
   getIdentifierSpec,
+  getArchetypeFeatureMatrix,
+  fieldRequirement,
+  allowedValuesFor,
   ARCHETYPE_REGISTRY,
   REGISTERED_ARCHETYPES,
   ENTITY_KINDS,
+  FEATURE_FIELDS,
+  ALLOWED_VALUE_CONTROLS,
 } from './registry'
 
 export {
