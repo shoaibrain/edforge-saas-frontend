@@ -35,23 +35,50 @@ export const SUBJECT_AREA_OPTIONS = [
 // re-exported from the package index at the pinned version — same local-options
 // pattern as SUBJECT_AREA_OPTIONS above. TODO(converge): import the canonical
 // list once shared-types re-exports it from the index + the pin is bumped.
-export const ACADEMIC_SUBJECT_OPTIONS = [
-  { value: 'mathematics', label: 'Mathematics' },
-  { value: 'science', label: 'Science' },
-  { value: 'english', label: 'English' },
-  { value: 'nepali', label: 'Nepali' },
-  { value: 'social_studies', label: 'Social Studies' },
-  { value: 'environment_population_health', label: 'Environment, Population & Health (EPH)' },
-  { value: 'health_physical_creative_arts', label: 'Health, Physical & Creative Arts' },
-  { value: 'local_subject', label: 'Local Subject' },
-  { value: 'optional_mathematics', label: 'Optional Mathematics' },
-  { value: 'optional_computer_science', label: 'Optional Computer Science' },
-  { value: 'optional_economics', label: 'Optional Economics' },
-  { value: 'accounting', label: 'Accounting' },
-  { value: 'physics', label: 'Physics' },
-  { value: 'chemistry', label: 'Chemistry' },
-  { value: 'biology', label: 'Biology' },
+// Single source of truth for the values — both the form options and the schema
+// enum derive from this tuple, so the dropdown and validation can never drift.
+export const ACADEMIC_SUBJECT_VALUES = [
+  'mathematics',
+  'science',
+  'english',
+  'nepali',
+  'social_studies',
+  'environment_population_health',
+  'health_physical_creative_arts',
+  'local_subject',
+  'optional_mathematics',
+  'optional_computer_science',
+  'optional_economics',
+  'accounting',
+  'physics',
+  'chemistry',
+  'biology',
 ] as const
+
+// Display labels, keyed by value — the Record type makes a missing/extra label a
+// compile error, keeping it exhaustive against the values tuple.
+const ACADEMIC_SUBJECT_LABELS: Record<(typeof ACADEMIC_SUBJECT_VALUES)[number], string> = {
+  mathematics: 'Mathematics',
+  science: 'Science',
+  english: 'English',
+  nepali: 'Nepali',
+  social_studies: 'Social Studies',
+  environment_population_health: 'Environment, Population & Health (EPH)',
+  health_physical_creative_arts: 'Health, Physical & Creative Arts',
+  local_subject: 'Local Subject',
+  optional_mathematics: 'Optional Mathematics',
+  optional_computer_science: 'Optional Computer Science',
+  optional_economics: 'Optional Economics',
+  accounting: 'Accounting',
+  physics: 'Physics',
+  chemistry: 'Chemistry',
+  biology: 'Biology',
+}
+
+export const ACADEMIC_SUBJECT_OPTIONS = ACADEMIC_SUBJECT_VALUES.map((value) => ({
+  value,
+  label: ACADEMIC_SUBJECT_LABELS[value],
+}))
 
 export const COURSE_TYPE_OPTIONS = [
   { value: 'required', label: 'Required' },
@@ -159,25 +186,7 @@ export const courseFormSchema = z.object({
   ),
   // Optional granular subject. When set, the backend derives `subjectArea` from
   // it. Mirrors the creditType optional-enum pattern (default undefined).
-  academicSubject: z
-    .enum([
-      'mathematics',
-      'science',
-      'english',
-      'nepali',
-      'social_studies',
-      'environment_population_health',
-      'health_physical_creative_arts',
-      'local_subject',
-      'optional_mathematics',
-      'optional_computer_science',
-      'optional_economics',
-      'accounting',
-      'physics',
-      'chemistry',
-      'biology',
-    ])
-    .optional(),
+  academicSubject: z.enum(ACADEMIC_SUBJECT_VALUES).optional(),
   courseType: z.enum(
     ['required', 'elective', 'enrichment', 'remedial', 'honors', 'ap', 'ib', 'dual_enrollment', 'vocational'],
     { required_error: 'Course type is required' }

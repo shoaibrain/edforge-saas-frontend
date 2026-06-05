@@ -343,7 +343,7 @@ export function CourseForm({ isEdit = false, schoolId }: CourseFormProps) {
           <SelectField
             name="academicSubject"
             label="Academic Subject (curriculum)"
-            placeholder="Optional — sets Subject Area automatically"
+            placeholder="Optional — sets Subject Area on save"
             options={ACADEMIC_SUBJECT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={GraduationCap}
           />
