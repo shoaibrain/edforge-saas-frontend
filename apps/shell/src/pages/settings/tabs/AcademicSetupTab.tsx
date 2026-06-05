@@ -251,12 +251,21 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
   const bellSchedules = (bellSchedulesData as any)?.items || (bellSchedulesData as any)?.data || (Array.isArray(bellSchedulesData) ? bellSchedulesData : [])
 
   // Wizard step completion
+  // C.5 follow-up — the bell-schedule step mirrors the backend C.4 activation
+  // predicate exactly (default + multi-period, with active schools
+  // grandfathered) so this in-tab checkmark can't disagree with the
+  // school-detail activation gate. A loose `length > 0` here showed ✓ while
+  // the gate refused activation on a placeholder default — the contradiction
+  // the C.5 chip surfaced but didn't resolve.
+  const hasRealDefaultBell = bellSchedules.some(
+    (b: any) => b.isDefault && (b.periodCount ?? b.classPeriods?.length ?? b.periods?.length ?? 0) > 1,
+  )
   const steps: WizardStepConfig[] = useMemo(() => [
     { id: 'years', label: 'Academic Years', completed: years.length > 0 },
     { id: 'sessions', label: 'Sessions & Terms', completed: sessions.length > 0 },
     { id: 'calendar', label: 'Calendar', completed: (calendarStats as any)?.totalDays > 0 },
-    { id: 'bell-schedule', label: 'Bell Schedule', completed: bellSchedules.length > 0 },
-  ], [years, sessions, calendarStats, bellSchedules])
+    { id: 'bell-schedule', label: 'Bell Schedule', completed: school?.status === 'active' || hasRealDefaultBell },
+  ], [years, sessions, calendarStats, hasRealDefaultBell, school?.status])
 
   // Default to first incomplete step
   const firstIncomplete = steps.find(s => !s.completed)?.id || 'years'
