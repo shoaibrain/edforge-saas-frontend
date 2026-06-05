@@ -15,6 +15,7 @@ import { useMemo, useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Loader2, ClipboardList, ArrowLeft, CheckCircle2, Lock } from 'lucide-react'
 import { UuidBadge } from '@edforge/archetype'
+import { Avatar } from '@edforge/ui'
 import type { ExamResponseDto, ResultCardResponseDto } from '@aibrains/shared-types'
 import {
   useResultCards,
@@ -30,6 +31,45 @@ function gpaClass(gpa: number): string {
   if (gpa >= 3.0) return 'text-blue-600 dark:text-blue-400'
   if (gpa >= 2.0) return 'text-amber-600 dark:text-amber-400'
   return 'text-red-600 dark:text-red-400'
+}
+
+// RC-UX.2: the frozen identity snapshot RC-UX.1 denormalizes onto the card. Typed
+// here as a local bridge until @aibrains/shared-types is published with the field;
+// the runtime data is present once the backend (RC-UX.1) is deployed.
+interface ResultCardStudentIdentity {
+  legalName: string
+  preferredName?: string
+  gradeLevel?: string
+  emisStudentId?: string
+  photoUrl?: string
+}
+
+function cardIdentity(card: ResultCardResponseDto): ResultCardStudentIdentity | undefined {
+  return (card as ResultCardResponseDto & { studentIdentity?: ResultCardStudentIdentity }).studentIdentity
+}
+
+/** Roster student cell: avatar + name + grade, falling back to the id badge. */
+function StudentCell({ card, size = 'sm' }: { card: ResultCardResponseDto; size?: 'sm' | 'md' }) {
+  const id = cardIdentity(card)
+  if (!id) return <UuidBadge value={card.studentId} />
+  return (
+    <div className="flex items-center gap-2.5 min-w-0">
+      <Avatar name={id.legalName} src={id.photoUrl} size={size} className="flex-shrink-0" />
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-text-primary truncate">
+          {id.legalName}
+          {id.preferredName ? <span className="text-text-tertiary font-normal"> ({id.preferredName})</span> : null}
+        </p>
+        {(id.gradeLevel || id.emisStudentId) && (
+          <p className="text-xs text-text-tertiary truncate">
+            {id.gradeLevel ? `Grade ${id.gradeLevel}` : ''}
+            {id.gradeLevel && id.emisStudentId ? ' · ' : ''}
+            {id.emisStudentId ? `EMIS ${id.emisStudentId}` : ''}
+          </p>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
@@ -108,10 +148,7 @@ function ReportCardDetail({
 
         {/* Summary */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs text-text-tertiary mb-0.5">Student</p>
-            <UuidBadge value={card.studentId} />
-          </div>
+          <StudentCell card={card} size="md" />
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="text-xs text-text-tertiary">Term GPA</p>
@@ -303,7 +340,7 @@ function ResultCardList({
                 tabIndex={0}
                 className="bg-surface-primary hover:bg-surface-secondary/60 transition-colors cursor-pointer"
               >
-                <td className="px-3 py-2"><UuidBadge value={card.studentId} /></td>
+                <td className="px-3 py-2"><StudentCell card={card} /></td>
                 <td className="px-3 py-2 text-right text-text-secondary">
                   {card.totalScore}/{card.totalMaxMarks}
                 </td>
