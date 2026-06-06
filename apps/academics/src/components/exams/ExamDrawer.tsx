@@ -74,26 +74,30 @@ export function ExamDrawer({
     mode: 'onBlur',
   })
 
-  // Re-seed the form whenever the drawer opens — switching between create
-  // and edit, or between two exams, must reset prior field state.
+  // Re-seed in edit mode — only when the drawer opens or the target exam
+  // changes. examPattern/terms are NOT dependencies here: a background
+  // refresh of either must not wipe an in-progress edit.
   useEffect(() => {
-    if (!open) return
-    if (exam) {
-      form.reset({
-        examName: exam.examName,
-        examType: exam.examType,
-        termId: exam.termId,
-        startDate: exam.startDate,
-        endDate: exam.endDate,
-        description: exam.description ?? '',
-      })
-    } else {
-      form.reset({
-        ...EMPTY_FORM,
-        examType: examPattern[0] ?? '',
-        termId: terms[0]?.periodId ?? '',
-      })
-    }
+    if (!open || !exam) return
+    form.reset({
+      examName: exam.examName,
+      examType: exam.examType,
+      termId: exam.termId,
+      startDate: exam.startDate,
+      endDate: exam.endDate,
+      description: exam.description ?? '',
+    })
+  }, [open, exam, form])
+
+  // Re-seed in create mode — depends on the option lists so the defaults
+  // track the latest archetype pattern / terms.
+  useEffect(() => {
+    if (!open || exam) return
+    form.reset({
+      ...EMPTY_FORM,
+      examType: examPattern[0] ?? '',
+      termId: terms[0]?.periodId ?? '',
+    })
   }, [open, exam, examPattern, terms, form])
 
   const onSubmit = useCallback(
