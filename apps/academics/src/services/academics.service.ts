@@ -2014,6 +2014,32 @@ export async function createExam(data: CreateExamDto): Promise<ExamResponseDto> 
   return apiPost<ExamResponseDto>('/academics/exams', data)
 }
 
+/**
+ * Get a single exam. GET /academics/exams/{examId}?schoolId=…
+ */
+export async function getExam(examId: string, schoolId: string): Promise<ExamResponseDto> {
+  return apiGet<ExamResponseDto>(`/academics/exams/${examId}`, { schoolId })
+}
+
+/**
+ * Transition an exam's status through the lifecycle state machine.
+ * PATCH /academics/exams/{examId}/status?schoolId=…
+ *
+ * `in_progress → closed` is what fires the result-batch Lambda (cards generate);
+ * an illegal jump returns 409 EXAM_STATE_INVALID_TRANSITION.
+ */
+export async function transitionExamStatus(
+  examId: string,
+  schoolId: string,
+  targetStatus: ExamStatus,
+  notes?: string,
+): Promise<ExamResponseDto> {
+  return apiPatch<ExamResponseDto>(
+    `/academics/exams/${examId}/status?schoolId=${encodeURIComponent(schoolId)}`,
+    notes ? { targetStatus, notes } : { targetStatus },
+  )
+}
+
 // ============================================================================
 // RESULT CARDS (Ed-Fi ReportCard — generated when an exam closes)
 // ============================================================================
@@ -2095,8 +2121,10 @@ export async function publishResultCard(
 
 export const academicsService = {
   getExams,
+  getExam,
   getExamPattern,
   createExam,
+  transitionExamStatus,
   getResultCards,
   updateResultCardConduct,
   updateResultCardRemark,
