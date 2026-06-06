@@ -104,8 +104,16 @@ export function ExamSubjectsTab({
   // Distinguish "no courses match this exam's grades" (scoped exam, real
   // curriculum, zero overlap) from "no courses exist / all already added" so
   // the empty-state can explain the grade-scope reason specifically.
+  // Gated on pagination being complete (`!hasNextPage && !isFetchingNextPage`):
+  // a later page may hold the only grade-matching course, so firing the
+  // empty-state mid-load would flash a false "no match" while pages are still
+  // arriving (the auto-page effect below drives the fetch to completion).
   const noGradeMatch =
-    examGradeLevels.length > 0 && courses.length > 0 && gradeMatchedCourses.length === 0
+    examGradeLevels.length > 0 &&
+    courses.length > 0 &&
+    gradeMatchedCourses.length === 0 &&
+    !hasNextPage &&
+    !isFetchingNextPage
 
   // The picker needs every course, not just the first page — auto-page through
   // the infinite query whenever the tab is mutable. ELS.8: the grade-match
