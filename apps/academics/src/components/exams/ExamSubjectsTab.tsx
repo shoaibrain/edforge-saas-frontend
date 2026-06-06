@@ -36,11 +36,17 @@ export function ExamSubjectsTab({
   schoolId,
   status,
   canManage,
+  examGradeLevels,
 }: {
   examId: string
   schoolId: string
   status: ExamStatus
   canManage: boolean
+  /**
+   * ELS.8 — the exam's grade-level scope. Filters the course picker to courses
+   * whose `gradeLevels` overlap. Empty (legacy pre-ELS.1 exam) → no filter.
+   */
+  examGradeLevels: string[]
 }) {
   const mutable = canManage && acceptsExamCourseMutations(status)
 
@@ -72,18 +78,46 @@ export function ExamSubjectsTab({
   })
 
   const takenCourseIds = useMemo(() => new Set(examCourses.map((ec) => ec.courseId)), [examCourses])
+
+  // ELS.8 — grade-level overlap filter. Mirrors the backend ELS.2 guard
+  // (EXAM_COURSE_GRADE_MISMATCH) exactly: a course is shown only when it could
+  // be added. Skip the filter — show the course — when EITHER side is
+  // empty/missing (the exam is a legacy pre-ELS.1 row with no scope, or the
+  // course has no curated gradeLevels); the backend allows the add in those
+  // cases, so the picker must not hide it. Hide only when both sides are
+  // populated and there is no overlap.
+  const examGradeSet = useMemo(() => new Set(examGradeLevels), [examGradeLevels])
+  const gradeMatchedCourses = useMemo(() => {
+    if (examGradeSet.size === 0) return courses
+    return courses.filter((c) => {
+      const cg = c.gradeLevels
+      if (!Array.isArray(cg) || cg.length === 0) return true
+      return cg.some((g) => examGradeSet.has(g))
+    })
+  }, [courses, examGradeSet])
+
   const availableCourses = useMemo(
-    () => courses.filter((c) => !takenCourseIds.has(c.courseId)),
-    [courses, takenCourseIds],
+    () => gradeMatchedCourses.filter((c) => !takenCourseIds.has(c.courseId)),
+    [gradeMatchedCourses, takenCourseIds],
   )
 
+  // Distinguish "no courses match this exam's grades" (scoped exam, real
+  // curriculum, zero overlap) from "no courses exist / all already added" so
+  // the empty-state can explain the grade-scope reason specifically.
+  const noGradeMatch =
+    examGradeLevels.length > 0 && courses.length > 0 && gradeMatchedCourses.length === 0
+
   // The picker needs every course, not just the first page — auto-page through
-  // the infinite query while the Add Subject form is open.
+  // the infinite query whenever the tab is mutable. ELS.8: the grade-match
+  // empty-state can only be trusted once all pages are loaded (a later page
+  // might hold the only grade-matching course), and the "Add Subject" button
+  // is gated on a non-empty filtered set — so paging can't wait for the form
+  // to open. Gated on `mutable` so read-only exams don't fetch the catalog.
   useEffect(() => {
-    if (adding && hasNextPage && !isFetchingNextPage) {
+    if (mutable && hasNextPage && !isFetchingNextPage) {
       void fetchNextPage()
     }
-  }, [adding, hasNextPage, isFetchingNextPage, fetchNextPage])
+  }, [mutable, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const handleAdd = async () => {
     if (!form.courseId) return
@@ -172,6 +206,19 @@ export function ExamSubjectsTab({
           <Lock className="w-4 h-4 text-text-tertiary" />
           Subjects are locked while the exam is {getExamStatusMeta(status).label}. They can only be changed in
           Draft or Scheduled.
+        </div>
+      )}
+
+      {/* ELS.8 — grade-scope empty state: the exam is scoped to grade(s) for
+          which the curriculum has no matching courses. */}
+      {mutable && !adding && noGradeMatch && (
+        <div className="flex items-start gap-2 rounded-lg border border-border-secondary bg-surface-secondary/50 px-4 py-3 text-sm text-text-secondary">
+          <BookOpen className="w-4 h-4 text-text-tertiary mt-0.5 flex-shrink-0" />
+          <span>
+            No courses match this exam&apos;s grade level{examGradeLevels.length !== 1 ? 's' : ''} (
+            {examGradeLevels.join(', ')}). Add courses tagged for{' '}
+            {examGradeLevels.length !== 1 ? 'those grades' : 'that grade'} in Curriculum first.
+          </span>
         </div>
       )}
 
