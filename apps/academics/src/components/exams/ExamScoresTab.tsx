@@ -10,14 +10,15 @@
  * `acceptsScoreWrites` guard (mirrored client-side via `acceptsScoreWrites`).
  */
 
-import { useEffect, useMemo, useState } from 'react'
-import { BookOpen, Lock, Save, Loader2, AlertCircle } from 'lucide-react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { BookOpen, Lock, Save, Loader2, AlertCircle, Users } from 'lucide-react'
 import type {
   EnrollmentResponseDto,
   ExamCourseResponseDto,
   ExamResponseDto,
   ExamScoreResponseDto,
 } from '@aibrains/shared-types'
+import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import { useEnrollments, flattenEnrollmentPages } from '../../hooks/useEnrollments'
 import { useExamCourses } from '../../hooks/useExamCourses'
 import {
@@ -26,6 +27,7 @@ import {
 } from '../../hooks/useExamScores'
 import { acceptsScoreWrites } from '../../schemas/exam-state-machine'
 import { getExamStatusMeta } from '../../schemas/exam.form'
+import { UserAvatar } from '../common/UserAvatar'
 
 const MAX_BULK = 250 // backend EXAM_SCORE_BULK_MAX_TOTAL
 
@@ -66,6 +68,56 @@ function uuidv4(): string {
     const v = ch === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })
+}
+
+// ============================================================================
+// SCORE CELL — editable input inside the roster table
+//
+// The score inputs are bound to component-level `edits` state. To keep them
+// editable inside the data table WITHOUT rebuilding the `columns` array on
+// every keystroke (which would reset the table's pagination/search), the edit
+// state flows to the cells through context: `columns` stays referentially
+// stable; only the ScoreCells re-render as the operator types.
+// ============================================================================
+
+interface ScoreEntryCtxValue {
+  edits: Record<string, RowEdit>
+  setRow: (enrollmentId: string, text: string) => void
+  maxMarks: number
+  writable: boolean
+}
+
+const ScoreEntryContext = createContext<ScoreEntryCtxValue | null>(null)
+
+function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studentName: string }) {
+  const ctx = useContext(ScoreEntryContext)
+  if (!ctx) return null
+  const { edits, setRow, maxMarks, writable } = ctx
+  const row = edits[enrollmentId] ?? { text: '', value: null }
+  const parsed = parseRow(row.text)
+  const tooHigh = parsed.valid && parsed.value != null && parsed.value > maxMarks
+  const tooLow = parsed.valid && parsed.value != null && parsed.value < 0
+  const showError = !parsed.valid || tooHigh || tooLow
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        max={maxMarks}
+        step="any"
+        value={row.text}
+        disabled={!writable}
+        onChange={(ev) => setRow(enrollmentId, ev.target.value)}
+        className={`w-24 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
+          showError ? 'border-red-500 text-red-600' : 'border-border-secondary text-text-primary'
+        } disabled:opacity-50`}
+        aria-label={`Score for ${studentName}`}
+        aria-invalid={showError || undefined}
+      />
+      <span className="text-xs text-text-tertiary tabular-nums w-12">/ {maxMarks}</span>
+    </div>
+  )
 }
 
 export function ExamScoresTab({
@@ -225,6 +277,59 @@ export function ExamScoresTab({
 
   const bulkMutation = useBulkExamScores(exam.examId, exam.schoolId)
 
+  // Roster table wiring. `setRow` is stable; the context value carries the
+  // live edit state to the ScoreCells. `columns` is referentially stable
+  // (empty deps) so typing never resets the table's pagination/search.
+  const setRow = useCallback((enrollmentId: string, text: string) => {
+    setEdits((prev) => ({ ...prev, [enrollmentId]: { text, value: parseRow(text).value } }))
+  }, [])
+  const scoreCtx = useMemo<ScoreEntryCtxValue>(
+    () => ({ edits, setRow, maxMarks, writable }),
+    [edits, setRow, maxMarks, writable],
+  )
+  const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'studentName',
+        header: 'Student',
+        size: 300,
+        cell: ({ row }) => {
+          const e = row.original
+          const displayName = e.studentName || 'Student'
+          return (
+            <div className="flex items-center gap-3 min-w-0">
+              <UserAvatar userId={e.studentId} userName={displayName} role="student" size="md" />
+              <span className="text-sm font-medium text-text-primary truncate">{displayName}</span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'gradeLevel',
+        header: 'Grade',
+        size: 110,
+        cell: ({ row }) => (
+          <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-secondary">
+            {row.original.gradeLevel}
+          </span>
+        ),
+      },
+      {
+        id: 'score',
+        header: () => <span className="block text-right">Score</span>,
+        size: 180,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <ScoreCell
+            enrollmentId={row.original.enrollmentId}
+            studentName={row.original.studentName ?? 'student'}
+          />
+        ),
+      },
+    ],
+    [],
+  )
+
   const handleSave = async () => {
     if (!selectedExamCourseId) return
     if (diffs.changes.length === 0) return
@@ -326,73 +431,31 @@ export function ExamScoresTab({
         </div>
       )}
 
-      {/* Roster */}
-      {rosterLoading || scoresLoading ? (
-        <div className="animate-pulse space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-12 rounded-lg bg-surface-secondary" />
-          ))}
-        </div>
-      ) : enrollments.length === 0 ? (
-        <div className="rounded-xl border border-border-secondary p-10 text-center">
-          <p className="text-sm text-text-secondary">
-            {examGradeSet.size > 0 && activeEnrollments.length > 0
-              ? `No active students enrolled at this exam's grade level${
-                  (exam.gradeLevels?.length ?? 0) === 1 ? '' : 's'
-                } (${(exam.gradeLevels ?? []).join(', ')}).`
-              : 'No active enrollments for this academic year.'}
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border border-border-secondary divide-y divide-border-secondary">
-          {enrollments.map((e) => {
-            const row = edits[e.enrollmentId] ?? { text: '', value: null }
-            const parsed = parseRow(row.text)
-            const tooHigh = parsed.valid && parsed.value != null && parsed.value > maxMarks
-            const tooLow = parsed.valid && parsed.value != null && parsed.value < 0
-            const showError = !parsed.valid || tooHigh || tooLow
-            return (
-              <div
-                key={e.enrollmentId}
-                className="flex items-center justify-between gap-3 px-4 py-2.5"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-text-primary truncate">
-                    {e.studentName ?? 'Student'}
-                  </p>
-                  <p className="text-xs text-text-tertiary">Grade {e.gradeLevel}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    max={maxMarks}
-                    step="any"
-                    value={row.text}
-                    disabled={!writable}
-                    onChange={(ev) => {
-                      const text = ev.target.value
-                      setEdits((prev) => ({
-                        ...prev,
-                        [e.enrollmentId]: { text, value: parseRow(text).value },
-                      }))
-                    }}
-                    className={`w-24 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
-                      showError
-                        ? 'border-red-500 text-red-600'
-                        : 'border-border-secondary text-text-primary'
-                    } disabled:opacity-50`}
-                    aria-label={`Score for ${e.studentName ?? 'student'}`}
-                    aria-invalid={showError || undefined}
-                  />
-                  <span className="text-xs text-text-tertiary tabular-nums w-12">/ {maxMarks}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+      {/* Roster — TanstackDataTable: avatar + name, grade, editable score.
+          Internal pagination + scroll (maxHeight) keep the page from
+          stretching unbounded on large rosters. */}
+      <ScoreEntryContext.Provider value={scoreCtx}>
+        <TanstackDataTable
+          columns={columns}
+          data={enrollments}
+          getRowId={(e) => e.enrollmentId}
+          isLoading={rosterLoading || scoresLoading}
+          enableSorting
+          searchPlaceholder="Search students by name…"
+          pagination={{ pageSize: 20 }}
+          maxHeight="calc(100vh - 22rem)"
+          emptyState={{
+            icon: <Users className="w-10 h-10" />,
+            title: 'No students to score',
+            description:
+              examGradeSet.size > 0 && activeEnrollments.length > 0
+                ? `No active students enrolled at this exam's grade level${
+                    (exam.gradeLevels?.length ?? 0) === 1 ? '' : 's'
+                  } (${(exam.gradeLevels ?? []).join(', ')}).`
+                : 'No active enrollments for this academic year.',
+          }}
+        />
+      </ScoreEntryContext.Provider>
 
       {/* Save bar */}
       {writable && enrollments.length > 0 && (
