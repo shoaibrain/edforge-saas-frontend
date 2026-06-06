@@ -11,6 +11,7 @@ import type {
   ExamResponseDto,
   ExamListResponseDto,
   CreateExamDto,
+  UpdateExamDto,
   ExamStatus,
   ExamCourseResponseDto,
   CreateExamCourseDto,
@@ -2025,6 +2026,24 @@ export async function getExam(examId: string, schoolId: string): Promise<ExamRes
 }
 
 /**
+ * Update an exam's editable fields (examName / examType / dates / description).
+ * PATCH /academics/exams/{examId}?schoolId=…
+ *
+ * Immutable: schoolId, academicYearId, termId. `examType` is server-guarded to
+ * exam.status === 'draft'. Status transitions go through `transitionExamStatus`.
+ */
+export async function updateExam(
+  examId: string,
+  schoolId: string,
+  data: UpdateExamDto,
+): Promise<ExamResponseDto> {
+  return apiPatch<ExamResponseDto>(
+    `/academics/exams/${examId}?schoolId=${encodeURIComponent(schoolId)}`,
+    data,
+  )
+}
+
+/**
  * Transition an exam's status through the lifecycle state machine.
  * PATCH /academics/exams/{examId}/status?schoolId=…
  *
@@ -2176,6 +2195,7 @@ export const academicsService = {
   getExam,
   getExamPattern,
   createExam,
+  updateExam,
   transitionExamStatus,
   getExamCourses,
   createExamCourse,

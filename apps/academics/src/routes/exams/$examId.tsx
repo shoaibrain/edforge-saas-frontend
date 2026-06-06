@@ -22,13 +22,14 @@ import {
   Check,
   ChevronRight,
   ScrollText,
+  Pencil,
 } from 'lucide-react'
 import { z } from 'zod'
 import { usePermission } from '@edforge/abac'
 import type { ExamStatus } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useGradingPeriods } from '../../hooks/useSchool'
-import { useExam, useTransitionExamStatus } from '../../hooks/useExams'
+import { useExam, useExamPattern, useTransitionExamStatus } from '../../hooks/useExams'
 import { getExamStatusMeta, humanizeExamType } from '../../schemas/exam.form'
 import {
   EXAM_STATUS_PIPELINE,
@@ -36,6 +37,7 @@ import {
   type ExamTransitionAction,
 } from '../../schemas/exam-state-machine'
 import { ResultCardsDrawer } from '../../components/exams/ResultCardsDrawer'
+import { ExamDrawer } from '../../components/exams/ExamDrawer'
 import { ExamSubjectsTab } from '../../components/exams/ExamSubjectsTab'
 
 type ExamDetailTab = 'overview' | 'subjects'
@@ -124,6 +126,7 @@ export function ExamDetailModule() {
   const schoolId = useActiveSchoolId() || ''
   const canManage = usePermission('edit', 'assessments')
   const [resultCardsOpen, setResultCardsOpen] = useState(false)
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<ExamDetailTab>('overview')
 
   const isValidId = useMemo(() => {
@@ -143,10 +146,17 @@ export function ExamDetailModule() {
     exam?.academicYearId ?? '',
     !!schoolId && !!exam?.academicYearId,
   )
-  const termName = useMemo(() => {
+  const termOptions = useMemo(() => {
     const periods = (gradingPeriods ?? []) as Array<{ periodId?: string; termId?: string; name: string }>
-    return periods.find((p) => (p.periodId ?? p.termId) === exam?.termId)?.name
-  }, [gradingPeriods, exam?.termId])
+    return periods.map((p) => ({ periodId: p.periodId ?? p.termId ?? '', name: p.name }))
+  }, [gradingPeriods])
+  const termName = useMemo(
+    () => termOptions.find((p) => p.periodId === exam?.termId)?.name,
+    [termOptions, exam?.termId],
+  )
+
+  const { data: examPatternData } = useExamPattern(!!schoolId)
+  const examPattern = examPatternData?.examPattern ?? []
 
   const handleTransition = (action: ExamTransitionAction) => {
     if (!exam) return
@@ -232,14 +242,26 @@ export function ExamDetailModule() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setResultCardsOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors flex-shrink-0"
-            >
-              <ScrollText className="w-4 h-4" />
-              Result Cards
-            </button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {canManage && exam.status !== 'published' && (
+                <button
+                  type="button"
+                  onClick={() => setEditDrawerOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Edit
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setResultCardsOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
+              >
+                <ScrollText className="w-4 h-4" />
+                Result Cards
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -339,6 +361,16 @@ export function ExamDetailModule() {
         open={resultCardsOpen}
         onClose={() => setResultCardsOpen(false)}
         exam={resultCardsOpen ? exam : null}
+      />
+
+      <ExamDrawer
+        open={editDrawerOpen}
+        onClose={() => setEditDrawerOpen(false)}
+        schoolId={schoolId}
+        academicYearId={exam.academicYearId}
+        terms={termOptions}
+        examPattern={examPattern}
+        exam={exam}
       />
     </div>
   )
