@@ -13,6 +13,8 @@ import { X, Loader2, ClipboardList } from 'lucide-react'
 import {
   FormProvider,
   useForm,
+  useFormContext,
+  Controller,
   zodResolver,
   TextField,
   SelectField,
@@ -22,6 +24,7 @@ import {
 } from '@edforge/forms'
 import type { CreateExamDto, ExamResponseDto, UpdateExamDto } from '@aibrains/shared-types'
 import { useCreateExam, useUpdateExam } from '../../hooks/useExams'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { examFormSchema, type ExamFormData, humanizeExamType } from '../../schemas/exam.form'
 
 interface ExamTermOption {
@@ -44,9 +47,31 @@ const EMPTY_FORM: ExamFormData = {
   examName: '',
   examType: '',
   termId: '',
+  gradeLevels: [],
   startDate: '',
   endDate: '',
   description: '',
+}
+
+/**
+ * Sort a selected gradeLevels[] by the option catalog's order so the persisted
+ * value is canonical (and idempotent change-detection in updateExam works on a
+ * stable shape).
+ */
+function sortByCatalog(
+  selected: readonly string[],
+  catalog: ReadonlyArray<{ value: string }>,
+): string[] {
+  const selectedSet = new Set(selected)
+  return catalog.filter((o) => selectedSet.has(o.value)).map((o) => o.value)
+}
+
+function gradeLevelsEqual(a: readonly string[], b: readonly string[]): boolean {
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
 }
 
 export function ExamDrawer({
@@ -68,6 +93,14 @@ export function ExamDrawer({
   // operators don't try a mutation that will 409.
   const examTypeLocked = isEdit && exam.status !== 'draft'
 
+  // ELS.6 — gradeLevels are server-guarded to draft too (EXAM_LOCKED on
+  // change post-draft). Mirror the examType lock so the picker is disabled
+  // outside Draft instead of letting the operator queue a mutation that 409s.
+  const gradeLevelsLocked = examTypeLocked
+
+  const { options: schoolGradeOptions, isLoading: schoolOptionsLoading } =
+    useSchoolEnabledGradeOptions(schoolId)
+
   const form = useForm<ExamFormData>({
     resolver: zodResolver(examFormSchema),
     defaultValues: EMPTY_FORM,
@@ -83,6 +116,10 @@ export function ExamDrawer({
       examName: exam.examName,
       examType: exam.examType,
       termId: exam.termId,
+      // ELS.6 — legacy exams created pre-ELS.1 may have undefined gradeLevels;
+      // ELS.4 backfill populates them, but the FE degrades to [] in the
+      // meantime so the form still mounts.
+      gradeLevels: exam.gradeLevels ?? [],
       startDate: exam.startDate,
       endDate: exam.endDate,
       description: exam.description ?? '',
@@ -97,6 +134,7 @@ export function ExamDrawer({
       ...EMPTY_FORM,
       examType: examPattern[0] ?? '',
       termId: terms[0]?.periodId ?? '',
+      gradeLevels: [],
     })
   }, [open, exam, examPattern, terms, form])
 
@@ -116,6 +154,17 @@ export function ExamDrawer({
           if (!examTypeLocked && data.examType !== exam.examType) {
             patch.examType = data.examType as CreateExamDto['examType']
           }
+          // ELS.6 — only PATCH gradeLevels when unlocked AND the value
+          // actually changed. Same idempotency rationale as examType: the
+          // backend lock-on-change check accepts a no-op resend, but
+          // dropping a no-op from the wire saves a round trip and is
+          // consistent with the existing mutation shape.
+          if (
+            !gradeLevelsLocked &&
+            !gradeLevelsEqual(data.gradeLevels, exam.gradeLevels ?? [])
+          ) {
+            patch.gradeLevels = data.gradeLevels
+          }
           await updateMutation.mutateAsync({ examId: exam.examId, schoolId, data: patch })
         } else {
           const payload: CreateExamDto = {
@@ -124,6 +173,7 @@ export function ExamDrawer({
             academicYearId,
             termId: data.termId,
             examType: data.examType as CreateExamDto['examType'],
+            gradeLevels: data.gradeLevels,
             startDate: data.startDate,
             endDate: data.endDate,
             description: data.description || undefined,
@@ -140,6 +190,7 @@ export function ExamDrawer({
       isEdit,
       exam,
       examTypeLocked,
+      gradeLevelsLocked,
       schoolId,
       academicYearId,
       createMutation,
@@ -249,6 +300,22 @@ export function ExamDrawer({
                         </div>
                       </FormSection>
 
+                      <FormSection
+                        title="Grade Levels"
+                        description="Scope this exam to the grade(s) sitting it. Drives the Subjects picker, score roster, and Result Card generation."
+                      >
+                        <GradeLevelsField
+                          options={schoolGradeOptions}
+                          disabled={gradeLevelsLocked}
+                          isLoading={schoolOptionsLoading}
+                          helperText={
+                            gradeLevelsLocked
+                              ? 'Locked: grade levels can only change while the exam is in Draft.'
+                              : 'Pick one for a per-grade exam, or multiple for a grade-split (e.g., Grade 9 + 10).'
+                          }
+                        />
+                      </FormSection>
+
                       <FormSection title="Schedule" description="When does this exam run?">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <DateField name="startDate" label="Start Date" />
@@ -293,5 +360,105 @@ export function ExamDrawer({
         </div>
       )}
     </AnimatePresence>
+  )
+}
+
+// ============================================================================
+// ELS.6 — GradeLevelsField (inline; only used by ExamDrawer)
+// ============================================================================
+
+interface GradeLevelsFieldProps {
+  options: ReadonlyArray<{ value: string; label: string }>
+  disabled?: boolean
+  isLoading?: boolean
+  helperText?: string
+}
+
+/**
+ * Multi-select chip-toggle picker for `Exam.gradeLevels`. Sourced from
+ * `useSchoolEnabledGradeOptions(schoolId)` so operators can only pick codes
+ * the school actually operates — backend would reject anything else with
+ * EXAM_GRADE_LEVEL_NOT_ENABLED, this surfaces the constraint at the UI.
+ */
+function GradeLevelsField({
+  options,
+  disabled = false,
+  isLoading = false,
+  helperText,
+}: GradeLevelsFieldProps) {
+  const { control } = useFormContext<ExamFormData>()
+
+  return (
+    <Controller
+      name="gradeLevels"
+      control={control}
+      render={({ field, fieldState }) => {
+        const value: string[] = field.value ?? []
+        const selectedSet = new Set(value)
+
+        const toggle = (code: string) => {
+          if (disabled) return
+          const next = new Set(selectedSet)
+          if (next.has(code)) next.delete(code)
+          else next.add(code)
+          field.onChange(sortByCatalog(Array.from(next), options))
+          // RHF Controller doesn't fire onBlur on button clicks; trigger it
+          // so the resolver re-runs and clears the "required" error eagerly.
+          field.onBlur()
+        }
+
+        if (isLoading) {
+          return (
+            <div className="flex items-center gap-2 text-sm text-text-tertiary py-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Loading available grade levels…
+            </div>
+          )
+        }
+
+        return (
+          <div>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Grade levels">
+              {options.length === 0 ? (
+                <p className="text-sm text-text-tertiary">
+                  This school has no enabled grade levels configured. Set them under
+                  Settings → Grade Levels before creating exams.
+                </p>
+              ) : (
+                options.map((option) => {
+                  const selected = selectedSet.has(option.value)
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => toggle(option.value)}
+                      disabled={disabled}
+                      aria-pressed={selected}
+                      className={[
+                        'px-3 py-1.5 text-sm font-medium rounded-full border transition-colors',
+                        'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+                        selected
+                          ? 'bg-purple-600 text-white border-purple-600'
+                          : 'bg-surface-primary text-text-secondary border-border-primary hover:border-purple-400 hover:text-text-primary',
+                        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+                      ].join(' ')}
+                    >
+                      {option.label}
+                    </button>
+                  )
+                })
+              )}
+            </div>
+            {fieldState.error?.message ? (
+              <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                {fieldState.error.message}
+              </p>
+            ) : helperText ? (
+              <p className="text-xs text-text-tertiary mt-2">{helperText}</p>
+            ) : null}
+          </div>
+        )
+      }}
+    />
   )
 }

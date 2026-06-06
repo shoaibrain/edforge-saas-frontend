@@ -84,8 +84,8 @@ importers:
   apps/academics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.70.0
-        version: 0.70.0(zod@3.24.4)
+        specifier: ^0.72.0
+        version: 0.72.0(zod@3.24.4)
       '@edforge/abac':
         specifier: workspace:*
         version: link:../../packages/abac
@@ -1276,8 +1276,8 @@ packages:
     peerDependencies:
       zod: ~3.24.4
 
-  '@aibrains/shared-types@0.70.0':
-    resolution: {integrity: sha512-pJdCeaFGTGRtMEcXL9/So6voueSb4a7QuuZVZKyuGUPm2ES01z4IcK8Peu9I1aZ4JzR5pYlb6A3QnJG+VuvX2w==}
+  '@aibrains/shared-types@0.72.0':
+    resolution: {integrity: sha512-CKPx9U7sys2ZYVLZoPsZh5HpQg8O5Nae8BGuAJaZI0IUniqibMBR4e7soiitR2Mfm8+uO3VWgOy/3GvgPDyppQ==}
     peerDependencies:
       zod: ~3.24.4
 
@@ -5482,7 +5482,7 @@ snapshots:
     dependencies:
       zod: 3.24.4
 
-  '@aibrains/shared-types@0.70.0(zod@3.24.4)':
+  '@aibrains/shared-types@0.72.0(zod@3.24.4)':
     dependencies:
       zod: 3.24.4
 
