@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type {
   CreateExamDto,
+  UpdateExamDto,
   ExamListResponseDto,
   ExamResponseDto,
   ExamStatus,
@@ -20,6 +21,7 @@ import {
   getExam,
   getExamPattern,
   createExam,
+  updateExam,
   transitionExamStatus,
   parseApiError,
   type ExamListParams,
@@ -78,6 +80,27 @@ export function useCreateExam() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: examKeys.lists() })
       toast.success('Exam created')
+    },
+    onError: (error) => {
+      toast.error(parseApiError(error).message)
+    },
+  })
+}
+
+export interface UpdateExamVars {
+  examId: string
+  schoolId: string
+  data: UpdateExamDto
+}
+
+export function useUpdateExam() {
+  const queryClient = useQueryClient()
+  return useMutation<ExamResponseDto, Error, UpdateExamVars>({
+    mutationFn: ({ examId, schoolId, data }) => updateExam(examId, schoolId, data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: [...examKeys.details(), updated.examId] })
+      queryClient.invalidateQueries({ queryKey: examKeys.lists() })
+      toast.success('Exam updated')
     },
     onError: (error) => {
       toast.error(parseApiError(error).message)

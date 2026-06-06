@@ -1,12 +1,13 @@
 /**
- * ExamDrawer — create-exam slide-over.
+ * ExamDrawer — exam create/edit slide-over.
  *
- * Slice 1 is create-only. Exam detail (courses, scores, results) lands in
- * later slices. academicYearId + schoolId come from the page; the form
- * collects name, type, term, dates, description.
+ * Pass `exam` to switch the drawer into edit mode (Slice 2 / EM-2.2).
+ * Immutable in edit mode: schoolId, academicYearId, termId. `examType` is
+ * only editable while exam.status === 'draft' (backend service guards it
+ * otherwise; the UI mirrors that to avoid 409 surprises).
  */
 
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Loader2, ClipboardList } from 'lucide-react'
 import {
@@ -19,8 +20,8 @@ import {
   TextareaField,
   FormSection,
 } from '@edforge/forms'
-import type { CreateExamDto } from '@aibrains/shared-types'
-import { useCreateExam } from '../../hooks/useExams'
+import type { CreateExamDto, ExamResponseDto, UpdateExamDto } from '@aibrains/shared-types'
+import { useCreateExam, useUpdateExam } from '../../hooks/useExams'
 import { examFormSchema, type ExamFormData, humanizeExamType } from '../../schemas/exam.form'
 
 interface ExamTermOption {
@@ -35,43 +36,113 @@ interface ExamDrawerProps {
   academicYearId: string
   terms: ExamTermOption[]
   examPattern: string[]
+  /** Pass an exam to switch into edit mode. */
+  exam?: ExamResponseDto | null
 }
 
-export function ExamDrawer({ open, onClose, schoolId, academicYearId, terms, examPattern }: ExamDrawerProps) {
+const EMPTY_FORM: ExamFormData = {
+  examName: '',
+  examType: '',
+  termId: '',
+  startDate: '',
+  endDate: '',
+  description: '',
+}
+
+export function ExamDrawer({
+  open,
+  onClose,
+  schoolId,
+  academicYearId,
+  terms,
+  examPattern,
+  exam,
+}: ExamDrawerProps) {
+  const isEdit = !!exam
   const createMutation = useCreateExam()
+  const updateMutation = useUpdateExam()
+  const mutation = isEdit ? updateMutation : createMutation
+  const isPending = mutation.isPending
+
+  // `examType` is server-guarded to draft. Lock the field outside draft so
+  // operators don't try a mutation that will 409.
+  const examTypeLocked = isEdit && exam.status !== 'draft'
 
   const form = useForm<ExamFormData>({
     resolver: zodResolver(examFormSchema),
-    defaultValues: {
-      examName: '',
-      examType: examPattern[0] ?? '',
-      termId: terms[0]?.periodId ?? '',
-      startDate: '',
-      endDate: '',
-      description: '',
-    },
+    defaultValues: EMPTY_FORM,
     mode: 'onBlur',
   })
 
+  // Re-seed the form whenever the drawer opens — switching between create
+  // and edit, or between two exams, must reset prior field state.
+  useEffect(() => {
+    if (!open) return
+    if (exam) {
+      form.reset({
+        examName: exam.examName,
+        examType: exam.examType,
+        termId: exam.termId,
+        startDate: exam.startDate,
+        endDate: exam.endDate,
+        description: exam.description ?? '',
+      })
+    } else {
+      form.reset({
+        ...EMPTY_FORM,
+        examType: examPattern[0] ?? '',
+        termId: terms[0]?.periodId ?? '',
+      })
+    }
+  }, [open, exam, examPattern, terms, form])
+
   const onSubmit = useCallback(
     async (data: ExamFormData) => {
-      const payload: CreateExamDto = {
-        examName: data.examName,
-        schoolId,
-        academicYearId,
-        termId: data.termId,
-        // examType values come from the archetype exam-pattern, which is a
-        // subset of the CreateExamDto enum — safe to narrow here.
-        examType: data.examType as CreateExamDto['examType'],
-        startDate: data.startDate,
-        endDate: data.endDate,
-        description: data.description || undefined,
+      try {
+        if (isEdit && exam) {
+          const patch: UpdateExamDto = {
+            examName: data.examName,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description || undefined,
+          }
+          // Only include examType if the field is editable AND it actually
+          // changed — keeps the request minimal and avoids hitting the
+          // status guard on no-op edits.
+          if (!examTypeLocked && data.examType !== exam.examType) {
+            patch.examType = data.examType as CreateExamDto['examType']
+          }
+          await updateMutation.mutateAsync({ examId: exam.examId, schoolId, data: patch })
+        } else {
+          const payload: CreateExamDto = {
+            examName: data.examName,
+            schoolId,
+            academicYearId,
+            termId: data.termId,
+            examType: data.examType as CreateExamDto['examType'],
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description || undefined,
+          }
+          await createMutation.mutateAsync(payload)
+        }
+        form.reset()
+        onClose()
+      } catch {
+        // onError toast is handled in the mutation hooks
       }
-      await createMutation.mutateAsync(payload)
-      form.reset()
-      onClose()
     },
-    [schoolId, academicYearId, createMutation, form, onClose]
+    [
+      isEdit,
+      exam,
+      examTypeLocked,
+      schoolId,
+      academicYearId,
+      createMutation,
+      updateMutation,
+      form,
+      onClose,
+    ],
   )
 
   const handleFormKeyDown = (e: React.KeyboardEvent) => {
@@ -86,10 +157,14 @@ export function ExamDrawer({ open, onClose, schoolId, academicYearId, terms, exa
   }
 
   const handleClose = () => {
-    if (createMutation.isPending) return
+    if (isPending) return
     form.reset()
     onClose()
   }
+
+  const title = isEdit ? 'Edit Exam' : 'Create Exam'
+  const submitLabel = isEdit ? 'Save Changes' : 'Create Exam'
+  const submittingLabel = isEdit ? 'Saving…' : 'Creating…'
 
   return (
     <AnimatePresence>
@@ -122,7 +197,7 @@ export function ExamDrawer({ open, onClose, schoolId, academicYearId, terms, exa
                       <ClipboardList className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     </div>
                     <h2 id="exam-drawer-title" className="text-lg font-semibold text-text-primary truncate">
-                      Create Exam
+                      {title}
                     </h2>
                   </div>
                   <button
@@ -151,12 +226,20 @@ export function ExamDrawer({ open, onClose, schoolId, academicYearId, terms, exa
                               label="Exam Type"
                               placeholder="Select exam type"
                               options={examPattern.map((t) => ({ value: t, label: humanizeExamType(t) }))}
+                              disabled={examTypeLocked}
+                              helperText={
+                                examTypeLocked
+                                  ? 'Locked: exam type can only change while the exam is in Draft.'
+                                  : undefined
+                              }
                             />
                             <SelectField
                               name="termId"
                               label="Term"
                               placeholder="Select term"
                               options={terms.map((t) => ({ value: t.periodId, label: t.name }))}
+                              disabled={isEdit}
+                              helperText={isEdit ? 'Term cannot be changed after creation.' : undefined}
                             />
                           </div>
                         </div>
@@ -178,23 +261,23 @@ export function ExamDrawer({ open, onClose, schoolId, academicYearId, terms, exa
                       <button
                         type="button"
                         onClick={handleClose}
-                        disabled={createMutation.isPending}
+                        disabled={isPending}
                         className="px-4 py-2 text-sm font-medium text-text-secondary bg-surface-primary border border-border-primary rounded-lg hover:bg-surface-secondary transition-colors disabled:opacity-50"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        disabled={createMutation.isPending}
+                        disabled={isPending}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                       >
-                        {createMutation.isPending ? (
+                        {isPending ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Creating…
+                            {submittingLabel}
                           </>
                         ) : (
-                          'Create Exam'
+                          submitLabel
                         )}
                       </button>
                     </div>
