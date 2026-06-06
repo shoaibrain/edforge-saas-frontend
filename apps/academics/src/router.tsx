@@ -37,6 +37,7 @@ import { SectionRosterPage } from './routes/sections/roster'
 import { BulkRosteringPage } from './routes/rostering'
 import { CurriculumModule } from './routes/curriculum'
 import { ExamsModule } from './routes/exams'
+import { ExamDetailModule } from './routes/exams/$examId'
 import { CourseDetailPage } from './routes/curriculum/$courseId'
 import { ReportCardPage } from './routes/grades/report-card'
 
@@ -279,6 +280,12 @@ const examsRoute = createRoute({
     component: ExamsModule,
 })
 
+const examDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/exams/$examId',
+    component: ExamDetailModule,
+})
+
 const gradeLevelsRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/grade-levels',
@@ -367,6 +374,7 @@ const routeTree = rootRoute.addChildren([
     gradebooksRedirectRoute,
     assessmentsRedirectRoute,
     examsRoute,
+    examDetailRoute,
     gradeLevelsRedirectRoute,
     coursesRedirectRoute,
     standardsRedirectRoute,

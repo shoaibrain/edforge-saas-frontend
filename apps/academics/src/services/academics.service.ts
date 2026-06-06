@@ -12,6 +12,9 @@ import type {
   ExamListResponseDto,
   CreateExamDto,
   ExamStatus,
+  ExamCourseResponseDto,
+  CreateExamCourseDto,
+  UpdateExamCourseDto,
   ResultCardResponseDto,
   ResultCardListResponseDto,
 } from '@aibrains/shared-types'
@@ -2014,6 +2017,81 @@ export async function createExam(data: CreateExamDto): Promise<ExamResponseDto> 
   return apiPost<ExamResponseDto>('/academics/exams', data)
 }
 
+/**
+ * Get a single exam. GET /academics/exams/{examId}?schoolId=…
+ */
+export async function getExam(examId: string, schoolId: string): Promise<ExamResponseDto> {
+  return apiGet<ExamResponseDto>(`/academics/exams/${examId}`, { schoolId })
+}
+
+/**
+ * Transition an exam's status through the lifecycle state machine.
+ * PATCH /academics/exams/{examId}/status?schoolId=…
+ *
+ * `in_progress → closed` is what fires the result-batch Lambda (cards generate);
+ * an illegal jump returns 409 EXAM_STATE_INVALID_TRANSITION.
+ */
+export async function transitionExamStatus(
+  examId: string,
+  schoolId: string,
+  targetStatus: ExamStatus,
+  notes?: string,
+): Promise<ExamResponseDto> {
+  return apiPatch<ExamResponseDto>(
+    `/academics/exams/${examId}/status?schoolId=${encodeURIComponent(schoolId)}`,
+    notes ? { targetStatus, notes } : { targetStatus },
+  )
+}
+
+// ============================================================================
+// EXAM COURSES (subjects on an exam — Ed-Fi AssessmentSection)
+// schoolId is derived server-side from the exam (no query param); only the
+// POST body carries schoolId. Mutations 409 EXAM_LOCKED once status leaves
+// {draft, scheduled}.
+// ============================================================================
+
+export interface ExamCourseListResult {
+  items: ExamCourseResponseDto[]
+  hasMore?: boolean
+  lastEvaluatedKey?: string
+}
+
+/**
+ * List the subjects (courses) attached to an exam.
+ * GET /academics/exams/{examId}/courses
+ */
+export async function getExamCourses(examId: string): Promise<ExamCourseListResult> {
+  return apiGet<ExamCourseListResult>(`/academics/exams/${examId}/courses`)
+}
+
+/**
+ * Add a subject (course) to an exam. POST /academics/exams/{examId}/courses
+ */
+export async function createExamCourse(
+  examId: string,
+  data: CreateExamCourseDto,
+): Promise<ExamCourseResponseDto> {
+  return apiPost<ExamCourseResponseDto>(`/academics/exams/${examId}/courses`, data)
+}
+
+/**
+ * Update an exam-course's marks/credit. PATCH …/courses/{examCourseId}
+ */
+export async function updateExamCourse(
+  examId: string,
+  examCourseId: string,
+  data: UpdateExamCourseDto,
+): Promise<ExamCourseResponseDto> {
+  return apiPatch<ExamCourseResponseDto>(`/academics/exams/${examId}/courses/${examCourseId}`, data)
+}
+
+/**
+ * Remove a subject from an exam. DELETE …/courses/{examCourseId}
+ */
+export async function deleteExamCourse(examId: string, examCourseId: string): Promise<void> {
+  return apiDelete(`/academics/exams/${examId}/courses/${examCourseId}`)
+}
+
 // ============================================================================
 // RESULT CARDS (Ed-Fi ReportCard — generated when an exam closes)
 // ============================================================================
@@ -2095,8 +2173,14 @@ export async function publishResultCard(
 
 export const academicsService = {
   getExams,
+  getExam,
   getExamPattern,
   createExam,
+  transitionExamStatus,
+  getExamCourses,
+  createExamCourse,
+  updateExamCourse,
+  deleteExamCourse,
   getResultCards,
   updateResultCardConduct,
   updateResultCardRemark,
