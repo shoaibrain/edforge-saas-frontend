@@ -30,7 +30,7 @@ export const examKeys = {
   lists: () => [...examKeys.all, 'list'] as const,
   list: (params: ExamListParams) => [...examKeys.lists(), params] as const,
   details: () => [...examKeys.all, 'detail'] as const,
-  detail: (examId: string) => [...examKeys.details(), examId] as const,
+  detail: (examId: string, schoolId: string) => [...examKeys.details(), examId, schoolId] as const,
   pattern: () => [...examKeys.all, 'pattern'] as const,
 }
 
@@ -51,7 +51,7 @@ export function useExams(params: ExamListParams, enabled = true) {
  */
 export function useExam(examId: string, schoolId: string, enabled = true) {
   return useQuery<ExamResponseDto, Error>({
-    queryKey: examKeys.detail(examId),
+    queryKey: examKeys.detail(examId, schoolId),
     queryFn: () => getExam(examId, schoolId),
     enabled: enabled && !!examId && !!schoolId,
     staleTime: 30 * 1000,
@@ -98,7 +98,7 @@ export function useTransitionExamStatus() {
     mutationFn: ({ examId, schoolId, targetStatus, notes }) =>
       transitionExamStatus(examId, schoolId, targetStatus, notes),
     onSuccess: (updated) => {
-      queryClient.invalidateQueries({ queryKey: examKeys.detail(updated.examId) })
+      queryClient.invalidateQueries({ queryKey: [...examKeys.details(), updated.examId] })
       queryClient.invalidateQueries({ queryKey: examKeys.lists() })
       toast.success(`Exam moved to ${updated.status.replace(/_/g, ' ')}`)
     },
