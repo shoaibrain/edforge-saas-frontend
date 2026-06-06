@@ -139,9 +139,19 @@ export function ExamScoresTab({
   // Local edit state, keyed by enrollmentId.
   const [edits, setEdits] = useState<Record<string, RowEdit>>({})
 
-  // Seed edits whenever the selected subject (or its persisted scores) changes.
+  // The roster auto-pages (effect above); `enrollments` grows page-by-page
+  // until then. Seeding must wait for the full roster — otherwise each
+  // arriving page re-fires the seed and `setEdits(seed)` wipes any marks the
+  // operator already typed on a >100-student roster.
+  const rosterFullyLoaded = !enrollmentsHasNextPage && !enrollmentsFetchingNext
+
+  // Seed edits once the roster is fully loaded, and whenever the selected
+  // subject (or its persisted scores) changes. A subject switch keeps the
+  // roster stable (enrollments don't refetch) and only swaps
+  // `scoreByEnrollmentId`, so re-seeding fully from the new subject's scores
+  // is correct — the prior subject's in-progress edits should not carry over.
   useEffect(() => {
-    if (!selectedExamCourseId) return
+    if (!selectedExamCourseId || !rosterFullyLoaded) return
     const seed: Record<string, RowEdit> = {}
     for (const e of enrollments) {
       const persisted = scoreByEnrollmentId.get(e.enrollmentId)
@@ -149,7 +159,7 @@ export function ExamScoresTab({
       seed[e.enrollmentId] = { text, value: persisted ? persisted.rawScore : null }
     }
     setEdits(seed)
-  }, [selectedExamCourseId, enrollments, scoreByEnrollmentId])
+  }, [selectedExamCourseId, rosterFullyLoaded, enrollments, scoreByEnrollmentId])
 
   const maxMarks = selectedCourse?.maxMarks ?? 0
 
