@@ -7,7 +7,7 @@
  * read-only and explains why.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BookOpen, Plus, Trash2, Pencil, Lock, X, Check } from 'lucide-react'
 import type { ExamCourseResponseDto, ExamStatus } from '@aibrains/shared-types'
 import { useCourses } from '../../hooks/useCourses'
@@ -47,7 +47,12 @@ export function ExamSubjectsTab({
   const { data, isLoading } = useExamCourses(examId)
   const examCourses = useMemo(() => data?.items ?? [], [data])
 
-  const { data: coursesData } = useCourses({ schoolId, limit: 100, enabled: mutable && !!schoolId })
+  const {
+    data: coursesData,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useCourses({ schoolId, limit: 100, enabled: mutable && !!schoolId })
   const courses = useMemo(
     () => (coursesData?.pages ?? []).flatMap((p) => p.items ?? []),
     [coursesData],
@@ -71,6 +76,14 @@ export function ExamSubjectsTab({
     () => courses.filter((c) => !takenCourseIds.has(c.courseId)),
     [courses, takenCourseIds],
   )
+
+  // The picker needs every course, not just the first page — auto-page through
+  // the infinite query while the Add Subject form is open.
+  useEffect(() => {
+    if (adding && hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage()
+    }
+  }, [adding, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const handleAdd = async () => {
     if (!form.courseId) return
