@@ -62,3 +62,12 @@ const TRANSITION_ACTIONS: Record<ExamStatus, ExamTransitionAction[]> = {
 export function getExamTransitionActions(status: ExamStatus): ExamTransitionAction[] {
   return TRANSITION_ACTIONS[status] ?? []
 }
+
+/**
+ * Whether exam-courses (subjects) can be added / edited / removed. Mirrors the
+ * backend `acceptsExamCourseMutations` guard — only while the exam is still
+ * `draft` or `scheduled`; afterwards the backend 409s `EXAM_LOCKED`.
+ */
+export function acceptsExamCourseMutations(status: ExamStatus): boolean {
+  return status === 'draft' || status === 'scheduled'
+}

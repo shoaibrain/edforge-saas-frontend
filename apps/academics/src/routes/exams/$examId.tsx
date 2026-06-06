@@ -36,6 +36,14 @@ import {
   type ExamTransitionAction,
 } from '../../schemas/exam-state-machine'
 import { ResultCardsDrawer } from '../../components/exams/ResultCardsDrawer'
+import { ExamSubjectsTab } from '../../components/exams/ExamSubjectsTab'
+
+type ExamDetailTab = 'overview' | 'subjects'
+
+const EXAM_DETAIL_TABS: { id: ExamDetailTab; label: string }[] = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'subjects', label: 'Subjects' },
+]
 
 // ============================================================================
 // PRESENTATION HELPERS
@@ -116,6 +124,7 @@ export function ExamDetailModule() {
   const schoolId = useActiveSchoolId() || ''
   const canManage = usePermission('edit', 'assessments')
   const [resultCardsOpen, setResultCardsOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<ExamDetailTab>('overview')
 
   const isValidId = useMemo(() => {
     try {
@@ -267,32 +276,63 @@ export function ExamDetailModule() {
           ) : null}
         </div>
 
-        {/* Overview */}
-        <div className="rounded-xl border border-border-secondary p-5">
-          <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border-secondary">
-            <CalendarDays className="w-4 h-4 text-text-tertiary" />
-            <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Overview</h4>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <DetailField label="Type" value={humanizeExamType(exam.examType)} />
-            <DetailField label="Term" value={termName} />
-            <DetailField label="Status" value={getExamStatusMeta(exam.status).label} />
-            <DetailField label="Start Date" value={exam.startDate} />
-            <DetailField label="End Date" value={exam.endDate} />
-            <DetailField label="Created" value={fmtDate(exam.createdAt)} />
-          </div>
-        </div>
+        {/* Tabs */}
+        <div>
+          <nav className="flex gap-1 border-b border-border-secondary mb-5" aria-label="Exam tabs">
+            {EXAM_DETAIL_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  activeTab === tab.id
+                    ? 'text-text-primary border-purple-500'
+                    : 'text-text-tertiary border-transparent hover:text-text-secondary'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
 
-        {/* Description */}
-        {exam.description && (
-          <div className="rounded-xl border border-border-secondary p-5">
-            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-secondary">
-              <FileText className="w-4 h-4 text-text-tertiary" />
-              <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Description</h4>
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <div className="rounded-xl border border-border-secondary p-5">
+                <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border-secondary">
+                  <CalendarDays className="w-4 h-4 text-text-tertiary" />
+                  <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Overview</h4>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <DetailField label="Type" value={humanizeExamType(exam.examType)} />
+                  <DetailField label="Term" value={termName} />
+                  <DetailField label="Status" value={getExamStatusMeta(exam.status).label} />
+                  <DetailField label="Start Date" value={exam.startDate} />
+                  <DetailField label="End Date" value={exam.endDate} />
+                  <DetailField label="Created" value={fmtDate(exam.createdAt)} />
+                </div>
+              </div>
+
+              {exam.description && (
+                <div className="rounded-xl border border-border-secondary p-5">
+                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-secondary">
+                    <FileText className="w-4 h-4 text-text-tertiary" />
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Description</h4>
+                  </div>
+                  <p className="text-sm text-text-secondary leading-relaxed">{exam.description}</p>
+                </div>
+              )}
             </div>
-            <p className="text-sm text-text-secondary leading-relaxed">{exam.description}</p>
-          </div>
-        )}
+          )}
+
+          {activeTab === 'subjects' && (
+            <ExamSubjectsTab
+              examId={exam.examId}
+              schoolId={schoolId}
+              status={exam.status}
+              canManage={canManage}
+            />
+          )}
+        </div>
       </div>
 
       <ResultCardsDrawer
