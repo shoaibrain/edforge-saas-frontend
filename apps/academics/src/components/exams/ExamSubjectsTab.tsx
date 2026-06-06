@@ -77,16 +77,22 @@ export function ExamSubjectsTab({
     const maxMarks = Number(form.maxMarks)
     const passingMarks = Number(form.passingMarks)
     if (!Number.isFinite(maxMarks) || maxMarks < 1) return
-    if (passingMarks > maxMarks) return
-    await createMut.mutateAsync({
-      schoolId,
-      courseId: form.courseId,
-      maxMarks,
-      passingMarks,
-      ...(form.creditHours ? { creditHours: Number(form.creditHours) } : {}),
-    })
-    setForm(EMPTY_ADD)
-    setAdding(false)
+    if (!Number.isFinite(passingMarks) || passingMarks < 0 || passingMarks > maxMarks) return
+    const creditHours = form.creditHours === '' ? undefined : Number(form.creditHours)
+    if (creditHours != null && (!Number.isFinite(creditHours) || creditHours < 0)) return
+    try {
+      await createMut.mutateAsync({
+        schoolId,
+        courseId: form.courseId,
+        maxMarks,
+        passingMarks,
+        ...(creditHours != null ? { creditHours } : {}),
+      })
+      setForm(EMPTY_ADD)
+      setAdding(false)
+    } catch {
+      // onError toast is handled in the mutation hook
+    }
   }
 
   const startEdit = (ec: ExamCourseResponseDto) => {
@@ -101,16 +107,23 @@ export function ExamSubjectsTab({
   const handleSaveEdit = async (examCourseId: string) => {
     const maxMarks = Number(editForm.maxMarks)
     const passingMarks = Number(editForm.passingMarks)
-    if (!Number.isFinite(maxMarks) || maxMarks < 1 || passingMarks > maxMarks) return
-    await updateMut.mutateAsync({
-      examCourseId,
-      data: {
-        maxMarks,
-        passingMarks,
-        ...(editForm.creditHours ? { creditHours: Number(editForm.creditHours) } : {}),
-      },
-    })
-    setEditingId(null)
+    if (!Number.isFinite(maxMarks) || maxMarks < 1) return
+    if (!Number.isFinite(passingMarks) || passingMarks < 0 || passingMarks > maxMarks) return
+    const creditHours = editForm.creditHours === '' ? undefined : Number(editForm.creditHours)
+    if (creditHours != null && (!Number.isFinite(creditHours) || creditHours < 0)) return
+    try {
+      await updateMut.mutateAsync({
+        examCourseId,
+        data: {
+          maxMarks,
+          passingMarks,
+          ...(creditHours != null ? { creditHours } : {}),
+        },
+      })
+      setEditingId(null)
+    } catch {
+      // onError toast is handled in the mutation hook
+    }
   }
 
   if (isLoading) {
