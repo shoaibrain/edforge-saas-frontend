@@ -29,6 +29,15 @@ import { getExamStatusMeta } from '../../schemas/exam.form'
 
 const MAX_BULK = 250 // backend EXAM_SCORE_BULK_MAX_TOTAL
 
+/**
+ * Enrollment statuses that count as "currently on the roster" for score entry.
+ * Mirrors the app-wide `isActive` definition in EnrollmentTable.tsx — the
+ * canonical active status is `'enrolled'`, NOT the literal `'active'`. Used to
+ * filter the score roster client-side (the server-side `status=active` filter
+ * matches zero rows and breaks pagination — see the roster load below).
+ */
+const ACTIVE_ENROLLMENT_STATUSES = new Set(['enrolled', 'active', 'pending'])
+
 interface RowEdit {
   /** The current input string (lets us distinguish empty from 0). */
   text: string
@@ -83,8 +92,18 @@ export function ExamScoresTab({
     [examCourses, selectedExamCourseId],
   )
 
-  // Roster: active enrollments for the exam's academic year. Score entry
-  // needs the full roster, so auto-page through the infinite query.
+  // Roster: enrollments for the exam's academic year. Score entry needs the
+  // full roster, so auto-page through the infinite query.
+  //
+  // NB: do NOT pass a server-side `status: 'active'` filter. The canonical
+  // active enrollment status in this system is `'enrolled'` (not the literal
+  // `'active'`) — see the app-wide `isActive` definition in
+  // EnrollmentTable.tsx and the `byStatus.enrolled` summary key. A
+  // `status=active` server filter is a DDB FilterExpression that matches zero
+  // PABSON rows, so every page returns empty `items` with a continuation
+  // cursor (`hasMore: true`) and the roster drains to []. We instead load all
+  // AY enrollments and apply the active-status filter client-side, mirroring
+  // the rest of the app.
   const {
     data: enrollmentsData,
     isLoading: rosterLoading,
@@ -94,7 +113,6 @@ export function ExamScoresTab({
   } = useEnrollments({
     schoolId: exam.schoolId,
     yearId: exam.academicYearId,
-    filters: { status: 'active' },
     limit: 100,
     enabled: !!exam.schoolId && !!exam.academicYearId,
   })
@@ -108,20 +126,32 @@ export function ExamScoresTab({
     [enrollmentsData],
   )
 
-  // ELS.9 — scope the roster to the exam's grade levels. Mirrors the backend
-  // ELS.3 result-batch Lambda filter exactly (`enrollment.gradeLevel ∈
-  // exam.gradeLevels`): the operator enters marks only against students who
-  // actually sit this exam, so the score sheet can't create rows for
-  // off-scope students (e.g. a Grade 8 child on a Grade 9/10 Send-Up).
-  // Legacy exams with empty/undefined gradeLevels keep the full AY roster —
-  // the same back-compat path the Lambda takes until ELS.4 backfill lands.
+  // ELS.9 — scope the roster to (a) currently-active enrollments and (b) the
+  // exam's grade levels.
+  //
+  // (a) Active-status set mirrors the app-wide `isActive` definition
+  // (EnrollmentTable.tsx): a student is on the roster while `enrolled`
+  // (canonical), `active`, or `pending`. Withdrawn / graduated / transferred /
+  // provisional enrollments are excluded — they aren't sitting the exam.
+  //
+  // (b) Grade filter mirrors the backend ELS.3 result-batch Lambda
+  // (`enrollment.gradeLevel ∈ exam.gradeLevels`) so the operator enters marks
+  // only against students who actually sit this exam, and the score sheet
+  // can't create rows for off-scope students (e.g. a Grade 8 child on a
+  // Grade 9/10 Send-Up). Legacy exams with empty/undefined gradeLevels keep
+  // the full active roster — the back-compat path the Lambda also takes until
+  // ELS.4 backfill lands.
   const examGradeSet = useMemo(() => new Set(exam.gradeLevels ?? []), [exam.gradeLevels])
+  const activeEnrollments = useMemo(
+    () => allEnrollments.filter((e) => ACTIVE_ENROLLMENT_STATUSES.has(e.status)),
+    [allEnrollments],
+  )
   const enrollments: EnrollmentResponseDto[] = useMemo(
     () =>
       examGradeSet.size === 0
-        ? allEnrollments
-        : allEnrollments.filter((e) => examGradeSet.has(e.gradeLevel)),
-    [allEnrollments, examGradeSet],
+        ? activeEnrollments
+        : activeEnrollments.filter((e) => examGradeSet.has(e.gradeLevel)),
+    [activeEnrollments, examGradeSet],
   )
 
   // Existing scores for the picked subject.
@@ -306,7 +336,7 @@ export function ExamScoresTab({
       ) : enrollments.length === 0 ? (
         <div className="rounded-xl border border-border-secondary p-10 text-center">
           <p className="text-sm text-text-secondary">
-            {examGradeSet.size > 0 && allEnrollments.length > 0
+            {examGradeSet.size > 0 && activeEnrollments.length > 0
               ? `No active students enrolled at this exam's grade level${
                   (exam.gradeLevels?.length ?? 0) === 1 ? '' : 's'
                 } (${(exam.gradeLevels ?? []).join(', ')}).`
