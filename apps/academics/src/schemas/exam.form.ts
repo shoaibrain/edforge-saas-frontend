@@ -16,6 +16,14 @@ export const examFormSchema = z
       .max(200, 'Exam name must not exceed 200 characters'),
     examType: z.string({ required_error: 'Exam type is required' }).min(1, 'Exam type is required'),
     termId: z.string({ required_error: 'Term is required' }).uuid('Select a term'),
+    // ELS.6 — scopes the exam to one or more grade codes. Each entry is a
+    // local grade code that must be in the school's enabledGradeLevels;
+    // the backend rejects out-of-set codes with EXAM_GRADE_LEVEL_NOT_ENABLED.
+    // The picker UI sources options from useSchoolEnabledGradeOptions so
+    // operators can only pick valid codes by construction.
+    gradeLevels: z
+      .array(z.string().min(1).max(8))
+      .min(1, 'Select at least one grade level'),
     // Stored as YYYY-MM-DD; lexical compare is correct for that format.
     startDate: z.string({ required_error: 'Start date is required' }).min(1, 'Start date is required'),
     endDate: z.string({ required_error: 'End date is required' }).min(1, 'End date is required'),
