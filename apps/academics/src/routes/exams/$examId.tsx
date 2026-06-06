@@ -60,6 +60,29 @@ function StatusPill({ status }: { status: ExamStatus }) {
   )
 }
 
+/**
+ * ELS.7 — grade-level scope chips. The exam's `gradeLevels` drives the Subjects
+ * picker, score roster, and Result Card generation, so surfacing it in the
+ * header makes the scope legible at the moment the operator is making scoping
+ * decisions. Legacy exams (pre-ELS.1, no gradeLevels) render nothing — the
+ * Overview "Grade Levels" field shows the em-dash fallback instead.
+ */
+function GradeChips({ gradeLevels }: { gradeLevels?: string[] }) {
+  if (!gradeLevels || gradeLevels.length === 0) return null
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {gradeLevels.map((g) => (
+        <span
+          key={g}
+          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-secondary text-text-secondary border border-border-secondary"
+        >
+          {g}
+        </span>
+      ))}
+    </div>
+  )
+}
+
 function StatusPipeline({ status }: { status: ExamStatus }) {
   const currentIndex = EXAM_STATUS_PIPELINE.indexOf(status)
   return (
@@ -239,6 +262,12 @@ export function ExamDetailModule() {
                     {exam.startDate} → {exam.endDate}
                   </span>
                 </div>
+                {exam.gradeLevels && exam.gradeLevels.length > 0 && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs font-medium text-text-tertiary">Grades</span>
+                    <GradeChips gradeLevels={exam.gradeLevels} />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -328,6 +357,10 @@ export function ExamDetailModule() {
                   <DetailField label="Type" value={humanizeExamType(exam.examType)} />
                   <DetailField label="Term" value={termName} />
                   <DetailField label="Status" value={getExamStatusMeta(exam.status).label} />
+                  <DetailField
+                    label="Grade Levels"
+                    value={exam.gradeLevels?.length ? <GradeChips gradeLevels={exam.gradeLevels} /> : undefined}
+                  />
                   <DetailField label="Start Date" value={exam.startDate} />
                   <DetailField label="End Date" value={exam.endDate} />
                   <DetailField label="Created" value={fmtDate(exam.createdAt)} />
@@ -352,6 +385,7 @@ export function ExamDetailModule() {
               schoolId={schoolId}
               status={exam.status}
               canManage={canManage}
+              examGradeLevels={exam.gradeLevels ?? []}
             />
           )}
         </div>
