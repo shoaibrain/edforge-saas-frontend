@@ -23,7 +23,7 @@ import {
   useUpdateResultCardRemark,
   usePublishResultCard,
 } from '../../hooks/useResultCards'
-import { getAcademicSubjectLabel } from '../../schemas/course.form'
+import { getAcademicSubjectLabel, getSubjectAreaLabel } from '../../schemas/course.form'
 import { humanizeExamType } from '../../schemas/exam.form'
 
 function gpaClass(gpa: number): string {
@@ -176,8 +176,14 @@ function ReportCardDetail({
             </thead>
             <tbody className="divide-y divide-border-secondary">
               {card.courseScores.map((cs, i) => (
-                <tr key={`${cs.academicSubject}-${i}`} className="bg-surface-primary">
-                  <td className="px-3 py-2 text-text-primary">{getAcademicSubjectLabel(cs.academicSubject)}</td>
+                <tr key={`${cs.examCourseId}-${i}`} className="bg-surface-primary">
+                  <td className="px-3 py-2 text-text-primary">
+                    {cs.academicSubject
+                      ? getAcademicSubjectLabel(cs.academicSubject)
+                      : cs.subjectArea
+                        ? getSubjectAreaLabel(cs.subjectArea)
+                        : cs.courseName ?? '—'}
+                  </td>
                   <td className="px-3 py-2 text-right text-text-secondary">
                     {cs.rawScore} / {cs.maxMarks}
                   </td>

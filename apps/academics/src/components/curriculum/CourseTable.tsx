@@ -271,7 +271,20 @@ export function CourseTable({
         accessorKey: 'subjectArea',
         header: 'Subject',
         size: 160,
-        cell: ({ row }) => <SubjectChip subject={row.original.subjectArea} />,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1.5">
+            <SubjectChip subject={row.original.subjectArea} />
+            {!row.original.academicSubject && (
+              <span
+                title="No granular academic subject set. Report cards fall back to this subject area — add a granular subject for finer labels."
+                aria-label="No granular academic subject set"
+                className="cursor-help text-xs text-amber-500"
+              >
+                ⚠
+              </span>
+            )}
+          </div>
+        ),
       },
       {
         accessorKey: 'gradeLevels',
