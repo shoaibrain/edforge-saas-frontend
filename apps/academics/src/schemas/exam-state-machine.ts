@@ -71,3 +71,12 @@ export function getExamTransitionActions(status: ExamStatus): ExamTransitionActi
 export function acceptsExamCourseMutations(status: ExamStatus): boolean {
   return status === 'draft' || status === 'scheduled'
 }
+
+/**
+ * Whether exam-score writes are accepted. Mirrors the backend
+ * `acceptsScoreWrites` guard — `scheduled` + `in_progress` only.
+ * `draft` → 409 `EXAM_NOT_SCHEDULED`; `closed`/`published` → 409 `EXAM_LOCKED`.
+ */
+export function acceptsScoreWrites(status: ExamStatus): boolean {
+  return status === 'scheduled' || status === 'in_progress'
+}

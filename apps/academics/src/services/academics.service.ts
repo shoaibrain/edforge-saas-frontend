@@ -16,6 +16,11 @@ import type {
   ExamCourseResponseDto,
   CreateExamCourseDto,
   UpdateExamCourseDto,
+  ExamScoreResponseDto,
+  CreateExamScoreDto,
+  UpdateExamScoreDto,
+  BulkExamScoreDto,
+  BulkExamScoreResponseDto,
   ResultCardResponseDto,
   ResultCardListResponseDto,
 } from '@aibrains/shared-types'
@@ -2112,6 +2117,77 @@ export async function deleteExamCourse(examId: string, examCourseId: string): Pr
 }
 
 // ============================================================================
+// EXAM SCORES (Ed-Fi StudentAssessmentScoreResult — score entry)
+// Backend guards writes to exam.status ∈ {scheduled, in_progress}: 409
+// EXAM_NOT_SCHEDULED (draft) / EXAM_LOCKED (closed/published). Bulk POST is
+// chunked at 100 server-side; max 250 per request.
+// ============================================================================
+
+export interface ExamScoreListResult {
+  items: ExamScoreResponseDto[]
+  hasMore?: boolean
+  lastEvaluatedKey?: string
+}
+
+export interface ExamScoresFilter {
+  schoolId: string
+  examCourseId?: string
+  enrollmentId?: string
+}
+
+/**
+ * List scores for an exam. GET /academics/exams/{examId}/scores?schoolId=…
+ */
+export async function getExamScores(
+  examId: string,
+  filter: ExamScoresFilter,
+): Promise<ExamScoreListResult> {
+  const params: Record<string, unknown> = { schoolId: filter.schoolId }
+  if (filter.examCourseId) params.examCourseId = filter.examCourseId
+  if (filter.enrollmentId) params.enrollmentId = filter.enrollmentId
+  return apiGet<ExamScoreListResult>(`/academics/exams/${examId}/scores`, params)
+}
+
+/**
+ * Record a single score. POST /academics/exams/{examId}/scores
+ */
+export async function createExamScore(
+  examId: string,
+  data: CreateExamScoreDto,
+): Promise<ExamScoreResponseDto> {
+  return apiPost<ExamScoreResponseDto>(`/academics/exams/${examId}/scores`, data)
+}
+
+/**
+ * Bulk-write scores for an exam (≤250 per request; server chunks at 100).
+ * POST /academics/exams/{examId}/scores/bulk?schoolId=…
+ *
+ * Idempotent on (correlationId, (examCourseId, enrollmentId) tuples).
+ */
+export async function createBulkExamScores(
+  examId: string,
+  schoolId: string,
+  data: BulkExamScoreDto,
+): Promise<BulkExamScoreResponseDto> {
+  return apiPost<BulkExamScoreResponseDto>(
+    `/academics/exams/${examId}/scores/bulk?schoolId=${encodeURIComponent(schoolId)}`,
+    data,
+  )
+}
+
+/**
+ * Update a single score (while status === 'entered').
+ * PATCH /academics/exams/{examId}/scores/{scoreId}
+ */
+export async function updateExamScore(
+  examId: string,
+  scoreId: string,
+  data: UpdateExamScoreDto,
+): Promise<ExamScoreResponseDto> {
+  return apiPatch<ExamScoreResponseDto>(`/academics/exams/${examId}/scores/${scoreId}`, data)
+}
+
+// ============================================================================
 // RESULT CARDS (Ed-Fi ReportCard — generated when an exam closes)
 // ============================================================================
 
@@ -2201,6 +2277,10 @@ export const academicsService = {
   createExamCourse,
   updateExamCourse,
   deleteExamCourse,
+  getExamScores,
+  createExamScore,
+  createBulkExamScores,
+  updateExamScore,
   getResultCards,
   updateResultCardConduct,
   updateResultCardRemark,

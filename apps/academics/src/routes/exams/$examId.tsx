@@ -39,12 +39,14 @@ import {
 import { ResultCardsDrawer } from '../../components/exams/ResultCardsDrawer'
 import { ExamDrawer } from '../../components/exams/ExamDrawer'
 import { ExamSubjectsTab } from '../../components/exams/ExamSubjectsTab'
+import { ExamScoresTab } from '../../components/exams/ExamScoresTab'
 
-type ExamDetailTab = 'overview' | 'subjects'
+type ExamDetailTab = 'overview' | 'subjects' | 'scores'
 
 const EXAM_DETAIL_TABS: { id: ExamDetailTab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'subjects', label: 'Subjects' },
+  { id: 'scores', label: 'Scores' },
 ]
 
 // ============================================================================
@@ -387,6 +389,10 @@ export function ExamDetailModule() {
               canManage={canManage}
               examGradeLevels={exam.gradeLevels ?? []}
             />
+          )}
+
+          {activeTab === 'scores' && (
+            <ExamScoresTab exam={exam} canManage={canManage} />
           )}
         </div>
       </div>
