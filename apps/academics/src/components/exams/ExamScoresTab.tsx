@@ -14,6 +14,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { BookOpen, Lock, Save, Loader2, AlertCircle, Users } from 'lucide-react'
 import type {
   EnrollmentResponseDto,
+  ExamComponentDto,
   ExamCourseResponseDto,
   ExamResponseDto,
   ExamScoreResponseDto,
@@ -45,6 +46,51 @@ interface RowEdit {
   text: string
   /** The numeric value, or null if blank. */
   value: number | null
+  /**
+   * P1.5b — per-component input text keyed by component code, used only when the
+   * selected subject is split (Theory/Practical/…). The single `text`/`value`
+   * fields are unused in that mode; rawScore = Σ component values at save.
+   */
+  components?: Record<string, string>
+}
+
+/**
+ * Evaluate an enrollment's per-component inputs against the subject's component
+ * defs. `complete` = every component has a valid in-range value; `anyFilled` =
+ * at least one; `invalid` = a present value is non-numeric or out of range.
+ */
+function evalComponents(
+  defs: ExamComponentDto[],
+  row: RowEdit | undefined,
+): { sum: number; complete: boolean; anyFilled: boolean; invalid: boolean; scores: Record<string, number> } {
+  let sum = 0
+  let anyFilled = false
+  let invalid = false
+  let filled = 0
+  const scores: Record<string, number> = {}
+  for (const d of defs) {
+    const t = (row?.components?.[d.code] ?? '').trim()
+    if (t === '') continue
+    anyFilled = true
+    const n = Number(t)
+    if (!Number.isFinite(n) || n < 0 || n > d.fullMarks) {
+      invalid = true
+      continue
+    }
+    filled++
+    scores[d.code] = n
+    sum += n
+  }
+  return { sum, complete: filled === defs.length && !invalid, anyFilled, invalid, scores }
+}
+
+/** Whether two component-score maps are equal (for change detection). */
+function sameComponentScores(a: Record<string, number> | undefined, b: Record<string, number>): boolean {
+  const ak = Object.keys(a ?? {})
+  const bk = Object.keys(b)
+  if (ak.length !== bk.length) return false
+  for (const k of bk) if ((a ?? {})[k] !== b[k]) return false
+  return true
 }
 
 function parseRow(text: string): { value: number | null; valid: boolean } {
@@ -83,8 +129,11 @@ function uuidv4(): string {
 interface ScoreEntryCtxValue {
   edits: Record<string, RowEdit>
   setRow: (enrollmentId: string, text: string) => void
+  setComponent: (enrollmentId: string, code: string, text: string) => void
   maxMarks: number
   writable: boolean
+  /** Subject component defs; non-empty ⇒ per-component entry (Theory/Practical/…). */
+  components: ExamComponentDto[]
 }
 
 const ScoreEntryContext = createContext<ScoreEntryCtxValue | null>(null)
@@ -92,8 +141,51 @@ const ScoreEntryContext = createContext<ScoreEntryCtxValue | null>(null)
 function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studentName: string }) {
   const ctx = useContext(ScoreEntryContext)
   if (!ctx) return null
-  const { edits, setRow, maxMarks, writable } = ctx
+  const { edits, setRow, setComponent, maxMarks, writable, components } = ctx
   const row = edits[enrollmentId] ?? { text: '', value: null }
+
+  // P1.5b — per-component entry (Theory/Practical/…). rawScore is the Σ shown
+  // read-only; a partially-filled split (some components blank) is flagged.
+  if (components.length > 0) {
+    const ev = evalComponents(components, row)
+    const partial = ev.anyFilled && !ev.complete
+    return (
+      <div className="flex items-center justify-end gap-2 flex-wrap">
+        {components.map((d) => {
+          const t = row.components?.[d.code] ?? ''
+          const n = Number(t)
+          const err = t.trim() !== '' && (!Number.isFinite(n) || n < 0 || n > d.fullMarks)
+          return (
+            <div key={d.code} className="flex items-center gap-1">
+              <span className="text-[11px] text-text-tertiary">{d.label ?? d.code}</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                max={d.fullMarks}
+                step="any"
+                value={t}
+                disabled={!writable}
+                onChange={(e) => setComponent(enrollmentId, d.code, e.target.value)}
+                className={`w-16 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
+                  err ? 'border-red-500 text-red-600' : 'border-border-secondary text-text-primary'
+                } disabled:opacity-50`}
+                aria-label={`${d.label ?? d.code} for ${studentName}`}
+                aria-invalid={err || undefined}
+              />
+              <span className="text-[11px] text-text-tertiary">/{d.fullMarks}</span>
+            </div>
+          )
+        })}
+        <span
+          className={`text-xs tabular-nums w-16 text-right ${partial ? 'text-red-600' : 'text-text-secondary'}`}
+        >
+          = {ev.anyFilled ? ev.sum : '—'}/{maxMarks}
+        </span>
+      </div>
+    )
+  }
+
   const parsed = parseRow(row.text)
   const tooHigh = parsed.valid && parsed.value != null && parsed.value > maxMarks
   const tooLow = parsed.valid && parsed.value != null && parsed.value < 0
@@ -234,26 +326,59 @@ export function ExamScoresTab({
   // is correct — the prior subject's in-progress edits should not carry over.
   useEffect(() => {
     if (!selectedExamCourseId || !rosterFullyLoaded) return
+    const defs = selectedCourse?.components ?? []
     const seed: Record<string, RowEdit> = {}
     for (const e of enrollments) {
       const persisted = scoreByEnrollmentId.get(e.enrollmentId)
-      const text = persisted ? String(persisted.rawScore) : ''
-      seed[e.enrollmentId] = { text, value: persisted ? persisted.rawScore : null }
+      if (defs.length > 0) {
+        const comp: Record<string, string> = {}
+        const cs = persisted?.componentScores
+        for (const d of defs) comp[d.code] = cs?.[d.code] != null ? String(cs[d.code]) : ''
+        seed[e.enrollmentId] = { text: '', value: null, components: comp }
+      } else {
+        const text = persisted ? String(persisted.rawScore) : ''
+        seed[e.enrollmentId] = { text, value: persisted ? persisted.rawScore : null }
+      }
     }
     setEdits(seed)
-  }, [selectedExamCourseId, rosterFullyLoaded, enrollments, scoreByEnrollmentId])
+  }, [selectedExamCourseId, rosterFullyLoaded, enrollments, scoreByEnrollmentId, selectedCourse])
 
   const maxMarks = selectedCourse?.maxMarks ?? 0
+  const components = useMemo<ExamComponentDto[]>(() => selectedCourse?.components ?? [], [selectedCourse])
 
   // Validate + diff against persisted scores.
   const diffs = useMemo(() => {
     if (!selectedCourse) return { changes: [], invalidCount: 0, blanksCount: 0 }
-    const changes: { enrollmentId: string; rawScore: number }[] = []
+    const changes: { enrollmentId: string; rawScore: number; componentScores?: Record<string, number> }[] = []
     let invalidCount = 0
     let blanksCount = 0
     for (const e of enrollments) {
       const row = edits[e.enrollmentId]
       if (!row) continue
+
+      // Component subject: rawScore = Σ components; a partial fill is invalid
+      // (you can't pass/fail a split subject on half its marks).
+      if (components.length > 0) {
+        const ev = evalComponents(components, row)
+        if (!ev.anyFilled) {
+          blanksCount++
+          continue
+        }
+        if (ev.invalid || !ev.complete) {
+          invalidCount++
+          continue
+        }
+        const existing = scoreByEnrollmentId.get(e.enrollmentId)
+        const changed =
+          !existing ||
+          existing.rawScore !== ev.sum ||
+          !sameComponentScores(existing.componentScores, ev.scores)
+        if (changed) {
+          changes.push({ enrollmentId: e.enrollmentId, rawScore: ev.sum, componentScores: ev.scores })
+        }
+        continue
+      }
+
       const { value, valid } = parseRow(row.text)
       if (!valid) {
         invalidCount++
@@ -273,7 +398,7 @@ export function ExamScoresTab({
       }
     }
     return { changes, invalidCount, blanksCount }
-  }, [edits, enrollments, scoreByEnrollmentId, selectedCourse, maxMarks])
+  }, [edits, enrollments, scoreByEnrollmentId, selectedCourse, maxMarks, components])
 
   const bulkMutation = useBulkExamScores(exam.examId, exam.schoolId)
 
@@ -283,9 +408,18 @@ export function ExamScoresTab({
   const setRow = useCallback((enrollmentId: string, text: string) => {
     setEdits((prev) => ({ ...prev, [enrollmentId]: { text, value: parseRow(text).value } }))
   }, [])
+  const setComponent = useCallback((enrollmentId: string, code: string, text: string) => {
+    setEdits((prev) => {
+      const row = prev[enrollmentId] ?? { text: '', value: null, components: {} }
+      return {
+        ...prev,
+        [enrollmentId]: { ...row, components: { ...(row.components ?? {}), [code]: text } },
+      }
+    })
+  }, [])
   const scoreCtx = useMemo<ScoreEntryCtxValue>(
-    () => ({ edits, setRow, maxMarks, writable }),
-    [edits, setRow, maxMarks, writable],
+    () => ({ edits, setRow, setComponent, maxMarks, writable, components }),
+    [edits, setRow, setComponent, maxMarks, writable, components],
   )
   const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(
     () => [
@@ -317,7 +451,7 @@ export function ExamScoresTab({
       {
         id: 'score',
         header: () => <span className="block text-right">Score</span>,
-        size: 180,
+        size: 340,
         enableSorting: false,
         cell: ({ row }) => (
           <ScoreCell
@@ -345,6 +479,7 @@ export function ExamScoresTab({
               examCourseId: selectedExamCourseId,
               enrollmentId: c.enrollmentId,
               rawScore: c.rawScore,
+              ...(c.componentScores ? { componentScores: c.componentScores } : {}),
             })),
           })
         } catch {
@@ -360,6 +495,7 @@ export function ExamScoresTab({
           examCourseId: selectedExamCourseId,
           enrollmentId: c.enrollmentId,
           rawScore: c.rawScore,
+          ...(c.componentScores ? { componentScores: c.componentScores } : {}),
         })),
       })
     } catch {
@@ -419,6 +555,9 @@ export function ExamScoresTab({
           {enrollments.length} student{enrollments.length === 1 ? '' : 's'} · max {maxMarks}
           {selectedCourse?.passingMarks != null && (
             <> · pass {selectedCourse.passingMarks}</>
+          )}
+          {components.length > 0 && (
+            <> · {components.map((c) => c.label ?? c.code).join(' + ')}</>
           )}
         </div>
       </div>

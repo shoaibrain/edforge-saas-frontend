@@ -20,7 +20,9 @@ import {
   FileText,
   Clock,
   Check,
+  CheckCircle2,
   ChevronRight,
+  Loader2,
   ScrollText,
   Pencil,
 } from 'lucide-react'
@@ -113,6 +115,54 @@ function StatusPipeline({ status }: { status: ExamStatus }) {
           </div>
         )
       })}
+    </div>
+  )
+}
+
+/**
+ * P1c — result-generation status on a closed exam (event-driven, no polling
+ * infra). The result-batch Lambda flips the exam from `pending` → `generated`
+ * (cards ready) or `failed` (DLQ'd); surfacing it here means a closed exam is
+ * never a silent empty state. The detail query polls while `pending` so this
+ * resolves without a manual refresh.
+ */
+function ResultGenerationBadge({
+  status,
+  generatedAt,
+  error,
+}: {
+  status: 'pending' | 'generated' | 'failed'
+  generatedAt?: string | null
+  error?: string | null
+}) {
+  const meta = {
+    pending: {
+      label: 'Generating result cards…',
+      cls: 'text-amber-600 dark:text-amber-400',
+      icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
+    },
+    generated: {
+      label: 'Result cards generated',
+      cls: 'text-emerald-600 dark:text-emerald-400',
+      icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+    },
+    failed: {
+      label: 'Result generation failed',
+      cls: 'text-red-600 dark:text-red-400',
+      icon: <AlertCircle className="w-3.5 h-3.5" />,
+    },
+  }[status]
+  const title = error ?? (generatedAt ? `Generated ${generatedAt}` : undefined)
+  return (
+    <div className="flex items-center justify-between pt-2 border-t border-border-secondary/50">
+      <span className="text-xs text-text-tertiary">Result generation</span>
+      <span
+        className={`inline-flex items-center gap-1.5 text-xs font-medium ${meta.cls}`}
+        title={title ?? undefined}
+      >
+        {meta.icon}
+        {meta.label}
+      </span>
     </div>
   )
 }
@@ -306,6 +356,13 @@ export function ExamDetailModule() {
             <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Lifecycle</h4>
           </div>
           <StatusPipeline status={exam.status} />
+          {exam.status === 'closed' && exam.resultGenerationStatus && (
+            <ResultGenerationBadge
+              status={exam.resultGenerationStatus}
+              generatedAt={exam.resultsGeneratedAt}
+              error={exam.lastGenerationError}
+            />
+          )}
           {canManage ? (
             actions.length > 0 ? (
               <div className="flex flex-wrap items-center gap-2 pt-1">

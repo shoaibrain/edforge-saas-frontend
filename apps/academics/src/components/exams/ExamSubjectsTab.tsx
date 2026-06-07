@@ -9,7 +9,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { BookOpen, Plus, Trash2, Pencil, Lock, X, Check } from 'lucide-react'
-import type { ExamCourseResponseDto, ExamStatus } from '@aibrains/shared-types'
+import type { ExamCourseResponseDto, ExamStatus, ExamComponentDto } from '@aibrains/shared-types'
 import { useCourses } from '../../hooks/useCourses'
 import {
   useExamCourses,
@@ -22,14 +22,62 @@ import { getExamStatusMeta } from '../../schemas/exam.form'
 
 const DEFAULT_PASSING = 32
 
+/** One Theory/Practical (or custom) component row in the Add-Subject form. */
+interface ComponentDraft {
+  label: string
+  fullMarks: string
+  passMarks: string
+}
+
 interface AddFormState {
   courseId: string
   maxMarks: string
   passingMarks: string
   creditHours: string
+  components: ComponentDraft[]
 }
 
-const EMPTY_ADD: AddFormState = { courseId: '', maxMarks: '100', passingMarks: String(DEFAULT_PASSING), creditHours: '' }
+const EMPTY_ADD: AddFormState = {
+  courseId: '',
+  maxMarks: '100',
+  passingMarks: String(DEFAULT_PASSING),
+  creditHours: '',
+  components: [],
+}
+
+/** Derive a stable component code from its label (theory/practical/custom). */
+function slugifyCode(label: string): string {
+  return label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20)
+}
+
+/**
+ * Build + validate the components payload from the draft rows. Mirrors the
+ * server refine: Σ fullMarks === maxMarks, each passMarks ≤ fullMarks, unique
+ * non-empty codes. Returns null when invalid (caller blocks submit).
+ */
+function buildComponents(
+  drafts: ComponentDraft[],
+  maxMarks: number,
+): { ok: true; components: ExamComponentDto[] } | { ok: false } {
+  if (drafts.length === 0) return { ok: true, components: [] }
+  const out: ExamComponentDto[] = []
+  const seen = new Set<string>()
+  let sum = 0
+  for (const d of drafts) {
+    const label = d.label.trim()
+    const code = slugifyCode(label)
+    const fullMarks = Number(d.fullMarks)
+    const passMarks = Number(d.passMarks)
+    if (!label || !code || seen.has(code)) return { ok: false }
+    if (!Number.isFinite(fullMarks) || fullMarks < 1) return { ok: false }
+    if (!Number.isFinite(passMarks) || passMarks < 0 || passMarks > fullMarks) return { ok: false }
+    seen.add(code)
+    sum += fullMarks
+    out.push({ code, label, fullMarks, passMarks })
+  }
+  if (sum !== maxMarks) return { ok: false }
+  return { ok: true, components: out }
+}
 
 export function ExamSubjectsTab({
   examId,
@@ -135,6 +183,8 @@ export function ExamSubjectsTab({
     if (!Number.isFinite(passingMarks) || passingMarks < 0 || passingMarks > maxMarks) return
     const creditHours = form.creditHours === '' ? undefined : Number(form.creditHours)
     if (creditHours != null && (!Number.isFinite(creditHours) || creditHours < 0)) return
+    const built = buildComponents(form.components, maxMarks)
+    if (!built.ok) return
     try {
       await createMut.mutateAsync({
         schoolId,
@@ -142,6 +192,7 @@ export function ExamSubjectsTab({
         maxMarks,
         passingMarks,
         ...(creditHours != null ? { creditHours } : {}),
+        ...(built.components.length > 0 ? { components: built.components } : {}),
       })
       setForm(EMPTY_ADD)
       setAdding(false)
@@ -149,6 +200,30 @@ export function ExamSubjectsTab({
       // onError toast is handled in the mutation hook
     }
   }
+
+  // Live component-split state for the add form (mirrors the server refine so
+  // the operator sees the Σ-must-equal-maxMarks rule before submitting).
+  const addMax = Number(form.maxMarks)
+  const componentsSum = form.components.reduce((s, c) => s + (Number(c.fullMarks) || 0), 0)
+  const componentsValid = buildComponents(form.components, addMax).ok
+
+  const setComponent = (idx: number, patch: Partial<ComponentDraft>) =>
+    setForm((f) => ({
+      ...f,
+      components: f.components.map((c, i) => (i === idx ? { ...c, ...patch } : c)),
+    }))
+  const addComponentRow = (label = '') =>
+    setForm((f) => ({ ...f, components: [...f.components, { label, fullMarks: '', passMarks: '' }] }))
+  const removeComponentRow = (idx: number) =>
+    setForm((f) => ({ ...f, components: f.components.filter((_, i) => i !== idx) }))
+  const seedTheoryPractical = () =>
+    setForm((f) => ({
+      ...f,
+      components: [
+        { label: 'Theory', fullMarks: '', passMarks: '' },
+        { label: 'Practical', fullMarks: '', passMarks: '' },
+      ],
+    }))
 
   const startEdit = (ec: ExamCourseResponseDto) => {
     setEditingId(ec.examCourseId)
@@ -271,6 +346,95 @@ export function ExamSubjectsTab({
               />
             </label>
           </div>
+
+          {/* P1.5b — optional Theory/Practical (or custom) split. The component
+              full marks must sum to Max Marks (mirrors the server refine). */}
+          <div className="rounded-lg border border-border-secondary/70 bg-surface-secondary/30 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-text-tertiary">
+                Components <span className="text-text-tertiary/70">(optional — e.g. Theory + Practical)</span>
+              </span>
+              {form.components.length === 0 ? (
+                <button
+                  type="button"
+                  onClick={seedTheoryPractical}
+                  className="text-xs font-medium text-purple-600 hover:text-purple-700"
+                >
+                  + Split into components
+                </button>
+              ) : (
+                <span className={`text-xs tabular-nums ${componentsValid ? 'text-text-tertiary' : 'text-red-600'}`}>
+                  Σ {componentsSum} / {Number.isFinite(addMax) ? addMax : '—'} full
+                </span>
+              )}
+            </div>
+
+            {form.components.map((c, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={c.label}
+                  placeholder="Label (e.g. Theory)"
+                  onChange={(e) => setComponent(i, { label: e.target.value })}
+                  className="flex-1 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary"
+                  aria-label={`Component ${i + 1} label`}
+                />
+                <input
+                  type="number"
+                  min={1}
+                  value={c.fullMarks}
+                  placeholder="Full"
+                  onChange={(e) => setComponent(i, { fullMarks: e.target.value })}
+                  className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-right"
+                  aria-label={`Component ${i + 1} full marks`}
+                />
+                <span className="text-text-tertiary text-xs">/ pass</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={c.passMarks}
+                  placeholder="Pass"
+                  onChange={(e) => setComponent(i, { passMarks: e.target.value })}
+                  className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-right"
+                  aria-label={`Component ${i + 1} pass marks`}
+                />
+                <button
+                  type="button"
+                  onClick={() => removeComponentRow(i)}
+                  className="p-1 rounded-lg text-text-tertiary hover:text-red-600 hover:bg-surface-secondary"
+                  aria-label="Remove component"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+
+            {form.components.length > 0 && (
+              <div className="flex items-center justify-between pt-1">
+                <button
+                  type="button"
+                  onClick={() => addComponentRow()}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add component
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, components: [] }))}
+                  className="text-xs text-text-tertiary hover:text-text-secondary"
+                >
+                  Clear (single subject)
+                </button>
+              </div>
+            )}
+            {form.components.length > 0 && !componentsValid && (
+              <p className="text-xs text-red-600">
+                Each component needs a label, full ≥ 1, 0 ≤ pass ≤ full, and the full marks must sum to Max
+                Marks ({Number.isFinite(addMax) ? addMax : '—'}).
+              </p>
+            )}
+          </div>
+
           <div className="flex items-center justify-end gap-2">
             <button
               type="button"
@@ -285,7 +449,7 @@ export function ExamSubjectsTab({
             <button
               type="button"
               onClick={handleAdd}
-              disabled={!form.courseId || createMut.isPending}
+              disabled={!form.courseId || createMut.isPending || !componentsValid}
               className="px-3 py-1.5 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
             >
               Add
@@ -315,6 +479,13 @@ export function ExamSubjectsTab({
                   </p>
                   {ec.academicSubject && (
                     <p className="text-xs text-text-tertiary">{ec.academicSubject}</p>
+                  )}
+                  {ec.components && ec.components.length > 0 && (
+                    <p className="text-xs text-text-tertiary">
+                      {ec.components
+                        .map((c) => `${c.label ?? c.code} ${c.fullMarks}/${c.passMarks}`)
+                        .join(' · ')}
+                    </p>
                   )}
                 </div>
 
