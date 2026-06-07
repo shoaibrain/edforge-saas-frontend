@@ -1,19 +1,20 @@
 /**
  * Government Reports — CEHRD IEMIS Flash I/II export surface.
  *
- * Operator flow: pick a template + academic year (BS) → (optional) pre-flight
- * → generate → the snapshot generates server-side (report-aggregator Lambda)
- * → download the presigned CSV → mark "Submitted" after the manual upload to
- * the IEMIS portal. A history table lists prior snapshots for the school.
+ * Operator flow: pick a template + academic year → (optional) validate →
+ * generate → the snapshot generates server-side (report-aggregator Lambda) →
+ * download the presigned CSV → upload it to the IEMIS portal → mark
+ * "Submitted", then "Verified" once CEHRD acknowledges it. A history table
+ * lists prior snapshots for the school.
  *
  * Full-page route (not a modal) mirroring the IEMIS *import* flow — the
- * history table and pre-flight findings can span many rows.
+ * history table and validation findings can span many rows.
  *
  * Rendered at `/academics/reports/government` (see router.tsx). The IEMIS
  * *export* counterpart to the IEMIS *import* button in the Students module.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   AlertTriangle,
@@ -24,9 +25,11 @@ import {
   Info,
   Loader2,
   Send,
+  ShieldCheck,
 } from 'lucide-react'
 import { StatusPill } from '@edforge/ui'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useAcademicYears, useSchoolProfile } from '../../hooks/useSchool'
 import {
   useCreateReportingSnapshot,
   usePreflightReportingSnapshot,
@@ -38,6 +41,8 @@ import {
 import {
   canDownload,
   canMarkSubmitted,
+  canMarkVerified,
+  extractBsYear,
   isValidBsYear,
   statusLabel,
   statusVariant,
@@ -56,9 +61,15 @@ const cardStyle = {
   borderColor: 'var(--v2-border-default)',
 } as const
 
+const IEMIS_PORTAL_URL = 'https://emis.cehrd.gov.np'
+
 export function GovernmentReportsExport() {
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+
+  // ---- hooks (all unconditional — before any early return) ----
+  const profileQuery = useSchoolProfile(schoolId)
+  const academicYearsQuery = useAcademicYears(schoolId ?? '', !!schoolId)
 
   const [templateId, setTemplateId] = useState<ReportingTemplateId>(
     'IEMIS_NPL_CEHRD_FLASH_I',
@@ -67,17 +78,39 @@ export function GovernmentReportsExport() {
   const [preflight, setPreflight] = useState<PreflightReportingSnapshotResponse | null>(null)
   const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null)
 
-  const yearValid = isValidBsYear(academicYearBs)
-
   const snapshotsQuery = useReportingSnapshots({ schoolId })
   const preflightMut = usePreflightReportingSnapshot()
   const createMut = useCreateReportingSnapshot()
   const downloadMut = useReportingSnapshotDownload()
   const transitionMut = useTransitionReportingSnapshot()
-
-  // Poll the just-created snapshot until generation terminates.
   const polled = useReportingSnapshotPoll(schoolId, activeSnapshotId)
 
+  // Academic-year options derived from the school's real years (PABSON years
+  // carry the BS year in their name). Falls back to manual entry if none parse.
+  const yearOptions = useMemo(() => {
+    const seen = new Set<string>()
+    const opts: { value: string; label: string }[] = []
+    for (const ay of academicYearsQuery.data ?? []) {
+      const bs = extractBsYear(ay.name)
+      if (!bs || seen.has(bs)) continue
+      seen.add(bs)
+      opts.push({ value: bs, label: ay.isCurrent ? `${ay.name} · current` : ay.name })
+    }
+    return opts
+  }, [academicYearsQuery.data])
+
+  const useYearDropdown = yearOptions.length > 0
+
+  // Default to the current academic year (or the newest parseable one) once
+  // the list loads, so the operator rarely has to touch the picker.
+  useEffect(() => {
+    if (academicYearBs || yearOptions.length === 0) return
+    const current = (academicYearsQuery.data ?? []).find((ay) => ay.isCurrent)
+    const currentBs = current ? extractBsYear(current.name) : null
+    setAcademicYearBs(currentBs ?? yearOptions[0].value)
+  }, [yearOptions, academicYearBs, academicYearsQuery.data])
+
+  const yearValid = isValidBsYear(academicYearBs)
   const canGenerate =
     !!schoolId &&
     yearValid &&
@@ -109,20 +142,16 @@ export function GovernmentReportsExport() {
 
   async function handleDownload(snap: ReportingSnapshot) {
     if (!schoolId) return
-    const result = await downloadMut.mutateAsync({
-      snapshotId: snap.snapshotId,
-      schoolId,
-    })
+    const result = await downloadMut.mutateAsync({ snapshotId: snap.snapshotId, schoolId })
     triggerBrowserDownload(result.url, result.fileName)
   }
 
-  async function handleMarkSubmitted(snap: ReportingSnapshot) {
+  async function handleTransition(
+    snap: ReportingSnapshot,
+    nextStatus: 'submitted' | 'verified',
+  ) {
     if (!schoolId) return
-    await transitionMut.mutateAsync({
-      snapshotId: snap.snapshotId,
-      schoolId,
-      nextStatus: 'submitted',
-    })
+    await transitionMut.mutateAsync({ snapshotId: snap.snapshotId, schoolId, nextStatus })
   }
 
   const snapshots = useMemo(
@@ -130,34 +159,51 @@ export function GovernmentReportsExport() {
     [snapshotsQuery.data],
   )
 
-  // ---- No active school gate ----
+  // ---- gate: no active school ----
   if (!schoolId) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <BackLink onClick={() => navigate({ to: '/' })} />
-        <div
-          className="rounded-xl border p-8 text-center mt-4"
-          style={cardStyle}
-        >
-          <FileSpreadsheet
-            className="w-8 h-8 mx-auto mb-3"
-            style={{ color: 'var(--v2-text-tertiary)' }}
-          />
-          <p style={{ color: 'var(--v2-text-secondary)' }}>
-            Select a school to generate government reports.
-          </p>
-        </div>
-      </div>
+      <PageShell onBack={() => navigate({ to: '/' })}>
+        <EmptyCard>Select a school to generate government reports.</EmptyCard>
+      </PageShell>
     )
   }
 
+  // ---- gate: school profile still loading ----
+  if (profileQuery.isLoading) {
+    return (
+      <PageShell onBack={() => navigate({ to: '/' })}>
+        <div className="rounded-xl border p-8 text-center" style={cardStyle}>
+          <Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: 'var(--v2-text-tertiary)' }} />
+        </div>
+      </PageShell>
+    )
+  }
+
+  // ---- gate: school has no IEMIS code → cannot produce a valid Flash CSV ----
+  if (!profileQuery.data?.emisSchoolCode) {
+    return (
+      <PageShell onBack={() => navigate({ to: '/' })}>
+        <div className="rounded-xl border p-8" style={cardStyle}>
+          <AlertTriangle className="w-7 h-7 mb-3" style={{ color: 'var(--v2-status-late)' }} />
+          <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--v2-text-primary)' }}>
+            This school has no IEMIS code yet
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--v2-text-secondary)' }}>
+            CEHRD Flash I/II exports require the school’s government-issued IEMIS
+            code (the <code>school_iemis_code</code> column). Add it under School
+            Settings, then return here to generate reports.
+          </p>
+        </div>
+      </PageShell>
+    )
+  }
+
+  const school = profileQuery.data
   const activeSnap = polled.data
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <BackLink onClick={() => navigate({ to: '/' })} />
-
-      <header className="mt-3 mb-6">
+    <PageShell onBack={() => navigate({ to: '/' })}>
+      <header className="mb-6">
         <h1
           className="text-xl font-semibold flex items-center gap-2"
           style={{ color: 'var(--v2-text-primary)' }}
@@ -166,8 +212,10 @@ export function GovernmentReportsExport() {
           Government Reports
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--v2-text-secondary)' }}>
-          Generate and download CEHRD IEMIS Flash I / Flash II CSVs, then mark
-          them submitted after uploading to the IEMIS portal.
+          Generate, download, and track CEHRD IEMIS Flash I / Flash II
+          submissions for{' '}
+          <span style={{ color: 'var(--v2-text-primary)' }}>{school.name}</span>{' '}
+          <span style={{ color: 'var(--v2-text-tertiary)' }}>· IEMIS {school.emisSchoolCode}</span>.
         </p>
       </header>
 
@@ -199,25 +247,59 @@ export function GovernmentReportsExport() {
             <span className="text-xs font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
               Academic year (BS)
             </span>
-            <input
-              value={academicYearBs}
-              onChange={(e) => {
-                setAcademicYearBs(e.target.value)
-                resetPreflight()
-              }}
-              inputMode="numeric"
-              placeholder="2083"
-              aria-label="Academic year in Bikram Sambat"
-              className="px-3 py-2 text-sm rounded-lg border bg-transparent"
-              style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-primary)' }}
-            />
-            {academicYearBs.length > 0 && !yearValid && (
-              <span className="text-[11px]" style={{ color: 'var(--v2-status-overdue)' }}>
-                Enter a 4-digit BS year, e.g. 2083.
-              </span>
+            {useYearDropdown ? (
+              <select
+                value={academicYearBs}
+                onChange={(e) => {
+                  setAcademicYearBs(e.target.value)
+                  resetPreflight()
+                }}
+                className="px-3 py-2 text-sm rounded-lg border bg-transparent"
+                style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-primary)' }}
+              >
+                {yearOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <>
+                <input
+                  value={academicYearBs}
+                  onChange={(e) => {
+                    setAcademicYearBs(e.target.value)
+                    resetPreflight()
+                  }}
+                  inputMode="numeric"
+                  placeholder="2083"
+                  aria-label="Academic year in Bikram Sambat"
+                  className="px-3 py-2 text-sm rounded-lg border bg-transparent"
+                  style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-primary)' }}
+                />
+                {academicYearBs.length > 0 && !yearValid && (
+                  <span className="text-[11px]" style={{ color: 'var(--v2-status-overdue)' }}>
+                    Enter a 4-digit BS year, e.g. 2083.
+                  </span>
+                )}
+              </>
             )}
           </label>
         </div>
+
+        {templateId === 'IEMIS_NPL_CEHRD_FLASH_II' && (
+          <div
+            className="mt-4 rounded-lg border p-3 text-[12px] flex items-start gap-2"
+            style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
+          >
+            <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'var(--v2-status-late)' }} />
+            <span>
+              Flash II’s <strong>exam marks</strong> and <strong>GPA</strong> columns are
+              entered manually in this version; all other columns (enrollment,
+              attendance, demographics) are generated automatically.
+            </span>
+          </div>
+        )}
 
         {preflight && <PreflightSummary preflight={preflight} />}
 
@@ -233,7 +315,7 @@ export function GovernmentReportsExport() {
             ) : (
               <Info className="w-4 h-4" />
             )}
-            Pre-flight
+            Validate
           </button>
           <button
             onClick={handleGenerate}
@@ -309,48 +391,118 @@ export function GovernmentReportsExport() {
 
                 <div className="flex items-center gap-1.5">
                   {canDownload(snap.status, snap.dryRun) && (
-                    <button
+                    <RowButton
                       onClick={() => handleDownload(snap)}
                       disabled={downloadMut.isPending}
-                      aria-label="Download CSV"
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
-                      style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      CSV
-                    </button>
+                      ariaLabel="Download CSV"
+                      icon={<Download className="w-3.5 h-3.5" />}
+                      label="CSV"
+                    />
                   )}
                   {canMarkSubmitted(snap.status, snap.dryRun) && (
-                    <button
-                      onClick={() => handleMarkSubmitted(snap)}
+                    <RowButton
+                      onClick={() => handleTransition(snap, 'submitted')}
                       disabled={transitionMut.isPending}
-                      aria-label="Mark submitted"
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
-                      style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      Mark submitted
-                    </button>
+                      ariaLabel="Mark submitted"
+                      icon={<Send className="w-3.5 h-3.5" />}
+                      label="Mark submitted"
+                    />
+                  )}
+                  {canMarkVerified(snap.status, snap.dryRun) && (
+                    <RowButton
+                      onClick={() => handleTransition(snap, 'verified')}
+                      disabled={transitionMut.isPending}
+                      ariaLabel="Mark verified"
+                      icon={<ShieldCheck className="w-3.5 h-3.5" />}
+                      label="Mark verified"
+                    />
                   )}
                 </div>
               </li>
             ))}
           </ul>
         )}
+
+        {/* ---- Operator guidance: the manual portal step ---- */}
+        <div
+          className="px-5 py-3 border-t text-[12px] flex items-start gap-2"
+          style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-tertiary)' }}
+        >
+          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          <span>
+            After downloading, upload the CSV to the IEMIS portal (
+            <a
+              href={IEMIS_PORTAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--v2-brand-primary)' }}
+            >
+              emis.cehrd.gov.np
+            </a>
+            ), then mark the report <strong>Submitted</strong> — and{' '}
+            <strong>Verified</strong> once CEHRD confirms acceptance.
+          </span>
+        </div>
       </section>
+    </PageShell>
+  )
+}
+
+// ============================================================================
+// Sub-components
+// ============================================================================
+
+function PageShell({ children, onBack }: { children: React.ReactNode; onBack: () => void }) {
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <button
+        onClick={onBack}
+        className="inline-flex items-center gap-1.5 text-[13px] transition-colors hover:opacity-80 mb-3"
+        style={{ color: 'var(--v2-text-secondary)' }}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </button>
+      {children}
     </div>
   )
 }
 
-function BackLink({ onClick }: { onClick: () => void }) {
+function EmptyCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border p-8 text-center" style={cardStyle}>
+      <FileSpreadsheet
+        className="w-8 h-8 mx-auto mb-3"
+        style={{ color: 'var(--v2-text-tertiary)' }}
+      />
+      <p style={{ color: 'var(--v2-text-secondary)' }}>{children}</p>
+    </div>
+  )
+}
+
+function RowButton({
+  onClick,
+  disabled,
+  ariaLabel,
+  icon,
+  label,
+}: {
+  onClick: () => void
+  disabled?: boolean
+  ariaLabel: string
+  icon: React.ReactNode
+  label: string
+}) {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 text-[13px] transition-colors hover:opacity-80"
-      style={{ color: 'var(--v2-text-secondary)' }}
+      disabled={disabled}
+      aria-label={ariaLabel}
+      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
+      style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
     >
-      <ArrowLeft className="w-4 h-4" />
-      Back
+      {icon}
+      {label}
     </button>
   )
 }
@@ -368,7 +520,7 @@ function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshot
         ) : (
           <AlertTriangle className="w-4 h-4" style={{ color: 'var(--v2-status-overdue)' }} />
         )}
-        {canProceed ? 'Pre-flight passed' : 'Pre-flight blocked'}
+        {canProceed ? 'Validation passed' : 'Validation blocked'}
       </div>
       {errors.length > 0 && (
         <ul className="mt-2 space-y-1" style={{ color: 'var(--v2-status-overdue)' }}>
@@ -404,10 +556,7 @@ function ActiveGenerationBanner({
   const ready = canDownload(snapshot.status, snapshot.dryRun)
 
   return (
-    <section
-      className="rounded-xl border p-4 mb-6 flex items-center gap-3"
-      style={cardStyle}
-    >
+    <section className="rounded-xl border p-4 mb-6 flex items-center gap-3" style={cardStyle}>
       {generating && <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--v2-brand-primary)' }} />}
       {ready && <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--v2-status-paid)' }} />}
       {failed && <AlertTriangle className="w-5 h-5" style={{ color: 'var(--v2-status-overdue)' }} />}

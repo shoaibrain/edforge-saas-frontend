@@ -2,6 +2,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   canDownload,
   canMarkSubmitted,
+  canMarkVerified,
+  extractBsYear,
   isInProgress,
   isValidBsYear,
   statusLabel,
@@ -40,6 +42,28 @@ describe('government-reports.helpers', () => {
       expect(canMarkSubmitted('submitted')).toBe(false)
       expect(canMarkSubmitted('verified')).toBe(false)
       expect(canMarkSubmitted('generating')).toBe(false)
+    })
+  })
+
+  describe('canMarkVerified', () => {
+    it('is true only for a non-dry-run submitted snapshot', () => {
+      expect(canMarkVerified('submitted')).toBe(true)
+      expect(canMarkVerified('submitted', true)).toBe(false)
+      expect(canMarkVerified('generated')).toBe(false)
+      expect(canMarkVerified('verified')).toBe(false)
+    })
+  })
+
+  describe('extractBsYear', () => {
+    it('pulls the leading 4-digit BS year from an academic-year name', () => {
+      expect(extractBsYear('2083')).toBe('2083')
+      expect(extractBsYear('2083-2084')).toBe('2083')
+      expect(extractBsYear('BS 2083/84')).toBe('2083')
+    })
+
+    it('returns null when no 4-digit year is present', () => {
+      expect(extractBsYear('Current Year')).toBeNull()
+      expect(extractBsYear('')).toBeNull()
     })
   })
 
