@@ -57,6 +57,11 @@ export function useExam(examId: string, schoolId: string, enabled = true) {
     queryFn: () => getExam(examId, schoolId),
     enabled: enabled && !!examId && !!schoolId,
     staleTime: 30 * 1000,
+    // P1c — while result generation is in flight (just-closed exam), poll so the
+    // status flips pending→generated/failed without a manual refresh. No-op for
+    // any other state (and other callers), so polling stops as soon as it resolves.
+    refetchInterval: (query) =>
+      query.state.data?.resultGenerationStatus === 'pending' ? 5000 : false,
   })
 }
 
