@@ -99,6 +99,32 @@ export function isStalledGenerating(
 }
 
 /**
+ * Find the most-recent non-failed report for a template + year, if any.
+ * Used to warn the operator that generating will create another version
+ * (regeneration is legitimate, so this informs rather than blocks). Relies on
+ * the newest-first ordering of the list.
+ */
+export function findExistingReport(
+  snapshots: ReportingSnapshot[],
+  templateId: ReportingTemplateId,
+  academicYearBs: string,
+): ReportingSnapshot | undefined {
+  return snapshots.find(
+    (s) =>
+      s.templateId === templateId &&
+      s.academicYearBs === academicYearBs &&
+      s.status !== 'failed',
+  )
+}
+
+/** True when a generated report contains zero student rows (likely wrong year). */
+export function isEmptyReport(
+  snapshot: Pick<ReportingSnapshot, 'status' | 'rowCount' | 'dryRun'>,
+): boolean {
+  return !snapshot.dryRun && canDownload(snapshot.status) && snapshot.rowCount === 0
+}
+
+/**
  * Group snapshots by academic year (BS), newest year first. Input is assumed
  * already sorted newest-first, so each group preserves that order.
  */

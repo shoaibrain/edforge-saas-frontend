@@ -5,8 +5,10 @@ import {
   canMarkVerified,
   canRetry,
   extractBsYear,
+  findExistingReport,
   GENERATION_STALL_MS,
   groupSnapshotsByYear,
+  isEmptyReport,
   isInProgress,
   isStalledGenerating,
   isValidBsYear,
@@ -126,6 +128,32 @@ describe('government-reports.helpers', () => {
       expect(
         isStalledGenerating(snap({ status: 'generated' }), start + GENERATION_STALL_MS * 10),
       ).toBe(false)
+    })
+  })
+
+  describe('findExistingReport', () => {
+    const rows = [
+      snap({ snapshotId: 'new', templateId: 'IEMIS_NPL_CEHRD_FLASH_I', academicYearBs: '2083', status: 'generated' }),
+      snap({ snapshotId: 'old', templateId: 'IEMIS_NPL_CEHRD_FLASH_I', academicYearBs: '2083', status: 'submitted' }),
+      snap({ snapshotId: 'fail', templateId: 'IEMIS_NPL_CEHRD_FLASH_I', academicYearBs: '2082', status: 'failed' }),
+    ]
+
+    it('returns the most-recent non-failed match for the template + year', () => {
+      expect(findExistingReport(rows, 'IEMIS_NPL_CEHRD_FLASH_I', '2083')?.snapshotId).toBe('new')
+    })
+
+    it('ignores failed snapshots and non-matching template/year', () => {
+      expect(findExistingReport(rows, 'IEMIS_NPL_CEHRD_FLASH_I', '2082')).toBeUndefined()
+      expect(findExistingReport(rows, 'IEMIS_NPL_CEHRD_FLASH_II', '2083')).toBeUndefined()
+    })
+  })
+
+  describe('isEmptyReport', () => {
+    it('flags a downloadable report with zero rows', () => {
+      expect(isEmptyReport(snap({ status: 'generated', rowCount: 0 }))).toBe(true)
+      expect(isEmptyReport(snap({ status: 'generated', rowCount: 42 }))).toBe(false)
+      expect(isEmptyReport(snap({ status: 'generating', rowCount: 0 }))).toBe(false)
+      expect(isEmptyReport(snap({ status: 'generated', rowCount: 0, dryRun: true }))).toBe(false)
     })
   })
 

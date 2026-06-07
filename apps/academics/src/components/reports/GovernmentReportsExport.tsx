@@ -45,7 +45,9 @@ import {
   canMarkVerified,
   canRetry,
   extractBsYear,
+  findExistingReport,
   groupSnapshotsByYear,
+  isEmptyReport,
   isStalledGenerating,
   isValidBsYear,
   statusLabel,
@@ -181,6 +183,15 @@ export function GovernmentReportsExport() {
         : snapshots.filter((s) => s.templateId === templateFilter)
     return groupSnapshotsByYear(filtered)
   }, [snapshots, templateFilter])
+
+  // Non-blocking heads-up: a report for this template + year already exists.
+  const existingReport = useMemo(
+    () =>
+      yearValid
+        ? findExistingReport(snapshots, templateId, academicYearBs.trim())
+        : undefined,
+    [snapshots, templateId, academicYearBs, yearValid],
+  )
 
   // ---- gate: no active school ----
   if (!schoolId) {
@@ -325,6 +336,19 @@ export function GovernmentReportsExport() {
         )}
 
         {preflight && <PreflightSummary preflight={preflight} />}
+
+        {existingReport && (
+          <div
+            className="mt-3 text-[12px] flex items-start gap-2"
+            style={{ color: 'var(--v2-text-tertiary)' }}
+          >
+            <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <span>
+              A {TEMPLATE_LABELS[templateId]} for BS {academicYearBs} already exists
+              ({statusLabel(existingReport.status)}). Generating creates a new version.
+            </span>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 mt-4">
           <button
@@ -639,12 +663,18 @@ function ActiveGenerationBanner({
 }) {
   const failed = snapshot.status === 'failed'
   const ready = canDownload(snapshot.status, snapshot.dryRun)
+  const empty = isEmptyReport(snapshot)
   // Past the stall budget we stop the spinner and prompt a manual refresh.
   const spinning = snapshot.status === 'generating' && !stalled
   const stalledGenerating = snapshot.status === 'generating' && stalled
 
   return (
-    <section className="rounded-xl border p-4 mb-6 flex items-center gap-3" style={cardStyle}>
+    <section
+      className="rounded-xl border p-4 mb-6 flex items-center gap-3"
+      style={cardStyle}
+      role="status"
+      aria-live="polite"
+    >
       {spinning && <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--v2-brand-primary)' }} />}
       {stalledGenerating && <AlertTriangle className="w-5 h-5" style={{ color: 'var(--v2-status-late)' }} />}
       {ready && <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--v2-status-paid)' }} />}
@@ -660,6 +690,11 @@ function ActiveGenerationBanner({
           <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
             This is unusual for a single school — it may have failed. Refresh to
             check the latest status.
+          </div>
+        )}
+        {ready && empty && (
+          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-status-late)' }}>
+            This report has 0 students — double-check the academic year before submitting.
           </div>
         )}
         {failed && snapshot.errorSummary && (
