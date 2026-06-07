@@ -22,7 +22,10 @@ import type {
   PreflightReportingSnapshotRequest,
   ReportingSnapshotStatus,
 } from '../components/reports/government-reports.types'
-import { isInProgress } from '../components/reports/government-reports.helpers'
+import {
+  isInProgress,
+  isStalledGenerating,
+} from '../components/reports/government-reports.helpers'
 
 export const reportingKeys = {
   all: ['reporting-snapshots'] as const,
@@ -62,7 +65,14 @@ export function useReportingSnapshotPoll(
         : [...reportingKeys.all, 'detail', 'disabled'],
     queryFn: () => getReportingSnapshot(snapshotId as string, schoolId as string),
     enabled: !!schoolId && !!snapshotId,
-    refetchInterval: (query) => (isInProgress(query.state.data?.status as ReportingSnapshotStatus) ? 5000 : false),
+    refetchInterval: (query) => {
+      const snap = query.state.data
+      if (!snap || !isInProgress(snap.status)) return false
+      // Bounded polling: stop the infinite spinner once the job has been
+      // generating past the stall budget; the UI then offers a manual refresh.
+      if (isStalledGenerating(snap)) return false
+      return 5000
+    },
     refetchIntervalInBackground: false,
     staleTime: 0,
     select: (data) => {

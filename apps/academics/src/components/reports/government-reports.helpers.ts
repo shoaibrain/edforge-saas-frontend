@@ -6,9 +6,18 @@
 
 import type { StatusPillVariant } from '@edforge/ui'
 import type {
+  ReportingSnapshot,
   ReportingSnapshotStatus,
   ReportingTemplateId,
 } from './government-reports.types'
+
+/**
+ * After this long in `generating`, the UI stops auto-polling and surfaces a
+ * "taking longer than expected" prompt with a manual refresh. Flash generation
+ * for a single school is normally seconds; minutes implies a stuck/failed job
+ * (e.g. the SBT step-function silent-failure class), so we cap the spin.
+ */
+export const GENERATION_STALL_MS = 5 * 60 * 1000
 
 /** Human label for a template id. */
 export const TEMPLATE_LABELS: Record<ReportingTemplateId, string> = {
@@ -67,6 +76,44 @@ export function canDownload(status: ReportingSnapshotStatus, dryRun?: boolean): 
 /** `generating` is the only non-terminal state — the UI polls while in it. */
 export function isInProgress(status: ReportingSnapshotStatus): boolean {
   return status === 'generating'
+}
+
+/** A failed report can be re-generated with the same template + year. */
+export function canRetry(status: ReportingSnapshotStatus): boolean {
+  return status === 'failed'
+}
+
+/**
+ * True when a snapshot has been `generating` past the stall budget — the
+ * trigger for the UI to stop the infinite spinner and offer a manual refresh.
+ * `now` is injectable for deterministic tests.
+ */
+export function isStalledGenerating(
+  snapshot: Pick<ReportingSnapshot, 'status' | 'createdAt'>,
+  now: number = Date.now(),
+): boolean {
+  if (snapshot.status !== 'generating') return false
+  const started = Date.parse(snapshot.createdAt)
+  if (Number.isNaN(started)) return false
+  return now - started > GENERATION_STALL_MS
+}
+
+/**
+ * Group snapshots by academic year (BS), newest year first. Input is assumed
+ * already sorted newest-first, so each group preserves that order.
+ */
+export function groupSnapshotsByYear(
+  snapshots: ReportingSnapshot[],
+): { year: string; items: ReportingSnapshot[] }[] {
+  const byYear = new Map<string, ReportingSnapshot[]>()
+  for (const s of snapshots) {
+    const arr = byYear.get(s.academicYearBs)
+    if (arr) arr.push(s)
+    else byYear.set(s.academicYearBs, [s])
+  }
+  return [...byYear.keys()]
+    .sort((a, b) => b.localeCompare(a))
+    .map((year) => ({ year, items: byYear.get(year)! }))
 }
 
 /** Operators mark a generated report "submitted" after the manual portal upload. */

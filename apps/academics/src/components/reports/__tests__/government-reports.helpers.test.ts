@@ -3,14 +3,36 @@ import {
   canDownload,
   canMarkSubmitted,
   canMarkVerified,
+  canRetry,
   extractBsYear,
+  GENERATION_STALL_MS,
+  groupSnapshotsByYear,
   isInProgress,
+  isStalledGenerating,
   isValidBsYear,
   statusLabel,
   statusVariant,
   triggerBrowserDownload,
 } from '../government-reports.helpers'
-import type { ReportingSnapshotStatus } from '../government-reports.types'
+import type {
+  ReportingSnapshot,
+  ReportingSnapshotStatus,
+} from '../government-reports.types'
+
+function snap(overrides: Partial<ReportingSnapshot>): ReportingSnapshot {
+  return {
+    snapshotId: 's',
+    schoolId: 'sch',
+    templateId: 'IEMIS_NPL_CEHRD_FLASH_I',
+    academicYearBs: '2083',
+    status: 'generated',
+    schemaVersion: 'v1',
+    createdAt: '2026-06-01T00:00:00.000Z',
+    createdBy: 'u',
+    updatedAt: '2026-06-01T00:00:00.000Z',
+    ...overrides,
+  }
+}
 
 const ALL_STATUSES: ReportingSnapshotStatus[] = [
   'generating',
@@ -73,6 +95,55 @@ describe('government-reports.helpers', () => {
       for (const s of ALL_STATUSES.filter((x) => x !== 'generating')) {
         expect(isInProgress(s)).toBe(false)
       }
+    })
+  })
+
+  describe('canRetry', () => {
+    it('is true only for failed', () => {
+      expect(canRetry('failed')).toBe(true)
+      for (const s of ALL_STATUSES.filter((x) => x !== 'failed')) {
+        expect(canRetry(s)).toBe(false)
+      }
+    })
+  })
+
+  describe('isStalledGenerating', () => {
+    const start = Date.parse('2026-06-01T00:00:00.000Z')
+
+    it('is false for a fresh generating snapshot', () => {
+      expect(
+        isStalledGenerating(snap({ status: 'generating' }), start + 1000),
+      ).toBe(false)
+    })
+
+    it('is true once generating past the stall budget', () => {
+      expect(
+        isStalledGenerating(snap({ status: 'generating' }), start + GENERATION_STALL_MS + 1),
+      ).toBe(true)
+    })
+
+    it('is false for non-generating statuses regardless of age', () => {
+      expect(
+        isStalledGenerating(snap({ status: 'generated' }), start + GENERATION_STALL_MS * 10),
+      ).toBe(false)
+    })
+  })
+
+  describe('groupSnapshotsByYear', () => {
+    it('groups by academicYearBs, newest year first, preserving input order within a group', () => {
+      const rows = [
+        snap({ snapshotId: 'a', academicYearBs: '2083' }),
+        snap({ snapshotId: 'b', academicYearBs: '2082' }),
+        snap({ snapshotId: 'c', academicYearBs: '2083' }),
+      ]
+      const groups = groupSnapshotsByYear(rows)
+      expect(groups.map((g) => g.year)).toEqual(['2083', '2082'])
+      expect(groups[0].items.map((s) => s.snapshotId)).toEqual(['a', 'c'])
+      expect(groups[1].items.map((s) => s.snapshotId)).toEqual(['b'])
+    })
+
+    it('returns [] for no snapshots', () => {
+      expect(groupSnapshotsByYear([])).toEqual([])
     })
   })
 

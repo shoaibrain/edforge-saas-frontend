@@ -24,6 +24,7 @@ import {
   FileSpreadsheet,
   Info,
   Loader2,
+  RefreshCw,
   Send,
   ShieldCheck,
 } from 'lucide-react'
@@ -42,7 +43,10 @@ import {
   canDownload,
   canMarkSubmitted,
   canMarkVerified,
+  canRetry,
   extractBsYear,
+  groupSnapshotsByYear,
+  isStalledGenerating,
   isValidBsYear,
   statusLabel,
   statusVariant,
@@ -77,6 +81,7 @@ export function GovernmentReportsExport() {
   const [academicYearBs, setAcademicYearBs] = useState('')
   const [preflight, setPreflight] = useState<PreflightReportingSnapshotResponse | null>(null)
   const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null)
+  const [templateFilter, setTemplateFilter] = useState<'ALL' | ReportingTemplateId>('ALL')
 
   const snapshotsQuery = useReportingSnapshots({ schoolId })
   const preflightMut = usePreflightReportingSnapshot()
@@ -154,10 +159,28 @@ export function GovernmentReportsExport() {
     await transitionMut.mutateAsync({ snapshotId: snap.snapshotId, schoolId, nextStatus })
   }
 
+  async function handleRetry(snap: ReportingSnapshot) {
+    if (!schoolId) return
+    const next = await createMut.mutateAsync({
+      templateId: snap.templateId,
+      academicYearBs: snap.academicYearBs,
+      schoolId,
+    })
+    setActiveSnapshotId(next.snapshotId)
+  }
+
   const snapshots = useMemo(
     () => snapshotsQuery.data?.snapshots ?? [],
     [snapshotsQuery.data],
   )
+
+  const groupedHistory = useMemo(() => {
+    const filtered =
+      templateFilter === 'ALL'
+        ? snapshots
+        : snapshots.filter((s) => s.templateId === templateFilter)
+    return groupSnapshotsByYear(filtered)
+  }, [snapshots, templateFilter])
 
   // ---- gate: no active school ----
   if (!schoolId) {
@@ -337,8 +360,11 @@ export function GovernmentReportsExport() {
       {activeSnap && (
         <ActiveGenerationBanner
           snapshot={activeSnap}
+          stalled={isStalledGenerating(activeSnap)}
+          refreshing={polled.isFetching}
           downloading={downloadMut.isPending}
           onDownload={() => handleDownload(activeSnap)}
+          onRefresh={() => polled.refetch()}
           onDismiss={() => setActiveSnapshotId(null)}
         />
       )}
@@ -346,81 +372,131 @@ export function GovernmentReportsExport() {
       {/* ---- History ---- */}
       <section className="rounded-xl border" style={cardStyle}>
         <div
-          className="px-5 py-3 border-b text-sm font-medium"
-          style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-primary)' }}
+          className="px-5 py-3 border-b flex items-center justify-between gap-3 flex-wrap"
+          style={{ borderColor: 'var(--v2-border-default)' }}
         >
-          Report history
+          <span className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+            Report history
+          </span>
+          <div className="flex items-center gap-1" role="group" aria-label="Filter by report">
+            {([
+              { value: 'ALL', label: 'All' },
+              { value: 'IEMIS_NPL_CEHRD_FLASH_I', label: 'Flash I' },
+              { value: 'IEMIS_NPL_CEHRD_FLASH_II', label: 'Flash II' },
+            ] as const).map((opt) => {
+              const active = templateFilter === opt.value
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => setTemplateFilter(opt.value)}
+                  aria-pressed={active}
+                  className="px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors"
+                  style={{
+                    background: active ? 'var(--v2-brand-primary)' : 'transparent',
+                    borderColor: active ? 'var(--v2-brand-primary)' : 'var(--v2-border-default)',
+                    color: active ? '#fff' : 'var(--v2-text-secondary)',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {snapshotsQuery.isLoading ? (
           <div className="px-5 py-8 text-center">
             <Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: 'var(--v2-text-tertiary)' }} />
           </div>
-        ) : snapshots.length === 0 ? (
+        ) : groupedHistory.length === 0 ? (
           <div className="px-5 py-8 text-center text-sm" style={{ color: 'var(--v2-text-tertiary)' }}>
-            No reports generated yet for this school.
+            {snapshots.length === 0
+              ? 'No reports generated yet for this school.'
+              : 'No reports match this filter.'}
           </div>
         ) : (
-          <ul>
-            {snapshots.map((snap) => (
-              <li
-                key={snap.snapshotId}
-                className="px-5 py-3 border-b last:border-b-0 flex items-center gap-3 flex-wrap"
-                style={{ borderColor: 'var(--v2-border-default)' }}
+          groupedHistory.map((group) => (
+            <div key={group.year}>
+              <div
+                className="px-5 py-1.5 text-[11px] font-semibold uppercase tracking-wide border-b"
+                style={{
+                  borderColor: 'var(--v2-border-default)',
+                  color: 'var(--v2-text-tertiary)',
+                  background: 'var(--v2-bg-subtle, transparent)',
+                }}
               >
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate" style={{ color: 'var(--v2-text-primary)' }}>
-                    {TEMPLATE_LABELS[snap.templateId]}{' '}
-                    <span style={{ color: 'var(--v2-text-tertiary)' }}>· BS {snap.academicYearBs}</span>
-                  </div>
-                  <div className="text-[11px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
-                    {typeof snap.rowCount === 'number' ? `${snap.rowCount} rows · ` : ''}
-                    {snap.generatedAt
-                      ? `generated ${new Date(snap.generatedAt).toLocaleString()}`
-                      : `created ${new Date(snap.createdAt).toLocaleString()}`}
-                    {snap.dryRun ? ' · dry-run' : ''}
-                  </div>
-                  {snap.status === 'failed' && snap.errorSummary && (
-                    <div className="text-[11px] mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
-                      {snap.errorSummary}
+                BS {group.year}
+              </div>
+              <ul>
+                {group.items.map((snap) => (
+                  <li
+                    key={snap.snapshotId}
+                    className="px-5 py-3 border-b last:border-b-0 flex items-center gap-3 flex-wrap"
+                    style={{ borderColor: 'var(--v2-border-default)' }}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium truncate" style={{ color: 'var(--v2-text-primary)' }}>
+                        {TEMPLATE_LABELS[snap.templateId]}
+                      </div>
+                      <div className="text-[11px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
+                        {typeof snap.rowCount === 'number' ? `${snap.rowCount} rows · ` : ''}
+                        {snap.generatedAt
+                          ? `generated ${new Date(snap.generatedAt).toLocaleString()}`
+                          : `created ${new Date(snap.createdAt).toLocaleString()}`}
+                        {snap.dryRun ? ' · dry-run' : ''}
+                      </div>
+                      {snap.status === 'failed' && snap.errorSummary && (
+                        <div className="text-[11px] mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
+                          {snap.errorSummary}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                <StatusPill variant={statusVariant(snap.status)} label={statusLabel(snap.status)} />
+                    <StatusPill variant={statusVariant(snap.status)} label={statusLabel(snap.status)} />
 
-                <div className="flex items-center gap-1.5">
-                  {canDownload(snap.status, snap.dryRun) && (
-                    <RowButton
-                      onClick={() => handleDownload(snap)}
-                      disabled={downloadMut.isPending}
-                      ariaLabel="Download CSV"
-                      icon={<Download className="w-3.5 h-3.5" />}
-                      label="CSV"
-                    />
-                  )}
-                  {canMarkSubmitted(snap.status, snap.dryRun) && (
-                    <RowButton
-                      onClick={() => handleTransition(snap, 'submitted')}
-                      disabled={transitionMut.isPending}
-                      ariaLabel="Mark submitted"
-                      icon={<Send className="w-3.5 h-3.5" />}
-                      label="Mark submitted"
-                    />
-                  )}
-                  {canMarkVerified(snap.status, snap.dryRun) && (
-                    <RowButton
-                      onClick={() => handleTransition(snap, 'verified')}
-                      disabled={transitionMut.isPending}
-                      ariaLabel="Mark verified"
-                      icon={<ShieldCheck className="w-3.5 h-3.5" />}
-                      label="Mark verified"
-                    />
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
+                    <div className="flex items-center gap-1.5">
+                      {canDownload(snap.status, snap.dryRun) && (
+                        <RowButton
+                          onClick={() => handleDownload(snap)}
+                          disabled={downloadMut.isPending}
+                          ariaLabel="Download CSV"
+                          icon={<Download className="w-3.5 h-3.5" />}
+                          label="CSV"
+                        />
+                      )}
+                      {canRetry(snap.status) && (
+                        <RowButton
+                          onClick={() => handleRetry(snap)}
+                          disabled={createMut.isPending}
+                          ariaLabel="Retry generation"
+                          icon={<RefreshCw className="w-3.5 h-3.5" />}
+                          label="Retry"
+                        />
+                      )}
+                      {canMarkSubmitted(snap.status, snap.dryRun) && (
+                        <RowButton
+                          onClick={() => handleTransition(snap, 'submitted')}
+                          disabled={transitionMut.isPending}
+                          ariaLabel="Mark submitted"
+                          icon={<Send className="w-3.5 h-3.5" />}
+                          label="Mark submitted"
+                        />
+                      )}
+                      {canMarkVerified(snap.status, snap.dryRun) && (
+                        <RowButton
+                          onClick={() => handleTransition(snap, 'verified')}
+                          disabled={transitionMut.isPending}
+                          ariaLabel="Mark verified"
+                          icon={<ShieldCheck className="w-3.5 h-3.5" />}
+                          label="Mark verified"
+                        />
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
         )}
 
         {/* ---- Operator guidance: the manual portal step ---- */}
@@ -536,42 +612,73 @@ function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshot
           ))}
         </ul>
       )}
+      <div className="mt-2 text-[11px]" style={{ color: 'var(--v2-text-tertiary)' }}>
+        Validation confirms the school and academic year exist. Per-student field
+        issues are reported on the report row during generation.
+      </div>
     </div>
   )
 }
 
 function ActiveGenerationBanner({
   snapshot,
+  stalled,
+  refreshing,
   downloading,
   onDownload,
+  onRefresh,
   onDismiss,
 }: {
   snapshot: ReportingSnapshot
+  stalled: boolean
+  refreshing: boolean
   downloading: boolean
   onDownload: () => void
+  onRefresh: () => void
   onDismiss: () => void
 }) {
-  const generating = snapshot.status === 'generating'
   const failed = snapshot.status === 'failed'
   const ready = canDownload(snapshot.status, snapshot.dryRun)
+  // Past the stall budget we stop the spinner and prompt a manual refresh.
+  const spinning = snapshot.status === 'generating' && !stalled
+  const stalledGenerating = snapshot.status === 'generating' && stalled
 
   return (
     <section className="rounded-xl border p-4 mb-6 flex items-center gap-3" style={cardStyle}>
-      {generating && <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--v2-brand-primary)' }} />}
+      {spinning && <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--v2-brand-primary)' }} />}
+      {stalledGenerating && <AlertTriangle className="w-5 h-5" style={{ color: 'var(--v2-status-late)' }} />}
       {ready && <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--v2-status-paid)' }} />}
       {failed && <AlertTriangle className="w-5 h-5" style={{ color: 'var(--v2-status-overdue)' }} />}
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>
-          {generating && 'Generating report…'}
+          {spinning && 'Generating report…'}
+          {stalledGenerating && 'Taking longer than expected'}
           {ready && 'Report ready'}
           {failed && 'Generation failed'}
         </div>
+        {stalledGenerating && (
+          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
+            This is unusual for a single school — it may have failed. Refresh to
+            check the latest status.
+          </div>
+        )}
         {failed && snapshot.errorSummary && (
           <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
             {snapshot.errorSummary}
           </div>
         )}
       </div>
+      {stalledGenerating && (
+        <button
+          onClick={onRefresh}
+          disabled={refreshing}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
+          style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
+        >
+          {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          Refresh
+        </button>
+      )}
       {ready && (
         <button
           onClick={onDownload}
