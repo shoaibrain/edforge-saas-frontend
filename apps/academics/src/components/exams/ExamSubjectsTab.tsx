@@ -9,7 +9,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { BookOpen, Plus, Trash2, Pencil, Lock, X, Check } from 'lucide-react'
-import type { ExamCourseResponseDto, ExamStatus, ExamComponentDto } from '@aibrains/shared-types'
+import type { ExamCourseResponseDto, ExamStatus } from '@aibrains/shared-types'
 import { useCourses } from '../../hooks/useCourses'
 import {
   useExamCourses,
@@ -19,15 +19,9 @@ import {
 } from '../../hooks/useExamCourses'
 import { acceptsExamCourseMutations } from '../../schemas/exam-state-machine'
 import { getExamStatusMeta } from '../../schemas/exam.form'
+import { buildComponents, type ComponentDraft } from './exam-scoring'
 
 const DEFAULT_PASSING = 32
-
-/** One Theory/Practical (or custom) component row in the Add-Subject form. */
-interface ComponentDraft {
-  label: string
-  fullMarks: string
-  passMarks: string
-}
 
 interface AddFormState {
   courseId: string
@@ -43,40 +37,6 @@ const EMPTY_ADD: AddFormState = {
   passingMarks: String(DEFAULT_PASSING),
   creditHours: '',
   components: [],
-}
-
-/** Derive a stable component code from its label (theory/practical/custom). */
-function slugifyCode(label: string): string {
-  return label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20)
-}
-
-/**
- * Build + validate the components payload from the draft rows. Mirrors the
- * server refine: Σ fullMarks === maxMarks, each passMarks ≤ fullMarks, unique
- * non-empty codes. Returns null when invalid (caller blocks submit).
- */
-function buildComponents(
-  drafts: ComponentDraft[],
-  maxMarks: number,
-): { ok: true; components: ExamComponentDto[] } | { ok: false } {
-  if (drafts.length === 0) return { ok: true, components: [] }
-  const out: ExamComponentDto[] = []
-  const seen = new Set<string>()
-  let sum = 0
-  for (const d of drafts) {
-    const label = d.label.trim()
-    const code = slugifyCode(label)
-    const fullMarks = Number(d.fullMarks)
-    const passMarks = Number(d.passMarks)
-    if (!label || !code || seen.has(code)) return { ok: false }
-    if (!Number.isFinite(fullMarks) || fullMarks < 1) return { ok: false }
-    if (!Number.isFinite(passMarks) || passMarks < 0 || passMarks > fullMarks) return { ok: false }
-    seen.add(code)
-    sum += fullMarks
-    out.push({ code, label, fullMarks, passMarks })
-  }
-  if (sum !== maxMarks) return { ok: false }
-  return { ok: true, components: out }
 }
 
 export function ExamSubjectsTab({

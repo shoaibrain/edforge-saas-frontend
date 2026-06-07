@@ -13,7 +13,7 @@
 
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Loader2, ClipboardList, ArrowLeft, CheckCircle2, Lock } from 'lucide-react'
+import { X, Loader2, ClipboardList, ArrowLeft, CheckCircle2, Lock, Printer, AlertCircle } from 'lucide-react'
 import { UuidBadge } from '@edforge/archetype'
 import { Avatar } from '@edforge/ui'
 import type { ExamResponseDto, ResultCardResponseDto } from '@aibrains/shared-types'
@@ -25,6 +25,8 @@ import {
 } from '../../hooks/useResultCards'
 import { getAcademicSubjectLabel, getSubjectAreaLabel } from '../../schemas/course.form'
 import { humanizeExamType } from '../../schemas/exam.form'
+import { useSchoolProfile } from '../../hooks/useSchool'
+import { openReportCardPrint } from './ReportCardPrint'
 
 function gpaClass(gpa: number): string {
   if (gpa >= 3.5) return 'text-emerald-600 dark:text-emerald-400'
@@ -128,10 +130,14 @@ function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
 
 function ReportCardDetail({
   card,
+  exam,
+  schoolName,
   onBack,
   onCardUpdated,
 }: {
   card: ResultCardResponseDto
+  exam: ExamResponseDto
+  schoolName?: string
   onBack: () => void
   onCardUpdated: (card: ResultCardResponseDto) => void
 }) {
@@ -349,22 +355,32 @@ function ReportCardDetail({
         </div>
       </div>
 
-      {/* Footer — publish */}
+      {/* Footer — print + publish */}
       <div className="shrink-0 flex items-center justify-between gap-3 px-6 py-4 border-t border-border-secondary bg-surface-secondary/50">
         <span className="text-xs text-text-tertiary">
           {card.status === 'published' ? 'Published — read only' : 'Draft — review then publish'}
         </span>
-        {isDraft && (
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handlePublish}
-            disabled={publishMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+            onClick={() => openReportCardPrint(card, exam, schoolName)}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
           >
-            {publishMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-            Publish
+            <Printer className="w-4 h-4" />
+            Print / PDF
           </button>
-        )}
+          {isDraft && (
+            <button
+              type="button"
+              onClick={handlePublish}
+              disabled={publishMutation.isPending}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+            >
+              {publishMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+              Publish
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -375,13 +391,13 @@ function ReportCardDetail({
 // ============================================================================
 
 function ResultCardList({
-  examId,
+  exam,
   onSelect,
 }: {
-  examId: string
+  exam: ExamResponseDto
   onSelect: (card: ResultCardResponseDto) => void
 }) {
-  const { data, isLoading } = useResultCards({ examId })
+  const { data, isLoading } = useResultCards({ examId: exam.examId })
   const cards = useMemo(() => data?.items ?? [], [data])
   // One exam → one grading scheme; key the columns off the cards.
   const division = useMemo(() => cards.some(isDivisionCard), [cards])
@@ -397,6 +413,34 @@ function ResultCardList({
   }
 
   if (cards.length === 0) {
+    // P1c — reflect the generation lifecycle so a just-closed exam isn't a
+    // silent "nothing here". The exam carries resultGenerationStatus; the
+    // detail query polls while pending, so this resolves on its own.
+    const gen = exam.resultGenerationStatus
+    if (exam.status === 'closed' && gen === 'pending') {
+      return (
+        <div className="px-6 py-12 text-center">
+          <Loader2 className="w-10 h-10 mx-auto text-amber-500 mb-3 animate-spin" />
+          <h4 className="text-base font-medium text-text-primary mb-1">Generating result cards…</h4>
+          <p className="text-sm text-text-secondary max-w-sm mx-auto">
+            This usually takes a few seconds. The list updates automatically when they&apos;re ready.
+          </p>
+        </div>
+      )
+    }
+    if (exam.status === 'closed' && gen === 'failed') {
+      return (
+        <div className="px-6 py-12 text-center">
+          <AlertCircle className="w-10 h-10 mx-auto text-red-500 mb-3" />
+          <h4 className="text-base font-medium text-text-primary mb-1">Result generation failed</h4>
+          <p className="text-sm text-text-secondary max-w-sm mx-auto">
+            {exam.lastGenerationError
+              ? exam.lastGenerationError
+              : 'Something went wrong generating the result cards. Re-opening and re-closing the exam will retry.'}
+          </p>
+        </div>
+      )
+    }
     return (
       <div className="px-6 py-12 text-center">
         <ClipboardList className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
@@ -500,6 +544,9 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const prevFocusedRef = useRef<HTMLElement | null>(null)
 
+  // School name for the printable report-card header (cached 5m).
+  const { data: school } = useSchoolProfile(exam?.schoolId ?? null, !!exam)
+
   useEffect(() => {
     if (!open) setSelectedCard(null)
   }, [open])
@@ -578,11 +625,13 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
                 {selectedCard ? (
                   <ReportCardDetail
                     card={selectedCard}
+                    exam={exam}
+                    schoolName={school?.name}
                     onBack={() => setSelectedCard(null)}
                     onCardUpdated={setSelectedCard}
                   />
                 ) : (
-                  <ResultCardList examId={exam.examId} onSelect={setSelectedCard} />
+                  <ResultCardList exam={exam} onSelect={setSelectedCard} />
                 )}
               </div>
             </motion.div>
