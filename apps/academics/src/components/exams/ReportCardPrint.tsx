@@ -120,7 +120,11 @@ function studentMeta(card: ResultCardResponseDto): string {
   return bits.join(' &middot; ')
 }
 
-function buildHtml(card: ResultCardResponseDto, exam: ExamResponseDto, schoolName?: string): string {
+export function buildReportCardHtml(
+  card: ResultCardResponseDto,
+  exam: ExamResponseDto,
+  schoolName?: string,
+): string {
   const division = isDivisionCard(card)
   const printedOn = new Date().toLocaleDateString()
   const remarkBlock = (label: string, value?: string | null) =>
@@ -222,7 +226,7 @@ export function openReportCardPrint(
   const win = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1100')
   if (!win) return false
   win.document.open()
-  win.document.write(buildHtml(card, exam, schoolName))
+  win.document.write(buildReportCardHtml(card, exam, schoolName))
   win.document.close()
   // Print once the new document has laid out. The window stays open so the
   // operator can cancel / re-print / Save-as-PDF.

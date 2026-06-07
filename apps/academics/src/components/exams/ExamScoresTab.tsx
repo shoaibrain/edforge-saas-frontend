@@ -29,6 +29,7 @@ import {
 import { acceptsScoreWrites } from '../../schemas/exam-state-machine'
 import { getExamStatusMeta } from '../../schemas/exam.form'
 import { UserAvatar } from '../common/UserAvatar'
+import { evalComponents, sameComponentScores } from './exam-scoring'
 
 const MAX_BULK = 250 // backend EXAM_SCORE_BULK_MAX_TOTAL
 
@@ -52,45 +53,6 @@ interface RowEdit {
    * fields are unused in that mode; rawScore = Σ component values at save.
    */
   components?: Record<string, string>
-}
-
-/**
- * Evaluate an enrollment's per-component inputs against the subject's component
- * defs. `complete` = every component has a valid in-range value; `anyFilled` =
- * at least one; `invalid` = a present value is non-numeric or out of range.
- */
-function evalComponents(
-  defs: ExamComponentDto[],
-  row: RowEdit | undefined,
-): { sum: number; complete: boolean; anyFilled: boolean; invalid: boolean; scores: Record<string, number> } {
-  let sum = 0
-  let anyFilled = false
-  let invalid = false
-  let filled = 0
-  const scores: Record<string, number> = {}
-  for (const d of defs) {
-    const t = (row?.components?.[d.code] ?? '').trim()
-    if (t === '') continue
-    anyFilled = true
-    const n = Number(t)
-    if (!Number.isFinite(n) || n < 0 || n > d.fullMarks) {
-      invalid = true
-      continue
-    }
-    filled++
-    scores[d.code] = n
-    sum += n
-  }
-  return { sum, complete: filled === defs.length && !invalid, anyFilled, invalid, scores }
-}
-
-/** Whether two component-score maps are equal (for change detection). */
-function sameComponentScores(a: Record<string, number> | undefined, b: Record<string, number>): boolean {
-  const ak = Object.keys(a ?? {})
-  const bk = Object.keys(b)
-  if (ak.length !== bk.length) return false
-  for (const k of bk) if ((a ?? {})[k] !== b[k]) return false
-  return true
 }
 
 function parseRow(text: string): { value: number | null; valid: boolean } {
