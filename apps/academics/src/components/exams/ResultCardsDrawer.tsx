@@ -33,6 +33,40 @@ function gpaClass(gpa: number): string {
   return 'text-red-600 dark:text-red-400'
 }
 
+// P1.5a/b — scheme is data, not config: a `result` (pass/fail) on the card means
+// the Division scheme produced it (PABSON terminal). letter_gpa cards leave
+// `result`/`division` unset and carry the letter `overallGrade` + `termGpa`.
+function isDivisionCard(card: ResultCardResponseDto): boolean {
+  return card.result != null
+}
+
+type CourseScore = ResultCardResponseDto['courseScores'][number]
+
+/** Per-subject outcome cell: Absent (AB) is a distinct non-failing state (P1b). */
+function CoursePassCell({ cs, division }: { cs: CourseScore; division: boolean }) {
+  if (cs.notGraded) {
+    return <span className="text-amber-600 dark:text-amber-400 text-xs font-medium" title="Absent / Not graded">AB</span>
+  }
+  const passed = division ? cs.pass === true : cs.isPassing
+  return passed ? (
+    <CheckCircle2 className="w-4 h-4 text-emerald-500 inline" />
+  ) : (
+    <span className="text-red-500 text-xs font-medium">Fail</span>
+  )
+}
+
+/** Theory/Practical (or custom) breakdown shown under the subject name. */
+function ComponentBreakdown({ cs }: { cs: CourseScore }) {
+  if (!cs.components || cs.components.length === 0) return null
+  return (
+    <span className="block text-xs text-text-tertiary">
+      {cs.components
+        .map((c) => `${c.label ?? c.code} ${c.obtained}/${c.fullMarks}`)
+        .join(' · ')}
+    </span>
+  )
+}
+
 // RC-UX.2: the frozen identity snapshot RC-UX.1 denormalizes onto the card. Typed
 // here as a local bridge until @aibrains/shared-types is published with the field;
 // the runtime data is present once the backend (RC-UX.1) is deployed.
@@ -102,6 +136,7 @@ function ReportCardDetail({
   onCardUpdated: (card: ResultCardResponseDto) => void
 }) {
   const isDraft = card.status === 'draft'
+  const division = isDivisionCard(card)
   const [conduct, setConduct] = useState(card.conduct ?? '')
   const [remark, setRemark] = useState(card.classTeacherRemark ?? '')
 
@@ -146,18 +181,51 @@ function ReportCardDetail({
           All result cards
         </button>
 
-        {/* Summary */}
+        {/* Summary — Division scheme shows %/Division/Result/Position; letter_gpa shows GPA/Overall */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <StudentCell card={card} size="md" />
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-xs text-text-tertiary">Term GPA</p>
-              <p className={`text-lg font-semibold ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-text-tertiary">Overall</p>
-              <p className="text-lg font-semibold text-text-primary">{card.overallGrade}</p>
-            </div>
+            {isDivisionCard(card) ? (
+              <>
+                {card.percentage != null && (
+                  <div className="text-right">
+                    <p className="text-xs text-text-tertiary">Percentage</p>
+                    <p className="text-lg font-semibold text-text-primary">{card.percentage.toFixed(1)}%</p>
+                  </div>
+                )}
+                <div className="text-right">
+                  <p className="text-xs text-text-tertiary">Division</p>
+                  <p className="text-lg font-semibold text-text-primary">{card.division ?? '—'}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-text-tertiary">Result</p>
+                  <p
+                    className={`text-lg font-semibold ${
+                      card.result === 'pass'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-red-600 dark:text-red-400'
+                    }`}
+                  >
+                    {card.result === 'pass' ? 'PASS' : 'FAIL'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-text-tertiary">Position</p>
+                  <p className="text-lg font-semibold text-text-primary">{card.classRank ?? '—'}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-right">
+                  <p className="text-xs text-text-tertiary">Term GPA</p>
+                  <p className={`text-lg font-semibold ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-text-tertiary">Overall</p>
+                  <p className="text-lg font-semibold text-text-primary">{card.overallGrade}</p>
+                </div>
+              </>
+            )}
             <StatusBadge status={card.status} />
           </div>
         </div>
@@ -168,10 +236,21 @@ function ReportCardDetail({
             <thead>
               <tr className="bg-surface-secondary text-left text-text-tertiary">
                 <th className="px-3 py-2 font-medium">Subject</th>
-                <th className="px-3 py-2 font-medium text-right">Score</th>
-                <th className="px-3 py-2 font-medium text-center">Grade</th>
-                <th className="px-3 py-2 font-medium text-right">GPA</th>
-                <th className="px-3 py-2 font-medium text-center">Pass</th>
+                {division ? (
+                  <>
+                    <th className="px-3 py-2 font-medium text-right">Marks</th>
+                    <th className="px-3 py-2 font-medium text-right">Pass M.</th>
+                    <th className="px-3 py-2 font-medium text-right">H.M.</th>
+                    <th className="px-3 py-2 font-medium text-center">Result</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="px-3 py-2 font-medium text-right">Score</th>
+                    <th className="px-3 py-2 font-medium text-center">Grade</th>
+                    <th className="px-3 py-2 font-medium text-right">GPA</th>
+                    <th className="px-3 py-2 font-medium text-center">Pass</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-border-secondary">
@@ -183,19 +262,27 @@ function ReportCardDetail({
                       : cs.subjectArea
                         ? getSubjectAreaLabel(cs.subjectArea)
                         : cs.courseName ?? '—'}
+                    <ComponentBreakdown cs={cs} />
                   </td>
-                  <td className="px-3 py-2 text-right text-text-secondary">
-                    {cs.rawScore} / {cs.maxMarks}
-                  </td>
-                  <td className="px-3 py-2 text-center font-medium text-text-primary">{cs.grade}</td>
-                  <td className={`px-3 py-2 text-right ${gpaClass(cs.gpa)}`}>{cs.gpa.toFixed(2)}</td>
-                  <td className="px-3 py-2 text-center">
-                    {cs.isPassing ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 inline" />
-                    ) : (
-                      <span className="text-red-500 text-xs font-medium">NG</span>
-                    )}
-                  </td>
+                  {division ? (
+                    <>
+                      <td className="px-3 py-2 text-right text-text-secondary">
+                        {cs.notGraded ? '—' : `${cs.rawScore} / ${cs.maxMarks}`}
+                      </td>
+                      <td className="px-3 py-2 text-right text-text-tertiary">{cs.passMarks ?? '—'}</td>
+                      <td className="px-3 py-2 text-right text-text-tertiary">{cs.highestInClass ?? '—'}</td>
+                      <td className="px-3 py-2 text-center"><CoursePassCell cs={cs} division /></td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-3 py-2 text-right text-text-secondary">
+                        {cs.notGraded ? '—' : `${cs.rawScore} / ${cs.maxMarks}`}
+                      </td>
+                      <td className="px-3 py-2 text-center font-medium text-text-primary">{cs.grade}</td>
+                      <td className={`px-3 py-2 text-right ${gpaClass(cs.gpa)}`}>{cs.gpa.toFixed(2)}</td>
+                      <td className="px-3 py-2 text-center"><CoursePassCell cs={cs} division={false} /></td>
+                    </>
+                  )}
                 </tr>
               ))}
               <tr className="bg-surface-secondary/60 font-medium">
@@ -296,6 +383,8 @@ function ResultCardList({
 }) {
   const { data, isLoading } = useResultCards({ examId })
   const cards = useMemo(() => data?.items ?? [], [data])
+  // One exam → one grading scheme; key the columns off the cards.
+  const division = useMemo(() => cards.some(isDivisionCard), [cards])
 
   if (isLoading) {
     return (
@@ -327,8 +416,18 @@ function ResultCardList({
             <tr className="bg-surface-secondary text-left text-text-tertiary">
               <th className="px-3 py-2 font-medium">Student</th>
               <th className="px-3 py-2 font-medium text-right">Total</th>
-              <th className="px-3 py-2 font-medium text-right">GPA</th>
-              <th className="px-3 py-2 font-medium text-center">Grade</th>
+              {division ? (
+                <>
+                  <th className="px-3 py-2 font-medium text-right">%</th>
+                  <th className="px-3 py-2 font-medium text-center">Division</th>
+                  <th className="px-3 py-2 font-medium text-center">Result</th>
+                </>
+              ) : (
+                <>
+                  <th className="px-3 py-2 font-medium text-right">GPA</th>
+                  <th className="px-3 py-2 font-medium text-center">Grade</th>
+                </>
+              )}
               <th className="px-3 py-2 font-medium text-center">Status</th>
             </tr>
           </thead>
@@ -350,8 +449,30 @@ function ResultCardList({
                 <td className="px-3 py-2 text-right text-text-secondary">
                   {card.totalScore}/{card.totalMaxMarks}
                 </td>
-                <td className={`px-3 py-2 text-right ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</td>
-                <td className="px-3 py-2 text-center font-medium text-text-primary">{card.overallGrade}</td>
+                {division ? (
+                  <>
+                    <td className="px-3 py-2 text-right text-text-secondary">
+                      {card.percentage != null ? `${card.percentage.toFixed(1)}%` : '—'}
+                    </td>
+                    <td className="px-3 py-2 text-center text-text-primary">{card.division ?? '—'}</td>
+                    <td className="px-3 py-2 text-center">
+                      <span
+                        className={`text-xs font-semibold ${
+                          card.result === 'pass'
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}
+                      >
+                        {card.result === 'pass' ? 'PASS' : 'FAIL'}
+                      </span>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td className={`px-3 py-2 text-right ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</td>
+                    <td className="px-3 py-2 text-center font-medium text-text-primary">{card.overallGrade}</td>
+                  </>
+                )}
                 <td className="px-3 py-2 text-center">
                   <StatusBadge status={card.status} />
                 </td>
