@@ -32,6 +32,7 @@ import { TeachersModule } from './routes/teachers'
 import { EnrollmentModule } from './routes/enrollment'
 import { StudentProfilesModule } from './routes/students/profiles'
 import { IemisImport } from './components/students/iemis/IemisImport'
+import { GovernmentReportsExport } from './components/reports/GovernmentReportsExport'
 import { CalendarModule } from './routes/calendar'
 import { SectionRosterPage } from './routes/sections/roster'
 import { BulkRosteringPage } from './routes/rostering'
@@ -102,6 +103,14 @@ const studentIemisImportRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/import/iemis',
     component: IemisImport,
+})
+
+// Government Reports — CEHRD IEMIS Flash I/II export (the export counterpart
+// to the IEMIS import flow). Full-page route; history + pre-flight can be long.
+const reportsGovernmentRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/reports/government',
+    component: GovernmentReportsExport,
 })
 
 // Teachers
@@ -352,6 +361,7 @@ const routeTree = rootRoute.addChildren([
     studentProfileRoute,
     studentProfilesRoute,
     studentIemisImportRoute,
+    reportsGovernmentRoute,
     teachersRoute,
     calendarRoute,
     // Classrooms (nested tree)
