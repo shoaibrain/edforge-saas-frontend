@@ -453,7 +453,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
           <SectionHeader
             icon={<Calendar className="w-4 h-4" />}
             title={t('sections.notes')}
-            iconColor="text-slate-500"
+            iconColor="text-[rgb(var(--text-tertiary))]"
           />
           <p className="text-sm text-text-secondary whitespace-pre-wrap">
             {student.notes}

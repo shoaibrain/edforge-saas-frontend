@@ -185,7 +185,7 @@ export function StudentTable({
         size: 100,
         cell: ({ row }) => (
           <span
-            className="text-[12px] font-medium"
+            className="text-xs font-medium"
             style={{ color: 'var(--v2-text-primary)' }}
           >
             {row.original.currentGradeLevel}
@@ -202,7 +202,7 @@ export function StudentTable({
           if (rate === null || rate === undefined) {
             return (
               <span
-                className="text-[12px]"
+                className="text-xs"
                 style={{ color: 'var(--v2-text-hint)' }}
                 title="No attendance recorded yet"
               >
@@ -214,7 +214,7 @@ export function StudentTable({
           return (
             <div className="flex items-center gap-2">
               <AttendanceDonutRing rate={rate} size={24} strokeWidth={3} />
-              <span className="text-[12px] font-medium" style={{ color }}>
+              <span className="text-xs font-medium" style={{ color }}>
                 {rate.toFixed(1)}%
               </span>
             </div>
@@ -235,7 +235,7 @@ export function StudentTable({
         size: 130,
         cell: ({ row }) => (
           <span
-            className="text-[12px]"
+            className="text-xs"
             style={{ color: 'var(--v2-text-secondary)' }}
           >
             {formatDate(row.original.enrollmentDate)}

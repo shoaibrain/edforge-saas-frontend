@@ -260,7 +260,7 @@ export function EnrollmentModule() {
             <button
               type="button"
               onClick={handleCancelEnrollment}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium rounded-[8px] transition-colors hover:opacity-80"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80"
               style={{
                 background: 'transparent',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -276,7 +276,7 @@ export function EnrollmentModule() {
                 <select
                   value={activeYearId}
                   onChange={(e) => setSelectedYearId(e.target.value)}
-                  className="px-2.5 py-1.5 text-[12px] rounded-[8px] focus:outline-none"
+                  className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none"
                   style={{
                     background: 'rgba(255, 255, 255, 0.04)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -351,7 +351,7 @@ export function EnrollmentModule() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="relative flex items-center gap-1.5 px-3 py-2.5 text-[12px] font-medium transition-colors"
+                  className="relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors"
                   style={{
                     color: isActive ? '#1D9E75' : '#5a6070',
                     borderBottom: isActive ? '2px solid #1D9E75' : '2px solid transparent',
@@ -372,7 +372,7 @@ export function EnrollmentModule() {
                   {isActive && (
                     <motion.div
                       layoutId="enrollment-tab-indicator"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full"
                       style={{ background: '#1D9E75' }}
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />

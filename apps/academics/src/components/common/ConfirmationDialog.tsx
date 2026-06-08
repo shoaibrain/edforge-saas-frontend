@@ -86,7 +86,7 @@ export function ConfirmationDialog({
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                       isDestructive
                         ? 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20'
-                        : 'bg-teal-100 dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20'
+                        : 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20'
                     }`}
                   >
                     {icon || (

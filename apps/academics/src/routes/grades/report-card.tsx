@@ -37,10 +37,10 @@ function getLetterGradeColor(grade: string): string {
 }
 
 function getGpaBadge(gpa: number): { bg: string; text: string } {
-  if (gpa >= 3.5) return { bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-emerald-700 dark:text-emerald-400' }
-  if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-blue-700 dark:text-blue-400' }
+  if (gpa >= 3.5) return { bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-emerald-700 ' }
+  if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-[rgb(var(--state-info-fg))] ' }
   if (gpa >= 2.0) return { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20', text: 'text-[rgb(var(--state-warning-fg))]' }
-  return { bg: 'bg-red-100 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-red-700 dark:text-red-400' }
+  return { bg: 'bg-red-100 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-red-700 ' }
 }
 
 // ============================================================================
@@ -282,7 +282,7 @@ export function ReportCardPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {grade.isFinal ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 dark:text-emerald-400 rounded-full print:text-gray-700 print:bg-gray-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full print:text-gray-700 print:bg-gray-200">
                             <Lock className="w-3 h-3 print:hidden" />
                             Final
                           </span>

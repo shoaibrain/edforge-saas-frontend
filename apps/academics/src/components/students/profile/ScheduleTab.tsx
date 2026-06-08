@@ -126,7 +126,7 @@ function StatCard({
 // ============================================================================
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]' }
+  if (!subject) return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
     return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
@@ -137,12 +137,12 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
   if (s.includes('history') || s.includes('social') || s.includes('geography'))
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('art') || s.includes('music') || s.includes('drama'))
-    return { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400' }
+    return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))] ' }
   if (s.includes('physical') || s.includes('pe') || s.includes('health'))
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
-    return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-cyan-600 ' }
-  return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]' }
+    return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-[rgb(var(--state-info-fg))] ' }
+  return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================
@@ -184,7 +184,7 @@ function ScheduleTable({
     <section>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-indigo-500" />
+          <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
           Current Classes
           <span className="text-xs text-text-tertiary font-normal ml-1">
             ({classrooms.length})
@@ -370,7 +370,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
       ) : (
         <section>
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-            <BookOpen className="w-4 h-4 text-indigo-500" />
+            <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
             Current Classes
           </h3>
           <div className="text-center py-8">

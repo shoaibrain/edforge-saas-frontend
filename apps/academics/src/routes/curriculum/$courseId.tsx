@@ -689,7 +689,7 @@ export function CourseDetailPage() {
               <div
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
                   course.isActive
-                    ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-emerald-700 dark:bg-[rgb(var(--state-success-bg)/0.18)] dark:text-emerald-400'
+                    ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-emerald-700 dark:bg-[rgb(var(--state-success-bg)/0.18)] '
                     : 'bg-[rgb(var(--surface-tertiary))] text-gray-600 dark:bg-gray-500/10 '
                 }`}
               >
@@ -731,7 +731,7 @@ export function CourseDetailPage() {
                   {isActive && (
                     <motion.div
                       layoutId="courseDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                       initial={false}
                       transition={{
                         type: 'spring',

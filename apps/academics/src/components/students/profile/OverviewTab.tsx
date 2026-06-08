@@ -121,12 +121,12 @@ function getAttendanceDotColor(status: string): string {
     case 'late': case 'tardy': return 'bg-[rgb(var(--state-warning-fg))]'
     case 'excused': return 'bg-[rgb(var(--state-info-fg))]'
     case 'remote': return 'bg-[rgb(var(--state-info-fg))]'
-    default: return 'bg-slate-300 dark:bg-slate-600'
+    default: return 'bg-[rgb(var(--border-primary))] '
   }
 }
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]' }
+  if (!subject) return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
     return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
@@ -137,12 +137,12 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
   if (s.includes('history') || s.includes('social') || s.includes('geography'))
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('art') || s.includes('music') || s.includes('drama'))
-    return { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400' }
+    return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))] ' }
   if (s.includes('physical') || s.includes('pe') || s.includes('health'))
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
-    return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-cyan-600 ' }
-  return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]' }
+    return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-[rgb(var(--state-info-fg))] ' }
+  return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================
@@ -240,7 +240,7 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
   }, [records])
 
   if (isLoading) {
-    return <div className="h-[160px] bg-surface-secondary rounded-xl animate-pulse" />
+    return <div className="h-40 bg-surface-secondary rounded-xl animate-pulse" />
   }
 
   if (is403Error(trendError)) {
@@ -249,7 +249,7 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
 
   if (chartData.length === 0) {
     return (
-      <div className="h-[120px] flex items-center justify-center rounded-xl border border-border-secondary bg-surface-secondary/30">
+      <div className="h-32 flex items-center justify-center rounded-xl border border-border-secondary bg-surface-secondary/30">
         <p className="text-sm text-text-tertiary">{tAcad('empty.noAttendance')}</p>
       </div>
     )
@@ -359,7 +359,7 @@ function AttendanceDailyStrip({ studentId }: { studentId: string }) {
                 ? 'bg-surface-secondary'
                 : day.status
                   ? getAttendanceDotColor(day.status)
-                  : 'bg-slate-200 dark:bg-slate-700'
+                  : 'bg-[rgb(var(--surface-tertiary))] '
             }`}
           />
         ))}
@@ -590,7 +590,7 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
     return (
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <BookOpen className="w-4 h-4 text-indigo-500" />
+          <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
           {tAcad('sections.currentClasses')}
         </h3>
         <div className="text-center py-8 rounded-xl border border-border-secondary bg-surface-secondary/30">
@@ -607,7 +607,7 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
   return (
     <section>
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-        <BookOpen className="w-4 h-4 text-indigo-500" />
+        <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
         {tAcad('sections.currentClasses')}
         <span className="text-xs text-text-tertiary font-normal ml-1">({classrooms.length})</span>
       </h3>

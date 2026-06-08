@@ -351,7 +351,7 @@ export function EditStudentModal({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[100px]"
+            className="min-w-24"
           >
             {isSubmitting ? (
               <>

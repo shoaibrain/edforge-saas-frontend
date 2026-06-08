@@ -188,7 +188,7 @@ export function EnrollmentDistributionChart({
       <div className="pt-3 mt-auto border-t border-border-secondary">
         <Link
           to="/students/enrollment"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-cyan-300 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           View Enrollment
           <ArrowRight className="w-3.5 h-3.5" />

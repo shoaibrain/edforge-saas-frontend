@@ -160,7 +160,7 @@ export function ReviewStep({ data }: WizardStepProps) {
   return (
     <div className="space-y-8">
       {isSubmitting && (
-        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700 flex items-center gap-3">
+        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-[rgb(var(--state-info-fg))] flex items-center gap-3">
           <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
           Creating student record and enrollment...
         </div>
@@ -168,7 +168,7 @@ export function ReviewStep({ data }: WizardStepProps) {
 
       {/* Enrollment Summary Confirmation Card */}
       <div className="rounded-xl border-2 border-teal-200 bg-[rgb(var(--state-info-bg)/0.18)]/50 p-5">
-        <h3 className="text-sm font-semibold text-teal-800 mb-3">
+        <h3 className="text-sm font-semibold text-[rgb(var(--state-info-fg))] mb-3">
           What will happen when you click "Create Student"
         </h3>
         <div className="space-y-2">

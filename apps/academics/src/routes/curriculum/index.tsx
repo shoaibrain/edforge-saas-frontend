@@ -346,7 +346,7 @@ export function CurriculumModule() {
 
       {/* ---- Context Banner ---- */}
       <p
-        className="text-[12px]"
+        className="text-xs"
         style={{
           color: 'var(--v2-text-faint, var(--text-muted, #4a5068))',
           marginBottom: 14,

@@ -25,7 +25,7 @@ function ListSkeleton() {
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-3">
           <div
-            className="w-[30px] h-[30px] rounded-full v2-skeleton-pulse flex-shrink-0"
+            className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0"
             style={{ background: 'var(--v2-bg-elevated)' }}
           />
           <div className="flex-1 space-y-1">
@@ -66,7 +66,7 @@ function StudentAvatar({ name, studentId }: { name: string; studentId: string })
   if (imgError || !src) {
     return (
       <div
-        className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[rgb(var(--action-primary-fg))]"
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[rgb(var(--action-primary-fg))]"
         style={{ background: bg }}
       >
         {initials}
@@ -80,7 +80,7 @@ function StudentAvatar({ name, studentId }: { name: string; studentId: string })
       alt={name}
       width={30}
       height={30}
-      className="w-[30px] h-[30px] rounded-full flex-shrink-0"
+      className="w-8 h-8 rounded-full flex-shrink-0"
       style={{ background: bg, maxWidth: 30, maxHeight: 30 }}
       onError={() => setImgError(true)}
     />
@@ -111,7 +111,7 @@ export function AtRiskStudentsCard({
         >
           At-risk student detail
         </h3>
-        <span className="text-[12px] font-semibold" style={{ color: '#E24B4A' }}>
+        <span className="text-xs font-semibold" style={{ color: '#E24B4A' }}>
           {totalAtRisk} at risk
         </span>
       </div>
@@ -146,7 +146,7 @@ export function AtRiskStudentsCard({
                     <span className="text-xs font-semibold tabular-nums" style={{ color }}>
                       {student.attendanceRate.toFixed(1)}%
                     </span>
-                    <div className="w-[50px]">
+                    <div className="w-12">
                       <AnimatedProgressBar
                         percentage={student.attendanceRate}
                         color={color}

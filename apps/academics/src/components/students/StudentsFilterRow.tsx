@@ -121,7 +121,7 @@ export function StudentsFilterRow({
       <span className="text-xs mx-1" style={{ color: 'var(--v2-text-ghost)' }}>or</span>
 
       {/* Search input */}
-      <div className="relative flex-1 min-w-[180px] max-w-sm">
+      <div className="relative flex-1 min-w-44 max-w-sm">
         <Search
           className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
           style={{ color: 'var(--v2-text-hint)' }}

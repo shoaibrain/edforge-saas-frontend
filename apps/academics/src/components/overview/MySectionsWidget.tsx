@@ -150,7 +150,7 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
                   <Link
                     to="/classrooms"
                     search={{ tab: 'gradebook' }}
-                    className="p-1.5 rounded-md text-[rgb(var(--state-info-fg))] hover:bg-purple-50 dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] transition-colors"
+                    className="p-1.5 rounded-md text-[rgb(var(--state-info-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] transition-colors"
                     title="Enter Grades"
                   >
                     <GraduationCap className="w-3.5 h-3.5" />

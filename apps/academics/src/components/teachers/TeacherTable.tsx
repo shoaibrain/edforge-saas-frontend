@@ -48,10 +48,10 @@ function getStatusBadge(status: string) {
 
 function getRoleBadge(role: string) {
   const styles: Record<string, string> = {
-    teacher: 'bg-[rgb(var(--state-info-bg)/0.18)] text-blue-700 dark:bg-[rgb(var(--state-info-fg))]/20 dark:text-blue-400',
-    principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-purple-700 dark:bg-[rgb(var(--state-info-fg))]/20 dark:text-purple-400',
-    vice_principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-indigo-700 dark:bg-[rgb(var(--state-info-fg))]/20 dark:text-indigo-400',
-    counselor: 'bg-teal-100 text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
+    teacher: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]/20 ',
+    principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-purple-700 dark:bg-[rgb(var(--state-info-fg))]/20 ',
+    vice_principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-indigo-700 dark:bg-[rgb(var(--state-info-fg))]/20 ',
+    counselor: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
     admin_staff: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
   }
   return styles[role] || 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 '

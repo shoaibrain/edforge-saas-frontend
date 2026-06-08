@@ -226,7 +226,7 @@ export function AttendanceTrendWidget({
         <Link
           to="/classrooms"
           search={{ tab: 'attendance' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-cyan-300 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           View Attendance
           <ArrowRight className="w-3.5 h-3.5" />

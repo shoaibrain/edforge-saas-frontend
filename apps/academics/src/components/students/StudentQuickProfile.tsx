@@ -126,7 +126,7 @@ export function StudentQuickProfile({
           <div className="flex-1 min-w-0 pt-[1px]">
             <h2
               id="sqp-name"
-              className="text-[15px] font-semibold truncate"
+              className="text-sm font-semibold truncate"
               style={{ color: 'var(--v2-text-primary)', letterSpacing: '-0.2px', lineHeight: 1.25 }}
             >
               {student.fullName}
@@ -138,7 +138,7 @@ export function StudentQuickProfile({
                 </span>
               )}
               <span
-                className={`inline-flex items-center gap-1 rounded-md px-2 py-px text-[9px] font-medium ${ss.pill}`}
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-px text-xs font-medium ${ss.pill}`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${ss.dot}`} />
                 {statusText}
@@ -191,18 +191,18 @@ export function StudentQuickProfile({
               muted
             />
             <div
-              className="relative overflow-hidden flex flex-col items-center justify-center gap-[2px] py-[8px]"
+              className="relative overflow-hidden flex flex-col items-center justify-center gap-0.5 py-2"
               style={{ background: 'var(--v2-surface-inset)', border: '1px solid var(--v2-border-default)', borderRadius: 9 }}
             >
               {attendanceRate != null ? (
                 <AttendanceDonutRing rate={attendanceRate} size={36} strokeWidth={3} showLabel />
               ) : (
-                <div className="w-[22px] h-[22px] rounded-full" style={{ border: '2px solid var(--v2-text-ghost)' }} />
+                <div className="w-5 h-5 rounded-full" style={{ border: '2px solid var(--v2-text-ghost)' }} />
               )}
-              <div className="text-[8px] font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'var(--v2-text-ghost)' }}>
+              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'var(--v2-text-ghost)' }}>
                 Attendance
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: accent, opacity: 0.7 }} />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: 0.7 }} />
             </div>
           </div>
 
@@ -216,7 +216,7 @@ export function StudentQuickProfile({
             }}
           >
             <div
-              className="text-[9px] font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px]"
+              className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px]"
               style={{ color: 'var(--v2-text-ghost)', borderBottom: '1px solid var(--v2-border-default)' }}
             >
               Enrollment
@@ -231,7 +231,7 @@ export function StudentQuickProfile({
 
           {/* ── Privacy note ── */}
           <div
-            className="flex gap-2 px-3 py-[8px]"
+            className="flex gap-2 px-3 py-2"
             style={{ background: 'rgba(55,138,221,0.04)', border: '1px solid rgba(55,138,221,0.10)', borderRadius: 7 }}
           >
             <Lock className="flex-shrink-0 mt-[1px]" style={{ width: 11, height: 11, color: 'var(--v2-info, #378ADD)' }} />
@@ -275,20 +275,20 @@ function Tile({
 }) {
   return (
     <div
-      className="relative overflow-hidden flex flex-col items-center gap-[4px] py-[10px]"
+      className="relative overflow-hidden flex flex-col items-center gap-1 py-2.5"
       style={{ background: 'var(--v2-surface-inset)', border: '1px solid var(--v2-border-default)', borderRadius: 9 }}
     >
       {icon}
       <div
-        className="text-[17px] font-semibold leading-none"
+        className="text-lg font-semibold leading-none"
         style={{ color: muted ? 'var(--v2-text-hint)' : 'var(--v2-text-primary)', letterSpacing: '-0.4px' }}
       >
         {value}
       </div>
-      <div className="text-[8px] font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
+      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
         {label}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: accent, opacity: muted ? 0.3 : 0.6 }} />
+      <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: muted ? 0.3 : 0.6 }} />
     </div>
   )
 }
@@ -296,12 +296,12 @@ function Tile({
 function Field({ label, value, sub }: { label: string; value: string; sub?: string | null }) {
   const empty = !value || value === '—'
   return (
-    <div className="flex flex-col gap-[2px]">
-      <div className="text-[9px] font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
+    <div className="flex flex-col gap-0.5">
+      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
         {label}
       </div>
       <div
-        className="text-[12px] font-medium leading-tight"
+        className="text-xs font-medium leading-tight"
         style={{ color: empty ? 'var(--v2-text-hint)' : 'var(--v2-text-secondary)' }}
       >
         {value}

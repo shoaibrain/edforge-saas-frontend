@@ -143,7 +143,7 @@ export function StaffRosterCard({
         >
           Staff roster
         </h3>
-        <span className="text-[12px] font-medium" style={{ color: 'var(--v2-text-hint)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--v2-text-hint)' }}>
           {activeCount} active
         </span>
       </div>
@@ -179,7 +179,7 @@ export function StaffRosterCard({
                   </div>
                   {/* Badge */}
                   <span
-                    className="text-[9px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                    className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
                     style={{
                       background: isFullTime ? 'rgba(29,158,117,0.10)' : 'rgba(239,159,39,0.10)',
                       color: isFullTime ? '#1D9E75' : '#EF9F27',

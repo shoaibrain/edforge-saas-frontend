@@ -376,7 +376,7 @@ export function StudentDrawer({
                     {/* Quick Stats */}
                     <div className="grid grid-cols-3 gap-3">
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <GraduationCap className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
+                        <GraduationCap className="w-4 h-4 text-[rgb(var(--state-info-fg))] mx-auto mb-1" />
                         <p className="text-lg font-bold text-text-primary">
                           {student.currentGradeLevel || '—'}
                         </p>
@@ -418,7 +418,7 @@ export function StudentDrawer({
                         <DetailField
                           icon={GraduationCap}
                           label="Grade Level"
-                          accent="text-indigo-500"
+                          accent="text-[rgb(var(--state-info-fg))]"
                           value={student.currentGradeLevel}
                         />
                         <DetailField
@@ -455,7 +455,7 @@ export function StudentDrawer({
                         <DetailField
                           icon={Phone}
                           label="Phone"
-                          accent="text-green-500"
+                          accent="text-[rgb(var(--state-success-fg))]"
                           value={student.contactInfo?.phone}
                         />
                       </div>
@@ -522,7 +522,7 @@ export function StudentDrawer({
                             {student.specialPrograms.map((program, i) => (
                               <span
                                 key={i}
-                                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] border border-purple-500/10"
+                                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] border border-[rgb(var(--state-info-border)/0.25)]"
                               >
                                 {program}
                               </span>
@@ -547,7 +547,7 @@ export function StudentDrawer({
                     type="button"
                     onClick={handleViewDetails}
                     aria-label={`View details for ${student.fullName}`}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-[rgb(var(--action-primary-fg))] rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
                   >
                     View Details
                     <ArrowRight className="w-4 h-4" aria-hidden="true" />

@@ -40,7 +40,7 @@ function ChartSkeleton() {
           />
           <div className="flex-1">
             <div
-              className="h-[14px] rounded-sm v2-skeleton-pulse"
+              className="h-3.5 rounded-sm v2-skeleton-pulse"
               style={{ background: 'var(--v2-bg-elevated)', width: `${30 + Math.random() * 50}%` }}
             />
           </div>
@@ -101,7 +101,7 @@ export function EnrollmentByGradeChart({
         >
           Enrollment by grade level
         </h3>
-        <span className="text-[12px] font-semibold" style={{ color: 'var(--v2-info)' }}>
+        <span className="text-xs font-semibold" style={{ color: 'var(--v2-info)' }}>
           {total} total
         </span>
       </div>

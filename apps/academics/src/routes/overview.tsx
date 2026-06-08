@@ -115,7 +115,7 @@ function NoSchoolGuard() {
     <div className="max-w-6xl mx-auto pt-16 pb-12">
       <Card className="p-8 border-border-secondary max-w-lg mx-auto text-center">
         <div className="inline-flex p-3 rounded-2xl bg-[rgb(var(--state-info-bg)/0.18)] mb-4">
-          <School className="w-7 h-7 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+          <School className="w-7 h-7 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <h2 className="text-lg font-bold text-text-primary">Select a school</h2>
         <p className="text-sm text-text-secondary mt-1.5">

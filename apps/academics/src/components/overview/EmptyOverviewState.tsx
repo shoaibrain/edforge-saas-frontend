@@ -93,7 +93,7 @@ export function EmptyOverviewState() {
                     <step.icon className={`w-5 h-5 ${step.iconColor}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-primary group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-cyan-400 transition-colors">
+                    <p className="text-sm font-medium text-text-primary group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-[rgb(var(--state-info-fg))] transition-colors">
                       {step.title}
                     </p>
                     <p className="text-xs text-text-tertiary mt-0.5">

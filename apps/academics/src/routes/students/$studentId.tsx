@@ -237,7 +237,7 @@ export function StudentProfilePage() {
                 {isActive && (
                   <motion.div
                     layoutId="studentProfileTab"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />

@@ -37,7 +37,7 @@ const statusStyles: Record<string, { bg: string; text: string; dot: string }> = 
   },
   inactive: {
     bg: 'bg-[rgb(var(--surface-tertiary))]0/10',
-    text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]',
+    text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
     dot: 'bg-[rgb(var(--text-tertiary))]',
   },
   graduated: {

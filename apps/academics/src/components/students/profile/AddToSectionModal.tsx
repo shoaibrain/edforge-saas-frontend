@@ -110,7 +110,7 @@ export function AddToSectionModal({
         <div className="p-3 rounded-lg bg-surface-secondary border border-border-secondary">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-[rgb(var(--state-info-fg))]/10 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-indigo-500" />
+              <BookOpen className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <p className="text-sm font-medium text-text-primary">

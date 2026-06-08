@@ -38,13 +38,13 @@ const statusConfig: Record<
   planning: {
     label: 'Planning',
     bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20',
-    text: 'text-blue-700 dark:text-blue-400',
+    text: 'text-[rgb(var(--state-info-fg))] ',
     dot: 'bg-[rgb(var(--state-info-fg))]',
   },
   active: {
     label: 'Active',
     bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20',
-    text: 'text-emerald-700 dark:text-emerald-400',
+    text: 'text-emerald-700 ',
     dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
   },
   completed: {
@@ -55,8 +55,8 @@ const statusConfig: Record<
   },
   archived: {
     label: 'Archived',
-    bg: 'bg-slate-100 dark:bg-[rgb(var(--surface-tertiary))]0/20',
-    text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]',
+    bg: 'bg-[rgb(var(--surface-tertiary))] dark:bg-[rgb(var(--surface-tertiary))]0/20',
+    text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
     dot: 'bg-[rgb(var(--surface-tertiary))]0',
   },
 }
@@ -160,7 +160,7 @@ function AcademicYearCard({
         <div className="flex items-center gap-2 ml-3 flex-shrink-0">
           <AcademicYearStatusBadge status={year.status} />
           {year.isCurrent && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 text-emerald-700 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 text-emerald-700 ">
               <CheckCircle2 className="w-3 h-3" />
               Current
             </span>

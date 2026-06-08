@@ -224,7 +224,7 @@ export function GradesModule() {
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="grades-tab-indicator"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}
@@ -340,7 +340,7 @@ export function GradesModule() {
 
                 {/* No Default Policy Warning */}
                 {hasNoDefaultPolicy && selectedSectionId && (
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-cyan-50/30 dark:bg-[rgb(var(--state-info-fg))]/8 border border-cyan-300/25 dark:border-cyan-400/15">
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]/30 dark:bg-[rgb(var(--state-info-fg))]/8 border border-cyan-300/25 dark:border-cyan-400/15">
                     <AlertTriangle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm text-text-primary font-medium">No default grading policy set</p>
@@ -349,7 +349,7 @@ export function GradesModule() {
                         <button
                           type="button"
                           onClick={() => setActiveTab('policies')}
-                          className="text-cyan-400 hover:text-cyan-300 font-medium hover:underline transition-colors"
+                          className="text-cyan-400 hover:text-[rgb(var(--text-primary))] font-medium hover:underline transition-colors"
                         >
                           Set a default policy
                         </button>

@@ -323,7 +323,7 @@ export function GovernmentReportsExport() {
 
         {templateId === 'IEMIS_NPL_CEHRD_FLASH_II' && (
           <div
-            className="mt-4 rounded-lg border p-3 text-[12px] flex items-start gap-2"
+            className="mt-4 rounded-lg border p-3 text-xs flex items-start gap-2"
             style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
           >
             <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'var(--v2-status-late)' }} />
@@ -339,7 +339,7 @@ export function GovernmentReportsExport() {
 
         {existingReport && (
           <div
-            className="mt-3 text-[12px] flex items-start gap-2"
+            className="mt-3 text-xs flex items-start gap-2"
             style={{ color: 'var(--v2-text-tertiary)' }}
           >
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
@@ -414,7 +414,7 @@ export function GovernmentReportsExport() {
                   key={opt.value}
                   onClick={() => setTemplateFilter(opt.value)}
                   aria-pressed={active}
-                  className="px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors"
+                  className="px-2.5 py-1 text-xs font-medium rounded-md border transition-colors"
                   style={{
                     background: active ? 'var(--v2-brand-primary)' : 'transparent',
                     borderColor: active ? 'var(--v2-brand-primary)' : 'var(--v2-border-default)',
@@ -525,7 +525,7 @@ export function GovernmentReportsExport() {
 
         {/* ---- Operator guidance: the manual portal step ---- */}
         <div
-          className="px-5 py-3 border-t text-[12px] flex items-start gap-2"
+          className="px-5 py-3 border-t text-xs flex items-start gap-2"
           style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-tertiary)' }}
         >
           <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
@@ -598,7 +598,7 @@ function RowButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
+      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
       style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
     >
       {icon}
@@ -687,18 +687,18 @@ function ActiveGenerationBanner({
           {failed && 'Generation failed'}
         </div>
         {stalledGenerating && (
-          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
             This is unusual for a single school — it may have failed. Refresh to
             check the latest status.
           </div>
         )}
         {ready && empty && (
-          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-status-late)' }}>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--v2-status-late)' }}>
             This report has 0 students — double-check the academic year before submitting.
           </div>
         )}
         {failed && snapshot.errorSummary && (
-          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
             {snapshot.errorSummary}
           </div>
         )}
@@ -727,7 +727,7 @@ function ActiveGenerationBanner({
       )}
       <button
         onClick={onDismiss}
-        className="text-[12px] transition-colors hover:opacity-80"
+        className="text-xs transition-colors hover:opacity-80"
         style={{ color: 'var(--v2-text-tertiary)' }}
       >
         Dismiss

@@ -44,7 +44,7 @@ const SEVERITY_STYLES = {
   info: {
     bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]',
     text: 'text-[rgb(var(--action-secondary-fg))]',
-    badge: 'bg-teal-100 text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
+    badge: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
     border: 'border-l-4 border-[rgb(var(--border-focus))]',
     label: 'Info',
   },
@@ -91,7 +91,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
       <Link to={alert.href as any}>
         <div className={`group flex items-center gap-3 p-4 rounded-r-lg ${style.bg} ${style.border} cursor-pointer hover:brightness-[0.98] dark:hover:brightness-110 transition-all`}>
           {/* Severity + Type icons */}
-          <div className="relative p-2 rounded-lg bg-white/60 dark:bg-white/10 flex-shrink-0">
+          <div className="relative p-2 rounded-lg bg-[rgb(var(--surface-secondary)/0.60)]  flex-shrink-0">
             <TypeIcon className={`w-5 h-5 ${style.text}`} />
             <div className="absolute -top-1 -right-1">
               <SeverityIcon className={`w-3.5 h-3.5 ${style.text}`} />
@@ -117,7 +117,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
 
           {/* Count badge */}
           {alert.count != null && (
-            <span className="text-xs font-medium text-text-secondary bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-full flex-shrink-0">
+            <span className="text-xs font-medium text-text-secondary bg-[rgb(var(--surface-secondary)/0.60)]  px-2 py-0.5 rounded-full flex-shrink-0">
               {alert.count}
             </span>
           )}
@@ -186,7 +186,7 @@ export function ActivityFeedWidget({
           <Link
             to="/classrooms"
             search={{ tab: 'attendance' }}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-cyan-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
           >
             View all ({totalCount})
             <ArrowRight className="w-3.5 h-3.5" />

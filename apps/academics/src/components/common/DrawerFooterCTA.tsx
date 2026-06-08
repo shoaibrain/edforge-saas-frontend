@@ -24,7 +24,7 @@ export function DrawerFooterCTA({ label, onClick, entityName }: DrawerFooterCTAP
         type="button"
         onClick={onClick}
         aria-label={`${label} for ${entityName}`}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-[rgb(var(--action-primary-fg))] rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
       >
         {label}
         <ArrowRight className="w-4 h-4" aria-hidden="true" />
