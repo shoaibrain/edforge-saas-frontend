@@ -91,7 +91,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
             <div className="min-w-0">
               {courseCode && (
                 <p
-                  className="text-[10px] font-mono uppercase tracking-[0.06em] mb-0.5"
+                  className="text-xs font-mono uppercase tracking-[0.06em] mb-0.5"
                   style={{ color: 'var(--v2-text-hint)' }}
                 >
                   {courseCode}
@@ -126,7 +126,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
 
           {/* Score row */}
           {hasGrade && (
-            <div className="flex items-center gap-4 text-[12px] mb-3">
+            <div className="flex items-center gap-4 text-xs mb-3">
               <span style={{ color: 'var(--v2-text-muted)' }}>
                 <span className="font-mono tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
                   {numericGrade != null ? numericGrade.toFixed(1) : '—'}
@@ -140,7 +140,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
                 {' GPA'}
               </span>
               <span
-                className="text-[10px] px-1.5 py-0.5 rounded-full"
+                className="text-xs px-1.5 py-0.5 rounded-full"
                 style={{
                   background: isFinal ? 'var(--v2-success-bg)' : 'var(--v2-info-bg)',
                   color: isFinal ? 'var(--v2-brand-primary)' : 'var(--v2-info)',
@@ -154,7 +154,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
           {/* Not graded state */}
           {!hasGrade && (
             <p
-              className="text-[12px] mb-3"
+              className="text-xs mb-3"
               style={{ color: 'var(--v2-text-hint)' }}
             >
               Not graded yet
@@ -184,7 +184,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
             <>
               <DashedDivider className="my-3" />
               <p
-                className="text-[12px]"
+                className="text-xs"
                 style={{ color: 'var(--v2-text-muted)' }}
               >
                 {teacherName}
