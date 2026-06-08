@@ -142,7 +142,7 @@ export function OnboardingFlow() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg-primary))] relative overflow-hidden">
+    <div className="min-h-screen bg-[rgb(var(--background-primary))] relative overflow-hidden">
       <OnboardingProgressBar progress={progress} />
       <OnboardingTopbar currentStep={currentStep} totalSteps={ONBOARDING_STEPS.length} />
 
@@ -156,7 +156,7 @@ export function OnboardingFlow() {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="w-full max-max-w-xl"
+            className="w-full max-w-xl"
           >
             {renderStep()}
           </motion.div>

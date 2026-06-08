@@ -4,6 +4,7 @@
 
 import { useState } from 'react'
 import { extractApiErrorMessage } from '@edforge/api-client'
+import { Button, Field, InlineAlert, Input, RadioGroup, Select, Stack } from '@edforge/ui'
 import { useShell } from '../../../lib/shell-context'
 import { tenantService } from '../../../services/tenant.service'
 import type { OnboardingStepProps } from '../onboarding.types'
@@ -17,6 +18,7 @@ const SCHOOL_TYPES = [
 ] as const
 
 const GRADE_OPTIONS = ['PK', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+const GRADE_SELECT_OPTIONS = GRADE_OPTIONS.map((grade) => ({ value: grade, label: grade }))
 
 export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProps) {
   const { workspaceSettings } = useShell()
@@ -84,118 +86,93 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
         Add a school to your organization. You can add more later.
       </p>
 
-      {/* Info banner */}
-      <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] mb-6">
-        <svg className="w-4 h-4 text-[rgb(var(--state-info-fg))] mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-        </svg>
-        <span className="text-xs text-[rgb(var(--state-info-fg))]">
+      <Stack space="md" className="mb-8">
+        <InlineAlert variant="info">
           This school inherits your organization's {currency} currency, calendar, and timezone settings.
-        </span>
-      </div>
+        </InlineAlert>
 
-      {/* School Name */}
-      <div className="mb-5">
-        <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-          School Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-        </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => { setName(e.target.value); setError(null) }}
-          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
-          placeholder="e.g. Sunrise Academy"
-          autoFocus
-        />
-      </div>
+        <Field label="School Name" required optionalText={null} error={error === 'School name is required' ? error : undefined}>
+          <Input
+            type="text"
+            value={name}
+            onChange={(e) => { setName(e.target.value); setError(null) }}
+            placeholder="e.g. Sunrise Academy"
+            autoFocus
+          />
+        </Field>
 
-      {/* School Type chips */}
-      <div className="mb-5">
-        <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-2">
-          School Type
-        </label>
-        <div className="grid grid-cols-4 gap-2">
-          {SCHOOL_TYPES.map((type) => (
-            <button
-              key={type.value}
-              onClick={() => setSchoolType(type.value)}
-              className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
-                schoolType === type.value
-                  ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--action-secondary-fg))] '
-                  : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
-              }`}
-            >
-              {type.label}
-            </button>
-          ))}
+        <Field label="School Type" optionalText={null}>
+          <RadioGroup
+            name="onboarding-school-type"
+            value={schoolType}
+            onChange={setSchoolType}
+            direction="horizontal"
+            variant="card"
+            options={SCHOOL_TYPES}
+          />
+        </Field>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-[rgb(var(--text-secondary))]">Grade Range</p>
+          <div className="flex items-start gap-3">
+            <Select
+              label="Start grade"
+              optionalText={null}
+              value={gradeFrom}
+              onChange={(value) => value && setGradeFrom(value)}
+              options={GRADE_SELECT_OPTIONS}
+              buttonClassName="min-w-0"
+            />
+            <span className="pt-3 text-xs text-[rgb(var(--text-tertiary))]">to</span>
+            <Select
+              label="End grade"
+              optionalText={null}
+              value={gradeTo}
+              onChange={(value) => value && setGradeTo(value)}
+              options={GRADE_SELECT_OPTIONS}
+              buttonClassName="min-w-0"
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Grade Range */}
-      <div className="mb-8">
-        <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-2">
-          Grade Range
-        </label>
-        <div className="flex items-center gap-3">
-          <select
-            value={gradeFrom}
-            onChange={(e) => setGradeFrom(e.target.value)}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
-          >
-            {GRADE_OPTIONS.map((g) => (
-              <option key={g} value={g}>{g}</option>
-            ))}
-          </select>
-          <span className="text-xs text-[rgb(var(--text-tertiary))]">to</span>
-          <select
-            value={gradeTo}
-            onChange={(e) => setGradeTo(e.target.value)}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
-          >
-            {GRADE_OPTIONS.map((g) => (
-              <option key={g} value={g}>{g}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      </Stack>
 
       {error && (
-        <p className="text-xs text-[rgb(var(--state-danger-fg))] mb-4">{error}</p>
+        error !== 'School name is required' ? (
+          <p className="text-xs text-[rgb(var(--state-danger-fg))] mb-4">{error}</p>
+        ) : null
       )}
 
       {showSkipWarning && (
-        <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-4">
-          <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-          </svg>
-          <span className="text-xs text-amber-600 dark:text-amber-400">
-            {stepConfig.skipWarning} Click skip again to confirm.
-          </span>
-        </div>
+        <InlineAlert variant="warning" className="mb-4">
+          {stepConfig.skipWarning} Click skip again to confirm.
+        </InlineAlert>
       )}
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button
+          <Button
+            type="button"
             onClick={onBack}
-            className="text-sm text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+            variant="ghost"
           >
             Back
-          </button>
-          <button
+          </Button>
+          <Button
+            type="button"
             onClick={handleSkip}
-            className="text-sm text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+            variant="ghost"
           >
             Skip
-          </button>
+          </Button>
         </div>
-        <button
+        <Button
+          type="button"
           onClick={handleCreate}
           disabled={saving || !name.trim()}
-          className="px-6 py-2.5 rounded-full bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))]  dark: text-[rgb(var(--action-primary-fg))] font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
+          isLoading={saving}
         >
-          {saving ? 'Creating...' : 'Create School'}
-        </button>
+          Create School
+        </Button>
       </div>
     </div>
   )
