@@ -104,6 +104,13 @@ const checks: FocusCheck[] = [
     focusEvidence: /focus-visible:ring|focus:ring|focus-within:ring|focusRing/,
     semanticEvidence: /--border-focus|focusRing/,
   },
+  {
+    primitive: 'Tabs',
+    file: 'packages/ui/src/components/Tabs.tsx',
+    interactiveEvidence: /role="tab"/,
+    focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
 ]
 
 function source(file: string): string {
@@ -145,6 +152,7 @@ describe('interactive primitive focus-ring baseline', () => {
       Textarea: 'semantic-pass',
       Select: 'semantic-pass',
       Combobox: 'semantic-pass',
+      Tabs: 'semantic-pass',
     })
   })
 })

@@ -19,6 +19,8 @@ const buttonVariants = cva(
           'border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] active:opacity-80',
         ghost:
           'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
+        tonal:
+          'border border-[rgb(var(--state-info-border)/0.35)] bg-[rgb(var(--state-info-bg)/0.35)] text-[rgb(var(--state-info-fg))] hover:bg-[rgb(var(--state-info-bg)/0.55)] active:opacity-80',
         danger:
           'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95 active:brightness-90 shadow-sm',
         link: 'text-[rgb(var(--action-secondary-fg))] underline-offset-4 hover:underline',
