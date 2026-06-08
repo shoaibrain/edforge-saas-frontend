@@ -1,14 +1,14 @@
 # Stream 2 Token Review — Proposed `base.css` Diff
 
-**Status:** review gate before any `packages/theme/src/base.css` edit.  
+**Status:** implemented; retained as the Stream 2 decision record.  
 **Reason:** `packages/theme/src/base.css` is the blast-radius file; no token PR should start until this proposal is approved.
 
 ## Goals
 
 1. Preserve current palette families: ink, teal, cyan, aqua, vanilla, golden, caramel, rust.
-2. Add a semantic alias layer while keeping existing token names.
+2. Add a semantic token layer and migrate consumers away from legacy token names.
 3. Fix the WCAG failures captured by `packages/ui/src/components/__tests__/contrast.test.ts`.
-4. Avoid breaking existing utilities during the alias window.
+4. Avoid breaking existing utilities during the migration window.
 
 ## Proposed semantic aliases
 
@@ -125,7 +125,7 @@ Add dark equivalents inside `.dark`:
    - `action-danger-fg on action-danger-bg`
    - `text-primary/text-secondary/text-tertiary` on supported surfaces
    - border/focus tokens on supported surfaces
-3. Keep a separate test that verifies deprecated aliases still exist during the migration window.
+3. After consumer migration is complete, remove deprecated alias definitions from `base.css`.
 
 ## Known visual drift
 

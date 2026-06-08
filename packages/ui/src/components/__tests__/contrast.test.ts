@@ -78,10 +78,10 @@ function collectSupportedMatrixFailures(): ContrastFailure[] {
 
   for (const [theme, tokens] of Object.entries(themes) as [ThemeName, Record<string, Rgb>][]) {
     const textPairs = [
-      ['text-primary', 'surface-primary'],
-      ['text-secondary', 'surface-primary'],
-      ['text-tertiary', 'surface-primary'],
-      ['text-tertiary', 'surface-tertiary'],
+      ['text-primary', 'background-primary'],
+      ['text-secondary', 'background-primary'],
+      ['text-tertiary', 'background-primary'],
+      ['text-tertiary', 'background-tertiary'],
     ] as const
 
     for (const [fg, bg] of textPairs) {
@@ -98,11 +98,10 @@ function collectSupportedMatrixFailures(): ContrastFailure[] {
     }
 
     const uiPairs = [
-      ['border-primary', 'surface-primary'],
-      ['border-secondary', 'surface-primary'],
-      ['border-tertiary', 'surface-primary'],
-      ['border-focus', 'surface-elevated'],
-      ['interactive-focus', 'surface-elevated'],
+      ['border-primary', 'background-primary'],
+      ['border-secondary', 'background-primary'],
+      ['border-tertiary', 'background-primary'],
+      ['border-focus', 'background-elevated'],
     ] as const
 
     for (const [fg, bg] of uiPairs) {
@@ -144,12 +143,12 @@ describe('design token contrast baseline', () => {
     expect(collectSupportedMatrixFailures()).toEqual([])
   })
 
-  it('keeps legacy border tokens fully defined in both themes during the alias window', () => {
+  it('keeps border tokens fully defined in both themes', () => {
     expect(Object.keys(rootTokens).filter((token) => token.startsWith('border-') && !(token in darkOverrides))).toEqual([
     ])
   })
 
-  it('defines the new semantic alias taxonomy in both themes', () => {
+  it('defines the semantic token taxonomy in both themes', () => {
     const requiredAliases = [
       'background-primary',
       'background-secondary',

@@ -119,11 +119,13 @@
   /* Font */
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  /* Surface colors - Light mode uses warm neutrals */
-  --surface-primary: 251 249 245; /* warm off-white */
-  --surface-secondary: 255 255 255;
-  --surface-tertiary: 246 243 235; /* vanilla-100 tint */
-  --surface-elevated: 255 255 255;
+  /* Background colors - Light mode uses warm neutrals */
+  --background-primary: 251 249 245; /* warm off-white */
+  --background-secondary: 255 255 255;
+  --background-tertiary: 246 243 235; /* vanilla-100 tint */
+  --background-elevated: 255 255 255;
+  --background-overlay: 0 18 25;
+  --background-inverse: 0 18 25;
 
   /* Text colors */
   --text-primary: 0 18 25; /* ink-500 */
@@ -136,25 +138,7 @@
   --border-secondary: 63 151 122; /* aqua-700, >=3:1 on warm surfaces */
   --border-tertiary: 0 122 147; /* teal-400, strong divider/focus-adjacent */
 
-  /* Interactive states */
-  --interactive-hover: 246 243 235;
-  --interactive-active: 233 216 166;
-  --interactive-focus: 0 95 115;
-
-  /* Brand accent */
-  --brand-primary: 0 95 115; /* teal-500 */
-  --brand-secondary: 10 147 150; /* cyan-500 */
-  --brand-accent: 238 155 0; /* golden-400 */
-
-  /* New semantic aliases — Stream 2 migration window. Keep legacy names above
-     until every consumer has moved to the taxonomy below. */
-  --background-primary: var(--surface-primary);
-  --background-secondary: var(--surface-secondary);
-  --background-tertiary: var(--surface-tertiary);
-  --background-elevated: var(--surface-elevated);
-  --background-overlay: 0 18 25;
-  --background-inverse: 0 18 25;
-
+  /* Semantic roles */
   --text-muted: var(--text-tertiary);
   --text-disabled: 148 163 184;
   --text-on-accent: 251 249 245;
@@ -162,13 +146,13 @@
   --border-subtle: var(--border-secondary);
   --border-default: var(--border-primary);
   --border-strong: var(--border-tertiary);
-  --border-focus: var(--interactive-focus);
+  --border-focus: 0 95 115;
 
-  --action-primary-bg: var(--brand-primary);
+  --action-primary-bg: 0 95 115;
   --action-primary-bg-hover: 0 78 94;
   --action-primary-bg-active: 0 59 70;
   --action-primary-fg: var(--text-on-accent);
-  --action-secondary-bg: var(--surface-tertiary);
+  --action-secondary-bg: var(--background-tertiary);
   --action-secondary-fg: var(--text-secondary);
   --action-danger-bg: 174 32 18;
   --action-danger-fg: var(--text-on-accent);
@@ -200,17 +184,16 @@
   --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
 
-  /* Icon colors - subtle brand tint for warmth */
-  --icon-inactive: 71 85 105; /* slate-600 with slight warmth */
-  --icon-inactive-hover: 51 65 85; /* slate-700 - darker on hover */
 }
 
 .dark {
-  /* Surface colors - Dark mode uses ink palette */
-  --surface-primary: 0 18 25;
-  --surface-secondary: 0 39 47;
-  --surface-tertiary: 0 59 70;
-  --surface-elevated: 0 78 94;
+  /* Background colors - Dark mode uses ink palette */
+  --background-primary: 0 18 25;
+  --background-secondary: 0 39 47;
+  --background-tertiary: 0 59 70;
+  --background-elevated: 0 78 94;
+  --background-overlay: 0 0 0;
+  --background-inverse: 251 249 245;
 
   /* Text colors - Dark mode */
   --text-primary: 251 247 237;
@@ -223,24 +206,7 @@
   --border-secondary: 58 122 138;
   --border-tertiary: 10 179 182;
 
-  /* Interactive states - Dark mode */
-  --interactive-hover: 0 59 70;
-  --interactive-active: 0 78 94;
-  --interactive-focus: 10 179 182;
-
-  /* Brand accent */
-  --brand-primary: 0 95 115;
-  --brand-secondary: 148 210 189;
-  --brand-accent: 238 155 0;
-
-  /* New semantic aliases — Stream 2 migration window */
-  --background-primary: var(--surface-primary);
-  --background-secondary: var(--surface-secondary);
-  --background-tertiary: var(--surface-tertiary);
-  --background-elevated: var(--surface-elevated);
-  --background-overlay: 0 0 0;
-  --background-inverse: 251 249 245;
-
+  /* Semantic roles */
   --text-muted: var(--text-tertiary);
   --text-disabled: 100 116 139;
   --text-on-accent: 251 249 245;
@@ -248,13 +214,13 @@
   --border-subtle: var(--border-secondary);
   --border-default: var(--border-primary);
   --border-strong: var(--border-tertiary);
-  --border-focus: var(--interactive-focus);
+  --border-focus: 10 179 182;
 
   --action-primary-bg: 0 95 115;
   --action-primary-bg-hover: 0 122 147;
   --action-primary-bg-active: 0 78 94;
   --action-primary-fg: var(--text-on-accent);
-  --action-secondary-bg: var(--surface-tertiary);
+  --action-secondary-bg: var(--background-tertiary);
   --action-secondary-fg: var(--text-secondary);
   --action-danger-bg: 174 32 18;
   --action-danger-fg: var(--text-on-accent);
@@ -286,9 +252,6 @@
   --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
 
-  /* Icon colors */
-  --icon-inactive: 125 164 152;
-  --icon-inactive-hover: 148 210 189;
 }
 
 /* Base layer styles */
@@ -309,7 +272,7 @@ html[lang="ne"] {
 }
 
 body {
-  background-color: rgb(var(--surface-primary));
+  background-color: rgb(var(--background-primary));
   color: rgb(var(--text-primary));
   min-height: 100vh;
   transition:

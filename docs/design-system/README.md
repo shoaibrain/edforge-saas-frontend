@@ -21,8 +21,6 @@ This directory documents the production presentation layer contract for EdForge�
 - `background.overlay` — modal/scrim overlays.
 - `background.inverse` — inverse surfaces.
 
-Legacy aliases (`surface-primary`, `surface-secondary`, etc.) remain during the migration window.
-
 ### Text
 
 - `text.primary` — primary labels/content.

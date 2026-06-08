@@ -9,19 +9,19 @@ Use:
 - `focusRing` for standalone buttons/cards/tabs.
 - `focusRingInset` for dense rows, menu items, table rows, and icon buttons.
 
-Both are backed by `--interactive-focus` / `border.focus` semantics.
+Both are backed by the `--border-focus` semantic token.
 
 ## State matrix
 
 | Component | Default | Hover | Active/selected | Focus-visible | Disabled | Loading |
 |---|---|---|---|---|---|---|
 | `Button` | variant token background/foreground | action hover token | action active token | `focusRing` | opacity + no pointer events | spinner + disabled |
-| `Dropdown` trigger | semantic surface + border | `interactive.hover` surface | open state follows Headless UI | `focusRing` | consumer-controlled | n/a |
+| `Dropdown` trigger | semantic surface + border | background tertiary surface | open state follows Headless UI | `focusRing` | consumer-controlled | n/a |
 | `Dropdown` item | text primary on menu surface | surface secondary | selected item uses action/brand text | `focusRingInset` | consumer-controlled | n/a |
-| `FilterTabs` | tertiary surface + secondary text | interactive hover | primary action bg + on-accent text | `focusRing` | future prop | n/a |
+| `FilterTabs` | tertiary surface + secondary text | background hover | primary action bg + on-accent text | `focusRing` | future prop | n/a |
 | `Accordion` trigger | inherited surface/text | component context | expanded icon/state | `focusRing` | future prop | n/a |
-| `TableRow` | border + primary text | interactive hover | selected tertiary surface | `focusRingInset` when clickable | n/a | table skeleton |
-| `DataTable` row | alternating semantic surfaces | brand-primary low-alpha hover | selected state + left border | `focusRingInset` when clickable | n/a | `DataTableSkeleton` |
+| `TableRow` | border + primary text | background hover | selected tertiary surface | `focusRingInset` when clickable | n/a | table skeleton |
+| `DataTable` row | alternating semantic surfaces | primary action low-alpha hover | selected state + left border | `focusRingInset` when clickable | n/a | `DataTableSkeleton` |
 | `AttendanceHeatmap` nav | icon button | contextual hover | n/a | `focusRingInset` | future prop | n/a |
 | `AttendanceHeatmap` cell | status color | future tooltip/hover | today border/status | `focusRingInset` | future prop | n/a |
 | Clickable `Card` | surface + raised shadow | overlay shadow | consumer-selected | `focusRing` | future prop | skeleton/consumer |
