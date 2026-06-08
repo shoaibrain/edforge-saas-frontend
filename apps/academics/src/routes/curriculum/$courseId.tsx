@@ -322,7 +322,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
           <ul className="space-y-1.5">
             {course.objectives.map((obj, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[rgb(var(--state-info-bg)/0.18)]0 flex-shrink-0" />
                 {obj}
               </li>
             ))}
@@ -443,7 +443,7 @@ function SectionsTab({
         <button
           type="button"
           onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
         >
           <Plus className="w-4 h-4" />
           Go to Scheduling
@@ -473,7 +473,7 @@ function SectionsTab({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex-shrink-0">
-                  <CalendarDays className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -512,7 +512,7 @@ function SectionsTab({
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      section.isActive ? 'bg-emerald-500' : 'bg-gray-400'
+                      section.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-gray-400'
                     }`}
                   />
                   <span className="text-xs text-text-secondary">
@@ -532,7 +532,7 @@ function SectionsTab({
             type="button"
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50"
           >
             {isFetchingNextPage ? 'Loading...' : 'Load More Sections'}
           </button>
@@ -549,8 +549,8 @@ function SectionsTab({
 function StandardsTab() {
   return (
     <div className="text-center py-12">
-      <div className="p-3 rounded-lg bg-purple-500/10 inline-block mb-4">
-        <Target className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+      <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] inline-block mb-4">
+        <Target className="w-8 h-8 text-[rgb(var(--state-info-fg))]" />
       </div>
       <h3 className="text-lg font-semibold text-text-primary mb-2">
         Learning Standards
@@ -636,7 +636,7 @@ export function CourseDetailPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/curriculum' })}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Curriculum
@@ -689,13 +689,13 @@ export function CourseDetailPage() {
               <div
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
                   course.isActive
-                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'
+                    ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-emerald-700 dark:bg-[rgb(var(--state-success-bg)/0.18)] dark:text-emerald-400'
+                    : 'bg-[rgb(var(--surface-tertiary))] text-gray-600 dark:bg-gray-500/10 '
                 }`}
               >
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    course.isActive ? 'bg-emerald-500' : 'bg-gray-400'
+                    course.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-gray-400'
                   }`}
                 />
                 {course.isActive ? 'Active' : 'Inactive'}
@@ -731,7 +731,7 @@ export function CourseDetailPage() {
                   {isActive && (
                     <motion.div
                       layoutId="courseDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                       initial={false}
                       transition={{
                         type: 'spring',

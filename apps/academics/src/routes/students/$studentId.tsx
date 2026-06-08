@@ -107,8 +107,8 @@ function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
-        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
-          <User className="w-7 h-7 text-red-600 dark:text-red-400" />
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center">
+          <User className="w-7 h-7 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
           {t('error.failedToLoad')}
@@ -223,13 +223,13 @@ export function StudentProfilePage() {
                 className={`
                   relative px-4 py-3 pb-3.5 text-sm transition-colors whitespace-nowrap outline-none
                   ${isActive
-                    ? 'text-teal-600 dark:text-teal-400 font-medium'
+                    ? 'text-[rgb(var(--action-secondary-fg))] font-medium'
                     : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-primary))]'
                   }
                 `}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-600 dark:text-teal-400' : 'opacity-70'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
                   {t(`tabs.${tab.id}`)}
                 </span>
 
@@ -237,7 +237,7 @@ export function StudentProfilePage() {
                 {isActive && (
                   <motion.div
                     layoutId="studentProfileTab"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />

@@ -84,7 +84,7 @@ function AvailableStudentRow({
       disabled={disabled}
       className={`flex items-center gap-3 w-full px-4 py-3 text-left transition-colors ${
         isSelected
-          ? 'bg-teal-50/50 dark:bg-teal-500/10'
+          ? 'bg-[rgb(var(--state-info-bg)/0.18)]/50 dark:bg-[rgb(var(--state-info-bg)/0.18)]'
           : disabled
             ? 'opacity-50 cursor-not-allowed'
             : 'hover:bg-surface-secondary/50'
@@ -92,10 +92,10 @@ function AvailableStudentRow({
     >
       <div
         className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-          isSelected ? 'bg-teal-500 border-teal-500' : 'border-border-primary'
+          isSelected ? 'bg-[rgb(var(--state-info-bg)/0.18)]0 border-[rgb(var(--border-focus))]' : 'border-border-primary'
         }`}
       >
-        {isSelected && <Check className="w-3 h-3 text-white" />}
+        {isSelected && <Check className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-text-primary truncate">
@@ -127,7 +127,7 @@ function RosterStudentRow({
     <div className="flex items-center justify-between py-3 px-4 hover:bg-surface-secondary/50 transition-colors">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 flex items-center justify-center">
-          <GraduationCap className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+          <GraduationCap className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
         </div>
         <div>
           <div className="text-sm font-medium text-text-primary">
@@ -150,7 +150,7 @@ function RosterStudentRow({
         type="button"
         onClick={onRemove}
         disabled={isRemoving}
-        className="p-1.5 rounded-md text-text-tertiary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
+        className="p-1.5 rounded-md text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors disabled:opacity-50"
         aria-label="Remove student"
       >
         {isRemoving ? (
@@ -312,7 +312,7 @@ export function SectionRosterPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Scheduling
@@ -375,7 +375,7 @@ export function SectionRosterPage() {
                     type="button"
                     onClick={handleBulkEnroll}
                     disabled={isEnrolling || spotsRemaining <= 0}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
                   >
                     {isEnrolling ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -393,7 +393,7 @@ export function SectionRosterPage() {
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   placeholder="Search students..."
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                 />
               </div>
             </div>

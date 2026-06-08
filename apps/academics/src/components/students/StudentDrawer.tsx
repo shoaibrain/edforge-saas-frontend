@@ -166,7 +166,7 @@ function ActionsDropdown({
                     setIsOpen(false)
                     onWithdraw(student)
                   }}
-                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
                 >
                   <UserMinus className="w-4 h-4" />
                   Withdraw Student
@@ -197,7 +197,7 @@ function SectionCard({
     <div className="rounded-xl border border-border-secondary bg-surface-secondary/50 overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-secondary bg-surface-secondary/80">
         <Icon className="w-3.5 h-3.5 text-text-tertiary" />
-        <h4 className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+        <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
           {title}
         </h4>
       </div>
@@ -223,7 +223,7 @@ function DetailField({
 }) {
   return (
     <div className="py-1">
-      <dt className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-1 flex items-center gap-1.5">
+      <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1 flex items-center gap-1.5">
         {Icon && <Icon className={`w-3 h-3 ${accent ?? 'text-text-tertiary'}`} />}
         {label}
       </dt>
@@ -303,7 +303,7 @@ export function StudentDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={handleBackdropClick}
             aria-hidden="true"
           />
@@ -344,7 +344,7 @@ export function StudentDrawer({
                       </h2>
                       <div className="flex items-center gap-2 mt-0.5">
                         {student.studentNumber && (
-                          <span className="font-mono text-[11px] text-text-tertiary">
+                          <span className="font-mono text-xs text-text-tertiary">
                             #{student.studentNumber}
                           </span>
                         )}
@@ -380,21 +380,21 @@ export function StudentDrawer({
                         <p className="text-lg font-bold text-text-primary">
                           {student.currentGradeLevel || '—'}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">Grade</p>
+                        <p className="text-xs text-text-tertiary">Grade</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <BookOpen className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
+                        <BookOpen className="w-4 h-4 text-[rgb(var(--state-success-fg))] mx-auto mb-1" />
                         <p className="text-lg font-bold text-text-primary">
                           &mdash;
                         </p>
-                        <p className="text-[11px] text-text-tertiary">GPA</p>
+                        <p className="text-xs text-text-tertiary">GPA</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <Clock className="w-4 h-4 text-amber-500 mx-auto mb-1" />
                         <p className="text-lg font-bold text-text-primary">
                           &mdash;
                         </p>
-                        <p className="text-[11px] text-text-tertiary">Attendance</p>
+                        <p className="text-xs text-text-tertiary">Attendance</p>
                       </div>
                     </div>
 
@@ -449,7 +449,7 @@ export function StudentDrawer({
                         <DetailField
                           icon={Mail}
                           label="Email"
-                          accent="text-blue-500"
+                          accent="text-[rgb(var(--state-info-fg))]"
                           value={student.contactInfo?.email}
                         />
                         <DetailField
@@ -484,11 +484,11 @@ export function StudentDrawer({
                                   {guardian.firstName} {guardian.lastName}
                                 </p>
                                 <div className="flex items-center gap-2">
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-surface-tertiary text-text-secondary capitalize">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-surface-tertiary text-text-secondary capitalize">
                                     {guardian.relationship}
                                   </span>
                                   {guardian.isPrimary && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]">
                                       Primary
                                     </span>
                                   )}
@@ -522,7 +522,7 @@ export function StudentDrawer({
                             {student.specialPrograms.map((program, i) => (
                               <span
                                 key={i}
-                                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/10"
+                                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] border border-purple-500/10"
                               >
                                 {program}
                               </span>
@@ -530,7 +530,7 @@ export function StudentDrawer({
                             {student.accommodations?.map((acc, i) => (
                               <span
                                 key={`acc-${i}`}
-                                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/10"
+                                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-warning-fg))]/10 text-[rgb(var(--state-warning-fg))] border border-amber-500/10"
                               >
                                 {acc}
                               </span>
@@ -547,7 +547,7 @@ export function StudentDrawer({
                     type="button"
                     onClick={handleViewDetails}
                     aria-label={`View details for ${student.fullName}`}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-[rgb(var(--action-primary-fg))] rounded-xl font-medium text-sm transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
                   >
                     View Details
                     <ArrowRight className="w-4 h-4" aria-hidden="true" />

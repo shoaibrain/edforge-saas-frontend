@@ -42,7 +42,7 @@ export class WidgetErrorBoundary extends Component<Props, State> {
       return (
         <Card className="p-6 border-border-secondary">
           <div className="flex items-center gap-3 text-text-secondary">
-            <div className="p-2 rounded-lg bg-amber-500/10">
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-warning-fg))]/10">
               <AlertTriangle className="w-5 h-5 text-amber-500" />
             </div>
             <div className="flex-1 min-w-0">

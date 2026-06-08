@@ -28,24 +28,24 @@ interface ActivityFeedWidgetProps {
 
 const SEVERITY_STYLES = {
   critical: {
-    bg: 'bg-red-50 dark:bg-red-500/10',
-    text: 'text-red-600 dark:text-red-400',
-    badge: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-    border: 'border-l-4 border-red-500',
+    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-danger-fg))]',
+    badge: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 ',
+    border: 'border-l-4 border-[rgb(var(--state-danger-border))]',
     label: 'Critical',
   },
   warning: {
-    bg: 'bg-amber-50 dark:bg-amber-500/10',
-    text: 'text-amber-600 dark:text-amber-400',
-    badge: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+    bg: 'bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10',
+    text: 'text-[rgb(var(--state-warning-fg))]',
+    badge: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
     border: 'border-l-4 border-amber-400',
     label: 'Warning',
   },
   info: {
-    bg: 'bg-teal-50 dark:bg-teal-500/10',
-    text: 'text-teal-600 dark:text-teal-400',
-    badge: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
-    border: 'border-l-4 border-teal-500',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]',
+    text: 'text-[rgb(var(--action-secondary-fg))]',
+    badge: 'bg-teal-100 text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
+    border: 'border-l-4 border-[rgb(var(--border-focus))]',
     label: 'Info',
   },
 }
@@ -105,7 +105,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
                 {alert.title}
               </p>
               <span
-                className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${style.badge} flex-shrink-0`}
+                className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${style.badge} flex-shrink-0`}
               >
                 {style.label}
               </span>
@@ -146,8 +146,8 @@ export function ActivityFeedWidget({
     <Card className="p-5 border-border-secondary flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 rounded-lg bg-amber-500/10">
-          <Bell className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+        <div className="p-1.5 rounded-lg bg-[rgb(var(--state-warning-fg))]/10">
+          <Bell className="w-4 h-4 text-[rgb(var(--state-warning-fg))]" />
         </div>
         <h3 className="text-sm font-semibold text-text-primary">
           Activity & Alerts
@@ -165,7 +165,7 @@ export function ActivityFeedWidget({
           <FeedSkeleton />
         ) : displayAlerts.length === 0 ? (
           <div className="py-8 text-center">
-            <CheckCircle className="w-10 h-10 mx-auto text-emerald-500 mb-3" />
+            <CheckCircle className="w-10 h-10 mx-auto text-[rgb(var(--state-success-fg))] mb-3" />
             <p className="text-sm font-medium text-text-primary">All clear!</p>
             <p className="text-xs text-text-tertiary mt-1">
               No alerts at this time
@@ -186,7 +186,7 @@ export function ActivityFeedWidget({
           <Link
             to="/classrooms"
             search={{ tab: 'attendance' }}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:text-teal-700 dark:hover:text-cyan-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-cyan-300 transition-colors"
           >
             View all ({totalCount})
             <ArrowRight className="w-3.5 h-3.5" />

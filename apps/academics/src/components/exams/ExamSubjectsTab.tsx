@@ -236,7 +236,7 @@ export function ExamSubjectsTab({
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
             Add Subject
@@ -318,12 +318,12 @@ export function ExamSubjectsTab({
                 <button
                   type="button"
                   onClick={seedTheoryPractical}
-                  className="text-xs font-medium text-purple-600 hover:text-purple-700"
+                  className="text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700"
                 >
                   + Split into components
                 </button>
               ) : (
-                <span className={`text-xs tabular-nums ${componentsValid ? 'text-text-tertiary' : 'text-red-600'}`}>
+                <span className={`text-xs tabular-nums ${componentsValid ? 'text-text-tertiary' : 'text-[rgb(var(--state-danger-fg))]'}`}>
                   Σ {componentsSum} / {Number.isFinite(addMax) ? addMax : '—'} full
                 </span>
               )}
@@ -361,7 +361,7 @@ export function ExamSubjectsTab({
                 <button
                   type="button"
                   onClick={() => removeComponentRow(i)}
-                  className="p-1 rounded-lg text-text-tertiary hover:text-red-600 hover:bg-surface-secondary"
+                  className="p-1 rounded-lg text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-surface-secondary"
                   aria-label="Remove component"
                 >
                   <X className="w-4 h-4" />
@@ -374,7 +374,7 @@ export function ExamSubjectsTab({
                 <button
                   type="button"
                   onClick={() => addComponentRow()}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add component
                 </button>
@@ -388,7 +388,7 @@ export function ExamSubjectsTab({
               </div>
             )}
             {form.components.length > 0 && !componentsValid && (
-              <p className="text-xs text-red-600">
+              <p className="text-xs text-[rgb(var(--state-danger-fg))]">
                 Each component needs a label, full ≥ 1, 0 ≤ pass ≤ full, and the full marks must sum to Max
                 Marks ({Number.isFinite(addMax) ? addMax : '—'}).
               </p>
@@ -410,7 +410,7 @@ export function ExamSubjectsTab({
               type="button"
               onClick={handleAdd}
               disabled={!form.courseId || createMut.isPending || !componentsValid}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
             >
               Add
             </button>
@@ -472,7 +472,7 @@ export function ExamSubjectsTab({
                       type="button"
                       onClick={() => handleSaveEdit(ec.examCourseId)}
                       disabled={updateMut.isPending}
-                      className="p-1.5 rounded-lg text-emerald-600 hover:bg-surface-secondary disabled:opacity-50"
+                      className="p-1.5 rounded-lg text-[rgb(var(--state-success-fg))] hover:bg-surface-secondary disabled:opacity-50"
                       aria-label="Save"
                     >
                       <Check className="w-4 h-4" />
@@ -510,7 +510,7 @@ export function ExamSubjectsTab({
                               deleteMut.mutate(ec.examCourseId)
                             }
                           }}
-                          className="p-1.5 rounded-lg text-text-tertiary hover:text-red-600 hover:bg-surface-secondary transition-colors"
+                          className="p-1.5 rounded-lg text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-surface-secondary transition-colors"
                           aria-label="Remove subject"
                         >
                           <Trash2 className="w-4 h-4" />

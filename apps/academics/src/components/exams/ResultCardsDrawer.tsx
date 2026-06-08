@@ -29,10 +29,10 @@ import { useSchoolProfile } from '../../hooks/useSchool'
 import { openReportCardPrint } from './ReportCardPrint'
 
 function gpaClass(gpa: number): string {
-  if (gpa >= 3.5) return 'text-emerald-600 dark:text-emerald-400'
-  if (gpa >= 3.0) return 'text-blue-600 dark:text-blue-400'
-  if (gpa >= 2.0) return 'text-amber-600 dark:text-amber-400'
-  return 'text-red-600 dark:text-red-400'
+  if (gpa >= 3.5) return 'text-[rgb(var(--state-success-fg))]'
+  if (gpa >= 3.0) return 'text-[rgb(var(--state-info-fg))]'
+  if (gpa >= 2.0) return 'text-[rgb(var(--state-warning-fg))]'
+  return 'text-[rgb(var(--state-danger-fg))]'
 }
 
 // P1.5a/b — scheme is data, not config: a `result` (pass/fail) on the card means
@@ -47,13 +47,13 @@ type CourseScore = ResultCardResponseDto['courseScores'][number]
 /** Per-subject outcome cell: Absent (AB) is a distinct non-failing state (P1b). */
 function CoursePassCell({ cs, division }: { cs: CourseScore; division: boolean }) {
   if (cs.notGraded) {
-    return <span className="text-amber-600 dark:text-amber-400 text-xs font-medium" title="Absent / Not graded">AB</span>
+    return <span className="text-[rgb(var(--state-warning-fg))] text-xs font-medium" title="Absent / Not graded">AB</span>
   }
   const passed = division ? cs.pass === true : cs.isPassing
   return passed ? (
-    <CheckCircle2 className="w-4 h-4 text-emerald-500 inline" />
+    <CheckCircle2 className="w-4 h-4 text-[rgb(var(--state-success-fg))] inline" />
   ) : (
-    <span className="text-red-500 text-xs font-medium">Fail</span>
+    <span className="text-[rgb(var(--state-danger-fg))] text-xs font-medium">Fail</span>
   )
 }
 
@@ -114,8 +114,8 @@ function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
         published
-          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-          : 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300'
+          ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 '
+          : 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 dark:text-gray-300'
       }`}
     >
       {published ? <Lock className="w-3 h-3" /> : null}
@@ -208,8 +208,8 @@ function ReportCardDetail({
                   <p
                     className={`text-lg font-semibold ${
                       card.result === 'pass'
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-red-600 dark:text-red-400'
+                        ? 'text-[rgb(var(--state-success-fg))]'
+                        : 'text-[rgb(var(--state-danger-fg))]'
                     }`}
                   >
                     {card.result === 'pass' ? 'PASS' : 'FAIL'}
@@ -318,7 +318,7 @@ function ReportCardDetail({
                 type="button"
                 onClick={handleSaveConduct}
                 disabled={conductMutation.isPending || conduct === (card.conduct ?? '')}
-                className="mt-1.5 text-xs font-medium text-purple-600 hover:text-purple-700 disabled:opacity-50"
+                className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700 disabled:opacity-50"
               >
                 {conductMutation.isPending ? 'Saving…' : 'Save conduct'}
               </button>
@@ -344,7 +344,7 @@ function ReportCardDetail({
                 type="button"
                 onClick={handleSaveRemark}
                 disabled={remarkMutation.isPending || remark === (card.classTeacherRemark ?? '')}
-                className="mt-1.5 text-xs font-medium text-purple-600 hover:text-purple-700 disabled:opacity-50"
+                className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700 disabled:opacity-50"
               >
                 {remarkMutation.isPending ? 'Saving…' : 'Save remark'}
               </button>
@@ -374,7 +374,7 @@ function ReportCardDetail({
               type="button"
               onClick={handlePublish}
               disabled={publishMutation.isPending}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
             >
               {publishMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
               Publish
@@ -431,7 +431,7 @@ function ResultCardList({
     if (exam.status === 'closed' && gen === 'failed') {
       return (
         <div className="px-6 py-12 text-center">
-          <AlertCircle className="w-10 h-10 mx-auto text-red-500 mb-3" />
+          <AlertCircle className="w-10 h-10 mx-auto text-[rgb(var(--state-danger-fg))] mb-3" />
           <h4 className="text-base font-medium text-text-primary mb-1">Result generation failed</h4>
           <p className="text-sm text-text-secondary max-w-sm mx-auto">
             {exam.lastGenerationError
@@ -503,8 +503,8 @@ function ResultCardList({
                       <span
                         className={`text-xs font-semibold ${
                           card.result === 'pass'
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-red-600 dark:text-red-400'
+                            ? 'text-[rgb(var(--state-success-fg))]'
+                            : 'text-[rgb(var(--state-danger-fg))]'
                         }`}
                       >
                         {card.result === 'pass' ? 'PASS' : 'FAIL'}
@@ -582,7 +582,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) onClose()
             }}
@@ -600,7 +600,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex-shrink-0">
-                      <ClipboardList className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <ClipboardList className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />
                     </div>
                     <div className="min-w-0">
                       <h2 id="result-cards-title" className="text-lg font-semibold text-text-primary truncate">

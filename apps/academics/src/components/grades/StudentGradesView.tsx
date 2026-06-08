@@ -31,18 +31,18 @@ interface StudentGradesViewProps {
 // ============================================================================
 
 function getLetterGradeColor(grade: string): string {
-  if (grade.startsWith('A')) return 'text-emerald-600 dark:text-emerald-400'
-  if (grade.startsWith('B')) return 'text-blue-600 dark:text-blue-400'
-  if (grade.startsWith('C')) return 'text-amber-600 dark:text-amber-400'
-  if (grade.startsWith('D')) return 'text-orange-600 dark:text-orange-400'
-  return 'text-red-600 dark:text-red-400'
+  if (grade.startsWith('A')) return 'text-[rgb(var(--state-success-fg))]'
+  if (grade.startsWith('B')) return 'text-[rgb(var(--state-info-fg))]'
+  if (grade.startsWith('C')) return 'text-[rgb(var(--state-warning-fg))]'
+  if (grade.startsWith('D')) return 'text-[rgb(var(--state-warning-fg))]'
+  return 'text-[rgb(var(--state-danger-fg))]'
 }
 
 function getGpaBadge(gpa: number): { bg: string; text: string } {
-  if (gpa >= 3.5) return { bg: 'bg-emerald-100 dark:bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400' }
-  if (gpa >= 3.0) return { bg: 'bg-blue-100 dark:bg-blue-500/20', text: 'text-blue-700 dark:text-blue-400' }
-  if (gpa >= 2.0) return { bg: 'bg-amber-100 dark:bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400' }
-  return { bg: 'bg-red-100 dark:bg-red-500/20', text: 'text-red-700 dark:text-red-400' }
+  if (gpa >= 3.5) return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-success-fg))] ' }
+  if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-blue-700 dark:text-blue-400' }
+  if (gpa >= 2.0) return { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20', text: 'text-[rgb(var(--state-warning-fg))]' }
+  return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] ' }
 }
 
 // ============================================================================
@@ -160,12 +160,12 @@ export function StudentGradesView({
                 </td>
                 <td className="px-4 py-3 text-center">
                   {grade.isFinal ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-full">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full">
                       <Lock className="w-3 h-3" />
                       Final
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 dark:bg-amber-500/20 dark:text-amber-400 rounded-full">
+                    <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full">
                       In Progress
                     </span>
                   )}

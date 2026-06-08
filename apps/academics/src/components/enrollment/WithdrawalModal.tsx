@@ -71,7 +71,7 @@ export function WithdrawalModal({
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-500" />
+            <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
             <h3 className="text-lg font-semibold text-text-primary">
               Withdraw Student
             </h3>
@@ -95,7 +95,7 @@ export function WithdrawalModal({
               value={withdrawalDate}
               onChange={(e) => setWithdrawalDate(e.target.value)}
               max={new Date().toISOString().split('T')[0]}
-              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -107,7 +107,7 @@ export function WithdrawalModal({
             <select
               value={exitWithdrawType}
               onChange={(e) => setExitWithdrawType(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             >
               <option value="">Select exit type...</option>
               {EXIT_WITHDRAW_TYPE_OPTIONS.map((r) => (
@@ -126,7 +126,7 @@ export function WithdrawalModal({
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             >
               <option value="">Select a reason...</option>
               {withdrawalReasons.map((r) => (
@@ -144,7 +144,7 @@ export function WithdrawalModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Optional notes..."
               rows={3}
-              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 resize-none"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] resize-none"
             />
           </div>
         </div>
@@ -157,7 +157,7 @@ export function WithdrawalModal({
             type="button"
             onClick={handleSubmit}
             disabled={withdrawMutation.isPending || !reason || !exitWithdrawType}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-danger-bg)/0.18)]0 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {withdrawMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             Withdraw Student

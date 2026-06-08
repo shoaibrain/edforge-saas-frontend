@@ -31,9 +31,9 @@ export interface ProfileHeaderProps {
 
 const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
   active: {
-    bg: 'bg-emerald-500/10',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    dot: 'bg-emerald-500',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-success-fg))]',
+    dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
   },
   inactive: {
     bg: 'bg-slate-500/10',
@@ -41,24 +41,24 @@ const statusStyles: Record<string, { bg: string; text: string; dot: string }> = 
     dot: 'bg-gray-400',
   },
   graduated: {
-    bg: 'bg-blue-500/10',
-    text: 'text-blue-600 dark:text-blue-400',
-    dot: 'bg-blue-500',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-info-fg))]',
+    dot: 'bg-[rgb(var(--state-info-fg))]',
   },
   transferred: {
-    bg: 'bg-amber-500/10',
-    text: 'text-amber-600 dark:text-amber-400',
-    dot: 'bg-amber-500',
+    bg: 'bg-[rgb(var(--state-warning-fg))]/10',
+    text: 'text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
   withdrawn: {
-    bg: 'bg-red-500/10',
-    text: 'text-red-600 dark:text-red-400',
-    dot: 'bg-red-500',
+    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-danger-fg))]',
+    dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
   },
   suspended: {
-    bg: 'bg-orange-500/10',
-    text: 'text-orange-600 dark:text-orange-400',
-    dot: 'bg-amber-500',
+    bg: 'bg-[rgb(var(--state-warning-fg))]/10',
+    text: 'text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
 }
 
@@ -185,7 +185,7 @@ export function ProfileHeader({
             <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
           )}
           {student.currentGradeLevel && (
-            <span className="font-medium text-teal-600 dark:text-teal-400">
+            <span className="font-medium text-[rgb(var(--action-secondary-fg))]">
               {t('gradeLabel', { level: student.currentGradeLevel })}
             </span>
           )}

@@ -36,12 +36,12 @@ type EnrollmentHistory = NonNullable<StudentProfileResponseDto['enrollmentHistor
 // ============================================================================
 
 const statusStyles: Record<string, { bg: string; text: string }> = {
-  active: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
-  enrolled: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
-  pending: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' },
-  withdrawn: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400' },
-  transferred: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' },
-  graduated: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400' },
+  active: { bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', text: 'text-[rgb(var(--state-success-fg))]' },
+  enrolled: { bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', text: 'text-[rgb(var(--state-success-fg))]' },
+  pending: { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' },
+  withdrawn: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))]' },
+  transferred: { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' },
+  graduated: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
   completed: { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' },
 }
 
@@ -60,10 +60,10 @@ function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollmen
   return (
     <div className="mb-8">
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+        <CheckCircle2 className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
         {t('sections.currentEnrollment')}
       </h3>
-      <div className="p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
+      <div className="p-5 rounded-xl bg-[rgb(var(--state-success-bg)/0.18)]0/5 border border-[rgb(var(--state-success-border))]/15">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div>
             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('fields.gradeLevel')}</p>
@@ -211,9 +211,9 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
           <CurrentEnrollmentSection enrollment={currentEnrollment} />
           {/* Success-state CTA: next step is adding to sections */}
           {onAddToSection && (
-            <div className="mb-6 p-4 rounded-lg bg-teal-500/5 border border-teal-500/15 flex items-center justify-between">
+            <div className="mb-6 p-4 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0/5 border border-[rgb(var(--border-focus))]/15 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-teal-600 dark:text-teal-400">
+                <p className="text-sm font-medium text-[rgb(var(--action-secondary-fg))]">
                   {t('enrollment.studentIsEnrolled')}
                 </p>
                 <p className="text-xs text-text-tertiary mt-0.5">
@@ -229,8 +229,8 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
         </>
       )}
       {!currentEnrollment && (
-        <div className="mb-6 p-4 rounded-lg bg-amber-500/5 border border-amber-500/15 flex items-center justify-between">
-          <p className="text-sm text-amber-600 dark:text-amber-400">
+        <div className="mb-6 p-4 rounded-lg bg-[rgb(var(--state-warning-fg))]/5 border border-amber-500/15 flex items-center justify-between">
+          <p className="text-sm text-[rgb(var(--state-warning-fg))]">
             {t('enrollment.noActiveEnrollment')}
           </p>
           {onEnroll && (

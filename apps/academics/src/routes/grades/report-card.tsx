@@ -29,18 +29,18 @@ import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 // ============================================================================
 
 function getLetterGradeColor(grade: string): string {
-  if (grade.startsWith('A')) return 'text-emerald-600 dark:text-emerald-400'
-  if (grade.startsWith('B')) return 'text-blue-600 dark:text-blue-400'
-  if (grade.startsWith('C')) return 'text-amber-600 dark:text-amber-400'
-  if (grade.startsWith('D')) return 'text-orange-600 dark:text-orange-400'
-  return 'text-red-600 dark:text-red-400'
+  if (grade.startsWith('A')) return 'text-[rgb(var(--state-success-fg))]'
+  if (grade.startsWith('B')) return 'text-[rgb(var(--state-info-fg))]'
+  if (grade.startsWith('C')) return 'text-[rgb(var(--state-warning-fg))]'
+  if (grade.startsWith('D')) return 'text-[rgb(var(--state-warning-fg))]'
+  return 'text-[rgb(var(--state-danger-fg))]'
 }
 
 function getGpaBadge(gpa: number): { bg: string; text: string } {
-  if (gpa >= 3.5) return { bg: 'bg-emerald-100 dark:bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400' }
-  if (gpa >= 3.0) return { bg: 'bg-blue-100 dark:bg-blue-500/20', text: 'text-blue-700 dark:text-blue-400' }
-  if (gpa >= 2.0) return { bg: 'bg-amber-100 dark:bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400' }
-  return { bg: 'bg-red-100 dark:bg-red-500/20', text: 'text-red-700 dark:text-red-400' }
+  if (gpa >= 3.5) return { bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-emerald-700 dark:text-emerald-400' }
+  if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-blue-700 dark:text-blue-400' }
+  if (gpa >= 2.0) return { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20', text: 'text-[rgb(var(--state-warning-fg))]' }
+  return { bg: 'bg-red-100 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-red-700 dark:text-red-400' }
 }
 
 // ============================================================================
@@ -102,7 +102,7 @@ export function ReportCardPage() {
         <button
           type="button"
           onClick={() => navigate({ to: '/students' })}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Go to Students
@@ -151,7 +151,7 @@ export function ReportCardPage() {
               <select
                 value={selectedTermId}
                 onChange={(e) => setSelectedTermId(e.target.value)}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
                 <option value="">All Terms</option>
                 {gradingPeriods.map((gp: { periodId: string; name: string }) => (
@@ -164,7 +164,7 @@ export function ReportCardPage() {
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
             >
               <Printer className="w-4 h-4" />
               Print
@@ -220,19 +220,19 @@ export function ReportCardPage() {
             {gpa && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print:grid-cols-3">
                 <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-gray-300 print:rounded print:bg-gray-50">
-                  <p className="text-xs text-text-tertiary mb-1 print:text-gray-500">Term GPA</p>
+                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Term GPA</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.termGpa).text} print:text-gray-900`}>
                     {gpa.termGpa.toFixed(2)}
                   </p>
                 </div>
                 <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-gray-300 print:rounded print:bg-gray-50">
-                  <p className="text-xs text-text-tertiary mb-1 print:text-gray-500">Cumulative GPA</p>
+                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Cumulative GPA</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.cumulativeGpa).text} print:text-gray-900`}>
                     {gpa.cumulativeGpa.toFixed(2)}
                   </p>
                 </div>
                 <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-gray-300 print:rounded print:bg-gray-50">
-                  <p className="text-xs text-text-tertiary mb-1 print:text-gray-500">Weighted GPA</p>
+                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Weighted GPA</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.weightedGpa).text} print:text-gray-900`}>
                     {gpa.weightedGpa.toFixed(2)}
                   </p>
@@ -244,7 +244,7 @@ export function ReportCardPage() {
             <div className="rounded-xl border border-border-secondary overflow-hidden print:rounded print:border-gray-300">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-surface-secondary print:bg-gray-100">
+                  <tr className="bg-surface-secondary print:bg-[rgb(var(--surface-tertiary))]">
                     <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-gray-900">Course</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">Assignments</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">Numeric</th>
@@ -282,12 +282,12 @@ export function ReportCardPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {grade.isFinal ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-full print:text-gray-700 print:bg-gray-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 dark:text-emerald-400 rounded-full print:text-gray-700 print:bg-gray-200">
                             <Lock className="w-3 h-3 print:hidden" />
                             Final
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 dark:bg-amber-500/20 dark:text-amber-400 rounded-full print:text-gray-600 print:bg-gray-200">
+                          <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full print:text-gray-600 print:bg-gray-200">
                             In Progress
                           </span>
                         )}
@@ -299,7 +299,7 @@ export function ReportCardPage() {
             </div>
 
             {/* Print Footer */}
-            <div className="hidden print:block mt-8 pt-4 border-t border-gray-300 text-xs text-gray-500 text-center">
+            <div className="hidden print:block mt-8 pt-4 border-t border-gray-300 text-xs text-[rgb(var(--text-tertiary))] text-center">
               Generated on {new Date().toLocaleString()} — EdForge Student Information System
             </div>
           </div>

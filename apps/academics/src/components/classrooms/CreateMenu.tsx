@@ -34,7 +34,7 @@ export function CreateMenu({ onCreateSection }: CreateMenuProps) {
               onClick={() => { setIsOpen(false); onCreateSection() }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              <CalendarDays className="w-4 h-4 text-teal-500" />
+              <CalendarDays className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
               New Section
             </button>
           </div>

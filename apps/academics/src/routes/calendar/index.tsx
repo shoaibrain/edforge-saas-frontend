@@ -37,21 +37,21 @@ const statusConfig: Record<
 > = {
   planning: {
     label: 'Planning',
-    bg: 'bg-blue-100 dark:bg-blue-500/20',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20',
     text: 'text-blue-700 dark:text-blue-400',
-    dot: 'bg-blue-500',
+    dot: 'bg-[rgb(var(--state-info-fg))]',
   },
   active: {
     label: 'Active',
-    bg: 'bg-emerald-100 dark:bg-emerald-500/20',
+    bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20',
     text: 'text-emerald-700 dark:text-emerald-400',
-    dot: 'bg-emerald-500',
+    dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
   },
   completed: {
     label: 'Completed',
-    bg: 'bg-amber-100 dark:bg-amber-500/20',
-    text: 'text-amber-700 dark:text-amber-400',
-    dot: 'bg-amber-500',
+    bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20',
+    text: 'text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
   archived: {
     label: 'Archived',
@@ -160,7 +160,7 @@ function AcademicYearCard({
         <div className="flex items-center gap-2 ml-3 flex-shrink-0">
           <AcademicYearStatusBadge status={year.status} />
           {year.isCurrent && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 text-emerald-700 dark:text-emerald-400">
               <CheckCircle2 className="w-3 h-3" />
               Current
             </span>
@@ -252,8 +252,8 @@ function NoSchoolSelected() {
   return (
     <div className="min-h-[400px] flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
-          <AlertCircle className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-[rgb(var(--state-warning-fg))]" />
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">
           No School Selected
@@ -270,8 +270,8 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="min-h-[400px] flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
-          <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">
           Failed to Load Academic Years
@@ -399,7 +399,7 @@ export function CalendarModule() {
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
-              <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              <Calendar className="w-6 h-6 text-[rgb(var(--state-success-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">
@@ -420,32 +420,32 @@ export function CalendarModule() {
             icon={CalendarDays}
             label="Current Year"
             value={stats.currentName}
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            accent="text-[rgb(var(--state-success-fg))]"
+            bg="bg-[rgb(var(--state-success-bg)/0.18)]"
             isLoading={isLoading}
           />
           <StatCard
             icon={Calendar}
             label="Total Years"
             value={stats.total}
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
             isLoading={isLoading}
           />
           <StatCard
             icon={Star}
             label="Active"
             value={stats.active}
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
+            accent="text-[rgb(var(--state-warning-fg))]"
+            bg="bg-[rgb(var(--state-warning-fg))]/10"
             isLoading={isLoading}
           />
           <StatCard
             icon={Clock}
             label="Planning"
             value={stats.planning}
-            accent="text-purple-600 dark:text-purple-400"
-            bg="bg-purple-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
             isLoading={isLoading}
           />
         </div>
@@ -511,7 +511,7 @@ export function CalendarModule() {
         variant="default"
         isLoading={setCurrentMutation.isPending}
         icon={
-          <Star className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <Star className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />
         }
       />
 

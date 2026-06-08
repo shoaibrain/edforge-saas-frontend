@@ -133,7 +133,7 @@ export function StudentQuickProfile({
             </h2>
             <div className="flex items-center gap-2 mt-[3px]">
               {student.studentNumber && (
-                <span className="font-mono text-[10px]" style={{ color: 'var(--v2-text-hint)' }}>
+                <span className="font-mono text-xs" style={{ color: 'var(--v2-text-hint)' }}>
                   #{student.studentNumber}
                 </span>
               )}
@@ -153,7 +153,7 @@ export function StudentQuickProfile({
             className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[var(--v2-border-default)] bg-[var(--v2-surface-interactive)] transition-colors hover:opacity-80 ${focusRingInset}`}
             aria-label="Close"
           >
-            <X className="w-[13px] h-[13px]" style={{ color: 'var(--v2-text-hint)' }} />
+            <X className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint)' }} />
           </button>
         </div>
       </QuickDrawer.Header>
@@ -169,7 +169,7 @@ export function StudentQuickProfile({
               role="alert"
             >
               <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[var(--v2-danger)]" />
-              <span className="text-[11px] font-medium text-[var(--v2-danger)]">
+              <span className="text-xs font-medium text-[var(--v2-danger)]">
                 At-risk &middot; {attendanceRate!.toFixed(0)}% attendance (30-day)
               </span>
             </div>
@@ -235,7 +235,7 @@ export function StudentQuickProfile({
             style={{ background: 'rgba(55,138,221,0.04)', border: '1px solid rgba(55,138,221,0.10)', borderRadius: 7 }}
           >
             <Lock className="flex-shrink-0 mt-[1px]" style={{ width: 11, height: 11, color: 'var(--v2-info, #378ADD)' }} />
-            <span className="text-[10px] leading-snug" style={{ color: 'var(--v2-text-muted)' }}>
+            <span className="text-xs leading-snug" style={{ color: 'var(--v2-text-muted)' }}>
               Demographics, contact info, and guardian details are on the full profile page.
             </span>
           </div>
@@ -248,7 +248,7 @@ export function StudentQuickProfile({
             aria-label={`View full profile for ${student.fullName}`}
           >
             View Full Profile
-            <ArrowRight className="w-[13px] h-[13px]" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </QuickDrawer.Body>
@@ -307,7 +307,7 @@ function Field({ label, value, sub }: { label: string; value: string; sub?: stri
         {value}
       </div>
       {sub && (
-        <div className="text-[10px]" style={{ color: 'var(--v2-text-hint)' }}>{sub}</div>
+        <div className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>{sub}</div>
       )}
     </div>
   )

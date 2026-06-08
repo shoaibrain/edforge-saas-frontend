@@ -91,7 +91,7 @@ export function GuardiansStep({
           <button
             type="button"
             onClick={addGuardian}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-[rgb(var(--border-secondary))] text-sm font-medium text-teal-600 hover:bg-teal-50 hover:border-teal-300 transition-colors w-full justify-center"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-[rgb(var(--border-secondary))] text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:border-teal-300 transition-colors w-full justify-center"
           >
             <Plus className="w-4 h-4" />
             Add Guardian

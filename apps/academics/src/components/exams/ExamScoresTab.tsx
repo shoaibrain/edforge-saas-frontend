@@ -119,7 +119,7 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
           const err = t.trim() !== '' && (!Number.isFinite(n) || n < 0 || n > d.fullMarks)
           return (
             <div key={d.code} className="flex items-center gap-1">
-              <span className="text-[11px] text-text-tertiary">{d.label ?? d.code}</span>
+              <span className="text-xs text-text-tertiary">{d.label ?? d.code}</span>
               <input
                 type="number"
                 inputMode="numeric"
@@ -130,17 +130,17 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
                 disabled={!writable}
                 onChange={(e) => setComponent(enrollmentId, d.code, e.target.value)}
                 className={`w-16 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
-                  err ? 'border-red-500 text-red-600' : 'border-border-secondary text-text-primary'
+                  err ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]' : 'border-border-secondary text-text-primary'
                 } disabled:opacity-50`}
                 aria-label={`${d.label ?? d.code} for ${studentName}`}
                 aria-invalid={err || undefined}
               />
-              <span className="text-[11px] text-text-tertiary">/{d.fullMarks}</span>
+              <span className="text-xs text-text-tertiary">/{d.fullMarks}</span>
             </div>
           )
         })}
         <span
-          className={`text-xs tabular-nums w-16 text-right ${partial ? 'text-red-600' : 'text-text-secondary'}`}
+          className={`text-xs tabular-nums w-16 text-right ${partial ? 'text-[rgb(var(--state-danger-fg))]' : 'text-text-secondary'}`}
         >
           = {ev.anyFilled ? ev.sum : '—'}/{maxMarks}
         </span>
@@ -164,7 +164,7 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
         disabled={!writable}
         onChange={(ev) => setRow(enrollmentId, ev.target.value)}
         className={`w-24 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
-          showError ? 'border-red-500 text-red-600' : 'border-border-secondary text-text-primary'
+          showError ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]' : 'border-border-secondary text-text-primary'
         } disabled:opacity-50`}
         aria-label={`Score for ${studentName}`}
         aria-invalid={showError || undefined}
@@ -563,7 +563,7 @@ export function ExamScoresTab({
         <div className="sticky bottom-4 flex items-center justify-between gap-3 rounded-xl border border-border-secondary bg-surface-primary/95 backdrop-blur px-4 py-3 shadow-sm">
           <div className="text-sm text-text-secondary">
             {diffs.invalidCount > 0 ? (
-              <span className="inline-flex items-center gap-1.5 text-red-600">
+              <span className="inline-flex items-center gap-1.5 text-[rgb(var(--state-danger-fg))]">
                 <AlertCircle className="w-4 h-4" />
                 {diffs.invalidCount} row{diffs.invalidCount === 1 ? '' : 's'} invalid (0–{maxMarks})
               </span>
@@ -586,7 +586,7 @@ export function ExamScoresTab({
               diffs.changes.length === 0 ||
               diffs.invalidCount > 0
             }
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
           >
             {bulkMutation.isPending ? (
               <>

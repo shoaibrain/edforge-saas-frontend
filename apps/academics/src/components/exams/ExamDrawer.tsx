@@ -230,7 +230,7 @@ export function ExamDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) handleClose()
             }}
@@ -249,7 +249,7 @@ export function ExamDrawer({
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex-shrink-0">
-                      <ClipboardList className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      <ClipboardList className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
                     </div>
                     <h2 id="exam-drawer-title" className="text-lg font-semibold text-text-primary truncate">
                       {title}
@@ -340,7 +340,7 @@ export function ExamDrawer({
                       <button
                         type="submit"
                         disabled={isPending}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                       >
                         {isPending ? (
                           <>
@@ -438,7 +438,7 @@ function GradeLevelsField({
                         'px-3 py-1.5 text-sm font-medium rounded-full border transition-colors',
                         'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
                         selected
-                          ? 'bg-purple-600 text-white border-purple-600'
+                          ? 'bg-purple-600 text-[rgb(var(--action-primary-fg))] border-purple-600'
                           : 'bg-surface-primary text-text-secondary border-border-primary hover:border-purple-400 hover:text-text-primary',
                         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
                       ].join(' ')}
@@ -450,7 +450,7 @@ function GradeLevelsField({
               )}
             </div>
             {fieldState.error?.message ? (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+              <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-2">
                 {fieldState.error.message}
               </p>
             ) : helperText ? (

@@ -85,7 +85,7 @@ function GradeLevelSelector({
   return (
     <div>
       <label className="block text-sm font-medium text-text-primary mb-2">
-        Grade Levels <span className="text-red-500">*</span>
+        Grade Levels <span className="text-[rgb(var(--state-danger-fg))]">*</span>
       </label>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => {
@@ -99,8 +99,8 @@ function GradeLevelSelector({
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
                 isSelected
                   ? isOutOfRange
-                    ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
-                    : 'bg-teal-500 text-white border-teal-500 shadow-sm'
+                    ? 'bg-[rgb(var(--state-warning-fg))] text-[rgb(var(--action-primary-fg))] border-amber-500 shadow-sm'
+                    : 'bg-[rgb(var(--state-info-bg)/0.18)]0 text-[rgb(var(--action-primary-fg))] border-[rgb(var(--border-focus))] shadow-sm'
                   : isOutOfRange
                     ? 'bg-surface-primary text-amber-500 border-amber-300 border-dashed hover:border-amber-400'
                     : 'bg-surface-primary text-text-secondary border-border-primary hover:border-teal-400 hover:text-text-primary'
@@ -113,7 +113,7 @@ function GradeLevelSelector({
         })}
       </div>
       {error && (
-        <p className="mt-1.5 text-sm text-red-500">{error}</p>
+        <p className="mt-1.5 text-sm text-[rgb(var(--state-danger-fg))]">{error}</p>
       )}
     </div>
   )
@@ -152,7 +152,7 @@ function ObjectivesInput() {
             <button
               type="button"
               onClick={() => removeObjective(i)}
-              className="p-0.5 rounded text-text-tertiary hover:text-red-500 transition-colors"
+              className="p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -162,7 +162,7 @@ function ObjectivesInput() {
           <input
             type="text"
             placeholder="Type an objective and press Enter"
-            className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+            className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault()
@@ -208,7 +208,7 @@ function MaterialsList() {
               isRequired: true,
             })
           }
-          className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded-md transition-colors"
+          className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded-md transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Material
@@ -233,7 +233,7 @@ function MaterialsList() {
                 <button
                   type="button"
                   onClick={() => remove(index)}
-                  className="p-1 rounded text-text-tertiary hover:text-red-500 transition-colors"
+                  className="p-1 rounded text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -246,7 +246,7 @@ function MaterialsList() {
                   </label>
                   <select
                     {...register(`textbooks.${index}.type`)}
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                   >
                     {MATERIAL_TYPE_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -263,7 +263,7 @@ function MaterialsList() {
                   <input
                     {...register(`textbooks.${index}.title`)}
                     placeholder="Material title"
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                   />
                 </div>
 
@@ -274,7 +274,7 @@ function MaterialsList() {
                   <input
                     {...register(`textbooks.${index}.author`)}
                     placeholder="Author name"
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                   />
                 </div>
 
@@ -285,7 +285,7 @@ function MaterialsList() {
                   <input
                     {...register(`textbooks.${index}.isbn`)}
                     placeholder="ISBN-13"
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                   />
                 </div>
               </div>

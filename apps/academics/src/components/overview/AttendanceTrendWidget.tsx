@@ -103,8 +103,8 @@ export function AttendanceTrendWidget({
     <Card className="p-5 border-border-secondary flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 rounded-lg bg-teal-500/10">
-          <ClipboardCheck className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+        <div className="p-1.5 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+          <ClipboardCheck className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <h3 className="text-sm font-semibold text-text-primary">
           Attendance Trend (30 Days)
@@ -226,7 +226,7 @@ export function AttendanceTrendWidget({
         <Link
           to="/classrooms"
           search={{ tab: 'attendance' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:text-teal-700 dark:hover:text-cyan-300 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-cyan-300 transition-colors"
         >
           View Attendance
           <ArrowRight className="w-3.5 h-3.5" />

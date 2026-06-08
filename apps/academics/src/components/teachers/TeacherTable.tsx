@@ -38,23 +38,23 @@ interface TeacherTableProps {
 
 function getStatusBadge(status: string) {
   const styles: Record<string, string> = {
-    active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-    on_leave: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-    suspended: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-    terminated: 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400',
+    active: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 ',
+    on_leave: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
+    suspended: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 ',
+    terminated: 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 ',
   }
-  return styles[status] || 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400'
+  return styles[status] || 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 '
 }
 
 function getRoleBadge(role: string) {
   const styles: Record<string, string> = {
-    teacher: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    principal: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    vice_principal: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
-    counselor: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
-    admin_staff: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+    teacher: 'bg-[rgb(var(--state-info-bg)/0.18)] text-blue-700 dark:bg-[rgb(var(--state-info-fg))]/20 dark:text-blue-400',
+    principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-purple-700 dark:bg-[rgb(var(--state-info-fg))]/20 dark:text-purple-400',
+    vice_principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-indigo-700 dark:bg-[rgb(var(--state-info-fg))]/20 dark:text-indigo-400',
+    counselor: 'bg-teal-100 text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
+    admin_staff: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
   }
-  return styles[role] || 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400'
+  return styles[role] || 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 '
 }
 
 // ============================================================================
@@ -165,7 +165,7 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
           <select
             value={roleFilter ?? ''}
             onChange={(e) => setRoleFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">All Roles</option>
             {roles.map((r) => (

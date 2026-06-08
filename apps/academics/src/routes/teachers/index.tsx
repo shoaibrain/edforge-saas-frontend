@@ -74,7 +74,7 @@ export function TeachersModule() {
         <div className="px-6 py-6">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
-              <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <Users className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Faculty Directory</h1>
@@ -93,29 +93,29 @@ export function TeachersModule() {
             icon={Users}
             label="Total Staff"
             value={isLoading ? '...' : totalStaff}
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={GraduationCap}
             label="Teachers"
             value={isLoading ? '...' : teachers.length}
-            accent="text-purple-600 dark:text-purple-400"
-            bg="bg-purple-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={UserCheck}
             label="Active"
             value={isLoading ? '...' : activeStaff.length}
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            accent="text-[rgb(var(--state-success-fg))]"
+            bg="bg-[rgb(var(--state-success-bg)/0.18)]"
           />
           <StatCard
             icon={Briefcase}
             label="Roles"
             value={isLoading ? '...' : uniqueRoles.length}
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
+            accent="text-[rgb(var(--state-warning-fg))]"
+            bg="bg-[rgb(var(--state-warning-fg))]/10"
           />
         </div>
 

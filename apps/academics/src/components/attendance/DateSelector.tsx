@@ -80,7 +80,7 @@ export function DateSelector({
             <div>
               <span className="text-sm font-medium text-text-primary block">{formattedDate}</span>
               {/* Task 5.6: BS date below Gregorian */}
-              <span className="text-[10px] text-text-tertiary block">{bsDateLabel} BS</span>
+              <span className="text-xs text-text-tertiary block">{bsDateLabel} BS</span>
             </div>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function DateSelector({
           <button
             type="button"
             onClick={onToday}
-            className="px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
           >
             Today
           </button>
@@ -97,7 +97,7 @@ export function DateSelector({
       </div>
 
       {isToday && (
-        <span className="px-2 py-0.5 text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-full">
+        <span className="px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]  rounded-full">
           Today
         </span>
       )}

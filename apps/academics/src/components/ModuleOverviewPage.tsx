@@ -198,8 +198,8 @@ function StatCard({ stat, index }: StatCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-[200px] h-[148px] p-5 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm transition-all duration-200 overflow-hidden">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+            <div className="group relative flex flex-col w-52 h-36 p-5 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm transition-all duration-200 overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
                 </div>
@@ -216,7 +216,7 @@ function StatCard({ stat, index }: StatCardProps) {
                             {stat.onRetry && (
                                 <button
                                     onClick={stat.onRetry}
-                                    className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+                                    className="flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium rounded bg-[rgb(var(--state-warning-fg))]/10 text-[rgb(var(--state-warning-fg))] hover:bg-[rgb(var(--state-warning-fg))]/20 transition-colors"
                                     title="Retry loading"
                                 >
                                     <RotateCcw className="w-2.5 h-2.5" />
@@ -229,8 +229,8 @@ function StatCard({ stat, index }: StatCardProps) {
                             <span className="text-3xl font-semibold text-[rgb(var(--text-primary))]">{stat.value}</span>
                             {stat.change && (
                                 <div className={`flex items-center gap-0.5 text-xs ${
-                                    stat.changeType === 'positive' ? 'text-emerald-600' :
-                                    stat.changeType === 'negative' ? 'text-rose-600' :
+                                    stat.changeType === 'positive' ? 'text-[rgb(var(--state-success-fg))]' :
+                                    stat.changeType === 'negative' ? 'text-[rgb(var(--state-danger-fg))]' :
                                     'text-[rgb(var(--text-tertiary))]'
                                 }`}>
                                     <TrendIcon className="w-3 h-3" />
@@ -322,7 +322,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                 tabIndex={0}
                 role="region"
                 aria-label="Key performance indicators"
-                className="flex gap-3 overflow-x-auto scrollbar-none scroll-smooth py-2 -my-2 focus:outline-none focus:ring-2 focus:ring-teal-500/30 rounded-xl"
+                className="flex gap-3 overflow-x-auto scrollbar-none scroll-smooth py-2 -my-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] rounded-xl"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {stats.map((stat, index) => (
@@ -449,9 +449,9 @@ export function ModuleOverviewPage({
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.1 }}
-                        className="p-3 rounded-xl bg-gradient-to-br from-teal-500/15 to-cyan-500/15 dark:from-teal-400/20 dark:to-cyan-500/20 border border-teal-500/20 dark:border-cyan-400/25 flex-shrink-0"
+                        className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)] dark:from-[rgb(var(--state-info-bg)/0.18)] dark:to-[rgb(var(--state-info-bg)/0.10)] border border-[rgb(var(--border-focus)/0.35)]  flex-shrink-0"
                     >
-                        <GalleryVerticalEnd className="w-5 h-5 text-teal-600 dark:text-cyan-400" />
+                        <GalleryVerticalEnd className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] " />
                     </motion.div>
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">

@@ -81,7 +81,7 @@ function QuickActions({ onNavigateTab }: { onNavigateTab: (tab: string) => void 
 function SectionInfoCard({ section }: { section: ClassroomOverviewProps['section'] }) {
   const percent = getCapacityPercent(section.currentEnrollment, section.maxEnrollment)
   const capacityColor =
-    percent < 15 ? 'bg-red-500' : percent < 33 ? 'bg-amber-500' : 'bg-teal-500'
+    percent < 15 ? 'bg-[rgb(var(--state-danger-bg)/0.18)]0' : percent < 33 ? 'bg-[rgb(var(--state-warning-fg))]' : 'bg-[rgb(var(--state-info-bg)/0.18)]0'
 
   const details = [
     { icon: BookOpen, label: 'Course', value: `${section.courseName || 'N/A'}${section.courseCode ? ` (${section.courseCode})` : ''}` },
@@ -101,7 +101,7 @@ function SectionInfoCard({ section }: { section: ClassroomOverviewProps['section
           <div key={d.label} className="flex items-start gap-2">
             <d.icon className="w-4 h-4 text-text-tertiary mt-0.5 flex-shrink-0" aria-hidden="true" />
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary font-medium">{d.label}</p>
+              <p className="text-xs uppercase tracking-wide text-text-tertiary font-medium">{d.label}</p>
               <p className="text-sm text-text-primary truncate">{d.value}</p>
             </div>
           </div>
@@ -126,11 +126,11 @@ function SectionInfoCard({ section }: { section: ClassroomOverviewProps['section
 // ── Grade Summary Widget ───────────────────────────────────────────────────
 
 const distColors: Record<string, string> = {
-  A: 'bg-emerald-500',
-  B: 'bg-blue-500',
-  C: 'bg-amber-500',
-  D: 'bg-orange-500',
-  F: 'bg-red-500',
+  A: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+  B: 'bg-[rgb(var(--state-info-fg))]',
+  C: 'bg-[rgb(var(--state-warning-fg))]',
+  D: 'bg-[rgb(var(--state-warning-fg))]',
+  F: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
 }
 
 function GradeSummaryWidget({
@@ -168,13 +168,13 @@ function GradeSummaryWidget({
         <button
           type="button"
           onClick={() => onNavigateTab('progress:gradebook')}
-          className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+          className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
         >
           Open Gradebook &rarr;
         </button>
       </div>
       {isError ? (
-        <p className="text-xs text-red-500">Failed to load grades</p>
+        <p className="text-xs text-[rgb(var(--state-danger-fg))]">Failed to load grades</p>
       ) : stats ? (
         <div className="space-y-3">
           <div className="flex items-baseline gap-2">
@@ -252,23 +252,23 @@ function AttendanceSummaryWidget({
         <button
           type="button"
           onClick={() => onNavigateTab('progress:attendance')}
-          className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+          className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
         >
           Open Attendance &rarr;
         </button>
       </div>
       {isError ? (
-        <p className="text-xs text-red-500">Failed to load attendance</p>
+        <p className="text-xs text-[rgb(var(--state-danger-fg))]">Failed to load attendance</p>
       ) : stats && stats.recorded > 0 ? (
         <div className="space-y-3">
           <div className="flex items-baseline gap-2">
             <span
               className={`text-3xl font-bold ${
                 stats.rate >= 95
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-[rgb(var(--state-success-fg))]'
                   : stats.rate >= 90
-                    ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'text-[rgb(var(--state-warning-fg))]'
+                    : 'text-[rgb(var(--state-danger-fg))]'
               }`}
             >
               {stats.rate.toFixed(1)}%
@@ -277,24 +277,24 @@ function AttendanceSummaryWidget({
           </div>
           <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
             {stats.present > 0 && (
-              <div className="bg-emerald-500 transition-all" style={{ width: `${(stats.present / stats.total) * 100}%` }} title={`Present: ${stats.present}`} />
+              <div className="bg-[rgb(var(--state-success-bg)/0.18)]0 transition-all" style={{ width: `${(stats.present / stats.total) * 100}%` }} title={`Present: ${stats.present}`} />
             )}
             {stats.late > 0 && (
-              <div className="bg-amber-500 transition-all" style={{ width: `${(stats.late / stats.total) * 100}%` }} title={`Late: ${stats.late}`} />
+              <div className="bg-[rgb(var(--state-warning-fg))] transition-all" style={{ width: `${(stats.late / stats.total) * 100}%` }} title={`Late: ${stats.late}`} />
             )}
             {stats.remote > 0 && (
-              <div className="bg-indigo-500 transition-all" style={{ width: `${(stats.remote / stats.total) * 100}%` }} title={`Remote: ${stats.remote}`} />
+              <div className="bg-[rgb(var(--state-info-fg))] transition-all" style={{ width: `${(stats.remote / stats.total) * 100}%` }} title={`Remote: ${stats.remote}`} />
             )}
             {stats.absent > 0 && (
-              <div className="bg-red-500 transition-all" style={{ width: `${(stats.absent / stats.total) * 100}%` }} title={`Absent: ${stats.absent}`} />
+              <div className="bg-[rgb(var(--state-danger-bg)/0.18)]0 transition-all" style={{ width: `${(stats.absent / stats.total) * 100}%` }} title={`Absent: ${stats.absent}`} />
             )}
           </div>
           <div className="flex flex-wrap gap-4 text-xs">
             {[
-              { label: 'Present', value: stats.present, dot: 'bg-emerald-500' },
-              { label: 'Late', value: stats.late, dot: 'bg-amber-500' },
-              { label: 'Remote', value: stats.remote, dot: 'bg-indigo-500' },
-              { label: 'Absent', value: stats.absent, dot: 'bg-red-500' },
+              { label: 'Present', value: stats.present, dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0' },
+              { label: 'Late', value: stats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
+              { label: 'Remote', value: stats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
+              { label: 'Absent', value: stats.absent, dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' },
             ]
               .filter((s) => s.value > 0)
               .map((s) => (
@@ -329,10 +329,10 @@ function AttendanceSummaryWidget({
 // ── Recent Classwork Widget ────────────────────────────────────────────────
 
 const classworkTypeConfig: Record<string, { icon: typeof ClipboardList; color: string; bg: string }> = {
-  assignment: { icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-  quiz: { icon: HelpCircle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-  material: { icon: FileText, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-  question: { icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+  assignment: { icon: ClipboardList, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  quiz: { icon: HelpCircle, color: 'text-amber-500', bg: 'bg-[rgb(var(--state-warning-fg))]/10' },
+  material: { icon: FileText, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  question: { icon: MessageCircle, color: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' },
 }
 
 function RecentClassworkWidget({
@@ -370,13 +370,13 @@ function RecentClassworkWidget({
         <button
           type="button"
           onClick={() => onNavigateTab('classwork')}
-          className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+          className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
         >
           View All Classwork &rarr;
         </button>
       </div>
       {isError ? (
-        <p className="text-xs text-red-500">Failed to load classwork</p>
+        <p className="text-xs text-[rgb(var(--state-danger-fg))]">Failed to load classwork</p>
       ) : totalItems > 0 ? (
         <div className="space-y-3">
           {/* Type counts */}
@@ -422,7 +422,7 @@ function RecentClassworkWidget({
                     </div>
                   </div>
                   {item.status === 'draft' && (
-                    <span className="px-2 py-0.5 text-[10px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 rounded-full">
+                    <span className="px-2 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/15 dark:text-amber-400 rounded-full">
                       Draft
                     </span>
                   )}

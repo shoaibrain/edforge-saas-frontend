@@ -70,7 +70,7 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <CalendarDays className="w-4 h-4 text-blue-500" />
+          <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
           <h3 className="text-sm font-semibold text-text-primary">
             My Sections
           </h3>
@@ -83,7 +83,7 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
         <Link
           to="/classrooms"
           search={{ tab: undefined }}
-          className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 hover:underline"
+          className="flex items-center gap-1 text-xs text-[rgb(var(--action-secondary-fg))] hover:underline"
         >
           View all
           <ArrowRight className="w-3 h-3" />
@@ -142,7 +142,7 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
                   <Link
                     to="/classrooms"
                     search={{ tab: 'attendance' }}
-                    className="p-1.5 rounded-md text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
+                    className="p-1.5 rounded-md text-amber-500 hover:bg-amber-50 dark:hover:bg-[rgb(var(--state-warning-fg))]/10 transition-colors"
                     title="Take Attendance"
                   >
                     <ClipboardCheck className="w-3.5 h-3.5" />
@@ -150,7 +150,7 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
                   <Link
                     to="/classrooms"
                     search={{ tab: 'gradebook' }}
-                    className="p-1.5 rounded-md text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
+                    className="p-1.5 rounded-md text-[rgb(var(--state-info-fg))] hover:bg-purple-50 dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] transition-colors"
                     title="Enter Grades"
                   >
                     <GraduationCap className="w-3.5 h-3.5" />

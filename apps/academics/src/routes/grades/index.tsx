@@ -176,7 +176,7 @@ export function GradesModule() {
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-                <GraduationCap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                <GraduationCap className="w-6 h-6 text-[rgb(var(--state-warning-fg))]" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-text-primary">
@@ -219,12 +219,12 @@ export function GradesModule() {
                     : 'text-text-tertiary hover:text-text-secondary'
                 }`}
               >
-                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-teal-500' : 'opacity-70'}`} />
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
                 {tab.label}
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="grades-tab-indicator"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}
@@ -257,7 +257,7 @@ export function GradesModule() {
                       value={selectedSectionId ?? ''}
                       onChange={(e) => setSelectedSectionId(e.target.value || null)}
                       disabled={sectionsLoading}
-                      className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 min-w-[250px]"
+                      className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] min-w-[250px]"
                     >
                       <option value="">Select a section...</option>
                       {sections.map((s) => (
@@ -272,7 +272,7 @@ export function GradesModule() {
                     <select
                       value={selectedTermId ?? ''}
                       onChange={(e) => setSelectedTermId(e.target.value || null)}
-                      className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     >
                       <option value="">Select grading period...</option>
                       {gradingPeriods.map((gp: { periodId: string; name: string }) => (
@@ -297,7 +297,7 @@ export function GradesModule() {
                           type="button"
                           onClick={() => setShowBulkModal(true)}
                           disabled={!effectiveTermId || !currentYear?.yearId}
-                          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           Record

@@ -75,11 +75,11 @@ function SaveStatusIndicator({
 
 function CalendarBanner({ description, eventType }: { description: string; eventType: string }) {
   return (
-    <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+    <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 border border-amber-200 dark:border-amber-500/20">
       <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
       <div>
         <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Non-Instructional Day</p>
-        <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+        <p className="text-xs text-[rgb(var(--state-warning-fg))] mt-0.5">
           {description || `This is a ${eventType} day.`} Attendance cannot be submitted for this date.
         </p>
       </div>

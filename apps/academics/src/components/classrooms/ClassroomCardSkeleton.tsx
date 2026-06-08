@@ -25,7 +25,7 @@ export function ClassroomCardSkeleton() {
             <div className="h-3 w-20 rounded" style={{ background: 'var(--v2-bg-elevated)' }} />
             <div className="h-3 w-12 rounded" style={{ background: 'var(--v2-bg-elevated)' }} />
           </div>
-          <div className="h-[3px] rounded-sm" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-1 rounded-sm" style={{ background: 'var(--v2-bg-elevated)' }} />
         </div>
       </div>
     </div>

@@ -48,8 +48,8 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-[rgb(var(--surface-secondary))] transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center">
-            <User className="w-4 h-4 text-teal-600" />
+          <div className="w-8 h-8 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
+            <User className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
           </div>
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
             Guardian {index + 1}
@@ -63,7 +63,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                 e.stopPropagation()
                 onRemove()
               }}
-              className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-lg text-red-400 hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
               aria-label="Remove guardian"
             >
               <Trash2 className="w-4 h-4" />

@@ -77,22 +77,22 @@ function SaveStatusBadge({ status }: { status?: SaveStatus }) {
     saved: {
       icon: Check,
       text: 'Saved',
-      className: 'text-emerald-600 dark:text-emerald-400',
+      className: 'text-[rgb(var(--state-success-fg))]',
     },
     saving: {
       icon: Loader2,
       text: 'Auto-saving...',
-      className: 'text-amber-600 dark:text-amber-400',
+      className: 'text-[rgb(var(--state-warning-fg))]',
     },
     offline: {
       icon: WifiOff,
       text: 'Offline',
-      className: 'text-red-600 dark:text-red-400',
+      className: 'text-[rgb(var(--state-danger-fg))]',
     },
     error: {
       icon: CloudOff,
       text: 'Save failed',
-      className: 'text-red-600 dark:text-red-400',
+      className: 'text-[rgb(var(--state-danger-fg))]',
     },
   }
 
@@ -122,8 +122,8 @@ function ProgressBar({ marked, total }: { marked: number; total: number }) {
       <div
         className={`h-full rounded-full transition-all duration-300 ${
           isComplete
-            ? 'bg-emerald-500 animate-pulse'
-            : 'bg-teal-500'
+            ? 'bg-[rgb(var(--state-success-bg)/0.18)]0 animate-pulse'
+            : 'bg-[rgb(var(--state-info-bg)/0.18)]0'
         }`}
         style={{ width: `${pct}%` }}
       />
@@ -431,7 +431,7 @@ export function AttendanceGrid({
                 type="button"
                 onClick={markAllPresent}
                 disabled={disabled}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)] dark:bg-[rgb(var(--state-success-bg)/0.18)] dark:hover:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-lg transition-colors disabled:opacity-50"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
                 All Present
@@ -440,7 +440,7 @@ export function AttendanceGrid({
                 type="button"
                 onClick={markAllAbsent}
                 disabled={disabled}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/20  rounded-lg transition-colors disabled:opacity-50"
               >
                 <XCircle className="w-3.5 h-3.5" />
                 All Absent
@@ -472,7 +472,7 @@ export function AttendanceGrid({
               type="button"
               onClick={handleSave}
               disabled={isSaving || markedCount === 0 || !hasChanges || disabled}
-              className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -494,7 +494,7 @@ export function AttendanceGrid({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search students..."
-            className="w-full pl-9 pr-8 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="w-full pl-9 pr-8 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             aria-label="Search students by name or number"
           />
           {searchQuery && (

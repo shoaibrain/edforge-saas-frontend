@@ -396,7 +396,7 @@ function GradebookTab() {
             value={selectedSectionId ?? ''}
             onChange={(e) => setSelectedSectionId(e.target.value || null)}
             disabled={sectionsLoading}
-            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 min-w-[250px]"
+            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] min-w-[250px]"
           >
             <option value="">Select a section...</option>
             {sections.map((s) => (
@@ -411,7 +411,7 @@ function GradebookTab() {
           <select
             value={selectedTermId ?? ''}
             onChange={(e) => setSelectedTermId(e.target.value || null)}
-            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">Select grading period...</option>
             {gradingPeriods.map((gp: { periodId: string; name: string }) => (
@@ -431,7 +431,7 @@ function GradebookTab() {
                 type="button"
                 onClick={() => setShowBulkModal(true)}
                 disabled={!effectiveTermId || !currentYear?.yearId}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Record
@@ -711,8 +711,8 @@ export function ClassroomsModule() {
               >
                 Classrooms
               </h1>
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+              <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
@@ -722,7 +722,7 @@ export function ClassroomsModule() {
                 <button
                   onClick={() => navigate({ to: '/classrooms/create' })}
                   aria-label="New classroom"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                   style={{
                     background: 'var(--v2-brand-primary)',
                     color: '#fff',

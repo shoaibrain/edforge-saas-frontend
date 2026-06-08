@@ -59,7 +59,7 @@ function CustomTooltip({ active, payload }: any) {
   const d = payload[0].payload as GradeLevelDistribution
   return (
     <div
-      className="rounded-lg border px-3 py-2 text-[11px] shadow-lg"
+      className="rounded-lg border px-3 py-2 text-xs shadow-lg"
       style={{
         background: 'var(--v2-bg-surface)',
         borderColor: 'var(--v2-border-default)',
@@ -96,7 +96,7 @@ export function EnrollmentByGradeChart({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           Enrollment by grade level
@@ -173,7 +173,7 @@ export function EnrollmentByGradeChart({
       <div className="pt-3 mt-3" style={{ borderTop: '1px solid var(--v2-border-default)' }}>
         <Link
           to="/students"
-          className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           View Enrollment

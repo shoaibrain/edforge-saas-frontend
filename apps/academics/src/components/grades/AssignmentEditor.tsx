@@ -232,7 +232,7 @@ export function AssignmentEditor({
                 value={assignmentName}
                 onChange={(e) => setAssignmentName(e.target.value)}
                 placeholder="e.g., Chapter 5 Quiz"
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
             </div>
 
@@ -244,7 +244,7 @@ export function AssignmentEditor({
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 >
                   {displayCategories.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -261,7 +261,7 @@ export function AssignmentEditor({
                   type="number"
                   value={possiblePoints}
                   onChange={(e) => setPossiblePoints(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   min={1}
                 />
               </div>
@@ -275,7 +275,7 @@ export function AssignmentEditor({
                 <select
                   value={assessmentPurpose}
                   onChange={(e) => setAssessmentPurpose(e.target.value as AssessmentCategory | '')}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 >
                   <option value="">Auto-detect</option>
                   <option value="formative">Formative</option>
@@ -290,7 +290,7 @@ export function AssignmentEditor({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
             </div>
@@ -300,7 +300,7 @@ export function AssignmentEditor({
           {stats && (
             <div className="bg-surface-secondary rounded-lg p-3">
               <div className="flex items-center gap-1.5 mb-2">
-                <BarChart2 className="w-3.5 h-3.5 text-teal-500" />
+                <BarChart2 className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))]" />
                 <span className="text-xs font-semibold text-text-primary">
                   Score Statistics ({stats.count} entered)
                 </span>
@@ -341,13 +341,13 @@ export function AssignmentEditor({
                 onChange={(e) => setPasteText(e.target.value)}
                 placeholder={"John Smith\t95\nJane Doe\t88"}
                 rows={6}
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 font-mono"
+                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] font-mono"
               />
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={handleBulkPaste}
-                  className="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+                  className="flex-1 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
                 >
                   Apply
                 </button>
@@ -411,7 +411,7 @@ export function AssignmentEditor({
                         handleScoreChange(student.studentId, e.target.value)
                       }
                       placeholder="—"
-                      className="w-20 px-2 py-1 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary text-right focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      className="w-20 px-2 py-1 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary text-right focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                       min={0}
                       max={possiblePts * 1.5}
                       step="any"
@@ -429,7 +429,7 @@ export function AssignmentEditor({
             type="button"
             onClick={() => handleSubmit(true)}
             disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || students.length === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Create Assignment
@@ -446,7 +446,7 @@ export function AssignmentEditor({
               type="button"
               onClick={() => handleSubmit(false)}
               disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || filledCount === 0}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

@@ -66,7 +66,7 @@ function StudentAvatar({ name, studentId }: { name: string; studentId: string })
   if (imgError || !src) {
     return (
       <div
-        className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-semibold text-white"
+        className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[rgb(var(--action-primary-fg))]"
         style={{ background: bg }}
       >
         {initials}
@@ -106,7 +106,7 @@ export function AtRiskStudentsCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           At-risk student detail
@@ -138,7 +138,7 @@ export function AtRiskStudentsCard({
                     <p className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
                       {student.studentName}
                     </p>
-                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
                       {student.gradeLevel ? `Grade ${student.gradeLevel}` : ''}{student.gradeLevel ? ' · ' : ''}{student.absentDays} absent
                     </p>
                   </div>
@@ -165,7 +165,7 @@ export function AtRiskStudentsCard({
       <div className="pt-3 mt-3" style={{ borderTop: '1px solid var(--v2-border-default)' }}>
         <Link
           to="/students"
-          className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           View all {totalAtRisk} at-risk students

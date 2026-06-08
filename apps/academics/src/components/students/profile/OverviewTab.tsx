@@ -75,52 +75,52 @@ function AccessRestricted({ label }: { label: string }) {
 // ============================================================================
 
 function getRateTheme(rate: number) {
-  if (rate >= 95) return { accent: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', labelKey: 'performance.excellent' }
-  if (rate >= 90) return { accent: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-500/10', labelKey: 'performance.good' }
-  if (rate >= 85) return { accent: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10', labelKey: 'performance.atRisk' }
-  return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', labelKey: 'performance.critical' }
+  if (rate >= 95) return { accent: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', labelKey: 'performance.excellent' }
+  if (rate >= 90) return { accent: 'text-[rgb(var(--action-secondary-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', labelKey: 'performance.good' }
+  if (rate >= 85) return { accent: 'text-[rgb(var(--state-warning-fg))]', bg: 'bg-[rgb(var(--state-warning-fg))]/10', labelKey: 'performance.atRisk' }
+  return { accent: 'text-[rgb(var(--state-danger-fg))]', bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', labelKey: 'performance.critical' }
 }
 
 function getGpaTheme(gpa: number) {
-  if (gpa >= 3.5) return { accent: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' }
-  if (gpa >= 3.0) return { accent: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500/10' }
-  if (gpa >= 2.0) return { accent: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' }
-  return { accent: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10' }
+  if (gpa >= 3.5) return { accent: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' }
+  if (gpa >= 3.0) return { accent: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' }
+  if (gpa >= 2.0) return { accent: 'text-[rgb(var(--state-warning-fg))]', bg: 'bg-[rgb(var(--state-warning-fg))]/10' }
+  return { accent: 'text-[rgb(var(--state-danger-fg))]', bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]' }
 }
 
 function getGradeColor(numericGrade: number): string {
-  if (numericGrade >= 90) return 'text-emerald-600 dark:text-emerald-400'
-  if (numericGrade >= 80) return 'text-blue-600 dark:text-blue-400'
-  if (numericGrade >= 70) return 'text-amber-600 dark:text-amber-400'
-  if (numericGrade >= 60) return 'text-orange-600 dark:text-orange-400'
-  return 'text-red-600 dark:text-red-400'
+  if (numericGrade >= 90) return 'text-[rgb(var(--state-success-fg))]'
+  if (numericGrade >= 80) return 'text-[rgb(var(--state-info-fg))]'
+  if (numericGrade >= 70) return 'text-[rgb(var(--state-warning-fg))]'
+  if (numericGrade >= 60) return 'text-[rgb(var(--state-warning-fg))]'
+  return 'text-[rgb(var(--state-danger-fg))]'
 }
 
 function getGradeBg(numericGrade: number): string {
-  if (numericGrade >= 90) return 'bg-emerald-500'
-  if (numericGrade >= 80) return 'bg-blue-500'
-  if (numericGrade >= 70) return 'bg-amber-500'
-  if (numericGrade >= 60) return 'bg-orange-500'
-  return 'bg-red-500'
+  if (numericGrade >= 90) return 'bg-[rgb(var(--state-success-bg)/0.18)]0'
+  if (numericGrade >= 80) return 'bg-[rgb(var(--state-info-fg))]'
+  if (numericGrade >= 70) return 'bg-[rgb(var(--state-warning-fg))]'
+  if (numericGrade >= 60) return 'bg-[rgb(var(--state-warning-fg))]'
+  return 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
 }
 
 function getLetterBadgeClasses(letter: string): string {
   switch (letter) {
-    case 'A': return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-    case 'B': return 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
-    case 'C': return 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-    case 'D': return 'bg-orange-500/15 text-orange-600 dark:text-orange-400'
-    default: return 'bg-red-500/15 text-red-600 dark:text-red-400'
+    case 'A': return 'bg-[rgb(var(--state-success-bg)/0.18)]0/15 text-[rgb(var(--state-success-fg))]'
+    case 'B': return 'bg-[rgb(var(--state-info-fg))]/15 text-[rgb(var(--state-info-fg))]'
+    case 'C': return 'bg-[rgb(var(--state-warning-fg))]/15 text-[rgb(var(--state-warning-fg))]'
+    case 'D': return 'bg-[rgb(var(--state-warning-fg))]/15 text-[rgb(var(--state-warning-fg))]'
+    default: return 'bg-[rgb(var(--state-danger-bg)/0.18)]0/15 text-[rgb(var(--state-danger-fg))]'
   }
 }
 
 function getAttendanceDotColor(status: string): string {
   switch (status) {
-    case 'present': return 'bg-emerald-500'
-    case 'absent': return 'bg-red-500'
-    case 'late': case 'tardy': return 'bg-amber-500'
-    case 'excused': return 'bg-blue-500'
-    case 'remote': return 'bg-indigo-500'
+    case 'present': return 'bg-[rgb(var(--state-success-bg)/0.18)]0'
+    case 'absent': return 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
+    case 'late': case 'tardy': return 'bg-[rgb(var(--state-warning-fg))]'
+    case 'excused': return 'bg-[rgb(var(--state-info-fg))]'
+    case 'remote': return 'bg-[rgb(var(--state-info-fg))]'
     default: return 'bg-slate-300 dark:bg-slate-600'
   }
 }
@@ -129,19 +129,19 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
   if (!subject) return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
-    return { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400' }
+    return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
   if (s.includes('english') || s.includes('language') || s.includes('literature'))
-    return { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400' }
+    return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
   if (s.includes('science') || s.includes('biology') || s.includes('chemistry') || s.includes('physics'))
-    return { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' }
+    return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', text: 'text-[rgb(var(--state-success-fg))]' }
   if (s.includes('history') || s.includes('social') || s.includes('geography'))
-    return { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' }
+    return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('art') || s.includes('music') || s.includes('drama'))
     return { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400' }
   if (s.includes('physical') || s.includes('pe') || s.includes('health'))
-    return { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400' }
+    return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
-    return { bg: 'bg-cyan-500/10', text: 'text-cyan-600 dark:text-cyan-400' }
+    return { bg: 'bg-cyan-500/10', text: 'text-cyan-600 ' }
   return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
 }
 
@@ -371,7 +371,7 @@ function AttendanceDailyStrip({ studentId }: { studentId: string }) {
           { status: 'late', label: 'Late' },
           { status: 'excused', label: 'Excused' },
         ].map((item) => (
-          <span key={item.status} className="flex items-center gap-1 text-[10px] text-text-tertiary">
+          <span key={item.status} className="flex items-center gap-1 text-xs text-text-tertiary">
             <span className={`w-2 h-2 rounded-sm ${getAttendanceDotColor(item.status)}`} />
             {item.label}
           </span>
@@ -424,7 +424,7 @@ function CourseGradeCard({
               {letterGrade}
             </span>
             {grade.isFinal && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-teal-500/15 text-teal-600 dark:text-teal-400">
+              <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)]0/15 text-[rgb(var(--action-secondary-fg))]">
                 Final
               </span>
             )}
@@ -473,13 +473,13 @@ function CourseGradeCard({
           {/* Category breakdown */}
           {categoryGrades.length > 0 && (
             <div className="px-4 pt-3 pb-2">
-              <p className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2">Category Breakdown</p>
+              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">Category Breakdown</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {categoryGrades.map((cat: any, i: number) => (
                   <div key={cat.categoryId || i} className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-surface-secondary">
                     <div className="min-w-0">
                       <p className="text-xs text-text-secondary truncate">{cat.categoryName}</p>
-                      <p className="text-[10px] text-text-tertiary">{cat.weight}% weight</p>
+                      <p className="text-xs text-text-tertiary">{cat.weight}% weight</p>
                     </div>
                     <span className={`text-xs font-bold tabular-nums ${cat.percentage > 0 ? getGradeColor(cat.percentage) : 'text-text-tertiary'}`}>
                       {cat.percentage > 0 ? `${cat.percentage.toFixed(0)}%` : '—'}
@@ -493,7 +493,7 @@ function CourseGradeCard({
           {/* Assignments list */}
           {gradedAssignments.length > 0 && (
             <div className="px-4 pt-2 pb-3">
-              <p className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">
                 Assignments ({gradedAssignments.length})
               </p>
               <div className="space-y-1">
@@ -501,7 +501,7 @@ function CourseGradeCard({
                   <div key={a.assignmentId} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors">
                     <FileText className="w-3.5 h-3.5 text-text-tertiary shrink-0" />
                     <span className="text-xs text-text-primary truncate flex-1">{a.assignmentName}</span>
-                    <span className="text-[10px] text-text-tertiary shrink-0">{a.assignmentType}</span>
+                    <span className="text-xs text-text-tertiary shrink-0">{a.assignmentType}</span>
                     {a.earnedPoints != null ? (
                       <span className={`text-xs font-medium tabular-nums shrink-0 ${getGradeColor(a.percentage ?? (a.earnedPoints / a.possiblePoints) * 100)}`}>
                         {a.earnedPoints}/{a.possiblePoints}
@@ -545,7 +545,7 @@ function CourseGradeCards({
     return (
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <BarChart3 className="w-4 h-4 text-blue-500" />
+          <BarChart3 className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
           {tAcad('sections.coursePerformance')}
         </h3>
         <div className="py-8 text-center rounded-xl border border-border-secondary bg-surface-secondary/30">
@@ -562,7 +562,7 @@ function CourseGradeCards({
   return (
     <section>
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-        <BarChart3 className="w-4 h-4 text-blue-500" />
+        <BarChart3 className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
         {tAcad('sections.coursePerformance')}
         <span className="text-xs text-text-tertiary font-normal ml-1">({validGrades.length})</span>
       </h3>
@@ -745,8 +745,8 @@ export function OverviewTab({ student }: OverviewTabProps) {
           icon={BookOpen}
           label={tAcad('stats.classes')}
           value={classrooms.length}
-          accent="text-indigo-600 dark:text-indigo-400"
-          bg="bg-indigo-500/10"
+          accent="text-[rgb(var(--state-info-fg))]"
+          bg="bg-[rgb(var(--state-info-fg))]/10"
         />
         <StatCard
           icon={GraduationCap}
@@ -774,7 +774,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
           <Link
             to="/classrooms"
             search={{ tab: 'attendance' }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
             {tAcad('sections.history')}
@@ -784,7 +784,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
         <AttendanceTrendChart studentId={student.studentId} />
         <AttendanceDailyStrip studentId={student.studentId} />
         {effectiveSummary && effectiveSummary.attendanceRate < 90 && (
-          <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200/50 dark:border-amber-500/20">
+          <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 border border-amber-200/50 dark:border-amber-500/20">
             <p className="text-sm text-amber-800 dark:text-amber-400 flex items-center gap-2">
               <TrendingDown className="w-4 h-4 flex-shrink-0" />
               {tAcad('alerts.lowAttendance')}
@@ -792,8 +792,8 @@ export function OverviewTab({ student }: OverviewTabProps) {
           </div>
         )}
         {effectiveSummary && effectiveSummary.attendanceRate >= 98 && (
-          <div className="mt-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/50 dark:border-emerald-500/20">
-            <p className="text-sm text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
+          <div className="mt-3 p-3 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] border border-emerald-200/50 dark:border-[rgb(var(--state-success-border))]/20">
+            <p className="text-sm text-emerald-800  flex items-center gap-2">
               <TrendingUp className="w-4 h-4 flex-shrink-0" />
               {tAcad('alerts.highAttendance')}
             </p>
@@ -806,7 +806,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
         {is403Error(gradesError) ? (
           <section>
             <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-              <BarChart3 className="w-4 h-4 text-blue-500" />
+              <BarChart3 className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
               {tAcad('sections.coursePerformance')}
             </h3>
             <AccessRestricted label="grade data" />

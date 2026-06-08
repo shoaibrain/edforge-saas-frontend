@@ -311,7 +311,7 @@ export function CurriculumModule() {
           {/* Separator + Date */}
           <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13 }}>|</span>
           <span
-            className="text-[13px]"
+            className="text-sm"
             style={{ color: 'var(--v2-text-faint, var(--text-muted, #4a5068))' }}
           >
             {today}

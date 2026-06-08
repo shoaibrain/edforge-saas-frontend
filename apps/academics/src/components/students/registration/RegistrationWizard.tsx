@@ -365,7 +365,7 @@ function RegistrationFooter() {
               type="button"
               onClick={() => submit()}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 text-[12px] font-semibold text-white rounded-[8px] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2 text-[12px] font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
               style={{ background: '#1D9E75' }}
             >
               {isSubmitting ? (
@@ -379,7 +379,7 @@ function RegistrationFooter() {
             <button
               type="button"
               onClick={() => goToNext()}
-              className="flex items-center gap-2 px-5 py-2 text-[12px] font-semibold text-white rounded-[8px] transition-all hover:opacity-90"
+              className="flex items-center gap-2 px-5 py-2 text-[12px] font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90"
               style={{ background: '#1D9E75' }}
             >
               Continue
@@ -508,7 +508,7 @@ function ContextSidebar() {
                     className="flex items-center justify-center"
                     style={{ width: 14, height: 14, borderRadius: '50%', background: '#1D9E75' }}
                   >
-                    <Check className="w-2.5 h-2.5 text-white" />
+                    <Check className="w-2.5 h-2.5 text-[rgb(var(--action-primary-fg))]" />
                   </div>
                 ) : status === 'current' ? (
                   <div

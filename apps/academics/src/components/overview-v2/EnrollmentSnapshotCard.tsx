@@ -49,11 +49,11 @@ function MetricRow({
       className="flex items-center justify-between py-1.5"
       style={{ borderBottom: '1px solid var(--v2-border-default)' }}
     >
-      <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+      <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
         {label}
       </span>
       <span
-        className="text-[11px] font-medium"
+        className="text-xs font-medium"
         style={{ color: valueColor || 'var(--v2-text-primary)' }}
       >
         {valuePrefix}{value ?? '—'}
@@ -83,7 +83,7 @@ export function EnrollmentSnapshotCard({
     >
       {/* Header */}
       <h3
-        className="text-[13px] font-medium mb-3"
+        className="text-sm font-medium mb-3"
         style={{ color: 'var(--v2-text-secondary)' }}
       >
         Enrollment snapshot
@@ -137,10 +137,10 @@ export function EnrollmentSnapshotCard({
             border: '1px solid rgba(29, 158, 117, 0.15)',
           }}
         >
-          <p className="text-[11px] font-medium" style={{ color: '#1D9E75' }}>
+          <p className="text-xs font-medium" style={{ color: '#1D9E75' }}>
             Academic year on track
           </p>
-          <p className="text-[10px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
             {academicYear.name} · {new Date(academicYear.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – {new Date(academicYear.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>

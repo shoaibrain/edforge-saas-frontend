@@ -103,7 +103,7 @@ function RowActionMenu({
             {onView && (
               <button
                 onClick={() => { onView(student); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
                 style={{ color: 'var(--v2-text-secondary)' }}
               >
                 <ExternalLink className="w-3 h-3" />
@@ -113,7 +113,7 @@ function RowActionMenu({
             {onWithdraw && (
               <button
                 onClick={() => { onWithdraw(student); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
                 style={{ color: '#E24B4A' }}
               >
                 <UserMinus className="w-3 h-3" />
@@ -161,14 +161,14 @@ export function StudentTable({
               />
               <div className="min-w-0">
                 <p
-                  className="text-[13px] font-medium truncate"
+                  className="text-sm font-medium truncate"
                   style={{ color: 'var(--v2-text-primary)' }}
                 >
                   {student.fullName}
                 </p>
                 {student.studentNumber && (
                   <p
-                    className="text-[10px] font-mono truncate"
+                    className="text-xs font-mono truncate"
                     style={{ color: 'var(--v2-text-hint)' }}
                   >
                     #{student.studentNumber}

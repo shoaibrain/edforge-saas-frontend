@@ -91,7 +91,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
           style={{ width: `${progress}%`, background: '#1D9E75' }}
         />
       </div>
-      <span className="text-[10px]" style={{ color: 'var(--v2-text-hint)' }}>
+      <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
         {progress}%
       </span>
     </div>
@@ -293,7 +293,7 @@ export function EnrollmentModule() {
                   <button
                     type="button"
                     onClick={handleExportCSV}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium rounded-[8px] transition-colors hover:opacity-80"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80"
                     style={{
                       background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -310,7 +310,7 @@ export function EnrollmentModule() {
                     type="button"
                     onClick={handleCloseYear}
                     disabled={closeYearMutation.isPending}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium rounded-[8px] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50"
                     style={{
                       background: 'rgba(239, 159, 39, 0.08)',
                       border: '1px solid rgba(239, 159, 39, 0.2)',
@@ -360,7 +360,7 @@ export function EnrollmentModule() {
                   {tab.label}
                   {tab.count !== undefined && (
                     <span
-                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                      className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
                       style={{
                         background: isActive ? 'rgba(29, 158, 117, 0.12)' : 'rgba(255, 255, 255, 0.06)',
                         color: isActive ? '#1D9E75' : 'var(--v2-text-hint)',
@@ -408,7 +408,7 @@ export function EnrollmentModule() {
                   >
                     <Calendar className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
                     <span
-                      className="text-[11px] font-medium px-2 py-0.5"
+                      className="text-xs font-medium px-2 py-0.5"
                       style={{
                         background: 'rgba(29, 158, 117, 0.1)',
                         color: '#1D9E75',
@@ -421,7 +421,7 @@ export function EnrollmentModule() {
                       startDate={activeYearObj.startDate}
                       endDate={activeYearObj.endDate}
                     />
-                    <div className="ml-auto flex items-center gap-3 text-[11px]" style={{ color: 'var(--v2-text-muted)' }}>
+                    <div className="ml-auto flex items-center gap-3 text-xs" style={{ color: 'var(--v2-text-muted)' }}>
                       <span>
                         <strong style={{ color: 'var(--v2-text-primary)' }}>{summary?.totalEnrolled ?? '--'}</strong> enrolled
                       </span>

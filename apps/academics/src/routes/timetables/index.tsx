@@ -15,7 +15,7 @@ export function TimetablesModule() {
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-              <LayoutGrid className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              <LayoutGrid className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Timetables</h1>
@@ -29,10 +29,10 @@ export function TimetablesModule() {
 
       <div className="p-6 space-y-6">
         {/* Redirect Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-blue-500/20 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-blue-500/20">
-              <ArrowRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-info-fg))]/20">
+              <ArrowRight className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -45,7 +45,7 @@ export function TimetablesModule() {
               <Link
                 to="/classrooms"
                 search={{ tab: undefined }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <span>Go to Master Scheduling</span>
                 <ArrowRight className="w-4 h-4" />
@@ -58,8 +58,8 @@ export function TimetablesModule() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:bg-surface-hover transition-colors cursor-pointer">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+                <User className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
               </div>
               <h4 className="font-medium text-text-primary">Teacher View</h4>
             </div>
@@ -70,8 +70,8 @@ export function TimetablesModule() {
 
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:bg-surface-hover transition-colors cursor-pointer">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]">
+                <User className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
               </div>
               <h4 className="font-medium text-text-primary">Student View</h4>
             </div>
@@ -82,8 +82,8 @@ export function TimetablesModule() {
 
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:bg-surface-hover transition-colors cursor-pointer">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+                <Calendar className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
               </div>
               <h4 className="font-medium text-text-primary">Room View</h4>
             </div>
@@ -96,8 +96,8 @@ export function TimetablesModule() {
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-indigo-500/10">
-              <LayoutGrid className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-info-fg))]/10">
+              <LayoutGrid className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">

@@ -97,7 +97,7 @@ function RowActions({
                 setOpen(false)
                 onRemove()
               }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-red-950/30 transition-colors"
             >
               <UserMinus className="w-4 h-4" />
               Remove from Section
@@ -144,7 +144,7 @@ function CapacityBar({
         type="button"
         onClick={onAddStudents}
         disabled={isFull}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/30 dark:hover:bg-teal-950/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-teal-950/30 dark:hover:bg-teal-950/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Add students to section"
       >
         <UserPlus className="w-3.5 h-3.5" />
@@ -287,7 +287,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
             </p>
             <p className="text-xs text-text-tertiary">Primary Instructor</p>
           </div>
-          <span className="flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400">
+          <span className="flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-teal-950/30 ">
             Teacher
           </span>
         </div>

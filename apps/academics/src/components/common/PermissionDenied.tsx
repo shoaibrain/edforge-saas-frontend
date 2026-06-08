@@ -32,7 +32,7 @@ export function PermissionDenied({
     <div className="min-h-[60vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
         <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900/30 dark:to-orange-800/30 flex items-center justify-center">
-          <ShieldOff className="w-10 h-10 text-amber-600 dark:text-amber-400" />
+          <ShieldOff className="w-10 h-10 text-[rgb(var(--state-warning-fg))]" />
         </div>
 
         <h1 className="text-2xl font-bold text-text-primary mb-3">
