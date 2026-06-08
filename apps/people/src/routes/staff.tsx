@@ -21,7 +21,16 @@ import {
   Download,
 } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
-import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import {
+  Container,
+  focusRing,
+  focusRingInset,
+  Inline,
+  PageHeader,
+  StatCard,
+  Text,
+  WidgetErrorBoundaryV2,
+} from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
 import { usePermission } from '@edforge/abac'
@@ -272,150 +281,71 @@ export default function StaffPage() {
     )
   }
 
-  return (
-    <div data-v2 style={{ padding: '24px 28px', overflow: 'auto' }}>
-      {/* PAGE HEADER */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              background: 'rgba(216,90,48,0.10)',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+  const pageActions = canCreate ? (
+    <div className="relative" ref={dropdownRef}>
+      <Inline gap="none" className="h-9">
+        <button
+          type="button"
+          onClick={() => navigate({ to: '/staff/new' })}
+          className={`inline-flex h-9 items-center gap-1.5 rounded-l-lg border-r border-[rgb(var(--surface-primary)/0.18)] bg-[rgb(var(--brand-primary))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--brand-secondary))] ${focusRing}`}
+        >
+          <UserPlus className="h-3.5 w-3.5" />
+          Add Staff Member
+        </button>
+        <button
+          type="button"
+          onClick={() => setAddDropdownOpen(!addDropdownOpen)}
+          className={`inline-flex h-9 w-8 items-center justify-center rounded-r-lg bg-[rgb(var(--brand-primary))] text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--brand-secondary))] ${focusRing}`}
+          aria-label="More add options"
+        >
+          <ChevronDown className="h-3 w-3" />
+        </button>
+      </Inline>
+      {addDropdownOpen && (
+        <div className="absolute right-0 z-30 mt-1 w-44 rounded-lg border border-border-primary bg-surface-primary py-1 shadow-xl">
+          <button
+            type="button"
+            onClick={() => {
+              setAddDropdownOpen(false)
+              modal.openCreate()
             }}
+            className={`w-full px-3 py-2 text-left text-xs text-text-secondary transition-colors hover:bg-surface-secondary ${focusRingInset}`}
           >
-            <Users style={{ width: 16, height: 16, color: '#D85A30' }} />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <h1
-                style={{
-                  fontSize: 18,
-                  fontWeight: 600,
-                  letterSpacing: '-0.3px',
-                  color: 'var(--v2-text-primary, #e8eaf0)',
-                  margin: 0,
-                }}
-              >
-                Staff Directory
-              </h1>
-              <div style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.10)', alignSelf: 'center' }} />
-              <span style={{ fontSize: 12, color: 'var(--v2-text-muted, #7a8099)' }}>
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-            </div>
-          </div>
+            Quick add user account
+          </button>
         </div>
+      )}
+    </div>
+  ) : undefined
 
-        {/* Split button */}
-        {canCreate && (
-          <div className="relative" ref={dropdownRef}>
-            <div style={{ display: 'flex', alignItems: 'center', height: 36 }}>
-              <button
-                type="button"
-                onClick={() => navigate({ to: '/staff/new' })}
-                style={{
-                  height: 36,
-                  background: '#1D9E75',
-                  border: 'none',
-                  borderRadius: '8px 0 0 8px',
-                  padding: '0 14px',
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  borderRight: '1px solid rgba(255,255,255,0.15)',
-                }}
-              >
-                <UserPlus style={{ width: 12, height: 12 }} />
-                Add Staff Member
-              </button>
-              <button
-                type="button"
-                onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-                style={{
-                  height: 36,
-                  width: 32,
-                  background: '#1D9E75',
-                  border: 'none',
-                  borderRadius: '0 8px 8px 0',
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                aria-label="More add options"
-              >
-                <ChevronDown style={{ width: 11, height: 11 }} />
-              </button>
-            </div>
-            {addDropdownOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  marginTop: 4,
-                  width: 180,
-                  background: 'var(--v2-bg-elevated, #1e2436)',
-                  border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-                  borderRadius: 8,
-                  padding: '4px 0',
-                  zIndex: 30,
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddDropdownOpen(false)
-                    modal.openCreate()
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: 11,
-                    color: 'var(--v2-text-secondary, #c8ccd8)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  Quick add user account
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+  return (
+    <Container data-v2 size="full" padding="lg" className="overflow-auto py-6">
+      {/* PAGE HEADER */}
+      <PageHeader
+        className="mb-2"
+        title="Staff Directory"
+        description={new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        actions={pageActions}
+      />
 
       {/* CONTEXT BANNER */}
-      <p style={{ fontSize: 11, color: 'var(--v2-text-muted, #7a8099)', marginBottom: 18 }}>
-        <em style={{ fontStyle: 'normal', fontWeight: 500, color: '#D85A30' }}>
+      <Text variant="caption" className="mb-5">
+        <em className="font-medium not-italic text-[var(--v2-brand-accent,#D85A30)]">
           {totalLoaded} active staff member{totalLoaded !== 1 ? 's' : ''}
         </em>
         {' · '}
-        <span style={{ color: '#1D9E75', fontStyle: 'normal', fontWeight: 500 }}>
+        <span className="font-medium text-[var(--v2-success)]">
           {teacherCount} teacher{teacherCount !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span style={{ color: '#7F77DD', fontStyle: 'normal', fontWeight: 500 }}>
+        <span className="font-medium text-[rgb(var(--brand-secondary))]">
           {principalCount} principal{principalCount !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span style={{ color: '#378ADD', fontStyle: 'normal', fontWeight: 500 }}>
+        <span className="font-medium text-[rgb(var(--brand-primary))]">
           {accessCount} with system access enabled
         </span>
-      </p>
+      </Text>
 
       {/* KPI TILES */}
       <WidgetErrorBoundaryV2>
@@ -472,52 +402,27 @@ export default function StaffPage() {
       </WidgetErrorBoundaryV2>
 
       {/* FILTER STRIP */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+      <Inline gap="sm" className="mb-3">
         {(['all', 'teacher', 'principal', 'support'] as QuickFilter[]).map((chip) => (
           <button
             key={chip}
             type="button"
             onClick={() => handleQuickFilter(chip)}
-            style={{
-              height: 30,
-              padding: '0 10px',
-              background: quickFilter === chip ? 'rgba(216,90,48,0.10)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${quickFilter === chip ? 'rgba(216,90,48,0.25)' : 'rgba(255,255,255,0.08)'}`,
-              borderRadius: 7,
-              fontSize: 11,
-              fontWeight: 500,
-              color: quickFilter === chip ? '#D85A30' : 'var(--v2-text-hint, #4a5068)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.12s',
-            }}
+            className={`inline-flex h-8 items-center whitespace-nowrap rounded-lg border px-3 text-xs font-medium transition-colors ${focusRingInset} ${quickFilter === chip ? 'border-[rgb(var(--brand-primary)/0.35)] bg-[rgb(var(--brand-primary)/0.10)] text-[rgb(var(--brand-primary))]' : 'border-border-secondary bg-surface-secondary text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary'}`}
           >
             {chip === 'all' ? 'All' : chip === 'teacher' ? 'Teachers' : chip === 'principal' ? 'Principal' : 'Support'}
           </button>
         ))}
 
         {/* Search input */}
-        <div style={{ flex: 1, minWidth: 200, position: 'relative', display: 'flex', alignItems: 'center' }}>
-          <Search style={{ position: 'absolute', left: 10, width: 12, height: 12, color: 'var(--v2-text-hint, #4a5068)', pointerEvents: 'none' }} />
+        <div className="relative flex min-w-[200px] flex-1 items-center">
+          <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-text-tertiary" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or email..."
-            style={{
-              width: '100%',
-              height: 32,
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 8,
-              padding: '0 11px 0 32px',
-              fontSize: 12,
-              color: 'var(--v2-text-primary, #e8eaf0)',
-              outline: 'none',
-              colorScheme: 'dark',
-            }}
+            className={`h-8 w-full rounded-lg border border-border-secondary bg-surface-secondary pl-9 pr-3 text-xs text-text-primary placeholder:text-text-tertiary ${focusRingInset}`}
           />
         </div>
 
@@ -528,18 +433,7 @@ export default function StaffPage() {
             updateFilter('role', (e.target.value as StaffRole) || undefined)
             setQuickFilter('all')
           }}
-          style={{
-            height: 32,
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 8,
-            padding: '0 10px',
-            fontSize: 11,
-            color: 'var(--v2-text-muted, #7a8099)',
-            outline: 'none',
-            cursor: 'pointer',
-            colorScheme: 'dark',
-          }}
+          className={`h-8 cursor-pointer rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-secondary ${focusRingInset}`}
         >
           <option value="">All Roles</option>
           {ROLE_FILTER_VALUES.map((role) => (
@@ -551,18 +445,7 @@ export default function StaffPage() {
 
         {/* Department dropdown */}
         <select
-          style={{
-            height: 32,
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 8,
-            padding: '0 10px',
-            fontSize: 11,
-            color: 'var(--v2-text-muted, #7a8099)',
-            outline: 'none',
-            cursor: 'pointer',
-            colorScheme: 'dark',
-          }}
+          className={`h-8 cursor-pointer rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-secondary ${focusRingInset}`}
         >
           <option value="">All Departments</option>
         </select>
@@ -572,28 +455,12 @@ export default function StaffPage() {
           type="button"
           onClick={handleExportCsv}
           disabled={staffMembers.length === 0}
-          style={{
-            height: 32,
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 8,
-            padding: '0 12px',
-            fontSize: 11,
-            color: 'var(--v2-text-hint, #4a5068)',
-            cursor: staffMembers.length === 0 ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            whiteSpace: 'nowrap',
-            marginLeft: 'auto',
-            opacity: staffMembers.length === 0 ? 0.5 : 1,
-            transition: 'all 0.12s',
-          }}
+          className={`ml-auto inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-tertiary transition-colors hover:bg-surface-tertiary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50 ${focusRingInset}`}
         >
-          <Download style={{ width: 12, height: 12 }} />
+          <Download className="h-3.5 w-3.5" />
           Export CSV
         </button>
-      </div>
+      </Inline>
 
       {/* STAFF TABLE */}
       <StaffTable
@@ -633,6 +500,6 @@ export default function StaffPage() {
         onConfirm={handleDelete}
         isDeleting={deleteMutation.isPending}
       />
-    </div>
+    </Container>
   )
 }
