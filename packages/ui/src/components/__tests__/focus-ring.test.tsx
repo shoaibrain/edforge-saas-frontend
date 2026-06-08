@@ -112,7 +112,7 @@ describe('interactive primitive focus-ring baseline', () => {
       FilterTabs: 'semantic-pass',
       Accordion: 'semantic-pass',
       Dropdown: 'semantic-pass',
-      'AttendanceHeatmap navigation': 'missing',
+      'AttendanceHeatmap navigation': 'semantic-pass',
     })
   })
 })

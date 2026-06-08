@@ -6,7 +6,7 @@
  */
 
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
-import { cn } from '../utils'
+import { cn, focusRingInset } from '../utils'
 
 export type HeatmapStatus = 'present' | 'absent' | 'late' | 'excused' | 'holiday' | 'weekend' | 'future' | 'none'
 
@@ -107,7 +107,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={() => onMonthChange(prevMonth(yearMonth))}
-            className="p-1.5 rounded-lg transition-colors"
+            className={cn('p-1.5 rounded-lg transition-colors', focusRingInset)}
             style={{ color: 'var(--v2-text-muted)' }}
             aria-label="Previous month"
           >
@@ -123,7 +123,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
           </span>
           <button
             onClick={() => onMonthChange(nextMonth(yearMonth))}
-            className="p-1.5 rounded-lg transition-colors"
+            className={cn('p-1.5 rounded-lg transition-colors', focusRingInset)}
             style={{ color: 'var(--v2-text-muted)' }}
             aria-label="Next month"
           >
@@ -158,7 +158,10 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
             return (
               <div
                 key={cell.date}
-                className="aspect-square rounded-lg flex items-center justify-center text-[11px] font-medium tabular-nums"
+                className={cn(
+                  'aspect-square rounded-lg flex items-center justify-center text-[11px] font-medium tabular-nums',
+                  focusRingInset
+                )}
                 style={{
                   background: colors.bg,
                   border: cell.isToday
