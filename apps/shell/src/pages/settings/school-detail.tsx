@@ -422,16 +422,15 @@ export default function SchoolDetailPage() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  // Permission Check
-  if (!user) return null
+  const isTenantAdmin = user?.globalRole === 'TenantAdmin'
 
-  const isTenantAdmin = user.globalRole === 'TenantAdmin'
-
-  const hasPermission = can(user, {
-    action: 'view',
-    resource: 'settings:school',
-    schoolId: schoolId,
-  })
+  const hasPermission = user
+    ? can(user, {
+        action: 'view',
+        resource: 'settings:school',
+        schoolId: schoolId,
+      })
+    : false
 
   // Fetch School Data
   const {
@@ -494,6 +493,8 @@ export default function SchoolDetailPage() {
   }
 
   const displaySchool = school
+
+  if (!user) return null
 
   if (isLoading) {
     return (
