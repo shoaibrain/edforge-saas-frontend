@@ -41,20 +41,20 @@ function getStatusBadge(status: string) {
     active: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 ',
     on_leave: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
     suspended: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 ',
-    terminated: 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 ',
+    terminated: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 ',
   }
-  return styles[status] || 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 '
+  return styles[status] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 '
 }
 
 function getRoleBadge(role: string) {
   const styles: Record<string, string> = {
     teacher: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]/20 ',
-    principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-purple-700 dark:bg-[rgb(var(--state-info-fg))]/20 ',
-    vice_principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-indigo-700 dark:bg-[rgb(var(--state-info-fg))]/20 ',
+    principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]/20 ',
+    vice_principal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]/20 ',
     counselor: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
     admin_staff: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
   }
-  return styles[role] || 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 '
+  return styles[role] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 '
 }
 
 // ============================================================================

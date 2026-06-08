@@ -162,10 +162,10 @@ export function ProfileHeader({
           name={student.fullName}
           src={avatarUrl}
           shape="circle"
-          className="w-16 h-16 ring-4 ring-white dark:ring-[rgb(var(--surface-primary))] shadow-sm bg-[rgb(var(--surface-secondary))]"
+          className="w-16 h-16 ring-4 ring-[rgb(var(--border-inverse))] dark:ring-[rgb(var(--surface-primary))] shadow-sm bg-[rgb(var(--surface-secondary))]"
         />
         <div
-          className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white dark:border-[rgb(var(--surface-primary))] ${statusStyle.dot}`}
+          className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-[rgb(var(--border-inverse))] dark:border-[rgb(var(--surface-primary))] ${statusStyle.dot}`}
         />
       </div>
 

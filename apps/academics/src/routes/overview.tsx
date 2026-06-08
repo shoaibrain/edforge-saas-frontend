@@ -198,7 +198,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
                 <GraduationCap className="w-4 h-4" style={{ color: '#1D9E75' }} />
               </div>
               <h1
-                className="text-[14px] font-semibold"
+                className="text-sm font-semibold"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 Academics

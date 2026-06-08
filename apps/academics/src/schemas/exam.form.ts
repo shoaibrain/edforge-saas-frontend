@@ -41,11 +41,11 @@ export type ExamFormData = z.infer<typeof examFormSchema>
 // ============================================================================
 
 export const EXAM_STATUS_META: Record<ExamStatus, { label: string; className: string }> = {
-  draft: { label: 'Draft', className: 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300' },
-  scheduled: { label: 'Scheduled', className: 'bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' },
+  draft: { label: 'Draft', className: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 ' },
+  scheduled: { label: 'Scheduled', className: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ' },
   in_progress: { label: 'In Progress', className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' },
-  closed: { label: 'Closed', className: 'bg-purple-50 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300' },
-  published: { label: 'Published', className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' },
+  closed: { label: 'Closed', className: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ' },
+  published: { label: 'Published', className: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 ' },
 }
 
 export function getExamStatusMeta(status: ExamStatus) {

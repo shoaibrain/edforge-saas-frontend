@@ -388,7 +388,7 @@ function GradebookTab() {
       {/* Section & Term Selectors */}
       <div className="flex items-center gap-3 flex-wrap">
         {!sectionsLoading && sections.length === 0 ? (
-          <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-[250px]">
+          <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-64">
             No sections assigned. Contact your administrator.
           </div>
         ) : (
@@ -396,7 +396,7 @@ function GradebookTab() {
             value={selectedSectionId ?? ''}
             onChange={(e) => setSelectedSectionId(e.target.value || null)}
             disabled={sectionsLoading}
-            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] min-w-[250px]"
+            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] min-w-64"
           >
             <option value="">Select a section...</option>
             {sections.map((s) => (
@@ -431,7 +431,7 @@ function GradebookTab() {
                 type="button"
                 onClick={() => setShowBulkModal(true)}
                 disabled={!effectiveTermId || !currentYear?.yearId}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Record
@@ -465,8 +465,8 @@ function GradebookTab() {
         </div>
       )}
       {hasNoDefaultPolicy && selectedSectionId && (
-        <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]/30 dark:bg-[rgb(var(--state-info-fg))]/8 border border-cyan-300/25 dark:border-cyan-400/15">
-          <AlertTriangle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]/30 dark:bg-[rgb(var(--state-info-fg))]/8 border border-[rgb(var(--state-info-border)/0.30)] ">
+          <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-info-fg))] flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-text-primary font-medium">No default grading policy set</p>
             <p className="text-xs text-text-secondary mt-0.5">
@@ -706,7 +706,7 @@ export function ClassroomsModule() {
                 <LayoutGrid className="w-4 h-4" style={{ color: '#378ADD' }} />
               </div>
               <h1
-                className="text-[14px] font-semibold"
+                className="text-sm font-semibold"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 Classrooms
@@ -809,7 +809,7 @@ export function ClassroomsModule() {
       </div>
 
       {/* Tab Content — error-bounded */}
-      <div className="p-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="p-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

@@ -37,10 +37,10 @@ function getLetterGradeColor(grade: string): string {
 }
 
 function getGpaBadge(gpa: number): { bg: string; text: string } {
-  if (gpa >= 3.5) return { bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-emerald-700 ' }
+  if (gpa >= 3.5) return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-success-fg))] ' }
   if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-[rgb(var(--state-info-fg))] ' }
   if (gpa >= 2.0) return { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20', text: 'text-[rgb(var(--state-warning-fg))]' }
-  return { bg: 'bg-red-100 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-red-700 ' }
+  return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] ' }
 }
 
 // ============================================================================
@@ -176,14 +176,14 @@ export function ReportCardPage() {
       {/* Printable Content */}
       <div ref={printRef} className="px-6 py-6 max-w-4xl mx-auto print:px-0 print:py-0 print:max-w-none">
         {/* Print Header (only visible when printing) */}
-        <div className="hidden print:block mb-8 border-b-2 border-gray-800 pb-4">
+        <div className="hidden print:block mb-8 border-b-2 border-[rgb(var(--text-primary))] pb-4">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Student Report Card</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Student Report Card</h1>
+            <p className="text-[rgb(var(--text-tertiary))] mt-1">
               {currentYear?.name || 'Academic Year'}{selectedTermId ? ` — ${gradingPeriods?.find((gp: { periodId: string }) => gp.periodId === selectedTermId)?.name || 'Term'}` : ''}
             </p>
           </div>
-          <div className="mt-4 flex justify-between text-sm text-gray-700">
+          <div className="mt-4 flex justify-between text-sm text-[rgb(var(--text-secondary))]">
             <div>
               <strong>Student:</strong> {studentName}
             </div>
@@ -219,21 +219,21 @@ export function ReportCardPage() {
             {/* GPA Summary */}
             {gpa && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print:grid-cols-3">
-                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-gray-300 print:rounded print:bg-gray-50">
+                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--surface-tertiary))]">
                   <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Term GPA</p>
-                  <p className={`text-2xl font-bold ${getGpaBadge(gpa.termGpa).text} print:text-gray-900`}>
+                  <p className={`text-2xl font-bold ${getGpaBadge(gpa.termGpa).text} print:text-[rgb(var(--text-primary))]`}>
                     {gpa.termGpa.toFixed(2)}
                   </p>
                 </div>
-                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-gray-300 print:rounded print:bg-gray-50">
+                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--surface-tertiary))]">
                   <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Cumulative GPA</p>
-                  <p className={`text-2xl font-bold ${getGpaBadge(gpa.cumulativeGpa).text} print:text-gray-900`}>
+                  <p className={`text-2xl font-bold ${getGpaBadge(gpa.cumulativeGpa).text} print:text-[rgb(var(--text-primary))]`}>
                     {gpa.cumulativeGpa.toFixed(2)}
                   </p>
                 </div>
-                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-gray-300 print:rounded print:bg-gray-50">
+                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--surface-tertiary))]">
                   <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Weighted GPA</p>
-                  <p className={`text-2xl font-bold ${getGpaBadge(gpa.weightedGpa).text} print:text-gray-900`}>
+                  <p className={`text-2xl font-bold ${getGpaBadge(gpa.weightedGpa).text} print:text-[rgb(var(--text-primary))]`}>
                     {gpa.weightedGpa.toFixed(2)}
                   </p>
                 </div>
@@ -241,16 +241,16 @@ export function ReportCardPage() {
             )}
 
             {/* Course Grades Table */}
-            <div className="rounded-xl border border-border-secondary overflow-hidden print:rounded print:border-gray-300">
+            <div className="rounded-xl border border-border-secondary overflow-hidden print:rounded print:border-[rgb(var(--border-primary))]">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-surface-secondary print:bg-[rgb(var(--surface-tertiary))]">
-                    <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-gray-900">Course</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">Assignments</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">Numeric</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">Letter</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">GPA Points</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-gray-700">Status</th>
+                    <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">Course</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Assignments</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Numeric</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Letter</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">GPA Points</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-secondary print:divide-gray-200">
@@ -259,35 +259,35 @@ export function ReportCardPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-text-tertiary print:hidden" />
-                          <span className="font-medium text-text-primary print:text-gray-900">
+                          <span className="font-medium text-text-primary print:text-[rgb(var(--text-primary))]">
                             {grade.courseName || <UuidBadge value={grade.courseId} />}
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-center text-text-secondary print:text-gray-600">
+                      <td className="px-4 py-3 text-center text-text-secondary print:text-[rgb(var(--text-tertiary))]">
                         {grade.assignments?.length ?? 0}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="font-semibold text-text-primary print:text-gray-900">
+                        <span className="font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">
                           {grade.numericGrade.toFixed(1)}%
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`font-bold text-lg ${getLetterGradeColor(grade.letterGrade)} print:text-gray-900`}>
+                        <span className={`font-bold text-lg ${getLetterGradeColor(grade.letterGrade)} print:text-[rgb(var(--text-primary))]`}>
                           {grade.letterGrade}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center text-text-secondary print:text-gray-600">
+                      <td className="px-4 py-3 text-center text-text-secondary print:text-[rgb(var(--text-tertiary))]">
                         {grade.gpaPoints.toFixed(1)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {grade.isFinal ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full print:text-gray-700 print:bg-gray-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full print:text-[rgb(var(--text-secondary))] print:bg-[rgb(var(--surface-tertiary))]">
                             <Lock className="w-3 h-3 print:hidden" />
                             Final
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full print:text-gray-600 print:bg-gray-200">
+                          <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full print:text-[rgb(var(--text-tertiary))] print:bg-[rgb(var(--surface-tertiary))]">
                             In Progress
                           </span>
                         )}
@@ -299,7 +299,7 @@ export function ReportCardPage() {
             </div>
 
             {/* Print Footer */}
-            <div className="hidden print:block mt-8 pt-4 border-t border-gray-300 text-xs text-[rgb(var(--text-tertiary))] text-center">
+            <div className="hidden print:block mt-8 pt-4 border-t border-[rgb(var(--border-primary))] text-xs text-[rgb(var(--text-tertiary))] text-center">
               Generated on {new Date().toLocaleString()} — EdForge Student Information System
             </div>
           </div>

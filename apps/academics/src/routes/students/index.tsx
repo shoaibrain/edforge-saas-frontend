@@ -223,7 +223,7 @@ function EmptyFilterState({ onClear }: { onClear: () => void }) {
         style={{ color: 'var(--v2-text-hint)', opacity: 0.5 }}
       />
       <p
-        className="text-[14px] font-medium mb-1"
+        className="text-sm font-medium mb-1"
         style={{ color: 'var(--v2-text-primary)' }}
       >
         No students found
@@ -271,7 +271,7 @@ function NoSchoolGuard() {
 
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="min-h-[400px] flex items-center justify-center">
+    <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
         <div
           className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
@@ -439,7 +439,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <Users className="w-4 h-4" style={{ color: '#1D9E75' }} />
               </div>
               <h1
-                className="text-[14px] font-semibold"
+                className="text-sm font-semibold"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 Students

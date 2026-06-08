@@ -302,7 +302,7 @@ export function CurriculumModule() {
 
           {/* Title */}
           <h1
-            className="text-[18px] font-semibold"
+            className="text-lg font-semibold"
             style={{ color: 'var(--v2-text-primary, var(--text-primary, #e8eaf0))', letterSpacing: -0.3 }}
           >
             Curriculum

@@ -126,7 +126,7 @@ function RosterStudentRow({
   return (
     <div className="flex items-center justify-between py-3 px-4 hover:bg-surface-secondary/50 transition-colors">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)] flex items-center justify-center">
           <GraduationCap className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
         </div>
         <div>
@@ -398,7 +398,7 @@ export function SectionRosterPage() {
               </div>
             </div>
 
-            <div className="max-h-[500px] overflow-y-auto">
+            <div className="max-h-128 overflow-y-auto">
               {studentsLoading ? (
                 <div className="py-12 text-center">
                   <Loader2 className="w-6 h-6 mx-auto text-text-tertiary animate-spin" />
@@ -439,7 +439,7 @@ export function SectionRosterPage() {
               </h3>
             </div>
 
-            <div className="max-h-[500px] overflow-y-auto">
+            <div className="max-h-128 overflow-y-auto">
               {rosterLoading ? (
                 <div className="py-12 text-center">
                   <Loader2 className="w-6 h-6 mx-auto text-text-tertiary animate-spin" />

@@ -246,7 +246,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             type="button"
             onClick={() => setShowBulkModal(true)}
             disabled={!effectiveTermId}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5" />
             Record
@@ -697,7 +697,7 @@ export function ClassroomDetailPage() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Enhanced gradient overlay for better text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgb(var(--background-overlay)/0.70)] via-[rgb(var(--background-overlay)/0.40)] to-[rgb(var(--background-overlay)/0.20)]" />
 
         {/* Content (positioned above overlay) */}
         <div className="relative px-4 sm:px-8 pt-5 pb-4">
@@ -706,10 +706,10 @@ export function ClassroomDetailPage() {
             <div className="flex items-center gap-2">
               <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                 section.isActive
-                  ? 'bg-white/20 text-[rgb(var(--action-primary-fg))]'
-                  : 'bg-black/20 text-[rgb(var(--action-primary-fg))]/80'
+                  ? 'bg-[rgb(var(--surface-primary)/0.20)] text-[rgb(var(--action-primary-fg))]'
+                  : 'bg-[rgb(var(--background-overlay)/0.20)] text-[rgb(var(--action-primary-fg))]/80'
               }`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-white' : 'bg-white/50'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--surface-secondary))]' : 'bg-[rgb(var(--surface-primary)/0.50)]'}`} />
                 {section.isActive ? 'Active' : 'Inactive'}
               </div>
               {schedPerms.edit && (
@@ -735,12 +735,12 @@ export function ClassroomDetailPage() {
 
           {/* Compact inline badges: enrollment + room */}
           <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-[rgb(var(--action-primary-fg))]/90">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--surface-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
               <Users className="w-3 h-3" />
               {section.currentEnrollment}/{section.maxEnrollment} students ({percent}%)
             </span>
             {(section.locationRoomNumber || section.roomNumber) && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-[rgb(var(--action-primary-fg))]/90">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--surface-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
                 <MapPin className="w-3 h-3" />
                 {section.locationRoomNumber || section.roomNumber}
               </span>
@@ -787,7 +787,7 @@ export function ClassroomDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 sm:px-8 py-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="px-4 sm:px-8 py-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

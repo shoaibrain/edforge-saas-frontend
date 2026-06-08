@@ -98,7 +98,7 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
             <div className="px-6 py-5 space-y-6">
               {/* Profile Header */}
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)] flex items-center justify-center">
                   <GraduationCap className="w-7 h-7 text-[rgb(var(--state-info-fg))]" />
                 </div>
                 <div>

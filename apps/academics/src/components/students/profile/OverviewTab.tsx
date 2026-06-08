@@ -792,8 +792,8 @@ export function OverviewTab({ student }: OverviewTabProps) {
           </div>
         )}
         {effectiveSummary && effectiveSummary.attendanceRate >= 98 && (
-          <div className="mt-3 p-3 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] border border-emerald-200/50 dark:border-[rgb(var(--state-success-border))]/20">
-            <p className="text-sm text-emerald-800  flex items-center gap-2">
+          <div className="mt-3 p-3 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] border border-[rgb(var(--state-success-border)/0.35)] dark:border-[rgb(var(--state-success-border))]/20">
+            <p className="text-sm text-[rgb(var(--state-success-fg))]  flex items-center gap-2">
               <TrendingUp className="w-4 h-4 flex-shrink-0" />
               {tAcad('alerts.highAttendance')}
             </p>
@@ -832,9 +832,9 @@ export function OverviewTabSkeleton() {
           <div key={i} className="h-20 bg-surface-secondary rounded-xl animate-pulse" />
         ))}
       </div>
-      <div className="h-[180px] bg-surface-secondary rounded-xl animate-pulse" />
+      <div className="h-44 bg-surface-secondary rounded-xl animate-pulse" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-[200px] bg-surface-secondary rounded-xl animate-pulse" />
+        <div className="h-52 bg-surface-secondary rounded-xl animate-pulse" />
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-14 bg-surface-tertiary rounded-lg animate-pulse" />

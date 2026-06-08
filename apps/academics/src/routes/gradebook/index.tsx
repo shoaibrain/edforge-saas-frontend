@@ -16,7 +16,7 @@ export function GradebookModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-[rgb(var(--state-warning-bg)/0.18)]">
               <BookCheck className="w-6 h-6 text-[rgb(var(--state-warning-fg))]" />
             </div>
             <div>
@@ -31,7 +31,7 @@ export function GradebookModule() {
 
       <div className="p-6 space-y-6">
         {/* Redirect Notice */}
-        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-blue-500/20 rounded-xl p-6">
+        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-lg bg-[rgb(var(--state-info-fg))]/20">
               <ArrowRight className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
@@ -47,7 +47,7 @@ export function GradebookModule() {
               <Link
                 to="/classrooms"
                 search={{ tab: 'gradebook' }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
               >
                 <span>Go to Grades & Assessments</span>
                 <ArrowRight className="w-4 h-4" />

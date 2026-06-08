@@ -43,8 +43,8 @@ const statusConfig: Record<
   },
   active: {
     label: 'Active',
-    bg: 'bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20',
-    text: 'text-emerald-700 ',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20',
+    text: 'text-[rgb(var(--state-success-fg))] ',
     dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
   },
   completed: {
@@ -144,7 +144,7 @@ function AcademicYearCard({
     <div
       className={`bg-surface-secondary rounded-xl border p-5 transition-all ${
         year.isCurrent
-          ? 'border-emerald-500/50 ring-1 ring-emerald-500/20'
+          ? 'border-[rgb(var(--state-success-border)/0.50)] ring-1 ring-[rgb(var(--state-success-border)/0.35)]'
           : 'border-border-secondary hover:border-border-primary'
       }`}
     >
@@ -160,7 +160,7 @@ function AcademicYearCard({
         <div className="flex items-center gap-2 ml-3 flex-shrink-0">
           <AcademicYearStatusBadge status={year.status} />
           {year.isCurrent && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 text-emerald-700 ">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 text-[rgb(var(--state-success-fg))] ">
               <CheckCircle2 className="w-3 h-3" />
               Current
             </span>
@@ -250,7 +250,7 @@ function StatCard({
 
 function NoSchoolSelected() {
   return (
-    <div className="min-h-[400px] flex items-center justify-center">
+    <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 flex items-center justify-center">
           <AlertCircle className="w-8 h-8 text-[rgb(var(--state-warning-fg))]" />
@@ -268,9 +268,9 @@ function NoSchoolSelected() {
 
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="min-h-[400px] flex items-center justify-center">
+    <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 flex items-center justify-center">
           <AlertCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -398,7 +398,7 @@ export function CalendarModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-success-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
               <Calendar className="w-6 h-6 text-[rgb(var(--state-success-fg))]" />
             </div>
             <div>

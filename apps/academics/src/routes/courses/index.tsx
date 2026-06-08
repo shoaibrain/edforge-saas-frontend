@@ -16,7 +16,7 @@ export function CoursesModule() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.10)]">
-                <BookOpen className="w-6 h-6 text-rose-600 " />
+                <BookOpen className="w-6 h-6 text-[rgb(var(--state-danger-fg))] " />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-text-primary">Course Catalog</h1>
@@ -35,7 +35,7 @@ export function CoursesModule() {
 
       <div className="p-6 space-y-6">
         {/* Redirect Notice */}
-        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-blue-500/20 rounded-xl p-6">
+        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-lg bg-[rgb(var(--state-info-fg))]/20">
               <ArrowRight className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
@@ -50,7 +50,7 @@ export function CoursesModule() {
               </p>
               <Link
                 to="/curriculum"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
               >
                 <span>Go to Curriculum Management</span>
                 <ArrowRight className="w-4 h-4" />
@@ -65,7 +65,7 @@ export function CoursesModule() {
             icon={BookOpen}
             label="Total Courses"
             value="87"
-            accent="text-rose-600 "
+            accent="text-[rgb(var(--state-danger-fg))] "
             bg="bg-[rgb(var(--state-danger-fg))]/10"
           />
           <StatCard
@@ -111,7 +111,7 @@ export function CoursesModule() {
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-[rgb(var(--state-danger-fg))]/10">
-              <BookOpen className="w-5 h-5 text-rose-600 " />
+              <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] " />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">

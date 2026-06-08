@@ -193,10 +193,10 @@ function MatrixCell({
             ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/20'
             : checked
               ? isPending && pendingAction === 'add'
-                ? 'border-emerald-400 bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)]'
-                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-teal-600'
+                ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)]'
+                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-[rgb(var(--state-info-border))]'
               : isPending && pendingAction === 'remove'
-                ? 'border-red-300 bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/5 hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
+                ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/5 hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
                 : 'border-border-secondary hover:border-[rgb(var(--border-focus))] hover:bg-surface-hover'
           }
         `}
@@ -209,7 +209,7 @@ function MatrixCell({
           <AlertTriangle className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
         )}
         {!checked && isPending && pendingAction === 'remove' && (
-          <Minus className="w-3.5 h-3.5 text-red-400" />
+          <Minus className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
         )}
         {checked && isPending && pendingAction === 'add' && (
           <Plus className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
@@ -217,7 +217,7 @@ function MatrixCell({
       </button>
       {/* Conflict tooltip */}
       {hasConflict && (
-        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-red-600 text-[rgb(var(--action-primary-fg))] text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
+        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
           <div className="font-medium mb-0.5">Schedule Conflict</div>
           <div>Same class period as {conflict.conflictingSectionIds.length} other section(s)</div>
           <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600" />
@@ -261,8 +261,8 @@ function MatrixStudentRow({
       }}
     >
       {/* Sticky student name column */}
-      <td className="sticky left-0 z-10 bg-surface-primary px-3 py-2 border-r-2 border-border-secondary whitespace-nowrap min-w-[220px]">
-        <div className="text-sm font-medium text-text-primary truncate max-w-[200px]">
+      <td className="sticky left-0 z-10 bg-surface-primary px-3 py-2 border-r-2 border-border-secondary whitespace-nowrap min-w-56">
+        <div className="text-sm font-medium text-text-primary truncate max-w-52">
           {student.lastName}, {student.firstName}
         </div>
         <div className="text-xs text-text-tertiary">
@@ -673,7 +673,7 @@ export function BulkRosteringPage() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
               <Grid3x3 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))]" />
             </div>
             <div>
@@ -765,7 +765,7 @@ export function BulkRosteringPage() {
             <thead className="sticky top-0 z-20">
               <tr className="bg-surface-secondary">
                 {/* Top-left corner cell */}
-                <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-r-2 border-b border-border-secondary min-w-[220px] text-left">
+                <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-r-2 border-b border-border-secondary min-w-56 text-left">
                   <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
                     Student
                   </span>
@@ -773,7 +773,7 @@ export function BulkRosteringPage() {
                 {allSections.map((section) => (
                   <th
                     key={section.sectionId}
-                    className="px-1 py-2 border-r border-b border-border-secondary min-w-[80px] max-w-32"
+                    className="px-1 py-2 border-r border-b border-border-secondary min-w-20 max-w-32"
                   >
                     <div className="text-xs font-semibold text-text-primary truncate" title={`${section.courseName ?? ''} - Section ${section.sectionNumber}`}>
                       {section.courseCode ?? section.courseName ?? ''}

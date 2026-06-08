@@ -472,7 +472,7 @@ function SectionsTab({
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex-shrink-0">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)] flex-shrink-0">
                   <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                 </div>
                 <div className="min-w-0">
@@ -656,7 +656,7 @@ export function CourseDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.10)]">
-                <BookOpen className="w-6 h-6 text-rose-600 " />
+                <BookOpen className="w-6 h-6 text-[rgb(var(--state-danger-fg))] " />
               </div>
               <div>
                 <div className="flex items-center gap-3">
@@ -689,8 +689,8 @@ export function CourseDetailPage() {
               <div
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
                   course.isActive
-                    ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-emerald-700 dark:bg-[rgb(var(--state-success-bg)/0.18)] '
-                    : 'bg-[rgb(var(--surface-tertiary))] text-gray-600 dark:bg-gray-500/10 '
+                    ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)] '
+                    : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] dark:bg-[rgb(var(--surface-tertiary))]0/10 '
                 }`}
               >
                 <div

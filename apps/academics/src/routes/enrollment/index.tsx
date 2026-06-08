@@ -384,7 +384,7 @@ export function EnrollmentModule() {
       </div>
 
       {/* Tab Content */}
-      <div className="p-6 min-h-[500px]">
+      <div className="p-6 min-h-128">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

@@ -63,7 +63,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                 e.stopPropagation()
                 onRemove()
               }}
-              className="p-1.5 rounded-lg text-red-400 hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
+              className="p-1.5 rounded-lg text-[rgb(var(--state-danger-fg))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
               aria-label="Remove guardian"
             >
               <Trash2 className="w-4 h-4" />

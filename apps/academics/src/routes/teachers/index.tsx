@@ -73,7 +73,7 @@ export function TeachersModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
               <Users className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>

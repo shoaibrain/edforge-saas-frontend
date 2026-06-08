@@ -75,7 +75,7 @@ function isValidUUID(id: string): boolean {
 function ProfileLoadingState() {
   return (
     <div className="min-h-full">
-      <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-0">
+      <div className="max-w-full mx-auto px-6 py-6 space-y-0">
         <div className="pb-6">
           <ProfileHeaderSkeleton />
         </div>
@@ -90,7 +90,7 @@ function ProfileLoadingState() {
             </div>
           ))}
         </div>
-        <div className="min-h-[500px] pt-6">
+        <div className="min-h-128 pt-6">
           <OverviewTabSkeleton />
         </div>
       </div>
@@ -200,7 +200,7 @@ export function StudentProfilePage() {
 
   return (
     <div className="min-h-full">
-      <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-0">
+      <div className="max-w-full mx-auto px-6 py-6 space-y-0">
         {/* Profile Header */}
         <div className="pb-6">
           <ProfileHeader
@@ -248,7 +248,7 @@ export function StudentProfilePage() {
         </div>
 
         {/* Tab Content with AnimatePresence */}
-        <div className="min-h-[500px] pt-6">
+        <div className="min-h-128 pt-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
