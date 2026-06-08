@@ -40,8 +40,8 @@ export type TenantDateFormat = 'short' | 'medium' | 'long' | 'numeric'
  */
 export function useTenantDateFormat() {
   const settings = useWorkspaceSettings()
-  const calendar = settings?.regional?.defaultCalendarSystem === 'bikram_sambat' ? 'bs' : 'ad'
-  const dual = !!settings?.regional?.enableDualDateDisplay
+  const calendar = settings?.defaultCalendarSystem === 'bikram_sambat' ? 'bs' : 'ad'
+  const dual = !!settings?.enableDualDateDisplay
 
   return (
     value: string | Date | null | undefined,

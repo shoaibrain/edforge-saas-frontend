@@ -5,7 +5,6 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useTranslation } from '@edforge/i18n'
 import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import type { HeatmapDay, HeatmapStatus } from '@edforge/ui'
 import { AlertCircle } from 'lucide-react'
@@ -56,8 +55,6 @@ function ParentAttendanceContent({
   childName: string
   academicYearId?: string
 }) {
-  const { t } = useTranslation('portal')
-
   const { data: yearData } = usePortalCurrentAcademicYear(schoolId)
   const yearId = academicYearId ?? yearData?.id ?? ''
 

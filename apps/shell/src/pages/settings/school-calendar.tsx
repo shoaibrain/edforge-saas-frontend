@@ -300,6 +300,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           startDate: activeYear.startDate,
           endDate: activeYear.endDate,
           schoolDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+          mode: 'replace',
           includeWeekends: false,
         },
       },

@@ -395,16 +395,13 @@ export default function PeopleSettingsPage() {
   const [roleModalUser, setRoleModalUser] = useState<UserResponseDto | null>(null)
   const [confirmModal, setConfirmModal] = useState<{ user: UserResponseDto; action: ConfirmAction } | null>(null)
 
-  // Check permission
-  if (!user) {
-    return <Navigate to="/login" />
-  }
-
-  const hasPermission = can(user, {
-    action: 'view',
-    resource: 'staff',
-    schoolId: activeSchoolId ?? undefined,
-  })
+  const hasPermission = user
+    ? can(user, {
+        action: 'view',
+        resource: 'staff',
+        schoolId: activeSchoolId ?? undefined,
+      })
+    : false
 
   // Build query params
   const queryParams: ListUsersParams = useMemo(() => {
@@ -416,10 +413,6 @@ export default function PeopleSettingsPage() {
   }, [searchQuery, roleFilter, statusFilter])
 
   const { data, isLoading } = useUsers(queryParams, !!hasPermission)
-
-  if (!hasPermission) {
-    return <AccessDenied message="You don't have permission to view access policy settings." />
-  }
 
   const users = data?.items || []
 
@@ -521,13 +514,21 @@ export default function PeopleSettingsPage() {
       cell: ({ row }) => (
         <UserActionsDropdown
           user={row.original}
-          currentUserId={user.id}
+          currentUserId={user?.id ?? ''}
           onChangeRole={handleChangeRole}
           onAction={handleAction}
         />
       ),
     }),
-  ], [user.id, handleChangeRole, handleAction])
+  ], [user?.id, handleChangeRole, handleAction])
+
+  if (!user) {
+    return <Navigate to="/login" />
+  }
+
+  if (!hasPermission) {
+    return <AccessDenied message="You don't have permission to view access policy settings." />
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">

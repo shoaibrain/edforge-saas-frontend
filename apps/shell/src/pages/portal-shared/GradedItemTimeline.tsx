@@ -6,7 +6,6 @@
  */
 
 import { useMemo } from 'react'
-import { useTranslation } from '@edforge/i18n'
 import type { CourseGradeResponseDto } from '@aibrains/shared-types'
 import { Skeleton } from '@edforge/ui'
 import { FileText, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
@@ -57,8 +56,6 @@ function formatDate(dateStr?: string): string {
 }
 
 export function GradedItemTimeline({ grades, loading }: GradedItemTimelineProps) {
-  const { t } = useTranslation('portal')
-
   const items = useMemo(() => {
     if (!grades) return []
     return flattenAssignments(grades)

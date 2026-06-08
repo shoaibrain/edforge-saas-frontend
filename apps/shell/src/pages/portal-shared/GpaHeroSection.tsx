@@ -3,7 +3,6 @@
  * Matched precisely to the prototype's .fp-progress-hero DOM and styling.
  */
 
-import { useTranslation } from '@edforge/i18n'
 import type { StudentGradesResponseDto } from '@aibrains/shared-types'
 import { Skeleton } from '@edforge/ui'
 
@@ -14,8 +13,6 @@ export interface GpaHeroSectionProps {
 }
 
 export function GpaHeroSection({ data, loading, childName }: GpaHeroSectionProps) {
-  const { t } = useTranslation('portal')
-
   if (loading) {
     return (
       <section className="fp-progress-hero" style={{ padding: '40px 44px' }}>
@@ -63,7 +60,7 @@ export function GpaHeroSection({ data, loading, childName }: GpaHeroSectionProps
   
   // Dash array circle calculation roughly for a 260px SVG. r = 110, circumference = 691.
   // 691 * (GPA / 4) offset calculation
-  const offset = hasMarks ? 691 - ((gpa!.cumulativeGpa / 4.0) * 691) : 691;
+  const offset = hasMarks ? 691 - (((gpa?.cumulativeGpa ?? 0) / 4.0) * 691) : 691;
 
   return (
     <section className="fp-progress-hero">

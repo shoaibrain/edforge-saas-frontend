@@ -6,7 +6,6 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useTranslation } from '@edforge/i18n'
 import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import type { HeatmapDay, HeatmapStatus } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
@@ -45,15 +44,13 @@ function StudentAttendanceContent({
   studentId,
   schoolId,
   academicYearId,
-  studentName
+  studentName: _studentName
 }: {
   studentId: string
   schoolId: string
   academicYearId?: string
   studentName: string
 }) {
-  const { t } = useTranslation('portal')
-
   const { data: yearData } = usePortalCurrentAcademicYear(schoolId)
   const yearId = academicYearId ?? yearData?.id ?? ''
 

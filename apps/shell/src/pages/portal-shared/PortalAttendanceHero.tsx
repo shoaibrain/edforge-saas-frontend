@@ -3,7 +3,6 @@
  * Enhanced UI/UX for Insight tiles with dynamic, Staff-level layout structure.
  */
 
-import { useTranslation } from '@edforge/i18n'
 import type { AttendanceSummary } from '../../hooks/usePortalStudentAttendance'
 import { Skeleton } from '@edforge/ui'
 import { Clock, FileText, CheckCircle2, AlertCircle } from 'lucide-react'
@@ -14,8 +13,6 @@ export interface PortalAttendanceHeroProps {
 }
 
 export function PortalAttendanceHero({ summary, loading }: PortalAttendanceHeroProps) {
-  const { t } = useTranslation('portal')
-
   if (loading || !summary) {
     return (
       <div className="fp-a-hero">
@@ -27,7 +24,7 @@ export function PortalAttendanceHero({ summary, loading }: PortalAttendanceHeroP
 
   const { attendanceRate, totalDays, presentDays, absentDays, lateDays, excusedDays } = summary
   
-  let rateDisplay = attendanceRate != null ? `${Math.round(attendanceRate)}%` : '—%'
+  const rateDisplay = attendanceRate != null ? `${Math.round(attendanceRate)}%` : '—%'
   
   let narrative = attendanceRate >= 95
       ? '"Excellent attendance so far. Keep up the rhythm."'

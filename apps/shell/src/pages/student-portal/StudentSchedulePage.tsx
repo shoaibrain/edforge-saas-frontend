@@ -6,7 +6,6 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useTranslation } from '@edforge/i18n'
 import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
@@ -17,7 +16,6 @@ import { PortalWeekTimetable } from '../portal-shared/PortalWeekTimetable'
 import { PortalScheduleCourseCard } from '../portal-shared/PortalScheduleCourseCard'
 
 export default function StudentSchedulePage() {
-  const { t } = useTranslation('portal')
   const { studentId, studentProfile } = useStudentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()
@@ -158,15 +156,13 @@ export default function StudentSchedulePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           {!loading && sections && sections.slice(0,2).map((sec, i) => {
+           {!loading && sections && sections.slice(0,2).map((sec) => {
              const isMath = sec.courseName.toLowerCase().includes('math') || sec.courseName.toLowerCase().includes('arith')
              const period = sec.periodId ? periodMap.get(sec.periodId) : null
              let timeStr = 'Time TBD'
-             let room = sec.room ?? 'Room TBD'
+             const room = sec.room ?? 'Room TBD'
 
              if (period) {
-                const startHour = parseInt(period.startTime.split(':')[0]) % 12 || 12
-                const startAmpm = parseInt(period.startTime.split(':')[0]) >= 12 ? 'pm' : 'am'
                 // Hardcode mocked days for the aesthetic like the prototype
                 timeStr = `9:00 — 10:00 AM • Period 1 • Mon—Fri`
                 if (!isMath) timeStr = `2:00 — 3:00 PM • Period 5 • Mon—Fri`

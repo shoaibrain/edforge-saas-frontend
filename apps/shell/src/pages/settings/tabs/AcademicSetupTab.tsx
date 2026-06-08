@@ -2088,6 +2088,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           academicYearId: yearId,
           startDate,
           endDate,
+          mode: 'replace',
           includeWeekends: false,
           schoolDays,
           holidays: localeHolidays.length > 0
