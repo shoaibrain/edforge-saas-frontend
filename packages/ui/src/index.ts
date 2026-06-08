@@ -54,6 +54,7 @@ export {
 export { Dropdown, type DropdownOption } from './components/Dropdown'
 export { Tag, tagVariants, type TagProps } from './components/Tag'
 export { Accordion, type AccordionItem, type AccordionProps } from './components/Accordion'
+export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
 
 // TanStack Data Table
 export {
