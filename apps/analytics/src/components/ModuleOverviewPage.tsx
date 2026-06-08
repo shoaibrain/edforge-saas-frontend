@@ -17,7 +17,6 @@ import {
     ArrowRight, 
     ChartNoAxesColumnDecreasing, 
     CloudLightning, 
-    GalleryVerticalEnd,
     ChevronLeft,
     ChevronRight,
     TrendingUp,
@@ -28,7 +27,7 @@ import {
     RotateCcw,
     Check,
 } from 'lucide-react'
-import { Card } from '@edforge/ui'
+import { Card, PageHeader } from '@edforge/ui'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -259,21 +258,12 @@ export function ModuleOverviewPage({ title, description, stats, actionCards, chi
 
     return (
         <div className="space-y-10 max-w-6xl mx-auto pb-12 relative">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="absolute top-4 right-0 z-10">
-                <WidgetVisibilityMenu widgets={widgets} onToggle={toggleWidget} onReset={resetWidgets} />
-            </motion.div>
-            <motion.header initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="pt-4 pr-12">
-                <div className="flex items-start gap-4">
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-                        className="p-3 rounded-xl bg-gradient-to-br from-violet-500/15 to-purple-500/15 dark:from-violet-400/20 dark:to-purple-500/20 border border-violet-500/20 dark:border-violet-400/25 flex-shrink-0">
-                        <GalleryVerticalEnd className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                    </motion.div>
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">{title} Overview</h1>
-                        <p className="text-[rgb(var(--text-secondary))] mt-1 max-w-2xl">{description}</p>
-                    </div>
-                </div>
-            </motion.header>
+            <PageHeader
+                className="pt-4"
+                title={`${title} Overview`}
+                description={description}
+                actions={<WidgetVisibilityMenu widgets={widgets} onToggle={toggleWidget} onReset={resetWidgets} />}
+            />
             {stats.length > 0 && (<WidgetSection label="Quick stats" icon={ChartNoAxesColumnDecreasing} visible={widgetVisibility['quick-stats']}><StatsCarousel stats={stats} /></WidgetSection>)}
             {actionCards.length > 0 && (
                 <WidgetSection label="Quick access" icon={CloudLightning} visible={widgetVisibility['quick-access']}>
