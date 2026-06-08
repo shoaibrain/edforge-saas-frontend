@@ -126,7 +126,7 @@ function StatCard({
 // ============================================================================
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
+  if (!subject) return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
     return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
@@ -141,8 +141,8 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
   if (s.includes('physical') || s.includes('pe') || s.includes('health'))
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
-    return { bg: 'bg-cyan-500/10', text: 'text-cyan-600 ' }
-  return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
+    return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-cyan-600 ' }
+  return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-slate-600 dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================

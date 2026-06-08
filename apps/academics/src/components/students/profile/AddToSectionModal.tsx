@@ -189,7 +189,7 @@ export function AddToSectionModal({
             !selectedSectionId ||
             enrollStudentMutation.isPending
           }
-          className="min-w-[120px]"
+          className="min-w-32"
         >
           {enrollStudentMutation.isPending ? (
             <>

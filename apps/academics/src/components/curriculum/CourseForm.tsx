@@ -103,7 +103,7 @@ function GradeLevelSelector({
                     : 'bg-[rgb(var(--state-info-bg)/0.18)]0 text-[rgb(var(--action-primary-fg))] border-[rgb(var(--border-focus))] shadow-sm'
                   : isOutOfRange
                     ? 'bg-surface-primary text-amber-500 border-amber-300 border-dashed hover:border-amber-400'
-                    : 'bg-surface-primary text-text-secondary border-border-primary hover:border-teal-400 hover:text-text-primary'
+                    : 'bg-surface-primary text-text-secondary border-border-primary hover:border-[rgb(var(--border-focus))] hover:text-text-primary'
               }`}
               title={isOutOfRange ? 'Outside school grade range' : undefined}
             >

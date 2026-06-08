@@ -222,7 +222,7 @@ function CapacityBar({ current, max }: { current: number; max: number }) {
   const textColor = getCapacityTextColor(current, max)
 
   return (
-    <div className="flex items-center gap-2 min-w-[120px]">
+    <div className="flex items-center gap-2 min-w-32">
       <div className="flex-1 h-2 bg-surface-secondary rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
@@ -266,8 +266,8 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
         {showCreditBadge && (
           <Badge
             label={creditTypeLabel}
-            bg="bg-slate-50"
-            text="text-slate-700"
+            bg="bg-[rgb(var(--surface-tertiary))]"
+            text="text-[rgb(var(--text-secondary))]"
           />
         )}
       </div>
@@ -512,7 +512,7 @@ function SectionsTab({
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      section.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-gray-400'
+                      section.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
                     }`}
                   />
                   <span className="text-xs text-text-secondary">
@@ -655,8 +655,8 @@ export function CourseDetailPage() {
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20">
-                <BookOpen className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.10)]">
+                <BookOpen className="w-6 h-6 text-rose-600 " />
               </div>
               <div>
                 <div className="flex items-center gap-3">
@@ -695,7 +695,7 @@ export function CourseDetailPage() {
               >
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    course.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-gray-400'
+                    course.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
                   }`}
                 />
                 {course.isActive ? 'Active' : 'Inactive'}

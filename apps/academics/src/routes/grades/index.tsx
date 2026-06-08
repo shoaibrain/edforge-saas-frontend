@@ -340,7 +340,7 @@ export function GradesModule() {
 
                 {/* No Default Policy Warning */}
                 {hasNoDefaultPolicy && selectedSectionId && (
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-cyan-50/30 dark:bg-cyan-500/8 border border-cyan-300/25 dark:border-cyan-400/15">
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-cyan-50/30 dark:bg-[rgb(var(--state-info-fg))]/8 border border-cyan-300/25 dark:border-cyan-400/15">
                     <AlertTriangle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm text-text-primary font-medium">No default grading policy set</p>

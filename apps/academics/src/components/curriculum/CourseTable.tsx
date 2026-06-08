@@ -201,7 +201,7 @@ function StatusDot({ isActive }: { isActive: boolean }) {
     <div className="flex items-center gap-1.5">
       <div
         className={`w-2 h-2 rounded-full ${
-          isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-gray-400'
+          isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
         }`}
       />
       <span className="text-xs text-text-secondary">

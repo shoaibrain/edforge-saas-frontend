@@ -14,7 +14,7 @@ export function GradeLevelsModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500/20 to-blue-500/20">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-blue-500/20">
               <Layers className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>

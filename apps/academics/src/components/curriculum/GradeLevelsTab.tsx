@@ -84,7 +84,7 @@ function StatCard({
 function GradeBadge({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-violet-500/20 flex items-center justify-center">
         <span className="text-xs font-bold text-[rgb(var(--state-info-fg))]">
           {value}
         </span>
@@ -109,7 +109,7 @@ function CourseChips({ courses }: { courses: CourseResponseDto[] }) {
       {display.map((name, i) => (
         <span
           key={i}
-          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-tertiary text-text-secondary truncate max-w-[140px]"
+          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-tertiary text-text-secondary truncate max-w-36"
           title={name}
         >
           {name}
@@ -296,8 +296,8 @@ export function GradeLevelsTab({
           icon={BookOpen}
           label="Course Assignments"
           value={stats.totalAssignments}
-          accent="text-[rgb(var(--state-danger-fg))] dark:text-rose-400"
-          bg="bg-rose-500/10"
+          accent="text-[rgb(var(--state-danger-fg))] "
+          bg="bg-[rgb(var(--state-danger-fg))]/10"
         />
         <StatCard
           icon={BarChart3}

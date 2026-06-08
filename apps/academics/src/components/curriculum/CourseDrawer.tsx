@@ -149,8 +149,8 @@ function CourseDetailView({
         {showCreditBadge && (
           <Badge
             label={creditTypeLabel}
-            bg="bg-slate-50"
-            text="text-slate-700"
+            bg="bg-[rgb(var(--surface-tertiary))]"
+            text="text-[rgb(var(--text-secondary))]"
           />
         )}
       </div>
@@ -526,8 +526,8 @@ export function CourseDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex-shrink-0">
-                      <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] dark:text-rose-400" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.10)] flex-shrink-0">
+                      <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] " />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">

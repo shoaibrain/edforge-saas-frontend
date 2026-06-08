@@ -151,7 +151,7 @@ function CapacityBar({ current, max }: { current: number; max: number }) {
   const textColor = getCapacityTextColor(current, max)
 
   return (
-    <div className="flex items-center gap-2 min-w-[120px]">
+    <div className="flex items-center gap-2 min-w-32">
       <div className="flex-1 h-2 bg-surface-secondary rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
@@ -269,7 +269,7 @@ export function SectionTable({
           <div className="flex items-center gap-1.5">
             <div
               className={`w-2 h-2 rounded-full ${
-                row.original.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-gray-400'
+                row.original.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
               }`}
             />
             <span className="text-xs text-text-secondary">

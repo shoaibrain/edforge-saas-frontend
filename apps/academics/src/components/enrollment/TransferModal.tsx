@@ -51,7 +51,7 @@ export function TransferModal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
           <div className="flex items-center gap-2">
@@ -134,7 +134,7 @@ export function TransferModal({
             type="button"
             onClick={handleSubmit}
             disabled={transferMutation.isPending || !destinationSchoolId}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] hover:bg-[rgb(var(--state-info-fg))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {transferMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             Transfer Student

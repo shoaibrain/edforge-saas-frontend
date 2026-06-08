@@ -203,7 +203,7 @@ export function AssignmentEditor({
   const isSaving = bulkGradeMutation.isPending
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/50">
+    <div className="fixed inset-0 z-50 flex justify-end bg-[rgb(var(--background-overlay)/0.50)]">
       <div className="bg-surface-primary w-full max-w-md h-full shadow-xl flex flex-col overflow-hidden border-l border-border-secondary">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-secondary">

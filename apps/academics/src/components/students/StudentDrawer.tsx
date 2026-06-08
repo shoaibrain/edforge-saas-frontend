@@ -323,7 +323,7 @@ export function StudentDrawer({
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Avatar (48px compromise per Amendment 15) */}
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-surface-tertiary shadow-sm ring-1 ring-white/10">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-surface-tertiary shadow-sm ring-1 ring-[rgb(var(--border-secondary))]">
                       <img
                         src={getAvatarUrl(student.studentId, 64)}
                         alt={getInitials(student.firstName, student.lastName)}

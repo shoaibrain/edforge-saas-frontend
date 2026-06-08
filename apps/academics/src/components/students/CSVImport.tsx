@@ -239,7 +239,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
   const invalidRows = parsedData.rows.filter((r) => r.errors.length > 0)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div
         className="w-full flex flex-col overflow-hidden"
         style={{

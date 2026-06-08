@@ -197,7 +197,7 @@ function MatrixCell({
                 : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-teal-600'
               : isPending && pendingAction === 'remove'
                 ? 'border-red-300 bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/5 hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
-                : 'border-border-secondary hover:border-teal-400 hover:bg-surface-hover'
+                : 'border-border-secondary hover:border-[rgb(var(--border-focus))] hover:bg-surface-hover'
           }
         `}
         aria-label={`${checked ? 'Remove from' : 'Add to'} ${sectionLabel}`}
@@ -773,7 +773,7 @@ export function BulkRosteringPage() {
                 {allSections.map((section) => (
                   <th
                     key={section.sectionId}
-                    className="px-1 py-2 border-r border-b border-border-secondary min-w-[80px] max-w-[120px]"
+                    className="px-1 py-2 border-r border-b border-border-secondary min-w-[80px] max-w-32"
                   >
                     <div className="text-xs font-semibold text-text-primary truncate" title={`${section.courseName ?? ''} - Section ${section.sectionNumber}`}>
                       {section.courseCode ?? section.courseName ?? ''}

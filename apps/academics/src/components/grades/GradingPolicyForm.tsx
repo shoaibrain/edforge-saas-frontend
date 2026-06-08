@@ -164,7 +164,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   const isSaving = createMutation.isPending || updateMutation.isPending
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">

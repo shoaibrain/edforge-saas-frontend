@@ -304,7 +304,7 @@ export function GradebookGrid({
                 className="px-3 py-3 text-center font-medium text-text-secondary min-w-[100px] border-r border-border-secondary group relative"
                 title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
               >
-                <div className="truncate max-w-[120px]">{col.name}</div>
+                <div className="truncate max-w-32">{col.name}</div>
                 <div className="text-xs text-text-tertiary font-normal mt-0.5">
                   {col.possiblePoints} pts
                 </div>

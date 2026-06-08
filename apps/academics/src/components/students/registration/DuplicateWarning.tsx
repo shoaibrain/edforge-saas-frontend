@@ -27,7 +27,7 @@ const confidenceStyles = {
     label: 'Medium',
   },
   low: {
-    badge: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
+    badge: 'bg-[rgb(var(--surface-tertiary))]0/10 text-slate-600 dark:text-[rgb(var(--text-tertiary))] border-slate-500/20',
     label: 'Low',
   },
 }

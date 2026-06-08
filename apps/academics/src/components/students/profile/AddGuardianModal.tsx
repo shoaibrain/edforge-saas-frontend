@@ -321,7 +321,7 @@ export function AddGuardianModal({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[120px]"
+            className="min-w-32"
           >
             {isSubmitting ? (
               <>

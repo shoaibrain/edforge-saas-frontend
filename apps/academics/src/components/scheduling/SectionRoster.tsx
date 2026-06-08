@@ -133,7 +133,7 @@ function CapacityBar({
         <span className="text-sm font-medium text-text-primary whitespace-nowrap">
           {current}/{max} enrolled
         </span>
-        <div className="h-1 flex-1 max-w-[120px] bg-surface-secondary rounded-full overflow-hidden">
+        <div className="h-1 flex-1 max-w-32 bg-surface-secondary rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all ${barColor}`}
             style={{ width: `${percent}%` }}

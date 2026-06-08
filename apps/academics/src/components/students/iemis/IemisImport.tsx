@@ -821,7 +821,7 @@ function ConfirmModal({
   const willImport = parse.rowCount - dryRun.skipped - dryRun.failed
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)] p-4"
       onClick={onCancel}
     >
       <div
