@@ -22,6 +22,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
+import { Input, Select } from '@edforge/ui'
 import { cn } from '@/lib/utils'
 
 // ============================================================================
@@ -68,34 +69,14 @@ interface SearchInputProps {
 }
 
 function SearchInput({ value, onChange, placeholder = 'Search...' }: SearchInputProps) {
-  const [focused, setFocused] = useState(false)
-
   return (
-    <motion.div
-      animate={{
-        borderColor: focused ? 'rgb(10, 147, 150)' : 'rgb(var(--border-primary))',
-        boxShadow: focused
-          ? '0 0 0 3px rgba(10, 147, 150, 0.15)'
-          : '0 0 0 0px transparent',
-      }}
-      transition={{ duration: 0.2 }}
-      className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden"
-    >
-      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        placeholder={placeholder}
-        className={cn(
-          'w-full pl-11 pr-4 py-3 bg-transparent',
-          'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
-          'focus:outline-none text-sm'
-        )}
-      />
-    </motion.div>
+    <Input
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      prefix={<Search className="w-4 h-4" />}
+    />
   )
 }
 
@@ -195,18 +176,14 @@ function GuardianCard({
               className="mt-3 flex items-center gap-3"
               onClick={(e) => e.stopPropagation()}
             >
-              <select
-                value={relationship || ''}
-                onChange={(e) => onRelationshipChange?.(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm rounded-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)]"
-              >
-                <option value="">Select relationship...</option>
-                {RELATIONSHIPS.map((rel) => (
-                  <option key={rel.value} value={rel.value}>
-                    {rel.label}
-                  </option>
-                ))}
-              </select>
+              <div className="flex-1">
+                <Select
+                  value={relationship || null}
+                  onChange={(v) => onRelationshipChange?.(v ?? '')}
+                  placeholder="Select relationship..."
+                  options={RELATIONSHIPS}
+                />
+              </div>
               {!isPrimary && onSetPrimary && (
                 <button
                   type="button"
@@ -281,46 +258,38 @@ function QuickAddGuardian({ onAdd, onCancel }: QuickAddGuardianProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <input
+        <Input
           type="text"
           placeholder="First Name *"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)]"
         />
-        <input
+        <Input
           type="text"
           placeholder="Last Name *"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)]"
         />
-        <input
+        <Input
           type="email"
           placeholder="Email Address *"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)]"
         />
-        <input
+        <Input
           type="tel"
           placeholder="Phone Number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)]"
         />
-        <select
-          value={relationship}
-          onChange={(e) => setRelationship(e.target.value)}
-          className="col-span-2 px-3 py-2 text-sm rounded-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)]"
-        >
-          <option value="">Select relationship...</option>
-          {RELATIONSHIPS.map((rel) => (
-            <option key={rel.value} value={rel.value}>
-              {rel.label}
-            </option>
-          ))}
-        </select>
+        <div className="col-span-2">
+          <Select
+            value={relationship || null}
+            onChange={(v) => setRelationship(v ?? '')}
+            placeholder="Select relationship..."
+            options={RELATIONSHIPS}
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-end gap-2 mt-4">

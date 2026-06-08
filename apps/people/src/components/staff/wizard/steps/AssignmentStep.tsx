@@ -110,6 +110,7 @@ function FteSlider({
       </label>
       <div className="flex items-center gap-4">
         <input
+          // allow-native-form-control: range slider has no DS adapter equivalent
           type="range"
           min={0}
           max={1}
