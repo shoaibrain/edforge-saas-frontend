@@ -6,10 +6,10 @@
  * Row click opens a quick-info drawer (managed by parent).
  */
 
-import { useMemo } from 'react'
+import { useMemo, type MouseEvent, type ReactNode } from 'react'
 import { UsersRound, Eye, Pencil, MoreVertical } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
-import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
+import { focusRingInset, TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleChip } from './StaffRoleChip'
 import { AccessChip } from './AccessChip'
@@ -31,13 +31,13 @@ interface StaffTableProps {
 // EMPLOYMENT TYPE BADGE COLORS
 // ============================================================================
 
-const EMPLOYMENT_STYLES: Record<string, { bg: string; color: string }> = {
-  active: { bg: 'rgba(239,159,39,0.10)', color: '#EF9F27' },
-  on_leave: { bg: 'rgba(239,159,39,0.10)', color: '#EF9F27' },
-  suspended: { bg: 'rgba(226,75,74,0.10)', color: '#E24B4A' },
-  terminated: { bg: 'rgba(226,75,74,0.10)', color: '#E24B4A' },
-  retired: { bg: 'rgba(255,255,255,0.06)', color: 'var(--v2-text-hint, #4a5068)' },
-  resigned: { bg: 'rgba(255,255,255,0.06)', color: 'var(--v2-text-hint, #4a5068)' },
+const EMPLOYMENT_STYLES: Record<string, string> = {
+  active: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
+  on_leave: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
+  suspended: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
+  terminated: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
+  retired: 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]',
+  resigned: 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]',
 }
 
 function getEmploymentLabel(status?: string): string {
@@ -76,49 +76,23 @@ export function StaffTable({
           const s = row.original
           const empStyle = EMPLOYMENT_STYLES[s.employmentStatus] || EMPLOYMENT_STYLES.active
           return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="flex items-center gap-2.5">
               <img
                 src={getStaffAvatar(s.staffId)}
                 alt={`${s.firstName} ${s.lastSurname}`}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  flexShrink: 0,
-                  objectFit: 'cover',
-                }}
+                className="h-8 w-8 shrink-0 rounded-full object-cover"
                 loading="lazy"
               />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: 'var(--v2-text-primary, #e8eaf0)',
-                    }}
-                  >
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <div className="flex items-center gap-1">
+                  <span className="truncate text-xs font-medium text-[var(--v2-text-primary)]">
                     {s.firstName} {s.lastSurname}
                   </span>
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 500,
-                      padding: '1px 5px',
-                      borderRadius: 4,
-                      background: empStyle.bg,
-                      color: empStyle.color,
-                    }}
-                  >
+                  <span className={`rounded px-1.5 py-px text-[9px] font-medium ${empStyle}`}>
                     {getEmploymentLabel(s.employmentStatus)}
                   </span>
                 </div>
-                <span
-                  style={{
-                    fontSize: 10,
-                    color: 'var(--v2-text-ghost, #2a3045)',
-                  }}
-                >
+                <span className="truncate text-[10px] text-[var(--v2-text-ghost)]">
                   {s.email}
                 </span>
               </div>
@@ -140,28 +114,9 @@ export function StaffTable({
           const status = row.original.employmentStatus
           const isActive = status === 'active'
           return (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                fontSize: 10,
-                fontWeight: 500,
-                padding: '2px 8px',
-                borderRadius: 7,
-                whiteSpace: 'nowrap',
-                background: isActive ? 'rgba(29,158,117,0.10)' : 'rgba(255,255,255,0.05)',
-                color: isActive ? '#1D9E75' : 'var(--v2-text-hint, #4a5068)',
-              }}
-            >
+            <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-[10px] font-medium ${isActive ? 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]' : 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]'}`}>
               <span
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  background: isActive ? '#1D9E75' : 'var(--v2-text-hint, #4a5068)',
-                  flexShrink: 0,
-                }}
+                className={`h-1.5 w-1.5 shrink-0 rounded-full ${isActive ? 'bg-[var(--v2-success)]' : 'bg-[var(--v2-text-hint)]'}`}
               />
               {isActive ? 'Active' : (status?.replace('_', ' ') || 'Unknown')}
             </span>
@@ -173,7 +128,7 @@ export function StaffTable({
         header: t('tableHeaders.hired'),
         size: 120,
         cell: ({ row }) => (
-          <span style={{ fontSize: 11, color: 'var(--v2-text-muted, #7a8099)' }}>
+          <span className="text-[11px] text-[var(--v2-text-muted)]">
             {formatDate(row.original.hireDate)}
           </span>
         ),
@@ -185,12 +140,7 @@ export function StaffTable({
         enableSorting: false,
         cell: ({ row }) => (
           <span
-            style={{
-              fontSize: 11,
-              color: row.original.departmentName
-                ? 'var(--v2-text-muted, #7a8099)'
-                : 'var(--v2-text-ghost, #2a3045)',
-            }}
+            className={`text-[11px] ${row.original.departmentName ? 'text-[var(--v2-text-muted)]' : 'text-[var(--v2-text-ghost)]'}`}
           >
             {row.original.departmentName || '—'}
           </span>
@@ -210,9 +160,9 @@ export function StaffTable({
         size: 100,
         enableSorting: false,
         cell: ({ row }) => (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+          <div className="flex items-center justify-end gap-1">
             <ActionBtn
-              icon={<Eye style={{ width: 13, height: 13 }} />}
+              icon={<Eye className="h-3.5 w-3.5" />}
               title="View"
               onClick={(e) => {
                 e.stopPropagation()
@@ -220,12 +170,12 @@ export function StaffTable({
               }}
             />
             <ActionBtn
-              icon={<Pencil style={{ width: 13, height: 13 }} />}
+              icon={<Pencil className="h-3.5 w-3.5" />}
               title="Edit"
               onClick={(e) => e.stopPropagation()}
             />
             <ActionBtn
-              icon={<MoreVertical style={{ width: 13, height: 13 }} />}
+              icon={<MoreVertical className="h-3.5 w-3.5" />}
               title="More"
               onClick={(e) => e.stopPropagation()}
             />
@@ -267,36 +217,17 @@ function ActionBtn({
   title,
   onClick,
 }: {
-  icon: React.ReactNode
+  icon: ReactNode
   title: string
-  onClick: (e: React.MouseEvent) => void
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void
 }) {
   return (
     <button
       type="button"
       title={title}
+      aria-label={title}
       onClick={onClick}
-      style={{
-        width: 26,
-        height: 26,
-        borderRadius: 6,
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'var(--v2-text-hint, #4a5068)',
-        transition: 'all 0.12s',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.07)'
-        e.currentTarget.style.color = 'var(--v2-text-secondary, #c8ccd8)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'transparent'
-        e.currentTarget.style.color = 'var(--v2-text-hint, #4a5068)'
-      }}
+      className={`flex h-7 w-7 items-center justify-center rounded-md text-[var(--v2-text-hint)] transition-colors hover:bg-[rgb(var(--surface-tertiary))] hover:text-[var(--v2-text-secondary)] ${focusRingInset}`}
     >
       {icon}
     </button>
