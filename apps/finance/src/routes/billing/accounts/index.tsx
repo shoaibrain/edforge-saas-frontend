@@ -11,9 +11,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2,
   Users,
-  FileText,
-  CreditCard,
-  BookOpen,
   TrendingUp,
   Receipt,
   AlertTriangle,
@@ -22,6 +19,7 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   TanstackDataTable,
   createExpandColumn,
+  FilterTabs,
   type ColumnDef,
   StatCard,
   WidgetErrorBoundaryV2,
@@ -41,52 +39,11 @@ import { formatDate, formatDateDual } from '../../../utils/format-date'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
 
-// ============================================================================
-// INLINE TABS
-// ============================================================================
-
-function TabButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-  count,
-}: {
-  active: boolean
-  onClick: () => void
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  count?: number
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        fontSize: '12px',
-        fontWeight: 500,
-        padding: '6px 12px',
-        borderRadius: 6,
-        background: active ? 'var(--v2-brand-primary, #1D9E75)' : 'transparent',
-        color: active ? '#fff' : 'var(--v2-text-secondary, #c8ccd8)',
-        border: 'none',
-        cursor: 'pointer',
-        transition: 'background 0.15s, color 0.15s',
-      }}
-      className="flex items-center gap-1.5"
-    >
-      <Icon className="w-3.5 h-3.5" />
-      {label}
-      {count !== undefined && count > 0 && (
-        <span className={`ml-1 px-1.5 py-0.5 text-[10px] rounded-full ${
-          active ? 'bg-white/20' : 'bg-[rgb(var(--surface-tertiary,220,220,220))]'
-        }`}>
-          {count}
-        </span>
-      )}
-    </button>
-  )
-}
+const ACCOUNT_TABS = [
+  { key: 'ledger', label: 'Ledger' },
+  { key: 'invoices', label: 'Invoices' },
+  { key: 'payments', label: 'Payments' },
+] satisfies { key: AccountTab; label: string }[]
 
 // ============================================================================
 // LEDGER TAB
@@ -349,26 +306,12 @@ function AccountDetail({
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-[rgb(var(--surface-tertiary,240,240,240))] rounded-lg p-1">
-        <TabButton
-          active={activeTab === 'ledger'}
-          onClick={() => setActiveTab('ledger')}
-          icon={BookOpen}
-          label="Ledger"
-        />
-        <TabButton
-          active={activeTab === 'invoices'}
-          onClick={() => setActiveTab('invoices')}
-          icon={FileText}
-          label="Invoices"
-        />
-        <TabButton
-          active={activeTab === 'payments'}
-          onClick={() => setActiveTab('payments')}
-          icon={CreditCard}
-          label="Payments"
-        />
-      </div>
+      <FilterTabs
+        tabs={ACCOUNT_TABS}
+        activeTab={activeTab}
+        onTabChange={(key) => setActiveTab(key as AccountTab)}
+        className="rounded-lg bg-[rgb(var(--surface-tertiary))] p-1"
+      />
 
       {/* Tab Content */}
       <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
