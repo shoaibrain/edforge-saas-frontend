@@ -76,6 +76,62 @@ const checks: FocusCheck[] = [
     focusEvidence: /focus-visible:ring|focus:ring|focus-visible:outline|focusRing/,
     semanticEvidence: /--border-focus|--border-focus|focusRing/,
   },
+  {
+    primitive: 'Input',
+    file: 'packages/ui/src/components/forms/Input.tsx',
+    interactiveEvidence: /InputHTMLAttributes<HTMLInputElement>/,
+    focusEvidence: /focus-visible:ring|focus:ring|focus-within:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Textarea',
+    file: 'packages/ui/src/components/forms/Textarea.tsx',
+    interactiveEvidence: /TextareaHTMLAttributes<HTMLTextAreaElement>/,
+    focusEvidence: /focus-visible:ring|focus:ring|focus:border|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Select',
+    file: 'packages/ui/src/components/forms/Select.tsx',
+    interactiveEvidence: /ListboxButton/,
+    focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Combobox',
+    file: 'packages/ui/src/components/forms/Combobox.tsx',
+    interactiveEvidence: /ComboboxInput/,
+    focusEvidence: /focus-visible:ring|focus:ring|focus-within:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Tabs',
+    file: 'packages/ui/src/components/Tabs.tsx',
+    interactiveEvidence: /role=\{isTablist \? 'tab'/,
+    focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Checkbox',
+    file: 'packages/ui/src/components/forms/Checkbox.tsx',
+    interactiveEvidence: /type="checkbox"/,
+    focusEvidence: /focus-visible:ring|focus:ring|peer-focus-visible:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'RadioGroup',
+    file: 'packages/ui/src/components/forms/RadioGroup.tsx',
+    interactiveEvidence: /type="radio"/,
+    focusEvidence: /focus-visible:ring|focus:ring|peer-focus-visible:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Switch',
+    file: 'packages/ui/src/components/forms/Switch.tsx',
+    interactiveEvidence: /role="switch"/,
+    focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
 ]
 
 function source(file: string): string {
@@ -113,6 +169,14 @@ describe('interactive primitive focus-ring baseline', () => {
       Accordion: 'semantic-pass',
       Dropdown: 'semantic-pass',
       'AttendanceHeatmap navigation': 'semantic-pass',
+      Input: 'semantic-pass',
+      Textarea: 'semantic-pass',
+      Select: 'semantic-pass',
+      Combobox: 'semantic-pass',
+      Tabs: 'semantic-pass',
+      Checkbox: 'semantic-pass',
+      RadioGroup: 'semantic-pass',
+      Switch: 'semantic-pass',
     })
   })
 })

@@ -997,6 +997,9 @@ importers:
       '@edforge/config':
         specifier: workspace:*
         version: link:../config
+      '@edforge/ui':
+        specifier: workspace:*
+        version: link:../ui
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.10.0(react-hook-form@7.73.1(react@19.2.5))
@@ -1025,9 +1028,6 @@ importers:
         specifier: ~3.24.4
         version: 3.24.4
     devDependencies:
-      '@edforge/ui':
-        specifier: workspace:*
-        version: link:../ui
       '@types/react':
         specifier: ^19.1.4
         version: 19.2.14

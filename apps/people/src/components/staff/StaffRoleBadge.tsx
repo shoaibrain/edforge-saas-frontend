@@ -8,6 +8,7 @@
 
 import type { StaffRole } from '@aibrains/shared-types'
 import { useTranslation } from '@edforge/i18n'
+import { StatusBadge } from '@edforge/ui'
 
 // Map snake_case StaffRole values to camelCase i18n keys
 const ROLE_I18N_KEY: Record<string, string> = {
@@ -27,15 +28,9 @@ const LEADERSHIP_ROLES: Set<StaffRole> = new Set(['principal', 'vice_principal']
 export function StaffRoleBadge({ role }: { role: StaffRole }) {
   const { t } = useTranslation('people')
   const label = t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })
-  const isLeadership = LEADERSHIP_ROLES.has(role)
-  const style = isLeadership
-    ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]'
-    : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${style}`}>
-      {label}
-    </span>
+    <StatusBadge tone={LEADERSHIP_ROLES.has(role) ? 'info' : 'neutral'}>{label}</StatusBadge>
   )
 }
 

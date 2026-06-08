@@ -20,6 +20,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'apps/shell/src'),
+      '@edforge/ui/forms': resolve(__dirname, 'packages/ui/src/components/forms'),
       '@edforge/ui': resolve(__dirname, 'packages/ui/src'),
       '@edforge/shell-components': resolve(__dirname, 'packages/shell-components/src'),
       '@edforge/abac': resolve(__dirname, 'packages/abac/src'),

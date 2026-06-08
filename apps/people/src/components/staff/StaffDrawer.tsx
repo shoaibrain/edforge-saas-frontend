@@ -33,7 +33,7 @@ import {
   Building2,
 } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
-import { focusRing, focusRingInset, SectionCard as UiSectionCard } from '@edforge/ui'
+import { focusRing, focusRingInset, SectionCard as UiSectionCard, StatusBadge } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffStatusBadge } from './StaffStatusBadge'
 import { getRoleI18nKey } from './StaffRoleBadge'
@@ -120,7 +120,7 @@ function ActionsDropdown({
                     setIsOpen(false)
                     onDelete(staff)
                   }}
-                  className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-[var(--v2-danger)] hover:bg-[var(--v2-danger-bg)] transition-colors ${focusRingInset}`}
+                  className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.5)] transition-colors ${focusRingInset}`}
                 >
                   <Trash2 className="w-4 h-4" />
                   {t('drawer.deleteStaff')}
@@ -331,7 +331,7 @@ export function StaffDrawer({
                         <p className="text-xs text-text-tertiary">{t('tableHeaders.role')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <BookOpen className="w-4 h-4 text-[var(--v2-success)] mx-auto mb-1" />
+                        <BookOpen className="w-4 h-4 text-[rgb(var(--state-success-fg))] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {staff.departmentName || '—'}
                         </p>
@@ -392,7 +392,7 @@ export function StaffDrawer({
                         <DetailField
                           icon={Phone}
                           label={t('fields.phone')}
-                          accent="text-[var(--v2-success)]"
+                          accent="text-[rgb(var(--state-success-fg))]"
                           value={staff.phone}
                         />
                       </div>
@@ -455,16 +455,14 @@ export function StaffDrawer({
                     <UiSectionCard title={<SectionTitle icon={Key} title={t('sections.systemAccess')} />}>
                       <div className="flex items-center gap-3">
                         {staff.userId ? (
-                          <>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--v2-success-bg)] text-[var(--v2-success)] border border-[var(--v2-success-border)]">
-                              <Key className="w-3.5 h-3.5" />
-                              {t('systemAccess.linkedAccount')}
-                            </span>
-                          </>
+                          <StatusBadge tone="success" size="md">
+                            <Key className="w-3.5 h-3.5" />
+                            {t('systemAccess.linkedAccount')}
+                          </StatusBadge>
                         ) : (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-text-tertiary border border-border-secondary">
+                          <StatusBadge tone="neutral" size="md">
                             {t('systemAccess.noAccountLinked')}
-                          </span>
+                          </StatusBadge>
                         )}
                       </div>
                     </UiSectionCard>

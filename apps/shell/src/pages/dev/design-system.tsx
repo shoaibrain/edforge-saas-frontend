@@ -4,17 +4,32 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
+  Combobox,
   Container,
   Dropdown,
+  EmptyState,
+  ErrorState,
   FilterTabs,
+  Field,
   Heading,
+  Input,
+  InlineAlert,
   Inline,
+  LoadingState,
   PageHeader,
+  PageShell,
+  RadioGroup,
   SectionCard,
+  Select,
   Stack,
+  Switch,
   Tag,
+  Tabs,
   Text,
+  Textarea,
   type FilterTab,
+  type TabItem,
 } from '@edforge/ui'
 import { useState } from 'react'
 
@@ -43,6 +58,12 @@ const tabs: FilterTab[] = [
   { key: 'all', label: 'All', count: 24 },
   { key: 'active', label: 'Active', count: 18 },
   { key: 'paused', label: 'Paused', count: 6 },
+]
+
+const pageTabs: TabItem[] = [
+  { id: 'hierarchy', label: 'Hierarchy', count: 3 },
+  { id: 'networks', label: 'Networks' },
+  { id: 'details', label: 'Details' },
 ]
 
 function TokenSwatch({
@@ -75,7 +96,12 @@ function TokenSwatch({
 
 export default function DesignSystemDevPage() {
   const [activeTab, setActiveTab] = useState('all')
+  const [pageTab, setPageTab] = useState('hierarchy')
   const [dropdownValue, setDropdownValue] = useState<string | null>('compact')
+  const [selectValue, setSelectValue] = useState<string | null>('high')
+  const [comboboxValue, setComboboxValue] = useState<string | null>(null)
+  const [radioValue, setRadioValue] = useState('high')
+  const [switchValue, setSwitchValue] = useState(true)
 
   if (!import.meta.env.DEV) {
     return (
@@ -88,7 +114,7 @@ export default function DesignSystemDevPage() {
   }
 
   return (
-    <Container size="wide" className="py-8">
+    <PageShell as="div" variant="overview">
       <Stack space="xl">
         <PageHeader
           title="Design System"
@@ -135,6 +161,7 @@ export default function DesignSystemDevPage() {
               <Button variant="secondary">Secondary</Button>
               <Button variant="outline">Outline</Button>
               <Button variant="ghost">Ghost</Button>
+              <Button variant="tonal">Tonal</Button>
               <Button variant="danger">Danger</Button>
               <Button disabled>Disabled</Button>
             </Inline>
@@ -149,6 +176,81 @@ export default function DesignSystemDevPage() {
                 ]}
               />
             </Inline>
+          </Stack>
+        </SectionCard>
+
+        <SectionCard title="Form primitives" description="Field, Input, and Textarea foundation states.">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="School name" required helperText="Use the public-facing institution name.">
+              <Input placeholder="Sunrise Academy" />
+            </Field>
+            <Field label="IEMIS code" lockedReason="Locked after school creation.">
+              <Input defaultValue="31012345" readOnly className="font-mono" />
+            </Field>
+            <Field label="Short name" error="Short name must be 50 characters or fewer.">
+              <Input defaultValue="A very long display name" />
+            </Field>
+            <Field label="School notes" helperText="Shown to administrators only.">
+              <Textarea defaultValue="Calm, readable multi-line input." maxLength={120} showCharacterCount />
+            </Field>
+            <Select
+              label="School type"
+              value={selectValue}
+              onChange={setSelectValue}
+              options={[
+                { value: 'elementary', label: 'Elementary' },
+                { value: 'middle', label: 'Middle' },
+                { value: 'high', label: 'High School', description: 'Grades 9–12' },
+              ]}
+            />
+            <Combobox
+              label="Parent district"
+              value={comboboxValue}
+              onChange={setComboboxValue}
+              placeholder="Search districts"
+              options={[
+                { value: 'north', label: 'North District' },
+                { value: 'south', label: 'South District' },
+                { value: 'central', label: 'Central Learning Network' },
+              ]}
+            />
+            <Field label="School type options" helperText="Card-style radio controls for high-confidence choices.">
+              <RadioGroup
+                variant="card"
+                direction="horizontal"
+                value={radioValue}
+                onChange={setRadioValue}
+                options={[
+                  { value: 'elementary', label: 'Elementary' },
+                  { value: 'high', label: 'High School' },
+                ]}
+              />
+            </Field>
+            <Field label="Operational settings">
+              <Stack space="sm">
+                <Checkbox label="Include inactive schools" description="Show archived schools in lists." />
+                <Switch
+                  checked={switchValue}
+                  onChange={setSwitchValue}
+                  label="Auto-sync calendars"
+                  description="Keep term dates aligned with workspace defaults."
+                />
+              </Stack>
+            </Field>
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Page recipes and states" description="Tabs, alerts, and non-data states for MFE pages.">
+          <Stack>
+            <Tabs tabs={pageTabs} value={pageTab} onChange={setPageTab} />
+            <InlineAlert variant="info" title="Setup guidance">
+              Settings pages should use shared recipes and primitives before page-local styling.
+            </InlineAlert>
+            <div className="grid gap-4 md:grid-cols-3">
+              <EmptyState title="No schools yet" description="Add a school to start configuring academics." />
+              <LoadingState label="Loading settings" />
+              <ErrorState title="Could not load settings" description="Try again from the preview toolbar." />
+            </div>
           </Stack>
         </SectionCard>
 
@@ -192,6 +294,6 @@ export default function DesignSystemDevPage() {
           </div>
         </SectionCard>
       </Stack>
-    </Container>
+    </PageShell>
   )
 }
