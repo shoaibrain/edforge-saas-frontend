@@ -140,8 +140,8 @@ export function CompleteStep({ data, clearSession }: CompleteStepProps) {
       {showConfetti && <Confetti />}
 
       {/* Success icon */}
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
-        <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[rgb(var(--state-success-fg))] to-[rgb(var(--action-primary-bg-hover))] flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
+        <svg className="w-8 h-8 text-[rgb(var(--action-primary-fg))]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
         </svg>
       </div>
@@ -174,13 +174,13 @@ export function CompleteStep({ data, clearSession }: CompleteStepProps) {
           <button
             key={card.path}
             onClick={() => navigate({ to: card.path as any })}
-            className="p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500/40 transition-all text-left group"
+            className="p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.40)] transition-all text-left group"
           >
             <span className="text-xl mb-2 block">{card.icon}</span>
-            <p className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-0.5 group-hover:text-teal-600 dark:group-hover:text-cyan-400 transition-colors">
+            <p className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-0.5 group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-[rgb(var(--text-primary))] transition-colors">
               {card.title}
             </p>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))]">{card.description}</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">{card.description}</p>
           </button>
         ))}
       </div>
@@ -189,7 +189,7 @@ export function CompleteStep({ data, clearSession }: CompleteStepProps) {
       <button
         onClick={() => navigate({ to: '/home', replace: true })}
         disabled={!completed}
-        className="px-8 py-3 rounded-full bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-semibold text-base transition-all hover:shadow-lg hover:shadow-teal-500/25 active:scale-[0.98] disabled:opacity-50"
+        className="px-8 py-3 rounded-full bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))]  dark: text-[rgb(var(--action-primary-fg))] font-semibold text-base transition-all hover:shadow-lg hover:shadow-teal-500/25 active:scale-[0.98] disabled:opacity-50"
       >
         Go to Dashboard
       </button>

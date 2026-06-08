@@ -90,8 +90,8 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
   }
 
   const inputBase = 'w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-colors'
-  const inputNormal = `${inputBase} border-[rgb(var(--border-primary))] focus:ring-teal-500/40`
-  const inputError = `${inputBase} border-red-400/60 ring-2 ring-red-400/30 focus:ring-red-400/50`
+  const inputNormal = `${inputBase} border-[rgb(var(--border-primary))] focus:ring-[rgb(var(--border-focus)/0.40)]`
+  const inputError = `${inputBase} border-[rgb(var(--state-danger-border)/0.60)] ring-2 ring-[rgb(var(--state-danger-border)/0.30)] focus:ring-[rgb(var(--state-danger-border)/0.50)]`
 
   return (
     <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
@@ -100,12 +100,12 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
 
       {/* Avatar */}
       <div className="flex flex-col items-center mb-8">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500/20 to-cyan-400/20 border-2 border-[rgb(var(--border-primary))] flex items-center justify-center mb-2">
-          <span className="text-2xl font-bold text-teal-600 dark:text-cyan-400">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/20 to-[rgb(var(--action-primary-bg-hover))]/20 border-2 border-[rgb(var(--border-primary))] flex items-center justify-center mb-2">
+          <span className="text-2xl font-bold text-[rgb(var(--action-secondary-fg))] ">
             {initials || '?'}
           </span>
         </div>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
           Photo upload coming soon
         </span>
       </div>
@@ -125,7 +125,7 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
               placeholder="First name"
             />
             {fieldErrors.firstName && (
-              <p className="text-[11px] text-red-500 mt-1.5">{fieldErrors.firstName}</p>
+              <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-1.5">{fieldErrors.firstName}</p>
             )}
           </div>
           <div>
@@ -140,7 +140,7 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
               placeholder="Last name"
             />
             {fieldErrors.lastName && (
-              <p className="text-[11px] text-red-500 mt-1.5">{fieldErrors.lastName}</p>
+              <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-1.5">{fieldErrors.lastName}</p>
             )}
           </div>
         </div>
@@ -159,7 +159,7 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
       </div>
 
       {generalError && (
-        <p className="text-xs text-red-500 mb-4">{generalError}</p>
+        <p className="text-xs text-[rgb(var(--state-danger-fg))] mb-4">{generalError}</p>
       )}
 
       {/* Actions */}
@@ -173,7 +173,7 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
         <button
           onClick={handleContinue}
           disabled={saving}
-          className="px-6 py-2.5 rounded-full bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
+          className="px-6 py-2.5 rounded-full bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))]  dark: text-[rgb(var(--action-primary-fg))] font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
         >
           {saving ? 'Saving...' : 'Continue'}
         </button>
