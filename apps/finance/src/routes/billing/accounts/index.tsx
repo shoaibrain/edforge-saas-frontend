@@ -60,7 +60,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -68,10 +68,10 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
   if (isError) {
     return (
       <div className="text-center py-6">
-        <p className="text-xs text-red-600 dark:text-red-400">
+        <p className="text-xs text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
           Failed to load ledger entries.
         </p>
-        <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1">
+        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
           {(error as Error)?.message ?? 'Unknown error'}
         </p>
         <button
@@ -117,10 +117,10 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-primary))]">
               {entry.description}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-red-600 dark:text-red-400">
+            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
               {entry.debit > 0 ? format(entry.debit) : ''}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-green-600 dark:text-green-400">
+            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-success-fg))] ">
               {entry.credit > 0 ? format(entry.credit) : ''}
             </td>
             <td className="px-2 py-1.5 text-xs text-right font-medium text-[rgb(var(--text-primary))]">
@@ -147,7 +147,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -178,7 +178,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
             className="hover:bg-[rgb(var(--surface-primary))] cursor-pointer transition-colors"
             onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
           >
-            <td className="px-2 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400">
+            <td className="px-2 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] ">
               {invoice.invoiceNumber}
             </td>
             <td className="px-2 py-1.5"><FinanceStatusChip status={invoice.status} size="xs" /></td>
@@ -186,7 +186,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
               {format(invoice.grandTotal)}
             </td>
             <td className="px-2 py-1.5 text-xs text-right font-medium">
-              <span className={invoice.amountDue > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+              <span className={invoice.amountDue > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '}>
                 {format(invoice.amountDue)}
               </span>
             </td>
@@ -219,7 +219,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -250,7 +250,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
             <td className="px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-primary))]">
               {inv.invoiceNumber}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-green-600 dark:text-green-400">
+            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-success-fg))] ">
               {format(inv.amountPaid)}
             </td>
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-secondary))]">
@@ -284,21 +284,21 @@ function AccountDetail({
       {/* Summary Header */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Outstanding</p>
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Outstanding</p>
           <p className={`text-sm font-semibold mt-0.5 ${
-            account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+            account.balance > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '
           }`}>
             {format(account.balance)}
           </p>
         </div>
         <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {format(account.totalPaid)}
           </p>
         </div>
         <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {account.lastPaymentDate ? formatDate(account.lastPaymentDate, detailSettings) : 'Never'}
           </p>
@@ -388,7 +388,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
     cell: ({ row }) => {
       const account = row.original
       return (
-        <span className={account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+        <span className={account.balance > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '}>
           {format(account.balance)}
         </span>
       )
@@ -528,7 +528,7 @@ export default function StudentAccountsPage() {
           description: 'Student accounts are created automatically when invoices are generated.',
         }}
         maxHeight="calc(100vh - 22rem)"
-        className="min-h-[400px]"
+        className="min-h-96"
       />
     </div>
   )

@@ -34,13 +34,13 @@ export function FinancePageHeader({
             <Icon className="w-4 h-4" style={{ color: iconColor }} />
           </div>
           <h1
-            className="text-[14px] font-semibold"
+            className="text-sm font-semibold"
             style={{ color: 'var(--v2-text-primary)' }}
           >
             {title}
           </h1>
         </div>
-        <p className="text-[11px]" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
           {subtitle}
         </p>
       </div>

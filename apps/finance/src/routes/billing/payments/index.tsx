@@ -97,7 +97,7 @@ function VoidPaymentDialog({
     <div
       ref={backdropRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -108,8 +108,8 @@ function VoidPaymentDialog({
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)] ">
+              <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
             </div>
             <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
               Void Payment
@@ -173,7 +173,7 @@ function VoidPaymentDialog({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="e.g. Duplicate payment, data entry error"
-            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-red-500/30"
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
           />
         </div>
@@ -192,7 +192,7 @@ function VoidPaymentDialog({
             type="button"
             onClick={() => onConfirm(reason.trim())}
             disabled={isPending || !reason.trim()}
-            className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-2 rounded-xl bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? (
               <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
@@ -282,7 +282,7 @@ function RefundPaymentDialog({
     <div
       ref={backdropRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -331,7 +331,7 @@ function RefundPaymentDialog({
           {totalRefunded > 0 && (
             <div className="flex justify-between text-sm">
               <span className="text-[rgb(var(--text-secondary))]">Already refunded</span>
-              <span className="font-medium text-orange-600 dark:text-orange-400">
+              <span className="font-medium text-[rgb(var(--state-warning-fg))] ">
                 {formatAmount(totalRefunded)}
               </span>
             </div>
@@ -359,13 +359,13 @@ function RefundPaymentDialog({
               step="0.01"
               className={`w-full px-3 py-2 text-sm border rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 ${
                 amountError
-                  ? 'border-red-400 focus:ring-red-500/30'
-                  : 'border-[rgb(var(--border-primary))] focus:ring-teal-500/30'
+                  ? 'border-[rgb(var(--state-danger-border))] focus:ring-[rgb(var(--border-focus)/0.35)]'
+                  : 'border-[rgb(var(--border-primary))] focus:ring-[rgb(var(--border-focus)/0.35)]'
               }`}
               autoFocus
             />
             {amountError && (
-              <p className="mt-1 text-xs text-red-500">{amountError}</p>
+              <p className="mt-1 text-xs text-[rgb(var(--state-danger-fg))]">{amountError}</p>
             )}
           </div>
 
@@ -379,7 +379,7 @@ function RefundPaymentDialog({
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               placeholder="Reason for refund..."
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
         </div>
@@ -398,7 +398,7 @@ function RefundPaymentDialog({
             type="button"
             onClick={() => onConfirm(parsedAmount, reason.trim())}
             disabled={isPending || !isValid}
-            className="flex-1 py-2 rounded-xl bg-orange-600 text-white text-sm font-semibold hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-2 rounded-xl bg-[rgb(var(--state-warning-fg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? (
               <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
@@ -623,7 +623,7 @@ function usePaymentColumns(
                 <button
                   onClick={() => handleVoidClick(payment)}
                   disabled={voidIsPending}
-                  className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
+                  className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))]"
                   title="Void Payment"
                 >
                   <Ban className="w-4 h-4" />
@@ -634,7 +634,7 @@ function usePaymentColumns(
                 payment.status === 'partially_refunded') && (
                 <button
                   onClick={() => handleRefundClick(payment)}
-                  className="p-1.5 rounded-md hover:bg-orange-50 text-orange-500 dark:hover:bg-orange-900/20 dark:text-orange-400"
+                  className="p-1.5 rounded-md hover:bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] dark:hover:bg-[rgb(var(--state-warning-bg)/0.18)] "
                   title="Refund"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -776,7 +776,7 @@ export default function PaymentsPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/payments/record' })}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
             style={{
               background: 'var(--v2-brand-primary)',
               color: '#fff',
@@ -861,7 +861,7 @@ export default function PaymentsPage() {
 
       {/* Data Table */}
       <TanstackDataTable<Payment>
-        className="min-h-[400px]"
+        className="min-h-96"
         columns={columns}
         data={paymentList}
         getRowId={(row) => row.id}

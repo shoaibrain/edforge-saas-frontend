@@ -208,7 +208,7 @@ export function FeeStructureForm({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
       onClick={handleBackdropClick}
     >
       <div className="w-full max-w-lg mx-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
@@ -354,7 +354,7 @@ export function FeeStructureForm({
               <input
                 type="checkbox"
                 {...register('autoApplyOnEnrollment')}
-                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
               <span className="text-sm text-[rgb(var(--text-primary))]">Auto-apply on enrollment</span>
             </label>
@@ -362,7 +362,7 @@ export function FeeStructureForm({
               <input
                 type="checkbox"
                 {...register('proRateOnMidTermEntry')}
-                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
               <span className="text-sm text-[rgb(var(--text-primary))]">Pro-rate on mid-term entry</span>
             </label>
@@ -503,7 +503,7 @@ function GradeLevelSelect({
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleAll}
-                className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
               <span className="text-sm font-medium text-[rgb(var(--text-primary))]">All Grades</span>
             </label>
@@ -518,7 +518,7 @@ function GradeLevelSelect({
                   type="checkbox"
                   checked={value.includes(grade)}
                   onChange={() => toggleGrade(grade)}
-                  className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-blue-600 focus:ring-blue-500"
+                  className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--state-info-fg))] focus:ring-[rgb(var(--border-focus))]"
                 />
                 <span className="text-sm text-[rgb(var(--text-primary))]">Grade {grade}</span>
               </label>
@@ -532,13 +532,13 @@ function GradeLevelSelect({
             {value.map((grade) => (
               <span
                 key={grade}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-600/10 text-blue-400 border border-blue-600/20"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] border border-[rgb(var(--state-info-border)/0.35)]"
               >
                 {grade}
                 <button
                   type="button"
                   onClick={() => toggleGrade(grade)}
-                  className="hover:text-blue-200"
+                  className="hover:text-[rgb(var(--state-info-fg))]"
                 >
                   &times;
                 </button>
@@ -558,7 +558,7 @@ function GradeLevelSelect({
 function SectionHeader({ title }: { title: string }) {
   return (
     <div className="flex items-center gap-2 pt-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+      <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
         {title}
       </span>
       <div className="flex-1 h-px bg-[rgb(var(--border-primary))]" />
@@ -585,7 +585,7 @@ function Field({
         {label}
       </label>
       {children}
-      {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
+      {error && <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-0.5">{error}</p>}
     </div>
   )
 }

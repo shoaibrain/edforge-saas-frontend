@@ -269,7 +269,7 @@ export default function FeeStructuresPage() {
     return (
       <div className="p-6 space-y-6">
         <div className="text-center py-16">
-          <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
+          <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--state-danger-fg))] opacity-60" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load fee structures</p>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
             Please check your connection and try again.
@@ -292,7 +292,7 @@ export default function FeeStructuresPage() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
             style={{
               background: 'var(--v2-brand-primary)',
               color: '#fff',
@@ -448,13 +448,13 @@ function DeleteConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
       onClick={handleBackdropClick}
     >
       <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl">
         {/* Warning icon */}
-        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50 dark:bg-red-500/10">
-          <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/10">
+          <AlertTriangle className="w-6 h-6 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
         </div>
 
         <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))] text-center">
@@ -482,7 +482,7 @@ function DeleteConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isPending}
-            className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-2 rounded-xl bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? 'Deleting...' : 'Confirm Delete'}
           </button>

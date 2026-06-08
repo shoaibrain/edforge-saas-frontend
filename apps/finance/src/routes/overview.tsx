@@ -96,7 +96,7 @@ function InsightStrip({
   }
 
   return (
-    <p className="text-[11px] leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+    <p className="text-xs leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
       {parts.join(' · ')}
     </p>
   )
@@ -117,10 +117,10 @@ function EmptyRecentSection({ title, message }: { title: string; message: string
       }}
     >
       <Inbox className="w-7 h-7 mb-2" style={{ color: 'var(--v2-text-hint)', opacity: 0.35 }} />
-      <h3 className="text-[12px] font-medium mb-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+      <h3 className="text-xs font-medium mb-0.5" style={{ color: 'var(--v2-text-hint)' }}>
         {title}
       </h3>
-      <p className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+      <p className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
         {message}
       </p>
     </div>
@@ -195,11 +195,11 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             >
               <DollarSign className="w-4 h-4" style={{ color: 'var(--v2-brand-primary)' }} />
             </div>
-            <h1 className="text-[14px] font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
+            <h1 className="text-sm font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
               Finance
             </h1>
-            <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-            <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+            <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
@@ -208,7 +208,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               aria-label="Bulk invoice generation"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
               style={{
                 background: 'var(--v2-bg-elevated)',
                 borderColor: 'var(--v2-border-default)',
@@ -221,7 +221,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/payments/record' })}
               aria-label="Record a payment"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
               style={{
                 background: 'var(--v2-brand-primary)',
                 color: '#fff',
