@@ -149,8 +149,11 @@ This restates the FINAL plan's intent with the actual post-#134 state baked in. 
 
 ### Epic S — People pilot (honor the plan's pilot rule)
 *Prove the full-journey recipe on one MFE before fan-out — the step #134 skipped.*
-- **S.1** People staff directory (table density, focus, toolbar) → **S.2** staff drawer/overview. ≤15 files each.
-- *Exit:* a complete People journey is consistent end-to-end in both themes, zero console errors, ESLint violation count for People drops to ~0. This becomes the reference recipe.
+- **S.1** ✅ **Done.** Staff directory: 4 ad-hoc badges → `StatusBadge`; `StaffTable` `--v2-*`→semantic tokens + `StatusBadge` cells; toolbar native `<select>`/`<input>`/inline-error → `Select`/`Input`/`ErrorState`. Behavior preserved; ds-warnings 232→218.
+- **S.2** ✅ **Done (drawer).** `StaffDrawer`: removed all `--v2-*` token refs (semantic `--state-*`); system-access badges → `StatusBadge`. The full drawer is now token-correct in the standalone MFE.
+- **S.3** ⏳ **Remaining People surface** — the bulk of the 218 ds-warnings live in `routes/overview.tsx` (~60), `routes/hr/index.tsx` (~38), and the staff modals/wizard. These are the follow-on slices (≤15 files each) to drive People toward ~0.
+- *Established recipe (reference for fan-out):* (1) ad-hoc status pills → `StatusBadge` with a semantic `tone` map; (2) `--v2-*` / hardcoded hex → semantic `--text-*`/`--state-*` tokens; (3) native `<select>`/`<input>` → `Select`/`Input`; (4) inline-style states → `ErrorState`/`EmptyState`/`LoadingState`; (5) preserve all data/columns/actions/navigation.
+- *Exit:* a complete People journey is consistent end-to-end in both themes, zero console errors, ESLint violation count for People drops to ~0.
 
 ### Epic T — Settings & onboarding completion
 *Finish what #134 started so no operator journey is half-migrated.*
