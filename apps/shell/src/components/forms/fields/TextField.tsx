@@ -81,7 +81,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
               hasError 
                 ? 'text-rust-500' 
                 : isFocused 
-                  ? 'text-teal-500' 
+                  ? 'text-[rgb(var(--action-secondary-fg))]' 
                   : 'text-[rgb(var(--text-secondary))]'
             )}
           >
@@ -97,7 +97,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             hasError 
               ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
               : isFocused 
-                ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+                ? 'border-[rgb(var(--border-focus))] shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
                 : 'border-[rgb(var(--border-primary))]',
             disabled && 'opacity-60 cursor-not-allowed',
             inputClassName
@@ -149,7 +149,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           <div className="pr-3 flex items-center gap-2">
             {suffix}
             {isValid && (
-              <Check className="w-4 h-4 text-teal-500" />
+              <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
             )}
             {hasError && (
               <AlertCircle className="w-4 h-4 text-rust-500" />

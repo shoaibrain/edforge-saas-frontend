@@ -61,7 +61,7 @@ export function DateField({
             hasError 
               ? 'text-rust-500' 
               : isFocused 
-                ? 'text-teal-500' 
+                ? 'text-[rgb(var(--action-secondary-fg))]' 
                 : 'text-[rgb(var(--text-secondary))]'
           )}
         >
@@ -77,7 +77,7 @@ export function DateField({
           hasError 
             ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
             : isFocused 
-              ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+              ? 'border-[rgb(var(--border-focus))] shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
               : 'border-[rgb(var(--border-primary))]',
           disabled && 'opacity-60 cursor-not-allowed'
         )}

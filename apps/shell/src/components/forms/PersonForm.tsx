@@ -56,7 +56,7 @@ const TYPE_CONFIG: Record<PersonType, TypeConfig> = {
   teacher: {
     label: 'Teacher',
     icon: User,
-    color: 'text-teal-500',
+    color: 'text-[rgb(var(--action-secondary-fg))]',
   },
   staff: {
     label: 'Staff',
@@ -243,13 +243,13 @@ export function PersonForm({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[120px]"
+            className="min-w-32"
           >
             {isSubmitting ? (
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                className="w-4 h-4 border-2 border-[rgb(var(--border-secondary))] border-t-white rounded-full"
               />
             ) : (
               <>

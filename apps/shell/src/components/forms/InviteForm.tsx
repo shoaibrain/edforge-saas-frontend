@@ -150,8 +150,8 @@ export function InviteForm({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-teal-500/15 dark:bg-cyan-500/20">
-              <UserPlus className="w-5 h-5 text-teal-600 dark:text-cyan-400" />
+            <div className="p-2.5 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]">
+              <UserPlus className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -242,7 +242,7 @@ export function InviteForm({
               <Button
                 type="submit"
                 disabled={isSubmitting || emailCount === 0}
-                className="min-w-[140px]"
+                className="min-w-36"
               >
                 <AnimatePresence mode="wait">
                   {isSubmitting ? (
@@ -256,7 +256,7 @@ export function InviteForm({
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                        className="w-4 h-4 border-2 border-[rgb(var(--border-secondary))] border-t-white rounded-full"
                       />
                       <span>Sending...</span>
                     </motion.div>
@@ -303,8 +303,8 @@ export function InviteForm({
                 animate={{ scale: 1, opacity: 1 }}
                 className="text-center"
               >
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-teal-500/20 flex items-center justify-center">
-                  <Check className="w-8 h-8 text-teal-500" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
+                  <Check className="w-8 h-8 text-[rgb(var(--action-secondary-fg))]" />
                 </div>
                 <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
                   Invitations Sent!

@@ -83,7 +83,7 @@ export function PhoneField({
             hasError 
               ? 'text-rust-500' 
               : isFocused 
-                ? 'text-teal-500' 
+                ? 'text-[rgb(var(--action-secondary-fg))]' 
                 : 'text-[rgb(var(--text-secondary))]'
           )}
         >
@@ -99,7 +99,7 @@ export function PhoneField({
           hasError 
             ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
             : isFocused 
-              ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+              ? 'border-[rgb(var(--border-focus))] shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
               : 'border-[rgb(var(--border-primary))]',
           disabled && 'opacity-60 cursor-not-allowed'
         )}
@@ -191,7 +191,7 @@ export function PhoneField({
                   'w-full flex items-center gap-3 px-3 py-2 text-sm text-left',
                   'transition-colors duration-150',
                   country.code === countryCode
-                    ? 'bg-teal-500/10 text-teal-700 dark:text-cyan-300'
+                    ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] '
                     : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]'
                 )}
               >

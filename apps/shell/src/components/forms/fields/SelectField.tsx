@@ -91,7 +91,7 @@ export function SelectField({
             hasError 
               ? 'text-rust-500' 
               : isOpen 
-                ? 'text-teal-500' 
+                ? 'text-[rgb(var(--action-secondary-fg))]' 
                 : 'text-[rgb(var(--text-secondary))]'
           )}
         >
@@ -115,7 +115,7 @@ export function SelectField({
           hasError 
             ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
             : (isOpen || isFocused) 
-              ? 'border-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
+              ? 'border-[rgb(var(--border-focus))] shadow-[0_0_0_3px_rgba(20,184,166,0.15)]'
               : 'border-[rgb(var(--border-primary))]',
           disabled && 'opacity-60 cursor-not-allowed'
         )}
@@ -174,7 +174,7 @@ export function SelectField({
                     'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left',
                     'transition-colors duration-150',
                     isSelected 
-                      ? 'bg-teal-500/10 text-teal-700 dark:text-cyan-300' 
+                      ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ' 
                       : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]',
                     option.disabled && 'opacity-50 cursor-not-allowed'
                   )}
@@ -183,7 +183,7 @@ export function SelectField({
                 >
                   {OptionIcon && <OptionIcon className="w-4 h-4" />}
                   <span className="flex-1">{option.label}</span>
-                  {isSelected && <Check className="w-4 h-4 text-teal-500" />}
+                  {isSelected && <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />}
                 </button>
               )
             })}
