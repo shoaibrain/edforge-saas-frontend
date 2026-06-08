@@ -57,6 +57,7 @@ export { Accordion, type AccordionItem, type AccordionProps } from './components
 export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
 export { Stack, stackVariants, type StackProps } from './components/layout/Stack'
+export { Heading, headingVariants, type HeadingProps } from './components/typography/Heading'
 
 // TanStack Data Table
 export {
