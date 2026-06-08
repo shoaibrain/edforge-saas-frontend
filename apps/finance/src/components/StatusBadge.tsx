@@ -7,32 +7,32 @@
 
 const STATUS_STYLES: Record<string, string> = {
   // Invoice statuses
-  draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  issued: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  partially_paid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
-  written_off: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
+  draft: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]',
+  issued: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  partially_paid: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  paid: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
+  overdue: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  cancelled: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]',
+  written_off: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]',
 
   // Payment statuses
-  completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  refunded: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-  partially_refunded: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  processing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  completed: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
+  failed: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  refunded: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  partially_refunded: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  pending: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  processing: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
 
   // Ledger entry types
-  debit: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  credit: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  debit: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  credit: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
 }
 
-const DEFAULT_STYLE = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+const DEFAULT_STYLE = 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'
 
 export function StatusBadge({ status, size = 'sm' }: { status: string; size?: 'xs' | 'sm' }) {
   const sizeClass = size === 'xs'
-    ? 'px-1.5 py-0.5 text-[10px]'
+    ? 'px-1.5 py-0.5 text-xs'
     : 'px-2 py-0.5 text-xs'
 
   return (
