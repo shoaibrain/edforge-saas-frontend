@@ -53,7 +53,7 @@ function StatusSkeleton() {
             <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
             <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
           </div>
-          <div className="h-[3px] rounded-sm v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-1 rounded-sm v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
         </div>
       ))}
     </div>
@@ -65,7 +65,7 @@ function DonutTooltip({ active, payload }: any) {
   const d = payload[0]
   return (
     <div
-      className="rounded-lg border px-3 py-2 text-[11px] shadow-lg"
+      className="rounded-lg border px-3 py-2 text-xs shadow-lg"
       style={{
         background: 'var(--v2-bg-surface)',
         borderColor: 'var(--v2-border-default)',
@@ -113,14 +113,14 @@ export function InvoiceStatusCard({
       }}
     >
       {/* Invoice status header */}
-      <h3 className="text-[13px] font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+      <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
         Invoice status breakdown
       </h3>
 
       {isLoading ? (
         <StatusSkeleton />
       ) : totalInvoiceCount === 0 ? (
-        <p className="text-[11px] py-4" style={{ color: 'var(--v2-text-hint)' }}>No invoices yet.</p>
+        <p className="text-xs py-4" style={{ color: 'var(--v2-text-hint)' }}>No invoices yet.</p>
       ) : (
         <div className="flex items-start gap-4">
           {/* Donut chart */}
@@ -150,10 +150,10 @@ export function InvoiceStatusCard({
             <div
               className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
             >
-              <span className="text-[16px] font-semibold leading-none" style={{ color: 'var(--v2-text-primary)' }}>
+              <span className="text-base font-semibold leading-none" style={{ color: 'var(--v2-text-primary)' }}>
                 {totalInvoiceCount}
               </span>
-              <span className="text-[9px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
                 total
               </span>
             </div>
@@ -168,15 +168,15 @@ export function InvoiceStatusCard({
                     className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ background: item.color }}
                   />
-                  <span className="text-[11px]" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <span className="text-xs" style={{ color: 'var(--v2-text-secondary)' }}>
                     {item.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+                  <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                     {item.pct}%
                   </span>
-                  <span className="text-[11px] font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <span className="text-xs font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
                     {item.value}
                   </span>
                 </div>
@@ -190,14 +190,14 @@ export function InvoiceStatusCard({
       <div className="my-4" style={{ height: 1, background: 'var(--v2-border-default)' }} />
 
       {/* Payment methods */}
-      <h3 className="text-[13px] font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+      <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
         Payment methods
       </h3>
 
       {isLoading ? (
         <StatusSkeleton />
       ) : totalPaymentCount === 0 ? (
-        <p className="text-[11px] py-4" style={{ color: 'var(--v2-text-hint)' }}>No payments yet.</p>
+        <p className="text-xs py-4" style={{ color: 'var(--v2-text-hint)' }}>No payments yet.</p>
       ) : (
         <div className="space-y-2.5">
           {sortedGateways.map(([gateway, count]) => {
@@ -208,15 +208,15 @@ export function InvoiceStatusCard({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                    <span className="text-[11px]" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs" style={{ color: 'var(--v2-text-secondary)' }}>
                       {formatGatewayLabel(gateway)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+                    <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                       {pct.toFixed(0)}%
                     </span>
-                    <span className="text-[11px] font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
                       {count}
                     </span>
                   </div>

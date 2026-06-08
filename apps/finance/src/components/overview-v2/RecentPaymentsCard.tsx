@@ -78,14 +78,14 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
         padding: 18,
       }}
     >
-      <h3 className="text-[13px] font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+      <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
         Recent payments
       </h3>
 
       {isLoading ? (
         <FeedSkeleton />
       ) : top5.length === 0 ? (
-        <p className="text-[11px] py-4" style={{ color: 'var(--v2-text-hint)' }}>No payments yet.</p>
+        <p className="text-xs py-4" style={{ color: 'var(--v2-text-hint)' }}>No payments yet.</p>
       ) : (
         <div className="space-y-1">
           {top5.map((payment) => {
@@ -106,7 +106,7 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
                       style={{ background: `${color}18`, color }}
                     >
                       {Icon ? <Icon className="w-3.5 h-3.5" /> : (
-                        <span className="text-[10px] font-bold">
+                        <span className="text-xs font-bold">
                           {formatGatewayLabel(payment.gateway).slice(0, 2).toUpperCase()}
                         </span>
                       )}
@@ -116,17 +116,17 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11px] font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <div className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
                     <EntityIdDisplay entity="payment" data={payment} variant="inline" />
                   </div>
-                  <div className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+                  <div className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                     {formatGatewayLabel(payment.gateway)} · {formatRelativeDate(dateStr)}
                   </div>
                 </div>
 
                 {/* Amount */}
                 <span
-                  className="text-[11px] font-semibold flex-shrink-0"
+                  className="text-xs font-semibold flex-shrink-0"
                   style={{ color: 'var(--v2-brand-primary)' }}
                 >
                   {format(payment.amount, { decimals: 0 })}

@@ -64,11 +64,11 @@ export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps
       }}
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[13px] font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+        <h3 className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
           Overdue aging report
         </h3>
         {!isLoading && !hasAnyOverdue && (
-          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(29,158,117,0.12)', color: '#1D9E75' }}>
+          <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(29,158,117,0.12)', color: '#1D9E75' }}>
             All clear
           </span>
         )}
@@ -92,19 +92,19 @@ export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps
                 }}
               >
                 <div
-                  className="text-[10px] font-medium mb-1.5"
+                  className="text-xs font-medium mb-1.5"
                   style={{ color: isActive ? '#E24B4A' : 'var(--v2-text-faint)' }}
                 >
                   {bucket.label}
                 </div>
                 <div
-                  className="text-[18px] font-bold leading-tight"
+                  className="text-lg font-bold leading-tight"
                   style={{ color: isActive ? '#E24B4A' : 'var(--v2-text-hint)' }}
                 >
                   {bucket.count}
                 </div>
                 <div
-                  className="text-[10px] mt-1"
+                  className="text-xs mt-1"
                   style={{ color: isActive ? 'rgba(226, 75, 74, 0.7)' : 'var(--v2-text-faint)' }}
                 >
                   {formatShort(bucket.amount)}

@@ -82,7 +82,7 @@ function SectionSkeleton({ rows = 4 }: { rows?: number }) {
             <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
             <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
           </div>
-          <div className="h-[3px] rounded-sm v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-1 rounded-sm v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
         </div>
       ))}
     </div>
@@ -109,7 +109,7 @@ function DonutTooltip({ active, payload }: any) {
   const d = payload[0]
   return (
     <div
-      className="rounded-lg border px-3 py-2 text-[11px] shadow-lg"
+      className="rounded-lg border px-3 py-2 text-xs shadow-lg"
       style={{
         background: 'var(--v2-bg-surface)',
         borderColor: 'var(--v2-border-default)',
@@ -211,12 +211,12 @@ export function BillingHealthCard({
     >
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[13px] font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+        <h3 className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
           Billing health
         </h3>
         {!isLoading && !hasAnyOverdue && totalInvoiceCount > 0 && (
           <span
-            className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+            className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
             style={{ background: 'rgba(29,158,117,0.12)', color: '#1D9E75' }}
           >
             <CheckCircle2 className="w-3 h-3" />
@@ -231,10 +231,10 @@ export function BillingHealthCard({
       ) : totalInvoiceCount === 0 ? (
         <div className="flex flex-col items-center py-6">
           <CheckCircle2 className="w-8 h-8 mb-2" style={{ color: 'var(--v2-text-hint)', opacity: 0.4 }} />
-          <p className="text-[12px] font-medium" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs font-medium" style={{ color: 'var(--v2-text-hint)' }}>
             No invoices yet
           </p>
-          <p className="text-[11px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
             Create your first invoice to see billing health data.
           </p>
         </div>
@@ -265,10 +265,10 @@ export function BillingHealthCard({
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-[15px] font-semibold leading-none" style={{ color: 'var(--v2-text-primary)' }}>
+                <span className="text-sm font-semibold leading-none" style={{ color: 'var(--v2-text-primary)' }}>
                   {totalInvoiceCount}
                 </span>
-                <span className="text-[9px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+                <span className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
                   invoices
                 </span>
               </div>
@@ -280,15 +280,15 @@ export function BillingHealthCard({
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                    <span className="text-[11px]" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs" style={{ color: 'var(--v2-text-secondary)' }}>
                       {item.name}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
+                    <span className="text-xs tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
                       {item.pct}%
                     </span>
-                    <span className="text-[11px] font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
                       {item.value}
                     </span>
                   </div>
@@ -303,11 +303,11 @@ export function BillingHealthCard({
           {/* ── Aging Spectrum ── */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[12px] font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+              <span className="text-xs font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
                 Aging overview
               </span>
               {hasAnyOverdue && (
-                <span className="text-[10px] tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
+                <span className="text-xs tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
                   {totalCount} overdue
                 </span>
               )}
@@ -315,7 +315,7 @@ export function BillingHealthCard({
 
             {/* Insight text */}
             {agingInsight && (
-              <p className="text-[11px] mb-3 leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+              <p className="text-xs mb-3 leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
                 {agingInsight}
               </p>
             )}
@@ -331,7 +331,7 @@ export function BillingHealthCard({
                 }}
               >
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: '#1D9E75' }} />
-                <span className="text-[11px]" style={{ color: '#1D9E75' }}>
+                <span className="text-xs" style={{ color: '#1D9E75' }}>
                   No overdue invoices — all accounts are current.
                 </span>
               </div>
@@ -360,7 +360,7 @@ export function BillingHealthCard({
                         title={`${bucket.label}: ${bucket.count} invoices (${formatShort(bucket.amount)})`}
                       >
                         {isActive && bucket.count > 0 && (
-                          <span className="text-[10px] font-bold text-white drop-shadow-sm">
+                          <span className="text-xs font-bold text-[rgb(var(--action-primary-fg))] drop-shadow-sm">
                             {bucket.count}
                           </span>
                         )}
@@ -385,13 +385,13 @@ export function BillingHealthCard({
                         style={{ width: `${width}%` }}
                       >
                         <div
-                          className="text-[9px] font-medium truncate"
+                          className="text-xs font-medium truncate"
                           style={{ color: isActive ? color : 'var(--v2-text-faint)' }}
                         >
                           {bucket.label}
                         </div>
                         {isActive && (
-                          <div className="text-[9px] tabular-nums" style={{ color: 'var(--v2-text-hint)' }}>
+                          <div className="text-xs tabular-nums" style={{ color: 'var(--v2-text-hint)' }}>
                             {formatShort(bucket.amount)}
                           </div>
                         )}
@@ -408,12 +408,12 @@ export function BillingHealthCard({
 
           {/* ── Payment Methods ── */}
           <div>
-            <span className="text-[12px] font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+            <span className="text-xs font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
               Payment methods
             </span>
 
             {totalPaymentCount === 0 ? (
-              <p className="text-[11px] py-3" style={{ color: 'var(--v2-text-hint)' }}>No payments recorded yet.</p>
+              <p className="text-xs py-3" style={{ color: 'var(--v2-text-hint)' }}>No payments recorded yet.</p>
             ) : (
               <div className="space-y-2 mt-2.5">
                 {sortedGateways.map(([gateway, count]) => {
@@ -424,15 +424,15 @@ export function BillingHealthCard({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                          <span className="text-[11px]" style={{ color: 'var(--v2-text-secondary)' }}>
+                          <span className="text-xs" style={{ color: 'var(--v2-text-secondary)' }}>
                             {formatGatewayLabel(gateway)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
+                          <span className="text-xs tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
                             {pct.toFixed(0)}%
                           </span>
-                          <span className="text-[11px] font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
+                          <span className="text-xs font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
                             {count}
                           </span>
                         </div>
