@@ -49,7 +49,7 @@ export function DataTableRowActions<TData>({
                         'flex items-center w-full px-3 py-2 text-sm transition-colors',
                         active && 'bg-[rgb(var(--surface-secondary))]',
                         action.variant === 'danger'
-                          ? 'text-red-400 hover:text-red-300'
+                          ? 'text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]'
                           : 'text-[rgb(var(--text-primary))]',
                         action.disabled && 'opacity-50 cursor-not-allowed'
                       )}

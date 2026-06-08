@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react'
 import { Check, ListFilter } from 'lucide-react'
 import type { Column } from '@tanstack/react-table'
-import { cn } from '../../utils'
+import { cn, focusRingInset } from '../../utils'
 import type { FacetedFilterOption } from './types'
 
 interface DataTableFacetedFilterProps<TData> {
@@ -36,15 +36,16 @@ export function DataTableFacetedFilter<TData>({
       <PopoverButton
         className={cn(
           'inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors',
+          focusRingInset,
           selectedValues.size > 0
-            ? 'border-teal-500/30 bg-teal-500/10 text-[rgb(var(--text-primary))]'
+            ? 'border-[rgb(var(--state-info-border)/0.35)] bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-primary))]'
             : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
         )}
       >
         <ListFilter className="w-3.5 h-3.5" />
         {title}
         {selectedValues.size > 0 && (
-          <span className="ml-1 px-1.5 py-0.5 text-xs font-semibold rounded-full bg-teal-500 text-white">
+          <span className="ml-1 px-1.5 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]">
             {selectedValues.size}
           </span>
         )}
@@ -71,18 +72,19 @@ export function DataTableFacetedFilter<TData>({
                   className={cn(
                     'flex items-center w-full px-3 py-2 text-sm transition-colors',
                     'hover:bg-[rgb(var(--surface-secondary))]',
-                    isSelected && 'text-teal-500'
+                    focusRingInset,
+                    isSelected && 'text-[rgb(var(--action-secondary-fg))]'
                   )}
                 >
                   <div
                     className={cn(
                       'flex items-center justify-center w-4 h-4 rounded border mr-2.5 flex-shrink-0',
                       isSelected
-                        ? 'bg-teal-500 border-teal-500'
+                        ? 'bg-[rgb(var(--action-primary-bg))] border-[rgb(var(--action-primary-bg))]'
                         : 'border-[rgb(var(--border-primary))]'
                     )}
                   >
-                    {isSelected && <Check className="w-3 h-3 text-white" />}
+                    {isSelected && <Check className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
                   </div>
                   {option.icon && (
                     <span className="flex-shrink-0 mr-2">{option.icon}</span>

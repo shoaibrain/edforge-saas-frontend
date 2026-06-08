@@ -77,7 +77,7 @@ export function DataTable<TData>({
           className
         )}
       >
-        <AlertCircle className="w-10 h-10 text-red-400 mb-3" />
+        <AlertCircle className="w-10 h-10 text-[rgb(var(--state-danger-fg))] mb-3" />
         <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-2">
           Failed to load data
         </h3>
@@ -88,7 +88,7 @@ export function DataTable<TData>({
           <button
             type="button"
             onClick={onRetry}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
@@ -133,7 +133,7 @@ export function DataTable<TData>({
 
       {/* Bulk Actions Bar — outside scroll area */}
       {hasBulkActions && (
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-teal-500/10 border-b border-teal-500/20">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-[rgb(var(--state-info-bg)/0.18)] border-b border-[rgb(var(--state-info-border)/0.35)]">
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {selectedRowCount} selected
           </span>
@@ -152,10 +152,10 @@ export function DataTable<TData>({
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
                   action.variant === 'danger'
-                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    ? 'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95'
                     : action.variant === 'outline'
                       ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))]'
-                      : 'bg-teal-600 text-white hover:bg-teal-700',
+                      : 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))]',
                   action.disabled && 'opacity-50 cursor-not-allowed'
                 )}
               >
@@ -180,7 +180,7 @@ export function DataTable<TData>({
         {isFetching && data.length > 0 && (
           <div className="sticky top-0 z-20">
             <div className="h-0.5 w-full bg-[rgb(var(--surface-tertiary))] overflow-hidden">
-              <div className="h-full w-1/3 bg-teal-500 animate-shimmer" />
+              <div className="h-full w-1/3 bg-[rgb(var(--action-primary-bg))] animate-shimmer" />
             </div>
           </div>
         )}
@@ -302,7 +302,7 @@ function TableRowWithExpansion<TData>({
         className={cn(
           'border-b border-[rgb(var(--border-secondary)/0.7)] last:border-b-0 transition-colors duration-150',
           isSelected
-            ? 'bg-teal-500/10 border-l-2 border-l-teal-500'
+            ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-l-2 border-l-[rgb(var(--border-focus))]'
             : isEvenRow
               ? 'bg-[rgb(var(--surface-tertiary)/0.35)]'
               : '',
