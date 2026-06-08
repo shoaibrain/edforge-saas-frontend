@@ -17,7 +17,7 @@ export const DashedDivider = forwardRef<HTMLDivElement, DashedDividerProps>(
           {...props}
         >
           <div className="flex-1 border-t border-dashed border-[var(--v2-border-default)]" />
-          <span className="text-[10px] font-mono uppercase tracking-[0.06em] text-[var(--v2-text-hint)] shrink-0">
+          <span className="text-xs font-mono uppercase tracking-[0.06em] text-[var(--v2-text-hint)] shrink-0">
             {label}
           </span>
           <div className="flex-1 border-t border-dashed border-[var(--v2-border-default)]" />

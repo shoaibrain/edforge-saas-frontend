@@ -199,7 +199,7 @@ export function DataTable<TData>({
                     <th
                       key={header.id}
                       className={cn(
-                        'px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
+                        'px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
                         meta?.align === 'right'
                           ? 'text-right'
                           : meta?.align === 'center'

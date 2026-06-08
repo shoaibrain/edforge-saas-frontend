@@ -95,7 +95,7 @@ export const FilterTabs = forwardRef<HTMLDivElement, FilterTabsProps>(
               {tab.count != null && (
                 <span
                   className={cn(
-                    'text-[10px] px-1.5 py-0.5 rounded-full leading-none font-semibold',
+                    'text-xs px-1.5 py-0.5 rounded-full leading-none font-semibold',
                     isActive
                       ? 'bg-[rgb(var(--surface-primary)/0.18)] text-[rgb(var(--text-inverted))]'
                       : 'bg-[rgb(var(--surface-elevated))] text-[rgb(var(--text-tertiary))]'

@@ -45,7 +45,7 @@ export const ContentSection = forwardRef<HTMLElement, ContentSectionProps>(
         {...props}
       >
         {eyebrow && (
-          <p className="text-[10px] font-mono uppercase tracking-[0.08em] text-[var(--v2-text-muted)] mb-1.5">
+          <p className="text-xs font-mono uppercase tracking-[0.08em] text-[var(--v2-text-muted)] mb-1.5">
             {eyebrow}
           </p>
         )}

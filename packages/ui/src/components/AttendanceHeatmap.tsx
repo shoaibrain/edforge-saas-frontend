@@ -138,7 +138,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
           {dayHeaders.map((h) => (
             <div
               key={h}
-              className="text-center text-[10px] font-medium py-1"
+              className="text-center text-xs font-medium py-1"
               style={{ color: 'var(--v2-text-hint)' }}
             >
               {h}
@@ -159,7 +159,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
               <div
                 key={cell.date}
                 className={cn(
-                  'aspect-square rounded-lg flex items-center justify-center text-[11px] font-medium tabular-nums',
+                  'aspect-square rounded-lg flex items-center justify-center text-xs font-medium tabular-nums',
                   focusRingInset
                 )}
                 style={{
@@ -191,7 +191,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
                 }}
               />
               <span
-                className="text-[10px] capitalize"
+                className="text-xs capitalize"
                 style={{ color: 'var(--v2-text-hint)' }}
               >
                 {status}
