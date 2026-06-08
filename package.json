@@ -18,6 +18,7 @@
     "build:mvp": "turbo build --filter=@edforge/shell --filter=@edforge/academics --filter=@edforge/people --filter=@edforge/finance --filter='./packages/*' --filter='./types/packages/*'",
     "build:packages": "turbo build --filter=./packages/*",
     "build:deploy": "bash scripts/build-deploy.sh",
+    "scaffold:mfe-page": "node scripts/scaffold-mfe-page.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
