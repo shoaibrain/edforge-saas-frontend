@@ -185,11 +185,11 @@ export function SyncDashboard() {
               <div
                 className={`
                   p-4 rounded-2xl
-                  ${isGlobalSyncing ? 'bg-teal-500/10 animate-pulse' : 'bg-surface-tertiary'}
+                  ${isGlobalSyncing ? 'bg-[rgb(var(--state-info-bg)/0.18)] animate-pulse' : 'bg-surface-tertiary'}
                 `}
               >
                 <Activity
-                  className={`w-8 h-8 ${isGlobalSyncing ? 'text-teal-500' : 'text-text-tertiary'}`}
+                  className={`w-8 h-8 ${isGlobalSyncing ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-text-tertiary'}`}
                 />
               </div>
               <div>
@@ -218,14 +218,14 @@ export function SyncDashboard() {
           {/* Overall Progress Bar */}
           <div className="relative h-4 bg-surface-tertiary rounded-full overflow-hidden">
             <motion.div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${overallProgress}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
             />
             {isGlobalSyncing && (
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgb(var(--surface-primary)/0.30)] to-transparent"
                 animate={{ x: ['-100%', '100%'] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
               />
@@ -267,7 +267,7 @@ export function SyncDashboard() {
                 <div
                   className={`
                     w-2 h-2 rounded-full
-                    ${log.type === 'success' ? 'bg-aqua-500' : log.type === 'error' ? 'bg-rust-500' : 'bg-teal-500'}
+                    ${log.type === 'success' ? 'bg-aqua-500' : log.type === 'error' ? 'bg-rust-500' : 'bg-[rgb(var(--action-primary-bg))]'}
                   `}
                 />
                 <span className="text-sm text-text-tertiary">{log.time}</span>
@@ -298,7 +298,7 @@ function ResourceCard({ resource, onResync }: ResourceCardProps) {
       case 'completed':
         return 'text-aqua-500'
       case 'syncing':
-        return 'text-teal-500'
+        return 'text-[rgb(var(--action-secondary-fg))]'
       case 'error':
         return 'text-rust-500'
       case 'paused':
@@ -372,7 +372,7 @@ function ResourceCard({ resource, onResync }: ResourceCardProps) {
                     ? 'bg-rust-500'
                     : resource.status === 'completed'
                     ? 'bg-aqua-500'
-                    : 'bg-gradient-to-r from-teal-500 to-cyan-500'
+                    : 'bg-gradient-to-r from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))]'
                 }
               `}
               initial={{ width: 0 }}

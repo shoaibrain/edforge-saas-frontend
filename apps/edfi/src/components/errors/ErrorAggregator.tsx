@@ -283,8 +283,8 @@ export function ErrorAggregator() {
         </Card>
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-teal-500/10">
-              <Lightbulb className="w-6 h-6 text-teal-500" />
+            <div className="p-3 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]">
+              <Lightbulb className="w-6 h-6 text-[rgb(var(--action-secondary-fg))]" />
             </div>
             <div>
               <p className="text-2xl font-bold text-text-primary">{errorGroups.length}</p>
@@ -301,7 +301,7 @@ export function ErrorAggregator() {
           onClick={() => setResourceFilter(null)}
           className={`
             px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all
-            ${!resourceFilter ? 'bg-teal-500/10 text-teal-600 dark:text-cyan-400' : 'text-text-tertiary hover:bg-surface-tertiary'}
+            ${!resourceFilter ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]' : 'text-text-tertiary hover:bg-surface-tertiary'}
           `}
         >
           All Resources
@@ -312,7 +312,7 @@ export function ErrorAggregator() {
             onClick={() => setResourceFilter(type)}
             className={`
               px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all
-              ${resourceFilter === type ? 'bg-teal-500/10 text-teal-600 dark:text-cyan-400' : 'text-text-tertiary hover:bg-surface-tertiary'}
+              ${resourceFilter === type ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]' : 'text-text-tertiary hover:bg-surface-tertiary'}
             `}
           >
             {type}
@@ -411,14 +411,14 @@ function ErrorGroupCard({
               transition={{ duration: 0.3 }}
             >
               {/* Suggestion Card */}
-              <div className="mx-5 mb-4 p-4 rounded-xl bg-teal-500/10 border border-teal-500/20">
+              <div className="mx-5 mb-4 p-4 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--border-focus)/0.35)]">
                 <div className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                  <Lightbulb className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-teal-600 dark:text-cyan-400 mb-1">
+                    <p className="font-medium text-[rgb(var(--action-secondary-fg))] mb-1">
                       Suggested Fix
                     </p>
-                    <p className="text-sm text-teal-700 dark:text-teal-300">
+                    <p className="text-sm text-[rgb(var(--text-secondary))]">
                       {group.suggestion}
                     </p>
                   </div>
