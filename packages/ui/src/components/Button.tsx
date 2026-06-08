@@ -12,7 +12,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-teal-600 text-white hover:bg-teal-700 active:bg-teal-800 shadow-sm',
+          'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] active:bg-[rgb(var(--action-primary-bg-active))] shadow-sm',
         secondary:
           'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-elevated))] active:opacity-80',
         outline:
@@ -20,8 +20,8 @@ const buttonVariants = cva(
         ghost:
           'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
         danger:
-          'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
-        link: 'text-teal-600 underline-offset-4 hover:underline',
+          'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95 active:brightness-90 shadow-sm',
+        link: 'text-[rgb(var(--action-secondary-fg))] underline-offset-4 hover:underline',
       },
       size: {
         sm: 'h-8 px-3 text-sm rounded-lg gap-1.5',
