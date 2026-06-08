@@ -50,6 +50,37 @@ test.describe('Design system visual baselines — public surfaces', () => {
     })
     await expectNoConsoleErrors(consoleErrors)
   })
+
+  test('design-system form primitives — light', async ({ page }) => {
+    const consoleErrors = await collectConsoleErrors(page)
+    await page.goto('/dev/design-system')
+    await expect(page.getByRole('heading', { name: 'Design System' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Form primitives' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /School type/ })).toBeVisible()
+    await expect(page).toHaveScreenshot('design-system-form-primitives-light.png', {
+      fullPage: true,
+      animations: 'disabled',
+    })
+    await expectNoConsoleErrors(consoleErrors)
+  })
+
+  test('design-system form primitives — dark', async ({ page }) => {
+    const consoleErrors = await collectConsoleErrors(page)
+    await page.addInitScript(() => {
+      window.localStorage.setItem('edforge-theme', JSON.stringify({ state: { theme: 'dark' }, version: 0 }))
+      document.documentElement.classList.add('dark')
+      document.documentElement.style.colorScheme = 'dark'
+    })
+    await page.goto('/dev/design-system')
+    await expect(page.getByRole('heading', { name: 'Design System' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Form primitives' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /School type/ })).toBeVisible()
+    await expect(page).toHaveScreenshot('design-system-form-primitives-dark.png', {
+      fullPage: true,
+      animations: 'disabled',
+    })
+    await expectNoConsoleErrors(consoleErrors)
+  })
 })
 
 test.describe('Design system visual baselines — PABSON pilot tenant shell', () => {
