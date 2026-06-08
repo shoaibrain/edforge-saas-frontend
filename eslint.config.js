@@ -12,8 +12,8 @@ export default [
     // Wave 1 — block raw UUID-fragment (`id.slice(0, N)`) renders in JSX.
     // Use @edforge/archetype's <EntityIdDisplay> / <UuidBadge> instead.
     noIdSliceInJsxConfig,
-    // Stream 0 design-system manifest — warn only until the baseline is
-    // intentionally ratcheted down in later governance streams.
+    // Governance lock-in — design-system rules are errors now that the
+    // hardcoded color/arbitrary-scale baseline has been cleared.
     designSystemConfig,
     {
         ignores: ['**/dist/**', '**/node_modules/**', '**/.turbo/**', '**/.rsbuild/**'],

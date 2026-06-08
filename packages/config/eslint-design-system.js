@@ -47,7 +47,7 @@ const designSystemPlugin = {
       meta: {
         type: 'suggestion',
         docs: {
-          description: 'Warn when app/UI code bypasses semantic color tokens with raw Tailwind palette utilities.',
+          description: 'Disallow app/UI code bypassing semantic color tokens with raw Tailwind palette utilities.',
         },
         messages: {
           hardcodedColor:
@@ -82,7 +82,7 @@ const designSystemPlugin = {
       meta: {
         type: 'suggestion',
         docs: {
-          description: 'Warn when app/UI code bypasses the spacing/type scale with arbitrary Tailwind values.',
+          description: 'Disallow app/UI code bypassing the spacing/type scale with arbitrary Tailwind values.',
         },
         messages: {
           arbitraryValue:
@@ -122,7 +122,7 @@ export default {
     'edforge-design-system': designSystemPlugin,
   },
   rules: {
-    'edforge-design-system/no-hardcoded-colors': 'warn',
-    'edforge-design-system/no-arbitrary-tailwind-values': 'warn',
+    'edforge-design-system/no-hardcoded-colors': 'error',
+    'edforge-design-system/no-arbitrary-tailwind-values': 'error',
   },
 }
