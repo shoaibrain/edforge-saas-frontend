@@ -17,7 +17,6 @@ import {
     ArrowRight, 
     ChartNoAxesColumnDecreasing, 
     CloudLightning, 
-    GalleryVerticalEnd,
     ChevronLeft,
     ChevronRight,
     TrendingUp,
@@ -28,7 +27,7 @@ import {
     RotateCcw,
     Check,
 } from 'lucide-react'
-import { Card } from '@edforge/ui'
+import { Card, PageHeader } from '@edforge/ui'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -171,8 +170,8 @@ function StatCard({ stat, index }: { stat: ModuleStat; index: number }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+            <div className="group relative flex flex-col w-44 h-36 p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
                 </div>
@@ -182,8 +181,8 @@ function StatCard({ stat, index }: { stat: ModuleStat; index: number }) {
                         <span className="text-xl font-bold text-[rgb(var(--text-primary))]">{stat.value}</span>
                         {stat.change && (
                             <div className={`flex items-center gap-0.5 text-xs ${
-                                stat.changeType === 'positive' ? 'text-emerald-600' :
-                                stat.changeType === 'negative' ? 'text-rose-600' :
+                                stat.changeType === 'positive' ? 'text-[rgb(var(--state-success-fg))]' :
+                                stat.changeType === 'negative' ? 'text-[rgb(var(--state-danger-fg))]' :
                                 'text-[rgb(var(--text-tertiary))]'
                             }`}>
                                 <TrendIcon className="w-3 h-3" />
@@ -256,7 +255,7 @@ function ActionCard({ card, delay = 0 }: { card: ModuleActionCard; delay?: numbe
             onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
                 <Link to={card.href}>
-                    <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-blue-500/30 dark:hover:border-blue-400/30">
+                    <Card className="p-6 h-full hover:shadow-overlay transition-shadow duration-base ease-standard cursor-pointer group border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))]">
                         <div className="flex items-start justify-between mb-4">
                             <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
                                 <card.icon className={`w-6 h-6 ${card.iconColor}`} />
@@ -265,7 +264,7 @@ function ActionCard({ card, delay = 0 }: { card: ModuleActionCard; delay?: numbe
                                 <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
                             </animated.div>
                         </div>
-                        <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{card.title}</h3>
+                        <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-[rgb(var(--action-secondary-fg))] transition-colors">{card.title}</h3>
                         <p className="text-sm text-[rgb(var(--text-tertiary))]">{card.description}</p>
                     </Card>
                 </Link>
@@ -308,22 +307,12 @@ export function ModuleOverviewPage({ title, description, stats, actionCards, chi
 
     return (
         <div className="space-y-10 max-w-6xl mx-auto pb-12 relative">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="absolute top-4 right-0 z-10">
-                <WidgetVisibilityMenu widgets={widgets} onToggle={toggleWidget} onReset={resetWidgets} />
-            </motion.div>
-
-            <motion.header initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="pt-4 pr-12">
-                <div className="flex items-start gap-4">
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-                        className="p-3 rounded-xl bg-gradient-to-br from-blue-500/15 to-indigo-500/15 dark:from-blue-400/20 dark:to-indigo-500/20 border border-blue-500/20 dark:border-blue-400/25 flex-shrink-0">
-                        <GalleryVerticalEnd className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    </motion.div>
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">{title} Overview</h1>
-                        <p className="text-[rgb(var(--text-secondary))] mt-1 max-w-2xl">{description}</p>
-                    </div>
-                </div>
-            </motion.header>
+            <PageHeader
+                className="pt-4"
+                title={`${title} Overview`}
+                description={description}
+                actions={<WidgetVisibilityMenu widgets={widgets} onToggle={toggleWidget} onReset={resetWidgets} />}
+            />
 
             {stats.length > 0 && (
                 <WidgetSection label="Quick stats" icon={ChartNoAxesColumnDecreasing} visible={widgetVisibility['quick-stats']}>
