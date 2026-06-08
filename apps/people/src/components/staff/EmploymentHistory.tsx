@@ -35,12 +35,12 @@ import { formatDate } from '../../lib/utils'
 // ============================================================================
 
 const STATUS_TIMELINE_COLORS: Record<string, string> = {
-  active: 'bg-emerald-500',
+  active: 'bg-[rgb(var(--state-success-fg))]',
   on_leave: 'bg-amber-500',
   suspended: 'bg-[rgb(var(--state-danger-bg))]0',
-  terminated: 'bg-slate-500',
-  retired: 'bg-blue-500',
-  resigned: 'bg-orange-500',
+  terminated: 'bg-[rgb(var(--text-tertiary))]',
+  retired: 'bg-[rgb(var(--state-info-fg))]',
+  resigned: 'bg-[rgb(var(--state-warning-fg))]',
 }
 
 const EMPLOYMENT_STATUS_OPTIONS = [
@@ -236,7 +236,7 @@ function UpdateStatusModal({
 // ============================================================================
 
 function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto; isLast: boolean }) {
-  const dotColor = STATUS_TIMELINE_COLORS[entry.newStatus] || 'bg-slate-400'
+  const dotColor = STATUS_TIMELINE_COLORS[entry.newStatus] || 'bg-[rgb(var(--text-tertiary))]'
 
   return (
     <div className="relative flex gap-4">
@@ -321,7 +321,7 @@ export function EmploymentHistory({
         </div>
         <button
           onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Update Status

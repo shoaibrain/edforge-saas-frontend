@@ -393,7 +393,7 @@ export function TrainingModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="min-w-[120px]"
+            className="min-w-32"
           >
             {isSubmitting ? (
               <>

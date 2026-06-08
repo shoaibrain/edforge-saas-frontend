@@ -173,7 +173,7 @@ function CopyButton({ text }: { text: string }) {
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.5, opacity: 0 }}
                     >
-                        <Check className="w-4 h-4 text-emerald-500" />
+                        <Check className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
                     </motion.div>
                 ) : (
                     <motion.div
@@ -246,7 +246,7 @@ function StaffActionsDropdown({ onAssignToSchool }: { onAssignToSchool: () => vo
 function SecurityScoreRing({ score }: { score: number }) {
     const circumference = 2 * Math.PI * 36
     const progress = (score / 100) * circumference
-    const color = score >= 80 ? 'text-emerald-500' : score >= 50 ? 'text-amber-500' : 'text-red-500'
+    const color = score >= 80 ? 'text-[rgb(var(--state-success-fg))]' : score >= 50 ? 'text-amber-500' : 'text-[rgb(var(--state-danger-fg))]'
     const bgColor = score >= 80 ? 'stroke-emerald-500/20' : score >= 50 ? 'stroke-amber-500/20' : 'stroke-red-500/20'
 
     return (
@@ -288,7 +288,7 @@ function SecurityScoreRing({ score }: { score: number }) {
 function LoadingSkeleton() {
     return (
         <div className="min-h-full">
-            <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-8">
+            <div className="max-w-full mx-auto px-6 py-6 space-y-8">
                 <div className="animate-pulse space-y-6">
                     <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-[rgb(var(--surface-secondary))] rounded-lg" />
@@ -393,7 +393,7 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                         )}
                         <div className="space-y-1">
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Staff Unique ID</span>
-                            <p className="text-sm font-mono text-teal-600 dark:text-teal-400 font-medium">{staff.staffUniqueId}</p>
+                            <p className="text-sm font-mono text-[rgb(var(--action-secondary-fg))]  font-medium">{staff.staffUniqueId}</p>
                         </div>
                     </div>
                 </div>
@@ -448,7 +448,7 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                         {staff.highlyQualifiedTeacher && (
                             <div className="space-y-1">
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Highly Qualified</span>
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ">
                                     <CheckCircle2 className="w-3 h-3" />
                                     HQT Certified
                                 </span>
@@ -578,14 +578,14 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                     </h3>
                     <div className="space-y-4">
                         {/* Staff Unique ID — Ed-Fi identifier (prominent) */}
-                        <div className="p-3 rounded-lg bg-teal-500/5 border border-teal-500/20">
+                        <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.12)] border border-[rgb(var(--border-focus)/0.35)]">
                             <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wider">
+                                <span className="text-xs font-medium text-[rgb(var(--action-secondary-fg))]  uppercase tracking-wider">
                                     Staff Unique ID
                                 </span>
                                 <span className="text-xs text-[rgb(var(--text-tertiary))]">Ed-Fi Identifier</span>
                             </div>
-                            <p className="text-lg font-mono font-semibold text-teal-600 dark:text-teal-400">
+                            <p className="text-lg font-mono font-semibold text-[rgb(var(--action-secondary-fg))] ">
                                 {staff.staffUniqueId}
                             </p>
                             <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
@@ -621,12 +621,12 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                                     </p>
                                 </div>
                                 {staff.userId ? (
-                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ">
                                         <Key className="w-3 h-3" />
                                         Active
                                     </span>
                                 ) : (
-                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400">
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] ">
                                         No Account
                                     </span>
                                 )}
@@ -659,7 +659,7 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                             <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-secondary))]">
                                 <span className="text-sm text-[rgb(var(--text-secondary))]">MFA Status</span>
                                 {security?.mfaEnabled ? (
-                                    <span className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
+                                    <span className="flex items-center gap-1.5 text-sm text-[rgb(var(--state-success-fg))] ">
                                         <CheckCircle2 className="w-3.5 h-3.5" />
                                         Enabled
                                     </span>
@@ -889,7 +889,7 @@ function OverviewTab({
                                             </p>
                                         </div>
                                         {a.isPrimary && (
-                                            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-600 dark:text-teal-400 flex-shrink-0">
+                                            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]  flex-shrink-0">
                                                 Primary
                                             </span>
                                         )}
@@ -912,10 +912,10 @@ function OverviewTab({
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-[rgb(var(--surface-tertiary))]">
-                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
-                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
-                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Avg Grade</th>
-                                            <th className="px-5 py-2.5 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Att %</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Avg Grade</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Att %</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
@@ -935,7 +935,7 @@ function OverviewTab({
                                                                 {section.courseName || '—'}
                                                             </p>
                                                             {section.courseCode && (
-                                                                <p className="text-[11px] text-[rgb(var(--text-tertiary))]">{section.courseCode}</p>
+                                                                <p className="text-xs text-[rgb(var(--text-tertiary))]">{section.courseCode}</p>
                                                             )}
                                                         </td>
                                                         <td className="px-5 py-3 text-sm text-[rgb(var(--text-secondary))]">
@@ -1074,18 +1074,18 @@ function AssignmentsTab({
                 <motion.div variants={fadeInUp} className="rounded-lg border border-[rgb(var(--border-secondary))] p-3">
                     <div className="flex items-center justify-between mb-1.5">
                         <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Total FTE</span>
-                        <span className={`text-xs font-bold ${totalFTE > 1 ? 'text-red-600 dark:text-red-400' : 'text-[rgb(var(--text-primary))]'}`}>
+                        <span className={`text-xs font-bold ${totalFTE > 1 ? 'text-[rgb(var(--state-danger-fg))] ' : 'text-[rgb(var(--text-primary))]'}`}>
                             {totalFTE.toFixed(2)}
                         </span>
                     </div>
                     <div className="w-full bg-[rgb(var(--surface-tertiary))] rounded-full h-1.5">
                         <div
-                            className={`h-1.5 rounded-full transition-all ${totalFTE > 1 ? 'bg-red-500' : totalFTE > 0.8 ? 'bg-amber-500' : 'bg-teal-500'}`}
+                            className={`h-1.5 rounded-full transition-all ${totalFTE > 1 ? 'bg-[rgb(var(--state-danger-fg))]' : totalFTE > 0.8 ? 'bg-amber-500' : 'bg-[rgb(var(--action-primary-bg))]'}`}
                             style={{ width: `${Math.min(totalFTE * 100, 100)}%` }}
                         />
                     </div>
                     {totalFTE > 1 && (
-                        <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
+                        <p className="text-xs text-[rgb(var(--state-danger-fg))]  mt-1 flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3" />
                             Overcommitted — exceeds 1.0
                         </p>
@@ -1120,7 +1120,7 @@ function AssignmentsTab({
                                 <motion.div
                                     key={assignment.assignmentId}
                                     variants={fadeInUp}
-                                    className="flex items-center justify-between p-3 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
+                                    className="flex items-center justify-between p-3 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-focus)/0.35)] transition-all group"
                                 >
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
@@ -1128,12 +1128,12 @@ function AssignmentsTab({
                                                 {schoolName}
                                             </h4>
                                             {hasEnded && (
-                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400 flex-shrink-0">
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]  flex-shrink-0">
                                                     Ended
                                                 </span>
                                             )}
                                             {assignment.isPrimary && (
-                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400 flex-shrink-0">
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]  flex-shrink-0">
                                                     Primary
                                                 </span>
                                             )}
@@ -1149,7 +1149,7 @@ function AssignmentsTab({
                                             {typeof assignment.fullTimeEquivalency === 'number' && (
                                                 <>
                                                     <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
-                                                    <span className="text-blue-600 dark:text-blue-400">FTE {assignment.fullTimeEquivalency.toFixed(2)}</span>
+                                                    <span className="text-[rgb(var(--state-info-fg))] ">FTE {assignment.fullTimeEquivalency.toFixed(2)}</span>
                                                 </>
                                             )}
                                             <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
@@ -1170,7 +1170,7 @@ function AssignmentsTab({
                                         </button>
                                         <button
                                             onClick={() => handleRemoveAssignment(assignment.assignmentId)}
-                                            className="p-1.5 rounded-md hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                                            className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                                             title="Remove"
                                             disabled={isRemoving}
                                         >
@@ -1235,11 +1235,11 @@ function AssignmentsTab({
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-[rgb(var(--surface-tertiary))]">
-                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
-                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
-                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
-                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Room</th>
-                                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Room</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
@@ -1253,7 +1253,7 @@ function AssignmentsTab({
                                                         {section.courseName || '\u2014'}
                                                     </p>
                                                     {section.courseCode && (
-                                                        <p className="text-[11px] text-[rgb(var(--text-tertiary))]">{section.courseCode}</p>
+                                                        <p className="text-xs text-[rgb(var(--text-tertiary))]">{section.courseCode}</p>
                                                     )}
                                                 </td>
                                                 <td className="px-3 py-2">
@@ -1261,7 +1261,7 @@ function AssignmentsTab({
                                                         {section.sectionName || section.sectionNumber}
                                                     </p>
                                                     {section.sectionName && (
-                                                        <p className="text-[11px] text-[rgb(var(--text-tertiary))]">#{section.sectionNumber}</p>
+                                                        <p className="text-xs text-[rgb(var(--text-tertiary))]">#{section.sectionNumber}</p>
                                                     )}
                                                 </td>
                                                 <td className="px-3 py-2 text-sm text-[rgb(var(--text-secondary))]">
@@ -1328,20 +1328,20 @@ function SecurityTab({
                             <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4">Security Status</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))]">
-                                    <div className={`p-2 rounded-lg ${security?.mfaEnabled ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}`}>
+                                    <div className={`p-2 rounded-lg ${security?.mfaEnabled ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]' : 'bg-amber-500/10 text-amber-600'}`}>
                                         <Shield className="w-5 h-5" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
                                             Two-Factor Auth
                                         </p>
-                                        <p className={`text-xs ${security?.mfaEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                        <p className={`text-xs ${security?.mfaEnabled ? 'text-[rgb(var(--state-success-fg))] ' : 'text-amber-600 dark:text-amber-400'}`}>
                                             {security?.mfaEnabled ? `Enabled (${security.mfaMethod || 'TOTP'})` : 'Not Enabled'}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))]">
-                                    <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600">
+                                    <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]">
                                         <Monitor className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -1354,7 +1354,7 @@ function SecurityTab({
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))]">
-                                    <div className="p-2 rounded-lg bg-purple-500/10 text-purple-600">
+                                    <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]">
                                         <Key className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -1369,7 +1369,7 @@ function SecurityTab({
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))]">
-                                    <div className={`p-2 rounded-lg ${(security?.failedLoginAttempts ?? 0) > 0 ? 'bg-red-500/10 text-red-600' : 'bg-emerald-500/10 text-emerald-600'}`}>
+                                    <div className={`p-2 rounded-lg ${(security?.failedLoginAttempts ?? 0) > 0 ? 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]' : 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]'}`}>
                                         <AlertTriangle className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -1415,7 +1415,7 @@ function SecurityTab({
                                     <div
                                         key={session.sessionId}
                                         className={`flex items-center justify-between p-4 rounded-lg border ${session.isCurrent
-                                            ? 'border-teal-500/30 bg-teal-500/5'
+                                            ? 'border-[rgb(var(--border-focus)/0.35)] bg-[rgb(var(--state-info-bg)/0.12)]'
                                             : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-primary))]'
                                             }`}
                                     >
@@ -1429,7 +1429,7 @@ function SecurityTab({
                                                         {session.browser} on {session.os}
                                                     </p>
                                                     {session.isCurrent && (
-                                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ">
                                                             Current
                                                         </span>
                                                     )}
@@ -1542,7 +1542,7 @@ export default function StaffDetailPage() {
                     </p>
                     <Link
                         to="/staff"
-                        className="inline-flex items-center gap-2 mt-6 px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--state-info-fg))] transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Staff Directory
@@ -1554,13 +1554,13 @@ export default function StaffDetailPage() {
 
     const displayName = [staff.firstName, staff.lastSurname].filter(Boolean).join(' ') || 'Unknown Staff'
     const avatarUrl = getStaffAvatar(staff.staffId)
-    const statusDotColor = staff.employmentStatus === 'active' ? 'bg-emerald-500'
+    const statusDotColor = staff.employmentStatus === 'active' ? 'bg-[rgb(var(--state-success-fg))]'
         : staff.employmentStatus === 'on_leave' ? 'bg-amber-500'
-        : 'bg-gray-400'
+        : 'bg-[rgb(var(--text-tertiary))]'
 
     return (
         <div className="min-h-full">
-            <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-0">
+            <div className="max-w-full mx-auto px-6 py-6 space-y-0">
                 {/* Header Section */}
                 <div className="space-y-0">
                     {/* Profile Info */}
@@ -1583,7 +1583,7 @@ export default function StaffDetailPage() {
                             <div className="flex flex-wrap items-center gap-2.5 mt-1 text-sm">
                                 <span className="text-[rgb(var(--text-tertiary))] truncate">{staff.email}</span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
-                                <span className="font-medium text-teal-600 dark:text-teal-400">
+                                <span className="font-medium text-[rgb(var(--action-secondary-fg))] ">
                                     {getRoleLabel(staff.role)}
                                 </span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
@@ -1615,7 +1615,7 @@ export default function StaffDetailPage() {
                                     `}
                                 >
                                     <span className="relative z-10 flex items-center gap-2">
-                                        <Icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
+                                        <Icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
                                         {tab.label}
                                     </span>
 
@@ -1623,7 +1623,7 @@ export default function StaffDetailPage() {
                                     {isActive && (
                                         <motion.div
                                             layoutId="staffTabIndicator"
-                                            className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))] rounded-t-full"
                                             initial={false}
                                             transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                                         />
@@ -1635,7 +1635,7 @@ export default function StaffDetailPage() {
                 </div>
 
                 {/* Content Area */}
-                <div className="min-h-[500px] pt-6">
+                <div className="min-h-128 pt-6">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}

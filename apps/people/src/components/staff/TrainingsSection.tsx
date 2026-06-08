@@ -31,23 +31,23 @@ import { formatDate } from '../../lib/utils'
 // ============================================================================
 
 const TRAINING_TYPE_COLORS: Record<string, string> = {
-  pedagogical: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  subject_matter: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  technology: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+  pedagogical: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  subject_matter: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  technology: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   inclusion: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  leadership: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
-  safety: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
-  assessment: 'bg-teal-500/10 text-[rgb(var(--action-secondary-fg))] ',
-  language: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  induction: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-  other: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+  leadership: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] ',
+  safety: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] ',
+  assessment: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ',
+  language: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
+  induction: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  other: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] ',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   scheduled: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  in_progress: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-  completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  cancelled: 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
+  in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  completed: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
+  cancelled: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] ',
 }
 
 const fadeInUp = {
@@ -141,7 +141,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
         </div>
         <button
           onClick={handleAdd}
-          className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Training

@@ -69,7 +69,7 @@ function CredentialsStep(_props: { data: Record<string, unknown>; updateData: (d
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
-        <BookOpen className="w-5 h-5 text-teal-500" />
+        <BookOpen className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Credentials & Qualifications</h3>
       </div>
       <p className="text-sm text-[rgb(var(--text-tertiary))]">
@@ -85,7 +85,7 @@ function ClassAssignmentStep(_props: { data: Record<string, unknown>; updateData
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
-        <Users className="w-5 h-5 text-indigo-500" />
+        <Users className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Class Assignments</h3>
       </div>
       <p className="text-sm text-[rgb(var(--text-tertiary))]">
@@ -117,7 +117,7 @@ function RolePermissionsStep(_props: { data: Record<string, unknown>; updateData
   return (
     <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
-        <Shield className="w-5 h-5 text-purple-500" />
+        <Shield className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Roles & Permissions</h3>
       </div>
       <p className="text-sm text-[rgb(var(--text-tertiary))]">
@@ -148,8 +148,8 @@ function StudentLinkingStep(_props: { data: Record<string, unknown>; updateData:
 function ReviewStep({ data }: { data: Record<string, unknown> }) {
   return (
     <div className="space-y-4">
-      <div className="bg-teal-500/10 dark:bg-cyan-500/10 rounded-xl p-4 border border-teal-500/20 dark:border-cyan-500/20">
-        <p className="text-sm text-teal-700 dark:text-cyan-300">
+      <div className="bg-[rgb(var(--state-info-bg)/0.18)]  rounded-xl p-4 border border-[rgb(var(--border-focus)/0.35)] /20">
+        <p className="text-sm text-[rgb(var(--state-info-fg))] ">
           Please review the information below before submitting.
         </p>
       </div>

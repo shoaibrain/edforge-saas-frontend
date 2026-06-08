@@ -205,7 +205,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
               <button
                 type="button"
                 onClick={() => removeAddress(index)}
-                className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
                 title="Remove address"
               >
                 <X className="w-4 h-4" />
@@ -329,7 +329,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
         <button
           type="button"
           onClick={addAddress}
-          className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+          className="flex items-center gap-2 text-sm text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Address
@@ -359,7 +359,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
               <button
                 type="button"
                 onClick={() => removeEmergencyContact(index)}
-                className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
                 title="Remove contact"
               >
                 <X className="w-4 h-4" />
@@ -401,7 +401,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
         <button
           type="button"
           onClick={addEmergencyContact}
-          className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+          className="flex items-center gap-2 text-sm text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Emergency Contact

@@ -415,7 +415,7 @@ export default function StaffPage() {
         ))}
 
         {/* Search input */}
-        <div className="relative flex min-w-[200px] flex-1 items-center">
+        <div className="relative flex min-w-52 flex-1 items-center">
           <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-text-tertiary" />
           <input
             type="text"

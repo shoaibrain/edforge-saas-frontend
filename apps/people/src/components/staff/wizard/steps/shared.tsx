@@ -158,7 +158,7 @@ export function AnimatedCheckbox({ label, checked, onChange, helpText, disabled 
             <motion.svg
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="w-3 h-3 text-white"
+              className="w-3 h-3 text-[rgb(var(--action-primary-fg))]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
