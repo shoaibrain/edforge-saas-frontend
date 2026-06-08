@@ -106,7 +106,7 @@ describe('interactive primitive focus-ring baseline', () => {
     expect(statusByPrimitive).toEqual({
       Button: 'semantic-pass',
       'Tag clickable usage': 'semantic-pass',
-      'Card as link/button usage': 'missing',
+      'Card as link/button usage': 'semantic-pass',
       'Table row': 'semantic-pass',
       'DataTable clickable row': 'semantic-pass',
       FilterTabs: 'semantic-pass',
