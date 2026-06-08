@@ -6,7 +6,7 @@
  */
 
 // Utilities
-export { cn, getUserAvatar } from './utils'
+export { cn, focusRing, focusRingInset, getUserAvatar } from './utils'
 
 // Components
 export { Button, buttonVariants, type ButtonProps } from './components/Button'
