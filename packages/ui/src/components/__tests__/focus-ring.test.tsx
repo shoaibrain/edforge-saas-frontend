@@ -109,7 +109,7 @@ describe('interactive primitive focus-ring baseline', () => {
       'Card as link/button usage': 'missing',
       'Table row': 'missing',
       'DataTable clickable row': 'missing',
-      FilterTabs: 'missing',
+      FilterTabs: 'semantic-pass',
       Accordion: 'missing',
       Dropdown: 'semantic-pass',
       'AttendanceHeatmap navigation': 'missing',
