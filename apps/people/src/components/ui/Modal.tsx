@@ -56,7 +56,7 @@ export function Modal({
           leaveTo="opacity-0"
         >
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" 
             aria-hidden="true" 
           />
         </TransitionChild>
