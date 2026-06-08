@@ -8,7 +8,7 @@
 import { Fragment } from 'react'
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '../utils'
+import { cn, focusRing, focusRingInset } from '../utils'
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: 'EN' },
@@ -41,9 +41,10 @@ export function LanguageSwitcher({
       <MenuButton
         className={cn(
           'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors',
+          focusRing,
           variant === 'default'
             ? 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] border border-[rgb(var(--border-secondary))]'
-            : 'text-white/80 hover:text-white hover:bg-white/10'
+            : 'text-[rgb(var(--text-inverted)/0.80)] hover:text-[rgb(var(--text-inverted))] hover:bg-[rgb(var(--surface-primary)/0.10)]'
         )}
         aria-label="Change language"
       >
@@ -56,14 +57,14 @@ export function LanguageSwitcher({
 
       <Transition
         as={Fragment}
-        enter="transition ease-out duration-100"
+        enter="transition ease-enter duration-fast"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
+        leave="transition ease-exit duration-instant"
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute right-0 z-50 mt-1.5 w-40 origin-top-right rounded-xl bg-[rgb(var(--surface-elevated))] shadow-lg ring-1 ring-black/5 border border-[rgb(var(--border-secondary))] focus:outline-none overflow-hidden">
+        <MenuItems className="absolute right-0 z-50 mt-1.5 w-40 origin-top-right rounded-xl bg-[rgb(var(--surface-elevated))] shadow-popover ring-1 ring-[rgb(var(--border-secondary))] border border-[rgb(var(--border-secondary))] focus:outline-none overflow-hidden">
           <div className="py-1">
             {LANGUAGES.map((lang) => (
               <MenuItem key={lang.code}>
@@ -73,9 +74,10 @@ export function LanguageSwitcher({
                     onClick={() => handleSelect(lang.code)}
                     className={cn(
                       'flex items-center gap-2.5 w-full px-3 py-2 text-sm',
+                      focusRingInset,
                       focus && 'bg-[rgb(var(--interactive-hover))]',
                       i18n.language === lang.code
-                        ? 'text-teal-600 dark:text-cyan-400 font-medium'
+                        ? 'text-[rgb(var(--action-secondary-fg))] font-medium'
                         : 'text-[rgb(var(--text-primary))]'
                     )}
                   >
