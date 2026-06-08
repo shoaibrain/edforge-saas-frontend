@@ -58,15 +58,15 @@ export function DeleteConfirmDialog({
     >
       <div className="space-y-4">
         {/* Warning icon and message */}
-        <div className="flex items-start gap-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+        <div className="flex items-start gap-4 p-4 rounded-lg bg-[rgb(var(--state-danger-bg))] border border-[rgb(var(--state-danger-border))]">
           <div className="flex-shrink-0">
-            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
+            <h4 className="text-sm font-medium text-[rgb(var(--state-danger-fg))]">
               {t('delete.warning')}
             </h4>
-            <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
               {t('delete.confirmation', { name: fullName })}
             </p>
           </div>
@@ -75,7 +75,7 @@ export function DeleteConfirmDialog({
         {/* Staff info */}
         <div className="p-4 rounded-lg bg-surface-secondary border border-border-secondary">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 font-medium">
+            <div className="w-10 h-10 rounded-full bg-[rgb(var(--state-danger-bg))] flex items-center justify-center text-[rgb(var(--state-danger-fg))] font-medium">
               {staff.firstName?.[0] ?? '?'}{staff.lastSurname?.[0] ?? '?'}
             </div>
             <div>
@@ -92,7 +92,7 @@ export function DeleteConfirmDialog({
             className="block text-sm font-medium text-text-primary mb-1.5"
           >
             {t('delete.typeToConfirm', { email: '' })}
-            <span className="font-mono text-red-600 dark:text-red-400">{staff.email}</span>
+            <span className="font-mono text-[rgb(var(--state-danger-fg))]">{staff.email}</span>
           </label>
           <input
             id="confirmEmail"
@@ -103,16 +103,16 @@ export function DeleteConfirmDialog({
               w-full px-3 py-2 rounded-lg border
               bg-surface-secondary text-text-primary
               placeholder:text-text-tertiary
-              focus:outline-none focus:ring-2 focus:ring-red-500/20
+              focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]
               transition-colors
-              ${confirmText && !canDelete ? 'border-red-500' : 'border-border-secondary'}
+              ${confirmText && !canDelete ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
             `}
             placeholder={t('delete.emailPlaceholder')}
             disabled={isDeleting}
             autoComplete="off"
           />
           {confirmText && !canDelete && (
-            <p className="mt-1 text-sm text-red-500">
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
               {t('delete.emailMismatch')}
             </p>
           )}
@@ -134,7 +134,7 @@ export function DeleteConfirmDialog({
           variant="danger"
           onClick={handleConfirm}
           disabled={!canDelete || isDeleting}
-          className="min-w-[100px]"
+          className="min-w-24"
         >
           {isDeleting ? (
             <>
