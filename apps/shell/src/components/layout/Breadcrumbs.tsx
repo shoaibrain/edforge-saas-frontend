@@ -67,9 +67,8 @@ const ROUTE_LABELS: Record<string, string> = {
   reports: 'Financial Reports',
   'audit-trail': 'Audit Trail',
 
-  // People & HR sub-routes
+  // People sub-routes
   staff: 'Staff Directory',
-  hr: 'Human Resources',
   payroll: 'Payroll',
   contracts: 'Contracts',
   'professional-development': 'Professional Development',

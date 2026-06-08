@@ -486,15 +486,9 @@ const peopleModule: ModuleConfig = {
           permission: { action: 'view', resource: 'staff' },
           requiresActiveSchool: true,
         },
-        {
-          // HR Admin: Tabbed view for Compensation (Payroll/Contracts) & Development (PD/Reviews)
-          id: 'hr-admin',
-          label: 'HR Admin',
-          icon: BrickWallShield,
-          href: '/people/hr',
-          permission: { action: 'view', resource: 'hr' },
-          requiresActiveSchool: true,
-        },
+        // HR Admin nav intentionally omitted — HR administration (payroll,
+        // reviews, contracts) is out of scope for V1 and ships in a later
+        // release. Don't surface a non-shippable placeholder in the nav.
       ],
     },
   ],
