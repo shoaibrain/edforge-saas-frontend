@@ -14,7 +14,7 @@ export default [
     noIdSliceInJsxConfig,
     // Governance lock-in — design-system rules are errors now that the
     // hardcoded color/arbitrary-scale baseline has been cleared.
-    designSystemConfig,
+    ...designSystemConfig,
     {
         ignores: ['**/dist/**', '**/node_modules/**', '**/.turbo/**', '**/.rsbuild/**'],
     },
