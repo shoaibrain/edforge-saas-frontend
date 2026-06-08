@@ -146,7 +146,7 @@ function SectionTitle({
   title: string
 }) {
   return (
-    <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-text-secondary">
+    <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
       <Icon className="h-3.5 w-3.5 text-text-tertiary" />
       {title}
     </span>
@@ -170,7 +170,7 @@ function DetailField({
 }) {
   return (
     <div className="py-1">
-      <dt className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-1 flex items-center gap-1.5">
+      <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1 flex items-center gap-1.5">
         {Icon && <Icon className={`w-3 h-3 ${accent ?? 'text-text-tertiary'}`} />}
         {label}
       </dt>
@@ -249,7 +249,7 @@ export function StaffDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={handleBackdropClick}
             aria-hidden="true"
           />
@@ -268,7 +268,7 @@ export function StaffDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
+                    <div className="p-2.5 rounded-xl bg-[rgb(var(--state-info-bg)/0.20)]">
                       <User className="w-5 h-5 text-[rgb(var(--brand-primary))]" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary">
@@ -298,7 +298,7 @@ export function StaffDrawer({
                   {/* Hero identity section */}
                   <div className="px-6 py-5 bg-surface-secondary/40 border-b border-border-secondary">
                     <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-surface-tertiary shadow-md ring-1 ring-white/10">
+                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-surface-tertiary shadow-md ring-1 ring-[rgb(var(--border-secondary))]">
                         <img
                           src={getStaffAvatar(staff.staffId, { size: 80 })}
                           alt={`${staff.firstName} ${staff.lastSurname}`}
@@ -313,7 +313,7 @@ export function StaffDrawer({
                           {staff.email}
                         </p>
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          <span className="font-mono text-[11px] text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-md border border-border-secondary truncate max-w-[200px]">
+                          <span className="font-mono text-xs text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-md border border-border-secondary truncate max-w-52">
                             #{staff.staffUniqueId}
                           </span>
                           <StaffStatusBadge status={staff.employmentStatus} />
@@ -328,21 +328,21 @@ export function StaffDrawer({
                         <p className="text-sm font-bold text-text-primary truncate">
                           {t(`roles.${getRoleI18nKey(staff.role)}`, { defaultValue: staff.role })}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">{t('tableHeaders.role')}</p>
+                        <p className="text-xs text-text-tertiary">{t('tableHeaders.role')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
                         <BookOpen className="w-4 h-4 text-[var(--v2-success)] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {staff.departmentName || '—'}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">{t('tableHeaders.department')}</p>
+                        <p className="text-xs text-text-tertiary">{t('tableHeaders.department')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <Clock className="w-4 h-4 text-amber-500 mx-auto mb-1" />
+                        <Clock className="w-4 h-4 text-[rgb(var(--state-warning-fg))] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {formatEmploymentType(staff.employmentType)}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">{t('drawer.type')}</p>
+                        <p className="text-xs text-text-tertiary">{t('drawer.type')}</p>
                       </div>
                     </div>
                   </div>
@@ -422,12 +422,12 @@ export function StaffDrawer({
                                 </p>
                                 <div className="flex items-center gap-2">
                                   {assignment.departmentName && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-surface-tertiary text-text-secondary">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-surface-tertiary text-text-secondary">
                                       {assignment.departmentName}
                                     </span>
                                   )}
                                   {assignment.isPrimary && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-[rgb(var(--brand-primary)/0.10)] text-[rgb(var(--brand-primary))]">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]">
                                       {t('drawer.primary')}
                                     </span>
                                   )}
