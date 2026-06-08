@@ -158,11 +158,6 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   const data = useAcademicsOverviewV2(schoolId)
   const { staggerContainer, fadeInUp } = useMotionVariants()
 
-  // Guards
-  if (!data.academicYear.isLoading && !data.academicYear.id && !data.academicYear.isError) {
-    return <NoAcademicYearGuard />
-  }
-
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: overviewKeys.all })
   }, [queryClient])
@@ -178,6 +173,11 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   // Attendance rate color
   const attendanceRate = data.overview.todayAttendanceRate
   const attendanceColor = attendanceRate != null ? getAttendanceColor(attendanceRate) : undefined
+
+  // Guards
+  if (!data.academicYear.isLoading && !data.academicYear.id && !data.academicYear.isError) {
+    return <NoAcademicYearGuard />
+  }
 
   return (
     <div data-v2 className="p-5 pb-10">

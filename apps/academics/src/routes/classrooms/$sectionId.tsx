@@ -12,7 +12,6 @@ import { useParams, useNavigate, useSearch, Outlet } from '@tanstack/react-route
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
-  BookOpen,
   Users,
   MapPin,
   MoreHorizontal,
@@ -28,6 +27,7 @@ import {
   Plus,
   Lock,
   TrendingUp,
+  type LucideIcon,
 } from 'lucide-react'
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
@@ -66,7 +66,7 @@ import { ClassworkFeed } from '../../components/classrooms/classwork'
 
 type ClassroomDetailTab = 'overview' | 'classwork' | 'people' | 'progress'
 
-const TABS: { id: ClassroomDetailTab; label: string; icon: typeof BookOpen }[] = [
+const TABS: { id: ClassroomDetailTab; label: string; icon: LucideIcon }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'classwork', label: 'Classwork', icon: FileText },
   { id: 'people', label: 'People', icon: Users },
