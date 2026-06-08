@@ -98,7 +98,7 @@ export function V2AlertItem({
           {title}
         </p>
         <p
-          className="text-[11px] mt-0.5 truncate"
+          className="text-xs mt-0.5 truncate"
           style={{ color: 'var(--v2-text-faint)' }}
         >
           {subtitle}
@@ -119,7 +119,7 @@ export function V2AlertItem({
       {cta && (
         <button
           onClick={cta.onClick}
-          className="text-[11px] font-medium px-2.5 py-1 rounded-md border whitespace-nowrap flex-shrink-0 transition-opacity hover:opacity-80"
+          className="text-xs font-medium px-2.5 py-1 rounded-md border whitespace-nowrap flex-shrink-0 transition-opacity hover:opacity-80"
           style={{
             color: config.ctaColor,
             borderColor: config.ctaBorder,
