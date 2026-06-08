@@ -204,7 +204,7 @@ export function Navbar() {
       ref={navRef}
       aria-label="Main navigation"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-          ? 'h-16 backdrop-blur-2xl bg-white/80 border-b shadow-sm'
+          ? 'h-16 backdrop-blur-2xl bg-[rgb(var(--background-elevated)/0.80)] border-b shadow-sm'
           : 'h-20 bg-transparent border-b border-transparent'
         }`}
       style={isScrolled ? {
@@ -346,7 +346,7 @@ export function Navbar() {
                             }}
                           >
                             {item.dropdown.footerItems.map((footerItem, idx) => (
-                              <NavLink key={idx} href={footerItem.href} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors group">
+                              <NavLink key={idx} href={footerItem.href} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[rgb(var(--surface-secondary))] transition-colors group">
                                 <div
                                   className="p-1.5 rounded-lg transition-colors"
                                   style={{
@@ -425,7 +425,7 @@ export function Navbar() {
           </Link>
           {/* Mobile Toggle — 44x44px min touch target */}
           <button
-            className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+            className="md:hidden min-w-11 min-h-11 flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
             style={{
               color: 'rgb(var(--text-primary))',
               backgroundColor: mobileMenuOpen ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
@@ -473,7 +473,7 @@ export function Navbar() {
                     <NavLink
                       key={idx}
                       href={subItem.href}
-                      className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-[44px] transition-colors touch-manipulation hover:bg-white"
+                      className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-11 transition-colors touch-manipulation hover:bg-[rgb(var(--surface-secondary))]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <subItem.icon className="w-4 h-4 shrink-0" style={{ color: subItem.iconColor }} />
@@ -490,7 +490,7 @@ export function Navbar() {
         <div className="p-4" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
           <Link
             to="/login"
-            className="lp-nav-signin flex items-center justify-center w-full min-h-[48px] py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+            className="lp-nav-signin flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
               backgroundColor: '#F97316',
