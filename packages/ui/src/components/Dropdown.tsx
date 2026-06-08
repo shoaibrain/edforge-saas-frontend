@@ -59,7 +59,7 @@ export function Dropdown({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute z-50 mt-1 w-full min-w-[200px] origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
+        <MenuItems className="absolute z-50 mt-1 w-full min-w-52 origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
           <div className="py-1">
             {options.map((option) => (
               <MenuItem key={option.id}>
@@ -70,7 +70,7 @@ export function Dropdown({
                       'flex items-center w-full px-3 py-2.5 text-sm',
                       focusRingInset,
                       active ? 'bg-[rgb(var(--surface-secondary))]' : '',
-                      value === option.id ? 'text-teal-500' : 'text-[rgb(var(--text-primary))]'
+                      value === option.id ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-[rgb(var(--text-primary))]'
                     )}
                   >
                     {option.icon && (
@@ -85,7 +85,7 @@ export function Dropdown({
                       )}
                     </div>
                     {showCheck && value === option.id && (
-                      <Check className="w-4 h-4 text-teal-500 ml-2" />
+                      <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ml-2" />
                     )}
                   </button>
                 )}
