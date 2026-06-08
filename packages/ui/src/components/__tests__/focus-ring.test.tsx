@@ -76,6 +76,20 @@ const checks: FocusCheck[] = [
     focusEvidence: /focus-visible:ring|focus:ring|focus-visible:outline|focusRing/,
     semanticEvidence: /--border-focus|--border-focus|focusRing/,
   },
+  {
+    primitive: 'Input',
+    file: 'packages/ui/src/components/forms/Input.tsx',
+    interactiveEvidence: /InputHTMLAttributes<HTMLInputElement>/,
+    focusEvidence: /focus-visible:ring|focus:ring|focus-within:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Textarea',
+    file: 'packages/ui/src/components/forms/Textarea.tsx',
+    interactiveEvidence: /TextareaHTMLAttributes<HTMLTextAreaElement>/,
+    focusEvidence: /focus-visible:ring|focus:ring|focus:border|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
 ]
 
 function source(file: string): string {
@@ -113,6 +127,8 @@ describe('interactive primitive focus-ring baseline', () => {
       Accordion: 'semantic-pass',
       Dropdown: 'semantic-pass',
       'AttendanceHeatmap navigation': 'semantic-pass',
+      Input: 'semantic-pass',
+      Textarea: 'semantic-pass',
     })
   })
 })

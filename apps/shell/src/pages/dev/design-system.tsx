@@ -7,13 +7,16 @@ import {
   Container,
   Dropdown,
   FilterTabs,
+  Field,
   Heading,
+  Input,
   Inline,
   PageHeader,
   SectionCard,
   Stack,
   Tag,
   Text,
+  Textarea,
   type FilterTab,
 } from '@edforge/ui'
 import { useState } from 'react'
@@ -150,6 +153,23 @@ export default function DesignSystemDevPage() {
               />
             </Inline>
           </Stack>
+        </SectionCard>
+
+        <SectionCard title="Form primitives" description="Field, Input, and Textarea foundation states.">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="School name" required helperText="Use the public-facing institution name.">
+              <Input placeholder="Sunrise Academy" />
+            </Field>
+            <Field label="IEMIS code" lockedReason="Locked after school creation.">
+              <Input defaultValue="31012345" readOnly className="font-mono" />
+            </Field>
+            <Field label="Short name" error="Short name must be 50 characters or fewer.">
+              <Input defaultValue="A very long display name" />
+            </Field>
+            <Field label="School notes" helperText="Shown to administrators only.">
+              <Textarea defaultValue="Calm, readable multi-line input." maxLength={120} showCharacterCount />
+            </Field>
+          </div>
         </SectionCard>
 
         <SectionCard title="Cards, tags, and typography">
