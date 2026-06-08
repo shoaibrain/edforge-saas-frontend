@@ -28,8 +28,8 @@ export function CustomReportsModule() {
         <div className="px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20">
-                <PieChart className="w-6 h-6 text-pink-600 dark:text-pink-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.18)]">
+                <PieChart className="w-6 h-6 text-[rgb(var(--state-danger-fg))]" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-text-primary">Custom Reports</h1>
@@ -53,37 +53,37 @@ export function CustomReportsModule() {
             icon={FileText}
             label="Saved Reports"
             value="34"
-            accent="text-pink-600 dark:text-pink-400"
-            bg="bg-pink-500/10"
+            accent="text-[rgb(var(--state-danger-fg))]"
+            bg="bg-[rgb(var(--state-danger-bg)/0.18)]"
           />
           <StatCard
             icon={Clock}
             label="Scheduled"
             value="8"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={Database}
             label="Data Sources"
             value="12"
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            accent="text-[rgb(var(--state-success-fg))]"
+            bg="bg-[rgb(var(--state-success-bg)/0.18)]"
           />
           <StatCard
             icon={Share2}
             label="Shared Reports"
             value="21"
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
+            accent="text-[rgb(var(--state-warning-fg))]"
+            bg="bg-[rgb(var(--state-warning-bg)/0.18)]"
           />
         </div>
 
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-pink-500/10">
-              <PieChart className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)]">
+              <PieChart className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -98,15 +98,15 @@ export function CustomReportsModule() {
               </p>
               <ul className="text-sm text-text-secondary space-y-1">
                 <li className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-pink-500" />
+                  <Layers className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
                   <span>Drag-and-drop field selection from multiple data sources</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-pink-500" />
+                  <Filter className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
                   <span>Advanced filtering with date ranges and custom conditions</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-pink-500" />
+                  <Calendar className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
                   <span>Schedule reports for automatic generation and email delivery</span>
                 </li>
               </ul>
@@ -217,8 +217,8 @@ function ExportCard({
   return (
     <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:bg-surface-hover transition-colors cursor-pointer">
       <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 rounded-lg bg-pink-500/10">
-          <Icon className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+        <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)]">
+          <Icon className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h4 className="font-medium text-text-primary">{title}</h4>
       </div>
@@ -249,7 +249,7 @@ function ReportRow({
       </div>
       <div className="flex items-center gap-2">
         {status === 'success' && (
-          <CheckCircle className="w-4 h-4 text-emerald-500" />
+          <CheckCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
         )}
         <Button variant="ghost" size="sm">
           <Download className="w-4 h-4" />
