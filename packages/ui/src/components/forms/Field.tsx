@@ -12,6 +12,7 @@ type FieldDensity = 'default' | 'compact' | 'inline'
 
 export interface FieldContextValue {
   controlId: string
+  labelId?: string
   describedBy?: string
   invalid?: boolean
   disabled?: boolean
@@ -63,6 +64,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
     const helperId = helperText ? `${resolvedControlId}-helper` : undefined
     const errorId = error ? `${resolvedControlId}-error` : undefined
     const lockId = lockedReason ? `${resolvedControlId}-locked` : undefined
+    const labelId = label ? `${resolvedControlId}-label` : undefined
     const describedBy = [errorId, !error ? helperId : undefined, lockId].filter(Boolean).join(' ') || undefined
     const isInvalid = Boolean(error)
 
@@ -70,6 +72,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
       <FieldContext.Provider
         value={{
           controlId: resolvedControlId,
+          labelId,
           describedBy,
           invalid: isInvalid,
           disabled,
@@ -96,6 +99,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
           {label ? (
             <div className={cn(density === 'inline' && 'pt-2')}>
               <label
+                id={labelId}
                 htmlFor={resolvedControlId}
                 className="block text-sm font-medium text-[rgb(var(--text-secondary))]"
               >

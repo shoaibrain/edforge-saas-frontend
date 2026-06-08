@@ -107,7 +107,7 @@ const checks: FocusCheck[] = [
   {
     primitive: 'Tabs',
     file: 'packages/ui/src/components/Tabs.tsx',
-    interactiveEvidence: /role="tab"/,
+    interactiveEvidence: /role=\{isTablist \? 'tab'/,
     focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
     semanticEvidence: /--border-focus|focusRing/,
   },

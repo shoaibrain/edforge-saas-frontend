@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useId, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { cn, focusRing } from '../../utils'
 import { Field, useFieldContext, type FieldProps } from './Field'
 
@@ -45,8 +45,17 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
   ) => {
     const field = useFieldContext()
     const sizes = sizeClasses[size]
-    const resolvedId = id ?? field?.controlId
+    const generatedId = useId()
+    const resolvedId = id ?? field?.controlId ?? `switch-${generatedId}`
     const resolvedDisabled = disabled ?? field?.disabled ?? false
+    // A <label htmlFor> does not name a <button>, so name the switch via
+    // aria-labelledby: its own visible label when present, otherwise the
+    // surrounding Field's label.
+    const ownLabelId = label ? `${resolvedId}-label` : undefined
+    const descriptionId = description ? `${resolvedId}-description` : undefined
+    const labelledBy = ownLabelId ?? field?.labelId
+    const describedBy =
+      [descriptionId, field?.describedBy].filter(Boolean).join(' ') || undefined
 
     return (
       <span className={cn('flex items-start gap-3', className)}>
@@ -56,7 +65,8 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           type="button"
           role="switch"
           aria-checked={checked}
-          aria-describedby={field?.describedBy}
+          aria-labelledby={labelledBy}
+          aria-describedby={describedBy}
           disabled={resolvedDisabled}
           onClick={() => onChange?.(!checked)}
           className={cn(
@@ -68,7 +78,6 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           )}
           {...props}
         >
-          <span className="sr-only">{label}</span>
           <span
             aria-hidden="true"
             className={cn(
@@ -81,12 +90,12 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
         {label || description ? (
           <span className="min-w-0 flex-1">
             {label ? (
-              <label htmlFor={resolvedId} className="block text-sm font-medium text-[rgb(var(--text-primary))]">
+              <span id={ownLabelId} className="block text-sm font-medium text-[rgb(var(--text-primary))]">
                 {label}
-              </label>
+              </span>
             ) : null}
             {description ? (
-              <span className="mt-0.5 block text-sm text-[rgb(var(--text-tertiary))]">
+              <span id={descriptionId} className="mt-0.5 block text-sm text-[rgb(var(--text-tertiary))]">
                 {description}
               </span>
             ) : null}

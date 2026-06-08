@@ -118,10 +118,10 @@ Tightly scoped; none require redesign.
 4. ⏳ Resolve the **two-form-systems** question and document the rule in `forms.md` (recommendation: `@edforge/forms` for any RHF-bound form; `@edforge/ui` primitives only for trivial local-state forms) — **deferred** to Epic P. (B.3)
 5. ✅ Remove dead `INPUT_CLASS` + fix the malformed className in `workspace.tsx`. (B.2 #8)
 
-**Should-fix (this PR or immediate follow-up):**
-6. `RadioGroup` `useId()` fallback `name`; `Switch` label wiring; `Tabs` roving-tabindex + arrow keys (or rename roles). (B.2 #4–6)
-7. Add `aria-busy`/`aria-live` to loading/count states. (B.2 #7)
-8. Add `packages/date-utils` to the ESLint globs. (B.5 #3)
+**Should-fix (this PR or immediate follow-up):** — _items 6–7 applied in Epic P.1._
+6. ✅ `RadioGroup` `useId()` fallback `name`; `Switch` label wiring (`aria-labelledby`/`aria-describedby`, no `<label htmlFor>` on a button; `Field` now exposes `labelId`, also consumed by `Select`); `Tabs` roving-tabindex + Arrow/Home/End keys, and `SegmentedControl` is now `role="group"` + `aria-pressed`. (B.2 #4–6)
+7. ✅ `aria-busy` on Input/Combobox loading; `aria-live` + `aria-describedby` on the Textarea counter; live region on the Combobox loading message. (B.2 #7)
+8. ⏳ Add `packages/date-utils` to the ESLint globs — folded into Epic G.3. (B.5 #3)
 
 **Governance (separate, urgent PR — see Epic G):**
 9. Stand up CI so the gates are real.
@@ -142,7 +142,7 @@ This restates the FINAL plan's intent with the actual post-#134 state baked in. 
 
 ### Epic P — Primitive completion & correctness
 *Close the defects so downstream consumers build on solid ground.*
-- **P.1** Land Part D must-fixes #1–#3, #6–#7 (Checkbox indeterminate, Tabs keyboard, RadioGroup name, Switch labels, aria states).
+- **P.1** ✅ **Done.** Part D must-fixes #1–#3 + should-fixes #6–#7: Checkbox indeterminate, Tabs roving-tabindex/keyboard + correct SegmentedControl semantics, RadioGroup name fallback, Switch label wiring (+`Field.labelId`, consumed by Select), aria-busy/aria-live on loading/counter states. Validated: typecheck 33/33, vitest 962/962, lint 0 errors.
 - **P.2** Resolve two-form-systems; codify in `forms.md`; delete shim patterns.
 - **P.3** Fill the remaining catalog gaps the audit/plan name and the migration will need: **Modal/Drawer form-footer recipes**, **status-badge** primitive (state-token-backed, to replace ad-hoc emerald/red/gray), and a documented **GradeRangeField** recipe (composed dual-`Select` with shared error region).
 - *Exit:* every primitive passes its own a11y test; one canonical form API.

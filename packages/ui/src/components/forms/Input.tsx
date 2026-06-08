@@ -127,6 +127,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           disabled={resolvedDisabled}
           readOnly={resolvedReadOnly}
           aria-invalid={ariaInvalid ?? (resolvedInvalid ? true : undefined)}
+          aria-busy={isLoading || undefined}
           aria-describedby={describedBy}
           className={cn(
             inputElementVariants({

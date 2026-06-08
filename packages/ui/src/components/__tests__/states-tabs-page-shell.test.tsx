@@ -1,6 +1,15 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { Button, EmptyState, ErrorState, InlineAlert, LoadingState, PageShell, Tabs } from '../../index'
+import { describe, expect, it, vi } from 'vitest'
+import {
+  Button,
+  EmptyState,
+  ErrorState,
+  InlineAlert,
+  LoadingState,
+  PageShell,
+  SegmentedControl,
+  Tabs,
+} from '../../index'
 
 describe('state primitives', () => {
   it('renders semantic inline alerts', () => {
@@ -61,6 +70,50 @@ describe('Tabs', () => {
       />
     )
     expect(screen.getByRole('tab', { name: 'Details' }).getAttribute('aria-selected')).toBe('true')
+  })
+
+  it('moves selection with arrow keys and roving tabindex', () => {
+    const onChange = vi.fn()
+    render(
+      <Tabs
+        value="hierarchy"
+        onChange={onChange}
+        tabs={[
+          { id: 'hierarchy', label: 'Hierarchy' },
+          { id: 'details', label: 'Details' },
+        ]}
+      />
+    )
+
+    const tablist = screen.getByRole('tablist')
+    const selectedTab = screen.getByRole('tab', { name: 'Hierarchy' })
+    const otherTab = screen.getByRole('tab', { name: 'Details' })
+    expect(selectedTab.getAttribute('tabindex')).toBe('0')
+    expect(otherTab.getAttribute('tabindex')).toBe('-1')
+
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    expect(onChange).toHaveBeenCalledWith('details')
+  })
+})
+
+describe('SegmentedControl', () => {
+  it('exposes group semantics with aria-pressed buttons', () => {
+    render(
+      <SegmentedControl
+        aria-label="Density"
+        value="comfortable"
+        onChange={() => {}}
+        tabs={[
+          { id: 'comfortable', label: 'Comfortable' },
+          { id: 'compact', label: 'Compact' },
+        ]}
+      />
+    )
+
+    expect(screen.getByRole('group', { name: 'Density' })).toBeTruthy()
+    const selected = screen.getByRole('button', { name: 'Comfortable' })
+    expect(selected.getAttribute('aria-pressed')).toBe('true')
+    expect(selected.getAttribute('role')).not.toBe('tab')
   })
 })
 

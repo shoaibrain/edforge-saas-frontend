@@ -58,4 +58,33 @@ describe('choice form controls', () => {
     fireEvent.click(toggle)
     expect(toggle.getAttribute('aria-checked')).toBe('true')
   })
+
+  it('groups RadioGroup radios under one name without an explicit name prop', () => {
+    render(
+      <RadioGroup
+        value="high"
+        onChange={() => {}}
+        options={[
+          { value: 'elementary', label: 'Elementary' },
+          { value: 'high', label: 'High School' },
+        ]}
+      />
+    )
+
+    const first = screen.getByRole('radio', { name: 'Elementary' }) as HTMLInputElement
+    const second = screen.getByRole('radio', { name: 'High School' }) as HTMLInputElement
+    expect(first.name).toBeTruthy()
+    expect(first.name).toBe(second.name)
+  })
+
+  it('names a Field-wrapped Switch via its surrounding label', () => {
+    render(
+      <Field label="Dual date display" optionalText={null}>
+        <Switch checked onChange={() => {}} />
+      </Field>
+    )
+
+    // accessible name resolves through aria-labelledby -> Field label
+    expect(screen.getByRole('switch', { name: /Dual date display/ })).toBeTruthy()
+  })
 })

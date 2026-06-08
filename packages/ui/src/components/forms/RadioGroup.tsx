@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useId, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils'
 import { Field, type FieldProps } from './Field'
 
@@ -36,7 +36,14 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
       ...props
     },
     ref
-  ) => (
+  ) => {
+    // Native radios must share a `name` to be a single keyboard-navigable
+    // group with DOM-level mutual exclusion. Fall back to a stable generated
+    // name when the consumer doesn't supply one.
+    const generatedName = useId()
+    const resolvedName = name ?? generatedName
+
+    return (
     <div
       ref={ref}
       role="radiogroup"
@@ -69,7 +76,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             <span className="relative mt-0.5 inline-flex">
               <input
                 type="radio"
-                name={name}
+                name={resolvedName}
                 value={option.value}
                 checked={selected}
                 disabled={optionDisabled}
@@ -107,7 +114,8 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
         )
       })}
     </div>
-  )
+    )
+  }
 )
 
 RadioGroup.displayName = 'RadioGroup'

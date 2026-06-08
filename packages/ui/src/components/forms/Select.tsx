@@ -111,6 +111,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
           <ListboxButton
             ref={ref}
             id={field?.controlId}
+            aria-labelledby={field?.labelId}
             aria-invalid={resolvedInvalid ? true : undefined}
             aria-describedby={field?.describedBy}
             className={cn(

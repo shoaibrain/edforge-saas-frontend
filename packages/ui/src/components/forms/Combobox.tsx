@@ -153,6 +153,7 @@ const ComboboxControl = forwardRef<HTMLInputElement, ComboboxControlProps>(
               ref={ref}
               id={field?.controlId}
               aria-invalid={resolvedInvalid ? true : undefined}
+              aria-busy={loading || undefined}
               aria-describedby={field?.describedBy}
               displayValue={(option: SelectOption | null) => option?.label ?? ''}
               onChange={(event) => setQuery(event.currentTarget.value)}
@@ -206,7 +207,13 @@ const ComboboxControl = forwardRef<HTMLInputElement, ComboboxControlProps>(
               )}
             >
               {loading ? (
-                <div className="px-3 py-2 text-sm text-[rgb(var(--text-tertiary))]">Loading options…</div>
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="px-3 py-2 text-sm text-[rgb(var(--text-tertiary))]"
+                >
+                  Loading options…
+                </div>
               ) : filteredOptions.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-[rgb(var(--text-tertiary))]">{emptyMessage}</div>
               ) : (

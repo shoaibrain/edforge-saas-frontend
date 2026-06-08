@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useId,
   useState,
   type ChangeEvent,
   type TextareaHTMLAttributes,
@@ -81,7 +82,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const resolvedDisabled = disabled ?? field?.disabled ?? false
     const resolvedReadOnly = readOnly ?? field?.readOnly ?? false
     const resolvedSize = size ?? (field?.density === 'compact' ? 'sm' : 'md')
-    const describedBy = [ariaDescribedBy, field?.describedBy].filter(Boolean).join(' ') || undefined
+    const generatedId = useId()
+    const showCount = Boolean(showCharacterCount && maxLength)
+    const countId = showCount ? `${resolvedId ?? `textarea-${generatedId}`}-count` : undefined
+    const describedBy =
+      [ariaDescribedBy, field?.describedBy, countId].filter(Boolean).join(' ') || undefined
     const [uncontrolledLength, setUncontrolledLength] = useState(initialLength(defaultValue))
     const characterCount = value !== undefined ? initialLength(value) : uncontrolledLength
 
@@ -117,8 +122,12 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           data-readonly={resolvedReadOnly || undefined}
           {...props}
         />
-        {showCharacterCount && maxLength ? (
-          <span className="absolute bottom-2 right-3 text-xs text-[rgb(var(--text-tertiary))]">
+        {showCount ? (
+          <span
+            id={countId}
+            aria-live="polite"
+            className="absolute bottom-2 right-3 text-xs text-[rgb(var(--text-tertiary))]"
+          >
             {characterCount}/{maxLength}
           </span>
         ) : null}
