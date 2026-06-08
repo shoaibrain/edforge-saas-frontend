@@ -136,12 +136,12 @@ export function AttendanceTrendCard({
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3
-            className="text-[13px] font-medium"
+            className="text-sm font-medium"
             style={{ color: 'var(--v2-text-secondary)' }}
           >
             {t('homeV2.trend.attendanceTrend')}
           </h3>
-          <p className="text-[11px] mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
             {t('homeV2.trend.rollingAverage')}
           </p>
         </div>
@@ -152,7 +152,7 @@ export function AttendanceTrendCard({
               className="rounded-sm"
               style={{ width: 8, height: 2, background: '#1D9E75' }}
             />
-            <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
               {t('homeV2.trend.actual')}
             </span>
           </div>
@@ -165,13 +165,13 @@ export function AttendanceTrendCard({
                 borderTop: '1px dashed rgba(239, 159, 39, 0.6)',
               }}
             />
-            <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
               {t('homeV2.trend.target', { threshold: ATTENDANCE_THRESHOLD })}
             </span>
           </div>
           {/* Average */}
           {summary && (
-            <span className="text-[11px] font-semibold" style={{ color: '#1D9E75' }}>
+            <span className="text-xs font-semibold" style={{ color: '#1D9E75' }}>
               {t('homeV2.trend.avg', { avg: summary.avg.toFixed(1) })}
             </span>
           )}
@@ -268,7 +268,7 @@ export function AttendanceTrendCard({
         <Link
           to="/academics/$"
           params={{ _splat: 'classrooms?tab=attendance' }}
-          className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           {t('homeV2.trend.viewAttendance')}

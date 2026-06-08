@@ -34,11 +34,11 @@ function FeedSkeleton() {
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
-          className="flex items-start gap-2.5 py-[9px]"
+          className="flex items-start gap-2.5 py-2"
           style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}
         >
           <div
-            className="w-[7px] h-[7px] rounded-full flex-shrink-0 mt-1 v2-skeleton-pulse"
+            className="w-2 h-2 rounded-full flex-shrink-0 mt-1 v2-skeleton-pulse"
             style={{ background: 'var(--v2-bg-elevated)' }}
           />
           <div className="flex-1 space-y-1">
@@ -75,7 +75,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <span
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           {t('homeV2.activity.recentActivity')}
@@ -83,7 +83,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
         <Link
           to="/finance/$"
           params={{ _splat: 'billing' }}
-          className="text-[11px] cursor-pointer transition-opacity hover:opacity-80"
+          className="text-xs cursor-pointer transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           {t('homeV2.activity.viewAll')}
@@ -102,7 +102,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
           {items.map((item, i) => (
             <div
               key={item.id}
-              className="flex items-start gap-2.5 py-[9px]"
+              className="flex items-start gap-2.5 py-2"
               style={{
                 borderBottom:
                   i < items.length - 1
@@ -111,7 +111,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
               }}
             >
               <div
-                className="w-[7px] h-[7px] rounded-full flex-shrink-0 mt-1"
+                className="w-2 h-2 rounded-full flex-shrink-0 mt-1"
                 style={{ background: DOT_COLORS[item.type] }}
               />
               <div className="flex-1 min-w-0">
@@ -122,7 +122,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
                   {item.text}
                 </p>
                 <p
-                  className="text-[10px] mt-0.5"
+                  className="text-xs mt-0.5"
                   style={{ color: 'var(--v2-text-ghost)' }}
                 >
                   {item.timestamp}

@@ -96,7 +96,7 @@ export function QuickActionsGridV2() {
       {/* Header */}
       <div className="mb-3.5">
         <span
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           Quick actions
@@ -104,7 +104,7 @@ export function QuickActionsGridV2() {
       </div>
 
       {/* 2×3 grid */}
-      <div className="grid grid-cols-2 gap-[7px]">
+      <div className="grid grid-cols-2 gap-2">
         {QUICK_ACTIONS.map((action) => (
           <Link
             key={action.id}
@@ -133,7 +133,7 @@ export function QuickActionsGridV2() {
                 background: action.iconBg,
               }}
             >
-              <action.icon className="w-[13px] h-[13px]" style={{ color: action.iconColor }} />
+              <action.icon className="w-3.5 h-3.5" style={{ color: action.iconColor }} />
             </div>
             <span
               className="text-xs font-medium"
@@ -141,7 +141,7 @@ export function QuickActionsGridV2() {
             >
               {action.label}
             </span>
-            <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
               {action.description}
             </span>
           </Link>

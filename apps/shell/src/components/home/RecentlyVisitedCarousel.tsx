@@ -81,9 +81,9 @@ function VisitedCard({ page, index }: VisitedCardProps) {
   // Module-based color schemes
   const moduleColors: Record<string, { bg: string; icon: string; gradient: string }> = {
     academics: {
-      bg: 'bg-teal-500/8 dark:bg-cyan-500/12',
-      icon: 'text-teal-600 dark:text-cyan-400',
-      gradient: 'from-teal-500/20 to-teal-500/5 dark:from-cyan-500/20 dark:to-cyan-500/5',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.12)] ',
+      icon: 'text-[rgb(var(--state-info-fg))] ',
+      gradient: 'from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.08)] dark:from-[rgb(var(--state-info-bg)/0.18)] dark:to-[rgb(var(--state-info-bg)/0.08)]',
     },
     finance: {
       bg: 'bg-golden-400/10',
@@ -96,9 +96,9 @@ function VisitedCard({ page, index }: VisitedCardProps) {
       gradient: 'from-aqua-400/20 to-aqua-400/5',
     },
     settings: {
-      bg: 'bg-slate-500/8 dark:bg-slate-400/12',
-      icon: 'text-slate-600 dark:text-slate-400',
-      gradient: 'from-slate-500/20 to-slate-500/5',
+      bg: 'bg-[rgb(var(--surface-tertiary))] ',
+      icon: 'text-[rgb(var(--text-secondary))] ',
+      gradient: 'from-[rgb(var(--surface-tertiary))] to-[rgb(var(--surface-secondary))]',
     },
     home: {
       bg: 'bg-vanilla-400/15',
@@ -119,7 +119,7 @@ function VisitedCard({ page, index }: VisitedCardProps) {
       <Link
         to={page.path}
         className={`
-          group relative flex flex-col w-[160px] h-[140px] p-4 rounded-2xl
+          group relative flex flex-col w-40 h-36 p-4 rounded-2xl
           bg-gradient-to-br ${colors.gradient}
           border border-[rgb(var(--border-primary))]
           transition-all duration-300 cursor-pointer overflow-hidden

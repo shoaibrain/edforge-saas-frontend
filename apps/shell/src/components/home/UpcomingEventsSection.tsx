@@ -57,8 +57,8 @@ const EVENT_TYPES: Record<UpcomingEvent['type'], EventTypeConfig> = {
   },
   class: {
     icon: GraduationCap,
-    bg: 'bg-teal-500/10 dark:bg-cyan-500/15',
-    iconColor: 'text-teal-600 dark:text-cyan-400',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)] ',
+    iconColor: 'text-[rgb(var(--state-info-fg))] ',
   },
   event: {
     icon: Users,
@@ -248,14 +248,14 @@ function DayGroup({ dateKey, events, dayIndex }: DayGroupProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 + dayIndex * 0.1 }}
-      className="flex-1 min-w-[280px]"
+      className="flex-1 min-w-72"
     >
       {/* Day Header */}
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgb(var(--border-secondary))]">
         <div className={`
           px-2.5 py-1 rounded-lg text-xs font-semibold
           ${isToday
-            ? 'bg-teal-500/15 text-teal-700 dark:bg-cyan-500/20 dark:text-cyan-400'
+            ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  '
             : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'
           }
         `}>
@@ -326,7 +326,7 @@ export function UpcomingEventsSection({
 
         <Link
           to={"/academics/calendar" as any}
-          className="flex items-center gap-1 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:underline"
+          className="flex items-center gap-1 text-xs font-medium text-[rgb(var(--state-info-fg))]  hover:underline"
         >
           View all
           <ArrowRight className="w-3 h-3" />
