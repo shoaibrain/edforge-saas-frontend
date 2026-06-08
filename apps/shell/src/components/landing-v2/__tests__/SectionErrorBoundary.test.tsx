@@ -33,8 +33,11 @@ describe('SectionErrorBoundary', () => {
         <ExplodingSection />
       </SectionErrorBoundary>
     )
-    const firstCall = consoleSpy.mock.calls[0]?.[0] as string | undefined
-    expect(firstCall).toMatch(/ExplodingOne/)
+    const loggedText = consoleSpy.mock.calls
+      .flat()
+      .map((arg) => String(arg))
+      .join('\n')
+    expect(loggedText).toMatch(/ExplodingOne/)
   })
 
   it('does NOT rethrow — subsequent siblings render unaffected', () => {

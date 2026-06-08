@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { render, cleanup } from '@testing-library/react'
+import { render, cleanup, within } from '@testing-library/react'
 import { Footer } from '../sections/footer/Footer'
 import { FOOTER } from '../landing.strings'
 
@@ -24,8 +24,9 @@ describe('Footer', () => {
   it('renders every link in every column with the configured href', () => {
     const { getByRole } = render(<Footer />)
     for (const col of FOOTER.columns) {
+      const nav = getByRole('navigation', { name: col.heading })
       for (const link of col.items) {
-        const a = getByRole('link', { name: link.label })
+        const a = within(nav).getByRole('link', { name: link.label })
         expect(a.getAttribute('href')).toBe(link.href)
       }
     }
