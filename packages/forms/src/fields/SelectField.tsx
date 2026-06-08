@@ -35,6 +35,15 @@ export interface SelectFieldProps {
   disabled?: boolean
   /** Whether field is required */
   required?: boolean
+  /** Show a clear ("none") affordance for optional selects */
+  clearable?: boolean
+  /**
+   * Value stored when nothing is selected / the field is cleared. Defaults to
+   * `''`. Optional reference selects validated by `z.string().uuid().optional()`
+   * or `.enum(...).optional()` must use `undefined` so an empty selection
+   * doesn't fail validation as a non-uuid/non-enum empty string.
+   */
+  emptyValue?: string | undefined
   /** Container class name */
   className?: string
   /** Select container class name */
@@ -54,6 +63,8 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
       helperText,
       disabled = false,
       required = false,
+      clearable = false,
+      emptyValue = '',
       className,
       selectClassName,
       rules,
@@ -85,9 +96,10 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
             helperText={helperText}
             error={errorMessage}
             disabled={disabled}
+            clearable={clearable}
             placeholder={placeholder}
             value={(field.value as string | undefined) || null}
-            onChange={(nextValue: string | null) => field.onChange(nextValue ?? '')}
+            onChange={(nextValue: string | null) => field.onChange(nextValue ?? emptyValue)}
             options={options.map((option) => ({
               value: option.value,
               label: option.label,

@@ -7,7 +7,7 @@
  */
 
 import { useEffect } from 'react'
-import { useForm, useWatch, FormProvider, zodResolver } from '@edforge/forms'
+import { useForm, useWatch, FormProvider, zodResolver, TextField, SelectField } from '@edforge/forms'
 import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
 import { Building2, Network, Info } from 'lucide-react'
@@ -46,16 +46,6 @@ export interface LEAFormProps {
   defaultSeaId?: string
   defaultEscId?: string
 }
-
-// ============================================================================
-// STYLES
-// ============================================================================
-
-const inputClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
-const selectClass = inputClass
-const labelClass = 'block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5'
-const errorClass = 'mt-1 text-xs text-[rgb(var(--state-danger-fg))]'
 
 // ============================================================================
 // COMPONENT
@@ -97,7 +87,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
     },
   })
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isDirty } } = methods
+  const { handleSubmit, reset, setValue, control, formState: { isDirty } } = methods
   const { guardedClose } = useFormDirtyGuard({ isDirty, onClose })
 
   // Watch LEA category to conditionally show charter status
@@ -185,104 +175,88 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>
-                  Ed-Fi ID <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-                  <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
-                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
-                  </Tooltip>
-                </label>
-                <input
-                  type="number"
-                  {...register('localEducationAgencyId', { valueAsNumber: true })}
-                  placeholder="e.g., 101912"
-                  readOnly={isEdit}
-                  className={`${inputClass} ${isEdit ? 'opacity-60 cursor-not-allowed' : ''}`}
-                />
-                {errors.localEducationAgencyId && (
-                  <p className={errorClass}>{errors.localEducationAgencyId.message}</p>
-                )}
-              </div>
-              <div>
-                <label className={labelClass}>
-                  Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-                </label>
-                <input
-                  type="text"
-                  {...register('nameOfInstitution')}
-                  placeholder="e.g., Austin Independent School District"
-                  className={inputClass}
-                />
-                {errors.nameOfInstitution && (
-                  <p className={errorClass}>{errors.nameOfInstitution.message}</p>
-                )}
-              </div>
+              <TextField
+                name="localEducationAgencyId"
+                type="number"
+                required
+                readOnly={isEdit}
+                placeholder="e.g., 101912"
+                rules={{ valueAsNumber: true }}
+                label={
+                  <>
+                    Ed-Fi ID
+                    <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                    </Tooltip>
+                  </>
+                }
+              />
+              <TextField
+                name="nameOfInstitution"
+                label="Name"
+                required
+                placeholder="e.g., Austin Independent School District"
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Short Name</label>
-                <input
-                  type="text"
-                  {...register('shortNameOfInstitution', { setValueAs: v => v === '' ? undefined : v })}
-                  placeholder="e.g., Austin ISD"
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Website</label>
-                <input
-                  type="url"
-                  {...register('webSite', { setValueAs: v => v === '' ? undefined : v })}
-                  placeholder="https://www.austinisd.org"
-                  className={inputClass}
-                />
-                {errors.webSite && <p className={errorClass}>{errors.webSite.message}</p>}
-              </div>
+              <TextField
+                name="shortNameOfInstitution"
+                label="Short Name"
+                placeholder="e.g., Austin ISD"
+                rules={{ setValueAs: (v) => (v === '' ? undefined : v) }}
+              />
+              <TextField
+                name="webSite"
+                label="Website"
+                type="url"
+                placeholder="https://www.austinisd.org"
+                rules={{ setValueAs: (v) => (v === '' ? undefined : v) }}
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className={labelClass}>
-                  LEA Category <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-                  <Tooltip content="The classification of this district. 'Independent' is the most common for standard school districts." side="top">
-                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
-                  </Tooltip>
-                </label>
-                <select {...register('leaCategoryDescriptor')} className={selectClass}>
-                  {LEA_CATEGORY_DESCRIPTORS.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>
-                  Operational Status
-                  <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
-                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
-                  </Tooltip>
-                </label>
-                <select {...register('operationalStatusDescriptor')} className={selectClass}>
-                  {OPERATIONAL_STATUS_DESCRIPTORS.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
-                  ))}
-                </select>
-              </div>
-              {showCharterField && (
-                <div>
-                  <label className={labelClass}>
-                    Charter Status
-                    <Tooltip content="Only applies to charter-type organizations." side="top">
+              <SelectField
+                name="leaCategoryDescriptor"
+                required
+                options={LEA_CATEGORY_DESCRIPTORS}
+                label={
+                  <>
+                    LEA Category
+                    <Tooltip content="The classification of this district. 'Independent' is the most common for standard school districts." side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
-                  </label>
-                  <select {...register('charterStatusDescriptor', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
-                    <option value="">Select...</option>
-                    {CHARTER_STATUS_DESCRIPTORS.map((d) => (
-                      <option key={d.value} value={d.value}>{d.label}</option>
-                    ))}
-                  </select>
-                </div>
+                  </>
+                }
+              />
+              <SelectField
+                name="operationalStatusDescriptor"
+                options={OPERATIONAL_STATUS_DESCRIPTORS}
+                label={
+                  <>
+                    Operational Status
+                    <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                    </Tooltip>
+                  </>
+                }
+              />
+              {showCharterField && (
+                <SelectField
+                  name="charterStatusDescriptor"
+                  placeholder="Select..."
+                  clearable
+                  emptyValue={undefined}
+                  options={CHARTER_STATUS_DESCRIPTORS}
+                  label={
+                    <>
+                      Charter Status
+                      <Tooltip content="Only applies to charter-type organizations." side="top">
+                        <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      </Tooltip>
+                    </>
+                  }
+                />
               )}
             </div>
           </div>
@@ -296,36 +270,37 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Hierarchy</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className={labelClass}>State Education Agency</label>
-                <select {...register('stateEducationAgencyId', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
-                  <option value="">None</option>
-                  {sea && <option value={sea.id}>{sea.nameOfInstitution}</option>}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>Education Service Center</label>
-                <select {...register('educationServiceCenterId', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
-                  <option value="">None</option>
-                  {escs.map((esc) => (
-                    <option key={esc.id} value={esc.id}>{esc.nameOfInstitution}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>
-                  Parent LEA
-                  <Tooltip content="Optional. Only needed if this district reports through another district (e.g., charter networks)." side="top">
-                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
-                  </Tooltip>
-                </label>
-                <select {...register('parentLocalEducationAgencyId', { setValueAs: v => v === '' ? undefined : v })} className={selectClass}>
-                  <option value="">None</option>
-                  {parentLeaOptions.map((lea) => (
-                    <option key={lea.id} value={lea.id}>{lea.nameOfInstitution}</option>
-                  ))}
-                </select>
-              </div>
+              <SelectField
+                name="stateEducationAgencyId"
+                label="State Education Agency"
+                placeholder="None"
+                clearable
+                emptyValue={undefined}
+                options={sea ? [{ value: sea.id, label: sea.nameOfInstitution }] : []}
+              />
+              <SelectField
+                name="educationServiceCenterId"
+                label="Education Service Center"
+                placeholder="None"
+                clearable
+                emptyValue={undefined}
+                options={escs.map((esc) => ({ value: esc.id, label: esc.nameOfInstitution }))}
+              />
+              <SelectField
+                name="parentLocalEducationAgencyId"
+                placeholder="None"
+                clearable
+                emptyValue={undefined}
+                options={parentLeaOptions.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution }))}
+                label={
+                  <>
+                    Parent LEA
+                    <Tooltip content="Optional. Only needed if this district reports through another district (e.g., charter networks)." side="top">
+                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                    </Tooltip>
+                  </>
+                }
+              />
             </div>
           </div>
 
