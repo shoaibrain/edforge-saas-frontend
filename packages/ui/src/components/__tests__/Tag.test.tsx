@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, cleanup } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Tag } from '../Tag'
 
 describe('Tag', () => {
@@ -34,6 +35,22 @@ describe('Tag', () => {
     const { container } = render(<Tag variant="ink">Static</Tag>)
     const dot = container.querySelector('[aria-hidden="true"]')
     expect(dot).toBeNull()
+    cleanup()
+  })
+
+  it('supports keyboard activation when used as a button', async () => {
+    const onClick = vi.fn()
+    const { getByRole } = render(
+      <Tag role="button" onClick={onClick}>
+        Filter
+      </Tag>
+    )
+
+    getByRole('button', { name: 'Filter' }).focus()
+    await userEvent.keyboard('{Enter}')
+    await userEvent.keyboard(' ')
+
+    expect(onClick).toHaveBeenCalledTimes(2)
     cleanup()
   })
 })
