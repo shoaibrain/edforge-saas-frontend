@@ -51,10 +51,10 @@ function SaveStatusIndicator({
   if (status === 'idle' && isOnline) return null
 
   const config = {
-    saved: { icon: Check, text: 'Saved', className: 'text-emerald-600 dark:text-emerald-400' },
-    saving: { icon: Loader2, text: 'Saving...', className: 'text-amber-600 dark:text-amber-400' },
-    offline: { icon: WifiOff, text: 'Offline — changes saved locally', className: 'text-red-600 dark:text-red-400' },
-    error: { icon: CloudOff, text: 'Save failed — will retry', className: 'text-red-600 dark:text-red-400' },
+    saved: { icon: Check, text: 'Saved', className: 'text-[rgb(var(--state-success-fg))]' },
+    saving: { icon: Loader2, text: 'Saving...', className: 'text-[rgb(var(--state-warning-fg))]' },
+    offline: { icon: WifiOff, text: 'Offline — changes saved locally', className: 'text-[rgb(var(--state-danger-fg))]' },
+    error: { icon: CloudOff, text: 'Save failed — will retry', className: 'text-[rgb(var(--state-danger-fg))]' },
     idle: { icon: Wifi, text: '', className: 'text-text-tertiary' },
   }
 

@@ -56,11 +56,11 @@ const statusButtons: {
   color: string
   activeColor: string
 }[] = [
-  { status: 'present', label: 'P', shortcut: 'P', color: 'hover:bg-emerald-100 hover:text-emerald-700 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400', activeColor: 'bg-emerald-500 text-white' },
-  { status: 'absent', label: 'A', shortcut: 'A', color: 'hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-500/20 dark:hover:text-red-400', activeColor: 'bg-red-500 text-white' },
-  { status: 'late', label: 'L', shortcut: 'L', color: 'hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-500/20 dark:hover:text-amber-400', activeColor: 'bg-amber-500 text-white' },
-  { status: 'excused', label: 'E', shortcut: 'E', color: 'hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-500/20 dark:hover:text-blue-400', activeColor: 'bg-blue-500 text-white' },
-  { status: 'remote', label: 'R', shortcut: 'R', color: 'hover:bg-indigo-100 hover:text-indigo-700 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-400', activeColor: 'bg-indigo-500 text-white' },
+  { status: 'present', label: 'P', shortcut: 'P', color: 'hover:bg-[rgb(var(--state-success-bg)/0.18)] hover:text-[rgb(var(--state-success-fg))]', activeColor: 'bg-[rgb(var(--state-success-fg))] text-[rgb(var(--action-primary-fg))]' },
+  { status: 'absent', label: 'A', shortcut: 'A', color: 'hover:bg-[rgb(var(--state-danger-bg)/0.18)] hover:text-[rgb(var(--state-danger-fg))]', activeColor: 'bg-[rgb(var(--state-danger-fg))] text-[rgb(var(--action-primary-fg))]' },
+  { status: 'late', label: 'L', shortcut: 'L', color: 'hover:bg-[rgb(var(--state-warning-bg)/0.18)] hover:text-[rgb(var(--state-warning-fg))]', activeColor: 'bg-[rgb(var(--state-warning-fg))] text-[rgb(var(--action-primary-fg))]' },
+  { status: 'excused', label: 'E', shortcut: 'E', color: 'hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:text-[rgb(var(--state-info-fg))]', activeColor: 'bg-[rgb(var(--state-info-fg))] text-[rgb(var(--action-primary-fg))]' },
+  { status: 'remote', label: 'R', shortcut: 'R', color: 'hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:text-[rgb(var(--state-info-fg))]', activeColor: 'bg-[rgb(var(--state-info-fg))] text-[rgb(var(--action-primary-fg))]' },
 ]
 
 // Task 4.5: Structured absence reasons
@@ -224,7 +224,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
               onClick={() => setShowNotes(!showNotes)}
               className={`relative p-2 rounded-lg transition-colors ${
                 notes
-                  ? 'text-teal-500 bg-teal-50 dark:bg-teal-500/10'
+                  ? 'text-[rgb(var(--action-secondary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]'
                   : 'text-text-tertiary hover:text-text-secondary hover:bg-surface-secondary'
               }`}
               title="Add notes"
@@ -241,7 +241,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
               <button
                 type="button"
                 onClick={handleSaveCorrection}
-                className="px-3 py-1.5 text-xs font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
               >
                 Save
               </button>
@@ -264,7 +264,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
           <select
             value={excuseType || ''}
             onChange={(e) => onExcuseTypeChange?.(e.target.value)}
-            className="w-full max-w-xs px-3 py-1.5 text-xs bg-surface-secondary border border-border-secondary rounded-lg text-text-primary appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="w-full max-w-xs px-3 py-1.5 text-xs bg-surface-secondary border border-border-secondary rounded-lg text-text-primary appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
             aria-label="Absence reason"
           >
             {EXCUSE_TYPES.map((t) => (
@@ -284,7 +284,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
             placeholder="Add a note..."
-            className="w-full px-3 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="w-full px-3 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
             aria-label="Attendance note"
           />
         </div>
