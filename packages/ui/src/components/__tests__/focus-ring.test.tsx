@@ -110,7 +110,7 @@ describe('interactive primitive focus-ring baseline', () => {
       'Table row': 'missing',
       'DataTable clickable row': 'missing',
       FilterTabs: 'semantic-pass',
-      Accordion: 'missing',
+      Accordion: 'semantic-pass',
       Dropdown: 'semantic-pass',
       'AttendanceHeatmap navigation': 'missing',
     })
