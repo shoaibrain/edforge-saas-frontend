@@ -97,7 +97,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+                    <div className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.25)] backdrop-blur-sm" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
@@ -111,17 +111,17 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all border border-gray-200 dark:border-gray-700">
+                            <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-[rgb(var(--surface-secondary))]  p-6 text-left align-middle shadow-xl transition-all border border-[rgb(var(--border-secondary))] ">
                                 <div className="flex items-center justify-between mb-6">
                                     <Dialog.Title
                                         as="h3"
-                                        className="text-lg font-semibold leading-6 text-gray-900 dark:text-white"
+                                        className="text-lg font-semibold leading-6 text-[rgb(var(--text-primary))] "
                                     >
                                         Assign User Role
                                     </Dialog.Title>
                                     <button
                                         onClick={handleClose}
-                                        className="p-1 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                        className="p-1 rounded-full text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-tertiary))] dark:hover:bg-[rgb(var(--surface-tertiary))] transition"
                                     >
                                         <X className="w-5 h-5" />
                                     </button>
@@ -131,14 +131,14 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                     {/* Step 1: User Selection (if not preselected) */}
                                     {!preselectedUserId && (
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] ">
                                                 Select User
                                             </label>
                                             <Combobox value={selectedUser} onChange={setSelectedUser}>
                                                 <div className="relative mt-1">
-                                                    <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-white dark:bg-gray-900 text-left border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 sm:text-sm">
+                                                    <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-[rgb(var(--surface-secondary))]  text-left border border-[rgb(var(--border-primary))]  focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] sm:text-sm">
                                                         <Combobox.Input
-                                                            className="w-full border-none py-2.5 pl-3 pr-10 text-sm leading-5 text-gray-900 dark:text-white bg-transparent focus:ring-0"
+                                                            className="w-full border-none py-2.5 pl-3 pr-10 text-sm leading-5 text-[rgb(var(--text-primary))]  bg-transparent focus:ring-0"
                                                             displayValue={(userId: string) => {
                                                                 const u = usersData?.items.find(u => u.userId === userId)
                                                                 return u ? `${u.firstName} ${u.lastName} (${u.email})` : ''
@@ -148,7 +148,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                         />
                                                         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
                                                             <ChevronDown
-                                                                className="h-5 w-5 text-gray-400"
+                                                                className="h-5 w-5 text-[rgb(var(--text-tertiary))]"
                                                                 aria-hidden="true"
                                                             />
                                                         </Combobox.Button>
@@ -160,9 +160,9 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                         leaveTo="opacity-0"
                                                         afterLeave={() => setSearchUserQuery('')}
                                                     >
-                                                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[rgb(var(--surface-secondary))]  py-1 text-base shadow-lg ring-1 ring-[rgb(var(--border-secondary))] ring-opacity-5 focus:outline-none sm:text-sm z-50">
                                                             {filteredUsers.length === 0 && searchUserQuery !== '' ? (
-                                                                <div className="relative cursor-default select-none py-2 px-4 text-gray-700 dark:text-gray-400">
+                                                                <div className="relative cursor-default select-none py-2 px-4 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]">
                                                                     Nothing found.
                                                                 </div>
                                                             ) : (
@@ -170,7 +170,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                                     <Combobox.Option
                                                                         key={user.userId}
                                                                         className={({ active }) =>
-                                                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-teal-600 text-white' : 'text-gray-900 dark:text-gray-200'
+                                                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]' : 'text-[rgb(var(--text-primary))] '
                                                                             }`
                                                                         }
                                                                         value={user.userId}
@@ -181,13 +181,13 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                                                     <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
                                                                                         {user.firstName} {user.lastName}
                                                                                     </span>
-                                                                                    <span className={`block truncate text-xs ${active ? 'text-teal-200' : 'text-gray-500'}`}>
+                                                                                    <span className={`block truncate text-xs ${active ? 'text-[rgb(var(--state-info-fg))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                                                                                         {user.email}
                                                                                     </span>
                                                                                 </div>
                                                                                 {selected ? (
                                                                                     <span
-                                                                                        className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? 'text-white' : 'text-teal-600'
+                                                                                        className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? 'text-[rgb(var(--action-primary-fg))]' : 'text-[rgb(var(--action-secondary-fg))]'
                                                                                             }`}
                                                                                     >
                                                                                         <Check className="h-5 w-5" aria-hidden="true" />
@@ -207,7 +207,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
 
                                     {/* Step 2: School Selection */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] ">
                                             Assign to School
                                         </label>
                                         <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
@@ -218,19 +218,19 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                     className={`
                                     flex items-center gap-3 p-3 rounded-lg border text-left transition-all
                                     ${selectedSchool === school.id
-                                                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 ring-1 ring-teal-500'
-                                                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                                            ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  ring-1 ring-[rgb(var(--border-focus))]'
+                                                            : 'border-[rgb(var(--border-secondary))]  hover:border-[rgb(var(--border-primary))] dark:hover:border-[rgb(var(--border-primary))]'
                                                         }
                                 `}
                                                 >
-                                                    <div className={`p-2 rounded-md ${selectedSchool === school.id ? 'bg-teal-100 text-teal-600' : 'bg-gray-100 text-gray-500'}`}>
+                                                    <div className={`p-2 rounded-md ${selectedSchool === school.id ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]' : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'}`}>
                                                         <SchoolIcon className="w-5 h-5" />
                                                     </div>
                                                     <div>
-                                                        <div className="font-medium text-gray-900 dark:text-white">{school.name}</div>
-                                                        <div className="text-xs text-gray-500">{school.code}</div>
+                                                        <div className="font-medium text-[rgb(var(--text-primary))] ">{school.name}</div>
+                                                        <div className="text-xs text-[rgb(var(--text-tertiary))]">{school.code}</div>
                                                     </div>
-                                                    {selectedSchool === school.id && <Check className="w-5 h-5 text-teal-600 ml-auto" />}
+                                                    {selectedSchool === school.id && <Check className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] ml-auto" />}
                                                 </button>
                                             ))}
                                         </div>
@@ -238,7 +238,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
 
                                     {/* Step 3: Role Selection */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] ">
                                             Select Role
                                         </label>
                                         <div className="grid grid-cols-2 gap-2">
@@ -249,16 +249,16 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                     className={`
                                     flex flex-col items-start p-3 rounded-lg border text-left transition-all h-full
                                     ${selectedRole === role.id
-                                                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 ring-1 ring-teal-500'
-                                                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                                            ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  ring-1 ring-[rgb(var(--border-focus))]'
+                                                            : 'border-[rgb(var(--border-secondary))]  hover:border-[rgb(var(--border-primary))] dark:hover:border-[rgb(var(--border-primary))]'
                                                         }
                                 `}
                                                 >
-                                                    <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2 w-full">
+                                                    <div className="font-medium text-[rgb(var(--text-primary))]  flex items-center gap-2 w-full">
                                                         {role.name}
-                                                        {selectedRole === role.id && <Check className="w-4 h-4 text-teal-600 ml-auto" />}
+                                                        {selectedRole === role.id && <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ml-auto" />}
                                                     </div>
-                                                    <div className="text-xs text-gray-500 mt-1">{role.description}</div>
+                                                    <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">{role.description}</div>
                                                 </button>
                                             ))}
                                         </div>
@@ -268,14 +268,14 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                 <div className="mt-8 flex justify-end gap-3">
                                     <button
                                         type="button"
-                                        className="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors"
+                                        className="inline-flex justify-center rounded-lg border border-[rgb(var(--border-primary))]  px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))]  hover:bg-[rgb(var(--surface-tertiary))] dark:hover:bg-[rgb(var(--surface-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] focus:ring-offset-2 transition-colors"
                                         onClick={handleClose}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="button"
-                                        className="inline-flex justify-center rounded-lg border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="inline-flex justify-center rounded-lg border border-transparent bg-[rgb(var(--action-primary-bg))] px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         onClick={() => assignMutation.mutate()}
                                         disabled={!selectedUser || !selectedSchool || !selectedRole || assignMutation.isPending}
                                     >

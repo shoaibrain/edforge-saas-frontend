@@ -237,7 +237,7 @@ export function BaseModal({
                     'text-[rgb(var(--text-tertiary))]',
                     'hover:text-[rgb(var(--text-primary))]',
                     'hover:bg-[rgb(var(--interactive-hover))]',
-                    'focus:outline-none focus:ring-2 focus:ring-teal-500/50',
+                    'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50',
                     'transition-all duration-200'
                   )}
                   aria-label="Close modal"
@@ -279,7 +279,7 @@ export function ModalHeader({ title, subtitle, icon, className }: ModalHeaderPro
     <div className={cn('px-6 pt-6 pb-4', className)}>
       <div className="flex items-start gap-4">
         {icon && (
-          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex items-center justify-center">
+          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)] flex items-center justify-center">
             {icon}
           </div>
         )}
