@@ -86,7 +86,7 @@ export function FeeStructureForm({
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]">
       <div className="w-full max-w-lg mx-4 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
@@ -246,7 +246,7 @@ function Field({
         {label}
       </label>
       {children}
-      {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
+      {error && <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-0.5">{error}</p>}
     </div>
   )
 }

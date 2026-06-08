@@ -10,22 +10,22 @@ import { useTranslation } from '@edforge/i18n'
 type StatusType = InvoiceStatus | PaymentStatus
 
 const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
-  draft: { bg: 'bg-slate-100 dark:bg-slate-500/20', text: 'text-slate-600 dark:text-slate-400' },
-  issued: { bg: 'bg-blue-100 dark:bg-blue-500/20', text: 'text-blue-700 dark:text-blue-400' },
+  draft: { bg: 'bg-[rgb(var(--surface-tertiary))] ', text: 'text-[rgb(var(--text-secondary))] ' },
+  issued: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-info-fg))] ' },
   partially_paid: { bg: 'bg-amber-100 dark:bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400' },
-  paid: { bg: 'bg-emerald-100 dark:bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400' },
-  completed: { bg: 'bg-emerald-100 dark:bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400' },
-  overdue: { bg: 'bg-red-100 dark:bg-red-500/20', text: 'text-red-700 dark:text-red-400' },
-  failed: { bg: 'bg-red-100 dark:bg-red-500/20', text: 'text-red-700 dark:text-red-400' },
-  cancelled: { bg: 'bg-slate-100 dark:bg-slate-500/20', text: 'text-slate-600 dark:text-slate-400' },
-  written_off: { bg: 'bg-slate-100 dark:bg-slate-500/20', text: 'text-slate-600 dark:text-slate-400' },
-  pending: { bg: 'bg-yellow-100 dark:bg-yellow-500/20', text: 'text-yellow-700 dark:text-yellow-400' },
-  processing: { bg: 'bg-blue-100 dark:bg-blue-500/20', text: 'text-blue-700 dark:text-blue-400' },
-  refunded: { bg: 'bg-purple-100 dark:bg-purple-500/20', text: 'text-purple-700 dark:text-purple-400' },
-  partially_refunded: { bg: 'bg-purple-100 dark:bg-purple-500/20', text: 'text-purple-700 dark:text-purple-400' },
+  paid: { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] ', text: 'text-[rgb(var(--state-success-fg))] ' },
+  completed: { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] ', text: 'text-[rgb(var(--state-success-fg))] ' },
+  overdue: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] ' },
+  failed: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] ' },
+  cancelled: { bg: 'bg-[rgb(var(--surface-tertiary))] ', text: 'text-[rgb(var(--text-secondary))] ' },
+  written_off: { bg: 'bg-[rgb(var(--surface-tertiary))] ', text: 'text-[rgb(var(--text-secondary))] ' },
+  pending: { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] ', text: 'text-[rgb(var(--state-warning-fg))] ' },
+  processing: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-info-fg))] ' },
+  refunded: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] ', text: 'text-[rgb(var(--state-info-fg))] ' },
+  partially_refunded: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] ', text: 'text-[rgb(var(--state-info-fg))] ' },
 }
 
-const DEFAULT_STYLE = { bg: 'bg-slate-100 dark:bg-slate-500/20', text: 'text-slate-600 dark:text-slate-400' }
+const DEFAULT_STYLE = { bg: 'bg-[rgb(var(--surface-tertiary))] ', text: 'text-[rgb(var(--text-secondary))] ' }
 
 export function InvoiceStatusBadge({ status }: { status: StatusType }) {
   const { t } = useTranslation('payments')

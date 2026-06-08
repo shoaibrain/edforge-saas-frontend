@@ -144,8 +144,8 @@ export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
           <button
             type="button"
             onClick={onPay}
-            className="w-full py-3 rounded-xl bg-teal-600 text-white font-semibold text-sm
-              hover:bg-teal-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+            className="w-full py-3 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] font-semibold text-sm
+              hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--border-focus))] focus-visible:ring-offset-2"
           >
             {t('actions.payNow')} — {format(invoice.amountDue)}
           </button>

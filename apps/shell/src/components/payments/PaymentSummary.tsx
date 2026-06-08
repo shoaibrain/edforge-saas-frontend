@@ -41,7 +41,7 @@ export function PaymentSummary({ invoice, compact = false }: PaymentSummaryProps
         <SummaryRow
           label={t('summary.discountTotal')}
           value={`-${fmt(invoice.discountTotal)}`}
-          className="text-emerald-600 dark:text-emerald-400"
+          className="text-[rgb(var(--state-success-fg))] "
         />
       )}
       {invoice.taxTotal > 0 && (
@@ -58,7 +58,7 @@ export function PaymentSummary({ invoice, compact = false }: PaymentSummaryProps
         <SummaryRow
           label={t('summary.amountPaid')}
           value={`-${fmt(invoice.amountPaid)}`}
-          className="text-emerald-600 dark:text-emerald-400"
+          className="text-[rgb(var(--state-success-fg))] "
         />
       )}
       {invoice.amountDue > 0 && invoice.amountDue !== invoice.grandTotal && (
@@ -67,7 +67,7 @@ export function PaymentSummary({ invoice, compact = false }: PaymentSummaryProps
             label={t('summary.balanceDue')}
             value={fmt(invoice.amountDue)}
             bold
-            className="text-red-600 dark:text-red-400"
+            className="text-[rgb(var(--state-danger-fg))] "
           />
         </div>
       )}

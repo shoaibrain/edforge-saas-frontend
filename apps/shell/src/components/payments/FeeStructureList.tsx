@@ -86,7 +86,7 @@ export function FeeStructureList({
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-[rgb(var(--text-primary))]">{fee.name}</span>
                   {!fee.isActive && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-500/20 text-slate-500">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--surface-tertiary))]  text-[rgb(var(--text-tertiary))]">
                       Inactive
                     </span>
                   )}
@@ -119,7 +119,7 @@ export function FeeStructureList({
                     {(fee.gradeLevels ?? []).map((grade) => (
                       <span
                         key={grade}
-                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
+                        className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/10 "
                       >
                         <GraduationCap className="w-2.5 h-2.5 mr-0.5" />
                         {grade}
@@ -141,10 +141,10 @@ export function FeeStructureList({
                   <button
                     type="button"
                     onClick={() => onDelete(fee)}
-                    className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                     aria-label={t('feeStructure.deleteFee')}
                   >
-                    <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                    <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
                   </button>
                 </div>
               </td>

@@ -96,13 +96,13 @@ export function InvoiceList({
             className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
               ${
                 statusFilter === tab.key
-                  ? 'bg-white dark:bg-[rgb(var(--bg-primary))] text-[rgb(var(--text-primary))] shadow-sm'
+                  ? 'bg-[rgb(var(--surface-secondary))] dark:bg-[rgb(var(--bg-primary))] text-[rgb(var(--text-primary))] shadow-sm'
                   : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
               }`}
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className="ml-1.5 text-[10px] opacity-60">({tab.count})</span>
+              <span className="ml-1.5 text-xs opacity-60">({tab.count})</span>
             )}
           </button>
         ))}
@@ -191,7 +191,7 @@ function InvoiceCard({
             type="button"
             onClick={onPay}
             className="ml-auto flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium
-              bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+              bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             {t('actions.payNow')}
           </button>
