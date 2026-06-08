@@ -169,7 +169,7 @@ export function TrainingModal({
   })
 
   const inputClass = (hasError: boolean) =>
-    `w-full px-3 py-2 rounded-lg border bg-surface-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-colors ${hasError ? 'border-red-500' : 'border-border-secondary'}`
+    `w-full px-3 py-2 rounded-lg border bg-surface-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-colors ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}`
 
   return (
     <Modal
@@ -187,7 +187,7 @@ export function TrainingModal({
         {/* Row 1 — Title (full width) */}
         <div>
           <label htmlFor="trainingTitle" className="block text-sm font-medium text-text-primary mb-1.5">
-            Training Title <span className="text-red-500">*</span>
+            Training Title <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <input
             id="trainingTitle"
@@ -202,7 +202,7 @@ export function TrainingModal({
             disabled={isSubmitting}
           />
           {errors.trainingTitle && (
-            <p className="mt-1 text-sm text-red-500">{errors.trainingTitle.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.trainingTitle.message}</p>
           )}
         </div>
 
@@ -210,7 +210,7 @@ export function TrainingModal({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="trainingType" className="block text-sm font-medium text-text-primary mb-1.5">
-              Type <span className="text-red-500">*</span>
+              Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="trainingType"
@@ -223,12 +223,12 @@ export function TrainingModal({
               ))}
             </select>
             {errors.trainingType && (
-              <p className="mt-1 text-sm text-red-500">{errors.trainingType.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.trainingType.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="status" className="block text-sm font-medium text-text-primary mb-1.5">
-              Status <span className="text-red-500">*</span>
+              Status <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="status"
@@ -241,12 +241,12 @@ export function TrainingModal({
               ))}
             </select>
             {errors.status && (
-              <p className="mt-1 text-sm text-red-500">{errors.status.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.status.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="durationHours" className="block text-sm font-medium text-text-primary mb-1.5">
-              Hours <span className="text-red-500">*</span>
+              Hours <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="durationHours"
@@ -259,7 +259,7 @@ export function TrainingModal({
               disabled={isSubmitting}
             />
             {errors.durationHours && (
-              <p className="mt-1 text-sm text-red-500">{errors.durationHours.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.durationHours.message}</p>
             )}
           </div>
         </div>
@@ -268,7 +268,7 @@ export function TrainingModal({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
             <label htmlFor="trainingProvider" className="block text-sm font-medium text-text-primary mb-1.5">
-              Provider <span className="text-red-500">*</span>
+              Provider <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="trainingProvider"
@@ -279,12 +279,12 @@ export function TrainingModal({
               disabled={isSubmitting}
             />
             {errors.trainingProvider && (
-              <p className="mt-1 text-sm text-red-500">{errors.trainingProvider.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.trainingProvider.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-text-primary mb-1.5">
-              Start Date <span className="text-red-500">*</span>
+              Start Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="startDate"
@@ -294,7 +294,7 @@ export function TrainingModal({
               disabled={isSubmitting}
             />
             {errors.startDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.startDate.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.startDate.message}</p>
             )}
           </div>
           <div>
@@ -313,7 +313,7 @@ export function TrainingModal({
               disabled={isSubmitting}
             />
             {errors.endDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.endDate.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.endDate.message}</p>
             )}
           </div>
         </div>
@@ -335,7 +335,7 @@ export function TrainingModal({
               disabled={isSubmitting}
             />
             {errors.certificateNumber && (
-              <p className="mt-1 text-sm text-red-500">{errors.certificateNumber.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.certificateNumber.message}</p>
             )}
           </div>
           <div>
@@ -356,7 +356,7 @@ export function TrainingModal({
               disabled={isSubmitting}
             />
             {errors.certificateUrl && (
-              <p className="mt-1 text-sm text-red-500">{errors.certificateUrl.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.certificateUrl.message}</p>
             )}
           </div>
         </div>
@@ -377,7 +377,7 @@ export function TrainingModal({
             disabled={isSubmitting}
           />
           {errors.notes && (
-            <p className="mt-1 text-sm text-red-500">{errors.notes.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.notes.message}</p>
           )}
         </div>
 

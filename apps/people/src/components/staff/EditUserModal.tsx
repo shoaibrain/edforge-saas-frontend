@@ -136,7 +136,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
               htmlFor="firstName" 
               className="block text-sm font-medium text-text-primary mb-1.5"
             >
-              First Name <span className="text-red-500">*</span>
+              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="firstName"
@@ -152,13 +152,13 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
                 placeholder:text-text-tertiary
                 focus:outline-none focus:ring-2 focus:ring-accent-primary/20
                 transition-colors
-                ${errors.firstName ? 'border-red-500' : 'border-border-secondary'}
+                ${errors.firstName ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
               `}
               placeholder="John"
               disabled={isSubmitting}
             />
             {errors.firstName && (
-              <p className="mt-1 text-sm text-red-500">{errors.firstName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
             )}
           </div>
 
@@ -168,7 +168,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
               htmlFor="lastName" 
               className="block text-sm font-medium text-text-primary mb-1.5"
             >
-              Last Name <span className="text-red-500">*</span>
+              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="lastName"
@@ -180,13 +180,13 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
                 placeholder:text-text-tertiary
                 focus:outline-none focus:ring-2 focus:ring-accent-primary/20
                 transition-colors
-                ${errors.lastName ? 'border-red-500' : 'border-border-secondary'}
+                ${errors.lastName ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
               `}
               placeholder="Doe"
               disabled={isSubmitting}
             />
             {errors.lastName && (
-              <p className="mt-1 text-sm text-red-500">{errors.lastName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastName.message}</p>
             )}
           </div>
         </div>
@@ -209,13 +209,13 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
               placeholder:text-text-tertiary
               focus:outline-none focus:ring-2 focus:ring-accent-primary/20
               transition-colors
-              ${errors.phone ? 'border-red-500' : 'border-border-secondary'}
+              ${errors.phone ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
             `}
             placeholder="+1 (555) 123-4567"
             disabled={isSubmitting}
           />
           {errors.phone && (
-            <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
           )}
         </div>
 
@@ -235,7 +235,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
               bg-surface-secondary text-text-primary
               focus:outline-none focus:ring-2 focus:ring-accent-primary/20
               transition-colors
-              ${errors.status ? 'border-red-500' : 'border-border-secondary'}
+              ${errors.status ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
             `}
             disabled={isSubmitting}
           >
@@ -244,7 +244,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
             <option value="suspended">Suspended</option>
           </select>
           {errors.status && (
-            <p className="mt-1 text-sm text-red-500">{errors.status.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.status.message}</p>
           )}
         </div>
 
@@ -268,7 +268,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[100px]"
+            className="min-w-24"
           >
             {isSubmitting ? (
               <>

@@ -37,7 +37,7 @@ const TRAINING_TYPE_COLORS: Record<string, string> = {
   inclusion: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   leadership: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
   safety: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
-  assessment: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
+  assessment: 'bg-teal-500/10 text-[rgb(var(--action-secondary-fg))] ',
   language: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
   induction: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
   other: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
@@ -165,7 +165,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
             </p>
             <button
               onClick={handleAdd}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add First Training
@@ -177,7 +177,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
               <motion.div
                 key={training.trainingId}
                 variants={fadeInUp}
-                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
+                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-focus)/0.35)] transition-all group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 min-w-0">
@@ -226,7 +226,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
                             href={training.certificateUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-teal-600 dark:text-teal-400 hover:underline"
+                            className="flex items-center gap-1 text-[rgb(var(--action-secondary-fg))]  hover:underline"
                           >
                             <ExternalLink className="w-3 h-3" />
                             Certificate
@@ -247,7 +247,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
                     </button>
                     <button
                       onClick={() => handleDelete(training.trainingId)}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                       title="Delete training"
                       disabled={deletingId === training.trainingId}
                     >

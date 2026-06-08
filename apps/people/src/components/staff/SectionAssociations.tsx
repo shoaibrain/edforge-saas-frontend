@@ -238,7 +238,7 @@ export function SectionAssociations({
                           <td className="px-4 py-3">
                             <a
                               href={`/academics/sections/${section.sectionId}`}
-                              className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-teal-600 transition-colors inline-block"
+                              className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--action-secondary-fg))] transition-colors inline-block"
                               title="View in Academics"
                             >
                               <ExternalLink className="w-4 h-4" />

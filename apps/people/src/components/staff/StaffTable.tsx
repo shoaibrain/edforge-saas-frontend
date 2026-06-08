@@ -88,11 +88,11 @@ export function StaffTable({
                   <span className="truncate text-xs font-medium text-[var(--v2-text-primary)]">
                     {s.firstName} {s.lastSurname}
                   </span>
-                  <span className={`rounded px-1.5 py-px text-[9px] font-medium ${empStyle}`}>
+                  <span className={`rounded px-1.5 py-px text-xs font-medium ${empStyle}`}>
                     {getEmploymentLabel(s.employmentStatus)}
                   </span>
                 </div>
-                <span className="truncate text-[10px] text-[var(--v2-text-ghost)]">
+                <span className="truncate text-xs text-[var(--v2-text-ghost)]">
                   {s.email}
                 </span>
               </div>
@@ -114,7 +114,7 @@ export function StaffTable({
           const status = row.original.employmentStatus
           const isActive = status === 'active'
           return (
-            <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-[10px] font-medium ${isActive ? 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]' : 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]'}`}>
+            <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-xs font-medium ${isActive ? 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]' : 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]'}`}>
               <span
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${isActive ? 'bg-[var(--v2-success)]' : 'bg-[var(--v2-text-hint)]'}`}
               />
@@ -128,7 +128,7 @@ export function StaffTable({
         header: t('tableHeaders.hired'),
         size: 120,
         cell: ({ row }) => (
-          <span className="text-[11px] text-[var(--v2-text-muted)]">
+          <span className="text-xs text-[var(--v2-text-muted)]">
             {formatDate(row.original.hireDate)}
           </span>
         ),
@@ -140,7 +140,7 @@ export function StaffTable({
         enableSorting: false,
         cell: ({ row }) => (
           <span
-            className={`text-[11px] ${row.original.departmentName ? 'text-[var(--v2-text-muted)]' : 'text-[var(--v2-text-ghost)]'}`}
+            className={`text-xs ${row.original.departmentName ? 'text-[var(--v2-text-muted)]' : 'text-[var(--v2-text-ghost)]'}`}
           >
             {row.original.departmentName || '—'}
           </span>

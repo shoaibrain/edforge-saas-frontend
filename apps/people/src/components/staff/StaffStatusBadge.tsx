@@ -23,28 +23,28 @@ const statusStyles: Record<
   { bgColor: string; textColor: string }
 > = {
   active: {
-    bgColor: 'bg-emerald-100 dark:bg-emerald-500/20',
-    textColor: 'text-emerald-700 dark:text-emerald-400',
+    bgColor: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+    textColor: 'text-[rgb(var(--state-success-fg))]',
   },
   on_leave: {
-    bgColor: 'bg-yellow-100 dark:bg-yellow-500/20',
-    textColor: 'text-yellow-700 dark:text-yellow-400',
+    bgColor: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+    textColor: 'text-[rgb(var(--state-warning-fg))]',
   },
   suspended: {
-    bgColor: 'bg-orange-100 dark:bg-orange-500/20',
-    textColor: 'text-orange-700 dark:text-orange-400',
+    bgColor: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+    textColor: 'text-[rgb(var(--state-warning-fg))]',
   },
   terminated: {
-    bgColor: 'bg-red-100 dark:bg-red-500/20',
-    textColor: 'text-red-700 dark:text-red-400',
+    bgColor: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
+    textColor: 'text-[rgb(var(--state-danger-fg))]',
   },
   retired: {
-    bgColor: 'bg-slate-100 dark:bg-slate-500/20',
-    textColor: 'text-slate-600 dark:text-slate-400',
+    bgColor: 'bg-[rgb(var(--surface-tertiary))]',
+    textColor: 'text-[rgb(var(--text-tertiary))]',
   },
   resigned: {
-    bgColor: 'bg-slate-100 dark:bg-slate-500/20',
-    textColor: 'text-slate-600 dark:text-slate-400',
+    bgColor: 'bg-[rgb(var(--surface-tertiary))]',
+    textColor: 'text-[rgb(var(--text-tertiary))]',
   },
 }
 

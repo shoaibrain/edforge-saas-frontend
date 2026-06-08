@@ -37,7 +37,7 @@ import { formatDate } from '../../lib/utils'
 const STATUS_TIMELINE_COLORS: Record<string, string> = {
   active: 'bg-emerald-500',
   on_leave: 'bg-amber-500',
-  suspended: 'bg-red-500',
+  suspended: 'bg-[rgb(var(--state-danger-bg))]0',
   terminated: 'bg-slate-500',
   retired: 'bg-blue-500',
   resigned: 'bg-orange-500',
@@ -128,7 +128,7 @@ function UpdateStatusModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -143,7 +143,7 @@ function UpdateStatusModal({
         {/* New Status */}
         <div>
           <label htmlFor="emp-status" className="block text-sm font-medium text-text-primary mb-1.5">
-            New Status <span className="text-red-500">*</span>
+            New Status <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="emp-status"
@@ -157,14 +157,14 @@ function UpdateStatusModal({
             ))}
           </select>
           {errors.employmentStatus && (
-            <p className="mt-1 text-sm text-red-500">{errors.employmentStatus.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.employmentStatus.message}</p>
           )}
         </div>
 
         {/* Effective Date */}
         <div>
           <label htmlFor="emp-date" className="block text-sm font-medium text-text-primary mb-1.5">
-            Effective Date <span className="text-red-500">*</span>
+            Effective Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <input
             id="emp-date"
@@ -174,7 +174,7 @@ function UpdateStatusModal({
             disabled={isSubmitting}
           />
           {errors.effectiveDate && (
-            <p className="mt-1 text-sm text-red-500">{errors.effectiveDate.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.effectiveDate.message}</p>
           )}
         </div>
 
@@ -212,7 +212,7 @@ function UpdateStatusModal({
           <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-[140px]">
+          <Button type="submit" disabled={isSubmitting} className="min-w-36">
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

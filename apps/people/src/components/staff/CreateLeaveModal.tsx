@@ -132,7 +132,7 @@ export function CreateLeaveModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -147,7 +147,7 @@ export function CreateLeaveModal({
         {/* Leave Type */}
         <div>
           <label htmlFor="leave-type" className="block text-sm font-medium text-text-primary mb-1.5">
-            Leave Type <span className="text-red-500">*</span>
+            Leave Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="leave-type"
@@ -165,7 +165,7 @@ export function CreateLeaveModal({
             ))}
           </select>
           {errors.leaveType && (
-            <p className="mt-1 text-sm text-red-500">{errors.leaveType.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.leaveType.message}</p>
           )}
         </div>
 
@@ -173,7 +173,7 @@ export function CreateLeaveModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="leave-start" className="block text-sm font-medium text-text-primary mb-1.5">
-              Start Date <span className="text-red-500">*</span>
+              Start Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="leave-start"
@@ -183,12 +183,12 @@ export function CreateLeaveModal({
               disabled={isSubmitting}
             />
             {errors.startDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.startDate.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.startDate.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="leave-end" className="block text-sm font-medium text-text-primary mb-1.5">
-              End Date <span className="text-red-500">*</span>
+              End Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="leave-end"
@@ -198,7 +198,7 @@ export function CreateLeaveModal({
               disabled={isSubmitting}
             />
             {errors.endDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.endDate.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.endDate.message}</p>
             )}
           </div>
         </div>
@@ -237,7 +237,7 @@ export function CreateLeaveModal({
                 disabled={isSubmitting}
               />
               {errors.hours && (
-                <p className="mt-1 text-sm text-red-500">{errors.hours.message}</p>
+                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.hours.message}</p>
               )}
             </div>
           )}
@@ -310,7 +310,7 @@ export function CreateLeaveModal({
           <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-[160px]">
+          <Button type="submit" disabled={isSubmitting} className="min-w-40">
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

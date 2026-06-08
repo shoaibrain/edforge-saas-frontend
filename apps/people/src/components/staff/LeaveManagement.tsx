@@ -33,10 +33,10 @@ import { formatDate } from '../../lib/utils'
 const LEAVE_STATUS_COLORS: Record<string, string> = {
   pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   approved: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  rejected: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  rejected: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
   cancelled: 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
   in_progress: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  completed: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
+  completed: 'bg-teal-500/10 text-[rgb(var(--action-secondary-fg))] ',
 }
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -57,7 +57,7 @@ const LEAVE_TYPE_LABELS: Record<string, string> = {
 
 const LEAVE_TYPE_COLORS: Record<string, string> = {
   annual: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  sick: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  sick: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
   personal: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
   bereavement: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
   maternity: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
@@ -230,8 +230,8 @@ export function LeaveManagement({
           </div>
           <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <CalendarX2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg))]0/10">
+                <CalendarX2 className="w-4 h-4 text-[rgb(var(--state-danger-fg))] " />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Pending</p>
@@ -318,7 +318,7 @@ export function LeaveManagement({
 
                       {/* Reason */}
                       <td className="px-4 py-3">
-                        <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-[200px] truncate">
+                        <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-52 truncate">
                           {request.reason || '—'}
                         </p>
                       </td>
@@ -340,7 +340,7 @@ export function LeaveManagement({
                                 </button>
                                 <button
                                   onClick={() => handleReject(request.leaveId)}
-                                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                                   title="Reject"
                                 >
                                   <X className="w-4 h-4" />

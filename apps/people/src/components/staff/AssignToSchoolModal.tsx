@@ -122,7 +122,7 @@ export function AssignToSchoolModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -137,7 +137,7 @@ export function AssignToSchoolModal({
         {/* School */}
         <div>
           <label htmlFor="assign-schoolId" className="block text-sm font-medium text-text-primary mb-1.5">
-            School <span className="text-red-500">*</span>
+            School <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="assign-schoolId"
@@ -161,7 +161,7 @@ export function AssignToSchoolModal({
             ))}
           </select>
           {errors.schoolId && (
-            <p className="mt-1 text-sm text-red-500">{errors.schoolId.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.schoolId.message}</p>
           )}
         </div>
 
@@ -169,7 +169,7 @@ export function AssignToSchoolModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="assign-role" className="block text-sm font-medium text-text-primary mb-1.5">
-              Role <span className="text-red-500">*</span>
+              Role <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="assign-role"
@@ -183,7 +183,7 @@ export function AssignToSchoolModal({
               ))}
             </select>
             {errors.role && (
-              <p className="mt-1 text-sm text-red-500">{errors.role.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.role.message}</p>
             )}
           </div>
           <div>
@@ -225,7 +225,7 @@ export function AssignToSchoolModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="assign-beginDate" className="block text-sm font-medium text-text-primary mb-1.5">
-              Begin Date <span className="text-red-500">*</span>
+              Begin Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="assign-beginDate"
@@ -235,7 +235,7 @@ export function AssignToSchoolModal({
               disabled={isSubmitting}
             />
             {errors.beginDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.beginDate.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.beginDate.message}</p>
             )}
           </div>
           <div>
@@ -280,7 +280,7 @@ export function AssignToSchoolModal({
             id="assign-isPrimary"
             type="checkbox"
             {...register('isPrimary')}
-            className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-2 focus:ring-accent-primary/20"
+            className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-2 focus:ring-accent-primary/20"
             disabled={isSubmitting}
           />
           <label htmlFor="assign-isPrimary" className="text-sm text-text-primary">
@@ -300,7 +300,7 @@ export function AssignToSchoolModal({
           <Button
             type="submit"
             disabled={isSubmitting || loadingSchools}
-            className="min-w-[140px]"
+            className="min-w-36"
           >
             {isSubmitting ? (
               <>
