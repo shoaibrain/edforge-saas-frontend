@@ -76,7 +76,7 @@ export function Avatar({
           {...props}
         />
       ) : (
-        <span className="font-semibold text-teal-600 dark:text-cyan-400">
+        <span className="font-semibold text-[rgb(var(--action-secondary-fg))]">
           {initials || '?'}
         </span>
       )}
@@ -106,7 +106,7 @@ export function AvatarGroup({
         <div
           className={cn(
             avatarVariants({ size, shape: 'circle' }),
-            'bg-teal-500/15 dark:bg-cyan-500/20 text-teal-700 dark:text-cyan-400 font-semibold'
+            'bg-[rgb(var(--state-info-bg)/0.22)] text-[rgb(var(--state-info-fg))] font-semibold'
           )}
         >
           +{remainingCount}
