@@ -149,10 +149,10 @@ export function FeeStructureList({
             <button
               type="button"
               onClick={() => onDelete(row.original)}
-              className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
               aria-label="Delete fee structure"
             >
-              <Trash2 className="w-3.5 h-3.5 text-red-400" />
+              <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
             </button>
           </div>
         ),
@@ -174,7 +174,7 @@ export function FeeStructureList({
         title: 'No fee structures configured',
         description: 'Add fee structures to start generating invoices.',
       }}
-      className="min-h-[400px]"
+      className="min-h-96"
     />
   )
 }

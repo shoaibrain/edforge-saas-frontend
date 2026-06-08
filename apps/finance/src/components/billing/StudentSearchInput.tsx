@@ -98,15 +98,15 @@ export function StudentSearchInput({
           }}
           onFocus={() => search.length >= 2 && setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+          className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
         />
       </div>
 
       {isOpen && debouncedSearch.length >= 2 && (
-        <div className="absolute z-50 mt-1 w-full bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-popover max-h-60 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-4">
-              <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+              <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
               <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">Searching...</span>
             </div>
           ) : students.length === 0 ? (
