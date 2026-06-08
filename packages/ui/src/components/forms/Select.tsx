@@ -48,6 +48,7 @@ const selectButtonVariants = cva(
 export interface SelectProps
   extends Omit<FieldProps, 'children' | 'controlId' | 'onChange'>,
     VariantProps<typeof selectButtonVariants> {
+  controlId?: string
   options: readonly SelectOption[]
   value?: string | null
   onChange: (value: string | null) => void
@@ -225,6 +226,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       disabled,
       readOnly,
       className,
+      controlId,
       ...props
     },
     ref
@@ -238,6 +240,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           required={required}
           optionalText={optionalText}
           lockedReason={lockedReason}
+          controlId={controlId}
           density={density}
           disabled={disabled}
           readOnly={readOnly}

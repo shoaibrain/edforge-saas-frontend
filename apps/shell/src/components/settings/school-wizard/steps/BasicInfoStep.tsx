@@ -11,6 +11,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import type { WizardStepProps } from '@edforge/wizard'
+import { Field, Input, Select } from '@edforge/ui'
 import {
   SCHOOL_TYPE_OPTIONS,
   GRADE_OPTIONS,
@@ -33,45 +34,21 @@ interface AnimatedInputProps extends React.InputHTMLAttributes<HTMLInputElement>
 }
 
 const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
-  ({ label, error, icon, required, helpText, id, className, ...props }, ref) => {
-    const [focused, setFocused] = useState(false)
+  ({ label, error, icon, required, helpText, id, className, size: _nativeSize, ...props }, ref) => {
     const fieldId = id || label.toLowerCase().replace(/\s+/g, '-')
+    void _nativeSize
 
     return (
-      <div className="space-y-1.5">
-        <label htmlFor={fieldId} className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
-        </label>
-        <motion.div
-          animate={{
-            borderColor: error
-              ? 'rgb(185, 62, 3)'
-              : focused ? 'rgb(10, 147, 150)' : 'rgb(var(--border-primary))',
-            boxShadow: error
-              ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
-              : focused ? '0 0 0 3px rgba(10, 147, 150, 0.15)' : '0 0 0 0px transparent',
-          }}
-          transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden"
-        >
-          {icon && (
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]">
-              {icon}
-            </div>
-          )}
-          <input
-            ref={ref}
-            id={fieldId}
-            {...props}
-            onFocus={(e) => { setFocused(true); props.onFocus?.(e) }}
-            onBlur={(e) => { setFocused(false); props.onBlur?.(e) }}
-            className={`w-full px-4 py-3 bg-transparent text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none text-sm ${icon ? 'pl-11' : ''} ${className || ''}`}
-          />
-        </motion.div>
-        {helpText && !error && <p className="text-xs text-[rgb(var(--text-tertiary))]">{helpText}</p>}
-        {error && <p className="text-xs text-rust-500">{error}</p>}
-      </div>
+      <Field
+        label={label || undefined}
+        controlId={fieldId}
+        required={required}
+        optionalText={required ? undefined : null}
+        helperText={helpText}
+        error={error}
+      >
+        <Input ref={ref} prefix={icon} className={className} {...props} />
+      </Field>
     )
   },
 )
@@ -90,47 +67,29 @@ interface AnimatedSelectProps extends React.SelectHTMLAttributes<HTMLSelectEleme
 
 const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
   ({ label, error, required, options, id, className, ...props }, ref) => {
-    const [focused, setFocused] = useState(false)
     const fieldId = id || label.toLowerCase().replace(/\s+/g, '-')
+    const value = typeof props.value === 'string' ? props.value : undefined
+    const handleChange = (nextValue: string | null) => {
+      props.onChange?.({
+        target: { value: nextValue ?? '' },
+        currentTarget: { value: nextValue ?? '' },
+      } as React.ChangeEvent<HTMLSelectElement>)
+    }
+
+    void ref
 
     return (
-      <div className="space-y-1.5">
-        <label htmlFor={fieldId} className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
-        </label>
-        <motion.div
-          animate={{
-            borderColor: error
-              ? 'rgb(185, 62, 3)'
-              : focused ? 'rgb(10, 147, 150)' : 'rgb(var(--border-primary))',
-            boxShadow: error
-              ? '0 0 0 3px rgba(185, 62, 3, 0.15)'
-              : focused ? '0 0 0 3px rgba(10, 147, 150, 0.15)' : '0 0 0 0px transparent',
-          }}
-          transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden"
-        >
-          <select
-            ref={ref}
-            id={fieldId}
-            {...props}
-            onFocus={(e) => { setFocused(true); props.onFocus?.(e) }}
-            onBlur={(e) => { setFocused(false); props.onBlur?.(e) }}
-            className={`w-full px-4 py-3 bg-transparent appearance-none text-[rgb(var(--text-primary))] focus:outline-none text-sm pr-10 ${className || ''}`}
-          >
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
-            <svg className="w-4 h-4 text-[rgb(var(--text-tertiary))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </motion.div>
-        {error && <p className="text-xs text-rust-500">{error}</p>}
-      </div>
+      <Select
+        label={label || undefined}
+        controlId={fieldId}
+        required={required}
+        optionalText={required ? undefined : null}
+        error={error}
+        value={value ?? null}
+        onChange={handleChange}
+        options={options}
+        buttonClassName={className}
+      />
     )
   },
 )
