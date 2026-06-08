@@ -201,7 +201,7 @@ const ComboboxControl = forwardRef<HTMLInputElement, ComboboxControlProps>(
           >
             <ComboboxOptions
               className={cn(
-                'absolute z-50 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-[rgb(var(--border-primary))]',
+                'absolute z-50 mt-1 max-h-64 min-w-full w-max max-w-sm overflow-auto rounded-xl border border-[rgb(var(--border-primary))]',
                 'bg-[rgb(var(--background-elevated))] p-1 shadow-popover focus:outline-none',
                 optionsClassName
               )}
