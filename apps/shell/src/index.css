@@ -5,6 +5,26 @@
 /* Import theme package */
 @import '@edforge/theme';
 
+/*
+ * MFE CSS ownership (host-owns-CSS).
+ *
+ * EdForge is a Module-Federation host (this shell) + remotes (people,
+ * academics, finance, …). Remotes ship NO CSS of their own — they render on
+ * this host's compiled stylesheet. Tailwind v4 only emits the utility classes
+ * it finds while scanning, and by default scans the building app's tree only
+ * (ignoring node_modules). So any class used solely in a shared package or in a
+ * remote app would be missing from the host CSS at runtime (collapsed grids,
+ * transparent popovers, no elevation).
+ *
+ * Declaring the sources here — on the HOST's own entry CSS (a real file, so the
+ * relative globs resolve into the workspace rather than through the @edforge/*
+ * node_modules symlinks) — makes the host generate the full design-system class
+ * surface for the shared packages AND every remote app. Adding a new MFE needs
+ * no change: the apps glob already covers everything under apps/.
+ */
+@source '../../../packages/*/src/**/*.{ts,tsx}';
+@source '../../../apps/*/src/**/*.{ts,tsx}';
+
 /* Home V2 design tokens and animations */
 @import './styles/home-v2-tokens.css';
 @import './styles/home-v2-animations.css';
