@@ -236,7 +236,7 @@ export function ExamSubjectsTab({
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <Plus className="w-4 h-4" />
             Add Subject
@@ -318,7 +318,7 @@ export function ExamSubjectsTab({
                 <button
                   type="button"
                   onClick={seedTheoryPractical}
-                  className="text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700"
+                  className="text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))]"
                 >
                   + Split into components
                 </button>
@@ -374,7 +374,7 @@ export function ExamSubjectsTab({
                 <button
                   type="button"
                   onClick={() => addComponentRow()}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))]"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add component
                 </button>
@@ -410,7 +410,7 @@ export function ExamSubjectsTab({
               type="button"
               onClick={handleAdd}
               disabled={!form.courseId || createMut.isPending || !componentsValid}
-              className="px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
             >
               Add
             </button>

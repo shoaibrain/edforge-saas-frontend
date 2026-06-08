@@ -187,7 +187,7 @@ export function FinalizationWizard({
 
                     {/* Student-level preview table */}
                     {analysis.eligibleGrades.length > 0 && (
-                      <div className="rounded-lg border border-border-secondary overflow-hidden max-h-[250px] overflow-y-auto">
+                      <div className="rounded-lg border border-border-secondary overflow-hidden max-h-64 overflow-y-auto">
                         <table className="w-full text-sm">
                           <thead className="bg-surface-secondary sticky top-0">
                             <tr>
@@ -265,7 +265,7 @@ export function FinalizationWizard({
                     <p className="text-sm font-semibold text-[rgb(var(--state-danger-fg))] ">
                       This action cannot be undone
                     </p>
-                    <p className="text-sm text-[rgb(var(--state-danger-fg))] dark:text-red-300 mt-1">
+                    <p className="text-sm text-[rgb(var(--state-danger-fg))] text-[rgb(var(--state-danger-fg))] mt-1">
                       You are about to finalize <strong>{analysis.eligibleGrades.length}</strong> grade(s).
                       Finalized grades are locked and cannot be modified.
                     </p>

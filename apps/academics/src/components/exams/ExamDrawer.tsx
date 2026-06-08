@@ -248,7 +248,7 @@ export function ExamDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex-shrink-0">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)] flex-shrink-0">
                       <ClipboardList className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
                     </div>
                     <h2 id="exam-drawer-title" className="text-lg font-semibold text-text-primary truncate">
@@ -340,7 +340,7 @@ export function ExamDrawer({
                       <button
                         type="submit"
                         disabled={isPending}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                       >
                         {isPending ? (
                           <>
@@ -436,10 +436,10 @@ function GradeLevelsField({
                       aria-pressed={selected}
                       className={[
                         'px-3 py-1.5 text-sm font-medium rounded-full border transition-colors',
-                        'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+                        'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]',
                         selected
-                          ? 'bg-purple-600 text-[rgb(var(--action-primary-fg))] border-purple-600'
-                          : 'bg-surface-primary text-text-secondary border-border-primary hover:border-purple-400 hover:text-text-primary',
+                          ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] border-[rgb(var(--border-focus))]'
+                          : 'bg-surface-primary text-text-secondary border-border-primary hover:border-[rgb(var(--border-focus))] hover:text-text-primary',
                         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
                       ].join(' ')}
                     >

@@ -58,9 +58,9 @@ function getGradeColor(percentage: number): string {
 
 function getGradeBg(percentage: number): string {
   if (percentage >= 90) return 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]'
-  if (percentage >= 80) return 'bg-blue-50 dark:bg-[rgb(var(--state-info-bg)/0.18)]'
+  if (percentage >= 80) return 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]'
   if (percentage >= 70) return 'bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10'
-  if (percentage >= 60) return 'bg-orange-50 dark:bg-[rgb(var(--state-warning-fg))]/10'
+  if (percentage >= 60) return 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/10'
   return 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]'
 }
 
@@ -301,7 +301,7 @@ export function GradebookGrid({
             {assignmentColumns.map((col) => (
               <th
                 key={col.name}
-                className="px-3 py-3 text-center font-medium text-text-secondary min-w-[100px] border-r border-border-secondary group relative"
+                className="px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
                 title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
               >
                 <div className="truncate max-w-32">{col.name}</div>
@@ -312,7 +312,7 @@ export function GradebookGrid({
             ))}
             {/* Add Assignment column */}
             {canEdit && onAddAssignment && (
-              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-[60px]">
+              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-16">
                 <button
                   type="button"
                   onClick={onAddAssignment}
@@ -324,10 +324,10 @@ export function GradebookGrid({
               </th>
             )}
             {/* Overall Grade */}
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-[100px] bg-surface-hover">
+            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
               Overall
             </th>
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-[80px] bg-surface-hover">
+            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
               Letter
             </th>
           </tr>
@@ -397,7 +397,7 @@ export function GradebookGrid({
                             }
                             onBlur={() => handleBlur(student, aName, editingCell.value)}
                             onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                            className="w-16 px-1.5 py-1 bg-white dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
+                            className="w-16 px-1.5 py-1 bg-[rgb(var(--surface-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
                             min={0}
                             step="any"
                           />
@@ -434,7 +434,7 @@ export function GradebookGrid({
                           }
                           onBlur={() => handleBlur(student, aName, editingCell.value)}
                           onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                          className="w-16 px-1.5 py-1 bg-white dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
+                          className="w-16 px-1.5 py-1 bg-[rgb(var(--surface-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
                           min={0}
                           step="any"
                         />

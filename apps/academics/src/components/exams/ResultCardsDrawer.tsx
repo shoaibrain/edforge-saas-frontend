@@ -115,7 +115,7 @@ function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
         published
           ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 '
-          : 'bg-[rgb(var(--surface-tertiary))] text-gray-700 dark:bg-gray-500/20 dark:text-gray-300'
+          : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] bg-[rgb(var(--surface-tertiary))] '
       }`}
     >
       {published ? <Lock className="w-3 h-3" /> : null}
@@ -312,13 +312,13 @@ function ReportCardDetail({
                 onChange={(e) => setConduct(e.target.value)}
                 rows={2}
                 placeholder="Conduct note…"
-                className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
               <button
                 type="button"
                 onClick={handleSaveConduct}
                 disabled={conductMutation.isPending || conduct === (card.conduct ?? '')}
-                className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700 disabled:opacity-50"
+                className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))] disabled:opacity-50"
               >
                 {conductMutation.isPending ? 'Saving…' : 'Save conduct'}
               </button>
@@ -338,13 +338,13 @@ function ReportCardDetail({
                 onChange={(e) => setRemark(e.target.value)}
                 rows={2}
                 placeholder="Class-teacher remark…"
-                className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
               <button
                 type="button"
                 onClick={handleSaveRemark}
                 disabled={remarkMutation.isPending || remark === (card.classTeacherRemark ?? '')}
-                className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-purple-700 disabled:opacity-50"
+                className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))] disabled:opacity-50"
               >
                 {remarkMutation.isPending ? 'Saving…' : 'Save remark'}
               </button>
@@ -374,7 +374,7 @@ function ReportCardDetail({
               type="button"
               onClick={handlePublish}
               disabled={publishMutation.isPending}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-success-fg))] rounded-lg hover:brightness-95 transition-colors disabled:opacity-50"
             >
               {publishMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
               Publish
@@ -599,7 +599,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
               <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex-shrink-0">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-success-bg)/0.18)] to-[rgb(var(--state-success-bg)/0.10)] flex-shrink-0">
                       <ClipboardList className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />
                     </div>
                     <div className="min-w-0">

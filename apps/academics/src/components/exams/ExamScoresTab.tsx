@@ -586,7 +586,7 @@ export function ExamScoresTab({
               diffs.changes.length === 0 ||
               diffs.invalidCount > 0
             }
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
           >
             {bulkMutation.isPending ? (
               <>

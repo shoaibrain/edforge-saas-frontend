@@ -395,7 +395,7 @@ export function AssignmentEditor({
                 ))}
               </div>
             ) : (
-              <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary max-h-[300px] overflow-y-auto">
+              <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary max-h-72 overflow-y-auto">
                 {students.map((student) => (
                   <div
                     key={student.studentId}

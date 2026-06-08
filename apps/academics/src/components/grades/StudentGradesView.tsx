@@ -40,7 +40,7 @@ function getLetterGradeColor(grade: string): string {
 
 function getGpaBadge(gpa: number): { bg: string; text: string } {
   if (gpa >= 3.5) return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-success-fg))] ' }
-  if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-blue-700 dark:text-blue-400' }
+  if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-[rgb(var(--state-info-fg))]' }
   if (gpa >= 2.0) return { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20', text: 'text-[rgb(var(--state-warning-fg))]' }
   return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] ' }
 }
