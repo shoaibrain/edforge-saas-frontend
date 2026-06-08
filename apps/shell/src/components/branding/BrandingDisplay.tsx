@@ -119,7 +119,7 @@ export function BrandingDisplay({ data }: BrandingDisplayProps) {
 
       {/* Version footer — opaque UUID for ops debugging only */}
       {branding.brandingVersionId && (
-        <p className="text-[10px] text-[rgb(var(--text-tertiary))] font-mono text-center pt-2">
+        <p className="text-xs text-[rgb(var(--text-tertiary))] font-mono text-center pt-2">
           {t('versionLabel')}: {branding.brandingVersionId}
         </p>
       )}

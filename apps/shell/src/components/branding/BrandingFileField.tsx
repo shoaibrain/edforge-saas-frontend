@@ -345,7 +345,7 @@ function BrandingFileFieldInner({
 
       {justUploaded && !errorMessage && (
         <p
-          className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1"
+          className="text-xs text-[rgb(var(--state-success-fg))] flex items-center gap-1"
           role="status"
         >
           <CheckCircle2 className="w-3 h-3" />
@@ -354,13 +354,13 @@ function BrandingFileFieldInner({
       )}
 
       {errorMessage && (
-        <p id={`${id}-err`} className="text-xs text-red-500 flex items-start gap-1" role="alert">
+        <p id={`${id}-err`} className="text-xs text-[rgb(var(--state-danger-fg))] flex items-start gap-1" role="alert">
           <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
           <span>{errorMessage}</span>
         </p>
       )}
 
-      <p id={`${id}-help`} className="text-[10px] text-[rgb(var(--text-tertiary))]">
+      <p id={`${id}-help`} className="text-xs text-[rgb(var(--text-tertiary))]">
         {t('form.upload.constraints', {
           allowed: allowlist.map(labelMime).join(', '),
           max: formatBytes(maxBytes),

@@ -275,9 +275,9 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
   }
 
   const inputBase =
-    'w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:opacity-50'
+    'w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50'
   const labelBase = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5'
-  const errorBase = 'mt-1 text-xs text-red-500'
+  const errorBase = 'mt-1 text-xs text-[rgb(var(--state-danger-fg))]'
 
   return (
     <FormProvider {...methods}>
@@ -480,7 +480,7 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
           <button
             type="submit"
             disabled={mutation.isPending || !isDirty}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
           >
             {mutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
