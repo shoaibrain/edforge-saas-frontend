@@ -23,14 +23,14 @@ export default function PeoplePlaceholder() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="p-6 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-start gap-4"
+        className="p-6 rounded-2xl bg-[rgb(var(--action-primary-bg))]/10 border border-[rgb(var(--state-info-border)/0.35)] flex items-start gap-4"
       >
-        <Users className="w-6 h-6 text-cyan-500 flex-shrink-0" />
+        <Users className="w-6 h-6 text-[rgb(var(--state-info-fg))] flex-shrink-0" />
         <div>
-          <h4 className="font-semibold text-cyan-600 dark:text-cyan-400 mb-1">
+          <h4 className="font-semibold text-[rgb(var(--state-info-fg))]  mb-1">
             People Federated Module
           </h4>
-          <p className="text-cyan-700  text-sm">
+          <p className="text-[rgb(var(--state-info-fg))]  text-sm">
             This placeholder will be replaced with the People remote module containing
             Staff Management, Parent Portal, Departments, and Communications.
           </p>

@@ -89,7 +89,7 @@ export function SchoolTransitionOverlay() {
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] dark:bg-cyan-400"
+                      className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] bg-[rgb(var(--action-primary-bg-hover))]"
                       animate={{ opacity: [0.3, 1, 0.3] }}
                       transition={{
                         duration: 0.8,

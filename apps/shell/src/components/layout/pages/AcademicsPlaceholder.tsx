@@ -169,7 +169,7 @@ function StatCard({ stat, index }: StatCardProps) {
         <CardContent className="p-5">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/10 to-[rgb(var(--action-primary-bg-hover))]/10">
-              <Icon className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+              <Icon className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] " />
             </div>
             <div className="flex-1">
               <p className="text-sm text-[rgb(var(--text-tertiary))]">{stat.label}</p>
@@ -177,7 +177,7 @@ function StatCard({ stat, index }: StatCardProps) {
               <p
                 className={`text-xs mt-1 ${
                   stat.trend === 'up'
-                    ? 'text-emerald-600 dark:text-emerald-400'
+                    ? 'text-[rgb(var(--state-success-fg))] '
                     : stat.trend === 'down'
                       ? 'text-[rgb(var(--state-danger-fg))] '
                       : 'text-[rgb(var(--text-tertiary))]'
@@ -198,10 +198,10 @@ function StatCard({ stat, index }: StatCardProps) {
 // ============================================================================
 
 const colorClasses = {
-  teal: 'from-[rgb(var(--action-primary-bg))]/10 to-teal-500/5 hover:from-[rgb(var(--action-primary-bg))]/20 hover:to-teal-500/10',
-  cyan: 'from-cyan-500/10 to-[rgb(var(--action-primary-bg-hover))]/5 hover:from-cyan-500/20 hover:to-[rgb(var(--action-primary-bg-hover))]/10',
+  teal: 'from-[rgb(var(--action-primary-bg))]/10 to-[rgb(var(--state-info-bg)/0.08)] hover:from-[rgb(var(--action-primary-bg))]/20 hover:to-[rgb(var(--state-info-bg)/0.14)]',
+  cyan: 'from-[rgb(var(--state-info-bg)/0.14)] to-[rgb(var(--action-primary-bg-hover))]/5 hover:from-[rgb(var(--state-info-bg)/0.18)] hover:to-[rgb(var(--action-primary-bg-hover))]/10',
   golden: 'from-amber-500/10 to-amber-500/5 hover:from-amber-500/20 hover:to-amber-500/10',
-  aqua: 'from-emerald-500/10 to-emerald-500/5 hover:from-emerald-500/20 hover:to-emerald-500/10',
+  aqua: 'from-[rgb(var(--state-success-bg)/0.14)] to-[rgb(var(--state-success-bg)/0.08)] hover:from-[rgb(var(--state-success-bg)/0.18)] hover:to-[rgb(var(--state-success-bg)/0.14)]',
 }
 
 interface ActionCardProps {
@@ -219,18 +219,18 @@ function ActionCardComponent({ card, index, onClick }: ActionCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 + index * 0.05 }}
       onClick={onClick}
-      className={`group p-6 rounded-2xl bg-gradient-to-br ${colorClasses[card.color]} border border-[rgb(var(--border-primary))] hover:border-teal-500 hover:shadow-lg transition-all duration-200 text-left w-full`}
+      className={`group p-6 rounded-2xl bg-gradient-to-br ${colorClasses[card.color]} border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))] hover:shadow-lg transition-all duration-200 text-left w-full`}
     >
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-[rgb(var(--surface-secondary))]">
-          <Icon className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+          <Icon className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">
               {card.title}
             </h3>
-            <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--action-secondary-fg))] group-hover:translate-x-1 transition-all" />
           </div>
           <p className="text-sm text-[rgb(var(--text-tertiary))] line-clamp-2">
             {card.description}
@@ -302,11 +302,11 @@ export default function AcademicsPlaceholder() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="p-6 rounded-2xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/5 via-cyan-500/5 to-teal-500/5 border border-teal-500/20"
+        className="p-6 rounded-2xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/5 via-[rgb(var(--state-info-bg)/0.08)] to-[rgb(var(--state-info-bg)/0.08)] border border-[rgb(var(--border-focus))]/20"
       >
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-xl bg-[rgb(var(--action-primary-bg))]/10">
-            <TrendingUp className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+            <TrendingUp className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
             <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1">

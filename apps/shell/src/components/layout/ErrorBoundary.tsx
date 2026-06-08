@@ -84,7 +84,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
             onClick={isDeploymentError ? () => window.location.reload() : resetError}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-xl',
-              'bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg))]  dark:hover:bg-cyan-600',
+              'bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg))]  dark:hover:bg-[rgb(var(--action-primary-bg-hover))]',
               'text-[rgb(var(--action-primary-fg))] font-medium text-sm',
               'transition-colors duration-150',
               'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:ring-offset-2'

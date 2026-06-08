@@ -140,9 +140,9 @@ function QuickActionPillButton({ action, onClick }: QuickActionPillProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] border border-[rgb(var(--border-primary))] hover:border-teal-500 transition-all text-sm font-medium text-[rgb(var(--text-primary))]"
+      className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))] transition-all text-sm font-medium text-[rgb(var(--text-primary))]"
     >
-      <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+      <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
       {action.label}
     </button>
   )
@@ -167,18 +167,18 @@ function SettingsCategoryCard({ category, index, onClick }: SettingsCategoryCard
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 + index * 0.05 }}
       onClick={onClick}
-      className="group p-6 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500 hover:shadow-lg transition-all duration-200 text-left w-full"
+      className="group p-6 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))] hover:shadow-lg transition-all duration-200 text-left w-full"
     >
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/10 to-[rgb(var(--action-primary-bg-hover))]/10 group-hover:from-[rgb(var(--action-primary-bg))]/20 group-hover:to-[rgb(var(--action-primary-bg-hover))]/20 transition-colors">
-          <Icon className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+          <Icon className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">
               {category.title}
             </h3>
-            <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--action-secondary-fg))] group-hover:translate-x-1 transition-all" />
           </div>
           <p className="text-sm text-[rgb(var(--text-tertiary))] mb-3">
             {category.description}
@@ -270,7 +270,7 @@ export default function SettingsPlaceholder() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
-            className="w-full pl-12 pr-4 py-3 rounded-full bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] transition-all"
+            className="w-full pl-12 pr-4 py-3 rounded-full bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] focus:border-[rgb(var(--border-focus))] focus:ring-2 focus:ring-[rgb(var(--border-focus))]/20 text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] transition-all"
           />
         </motion.div>
       </motion.div>
@@ -311,7 +311,7 @@ export default function SettingsPlaceholder() {
         className="text-center text-sm text-[rgb(var(--text-tertiary))]"
       >
         Your data is protected and managed according to our{' '}
-        <a href="/privacy" className="text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400 hover:underline">
+        <a href="/privacy" className="text-[rgb(var(--action-secondary-fg))]  hover:underline">
           privacy policy
         </a>
         .

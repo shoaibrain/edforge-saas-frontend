@@ -68,10 +68,10 @@ export default function EdFiPlaceholder() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 + index * 0.05 }}
-              className="flex items-center justify-between p-4 rounded-xl bg-surface-tertiary hover:bg-[rgb(var(--action-primary-bg))]/10 border border-transparent hover:border-teal-500 transition-all duration-200"
+              className="flex items-center justify-between p-4 rounded-xl bg-surface-tertiary hover:bg-[rgb(var(--action-primary-bg))]/10 border border-transparent hover:border-[rgb(var(--border-focus))] transition-all duration-200"
             >
               <span className="font-medium text-text-primary">{action}</span>
-              <ArrowRight className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
+              <ArrowRight className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
             </motion.button>
           ))}
         </CardContent>
@@ -82,14 +82,14 @@ export default function EdFiPlaceholder() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="p-6 rounded-2xl bg-[rgb(var(--action-primary-bg))]/10 border border-teal-500/20 flex items-start gap-4"
+        className="p-6 rounded-2xl bg-[rgb(var(--action-primary-bg))]/10 border border-[rgb(var(--border-focus))]/20 flex items-start gap-4"
       >
-        <Cloud className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400 flex-shrink-0" />
+        <Cloud className="w-6 h-6 text-[rgb(var(--action-secondary-fg))]  flex-shrink-0" />
         <div>
-          <h4 className="font-semibold text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400 mb-1">
+          <h4 className="font-semibold text-[rgb(var(--action-secondary-fg))]  mb-1">
             Module Federation Placeholder
           </h4>
-          <p className="text-[rgb(var(--state-info-fg))] dark:text-teal-300 text-sm">
+          <p className="text-[rgb(var(--state-info-fg))] text-[rgb(var(--action-secondary-fg))] text-sm">
             This is a placeholder for the Ed-Fi federated module. In production, this component
             will be loaded dynamically from the Ed-Fi remote at runtime.
           </p>

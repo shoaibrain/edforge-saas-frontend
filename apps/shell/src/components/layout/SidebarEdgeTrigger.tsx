@@ -85,7 +85,7 @@ export function SidebarEdgeTrigger({ collapsed, onToggle }: SidebarEdgeTriggerPr
               'border border-[rgb(var(--border-secondary))]',
               'shadow-sm',
               'text-[rgb(var(--text-tertiary))]',
-              'hover:bg-[rgb(var(--action-primary-bg))] dark:hover:bg-cyan-500',
+              'hover:bg-[rgb(var(--action-primary-bg))] dark:hover:bg-[rgb(var(--action-primary-bg-hover))]',
               'hover:text-[rgb(var(--action-primary-fg))]',
               'hover:border-transparent',
               'transition-colors duration-150',

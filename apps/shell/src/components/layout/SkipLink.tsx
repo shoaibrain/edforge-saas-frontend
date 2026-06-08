@@ -32,10 +32,10 @@ export function SkipLink({
         'focus:not-sr-only',
         'focus:fixed focus:top-4 focus:left-4 focus:z-[100]',
         'focus:px-4 focus:py-2',
-        'focus:bg-[rgb(var(--action-primary-bg))] dark:focus:bg-cyan-500',
+        'focus:bg-[rgb(var(--action-primary-bg))] dark:focus:bg-[rgb(var(--action-primary-bg))]',
         'focus:text-[rgb(var(--action-primary-fg))] focus:font-medium focus:text-sm',
         'focus:rounded-lg focus:shadow-lg',
-        'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500',
+        'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[rgb(var(--border-focus))]',
         'transition-all duration-200',
         className
       )}

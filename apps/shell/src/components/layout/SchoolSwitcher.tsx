@@ -145,7 +145,7 @@ export function SchoolSwitcher() {
               placeholder="Find School..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-teal-500 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
           </div>
         </div>
@@ -185,7 +185,7 @@ export function SchoolSwitcher() {
                   >
                     <div className={cn(
                       'w-10 h-10 rounded-lg overflow-hidden flex-shrink-0',
-                      isSelected ? 'ring-2 ring-teal-500' : 'ring-1 ring-[rgb(var(--border-primary))]'
+                      isSelected ? 'ring-2 ring-[rgb(var(--border-focus))]' : 'ring-1 ring-[rgb(var(--border-primary))]'
                     )}>
                       <img
                         src={getSchoolAvatar(school.name, { size: 40 })}
@@ -231,7 +231,7 @@ export function SchoolSwitcher() {
               <button
                 onClick={handleCreateSchool}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400 rounded-xl transition-colors font-medium',
+                  'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-[rgb(var(--action-secondary-fg))]  rounded-xl transition-colors font-medium',
                   active && 'bg-[rgb(var(--action-primary-bg))]/10'
                 )}
               >
@@ -288,9 +288,9 @@ export function SchoolSwitcher() {
           className={cn(
             'w-80 rounded-2xl z-50 overflow-hidden',
             'bg-[rgb(var(--surface-secondary))]/85 backdrop-blur-xl',
-            'border border-white/10 dark:border-white/5',
+            'border border-[rgb(var(--border-secondary))] ',
             'shadow-xl shadow-black/10 dark:shadow-black/40',
-            'ring-1 ring-inset ring-white/5',
+            'ring-1 ring-inset ring-[rgb(var(--border-secondary))]',
             '[--anchor-gap:8px]'
           )}
         >
