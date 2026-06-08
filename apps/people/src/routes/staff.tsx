@@ -23,13 +23,17 @@ import {
 import { useTranslation } from '@edforge/i18n'
 import {
   Container,
+  ErrorState,
   focusRing,
   focusRingInset,
   Inline,
+  Input,
   PageHeader,
+  Select,
   StatCard,
   Text,
   WidgetErrorBoundaryV2,
+  type SelectOption,
 } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
@@ -250,36 +254,30 @@ export default function StaffPage() {
   if (error && !isLoading) {
     const { message, isRetryable } = parseApiError(error)
     return (
-      <div data-v2 style={{ padding: '24px 28px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px', textAlign: 'center' }}>
-          <Users style={{ width: 48, height: 48, color: 'var(--v2-text-hint)', marginBottom: 12 }} />
-          <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--v2-text-primary)', marginBottom: 8 }}>
-            {t('error.failedToLoad')}
-          </h3>
-          <p style={{ fontSize: 12, color: 'var(--v2-text-muted)', marginBottom: 16 }}>{message}</p>
-          {isRetryable && (
-            <button
-              type="button"
-              onClick={() => refetch()}
-              style={{
-                height: 34,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.09)',
-                borderRadius: 7,
-                padding: '0 14px',
-                fontSize: 12,
-                fontWeight: 500,
-                color: '#9aa0b8',
-                cursor: 'pointer',
-              }}
-            >
-              {t('error.tryAgain')}
-            </button>
-          )}
-        </div>
-      </div>
+      <Container size="full" padding="lg" className="py-6">
+        <ErrorState
+          title={t('error.failedToLoad')}
+          description={message}
+          action={
+            isRetryable ? (
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className={`inline-flex h-9 items-center rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3.5 text-xs font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))] ${focusRing}`}
+              >
+                {t('error.tryAgain')}
+              </button>
+            ) : undefined
+          }
+        />
+      </Container>
     )
   }
+
+  const roleOptions: SelectOption[] = ROLE_FILTER_VALUES.map((role) => ({
+    value: role,
+    label: t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role }),
+  }))
 
   const pageActions = canCreate ? (
     <div className="relative" ref={dropdownRef}>
@@ -415,40 +413,46 @@ export default function StaffPage() {
         ))}
 
         {/* Search input */}
-        <div className="relative flex min-w-52 flex-1 items-center">
-          <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-text-tertiary" />
-          <input
+        <div className="flex min-w-52 flex-1 items-center">
+          <Input
+            size="sm"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or email..."
-            className={`h-8 w-full rounded-lg border border-border-secondary bg-surface-secondary pl-9 pr-3 text-xs text-text-primary placeholder:text-text-tertiary ${focusRingInset}`}
+            prefix={<Search className="h-3.5 w-3.5" />}
+            aria-label="Search staff by name or email"
           />
         </div>
 
         {/* Role dropdown */}
-        <select
-          value={filters.role || ''}
-          onChange={(e) => {
-            updateFilter('role', (e.target.value as StaffRole) || undefined)
-            setQuickFilter('all')
-          }}
-          className={`h-8 cursor-pointer rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-secondary ${focusRingInset}`}
-        >
-          <option value="">All Roles</option>
-          {ROLE_FILTER_VALUES.map((role) => (
-            <option key={role} value={role}>
-              {t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })}
-            </option>
-          ))}
-        </select>
+        <div className="w-44">
+          <Select
+            size="sm"
+            aria-label="Filter by role"
+            options={roleOptions}
+            value={filters.role ?? null}
+            onChange={(value) => {
+              updateFilter('role', (value as StaffRole) || undefined)
+              setQuickFilter('all')
+            }}
+            placeholder="All Roles"
+            clearable
+          />
+        </div>
 
         {/* Department dropdown */}
-        <select
-          className={`h-8 cursor-pointer rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-secondary ${focusRingInset}`}
-        >
-          <option value="">All Departments</option>
-        </select>
+        <div className="w-44">
+          <Select
+            size="sm"
+            aria-label="Filter by department"
+            options={[]}
+            value={null}
+            onChange={() => {}}
+            placeholder="All Departments"
+            disabled
+          />
+        </div>
 
         {/* Export CSV */}
         <button

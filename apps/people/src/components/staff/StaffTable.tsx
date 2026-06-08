@@ -9,7 +9,7 @@
 import { useMemo, type MouseEvent, type ReactNode } from 'react'
 import { UsersRound, Eye, Pencil, MoreVertical } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
-import { focusRingInset, TanstackDataTable, type ColumnDef } from '@edforge/ui'
+import { focusRingInset, StatusBadge, TanstackDataTable, type ColumnDef, type StatusTone } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleChip } from './StaffRoleChip'
 import { AccessChip } from './AccessChip'
@@ -31,13 +31,13 @@ interface StaffTableProps {
 // EMPLOYMENT TYPE BADGE COLORS
 // ============================================================================
 
-const EMPLOYMENT_STYLES: Record<string, string> = {
-  active: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
-  on_leave: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
-  suspended: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
-  terminated: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
-  retired: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
-  resigned: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
+const EMPLOYMENT_TONE: Record<string, StatusTone> = {
+  active: 'neutral',
+  on_leave: 'warning',
+  suspended: 'warning',
+  terminated: 'danger',
+  retired: 'neutral',
+  resigned: 'neutral',
 }
 
 function getEmploymentLabel(status?: string): string {
@@ -74,7 +74,7 @@ export function StaffTable({
         size: 280,
         cell: ({ row }) => {
           const s = row.original
-          const empStyle = EMPLOYMENT_STYLES[s.employmentStatus] || EMPLOYMENT_STYLES.active
+          const empTone = EMPLOYMENT_TONE[s.employmentStatus] ?? 'neutral'
           return (
             <div className="flex items-center gap-2.5">
               <img
@@ -85,14 +85,12 @@ export function StaffTable({
               />
               <div className="flex min-w-0 flex-col gap-0.5">
                 <div className="flex items-center gap-1">
-                  <span className="truncate text-xs font-medium text-[var(--v2-text-primary)]">
+                  <span className="truncate text-xs font-medium text-[rgb(var(--text-primary))]">
                     {s.firstName} {s.lastSurname}
                   </span>
-                  <span className={`rounded px-1.5 py-px text-xs font-medium ${empStyle}`}>
-                    {getEmploymentLabel(s.employmentStatus)}
-                  </span>
+                  <StatusBadge tone={empTone}>{getEmploymentLabel(s.employmentStatus)}</StatusBadge>
                 </div>
-                <span className="truncate text-xs text-[var(--v2-text-ghost)]">
+                <span className="truncate text-xs text-[rgb(var(--text-tertiary))]">
                   {s.email}
                 </span>
               </div>
@@ -114,12 +112,9 @@ export function StaffTable({
           const status = row.original.employmentStatus
           const isActive = status === 'active'
           return (
-            <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-xs font-medium ${isActive ? 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]' : 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]'}`}>
-              <span
-                className={`h-1.5 w-1.5 shrink-0 rounded-full ${isActive ? 'bg-[var(--v2-success)]' : 'bg-[var(--v2-text-hint)]'}`}
-              />
-              {isActive ? 'Active' : (status?.replace('_', ' ') || 'Unknown')}
-            </span>
+            <StatusBadge tone={isActive ? 'success' : 'neutral'} dot>
+              {isActive ? 'Active' : status?.replace('_', ' ') || 'Unknown'}
+            </StatusBadge>
           )
         },
       },
@@ -128,7 +123,7 @@ export function StaffTable({
         header: t('tableHeaders.hired'),
         size: 120,
         cell: ({ row }) => (
-          <span className="text-xs text-[var(--v2-text-muted)]">
+          <span className="text-xs text-[rgb(var(--text-tertiary))]">
             {formatDate(row.original.hireDate)}
           </span>
         ),
@@ -140,7 +135,7 @@ export function StaffTable({
         enableSorting: false,
         cell: ({ row }) => (
           <span
-            className={`text-xs ${row.original.departmentName ? 'text-[var(--v2-text-muted)]' : 'text-[var(--v2-text-ghost)]'}`}
+            className={`text-xs ${row.original.departmentName ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}
           >
             {row.original.departmentName || '—'}
           </span>
@@ -227,7 +222,7 @@ function ActionBtn({
       title={title}
       aria-label={title}
       onClick={onClick}
-      className={`flex h-7 w-7 items-center justify-center rounded-md text-[var(--v2-text-hint)] transition-colors hover:bg-[rgb(var(--background-tertiary))] hover:text-[var(--v2-text-secondary)] ${focusRingInset}`}
+      className={`flex h-7 w-7 items-center justify-center rounded-md text-[rgb(var(--text-tertiary))] transition-colors hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-secondary))] ${focusRingInset}`}
     >
       {icon}
     </button>
