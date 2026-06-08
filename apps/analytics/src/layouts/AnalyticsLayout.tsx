@@ -6,7 +6,7 @@
  * MFE modules should only render their content.
  */
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 export function AnalyticsLayout({ children }: { children: ReactNode }) {
     // Shell's AppShell provides the layout (Header + Sidebar)
