@@ -1,24 +1,27 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '../utils'
+import { cn, focusRing } from '../utils'
 
 const buttonVariants = cva(
   // Base styles — use theme-aware focus ring
-  'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+  cn(
+    'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none',
+    focusRing
+  ),
   {
     variants: {
       variant: {
         primary:
-          'bg-teal-600 text-white hover:bg-teal-700 active:bg-teal-800 shadow-sm',
+          'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] active:bg-[rgb(var(--action-primary-bg-active))] shadow-sm',
         secondary:
-          'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-elevated))] active:opacity-80',
+          'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-elevated))] active:opacity-80',
         outline:
-          'border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-tertiary))] active:opacity-80',
+          'border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] active:opacity-80',
         ghost:
-          'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
+          'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
         danger:
-          'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
-        link: 'text-teal-600 underline-offset-4 hover:underline',
+          'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95 active:brightness-90 shadow-sm',
+        link: 'text-[rgb(var(--action-secondary-fg))] underline-offset-4 hover:underline',
       },
       size: {
         sm: 'h-8 px-3 text-sm rounded-lg gap-1.5',

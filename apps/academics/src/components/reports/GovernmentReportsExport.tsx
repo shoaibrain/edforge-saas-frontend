@@ -312,7 +312,7 @@ export function GovernmentReportsExport() {
                   style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-primary)' }}
                 />
                 {academicYearBs.length > 0 && !yearValid && (
-                  <span className="text-[11px]" style={{ color: 'var(--v2-status-overdue)' }}>
+                  <span className="text-xs" style={{ color: 'var(--v2-status-overdue)' }}>
                     Enter a 4-digit BS year, e.g. 2083.
                   </span>
                 )}
@@ -323,7 +323,7 @@ export function GovernmentReportsExport() {
 
         {templateId === 'IEMIS_NPL_CEHRD_FLASH_II' && (
           <div
-            className="mt-4 rounded-lg border p-3 text-[12px] flex items-start gap-2"
+            className="mt-4 rounded-lg border p-3 text-xs flex items-start gap-2"
             style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
           >
             <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'var(--v2-status-late)' }} />
@@ -339,7 +339,7 @@ export function GovernmentReportsExport() {
 
         {existingReport && (
           <div
-            className="mt-3 text-[12px] flex items-start gap-2"
+            className="mt-3 text-xs flex items-start gap-2"
             style={{ color: 'var(--v2-text-tertiary)' }}
           >
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
@@ -354,7 +354,7 @@ export function GovernmentReportsExport() {
           <button
             onClick={handlePreflight}
             disabled={!yearValid || preflightMut.isPending}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
             style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
           >
             {preflightMut.isPending ? (
@@ -367,7 +367,7 @@ export function GovernmentReportsExport() {
           <button
             onClick={handleGenerate}
             disabled={!canGenerate}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
             style={{ background: 'var(--v2-brand-primary)', color: '#fff' }}
           >
             {createMut.isPending ? (
@@ -414,7 +414,7 @@ export function GovernmentReportsExport() {
                   key={opt.value}
                   onClick={() => setTemplateFilter(opt.value)}
                   aria-pressed={active}
-                  className="px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors"
+                  className="px-2.5 py-1 text-xs font-medium rounded-md border transition-colors"
                   style={{
                     background: active ? 'var(--v2-brand-primary)' : 'transparent',
                     borderColor: active ? 'var(--v2-brand-primary)' : 'var(--v2-border-default)',
@@ -442,7 +442,7 @@ export function GovernmentReportsExport() {
           groupedHistory.map((group) => (
             <div key={group.year}>
               <div
-                className="px-5 py-1.5 text-[11px] font-semibold uppercase tracking-wide border-b"
+                className="px-5 py-1.5 text-xs font-semibold uppercase tracking-wide border-b"
                 style={{
                   borderColor: 'var(--v2-border-default)',
                   color: 'var(--v2-text-tertiary)',
@@ -462,7 +462,7 @@ export function GovernmentReportsExport() {
                       <div className="text-sm font-medium truncate" style={{ color: 'var(--v2-text-primary)' }}>
                         {TEMPLATE_LABELS[snap.templateId]}
                       </div>
-                      <div className="text-[11px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
+                      <div className="text-xs mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
                         {typeof snap.rowCount === 'number' ? `${snap.rowCount} rows · ` : ''}
                         {snap.generatedAt
                           ? `generated ${new Date(snap.generatedAt).toLocaleString()}`
@@ -470,7 +470,7 @@ export function GovernmentReportsExport() {
                         {snap.dryRun ? ' · dry-run' : ''}
                       </div>
                       {snap.status === 'failed' && snap.errorSummary && (
-                        <div className="text-[11px] mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
+                        <div className="text-xs mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
                           {snap.errorSummary}
                         </div>
                       )}
@@ -525,7 +525,7 @@ export function GovernmentReportsExport() {
 
         {/* ---- Operator guidance: the manual portal step ---- */}
         <div
-          className="px-5 py-3 border-t text-[12px] flex items-start gap-2"
+          className="px-5 py-3 border-t text-xs flex items-start gap-2"
           style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-tertiary)' }}
         >
           <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
@@ -557,7 +557,7 @@ function PageShell({ children, onBack }: { children: React.ReactNode; onBack: ()
     <div className="max-w-4xl mx-auto px-4 py-8">
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-1.5 text-[13px] transition-colors hover:opacity-80 mb-3"
+        className="inline-flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 mb-3"
         style={{ color: 'var(--v2-text-secondary)' }}
       >
         <ArrowLeft className="w-4 h-4" />
@@ -598,7 +598,7 @@ function RowButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
+      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
       style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
     >
       {icon}
@@ -611,7 +611,7 @@ function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshot
   const { errors, warnings, canProceed } = preflight
   return (
     <div
-      className="mt-4 rounded-lg border p-3 text-[13px]"
+      className="mt-4 rounded-lg border p-3 text-sm"
       style={{ borderColor: 'var(--v2-border-default)' }}
     >
       <div className="flex items-center gap-2 font-medium" style={{ color: 'var(--v2-text-primary)' }}>
@@ -636,7 +636,7 @@ function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshot
           ))}
         </ul>
       )}
-      <div className="mt-2 text-[11px]" style={{ color: 'var(--v2-text-tertiary)' }}>
+      <div className="mt-2 text-xs" style={{ color: 'var(--v2-text-tertiary)' }}>
         Validation confirms the school and academic year exist. Per-student field
         issues are reported on the report row during generation.
       </div>
@@ -687,18 +687,18 @@ function ActiveGenerationBanner({
           {failed && 'Generation failed'}
         </div>
         {stalledGenerating && (
-          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--v2-text-tertiary)' }}>
             This is unusual for a single school — it may have failed. Refresh to
             check the latest status.
           </div>
         )}
         {ready && empty && (
-          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-status-late)' }}>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--v2-status-late)' }}>
             This report has 0 students — double-check the academic year before submitting.
           </div>
         )}
         {failed && snapshot.errorSummary && (
-          <div className="text-[12px] mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--v2-status-overdue)' }}>
             {snapshot.errorSummary}
           </div>
         )}
@@ -707,7 +707,7 @@ function ActiveGenerationBanner({
         <button
           onClick={onRefresh}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
           style={{ borderColor: 'var(--v2-border-default)', color: 'var(--v2-text-secondary)' }}
         >
           {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
@@ -718,7 +718,7 @@ function ActiveGenerationBanner({
         <button
           onClick={onDownload}
           disabled={downloading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
           style={{ background: 'var(--v2-brand-primary)', color: '#fff' }}
         >
           {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -727,7 +727,7 @@ function ActiveGenerationBanner({
       )}
       <button
         onClick={onDismiss}
-        className="text-[12px] transition-colors hover:opacity-80"
+        className="text-xs transition-colors hover:opacity-80"
         style={{ color: 'var(--v2-text-tertiary)' }}
       >
         Dismiss

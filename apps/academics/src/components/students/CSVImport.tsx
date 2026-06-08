@@ -239,7 +239,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
   const invalidRows = parsedData.rows.filter((r) => r.errors.length > 0)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div
         className="w-full flex flex-col overflow-hidden"
         style={{
@@ -779,7 +779,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex items-center gap-1.5 text-white transition-all hover:opacity-90"
+                className="flex items-center gap-1.5 text-[rgb(var(--action-primary-fg))] transition-all hover:opacity-90"
                 style={{
                   background: '#1D9E75',
                   borderRadius: 8,
@@ -814,7 +814,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                     type="button"
                     onClick={handleImport}
                     disabled={validRows.length === 0 || !!rowLimitError}
-                    className="flex items-center gap-1.5 text-white transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 text-[rgb(var(--action-primary-fg))] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{
                       background: '#1D9E75',
                       borderRadius: 8,

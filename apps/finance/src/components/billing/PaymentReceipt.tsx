@@ -98,11 +98,11 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
       </div>
 
       {/* Receipt card */}
-      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-black">
+      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-[rgb(var(--text-primary))]">
         {/* Success header */}
         <div className="text-center mb-6 pb-6 border-b border-[rgb(var(--border-primary))] border-dashed">
-          <div className="inline-flex p-3 rounded-full bg-emerald-100 dark:bg-emerald-500/10 mb-3 print:hidden">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+          <div className="inline-flex p-3 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] mb-3 print:hidden">
+            <CheckCircle2 className="w-8 h-8 text-[rgb(var(--state-success-fg))]" />
           </div>
           <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">
             {t('receipt.title')}
@@ -174,7 +174,7 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
           {receipt.discountTotal > 0 && (
             <div className="flex justify-between">
               <span className="text-[rgb(var(--text-tertiary))]">{t('summary.discountTotal')}</span>
-              <span className="text-emerald-600">-{fmt(receipt.discountTotal)}</span>
+              <span className="text-[rgb(var(--state-success-fg))]">-{fmt(receipt.discountTotal)}</span>
             </div>
           )}
           {receipt.taxTotal > 0 && (

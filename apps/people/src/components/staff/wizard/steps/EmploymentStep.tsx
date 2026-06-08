@@ -150,9 +150,9 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="space-y-4 pl-8 border-l-2 border-teal-500/30"
+              className="space-y-4 pl-8 border-l-2 border-[rgb(var(--border-focus)/0.35)]"
             >
-              <div className="p-3 rounded-lg bg-teal-500/10 text-sm text-teal-700 dark:text-teal-300">
+              <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] text-sm text-[rgb(var(--state-info-fg))] ">
                 A Cognito account will be created with the email from Step 2
                 ({(data.email as string) || 'not set yet'}). A temporary password will be auto-generated.
               </div>

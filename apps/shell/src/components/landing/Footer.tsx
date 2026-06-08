@@ -47,7 +47,7 @@ export function Footer() {
     <footer
       className="w-full"
       style={{
-        backgroundColor: 'rgb(var(--surface-primary))',
+        backgroundColor: 'rgb(var(--background-primary))',
         borderTop: '1px solid rgb(var(--border-primary))',
       }}
     >

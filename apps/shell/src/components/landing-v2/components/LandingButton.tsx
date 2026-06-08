@@ -59,7 +59,7 @@ const VARIANT_STYLES: Record<LandingButtonVariant, string> = {
 const SIZE_STYLES: Record<LandingButtonSize, string> = {
   sm: 'px-4 py-2 text-sm',
   md: 'px-5 py-3 text-[14.5px]',
-  lg: 'px-6 py-3.5 text-[15px]',
+  lg: 'px-6 py-3.5 text-sm',
 }
 
 function composeClassName(

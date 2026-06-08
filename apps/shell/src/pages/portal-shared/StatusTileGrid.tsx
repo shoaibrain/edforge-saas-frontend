@@ -50,7 +50,7 @@ export function StatusTileGrid(props: StatusTileGridProps) {
               {props[key]}
             </p>
             <p
-              className="text-[10px] mt-0.5"
+              className="text-xs mt-0.5"
               style={{ color: 'var(--v2-text-muted)' }}
             >
               {t(i18nKey)}

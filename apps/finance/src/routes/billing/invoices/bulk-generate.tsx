@@ -48,7 +48,7 @@ export default function BulkInvoicesPage() {
       </div>
 
       {/* Form */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl p-6">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl p-6">
         <BulkInvoiceForm
           schoolId={schoolId}
           onComplete={() => navigate({ to: '/invoices' })}

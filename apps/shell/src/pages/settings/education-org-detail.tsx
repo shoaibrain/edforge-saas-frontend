@@ -49,15 +49,15 @@ const ORG_TYPE_META: Record<OrgType, { label: string; fullLabel: string; icon: L
     label: 'SEA',
     fullLabel: 'State Education Agency',
     icon: Landmark,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bgColor: 'bg-indigo-500/10',
+    color: 'text-[rgb(var(--state-info-fg))] ',
+    bgColor: 'bg-[rgb(var(--state-info-bg)/0.18)]',
   },
   lea: {
     label: 'LEA',
     fullLabel: 'Local Education Agency',
     icon: Building2,
-    color: 'text-teal-600 dark:text-teal-400',
-    bgColor: 'bg-teal-500/10',
+    color: 'text-[rgb(var(--action-secondary-fg))] ',
+    bgColor: 'bg-[rgb(var(--action-primary-bg))]/10',
   },
   esc: {
     label: 'ESC',
@@ -82,7 +82,7 @@ function InfoCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+    <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
       <div className="flex items-center gap-2 mb-4">
         <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
@@ -108,9 +108,9 @@ function FieldRow({ label, value }: { label: string; value?: string | number | n
 
 function ChildOrgItem({ node, onNavigate }: { node: HierarchyNode; onNavigate: (node: HierarchyNode) => void }) {
   const typeColors: Record<string, string> = {
-    localEducationAgency: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+    localEducationAgency: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  border-[rgb(var(--border-focus)/0.35)]',
     educationServiceCenter: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-    school: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+    school: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
   }
   const typeLabels: Record<string, string> = {
     localEducationAgency: 'LEA',
@@ -121,16 +121,16 @@ function ChildOrgItem({ node, onNavigate }: { node: HierarchyNode; onNavigate: (
   return (
     <button
       onClick={() => onNavigate(node)}
-      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors text-left"
+      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left"
     >
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border ${typeColors[node.type] || ''}`}>
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${typeColors[node.type] || ''}`}>
         {typeLabels[node.type] || node.type}
       </span>
       <span className="text-sm font-medium text-[rgb(var(--text-primary))] truncate flex-1">{node.name}</span>
       {node.edfiId !== undefined && (
-        <span className="text-[10px] text-[rgb(var(--text-tertiary))] font-mono">#{node.edfiId}</span>
+        <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">#{node.edfiId}</span>
       )}
-      <span className={`w-2 h-2 rounded-full ${node.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+      <span className={`w-2 h-2 rounded-full ${node.status === 'Active' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
     </button>
   )
 }
@@ -157,7 +157,7 @@ function TabButton({
       onClick={() => onSelect(id)}
       className={`relative px-4 py-2 text-sm font-medium transition-colors ${
         isActive
-          ? 'text-teal-600 dark:text-teal-400'
+          ? 'text-[rgb(var(--action-secondary-fg))] '
           : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
       }`}
       role="tab"
@@ -167,7 +167,7 @@ function TabButton({
       {isActive && (
         <motion.div
           layoutId="edorg-detail-tab"
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500 rounded-full"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))] rounded-full"
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         />
       )}
@@ -350,13 +350,13 @@ export default function EducationOrgDetailPage() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border ${meta.bgColor} ${meta.color}`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${meta.bgColor} ${meta.color}`}>
               {meta.label}
             </span>
-            <span className="text-[10px] text-[rgb(var(--text-tertiary))] font-mono">#{edfiId}</span>
+            <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">#{edfiId}</span>
             <span className="inline-flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-              <span className="text-[11px] text-[rgb(var(--text-tertiary))]">{status}</span>
+              <span className={`w-2 h-2 rounded-full ${status === 'Active' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
+              <span className="text-xs text-[rgb(var(--text-tertiary))]">{status}</span>
             </span>
           </div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] tracking-tight truncate">{name}</h1>
@@ -400,7 +400,7 @@ export default function EducationOrgDetailPage() {
                     href={orgData.webSite}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline inline-flex items-center gap-1"
+                    className="text-sm font-medium text-[rgb(var(--action-secondary-fg))]  hover:underline inline-flex items-center gap-1"
                   >
                     <Globe className="w-3.5 h-3.5" />
                     {orgData.webSite}
@@ -423,7 +423,7 @@ export default function EducationOrgDetailPage() {
                 {categories.map((cat, i) => (
                   <span
                     key={i}
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]"
+                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]"
                   >
                     {cat.educationOrganizationCategoryDescriptor}
                   </span>
@@ -437,8 +437,8 @@ export default function EducationOrgDetailPage() {
             <InfoCard title="Addresses" icon={MapPin}>
               <div className="space-y-3">
                 {addresses.map((addr, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
+                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
                       {addr.addressTypeDescriptor}
                     </p>
                     <p className="text-sm text-[rgb(var(--text-primary))]">
@@ -459,8 +459,8 @@ export default function EducationOrgDetailPage() {
             <InfoCard title="Telephones" icon={Phone}>
               <div className="grid grid-cols-2 gap-3">
                 {telephones.map((tel, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
+                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
                       {tel.institutionTelephoneNumberTypeDescriptor}
                     </p>
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tel.telephoneNumber}</p>
@@ -475,8 +475,8 @@ export default function EducationOrgDetailPage() {
             <InfoCard title="Identification Codes" icon={Hash}>
               <div className="grid grid-cols-2 gap-3">
                 {identificationCodes.map((code, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
+                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
                       {code.educationOrganizationIdentificationSystemDescriptor}
                     </p>
                     <p className="text-sm font-mono font-medium text-[rgb(var(--text-primary))]">{code.identificationCode}</p>
@@ -511,7 +511,7 @@ export default function EducationOrgDetailPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] divide-y divide-[rgb(var(--border-primary))]">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
             {schools.length > 0 ? (
               schools.map((s) => <ChildOrgItem key={s.id} node={s} onNavigate={handleChildNavigate} />)
             ) : (
@@ -530,7 +530,7 @@ export default function EducationOrgDetailPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] divide-y divide-[rgb(var(--border-primary))]">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
             {(orgType === 'sea' ? seaDirectChildren : nonSchoolChildren).map((child) => (
               <ChildOrgItem key={child.id} node={child} onNavigate={handleChildNavigate} />
             ))}

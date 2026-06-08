@@ -89,12 +89,12 @@ const STAFF_WIZARD_STEPS: WizardStep[] = [
 
 function StaffWizardHeader({ onCancel }: { onCancel: () => void }) {
   return (
-    <header className="sticky top-0 z-20 bg-[rgb(var(--surface-primary))] border-b border-[rgb(var(--border-primary))]">
+    <header className="sticky top-0 z-20 bg-[rgb(var(--background-primary))] border-b border-[rgb(var(--border-primary))]">
       <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={onCancel}
-            className="p-2 rounded-xl text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+            className="p-2 rounded-xl text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>

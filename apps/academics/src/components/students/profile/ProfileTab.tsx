@@ -226,7 +226,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
         <SectionHeader
           icon={<Calendar className="w-4 h-4" />}
           title={t('sections.personalInfo')}
-          iconColor="text-blue-500"
+          iconColor="text-[rgb(var(--state-info-fg))]"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField
@@ -263,7 +263,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
         <SectionHeader
           icon={<Mail className="w-4 h-4" />}
           title={t('sections.contactInfo')}
-          iconColor="text-teal-500"
+          iconColor="text-[rgb(var(--action-secondary-fg))]"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField
@@ -327,7 +327,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
         <SectionHeader
           icon={<GraduationCap className="w-4 h-4" />}
           title={t('sections.academicInfo')}
-          iconColor="text-emerald-500"
+          iconColor="text-[rgb(var(--state-success-fg))]"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField label={t('fields.currentGrade')} value={student.currentGradeLevel ? t('gradeLabel', { level: student.currentGradeLevel }) : undefined} />
@@ -359,7 +359,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
         <SectionHeader
           icon={<Shield className="w-4 h-4" />}
           title={t('sections.programsAccommodations')}
-          iconColor="text-purple-500"
+          iconColor="text-[rgb(var(--state-info-fg))]"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
           <DataField
@@ -395,7 +395,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
           <SectionHeader
             icon={<Heart className="w-4 h-4" />}
             title={t('sections.medicalInfo')}
-            iconColor="text-red-500"
+            iconColor="text-[rgb(var(--state-danger-fg))]"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
             <DataField
@@ -453,7 +453,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
           <SectionHeader
             icon={<Calendar className="w-4 h-4" />}
             title={t('sections.notes')}
-            iconColor="text-slate-500"
+            iconColor="text-[rgb(var(--text-tertiary))]"
           />
           <p className="text-sm text-text-secondary whitespace-pre-wrap">
             {student.notes}

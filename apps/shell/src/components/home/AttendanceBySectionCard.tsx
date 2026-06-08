@@ -53,7 +53,7 @@ function SectionSkeleton() {
             {['Section', 'Students', 'Recorded', 'Rate', 'Status'].map((h) => (
               <th
                 key={h}
-                className="text-left text-[11px] font-medium pb-2 px-2"
+                className="text-left text-xs font-medium pb-2 px-2"
                 scope="col"
                 style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)' }}
               >
@@ -65,19 +65,19 @@ function SectionSkeleton() {
         <tbody>
           {Array.from({ length: 5 }).map((_, i) => (
             <tr key={i}>
-              <td className="py-[10px] px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
                 <div className="h-3 rounded v2-skeleton-pulse" style={{ width: `${100 + Math.random() * 80}px`, background: 'var(--v2-bg-elevated)' }} />
               </td>
-              <td className="py-[10px] px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
                 <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
               </td>
-              <td className="py-[10px] px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
                 <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
               </td>
-              <td className="py-[10px] px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
                 <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
               </td>
-              <td className="py-[10px] px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
                 <div className="h-5 w-16 rounded-md v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
               </td>
             </tr>
@@ -133,13 +133,13 @@ export function AttendanceBySectionCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
         <span
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           {t('homeV2.attendance.classroomAttendance')}
         </span>
         {todayRate != null && (
-          <span className="text-[11px] font-medium" style={{ color: 'var(--v2-warning)' }}>
+          <span className="text-xs font-medium" style={{ color: 'var(--v2-warning)' }}>
             {todayRate.toFixed(1)}% today
           </span>
         )}
@@ -148,7 +148,7 @@ export function AttendanceBySectionCard({
       {/* Ticket 2.4: Summary header bar */}
       {!isLoading && sections.length > 0 && (
         <div
-          className="flex items-center gap-3 mb-3 text-[11px]"
+          className="flex items-center gap-3 mb-3 text-xs"
           style={{ color: 'var(--v2-text-hint)' }}
         >
           <span>{sections.length} section{sections.length !== 1 ? 's' : ''} total</span>
@@ -199,21 +199,21 @@ export function AttendanceBySectionCard({
               <tr>
                 <th
                   scope="col"
-                  className="text-left text-[11px] font-medium pb-2 px-2"
+                  className="text-left text-xs font-medium pb-2 px-2"
                   style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)' }}
                 >
                   {t('homeV2.attendance.section')}
                 </th>
                 <th
                   scope="col"
-                  className="text-center text-[11px] font-medium pb-2 px-2"
+                  className="text-center text-xs font-medium pb-2 px-2"
                   style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 80 }}
                 >
                   {t('homeV2.attendance.students')}
                 </th>
                 <th
                   scope="col"
-                  className="text-center text-[11px] font-medium pb-2 px-2"
+                  className="text-center text-xs font-medium pb-2 px-2"
                   style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 80 }}
                 >
                   {t('homeV2.attendance.recordedCol')}
@@ -221,14 +221,14 @@ export function AttendanceBySectionCard({
                 {/* Ticket 2.2: Rate column */}
                 <th
                   scope="col"
-                  className="text-center text-[11px] font-medium pb-2 px-2"
+                  className="text-center text-xs font-medium pb-2 px-2"
                   style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 70 }}
                 >
                   {t('homeV2.attendance.rate')}
                 </th>
                 <th
                   scope="col"
-                  className="text-right text-[11px] font-medium pb-2 px-2"
+                  className="text-right text-xs font-medium pb-2 px-2"
                   style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 90 }}
                 >
                   {t('homeV2.attendance.status')}
@@ -255,7 +255,7 @@ export function AttendanceBySectionCard({
                     className="transition-colors hover:bg-[var(--v2-bg-elevated)] focus-visible:bg-[var(--v2-bg-elevated)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--v2-brand-primary)]"
                   >
                     <td
-                      className="py-[10px] px-2"
+                      className="py-2.5 px-2"
                       style={{
                         borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
                       }}
@@ -265,28 +265,28 @@ export function AttendanceBySectionCard({
                       </span>
                     </td>
                     <td
-                      className="text-center py-[10px] px-2"
+                      className="text-center py-2.5 px-2"
                       style={{
                         borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
                       }}
                     >
                       {section.studentCount != null ? (
-                        <span className="inline-flex items-center gap-1 text-[11px]" style={{ color: 'var(--v2-text-hint)' }}>
-                          <Users className="w-[10px] h-[10px]" />
+                        <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--v2-text-hint)' }}>
+                          <Users className="w-2.5 h-2.5" />
                           {section.studentCount}
                         </span>
                       ) : (
-                        <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>—</span>
+                        <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>—</span>
                       )}
                     </td>
                     <td
-                      className="text-center py-[10px] px-2"
+                      className="text-center py-2.5 px-2"
                       style={{
                         borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
                       }}
                     >
                       {section.recordedCount != null && section.studentCount != null ? (
-                        <span className="text-[11px]" style={{
+                        <span className="text-xs" style={{
                           color: section.recordedCount === section.studentCount
                             ? 'var(--v2-brand-primary)'
                             : 'var(--v2-text-hint)',
@@ -294,67 +294,67 @@ export function AttendanceBySectionCard({
                           {section.recordedCount}/{section.studentCount}
                         </span>
                       ) : (
-                        <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>—</span>
+                        <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>—</span>
                       )}
                     </td>
                     {/* Ticket 2.2: Rate cell with color coding */}
                     <td
-                      className="text-center py-[10px] px-2"
+                      className="text-center py-2.5 px-2"
                       style={{
                         borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
                       }}
                     >
                       {rate != null ? (
                         <span
-                          className="text-[11px] font-medium"
+                          className="text-xs font-medium"
                           style={{ color: getRateColor(rate) }}
                         >
                           {rate.toFixed(0)}%
                         </span>
                       ) : (
-                        <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>—</span>
+                        <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>—</span>
                       )}
                     </td>
                     <td
-                      className="text-right py-[10px] px-2"
+                      className="text-right py-2.5 px-2"
                       style={{
                         borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
                       }}
                     >
                       {section.status === 'taken' ? (
                         <span
-                          className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md"
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
                           style={{
                             background: 'var(--v2-accent-enrollment)',
                             color: 'var(--v2-brand-primary)',
                           }}
                           aria-label="Attendance taken"
                         >
-                          <Check className="w-[9px] h-[9px]" />
+                          <Check className="w-2 h-2" />
                           {t('homeV2.attendance.taken')}
                         </span>
                       ) : section.status === 'partial' ? (
                         <span
-                          className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md"
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
                           style={{
                             background: 'var(--v2-accent-academics)',
                             color: '#378ADD',
                           }}
                           aria-label="Attendance partially taken"
                         >
-                          <Clock className="w-[9px] h-[9px]" />
+                          <Clock className="w-2 h-2" />
                           {t('homeV2.attendance.partial')}
                         </span>
                       ) : (
                         <span
-                          className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md"
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
                           style={{
                             background: 'var(--v2-accent-attendance)',
                             color: 'var(--v2-warning)',
                           }}
                           aria-label="Attendance pending"
                         >
-                          <Clock className="w-[9px] h-[9px]" />
+                          <Clock className="w-2 h-2" />
                           {t('homeV2.attendance.pending')}
                         </span>
                       )}

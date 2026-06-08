@@ -4,7 +4,6 @@
  */
 
 import { useMemo } from 'react'
-import { useTranslation } from '@edforge/i18n'
 import type { AttendanceSummary, AttendanceRecord } from '../../../hooks/usePortalStudentAttendance'
 import type { CalendarDate } from '../../../hooks/usePortalCalendarDates'
 
@@ -30,8 +29,6 @@ export function AttendancePatterns({
   calendarDates,
   childName = 'Your child',
 }: AttendancePatternsProps) {
-  const { t } = useTranslation('portal')
-
   const insights = useMemo(() => {
     const cards: InsightCard[] = []
 

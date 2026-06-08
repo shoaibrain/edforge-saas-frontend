@@ -35,12 +35,12 @@ import { formatDate } from '../../lib/utils'
 // ============================================================================
 
 const STATUS_TIMELINE_COLORS: Record<string, string> = {
-  active: 'bg-emerald-500',
+  active: 'bg-[rgb(var(--state-success-fg))]',
   on_leave: 'bg-amber-500',
-  suspended: 'bg-red-500',
-  terminated: 'bg-slate-500',
-  retired: 'bg-blue-500',
-  resigned: 'bg-orange-500',
+  suspended: 'bg-[rgb(var(--state-danger-bg))]0',
+  terminated: 'bg-[rgb(var(--text-tertiary))]',
+  retired: 'bg-[rgb(var(--state-info-fg))]',
+  resigned: 'bg-[rgb(var(--state-warning-fg))]',
 }
 
 const EMPLOYMENT_STATUS_OPTIONS = [
@@ -128,7 +128,7 @@ function UpdateStatusModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -143,7 +143,7 @@ function UpdateStatusModal({
         {/* New Status */}
         <div>
           <label htmlFor="emp-status" className="block text-sm font-medium text-text-primary mb-1.5">
-            New Status <span className="text-red-500">*</span>
+            New Status <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="emp-status"
@@ -157,14 +157,14 @@ function UpdateStatusModal({
             ))}
           </select>
           {errors.employmentStatus && (
-            <p className="mt-1 text-sm text-red-500">{errors.employmentStatus.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.employmentStatus.message}</p>
           )}
         </div>
 
         {/* Effective Date */}
         <div>
           <label htmlFor="emp-date" className="block text-sm font-medium text-text-primary mb-1.5">
-            Effective Date <span className="text-red-500">*</span>
+            Effective Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <input
             id="emp-date"
@@ -174,7 +174,7 @@ function UpdateStatusModal({
             disabled={isSubmitting}
           />
           {errors.effectiveDate && (
-            <p className="mt-1 text-sm text-red-500">{errors.effectiveDate.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.effectiveDate.message}</p>
           )}
         </div>
 
@@ -212,7 +212,7 @@ function UpdateStatusModal({
           <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-[140px]">
+          <Button type="submit" disabled={isSubmitting} className="min-w-36">
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -236,13 +236,13 @@ function UpdateStatusModal({
 // ============================================================================
 
 function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto; isLast: boolean }) {
-  const dotColor = STATUS_TIMELINE_COLORS[entry.newStatus] || 'bg-slate-400'
+  const dotColor = STATUS_TIMELINE_COLORS[entry.newStatus] || 'bg-[rgb(var(--text-tertiary))]'
 
   return (
     <div className="relative flex gap-4">
       {/* Timeline Line + Dot */}
       <div className="flex flex-col items-center">
-        <div className={`w-3 h-3 rounded-full ${dotColor} ring-4 ring-[rgb(var(--surface-primary))] flex-shrink-0 mt-1.5`} />
+        <div className={`w-3 h-3 rounded-full ${dotColor} ring-4 ring-[rgb(var(--background-primary))] flex-shrink-0 mt-1.5`} />
         {!isLast && (
           <div className="w-0.5 flex-1 bg-[rgb(var(--border-secondary))] mt-1" />
         )}
@@ -250,7 +250,7 @@ function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto;
 
       {/* Content */}
       <div className="pb-8 min-w-0 flex-1">
-        <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+        <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
           {/* Status Transition */}
           <div className="flex items-center gap-2 flex-wrap">
             <StaffStatusBadge status={entry.previousStatus} />
@@ -321,7 +321,7 @@ export function EmploymentHistory({
         </div>
         <button
           onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Update Status
@@ -334,13 +334,13 @@ export function EmploymentHistory({
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse flex gap-4">
-                <div className="w-3 h-3 rounded-full bg-[rgb(var(--surface-secondary))] mt-1.5" />
-                <div className="flex-1 h-24 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+                <div className="w-3 h-3 rounded-full bg-[rgb(var(--background-secondary))] mt-1.5" />
+                <div className="flex-1 h-24 bg-[rgb(var(--background-secondary))] rounded-xl" />
               </div>
             ))}
           </div>
         ) : !history || history.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <History className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Employment History</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">

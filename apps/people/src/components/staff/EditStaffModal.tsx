@@ -168,7 +168,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -197,7 +197,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-1.5">
-              First Name <span className="text-red-500">*</span>
+              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="firstName"
@@ -212,12 +212,12 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               disabled={isSubmitting}
             />
             {errors.firstName && (
-              <p className="mt-1 text-sm text-red-500">{errors.firstName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="lastSurname" className="block text-sm font-medium text-text-primary mb-1.5">
-              Last Name <span className="text-red-500">*</span>
+              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="lastSurname"
@@ -228,7 +228,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               disabled={isSubmitting}
             />
             {errors.lastSurname && (
-              <p className="mt-1 text-sm text-red-500">{errors.lastSurname.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastSurname.message}</p>
             )}
           </div>
           <div>
@@ -244,7 +244,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               disabled={isSubmitting}
             />
             {errors.phone && (
-              <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
             )}
           </div>
         </div>
@@ -266,7 +266,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               ))}
             </select>
             {errors.role && (
-              <p className="mt-1 text-sm text-red-500">{errors.role.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.role.message}</p>
             )}
           </div>
           <div>
@@ -284,7 +284,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               ))}
             </select>
             {errors.employmentStatus && (
-              <p className="mt-1 text-sm text-red-500">{errors.employmentStatus.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.employmentStatus.message}</p>
             )}
           </div>
         </div>
@@ -307,7 +307,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               ))}
             </select>
             {errors.departmentId && (
-              <p className="mt-1 text-sm text-red-500">{errors.departmentId.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.departmentId.message}</p>
             )}
           </div>
           <div>
@@ -323,7 +323,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               disabled={isSubmitting}
             />
             {errors.title && (
-              <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.title.message}</p>
             )}
           </div>
         </div>
@@ -358,7 +358,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 disabled={isSubmitting}
               />
               {errors.emisStaffId && (
-                <p className="mt-1 text-sm text-red-500">{errors.emisStaffId.message}</p>
+                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.emisStaffId.message}</p>
               )}
               <p className="mt-1 text-xs text-text-tertiary">
                 CEHRD-issued 16-digit identifier (V1 placeholder format).
@@ -382,7 +382,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 ))}
               </select>
               {errors.nationality && (
-                <p className="mt-1 text-sm text-red-500">{errors.nationality.message}</p>
+                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.nationality.message}</p>
               )}
             </div>
           </div>
@@ -407,7 +407,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 ))}
               </select>
               {errors.maritalStatus && (
-                <p className="mt-1 text-sm text-red-500">{errors.maritalStatus.message}</p>
+                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.maritalStatus.message}</p>
               )}
             </div>
             <div>
@@ -428,7 +428,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 ))}
               </select>
               {errors.appointmentType && (
-                <p className="mt-1 text-sm text-red-500">{errors.appointmentType.message}</p>
+                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.appointmentType.message}</p>
               )}
             </div>
             <div>
@@ -445,7 +445,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                 disabled={isSubmitting}
               />
               {errors.appointmentDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.appointmentDate.message}</p>
+                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.appointmentDate.message}</p>
               )}
               <p className="mt-1 text-xs text-text-tertiary">
                 Per CEHRD register.
@@ -472,7 +472,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[100px]"
+            className="min-w-24"
           >
             {isSubmitting ? (
               <>

@@ -6,6 +6,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react'
+import { focusRing } from '../utils'
 
 export type AccordionItem = {
   id: string
@@ -149,6 +150,7 @@ export function Accordion({
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
                 onKeyDown={(e) => onKeyDown(e, i)}
+                className={focusRing}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

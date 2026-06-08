@@ -31,7 +31,7 @@ export function TopicSection({ name, items, defaultOpen = true, onItemClick }: T
         ) : (
           <ChevronRight className="w-4 h-4 text-text-tertiary" />
         )}
-        <h3 className="text-sm font-semibold text-text-primary group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+        <h3 className="text-sm font-semibold text-text-primary group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-[rgb(var(--action-secondary-fg))] transition-colors">
           {name}
         </h3>
         <span className="text-xs text-text-tertiary">({items.length})</span>

@@ -71,11 +71,11 @@ export default function PaymentGatewaysPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] animate-spin" />
           </div>
         ) : isError ? (
           <div className="text-center py-12">
-            <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400 opacity-60" />
+            <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--state-danger-fg))] opacity-60" />
             <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load gateway configurations</p>
             <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
               Please check your connection and try again.

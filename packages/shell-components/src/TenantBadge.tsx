@@ -58,7 +58,7 @@ export function TenantBadge({
       className={[
         'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1',
         'border text-[11px] font-semibold tracking-wide',
-        'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))]',
+        'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))]',
         'text-[rgb(var(--text-secondary))]',
         className ?? '',
       ].join(' ')}

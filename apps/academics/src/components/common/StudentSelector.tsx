@@ -129,7 +129,7 @@ export function StudentSelector({
               placeholder="Search by name or student number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
               autoFocus
             />
           </div>
@@ -164,7 +164,7 @@ export function StudentSelector({
                     disabled={disabled}
                     className={`flex items-center gap-3 w-full px-4 py-3 text-left transition-colors ${
                       isSelected
-                        ? 'bg-teal-50/50'
+                        ? 'bg-[rgb(var(--state-info-bg)/0.18)]/50'
                         : disabled
                           ? 'opacity-50 cursor-not-allowed'
                           : 'hover:bg-surface-secondary/50'
@@ -174,11 +174,11 @@ export function StudentSelector({
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                         isSelected
-                          ? 'bg-teal-500 border-teal-500'
+                          ? 'bg-[rgb(var(--state-info-bg)/0.18)]0 border-[rgb(var(--border-focus))]'
                           : 'border-border-primary'
                       }`}
                     >
-                      {isSelected && <Check className="w-3 h-3 text-white" />}
+                      {isSelected && <Check className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
                     </div>
 
                     {/* Student info */}
@@ -217,7 +217,7 @@ export function StudentSelector({
               type="button"
               onClick={handleEnroll}
               disabled={selectedIds.size === 0 || isEnrolling}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
             >
               {isEnrolling ? (
                 <>

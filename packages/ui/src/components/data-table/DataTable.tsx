@@ -1,7 +1,7 @@
-import { type ReactNode } from 'react'
+import { type KeyboardEvent, type ReactNode } from 'react'
 import { flexRender } from '@tanstack/react-table'
 import type { Row } from '@tanstack/react-table'
-import { cn } from '../../utils'
+import { cn, focusRingInset } from '../../utils'
 import { useDataTable } from './hooks/useDataTable'
 import { DataTableColumnHeader } from './DataTableColumnHeader'
 import { DataTableSkeleton } from './DataTableSkeleton'
@@ -73,11 +73,11 @@ export function DataTable<TData>({
     return (
       <div
         className={cn(
-          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-primary))]',
+          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-primary))]',
           className
         )}
       >
-        <AlertCircle className="w-10 h-10 text-red-400 mb-3" />
+        <AlertCircle className="w-10 h-10 text-[rgb(var(--state-danger-fg))] mb-3" />
         <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-2">
           Failed to load data
         </h3>
@@ -88,7 +88,7 @@ export function DataTable<TData>({
           <button
             type="button"
             onClick={onRetry}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
@@ -113,7 +113,7 @@ export function DataTable<TData>({
   return (
     <div
       className={cn(
-        'flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        'flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
       style={maxHeight ? { maxHeight, height: maxHeight } : undefined}
@@ -133,7 +133,7 @@ export function DataTable<TData>({
 
       {/* Bulk Actions Bar — outside scroll area */}
       {hasBulkActions && (
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-teal-500/10 border-b border-teal-500/20">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-[rgb(var(--state-info-bg)/0.18)] border-b border-[rgb(var(--state-info-border)/0.35)]">
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {selectedRowCount} selected
           </span>
@@ -152,10 +152,10 @@ export function DataTable<TData>({
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
                   action.variant === 'danger'
-                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    ? 'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95'
                     : action.variant === 'outline'
-                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))]'
-                      : 'bg-teal-600 text-white hover:bg-teal-700',
+                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]'
+                      : 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))]',
                   action.disabled && 'opacity-50 cursor-not-allowed'
                 )}
               >
@@ -179,8 +179,8 @@ export function DataTable<TData>({
         {/* Fetching progress bar — sticky at top of scroll area */}
         {isFetching && data.length > 0 && (
           <div className="sticky top-0 z-20">
-            <div className="h-0.5 w-full bg-[rgb(var(--surface-tertiary))] overflow-hidden">
-              <div className="h-full w-1/3 bg-teal-500 animate-shimmer" />
+            <div className="h-0.5 w-full bg-[rgb(var(--background-tertiary))] overflow-hidden">
+              <div className="h-full w-1/3 bg-[rgb(var(--action-primary-bg))] animate-shimmer" />
             </div>
           </div>
         )}
@@ -190,7 +190,7 @@ export function DataTable<TData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
                 key={headerGroup.id}
-                className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--surface-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
+                className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
               >
                 {headerGroup.headers.map((header) => {
                   const meta = header.column.columnDef
@@ -199,7 +199,7 @@ export function DataTable<TData>({
                     <th
                       key={header.id}
                       className={cn(
-                        'px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
+                        'px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
                         meta?.align === 'right'
                           ? 'text-right'
                           : meta?.align === 'center'
@@ -286,6 +286,15 @@ function TableRowWithExpansion<TData>({
   const isSelected = row.getIsSelected()
   const isExpanded = enableExpanding && row.getIsExpanded()
   const isEvenRow = rowIndex % 2 === 0
+  const isInteractive = typeof onRowClick === 'function'
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>) => {
+    if (!isInteractive) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onRowClick(row.original)
+    }
+  }
 
   return (
     <>
@@ -293,15 +302,17 @@ function TableRowWithExpansion<TData>({
         className={cn(
           'border-b border-[rgb(var(--border-secondary)/0.7)] last:border-b-0 transition-colors duration-150',
           isSelected
-            ? 'bg-teal-500/10 border-l-2 border-l-teal-500'
+            ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-l-2 border-l-[rgb(var(--border-focus))]'
             : isEvenRow
-              ? 'bg-[rgb(var(--surface-tertiary)/0.35)]'
+              ? 'bg-[rgb(var(--background-tertiary)/0.35)]'
               : '',
-          !isSelected && onRowClick && 'cursor-pointer',
-          !isSelected && 'hover:bg-[rgb(var(--brand-primary)/0.06)]',
+          !isSelected && isInteractive && ['cursor-pointer', focusRingInset],
+          !isSelected && 'hover:bg-[rgb(var(--action-primary-bg)/0.06)]',
           isExpanded && 'border-b-0'
         )}
-        onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+        onClick={isInteractive ? () => onRowClick(row.original) : undefined}
+        onKeyDown={handleKeyDown}
+        tabIndex={isInteractive ? 0 : undefined}
         data-state={isSelected ? 'selected' : undefined}
         aria-selected={isSelected || undefined}
       >
@@ -328,7 +339,7 @@ function TableRowWithExpansion<TData>({
         <tr className="border-b border-[rgb(var(--border-secondary)/0.7)]">
           <td
             colSpan={visibleCellCount}
-            className="bg-[rgb(var(--surface-tertiary)/0.2)] border-l-2 border-l-teal-500/30 px-4 py-3"
+            className="bg-[rgb(var(--background-tertiary)/0.2)] border-l-2 border-l-teal-500/30 px-4 py-3"
           >
             {renderSubComponent({ row })}
           </td>

@@ -43,7 +43,7 @@ export const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputPro
               : focused ? '0 0 0 3px rgba(10, 147, 150, 0.15)' : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]">
@@ -102,7 +102,7 @@ export const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelect
               : focused ? '0 0 0 3px rgba(10, 147, 150, 0.15)' : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden"
         >
           <select
             ref={ref}
@@ -158,7 +158,7 @@ export function AnimatedCheckbox({ label, checked, onChange, helpText, disabled 
             <motion.svg
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="w-3 h-3 text-white"
+              className="w-3 h-3 text-[rgb(var(--action-primary-fg))]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

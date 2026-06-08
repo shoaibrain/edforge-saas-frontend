@@ -57,7 +57,7 @@ export function StudentStatusBadge({ status }: StudentStatusBadgeProps) {
 
   return (
     <span
-      className="inline-flex items-center px-2.5 py-0.5 text-[11px] font-medium"
+      className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium"
       style={{
         borderRadius: 10,
         background: config.bg,

@@ -41,7 +41,7 @@ export default function FinanceReceiptPage() {
   if (isLoading || isPending) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -72,14 +72,14 @@ export default function FinanceReceiptPage() {
             : 'error.failedToLoad'
     return (
       <div className="text-center py-16">
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400" />
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--state-danger-fg))]" />
         <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
           {t(messageKey)}
         </p>
         <button
           type="button"
           onClick={() => navigate({ to: '/payments' })}
-          className="mt-4 px-4 py-2 rounded-lg text-sm font-medium bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          className="mt-4 px-4 py-2 rounded-lg text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
         >
           {t('flow.returnToPayments')}
         </button>

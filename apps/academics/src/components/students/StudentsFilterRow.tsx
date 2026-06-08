@@ -106,7 +106,7 @@ export function StudentsFilterRow({
           <button
             key={chip.key}
             onClick={() => setFilterMode(chip.key)}
-            className="px-2.5 py-1 text-[11px] font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+            className="px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
             style={{
               background: isActive ? 'var(--v2-brand-primary)' : 'transparent',
               borderColor: isActive ? 'var(--v2-brand-primary)' : 'var(--v2-border-default)',
@@ -118,10 +118,10 @@ export function StudentsFilterRow({
         )
       })}
 
-      <span className="text-[10px] mx-1" style={{ color: 'var(--v2-text-ghost)' }}>or</span>
+      <span className="text-xs mx-1" style={{ color: 'var(--v2-text-ghost)' }}>or</span>
 
       {/* Search input */}
-      <div className="relative flex-1 min-w-[180px] max-w-sm">
+      <div className="relative flex-1 min-w-44 max-w-sm">
         <Search
           className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
           style={{ color: 'var(--v2-text-hint)' }}
@@ -131,7 +131,7 @@ export function StudentsFilterRow({
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
           placeholder="Search by name or student ID..."
-          className="w-full pl-8 pr-7 py-1.5 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+          className="w-full pl-8 pr-7 py-1.5 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
           style={inputStyle}
         />
         {localSearch && (
@@ -151,7 +151,7 @@ export function StudentsFilterRow({
         value={filters.gradeLevel ?? ''}
         onChange={(e) => setGradeLevel(e.target.value || null)}
         disabled={gradeOptionsLoading}
-        className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30 disabled:opacity-60 disabled:cursor-not-allowed"
         style={inputStyle}
       >
         <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
@@ -164,7 +164,7 @@ export function StudentsFilterRow({
       <select
         value={filters.status ?? ''}
         onChange={(e) => setStatus((e.target.value || null) as StudentStatus | null)}
-        className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+        className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
         style={inputStyle}
       >
         <option value="">All Status</option>
@@ -177,7 +177,7 @@ export function StudentsFilterRow({
       {isActiveFilters && (
         <button
           onClick={handleClearFilters}
-          className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-full transition-colors hover:opacity-80"
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           <X className="w-3 h-3" />
@@ -191,7 +191,7 @@ export function StudentsFilterRow({
           onClick={onExport}
           disabled={isExporting || !hasAcademicYear}
           aria-label="Export students as CSV"
-          className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
           style={{
             background: 'var(--v2-bg-elevated)',
             borderColor: 'var(--v2-border-default)',

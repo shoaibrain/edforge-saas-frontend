@@ -296,7 +296,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
                 <button
                   type="button"
                   onClick={() => removeAdditionalAssignment(index)}
-                  className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                  className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -340,7 +340,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
         <button
           type="button"
           onClick={addAssignment}
-          className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+          className="flex items-center gap-2 text-sm text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Another School Assignment
@@ -352,7 +352,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
         animate={{
           borderColor: isOvercommitted ? 'rgb(185, 62, 3)' : 'rgb(var(--border-secondary))',
         }}
-        className="flex items-center justify-between p-4 rounded-xl border-2 bg-[rgb(var(--surface-secondary))]"
+        className="flex items-center justify-between p-4 rounded-xl border-2 bg-[rgb(var(--background-secondary))]"
       >
         <div className="flex items-center gap-2">
           {isOvercommitted && <AlertTriangle className="w-4 h-4 text-rust-500" />}
@@ -364,7 +364,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
           className={`text-lg font-mono font-semibold ${
             isOvercommitted
               ? 'text-rust-500'
-              : 'text-teal-600 dark:text-teal-400'
+              : 'text-[rgb(var(--action-secondary-fg))] '
           }`}
         >
           {totalFte.toFixed(2)}

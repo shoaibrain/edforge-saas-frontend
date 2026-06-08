@@ -41,7 +41,7 @@ function FinanceSkeleton() {
             />
           </div>
           <div
-            className="h-[3px] rounded-sm v2-skeleton-pulse"
+            className="h-1 rounded-sm v2-skeleton-pulse"
             style={{ background: 'var(--v2-bg-elevated)' }}
           />
         </div>
@@ -75,7 +75,7 @@ function AnimatedBar({
 
   return (
     <div
-      className="h-[3px] rounded-sm overflow-hidden"
+      className="h-1 rounded-sm overflow-hidden"
       style={{ background: 'var(--v2-border-default)' }}
       role="progressbar"
       aria-valuenow={percentage}
@@ -128,13 +128,13 @@ export function FinanceSummaryCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           {t('homeV2.finance.financialOverview')}
         </h3>
         {!isLoading && !isError && (
-          <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+          <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
             {collectionRate.toFixed(1)}% collected
           </span>
         )}
@@ -165,7 +165,7 @@ export function FinanceSummaryCard({
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-[11px]">
+          <div className="flex flex-col gap-3">
             {/* Collected bar */}
             <div>
               <div className="flex items-center justify-between mb-1">
@@ -234,10 +234,10 @@ export function FinanceSummaryCard({
               <>
                 {Object.entries(byFeeType).map(([type, breakdown]) => (
                   <div key={type} className="flex items-center justify-between">
-                    <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+                    <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                       {formatFeeType(type)}
                     </span>
-                    <span className="text-[11px]" style={{ color: 'var(--v2-text-hint)' }}>
+                    <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
                       {formatShort(breakdown.totalAmount)} invoiced
                     </span>
                   </div>
@@ -250,11 +250,11 @@ export function FinanceSummaryCard({
 
             {/* Total invoiced */}
             <div className="flex items-baseline justify-between pt-1">
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                 {t('homeV2.finance.totalInvoiced')}
               </span>
               <span
-                className="text-[13px] font-semibold"
+                className="text-sm font-semibold"
                 style={{ color: 'var(--v2-danger)' }}
               >
                 {formatShort(totalInvoiced)}
@@ -272,7 +272,7 @@ export function FinanceSummaryCard({
         <Link
           to="/finance/$"
           params={{ _splat: '' }}
-          className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           {t('homeV2.finance.viewFinance')}

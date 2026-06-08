@@ -64,7 +64,7 @@ function StepIndicator({
         }
       default:
         return {
-          bg: 'bg-[rgb(var(--surface-tertiary))]',
+          bg: 'bg-[rgb(var(--background-tertiary))]',
           border: 'border-[rgb(var(--border-primary))]',
           text: 'text-[rgb(var(--text-tertiary))]',
           title: 'text-[rgb(var(--text-tertiary))]',

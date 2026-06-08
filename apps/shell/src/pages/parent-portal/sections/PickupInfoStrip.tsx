@@ -88,7 +88,7 @@ export function PickupInfoStrip({ bellSchedules, staggerIndex = 0 }: PickupInfoS
               </div>
               <div>
                 <p
-                  className="text-[10px] uppercase tracking-[0.04em]"
+                  className="text-xs uppercase tracking-[0.04em]"
                   style={{ color: 'var(--v2-text-hint)' }}
                 >
                   {card.label}

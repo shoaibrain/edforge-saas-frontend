@@ -36,7 +36,7 @@ export function BrandingDisplay({ data }: BrandingDisplayProps) {
 
   if (!branding) {
     return (
-      <div className="rounded-2xl border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-8 text-center">
+      <div className="rounded-2xl border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-8 text-center">
         <AlertCircle className="w-8 h-8 mx-auto mb-3 text-[rgb(var(--text-tertiary))]" />
         <h3 className="text-sm font-medium text-[rgb(var(--text-primary))]">
           {t('empty.title')}
@@ -119,7 +119,7 @@ export function BrandingDisplay({ data }: BrandingDisplayProps) {
 
       {/* Version footer — opaque UUID for ops debugging only */}
       {branding.brandingVersionId && (
-        <p className="text-[10px] text-[rgb(var(--text-tertiary))] font-mono text-center pt-2">
+        <p className="text-xs text-[rgb(var(--text-tertiary))] font-mono text-center pt-2">
           {t('versionLabel')}: {branding.brandingVersionId}
         </p>
       )}
@@ -139,7 +139,7 @@ interface SectionProps {
 
 function Section({ icon: Icon, title, children }: SectionProps) {
   return (
-    <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] p-5">
+    <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-5">
       <header className="flex items-center gap-2 mb-3 pb-2 border-b border-[rgb(var(--border-primary))]">
         <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         <h3 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))]">
@@ -231,7 +231,7 @@ function AssetPreview({ label, url, emptyText, isPdfPossible }: AssetPreviewProp
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block aspect-video rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors flex items-center justify-center text-xs text-[rgb(var(--text-secondary))] font-medium"
+            className="block aspect-video rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors flex items-center justify-center text-xs text-[rgb(var(--text-secondary))] font-medium"
           >
             PDF
           </a>
@@ -239,11 +239,11 @@ function AssetPreview({ label, url, emptyText, isPdfPossible }: AssetPreviewProp
           <img
             src={url}
             alt={label}
-            className="block w-full aspect-video object-contain rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+            className="block w-full aspect-video object-contain rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
           />
         )
       ) : (
-        <div className="aspect-video rounded-md border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] flex items-center justify-center text-xs text-[rgb(var(--text-tertiary))] italic px-2 text-center">
+        <div className="aspect-video rounded-md border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] flex items-center justify-center text-xs text-[rgb(var(--text-tertiary))] italic px-2 text-center">
           {emptyText}
         </div>
       )}

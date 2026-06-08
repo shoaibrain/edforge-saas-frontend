@@ -493,14 +493,14 @@ function GateView({
     return (
       <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-5">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-warning-fg))] flex-shrink-0 mt-0.5" />
           <div className="text-sm">
             <div className="font-medium text-amber-900 dark:text-amber-200">
               {school.name} has no IEMIS school code
             </div>
             <p className="mt-1 text-amber-800 dark:text-amber-300">
               IEMIS imports require the school to have its Nepal government-issued{' '}
-              <code className="px-1 rounded bg-amber-100 dark:bg-amber-900">emisSchoolCode</code>{' '}
+              <code className="px-1 rounded bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-amber-900">emisSchoolCode</code>{' '}
               set. That value is immutable after school creation, so it must be
               entered on the school itself. Ask the tenant admin to create a
               new school through the School Wizard with the IEMIS code, or
@@ -537,7 +537,7 @@ function FileChooserCard({
         onDrop={onDrop}
         className={`rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
           isDragging
-            ? 'border-teal-500 bg-teal-50 dark:bg-teal-950/30'
+            ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)] '
             : 'border-border-primary bg-surface-secondary'
         }`}
       >
@@ -548,7 +548,7 @@ function FileChooserCard({
         <p className="mt-1 text-sm text-text-tertiary">
           or click below to browse. Up to {MAX_IEMIS_ROW_COUNT} rows per file.
         </p>
-        <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium cursor-pointer">
+        <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] text-sm font-medium cursor-pointer">
           <Upload className="w-4 h-4" />
           Browse files
           <input
@@ -565,7 +565,7 @@ function FileChooserCard({
       </div>
       <div className="rounded-lg border border-border-primary bg-surface-secondary p-4 text-sm">
         <div className="flex items-start gap-2">
-          <Info className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
+          <Info className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] flex-shrink-0 mt-0.5" />
           <div className="space-y-1 text-text-secondary">
             <div className="font-medium text-text-primary">Expected columns</div>
             <p>
@@ -617,7 +617,7 @@ function PreviewView({
       {/* File summary */}
       <div className="rounded-xl border border-border-primary bg-surface-primary p-4">
         <div className="flex items-center gap-3">
-          <FileSpreadsheet className="w-5 h-5 text-teal-600" />
+          <FileSpreadsheet className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
           <div className="flex-1">
             <div className="text-sm font-medium text-text-primary">
               {parse.fileName}
@@ -651,7 +651,7 @@ function PreviewView({
           historical imports, painful at pilot scale (779 manual clicks).
 
           Dark-mode contrast note: text colors here are tone-tinted
-          (text-teal-900 dark:text-teal-100 etc.) instead of the semantic
+          (text-[rgb(var(--text-primary))]  etc.) instead of the semantic
           text-text-primary CSS-vars. The CSS-vars resolve to white in dark
           mode, which becomes washed out against the teal-tinted background;
           tone-tinted classes pair correctly with both light and dark bgs.
@@ -660,7 +660,7 @@ function PreviewView({
         <div
           className={`rounded-xl border p-4 ${
             eligibleAcademicYear
-              ? 'border-teal-300 bg-teal-50 dark:bg-teal-950/40 dark:border-teal-800'
+              ? 'border-[rgb(var(--state-info-border)/0.45)] bg-[rgb(var(--state-info-bg)/0.18)]  '
               : 'border-border-primary bg-surface-secondary'
           }`}
         >
@@ -682,18 +682,18 @@ function PreviewView({
               <div
                 className={`flex items-center gap-2 text-sm font-medium ${
                   eligibleAcademicYear
-                    ? 'text-teal-900 dark:text-teal-100'
+                    ? 'text-[rgb(var(--text-primary))] '
                     : 'text-text-primary'
                 }`}
               >
-                <CalendarCheck className="w-4 h-4 text-teal-600 dark:text-teal-300" />
+                <CalendarCheck className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
                 Enroll all imported students into this year
               </div>
               {eligibleAcademicYear ? (
-                <div className="mt-1 text-xs text-teal-800 dark:text-teal-200">
+                <div className="mt-1 text-xs text-[rgb(var(--state-info-fg))] ">
                   <b>{eligibleAcademicYear.name}</b>
                   {eligibleAcademicYear.isCurrent && (
-                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-teal-100 dark:bg-teal-900/70 text-teal-800 dark:text-teal-100">
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)]  text-[rgb(var(--state-info-fg))] ">
                       current
                     </span>
                   )}
@@ -710,7 +710,7 @@ function PreviewView({
               <div
                 className={`mt-2 text-xs ${
                   eligibleAcademicYear
-                    ? 'text-teal-700 dark:text-teal-300'
+                    ? 'text-[rgb(var(--text-secondary))] '
                     : 'text-text-tertiary'
                 }`}
               >
@@ -790,7 +790,7 @@ function PreviewView({
           <button
             onClick={onConfirm}
             disabled={willImport <= 0}
-            className="px-4 py-1.5 text-sm rounded-lg bg-teal-500 hover:bg-teal-600 disabled:bg-text-tertiary disabled:cursor-not-allowed text-white font-medium"
+            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
             {willImport > 0
               ? `Import ${willImport} student${willImport === 1 ? '' : 's'}`
@@ -821,7 +821,7 @@ function ConfirmModal({
   const willImport = parse.rowCount - dryRun.skipped - dryRun.failed
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)] p-4"
       onClick={onCancel}
     >
       <div
@@ -884,7 +884,7 @@ function ConfirmModal({
           <button
             onClick={onConfirm}
             disabled={!ack || willImport <= 0}
-            className="px-4 py-1.5 text-sm rounded-lg bg-teal-500 hover:bg-teal-600 disabled:bg-text-tertiary disabled:cursor-not-allowed text-white font-medium"
+            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
             Import {willImport} now
           </button>
@@ -921,15 +921,15 @@ function ProgressView({
       (enrollInAcademicYearName ? ` and enrolling into ${enrollInAcademicYearName}.` : '.')
 
   return (
-    <div className="rounded-xl border border-teal-300 bg-teal-50 dark:bg-teal-950/30 dark:border-teal-800 p-5">
+    <div className="rounded-xl border border-[rgb(var(--state-info-border)/0.45)] bg-[rgb(var(--state-info-bg)/0.18)]   p-5">
       <div className="flex items-start gap-3">
-        <Loader2 className="w-5 h-5 text-teal-600 dark:text-teal-400 animate-spin flex-shrink-0 mt-0.5" />
+        <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <div className="text-sm font-medium text-teal-900 dark:text-teal-200">
+          <div className="text-sm font-medium text-[rgb(var(--text-primary))] ">
             {isQueued ? 'Import queued' : 'Importing students…'}
           </div>
-          <p className="mt-1 text-sm text-teal-800 dark:text-teal-300">{description}</p>
-          <p className="mt-2 text-xs text-teal-700 dark:text-teal-400">
+          <p className="mt-1 text-sm text-[rgb(var(--state-info-fg))] ">{description}</p>
+          <p className="mt-2 text-xs text-[rgb(var(--text-secondary))] ">
             You can keep this tab open. The import runs server-side; closing
             the tab won't cancel the job, but you'll lose the live status view.
           </p>
@@ -937,8 +937,8 @@ function ProgressView({
       </div>
 
       {/* Indeterminate stripe — until the worker reports per-batch progress */}
-      <div className="mt-4 h-1.5 rounded-full bg-teal-200/70 dark:bg-teal-900/60 overflow-hidden">
-        <div className="h-full w-1/3 bg-teal-500 animate-[indeterminate_1.4s_ease-in-out_infinite] [animation-name:indeterminate]"
+      <div className="mt-4 h-1.5 rounded-full bg-[rgb(var(--state-info-bg)/0.26)]  overflow-hidden">
+        <div className="h-full w-1/3 bg-[rgb(var(--state-info-bg)/0.18)]0 animate-[indeterminate_1.4s_ease-in-out_infinite] [animation-name:indeterminate]"
           style={{
             animation: 'indeterminate 1.4s ease-in-out infinite',
           }}
@@ -980,15 +980,15 @@ function ResultsView({
       <div
         className={`rounded-xl border p-5 ${
           allSuccess
-            ? 'border-green-300 bg-green-50 dark:bg-green-950/20 dark:border-green-800'
+            ? 'border-[rgb(var(--state-success-border)/0.45)] bg-[rgb(var(--state-success-bg)/0.18)]  '
             : 'border-amber-300 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800'
         }`}
       >
         <div className="flex items-start gap-3">
           {allSuccess ? (
-            <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
+            <CheckCircle2 className="w-6 h-6 text-[rgb(var(--state-success-fg))]  flex-shrink-0" />
           ) : (
-            <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <AlertTriangle className="w-6 h-6 text-[rgb(var(--state-warning-fg))] flex-shrink-0" />
           )}
           <div>
             <div className="text-base font-semibold text-text-primary">
@@ -1053,7 +1053,7 @@ function ResultsView({
           </button>
           <button
             onClick={onViewStudents}
-            className="px-4 py-1.5 text-sm rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-medium"
+            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] font-medium"
           >
             View students
           </button>
@@ -1077,8 +1077,8 @@ function CountTile({
   tone: 'success' | 'warn' | 'danger' | 'neutral'
 }) {
   const toneClass = {
-    success: 'text-green-600 dark:text-green-400',
-    warn: 'text-amber-600 dark:text-amber-400',
+    success: 'text-[rgb(var(--state-success-fg))] ',
+    warn: 'text-[rgb(var(--state-warning-fg))]',
     danger: 'text-rust-500',
     neutral: 'text-text-tertiary',
   }[tone]
@@ -1164,7 +1164,7 @@ function InlineStatus({
   return (
     <div className="rounded-xl border border-border-primary bg-surface-secondary p-5">
       <div className="flex items-start gap-3">
-        <div className="text-teal-600 dark:text-teal-400">{icon}</div>
+        <div className="text-[rgb(var(--action-secondary-fg))]">{icon}</div>
         <div>
           <div className="text-sm font-medium text-text-primary">{title}</div>
           <div className="mt-1 text-xs text-text-tertiary">{description}</div>
@@ -1195,7 +1195,7 @@ function ErrorCard({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="mt-3 px-3 py-1.5 text-sm rounded-lg bg-rust-500 hover:bg-rust-600 text-white"
+              className="mt-3 px-3 py-1.5 text-sm rounded-lg bg-rust-500 hover:bg-rust-600 text-[rgb(var(--action-primary-fg))]"
             >
               {retryLabel}
             </button>

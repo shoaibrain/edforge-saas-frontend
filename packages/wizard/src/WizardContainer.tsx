@@ -79,10 +79,10 @@ function WizardContent({
   const { currentStepData, currentStep } = useWizard()
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--surface-primary))]">
+    <div className="min-h-screen bg-[rgb(var(--background-primary))]">
       {header}
 
-      <div className="py-8 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+      <div className="py-8 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
         <div className="hidden md:block">
           <WizardProgress />
         </div>

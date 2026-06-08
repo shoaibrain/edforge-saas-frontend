@@ -55,7 +55,7 @@ function StaffAvatar({ staff }: { staff: any }) {
   if (imgError || !src) {
     return (
       <div
-        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-semibold text-white"
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[rgb(var(--action-primary-fg))]"
         style={{ background: bg }}
       >
         {initials}
@@ -138,12 +138,12 @@ export function StaffRosterCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3
-          className="text-[13px] font-medium"
+          className="text-sm font-medium"
           style={{ color: 'var(--v2-text-secondary)' }}
         >
           Staff roster
         </h3>
-        <span className="text-[12px] font-medium" style={{ color: 'var(--v2-text-hint)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--v2-text-hint)' }}>
           {activeCount} active
         </span>
       </div>
@@ -173,13 +173,13 @@ export function StaffRosterCard({
                     <p className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
                       {getDisplayName(s)}
                     </p>
-                    <p className="text-[10px] truncate" style={{ color: 'var(--v2-text-faint)' }}>
+                    <p className="text-xs truncate" style={{ color: 'var(--v2-text-faint)' }}>
                       {getRole(s)} · {getDepartment(s)}
                     </p>
                   </div>
                   {/* Badge */}
                   <span
-                    className="text-[9px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                    className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
                     style={{
                       background: isFullTime ? 'rgba(29,158,117,0.10)' : 'rgba(239,159,39,0.10)',
                       color: isFullTime ? '#1D9E75' : '#EF9F27',
@@ -201,10 +201,10 @@ export function StaffRosterCard({
           <div className="space-y-1.5">
             {departments.slice(0, 4).map((dept) => (
               <div key={dept.name} className="flex items-center justify-between">
-                <span className="text-[10px]" style={{ color: 'var(--v2-text-faint)' }}>
+                <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                   {dept.name}
                 </span>
-                <span className="text-[10px] font-medium" style={{ color: '#1D9E75' }}>
+                <span className="text-xs font-medium" style={{ color: '#1D9E75' }}>
                   {dept.count} teacher{dept.count !== 1 ? 's' : ''}
                 </span>
               </div>

@@ -202,7 +202,7 @@ export function HeaderActionButton({
         p-1.5 rounded-lg
         text-[rgb(var(--text-tertiary))]
         hover:text-[rgb(var(--text-secondary))]
-        hover:bg-[rgb(var(--surface-tertiary))]
+        hover:bg-[rgb(var(--background-tertiary))]
         transition-colors
         ${className}
       `}

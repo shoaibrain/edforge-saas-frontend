@@ -84,8 +84,8 @@ function StatCard({
 function GradeBadge({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
-        <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-violet-500/20 flex items-center justify-center">
+        <span className="text-xs font-bold text-[rgb(var(--state-info-fg))]">
           {value}
         </span>
       </div>
@@ -109,14 +109,14 @@ function CourseChips({ courses }: { courses: CourseResponseDto[] }) {
       {display.map((name, i) => (
         <span
           key={i}
-          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-tertiary text-text-secondary truncate max-w-[140px]"
+          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-tertiary text-text-secondary truncate max-w-36"
           title={name}
         >
           {name}
         </span>
       ))}
       {remaining > 0 && (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]">
           +{remaining} more
         </span>
       )}
@@ -289,29 +289,29 @@ export function GradeLevelsTab({
           icon={Layers}
           label="Total Grade Levels"
           value={stats.totalGrades}
-          accent="text-indigo-600 dark:text-indigo-400"
-          bg="bg-indigo-500/10"
+          accent="text-[rgb(var(--state-info-fg))]"
+          bg="bg-[rgb(var(--state-info-fg))]/10"
         />
         <StatCard
           icon={BookOpen}
           label="Course Assignments"
           value={stats.totalAssignments}
-          accent="text-rose-600 dark:text-rose-400"
-          bg="bg-rose-500/10"
+          accent="text-[rgb(var(--state-danger-fg))] "
+          bg="bg-[rgb(var(--state-danger-fg))]/10"
         />
         <StatCard
           icon={BarChart3}
           label="Avg. Courses / Grade"
           value={stats.avgPerGrade}
-          accent="text-teal-600 dark:text-teal-400"
-          bg="bg-teal-500/10"
+          accent="text-[rgb(var(--action-secondary-fg))]"
+          bg="bg-[rgb(var(--state-info-bg)/0.18)]"
         />
         <StatCard
           icon={GraduationCap}
           label="Grades with Courses"
           value={stats.withCourses}
-          accent="text-amber-600 dark:text-amber-400"
-          bg="bg-amber-500/10"
+          accent="text-[rgb(var(--state-warning-fg))]"
+          bg="bg-[rgb(var(--state-warning-fg))]/10"
         />
       </div>
 

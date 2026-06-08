@@ -162,7 +162,7 @@ export function AddGuardianModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -178,7 +178,7 @@ export function AddGuardianModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="guardianFirstName" className="block text-sm font-medium text-text-primary mb-1.5">
-              First Name <span className="text-red-500">*</span>
+              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="guardianFirstName"
@@ -193,12 +193,12 @@ export function AddGuardianModal({
               disabled={isSubmitting}
             />
             {errors.firstName && (
-              <p className="mt-1 text-sm text-red-500">{errors.firstName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="guardianLastName" className="block text-sm font-medium text-text-primary mb-1.5">
-              Last Name <span className="text-red-500">*</span>
+              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="guardianLastName"
@@ -209,7 +209,7 @@ export function AddGuardianModal({
               disabled={isSubmitting}
             />
             {errors.lastName && (
-              <p className="mt-1 text-sm text-red-500">{errors.lastName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastName.message}</p>
             )}
           </div>
         </div>
@@ -217,7 +217,7 @@ export function AddGuardianModal({
         {/* Relationship */}
         <div>
           <label htmlFor="relationship" className="block text-sm font-medium text-text-primary mb-1.5">
-            Relationship <span className="text-red-500">*</span>
+            Relationship <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="relationship"
@@ -230,7 +230,7 @@ export function AddGuardianModal({
             ))}
           </select>
           {errors.relationship && (
-            <p className="mt-1 text-sm text-red-500">{errors.relationship.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.relationship.message}</p>
           )}
         </div>
 
@@ -238,7 +238,7 @@ export function AddGuardianModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="guardianPhone" className="block text-sm font-medium text-text-primary mb-1.5">
-              Phone <span className="text-red-500">*</span>
+              Phone <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary pointer-events-none border-r border-border-primary pr-2">
@@ -254,7 +254,7 @@ export function AddGuardianModal({
               />
             </div>
             {errors.phone && (
-              <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
             )}
           </div>
           <div>
@@ -270,7 +270,7 @@ export function AddGuardianModal({
               disabled={isSubmitting}
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.email.message}</p>
             )}
           </div>
         </div>
@@ -282,7 +282,7 @@ export function AddGuardianModal({
               id="isPrimary"
               type="checkbox"
               {...register('isPrimary')}
-              className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-teal-500/20"
+              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
               disabled={isSubmitting}
             />
             <label htmlFor="isPrimary" className="text-sm text-text-primary">
@@ -294,7 +294,7 @@ export function AddGuardianModal({
               id="canPickup"
               type="checkbox"
               {...register('canPickup')}
-              className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-teal-500/20"
+              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
               disabled={isSubmitting}
             />
             <label htmlFor="canPickup" className="text-sm text-text-primary">
@@ -304,7 +304,7 @@ export function AddGuardianModal({
         </div>
 
         {isDirty && (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
+          <p className="text-sm text-[rgb(var(--state-warning-fg))]">
             You have unsaved changes
           </p>
         )}
@@ -321,7 +321,7 @@ export function AddGuardianModal({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[120px]"
+            className="min-w-32"
           >
             {isSubmitting ? (
               <>

@@ -41,7 +41,7 @@ function LanguageToggle() {
 
   return (
     <div
-      className="flex items-center gap-1 p-1 bg-[rgb(var(--surface-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
+      className="flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
       role="radiogroup"
       aria-label="Language"
     >
@@ -55,14 +55,14 @@ function LanguageToggle() {
             onClick={handleSwitch(code)}
             className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
               isActive
-                ? 'text-white'
+                ? 'text-[rgb(var(--action-primary-fg))]'
                 : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
             }`}
           >
             {isActive && (
               <motion.div
                 layoutId="lang-toggle-pill"
-                className="absolute inset-0 bg-teal-500 dark:bg-cyan-500 rounded-md shadow-sm"
+                className="absolute inset-0 bg-[rgb(var(--action-primary-bg))]  rounded-md shadow-sm"
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />
             )}
@@ -92,9 +92,9 @@ function HamburgerButton() {
       aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
     >
       <div className="flex flex-col gap-1">
-        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
-        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
-        <span className="block w-[18px] h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-5 h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-5 h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-5 h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
       </div>
     </button>
   )
@@ -119,7 +119,7 @@ function ThemePill() {
     >
       <button
         className={cn(
-          'rounded-xl text-[10px] font-medium transition-all duration-150 border-none font-[inherit]',
+          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit]',
         )}
         style={{
           padding: '3px 10px',
@@ -134,7 +134,7 @@ function ThemePill() {
       </button>
       <button
         className={cn(
-          'rounded-xl text-[10px] font-medium transition-all duration-150 border-none font-[inherit]',
+          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit]',
         )}
         style={{
           padding: '3px 10px',
@@ -195,7 +195,7 @@ function HomeTopbarCenter() {
         {greeting}
       </span>
       <span
-        className="text-[11px] ml-[10px] pl-[10px]"
+        className="text-xs ml-[10px] pl-[10px]"
         style={{
           color: 'var(--shell-text-4)',
           borderLeft: '1px solid var(--shell-border-color)',
@@ -223,9 +223,9 @@ function UserMenu() {
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        className="flex items-center rounded-full hover:ring-teal-500/50 transition-all duration-200 ml-1 flex-shrink-0"
+        className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0"
       >
-        <div className="w-[30px] h-[30px] rounded-full overflow-hidden">
+        <div className="w-8 h-8 rounded-full overflow-hidden">
           <Avatar
             name={user.name}
             size="sm"
@@ -243,9 +243,9 @@ function UserMenu() {
         leaveFrom="opacity-100 scale-100 translate-y-0"
         leaveTo="opacity-0 scale-95 translate-y-1"
       >
-        <MenuItems className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden">
+        <MenuItems className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden">
           {/* User Info */}
-          <div className="px-4 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-tertiary))]">
+          <div className="px-4 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
             <div className="flex items-center gap-3">
               <Avatar name={user.name} size="lg" shape="rounded" />
               <div className="flex-1 min-w-0">
@@ -253,7 +253,7 @@ function UserMenu() {
                   {user.displayName || user.name}
                 </p>
                 <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{user.email}</p>
-                <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-teal-500/15 text-teal-700 dark:bg-cyan-500/20 dark:text-cyan-300">
+                <span className="inline-block mt-1.5 px-2 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  ">
                   {user.globalRole}
                 </span>
               </div>
@@ -272,9 +272,9 @@ function UserMenu() {
               {({ active }) => (
                 <button
                   onClick={() => navigate({ to: '/settings', search: { tab: 'account' } })}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
                     <User className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
@@ -288,9 +288,9 @@ function UserMenu() {
               {({ active }) => (
                 <button
                   onClick={() => navigate({ to: '/settings', search: { tab: 'account' } })}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
                     <Settings className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
@@ -362,7 +362,7 @@ export function Header() {
       </div>
 
       {/* RIGHT ZONE: Theme pill + User avatar */}
-      <div className="flex items-center gap-[2px] flex-shrink-0 pr-4">
+      <div className="flex items-center gap-0.5 flex-shrink-0 pr-4">
         <ThemePill />
         <UserMenu />
       </div>

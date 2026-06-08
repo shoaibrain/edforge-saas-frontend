@@ -56,7 +56,7 @@ export function NoCurrentAcademicYearEmptyState({
       {actionHref && actionLabel && (
         <a
           href={actionHref}
-          className="inline-flex items-center mt-4 px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
+          className="inline-flex items-center mt-4 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))]  dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           {actionLabel}
         </a>

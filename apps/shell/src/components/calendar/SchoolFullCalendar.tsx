@@ -219,7 +219,7 @@ export function SchoolFullCalendar({
   if (isLoading && !hasHadData.current) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] animate-spin" />
         <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading calendar...</span>
       </div>
     )
@@ -265,13 +265,13 @@ export function SchoolFullCalendar({
       {/* Refetch loading overlay (shows during month navigation) */}
       {isLoading && hasHadData.current && (
         <div className="fc-loading-overlay">
-          <Loader2 className="w-5 h-5 text-teal-500 animate-spin" />
+          <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
         </div>
       )}
 
       {/* Empty state overlay */}
       {isEmpty && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--surface-primary))]/80 rounded-xl z-10 pointer-events-auto">
+        <div className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--background-primary))]/80 rounded-xl z-10 pointer-events-auto">
           <div className="text-center">
             <p className="text-sm text-[rgb(var(--text-tertiary))] mb-3">
               No calendar dates generated for this academic year.
@@ -279,7 +279,7 @@ export function SchoolFullCalendar({
             {onGenerate && (
               <button
                 onClick={onGenerate}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
               >
                 <Wand2 className="w-4 h-4" />
                 Generate Calendar

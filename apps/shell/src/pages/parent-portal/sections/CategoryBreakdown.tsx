@@ -72,13 +72,13 @@ export function CategoryBreakdown({
           <div key={cat.name}>
             <div className="flex items-center justify-between mb-1">
               <span
-                className="text-[12px] font-medium"
+                className="text-xs font-medium"
                 style={{ color: 'var(--v2-text-secondary)' }}
               >
                 {cat.name}
               </span>
               <span
-                className="text-[12px] font-mono tabular-nums"
+                className="text-xs font-mono tabular-nums"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 {formatCurrency(cat.amount)}

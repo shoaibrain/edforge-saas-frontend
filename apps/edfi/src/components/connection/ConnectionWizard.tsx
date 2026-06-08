@@ -145,9 +145,9 @@ export function ConnectionWizard() {
                   flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300
                   ${
                     index < currentStepIndex
-                      ? 'bg-teal-500 border-teal-500 text-white'
+                      ? 'bg-[rgb(var(--action-primary-bg))] border-[rgb(var(--border-focus))] text-[rgb(var(--action-primary-fg))]'
                       : index === currentStepIndex
-                      ? 'bg-teal-500/10 border-teal-500 text-teal-500'
+                      ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-[rgb(var(--border-focus))] text-[rgb(var(--action-secondary-fg))]'
                       : 'bg-surface-tertiary border-border-primary text-text-tertiary'
                   }
                 `}
@@ -162,7 +162,7 @@ export function ConnectionWizard() {
                 <div
                   className={`
                     hidden sm:block w-12 h-0.5 mx-2 transition-colors duration-300
-                    ${index < currentStepIndex ? 'bg-teal-500' : 'bg-border-primary'}
+                    ${index < currentStepIndex ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-border-primary'}
                   `}
                 />
               )}
@@ -175,7 +175,7 @@ export function ConnectionWizard() {
               key={step.id}
               className={`
                 text-xs font-medium hidden sm:block
-                ${index === currentStepIndex ? 'text-teal-500' : 'text-text-tertiary'}
+                ${index === currentStepIndex ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-text-tertiary'}
               `}
             >
               {step.label}
@@ -260,7 +260,7 @@ export function ConnectionWizard() {
                 <div className="text-center py-8">
                   {validating ? (
                     <div className="space-y-4">
-                      <Loader2 className="w-16 h-16 text-teal-500 animate-spin mx-auto" />
+                      <Loader2 className="w-16 h-16 text-[rgb(var(--action-secondary-fg))] animate-spin mx-auto" />
                       <p className="text-text-secondary">Validating connection...</p>
                     </div>
                   ) : validationResult ? (
@@ -304,7 +304,7 @@ export function ConnectionWizard() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <Cloud className="w-16 h-16 text-teal-500/50 mx-auto" />
+                      <Cloud className="w-16 h-16 text-[rgb(var(--action-secondary-fg)/0.50)] mx-auto" />
                       <p className="text-text-secondary">Click validate to test your connection</p>
                       <Button onClick={handleValidate} size="lg">
                         Validate Connection
@@ -330,7 +330,7 @@ export function ConnectionWizard() {
                         w-full p-4 rounded-xl text-left transition-all duration-200
                         ${
                           connectionData.schoolYear === year
-                            ? 'bg-teal-500/10 border-2 border-teal-500'
+                            ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-2 border-[rgb(var(--border-focus))]'
                             : 'bg-surface-tertiary border-2 border-transparent hover:border-border-primary'
                         }
                       `}
@@ -340,14 +340,14 @@ export function ConnectionWizard() {
                           <Calendar
                             className={`w-5 h-5 ${
                               connectionData.schoolYear === year
-                                ? 'text-teal-500'
+                                ? 'text-[rgb(var(--action-secondary-fg))]'
                                 : 'text-text-tertiary'
                             }`}
                           />
                           <span className="font-medium text-text-primary">{year}</span>
                         </div>
                         {connectionData.schoolYear === year && (
-                          <CheckCircle className="w-5 h-5 text-teal-500" />
+                          <CheckCircle className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
                         )}
                       </div>
                     </button>
@@ -380,14 +380,14 @@ export function ConnectionWizard() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20">
+                  <div className="p-4 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--border-focus)/0.35)]">
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-teal-600 dark:text-cyan-400">
+                        <p className="font-medium text-[rgb(var(--action-secondary-fg))]">
                           Ready for Data Exchange
                         </p>
-                        <p className="text-sm text-teal-700 dark:text-teal-300">
+                        <p className="text-sm text-[rgb(var(--text-secondary))]">
                           Your connection has been validated and is ready for Ed-Fi data synchronization.
                         </p>
                       </div>

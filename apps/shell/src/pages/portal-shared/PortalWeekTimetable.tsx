@@ -78,7 +78,7 @@ export function PortalWeekTimetable({
         </div>
 
         {/* Timeline Rows */}
-        {rows.map((period, i) => {
+        {rows.map((period) => {
           const hour = parseHour(period.startTime)
 
           return (

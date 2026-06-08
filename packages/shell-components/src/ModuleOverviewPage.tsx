@@ -163,9 +163,9 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 className={`
                     p-1.5 rounded-md
                     text-[rgb(var(--text-tertiary))]
-                    hover:bg-[rgb(var(--surface-tertiary))]
+                    hover:bg-[rgb(var(--background-tertiary))]
                     transition-colors
-                    ${isOpen ? 'bg-[rgb(var(--surface-tertiary))]' : ''}
+                    ${isOpen ? 'bg-[rgb(var(--background-tertiary))]' : ''}
                 `}
                 title="Page options"
                 aria-label="Page options"
@@ -180,12 +180,12 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -4 }}
                     transition={{ duration: 0.1 }}
-                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
                     role="menu"
                 >
                     <button
                         onClick={() => setShowWidgets(true)}
-                        className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--interactive-hover))] transition-colors text-left text-sm text-[rgb(var(--text-primary))]"
+                        className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left text-sm text-[rgb(var(--text-primary))]"
                     >
                         <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>Show/hide widgets</span>
@@ -194,7 +194,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     <div className="my-1 border-t border-[rgb(var(--border-secondary))]" />
                     <button
                         onClick={() => { onReset(); setIsOpen(false) }}
-                        className="w-full px-3 py-2 flex items-center gap-3 text-left text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+                        className="w-full px-3 py-2 flex items-center gap-3 text-left text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                     >
                         <RotateCcw className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>Reset to default</span>
@@ -208,12 +208,12 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 4 }}
                     transition={{ duration: 0.1 }}
-                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
                     role="menu"
                 >
                     <button
                         onClick={() => setShowWidgets(false)}
-                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--interactive-hover))] transition-colors text-left text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
+                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
                     >
                         <span>‹</span>
                         <span>Back</span>
@@ -222,7 +222,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                         <button
                             key={widget.id}
                             onClick={() => onToggle(widget.id)}
-                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--interactive-hover))] transition-colors text-left text-sm"
+                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left text-sm"
                             role="menuitemcheckbox"
                             aria-checked={widget.visible}
                         >
@@ -259,7 +259,7 @@ function StatCard({ stat, index }: StatCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+            <div className="group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
@@ -344,7 +344,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.15 }}
                     onClick={() => smoothScroll('left')}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))] transition-all"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] transition-all"
                     aria-label="Scroll left"
                 >
                     <ChevronLeft className="w-5 h-5" />
@@ -357,7 +357,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.15 }}
                     onClick={() => smoothScroll('right')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))] transition-all"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] transition-all"
                     aria-label="Scroll right"
                 >
                     <ChevronRight className="w-5 h-5" />
@@ -376,10 +376,10 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
             </div>
             {/* Edge fade gradients */}
             <div
-                className={`pointer-events-none absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[rgb(var(--surface-primary))] via-[rgb(var(--surface-primary))]/80 to-transparent transition-opacity duration-300 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`}
+                className={`pointer-events-none absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[rgb(var(--background-primary))] via-[rgb(var(--background-primary))]/80 to-transparent transition-opacity duration-300 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`}
             />
             <div
-                className={`pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[rgb(var(--surface-primary))] via-[rgb(var(--surface-primary))]/80 to-transparent transition-opacity duration-300 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`}
+                className={`pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[rgb(var(--background-primary))] via-[rgb(var(--background-primary))]/80 to-transparent transition-opacity duration-300 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`}
             />
         </div>
     )

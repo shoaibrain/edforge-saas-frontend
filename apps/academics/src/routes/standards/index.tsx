@@ -14,8 +14,8 @@ export function StandardsModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-              <Target className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
+              <Target className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Learning Standards</h1>
@@ -29,10 +29,10 @@ export function StandardsModule() {
 
       <div className="p-6 space-y-6">
         {/* Redirect Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-blue-500/20">
-              <ArrowRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-info-fg))]/20">
+              <ArrowRight className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -44,7 +44,7 @@ export function StandardsModule() {
               </p>
               <Link
                 to="/curriculum"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
               >
                 <span>Go to Curriculum Management</span>
                 <ArrowRight className="w-4 h-4" />
@@ -57,8 +57,8 @@ export function StandardsModule() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+                <Target className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
               </div>
               <div>
                 <h4 className="font-medium text-text-primary">Common Core State Standards</h4>
@@ -73,8 +73,8 @@ export function StandardsModule() {
 
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]">
+                <Target className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
               </div>
               <div>
                 <h4 className="font-medium text-text-primary">Next Generation Science Standards</h4>
@@ -91,8 +91,8 @@ export function StandardsModule() {
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-purple-500/10">
-              <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+              <Target className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -105,15 +105,15 @@ export function StandardsModule() {
               </p>
               <ul className="text-sm text-text-secondary space-y-1">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
                   <span>CASE-compliant standards import</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
                   <span>Hierarchical organization (domains, clusters, standards)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
                   <span>Student mastery tracking by standard</span>
                 </li>
               </ul>

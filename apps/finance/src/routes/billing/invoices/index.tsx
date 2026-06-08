@@ -108,7 +108,7 @@ function InvoiceDownloadIconButton({
         })
       }
       disabled={downloadInvoice.isPending}
-      className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
+      className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
       title={label}
       aria-label={label}
     >
@@ -283,7 +283,7 @@ export default function InvoicesPage() {
             <div className="flex items-center gap-1.5 text-[rgb(var(--text-secondary))]">
               <span>{invoice.dueDate ? formatDateDual(invoice.dueDate, settings) : '-'}</span>
               {invoice.status === 'overdue' && overdueDays > 0 && (
-                <span className="inline-flex items-center gap-0.5 text-xs text-red-600 dark:text-red-400">
+                <span className="inline-flex items-center gap-0.5 text-xs text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
                   <Clock className="w-3 h-3" />
                   Overdue by {overdueDays}d
                 </span>
@@ -310,7 +310,7 @@ export default function InvoicesPage() {
             <div className="flex items-center justify-end gap-1">
               <button
                 onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
-                className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]"
                 title="View"
               >
                 <Eye className="w-4 h-4" />
@@ -335,7 +335,7 @@ export default function InvoicesPage() {
                   <button
                     onClick={() => handleIssue(invoice.id)}
                     disabled={issueMutation.isPending}
-                    className="p-1.5 rounded-md hover:bg-green-50 text-green-600 dark:hover:bg-green-900/20 dark:text-green-400"
+                    className="p-1.5 rounded-md hover:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:hover:bg-[rgb(var(--state-success-bg)/0.18)] "
                     title="Issue"
                   >
                     <Check className="w-4 h-4" />
@@ -343,7 +343,7 @@ export default function InvoicesPage() {
                   <button
                     onClick={() => openCancelDialog(invoice.id)}
                     disabled={cancelMutation.isPending}
-                    className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
+                    className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))]"
                     title="Cancel"
                   >
                     <X className="w-4 h-4" />
@@ -354,7 +354,7 @@ export default function InvoicesPage() {
                 <button
                   onClick={() => openCancelDialog(invoice.id)}
                   disabled={cancelMutation.isPending}
-                  className="p-1.5 rounded-md hover:bg-red-50 text-red-500 dark:hover:bg-red-900/20 dark:text-red-400"
+                  className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))]"
                   title="Cancel"
                 >
                   <X className="w-4 h-4" />
@@ -400,7 +400,7 @@ export default function InvoicesPage() {
             <button
               type="button"
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80"
               style={{
                 background: 'var(--v2-bg-elevated)',
                 borderColor: 'var(--v2-border-default)',
@@ -413,7 +413,7 @@ export default function InvoicesPage() {
             <button
               type="button"
               onClick={() => setShowGenerateForm(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
               style={{
                 background: 'var(--v2-brand-primary)',
                 color: '#fff',
@@ -501,7 +501,7 @@ export default function InvoicesPage() {
       )}
 
       <TanstackDataTable<Invoice>
-        className="min-h-[400px]"
+        className="min-h-96"
         columns={columns}
         data={invoices}
         getRowId={(row) => row.id}
@@ -600,23 +600,23 @@ function CancelInvoiceDialog({
   }, [handleKeyDown])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
       >
         <div className="flex items-start gap-3 mb-4">
-          <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
-            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] ">
+            <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
               Cancel Invoice {invoiceNumber}?
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-              This action is <span className="font-semibold text-red-600 dark:text-red-400">irreversible</span>.
+              This action is <span className="font-semibold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">irreversible</span>.
               The invoice will be permanently cancelled and cannot be re-issued.
             </p>
           </div>
@@ -631,7 +631,7 @@ function CancelInvoiceDialog({
             onChange={(e) => setReason(e.target.value)}
             placeholder="Enter the reason for cancelling this invoice..."
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-red-500/30"
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
           />
         </div>
@@ -643,7 +643,7 @@ function CancelInvoiceDialog({
           <Button
             onClick={() => onConfirm(reason.trim())}
             disabled={isPending || !reason.trim()}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-[rgb(var(--action-danger-bg))] hover:brightness-95 text-[rgb(var(--action-primary-fg))]"
           >
             {isPending ? (
               <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
@@ -674,16 +674,16 @@ function BulkIssueConfirmModal({
   onCancel: () => void
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
       >
         <div className="flex items-start gap-3 mb-4">
-          <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
-            <Send className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="p-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] ">
+            <Send className="w-5 h-5 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
@@ -791,11 +791,11 @@ function GenerateInvoiceModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
       >
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-4">
           Generate Invoice
@@ -826,7 +826,7 @@ function GenerateInvoiceModal({
                 feeStructures.map((fee: any) => (
                   <label
                     key={fee.id}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgb(var(--surface-secondary))] cursor-pointer"
+                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgb(var(--background-secondary))] cursor-pointer"
                   >
                     <input
                       type="checkbox"
@@ -853,7 +853,7 @@ function GenerateInvoiceModal({
               <select
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
               >
                 <option value="">Select academic year</option>
                 {academicYears.map((y) => (
@@ -871,7 +871,7 @@ function GenerateInvoiceModal({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
               />
             </div>
           </div>
@@ -886,7 +886,7 @@ function GenerateInvoiceModal({
               value={billingPeriod}
               onChange={(e) => setBillingPeriod(e.target.value)}
               placeholder="e.g., First Term, Admission"
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
             />
           </div>
 
@@ -899,13 +899,13 @@ function GenerateInvoiceModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none"
             />
           </div>
 
           {/* Totals Preview */}
           {selectedFees.length > 0 && (
-            <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 space-y-1">
+            <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 space-y-1">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                 <span>Subtotal</span>
                 <span>{formatCurr(subtotal)}</span>

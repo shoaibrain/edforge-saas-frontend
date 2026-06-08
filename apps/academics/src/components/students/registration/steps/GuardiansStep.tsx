@@ -74,7 +74,7 @@ export function GuardiansStep({
         ) : (
           /* Empty State */
           <div className="rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))] p-8 text-center">
-            <div className="mx-auto w-12 h-12 rounded-xl bg-[rgb(var(--surface-secondary))] flex items-center justify-center mb-3">
+            <div className="mx-auto w-12 h-12 rounded-xl bg-[rgb(var(--background-secondary))] flex items-center justify-center mb-3">
               <Users className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
             </div>
             <h3 className="text-sm font-medium text-[rgb(var(--text-primary))]">
@@ -91,7 +91,7 @@ export function GuardiansStep({
           <button
             type="button"
             onClick={addGuardian}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-[rgb(var(--border-secondary))] text-sm font-medium text-teal-600 hover:bg-teal-50 hover:border-teal-300 transition-colors w-full justify-center"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-[rgb(var(--border-secondary))] text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:border-[rgb(var(--state-info-border)/0.45)] transition-colors w-full justify-center"
           >
             <Plus className="w-4 h-4" />
             Add Guardian

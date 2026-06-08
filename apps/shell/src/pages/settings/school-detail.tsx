@@ -97,18 +97,18 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
   },
   suspended: {
     icon: PauseCircle,
-    color: 'text-orange-500',
-    bg: 'bg-orange-500/10',
-    borderColor: 'border-orange-500/20',
-    dot: 'bg-orange-500',
+    color: 'text-[rgb(var(--state-warning-fg))]',
+    bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]0/10',
+    borderColor: 'border-[rgb(var(--state-warning-border)/0.35)]',
+    dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0',
     label: 'Suspended',
   },
   closed: {
     icon: Lock,
-    color: 'text-red-500',
-    bg: 'bg-red-500/10',
-    borderColor: 'border-red-500/20',
-    dot: 'bg-red-500',
+    color: 'text-[rgb(var(--state-danger-fg))]',
+    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10',
+    borderColor: 'border-[rgb(var(--state-danger-border)/0.35)]',
+    dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
     label: 'Closed',
   },
 }
@@ -116,8 +116,8 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
 const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: SchoolStatus; color: string }[]> = {
   setup: [{ label: 'Activate School', targetStatus: 'active', color: 'text-[#1D9E75]' }],
   active: [
-    { label: 'Suspend School', targetStatus: 'suspended', color: 'text-orange-600' },
-    { label: 'Deactivate School', targetStatus: 'inactive', color: 'text-red-600' },
+    { label: 'Suspend School', targetStatus: 'suspended', color: 'text-[rgb(var(--state-warning-fg))]' },
+    { label: 'Deactivate School', targetStatus: 'inactive', color: 'text-[rgb(var(--state-danger-fg))]' },
   ],
   suspended: [{ label: 'Reactivate School', targetStatus: 'active', color: 'text-[#1D9E75]' }],
   inactive: [{ label: 'Reactivate School', targetStatus: 'active', color: 'text-[#1D9E75]' }],
@@ -220,12 +220,12 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl overflow-hidden"
+        className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl overflow-hidden"
       >
         <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
           <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -286,12 +286,12 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={school.name}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-rust-500/40 focus:border-rust-500 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-rust-500/40 focus:border-rust-500 transition-all"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
           <Button variant="ghost" onClick={onClose} disabled={isDeleting}>
             Cancel
           </Button>
@@ -318,7 +318,7 @@ function SchoolAvatar({ name }: { name: string }) {
   // Generate a consistent gradient from the school name
   const initial = name.charAt(0).toUpperCase()
   return (
-    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3a5c] to-[#378ADD] flex items-center justify-center text-white text-lg font-extrabold flex-shrink-0 border border-[rgba(55,138,221,0.2)]">
+    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3a5c] to-[#378ADD] flex items-center justify-center text-[rgb(var(--action-primary-fg))] text-lg font-extrabold flex-shrink-0 border border-[rgba(55,138,221,0.2)]">
       {initial}
     </div>
   )
@@ -347,22 +347,22 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
           ⚙️
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-[13px] font-semibold text-[rgb(var(--text-primary))] mb-0.5">
+          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-0.5">
             Complete school setup before activating
           </h3>
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
             Configure your school's academic structure so EdForge can track attendance, grades, and scheduling correctly.
           </p>
 
           {/* Progress bar */}
           <div className="mb-2.5">
-            <div className="h-[3px] bg-[rgba(255,255,255,0.06)] rounded-full mb-1">
+            <div className="h-1 bg-[rgba(255,255,255,0.06)] rounded-full mb-1">
               <div
                 className="h-full bg-[#EF9F27] rounded-full transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
               {completedCount} of {totalCount} setup tasks complete
             </p>
           </div>
@@ -374,7 +374,7 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
                 key={task.id}
                 onClick={() => onTaskClick(task.tab)}
                 className={`
-                  inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium
+                  inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
                   border transition-all cursor-pointer
                   ${task.completed
                     ? 'bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border-[rgba(29,158,117,0.2)]'
@@ -382,7 +382,7 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
                   }
                 `}
               >
-                <span className="text-[10px]">{task.completed ? '✓' : '○'}</span>
+                <span className="text-xs">{task.completed ? '✓' : '○'}</span>
                 {task.label}
               </button>
             ))}
@@ -393,7 +393,7 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
         <button
           onClick={onActivate}
           disabled={isActivating}
-          className="flex-shrink-0 self-center bg-[#1D9E75] text-white text-xs font-medium px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
+          className="flex-shrink-0 self-center bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
         >
           ✓ Activate School <ArrowRight className="w-3.5 h-3.5" />
         </button>
@@ -422,16 +422,15 @@ export default function SchoolDetailPage() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  // Permission Check
-  if (!user) return null
+  const isTenantAdmin = user?.globalRole === 'TenantAdmin'
 
-  const isTenantAdmin = user.globalRole === 'TenantAdmin'
-
-  const hasPermission = can(user, {
-    action: 'view',
-    resource: 'settings:school',
-    schoolId: schoolId,
-  })
+  const hasPermission = user
+    ? can(user, {
+        action: 'view',
+        resource: 'settings:school',
+        schoolId: schoolId,
+      })
+    : false
 
   // Fetch School Data
   const {
@@ -495,20 +494,22 @@ export default function SchoolDetailPage() {
 
   const displaySchool = school
 
+  if (!user) return null
+
   if (isLoading) {
     return (
       <div className="mx-auto px-6 py-6">
         <div className="animate-pulse space-y-6">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+            <div className="w-12 h-12 bg-[rgb(var(--background-secondary))] rounded-xl" />
             <div className="space-y-2">
-              <div className="h-5 w-48 bg-[rgb(var(--surface-secondary))] rounded-lg" />
-              <div className="h-3 w-32 bg-[rgb(var(--surface-secondary))] rounded" />
+              <div className="h-5 w-48 bg-[rgb(var(--background-secondary))] rounded-lg" />
+              <div className="h-3 w-32 bg-[rgb(var(--background-secondary))] rounded" />
             </div>
           </div>
-          <div className="h-20 bg-[rgb(var(--surface-secondary))] rounded-xl" />
-          <div className="h-10 bg-[rgb(var(--surface-secondary))] rounded-lg" />
-          <div className="h-64 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+          <div className="h-20 bg-[rgb(var(--background-secondary))] rounded-xl" />
+          <div className="h-10 bg-[rgb(var(--background-secondary))] rounded-lg" />
+          <div className="h-64 bg-[rgb(var(--background-secondary))] rounded-xl" />
         </div>
       </div>
     )
@@ -544,19 +545,19 @@ export default function SchoolDetailPage() {
               </h1>
               <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                 {/* Code chip */}
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
+                <span className="text-xs font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
                   {displaySchool.code}
                 </span>
                 {/* IEMIS Code chip (S1.11) — renders only for PABSON schools
                     that have an emisSchoolCode set. */}
                 <IemisCodeBadge code={displaySchool.emisSchoolCode} />
                 {/* Type chip */}
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
+                <span className="text-xs font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
                   {SCHOOL_TYPE_LABELS[displaySchool.type || ''] || displaySchool.type || 'School'}
                 </span>
                 {/* Status chip */}
-                <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.borderColor}`}>
-                  <span className={`w-[5px] h-[5px] rounded-full ${statusCfg.dot}`} />
+                <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.borderColor}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
                   {statusCfg.label}
                 </span>
               </div>
@@ -578,7 +579,7 @@ export default function SchoolDetailPage() {
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <MenuItems className="absolute right-0 z-50 mt-1 w-56 origin-top-right rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+                  <MenuItems className="absolute right-0 z-50 mt-1 w-56 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
                     <div className="py-1">
                       {STATUS_ACTIONS[displaySchool.status]?.map((action) => (
                         <MenuItem key={action.targetStatus}>
@@ -586,7 +587,7 @@ export default function SchoolDetailPage() {
                             <button
                               onClick={() => statusMutation.mutate(action.targetStatus)}
                               disabled={statusMutation.isPending}
-                              className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--surface-secondary))]' : ''} disabled:opacity-50`}
+                              className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--background-secondary))]' : ''} disabled:opacity-50`}
                             >
                               <Power className="w-4 h-4 mr-2.5" />
                               {action.label}
@@ -602,7 +603,7 @@ export default function SchoolDetailPage() {
                           {({ active }) => (
                             <button
                               onClick={() => setShowDeleteModal(true)}
-                              className={`flex items-center w-full px-3 py-2.5 text-sm text-red-600 ${active ? 'bg-red-50 dark:bg-red-500/10' : ''}`}
+                              className={`flex items-center w-full px-3 py-2.5 text-sm text-[rgb(var(--state-danger-fg))] ${active ? 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/10' : ''}`}
                             >
                               <Trash2 className="w-4 h-4 mr-2.5" />
                               {displaySchool.status === 'setup' ? 'Delete School' : 'Deactivate School'}
@@ -668,7 +669,7 @@ export default function SchoolDetailPage() {
                   {tab.label}
                   {badge && (
                     <span className={`
-                      text-[9px] font-semibold px-1.5 py-px rounded-full border
+                      text-xs font-semibold px-1.5 py-px rounded-full border
                       ${badge.variant === 'amber'
                         ? 'bg-[rgba(239,159,39,0.12)] text-[#EF9F27] border-[rgba(239,159,39,0.2)]'
                         : 'bg-[rgba(29,158,117,0.1)] text-[#1D9E75] border-[rgba(29,158,117,0.2)]'
@@ -684,7 +685,7 @@ export default function SchoolDetailPage() {
         </div>
 
         {/* ── Content Area ── */}
-        <div className="min-h-[400px]">
+        <div className="min-h-96">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

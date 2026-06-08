@@ -93,19 +93,19 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
   if (isError) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-red-50 dark:bg-red-500/10 rounded-xl border border-red-200 dark:border-red-500/20 p-8 text-center">
-          <AlertCircle className="w-10 h-10 mx-auto text-red-500 mb-3" />
-          <h4 className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
+        <div className="bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-xl border border-[rgb(var(--state-danger-border))] dark:border-[rgb(var(--state-danger-border))]/20 p-8 text-center">
+          <AlertCircle className="w-10 h-10 mx-auto text-[rgb(var(--state-danger-fg))] mb-3" />
+          <h4 className="text-sm font-medium text-[rgb(var(--state-danger-fg))]  mb-1">
             Failed to load classwork
           </h4>
-          <p className="text-xs text-red-600/70 dark:text-red-400/70 mb-4">
+          <p className="text-xs text-[rgb(var(--state-danger-fg))]/70 /70 mb-4">
             There was an error fetching classwork data. Please try again.
           </p>
           <button
             type="button"
             onClick={() => refetch()}
             aria-label="Retry loading classwork"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/20 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/30 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))]  bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.28)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/30 transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Retry

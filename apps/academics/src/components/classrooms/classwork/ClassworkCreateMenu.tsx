@@ -37,7 +37,7 @@ export function ClassworkCreateMenu({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-full hover:bg-teal-600 transition-colors shadow-sm"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-full hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors shadow-sm"
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label="Create classwork"
@@ -59,7 +59,7 @@ export function ClassworkCreateMenu({
               }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              <ClipboardList className="w-4 h-4 text-blue-500" aria-hidden="true" />
+              <ClipboardList className="w-4 h-4 text-[rgb(var(--state-info-fg))]" aria-hidden="true" />
               Assignment
             </button>
             <button
@@ -83,7 +83,7 @@ export function ClassworkCreateMenu({
               }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              <MessageCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+              <MessageCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" aria-hidden="true" />
               Question
             </button>
             <button
@@ -95,7 +95,7 @@ export function ClassworkCreateMenu({
               }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              <FileText className="w-4 h-4 text-purple-500" aria-hidden="true" />
+              <FileText className="w-4 h-4 text-[rgb(var(--state-info-fg))]" aria-hidden="true" />
               Material
             </button>
             <div className="border-t border-border-secondary my-1" role="separator" />
@@ -108,7 +108,7 @@ export function ClassworkCreateMenu({
                   onKeyDown={(e) => { if (e.key === 'Enter') handleTopicSubmit() }}
                   placeholder="Topic name..."
                   aria-label="New topic name"
-                  className="flex-1 px-2 py-1 text-sm bg-surface-secondary border border-border-primary rounded text-text-primary outline-none focus:ring-1 focus:ring-teal-500/20"
+                  className="flex-1 px-2 py-1 text-sm bg-surface-secondary border border-border-primary rounded text-text-primary outline-none focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   autoFocus
                 />
                 <button
@@ -116,7 +116,7 @@ export function ClassworkCreateMenu({
                   onClick={handleTopicSubmit}
                   disabled={!topicName.trim()}
                   aria-label="Add topic"
-                  className="text-xs font-medium text-teal-500 hover:text-teal-600 disabled:opacity-40"
+                  className="text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] disabled:opacity-40"
                 >
                   Add
                 </button>
@@ -128,7 +128,7 @@ export function ClassworkCreateMenu({
                 onClick={() => setShowTopicInput(true)}
                 className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
               >
-                <FolderPlus className="w-4 h-4 text-teal-500" aria-hidden="true" />
+                <FolderPlus className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" aria-hidden="true" />
                 Topic
               </button>
             )}

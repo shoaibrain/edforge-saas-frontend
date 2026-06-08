@@ -123,7 +123,7 @@ export function Tooltip({
               }}
               className="pointer-events-none"
             >
-              <div className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-sm font-medium shadow-lg whitespace-nowrap">
+              <div className="px-3 py-1.5 rounded-lg bg-[rgb(var(--background-inverse))] text-[rgb(var(--action-primary-fg))] text-sm font-medium shadow-lg whitespace-nowrap">
                 {content}
               </div>
             </motion.div>

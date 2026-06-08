@@ -75,8 +75,8 @@ function PlatformSelectStep() {
                   group flex items-center gap-4 p-4 rounded-xl border text-left w-full
                   transition-all duration-200
                   ${connected
-                    ? 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
-                    : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
+                    ? 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
+                    : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
                   }
                 `}
               >
@@ -124,8 +124,8 @@ function PlatformSelectStep() {
                   group flex items-center gap-4 p-4 rounded-xl border text-left w-full
                   transition-all duration-200
                   ${connected
-                    ? 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
-                    : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
+                    ? 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
+                    : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
                   }
                 `}
               >
@@ -218,9 +218,9 @@ function PermissionsStep() {
       </div>
       
       {/* Permissions */}
-      <div className="p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-secondary))]">
+      <div className="p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-secondary))]">
         <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-3 flex items-center gap-2">
-          <Shield className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+          <Shield className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
           Permissions required
         </h3>
         <ul className="space-y-2">
@@ -246,7 +246,7 @@ function PermissionsStep() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your.email@school.edu"
-          className="w-full px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20 dark:focus:ring-cyan-500/20 focus:border-teal-500 dark:focus:border-cyan-500"
+          className="w-full px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] dark:focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] dark:focus:border-[rgb(var(--border-focus))]"
         />
       </div>
       
@@ -254,14 +254,14 @@ function PermissionsStep() {
       <div className="flex items-center gap-3 pt-2">
         <button
           onClick={() => setWizardStep('select')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
         </button>
         <button
           onClick={handleConnect}
-          className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-teal-600 dark:bg-cyan-600 text-white font-medium hover:bg-teal-700 dark:hover:bg-cyan-700 transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))]  text-[rgb(var(--action-primary-fg))] font-medium hover:bg-[rgb(var(--action-primary-bg-hover))] dark: transition-colors"
         >
           <ExternalLink className="w-4 h-4" />
           Connect with {platform.name}
@@ -288,7 +288,7 @@ function ConnectingStep() {
       </div>
       
       <div className="flex items-center justify-center gap-3 mb-4">
-        <Loader2 className="w-5 h-5 animate-spin text-teal-600 dark:text-cyan-400" />
+        <Loader2 className="w-5 h-5 animate-spin text-[rgb(var(--action-secondary-fg))]" />
         <span className="text-lg font-medium text-[rgb(var(--text-primary))]">
           Connecting to {platform.name}...
         </span>
@@ -334,7 +334,7 @@ function SuccessStep() {
       
       {/* Connected Account */}
       {integration && (
-        <div className="inline-flex items-center gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] mb-8">
+        <div className="inline-flex items-center gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--background-tertiary))] mb-8">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${platform.bgColor}`}>
             <PlatformLogo platformId={platform.id} size={24} />
           </div>
@@ -350,21 +350,21 @@ function SuccessStep() {
       )}
       
       {/* What's Next */}
-      <div className="text-left p-4 rounded-xl bg-teal-500/5 dark:bg-cyan-500/10 border border-teal-500/20 dark:border-cyan-500/20 mb-6">
+      <div className="text-left p-4 rounded-xl bg-[rgb(var(--state-info-bg)/0.12)]  border border-[rgb(var(--border-focus)/0.35)]  mb-6">
         <h3 className="font-medium text-sm text-[rgb(var(--text-primary))] mb-2">
           What's next?
         </h3>
         <ul className="space-y-1.5 text-sm text-[rgb(var(--text-secondary))]">
           <li className="flex items-center gap-2">
-            <Check className="w-3.5 h-3.5 text-teal-600 dark:text-cyan-400" />
+            <Check className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))]" />
             Schedule meetings directly from EdForge
           </li>
           <li className="flex items-center gap-2">
-            <Check className="w-3.5 h-3.5 text-teal-600 dark:text-cyan-400" />
+            <Check className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))]" />
             Join meetings with one click
           </li>
           <li className="flex items-center gap-2">
-            <Check className="w-3.5 h-3.5 text-teal-600 dark:text-cyan-400" />
+            <Check className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))]" />
             Sync your calendar automatically
           </li>
         </ul>
@@ -372,7 +372,7 @@ function SuccessStep() {
       
       <button
         onClick={closeWizard}
-        className="w-full px-6 py-3 rounded-xl bg-teal-600 dark:bg-cyan-600 text-white font-medium hover:bg-teal-700 dark:hover:bg-cyan-700 transition-colors"
+        className="w-full px-6 py-3 rounded-xl bg-[rgb(var(--action-primary-bg))]  text-[rgb(var(--action-primary-fg))] font-medium hover:bg-[rgb(var(--action-primary-bg-hover))] dark: transition-colors"
       >
         Done
       </button>
@@ -405,13 +405,13 @@ function ErrorStep() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setWizardStep('select')}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+          className="flex-1 px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
         >
           Choose different platform
         </button>
         <button
           onClick={() => setWizardStep('permissions')}
-          className="flex-1 px-4 py-2.5 rounded-xl bg-teal-600 dark:bg-cyan-600 text-white font-medium hover:bg-teal-700 dark:hover:bg-cyan-700 transition-colors"
+          className="flex-1 px-4 py-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))]  text-[rgb(var(--action-primary-fg))] font-medium hover:bg-[rgb(var(--action-primary-bg-hover))] dark: transition-colors"
         >
           Try again
         </button>
@@ -454,7 +454,7 @@ export function ConnectionWizard() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={canClose ? closeWizard : undefined}
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm"
         />
         
         {/* Modal */}
@@ -463,13 +463,13 @@ export function ConnectionWizard() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', duration: 0.4 }}
-          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-2xl"
+          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-2xl"
         >
           {/* Close Button */}
           {canClose && (
             <button
               onClick={closeWizard}
-              className="absolute top-4 right-4 p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors z-10"
+              className="absolute top-4 right-4 p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors z-10"
             >
               <X className="w-5 h-5" />
             </button>

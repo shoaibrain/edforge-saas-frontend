@@ -61,8 +61,8 @@ export function ExamsModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8 flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-              <ClipboardList className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
+              <ClipboardList className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Examinations</h1>
@@ -79,7 +79,7 @@ export function ExamsModule() {
               onClick={() => setDrawerOpen(true)}
               disabled={!canOpenDrawer}
               title={!canOpenDrawer ? 'An academic year with terms is required first' : undefined}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] rounded-lg hover:brightness-95 transition-colors disabled:opacity-50"
             >
               <Plus className="w-4 h-4" />
               Create Exam

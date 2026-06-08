@@ -124,7 +124,7 @@ export function AcademicsFilterRow({
             <button
               key={opt.key}
               onClick={() => handleQuickSelect(opt.key)}
-              className="px-2.5 py-1 text-[11px] font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+              className="px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
               style={{
                 background: isActive ? 'var(--v2-brand-primary)' : 'transparent',
                 borderColor: isActive ? 'var(--v2-brand-primary)' : 'rgba(255, 255, 255, 0.1)',
@@ -136,7 +136,7 @@ export function AcademicsFilterRow({
           )
         })}
 
-        <span className="text-[10px] mx-1" style={{ color: 'var(--v2-text-ghost)' }}>or</span>
+        <span className="text-xs mx-1" style={{ color: 'var(--v2-text-ghost)' }}>or</span>
 
         {/* Date inputs */}
         <input
@@ -144,16 +144,16 @@ export function AcademicsFilterRow({
           value={fromDate}
           onChange={(e) => onFromChange(e.target.value)}
           aria-label="From date"
-          className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+          className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
           style={inputStyle}
         />
-        <span className="text-[10px]" style={{ color: 'var(--v2-text-ghost)' }}>→</span>
+        <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>→</span>
         <input
           type="date"
           value={toDate}
           onChange={(e) => onToChange(e.target.value)}
           aria-label="To date"
-          className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+          className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
           style={inputStyle}
         />
 
@@ -162,7 +162,7 @@ export function AcademicsFilterRow({
           <select
             value={gradeLevelFilter}
             onChange={(e) => onGradeLevelChange(e.target.value)}
-            className="px-2 py-1 text-[11px] border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
+            className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
             style={inputStyle}
           >
             <option value="">All Grades</option>
@@ -176,7 +176,7 @@ export function AcademicsFilterRow({
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-full transition-colors hover:opacity-80"
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80"
             style={{ color: 'var(--v2-brand-primary)' }}
           >
             <X className="w-3 h-3" />
@@ -190,7 +190,7 @@ export function AcademicsFilterRow({
             onClick={onExport}
             disabled={isExporting || !hasAcademicYear}
             aria-label="Export enrollments as CSV"
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
             style={{
               background: 'var(--v2-bg-elevated)',
               borderColor: 'var(--v2-border-default)',

@@ -145,13 +145,13 @@ export function InviteForm({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -20 }}
         transition={{ type: 'spring', stiffness: 280, damping: 25 }}
-        className="relative w-full max-w-lg rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-black/20"
+        className="relative w-full max-w-lg rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-black/20"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-teal-500/15 dark:bg-cyan-500/20">
-              <UserPlus className="w-5 h-5 text-teal-600 dark:text-cyan-400" />
+            <div className="p-2.5 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]">
+              <UserPlus className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -164,7 +164,7 @@ export function InviteForm({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
@@ -242,7 +242,7 @@ export function InviteForm({
               <Button
                 type="submit"
                 disabled={isSubmitting || emailCount === 0}
-                className="min-w-[140px]"
+                className="min-w-36"
               >
                 <AnimatePresence mode="wait">
                   {isSubmitting ? (
@@ -256,7 +256,7 @@ export function InviteForm({
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                        className="w-4 h-4 border-2 border-[rgb(var(--border-secondary))] border-t-white rounded-full"
                       />
                       <span>Sending...</span>
                     </motion.div>
@@ -296,15 +296,15 @@ export function InviteForm({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--surface-secondary))]/95 rounded-2xl"
+              className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--background-secondary))]/95 rounded-2xl"
             >
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="text-center"
               >
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-teal-500/20 flex items-center justify-center">
-                  <Check className="w-8 h-8 text-teal-500" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
+                  <Check className="w-8 h-8 text-[rgb(var(--action-secondary-fg))]" />
                 </div>
                 <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
                   Invitations Sent!

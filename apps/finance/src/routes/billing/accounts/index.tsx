@@ -11,9 +11,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2,
   Users,
-  FileText,
-  CreditCard,
-  BookOpen,
   TrendingUp,
   Receipt,
   AlertTriangle,
@@ -22,6 +19,7 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   TanstackDataTable,
   createExpandColumn,
+  FilterTabs,
   type ColumnDef,
   StatCard,
   WidgetErrorBoundaryV2,
@@ -41,52 +39,11 @@ import { formatDate, formatDateDual } from '../../../utils/format-date'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
 
-// ============================================================================
-// INLINE TABS
-// ============================================================================
-
-function TabButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-  count,
-}: {
-  active: boolean
-  onClick: () => void
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  count?: number
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        fontSize: '12px',
-        fontWeight: 500,
-        padding: '6px 12px',
-        borderRadius: 6,
-        background: active ? 'var(--v2-brand-primary, #1D9E75)' : 'transparent',
-        color: active ? '#fff' : 'var(--v2-text-secondary, #c8ccd8)',
-        border: 'none',
-        cursor: 'pointer',
-        transition: 'background 0.15s, color 0.15s',
-      }}
-      className="flex items-center gap-1.5"
-    >
-      <Icon className="w-3.5 h-3.5" />
-      {label}
-      {count !== undefined && count > 0 && (
-        <span className={`ml-1 px-1.5 py-0.5 text-[10px] rounded-full ${
-          active ? 'bg-white/20' : 'bg-[rgb(var(--surface-tertiary,220,220,220))]'
-        }`}>
-          {count}
-        </span>
-      )}
-    </button>
-  )
-}
+const ACCOUNT_TABS = [
+  { key: 'ledger', label: 'Ledger' },
+  { key: 'invoices', label: 'Invoices' },
+  { key: 'payments', label: 'Payments' },
+] satisfies { key: AccountTab; label: string }[]
 
 // ============================================================================
 // LEDGER TAB
@@ -103,7 +60,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -111,16 +68,16 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
   if (isError) {
     return (
       <div className="text-center py-6">
-        <p className="text-xs text-red-600 dark:text-red-400">
+        <p className="text-xs text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
           Failed to load ledger entries.
         </p>
-        <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1">
+        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
           {(error as Error)?.message ?? 'Unknown error'}
         </p>
         <button
           type="button"
           onClick={() => { void refetch() }}
-          className="mt-2 text-xs px-2 py-1 rounded border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-secondary))]"
+          className="mt-2 text-xs px-2 py-1 rounded border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]"
         >
           Retry
         </button>
@@ -160,10 +117,10 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-primary))]">
               {entry.description}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-red-600 dark:text-red-400">
+            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
               {entry.debit > 0 ? format(entry.debit) : ''}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-green-600 dark:text-green-400">
+            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-success-fg))] ">
               {entry.credit > 0 ? format(entry.credit) : ''}
             </td>
             <td className="px-2 py-1.5 text-xs text-right font-medium text-[rgb(var(--text-primary))]">
@@ -190,7 +147,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -218,10 +175,10 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
         {invoices.map((invoice) => (
           <tr
             key={invoice.id}
-            className="hover:bg-[rgb(var(--surface-primary))] cursor-pointer transition-colors"
+            className="hover:bg-[rgb(var(--background-primary))] cursor-pointer transition-colors"
             onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
           >
-            <td className="px-2 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400">
+            <td className="px-2 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] ">
               {invoice.invoiceNumber}
             </td>
             <td className="px-2 py-1.5"><FinanceStatusChip status={invoice.status} size="xs" /></td>
@@ -229,7 +186,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
               {format(invoice.grandTotal)}
             </td>
             <td className="px-2 py-1.5 text-xs text-right font-medium">
-              <span className={invoice.amountDue > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+              <span className={invoice.amountDue > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '}>
                 {format(invoice.amountDue)}
               </span>
             </td>
@@ -262,7 +219,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
       </div>
     )
   }
@@ -293,7 +250,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
             <td className="px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-primary))]">
               {inv.invoiceNumber}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-green-600 dark:text-green-400">
+            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-success-fg))] ">
               {format(inv.amountPaid)}
             </td>
             <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-secondary))]">
@@ -326,22 +283,22 @@ function AccountDetail({
     <div className="px-4 pb-4 space-y-3">
       {/* Summary Header */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Outstanding</p>
+        <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Outstanding</p>
           <p className={`text-sm font-semibold mt-0.5 ${
-            account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+            account.balance > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '
           }`}>
             {format(account.balance)}
           </p>
         </div>
-        <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
+        <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {format(account.totalPaid)}
           </p>
         </div>
-        <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-[10px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
+        <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {account.lastPaymentDate ? formatDate(account.lastPaymentDate, detailSettings) : 'Never'}
           </p>
@@ -349,26 +306,12 @@ function AccountDetail({
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-[rgb(var(--surface-tertiary,240,240,240))] rounded-lg p-1">
-        <TabButton
-          active={activeTab === 'ledger'}
-          onClick={() => setActiveTab('ledger')}
-          icon={BookOpen}
-          label="Ledger"
-        />
-        <TabButton
-          active={activeTab === 'invoices'}
-          onClick={() => setActiveTab('invoices')}
-          icon={FileText}
-          label="Invoices"
-        />
-        <TabButton
-          active={activeTab === 'payments'}
-          onClick={() => setActiveTab('payments')}
-          icon={CreditCard}
-          label="Payments"
-        />
-      </div>
+      <FilterTabs
+        tabs={ACCOUNT_TABS}
+        activeTab={activeTab}
+        onTabChange={(key) => setActiveTab(key as AccountTab)}
+        className="rounded-lg bg-[rgb(var(--background-tertiary))] p-1"
+      />
 
       {/* Tab Content */}
       <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
@@ -419,7 +362,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
       const account = row.original
       return (
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--surface-tertiary))]">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
             <img
               src={getAvatarUrl(account.studentId)}
               alt={account.studentName || 'Student'}
@@ -445,7 +388,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
     cell: ({ row }) => {
       const account = row.original
       return (
-        <span className={account.balance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+        <span className={account.balance > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '}>
           {format(account.balance)}
         </span>
       )
@@ -585,7 +528,7 @@ export default function StudentAccountsPage() {
           description: 'Student accounts are created automatically when invoices are generated.',
         }}
         maxHeight="calc(100vh - 22rem)"
-        className="min-h-[400px]"
+        className="min-h-96"
       />
     </div>
   )

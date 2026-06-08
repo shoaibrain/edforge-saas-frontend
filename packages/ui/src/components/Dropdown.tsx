@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from 'react'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { ChevronDown, Check } from 'lucide-react'
-import { cn } from '../utils'
+import { cn, focusRing, focusRingInset } from '../utils'
 
 export interface DropdownOption {
   id: string
@@ -37,9 +37,10 @@ export function Dropdown({
       <MenuButton
         className={cn(
           'flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-left',
-          'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
-          'hover:bg-[rgb(var(--surface-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30',
-          'transition-colors duration-150',
+          'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
+          'hover:bg-[rgb(var(--background-tertiary))]',
+          focusRing,
+          'transition-colors duration-fast ease-standard',
           buttonClassName
         )}
       >
@@ -51,14 +52,14 @@ export function Dropdown({
 
       <Transition
         as={Fragment}
-        enter="transition ease-out duration-100"
+        enter="transition ease-enter duration-fast"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
+        leave="transition ease-exit duration-instant"
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute z-50 mt-1 w-full min-w-[200px] origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+        <MenuItems className="absolute z-50 mt-1 w-full min-w-52 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
           <div className="py-1">
             {options.map((option) => (
               <MenuItem key={option.id}>
@@ -67,8 +68,9 @@ export function Dropdown({
                     onClick={() => onChange(option.id)}
                     className={cn(
                       'flex items-center w-full px-3 py-2.5 text-sm',
-                      active ? 'bg-[rgb(var(--surface-secondary))]' : '',
-                      value === option.id ? 'text-teal-500' : 'text-[rgb(var(--text-primary))]'
+                      focusRingInset,
+                      active ? 'bg-[rgb(var(--background-secondary))]' : '',
+                      value === option.id ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-[rgb(var(--text-primary))]'
                     )}
                   >
                     {option.icon && (
@@ -83,7 +85,7 @@ export function Dropdown({
                       )}
                     </div>
                     {showCheck && value === option.id && (
-                      <Check className="w-4 h-4 text-teal-500 ml-2" />
+                      <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ml-2" />
                     )}
                   </button>
                 )}

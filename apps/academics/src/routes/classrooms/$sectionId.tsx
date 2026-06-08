@@ -12,7 +12,6 @@ import { useParams, useNavigate, useSearch, Outlet } from '@tanstack/react-route
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
-  BookOpen,
   Users,
   MapPin,
   MoreHorizontal,
@@ -28,6 +27,7 @@ import {
   Plus,
   Lock,
   TrendingUp,
+  type LucideIcon,
 } from 'lucide-react'
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
@@ -66,7 +66,7 @@ import { ClassworkFeed } from '../../components/classrooms/classwork'
 
 type ClassroomDetailTab = 'overview' | 'classwork' | 'people' | 'progress'
 
-const TABS: { id: ClassroomDetailTab; label: string; icon: typeof BookOpen }[] = [
+const TABS: { id: ClassroomDetailTab; label: string; icon: LucideIcon }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'classwork', label: 'Classwork', icon: FileText },
   { id: 'people', label: 'People', icon: Users },
@@ -233,7 +233,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
           <select
             value={selectedTermId ?? ''}
             onChange={(e) => setSelectedTermId(e.target.value || null)}
-            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">Select grading period...</option>
             {gradingPeriods.map((gp: { periodId: string; name: string }) => (
@@ -246,7 +246,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             type="button"
             onClick={() => setShowBulkModal(true)}
             disabled={!effectiveTermId}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-50 bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5" />
             Record
@@ -378,11 +378,11 @@ function ProgressOverview({
   }, [roster, todayRecords])
 
   const distColors: Record<string, string> = {
-    A: 'bg-emerald-500',
-    B: 'bg-blue-500',
-    C: 'bg-amber-500',
-    D: 'bg-orange-500',
-    F: 'bg-red-500',
+    A: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+    B: 'bg-[rgb(var(--state-info-fg))]',
+    C: 'bg-[rgb(var(--state-warning-fg))]',
+    D: 'bg-[rgb(var(--state-warning-fg))]',
+    F: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
   }
 
   return (
@@ -396,7 +396,7 @@ function ProgressOverview({
           <button
             type="button"
             onClick={() => onNavigate('gradebook')}
-            className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+            className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
           >
             Open Gradebook &rarr;
           </button>
@@ -448,7 +448,7 @@ function ProgressOverview({
           <button
             type="button"
             onClick={() => onNavigate('attendance')}
-            className="text-xs text-teal-500 hover:text-teal-600 font-medium"
+            className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
           >
             Open Attendance &rarr;
           </button>
@@ -457,9 +457,9 @@ function ProgressOverview({
           <div className="space-y-3">
             <div className="flex items-baseline gap-2">
               <span className={`text-3xl font-bold ${
-                attendanceStats.rate >= 95 ? 'text-emerald-600 dark:text-emerald-400' :
-                attendanceStats.rate >= 90 ? 'text-amber-600 dark:text-amber-400' :
-                'text-red-600 dark:text-red-400'
+                attendanceStats.rate >= 95 ? 'text-[rgb(var(--state-success-fg))]' :
+                attendanceStats.rate >= 90 ? 'text-[rgb(var(--state-warning-fg))]' :
+                'text-[rgb(var(--state-danger-fg))]'
               }`}>
                 {attendanceStats.rate.toFixed(1)}%
               </span>
@@ -468,25 +468,25 @@ function ProgressOverview({
 
             <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
               {attendanceStats.present > 0 && (
-                <div className="bg-emerald-500 transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
+                <div className="bg-[rgb(var(--state-success-bg)/0.18)]0 transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
               )}
               {attendanceStats.late > 0 && (
-                <div className="bg-amber-500 transition-all" style={{ width: `${(attendanceStats.late / attendanceStats.total) * 100}%` }} title={`Late: ${attendanceStats.late}`} />
+                <div className="bg-[rgb(var(--state-warning-fg))] transition-all" style={{ width: `${(attendanceStats.late / attendanceStats.total) * 100}%` }} title={`Late: ${attendanceStats.late}`} />
               )}
               {attendanceStats.remote > 0 && (
-                <div className="bg-indigo-500 transition-all" style={{ width: `${(attendanceStats.remote / attendanceStats.total) * 100}%` }} title={`Remote: ${attendanceStats.remote}`} />
+                <div className="bg-[rgb(var(--state-info-fg))] transition-all" style={{ width: `${(attendanceStats.remote / attendanceStats.total) * 100}%` }} title={`Remote: ${attendanceStats.remote}`} />
               )}
               {attendanceStats.absent > 0 && (
-                <div className="bg-red-500 transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
+                <div className="bg-[rgb(var(--state-danger-bg)/0.18)]0 transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
               )}
             </div>
 
             <div className="flex flex-wrap gap-4 text-xs">
               {[
-                { label: 'Present', value: attendanceStats.present, dot: 'bg-emerald-500' },
-                { label: 'Late', value: attendanceStats.late, dot: 'bg-amber-500' },
-                { label: 'Remote', value: attendanceStats.remote, dot: 'bg-indigo-500' },
-                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-red-500' },
+                { label: 'Present', value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0' },
+                { label: 'Late', value: attendanceStats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
+                { label: 'Remote', value: attendanceStats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
+                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' },
               ].filter(s => s.value > 0).map((s) => (
                 <div key={s.label} className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${s.dot}`} />
@@ -673,7 +673,7 @@ export function ClassroomDetailPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Classrooms
@@ -697,7 +697,7 @@ export function ClassroomDetailPage() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Enhanced gradient overlay for better text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgb(var(--background-overlay)/0.70)] via-[rgb(var(--background-overlay)/0.40)] to-[rgb(var(--background-overlay)/0.20)]" />
 
         {/* Content (positioned above overlay) */}
         <div className="relative px-4 sm:px-8 pt-5 pb-4">
@@ -706,10 +706,10 @@ export function ClassroomDetailPage() {
             <div className="flex items-center gap-2">
               <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                 section.isActive
-                  ? 'bg-white/20 text-white'
-                  : 'bg-black/20 text-white/80'
+                  ? 'bg-[rgb(var(--background-primary)/0.20)] text-[rgb(var(--action-primary-fg))]'
+                  : 'bg-[rgb(var(--background-overlay)/0.20)] text-[rgb(var(--action-primary-fg))]/80'
               }`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-white' : 'bg-white/50'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--background-secondary))]' : 'bg-[rgb(var(--background-primary)/0.50)]'}`} />
                 {section.isActive ? 'Active' : 'Inactive'}
               </div>
               {schedPerms.edit && (
@@ -723,10 +723,10 @@ export function ClassroomDetailPage() {
           </div>
 
           {/* Title + meta on banner — tighter layout */}
-          <h1 className="text-2xl font-bold text-white drop-shadow-sm">
+          <h1 className="text-2xl font-bold text-[rgb(var(--action-primary-fg))] drop-shadow-sm">
             {section.sectionName || `Section ${section.sectionNumber}`}
           </h1>
-          <p className="text-white/80 text-sm mt-0.5 drop-shadow-sm">
+          <p className="text-[rgb(var(--action-primary-fg))]/80 text-sm mt-0.5 drop-shadow-sm">
             {section.courseName}
             {section.courseCode && ` (${section.courseCode})`}
             {' · '}
@@ -735,12 +735,12 @@ export function ClassroomDetailPage() {
 
           {/* Compact inline badges: enrollment + room */}
           <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-white/90">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--background-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
               <Users className="w-3 h-3" />
               {section.currentEnrollment}/{section.maxEnrollment} students ({percent}%)
             </span>
             {(section.locationRoomNumber || section.roomNumber) && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-white/90">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--background-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
                 <MapPin className="w-3 h-3" />
                 {section.locationRoomNumber || section.roomNumber}
               </span>
@@ -769,12 +769,12 @@ export function ClassroomDetailPage() {
                       : 'text-text-tertiary hover:text-text-secondary'
                   }`}
                 >
-                  <tab.icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
+                  <tab.icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
                   {tab.label}
                   {isActive && (
                     <motion.div
                       layoutId="classroomDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
                       initial={false}
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />
@@ -787,7 +787,7 @@ export function ClassroomDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 sm:px-8 py-6 min-h-[500px]" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="px-4 sm:px-8 py-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

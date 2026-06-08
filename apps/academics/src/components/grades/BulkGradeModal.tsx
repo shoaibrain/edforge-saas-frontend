@@ -126,7 +126,7 @@ export function BulkGradeModal({
   const isStudentsLoading = students.length === 0 && entries.length === 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
@@ -150,7 +150,7 @@ export function BulkGradeModal({
                 value={assignmentName}
                 onChange={(e) => setAssignmentName(e.target.value)}
                 placeholder="e.g., Chapter 3 Quiz"
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
             </div>
             <div>
@@ -162,7 +162,7 @@ export function BulkGradeModal({
                 value={possiblePoints}
                 onChange={(e) => setPossiblePoints(e.target.value)}
                 min={1}
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
             </div>
           </div>
@@ -175,7 +175,7 @@ export function BulkGradeModal({
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
                 {displayCategories.map((opt) => (
                   <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -189,7 +189,7 @@ export function BulkGradeModal({
               <select
                 value={assessmentPurpose}
                 onChange={(e) => setAssessmentPurpose(e.target.value as AssessmentCategory | '')}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
                 <option value="">Auto-detect</option>
                 <option value="formative">Formative</option>
@@ -234,7 +234,7 @@ export function BulkGradeModal({
                         placeholder="—"
                         min={0}
                         max={Number(possiblePoints) * 1.5}
-                        className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                        className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                       />
                       <span className="text-xs text-text-tertiary">/ {possiblePoints}</span>
                     </div>
@@ -254,7 +254,7 @@ export function BulkGradeModal({
             type="button"
             onClick={handleSubmit}
             disabled={bulkMutation.isPending || !assignmentName.trim() || validEntries.length === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {bulkMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Grades ({validEntries.length})

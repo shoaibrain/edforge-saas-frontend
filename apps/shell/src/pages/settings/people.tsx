@@ -62,15 +62,15 @@ const STATUS_OPTIONS = [
 function getStatusBadge(status: string) {
   switch (status) {
     case 'active':
-      return { bg: 'bg-emerald-100 dark:bg-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400', icon: CheckCircle2 }
+      return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] ', text: 'text-[rgb(var(--state-success-fg))] ', icon: CheckCircle2 }
     case 'inactive':
-      return { bg: 'bg-gray-100 dark:bg-gray-500/20', text: 'text-gray-600 dark:text-gray-400', icon: UserX }
+      return { bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/20', text: 'text-[rgb(var(--text-secondary))] ', icon: UserX }
     case 'suspended':
-      return { bg: 'bg-red-100 dark:bg-red-500/20', text: 'text-red-700 dark:text-red-400', icon: ShieldAlert }
+      return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]', icon: ShieldAlert }
     case 'pending':
       return { bg: 'bg-amber-100 dark:bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400', icon: Clock }
     default:
-      return { bg: 'bg-gray-100 dark:bg-gray-500/20', text: 'text-gray-600 dark:text-gray-400', icon: Clock }
+      return { bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/20', text: 'text-[rgb(var(--text-secondary))] ', icon: Clock }
   }
 }
 
@@ -78,7 +78,7 @@ function getRoleBadge(role: string) {
   if (role === 'TenantAdmin') {
     return { bg: 'bg-violet-100 dark:bg-violet-500/20', text: 'text-violet-700 dark:text-violet-400' }
   }
-  return { bg: 'bg-blue-100 dark:bg-blue-500/20', text: 'text-blue-700 dark:text-blue-400' }
+  return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]' }
 }
 
 // ============================================================================
@@ -99,7 +99,7 @@ function StatCard({
   return (
     <motion.div
       variants={fadeInUp}
-      className="bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-xl p-4"
+      className="bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-xl p-4"
     >
       <div className="flex items-center gap-3">
         <div className={`p-2.5 rounded-lg ${color}`}>
@@ -135,18 +135,18 @@ function ChangeRoleModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Change Role</h3>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-md text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] transition-colors"
+            className="p-1 rounded-md text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -159,7 +159,7 @@ function ChangeRoleModal({
         <select
           value={newRole}
           onChange={(e) => setNewRole(e.target.value as GlobalRole)}
-          className="w-full px-3 py-2.5 bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20 mb-6"
+          className="w-full px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] mb-6"
         >
           {ROLE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -193,7 +193,7 @@ const ACTION_CONFIG: Record<ConfirmAction, { title: string; description: string;
     title: 'Activate User',
     description: 'This will restore the user\'s access to the platform.',
     buttonLabel: 'Activate',
-    color: 'bg-emerald-500 hover:bg-emerald-600',
+    color: 'bg-[rgb(var(--state-success-fg))] hover:bg-[rgb(var(--state-success-fg))]',
   },
   deactivate: {
     title: 'Deactivate User',
@@ -205,13 +205,13 @@ const ACTION_CONFIG: Record<ConfirmAction, { title: string; description: string;
     title: 'Suspend User',
     description: 'This will immediately revoke all access and active sessions.',
     buttonLabel: 'Suspend',
-    color: 'bg-red-500 hover:bg-red-600',
+    color: 'bg-[rgb(var(--state-danger-bg)/0.18)]0 hover:bg-[rgb(var(--action-danger-bg))]',
   },
   delete: {
     title: 'Delete User',
     description: 'This action cannot be easily undone. The user will be permanently removed.',
     buttonLabel: 'Delete',
-    color: 'bg-red-600 hover:bg-red-700',
+    color: 'bg-[rgb(var(--action-danger-bg))] hover:brightness-95',
   },
 }
 
@@ -245,15 +245,15 @@ function ConfirmActionModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-full bg-red-100 dark:bg-red-500/20">
-            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20">
+            <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
           </div>
           <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{config.title}</h3>
         </div>
@@ -269,7 +269,7 @@ function ConfirmActionModal({
             type="button"
             onClick={handleConfirm}
             disabled={isPending}
-            className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 ${config.color}`}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] rounded-lg transition-colors disabled:opacity-50 ${config.color}`}
           >
             {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             {config.buttonLabel}
@@ -303,7 +303,7 @@ function UserActionsDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] transition-colors"
+        className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
@@ -316,13 +316,13 @@ function UserActionsDropdown({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="absolute right-0 top-full mt-1 z-50 w-48 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg py-1"
+              className="absolute right-0 top-full mt-1 z-50 w-48 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg py-1"
             >
               <button
                 type="button"
                 onClick={() => { onChangeRole(user); setOpen(false) }}
                 disabled={isSelf}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <UserCog className="w-4 h-4" />
                 Change Role
@@ -332,7 +332,7 @@ function UserActionsDropdown({
                 <button
                   type="button"
                   onClick={() => { onAction(user, 'activate'); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-[rgb(var(--surface-hover))] transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-success-fg))]  hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   <UserCheck className="w-4 h-4" />
                   Activate
@@ -343,7 +343,7 @@ function UserActionsDropdown({
                 <button
                   type="button"
                   onClick={() => { onAction(user, 'deactivate'); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-[rgb(var(--surface-hover))] transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-warning-fg))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   <UserX className="w-4 h-4" />
                   Deactivate
@@ -354,7 +354,7 @@ function UserActionsDropdown({
                 <button
                   type="button"
                   onClick={() => { onAction(user, 'suspend'); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-[rgb(var(--surface-hover))] transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   <ShieldAlert className="w-4 h-4" />
                   Suspend
@@ -367,7 +367,7 @@ function UserActionsDropdown({
                 type="button"
                 onClick={() => { onAction(user, 'delete'); setOpen(false) }}
                 disabled={isSelf}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete User
@@ -395,16 +395,13 @@ export default function PeopleSettingsPage() {
   const [roleModalUser, setRoleModalUser] = useState<UserResponseDto | null>(null)
   const [confirmModal, setConfirmModal] = useState<{ user: UserResponseDto; action: ConfirmAction } | null>(null)
 
-  // Check permission
-  if (!user) {
-    return <Navigate to="/login" />
-  }
-
-  const hasPermission = can(user, {
-    action: 'view',
-    resource: 'staff',
-    schoolId: activeSchoolId ?? undefined,
-  })
+  const hasPermission = user
+    ? can(user, {
+        action: 'view',
+        resource: 'staff',
+        schoolId: activeSchoolId ?? undefined,
+      })
+    : false
 
   // Build query params
   const queryParams: ListUsersParams = useMemo(() => {
@@ -416,10 +413,6 @@ export default function PeopleSettingsPage() {
   }, [searchQuery, roleFilter, statusFilter])
 
   const { data, isLoading } = useUsers(queryParams, !!hasPermission)
-
-  if (!hasPermission) {
-    return <AccessDenied message="You don't have permission to view access policy settings." />
-  }
 
   const users = data?.items || []
 
@@ -447,7 +440,7 @@ export default function PeopleSettingsPage() {
         const u = row.original
         return (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 text-xs font-semibold shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--action-primary-bg))]/20 flex items-center justify-center text-[rgb(var(--action-secondary-fg))]  text-xs font-semibold shrink-0">
               {u.firstName?.[0] || ''}{u.lastName?.[0] || ''}
             </div>
             <div className="min-w-0">
@@ -511,7 +504,7 @@ export default function PeopleSettingsPage() {
       cell: ({ row }) => {
         const u = row.original
         return (
-          <span className={`text-xs font-medium ${u.mfaEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-[rgb(var(--text-tertiary))]'}`}>
+          <span className={`text-xs font-medium ${u.mfaEnabled ? 'text-[rgb(var(--state-success-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`}>
             {u.mfaEnabled ? 'On' : 'Off'}
           </span>
         )
@@ -521,13 +514,21 @@ export default function PeopleSettingsPage() {
       cell: ({ row }) => (
         <UserActionsDropdown
           user={row.original}
-          currentUserId={user.id}
+          currentUserId={user?.id ?? ''}
           onChangeRole={handleChangeRole}
           onAction={handleAction}
         />
       ),
     }),
-  ], [user.id, handleChangeRole, handleAction])
+  ], [user?.id, handleChangeRole, handleAction])
+
+  if (!user) {
+    return <Navigate to="/login" />
+  }
+
+  if (!hasPermission) {
+    return <AccessDenied message="You don't have permission to view access policy settings." />
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
@@ -545,29 +546,29 @@ export default function PeopleSettingsPage() {
 
         {/* Stat Cards */}
         <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Total Users" value={stats.total} icon={Users} color="bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400" />
-          <StatCard label="Active" value={stats.active} icon={UserCheck} color="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" />
-          <StatCard label="Suspended" value={stats.suspended} icon={ShieldAlert} color="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400" />
-          <StatCard label="Pending" value={stats.pending} icon={Clock} color="bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400" />
+          <StatCard label="Total Users" value={stats.total} icon={Users} color="bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--action-primary-bg))]/20 text-[rgb(var(--action-secondary-fg))] " />
+          <StatCard label="Active" value={stats.active} icon={UserCheck} color="bg-[rgb(var(--state-success-bg)/0.18)]  text-[rgb(var(--state-success-fg))] " />
+          <StatCard label="Suspended" value={stats.suspended} icon={ShieldAlert} color="bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
+          <StatCard label="Pending" value={stats.pending} icon={Clock} color="bg-amber-100 dark:bg-amber-500/20 text-[rgb(var(--state-warning-fg))]" />
         </motion.div>
 
         {/* Filters */}
         <motion.div variants={fadeInUp} className="flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 min-w-[200px] max-w-md">
+          <div className="relative flex-1 min-w-52 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2.5 bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">All Roles</option>
             {ROLE_OPTIONS.map((opt) => (
@@ -578,7 +579,7 @@ export default function PeopleSettingsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">All Statuses</option>
             {STATUS_OPTIONS.map((opt) => (
@@ -640,8 +641,8 @@ function AccessDenied({ message }: { message: string }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center py-16"
       >
-        <div className="p-4 rounded-full bg-red-500/10 inline-flex mb-4">
-          <ShieldX className="w-8 h-8 text-red-500" />
+        <div className="p-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 inline-flex mb-4">
+          <ShieldX className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">Access Denied</h2>
         <p className="text-[rgb(var(--text-tertiary))]">{message}</p>

@@ -161,7 +161,7 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
 
         {/* Results count */}
         {totalResults !== undefined && (
-          <span className="text-[11px] ml-auto" style={{ color: 'var(--v2-text-hint)' }}>
+          <span className="text-xs ml-auto" style={{ color: 'var(--v2-text-hint)' }}>
             {totalResults} section{totalResults !== 1 ? 's' : ''}
             {filterCount > 0 ? ' matched' : ''}
           </span>

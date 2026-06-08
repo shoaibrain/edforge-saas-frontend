@@ -156,7 +156,7 @@ export function OnboardingFlow() {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="w-full max-w-[560px]"
+            className="w-full max-max-w-xl"
           >
             {renderStep()}
           </motion.div>

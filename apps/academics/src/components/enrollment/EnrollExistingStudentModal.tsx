@@ -190,7 +190,7 @@ export function EnrollExistingStudentModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -205,8 +205,8 @@ export function EnrollExistingStudentModal({
         {/* Read-only student info */}
         <div className="p-3 rounded-lg bg-surface-secondary border border-border-secondary">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-teal-500" />
+            <div className="w-9 h-9 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
             </div>
             <div>
               <p className="text-sm font-medium text-text-primary">
@@ -227,7 +227,7 @@ export function EnrollExistingStudentModal({
             htmlFor="academicYearId"
             className="block text-sm font-medium text-text-primary mb-1.5"
           >
-            Academic Year <span className="text-red-500">*</span>
+            Academic Year <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="academicYearId"
@@ -248,12 +248,12 @@ export function EnrollExistingStudentModal({
             ))}
           </select>
           {errors.academicYearId && (
-            <p className="mt-1 text-sm text-red-500">
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
               {errors.academicYearId.message}
             </p>
           )}
           {activeYears.length === 0 && (
-            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+            <p className="mt-1 text-xs text-[rgb(var(--state-warning-fg))]">
               No active academic years found. Activate an academic year in
               Settings first.
             </p>
@@ -267,7 +267,7 @@ export function EnrollExistingStudentModal({
               htmlFor="enrollmentDate"
               className="block text-sm font-medium text-text-primary mb-1.5"
             >
-              Entry Date <span className="text-red-500">*</span>
+              Entry Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="enrollmentDate"
@@ -277,7 +277,7 @@ export function EnrollExistingStudentModal({
               disabled={isSubmitting}
             />
             {errors.enrollmentDate && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
                 {errors.enrollmentDate.message}
               </p>
             )}
@@ -287,7 +287,7 @@ export function EnrollExistingStudentModal({
               htmlFor="gradeLevel"
               className="block text-sm font-medium text-text-primary mb-1.5"
             >
-              Grade Level <span className="text-red-500">*</span>
+              Grade Level <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="gradeLevel"
@@ -303,7 +303,7 @@ export function EnrollExistingStudentModal({
               ))}
             </select>
             {errors.gradeLevel && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
                 {errors.gradeLevel.message}
               </p>
             )}
@@ -317,7 +317,7 @@ export function EnrollExistingStudentModal({
               htmlFor="enrollmentType"
               className="block text-sm font-medium text-text-primary mb-1.5"
             >
-              Enrollment Type <span className="text-red-500">*</span>
+              Enrollment Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="enrollmentType"
@@ -332,7 +332,7 @@ export function EnrollExistingStudentModal({
               ))}
             </select>
             {errors.enrollmentType && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
                 {errors.enrollmentType.message}
               </p>
             )}
@@ -367,7 +367,7 @@ export function EnrollExistingStudentModal({
               id="primarySchool"
               type="checkbox"
               {...register('primarySchool')}
-              className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-teal-500/20"
+              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
               disabled={isSubmitting}
             />
             <label
@@ -401,7 +401,7 @@ export function EnrollExistingStudentModal({
         </div>
 
         {isDirty && (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
+          <p className="text-sm text-[rgb(var(--state-warning-fg))]">
             You have unsaved changes
           </p>
         )}
@@ -418,7 +418,7 @@ export function EnrollExistingStudentModal({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[120px]"
+            className="min-w-32"
           >
             {isSubmitting ? (
               <>

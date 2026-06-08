@@ -32,11 +32,11 @@ import { formatDate } from '../../lib/utils'
 
 const LEAVE_STATUS_COLORS: Record<string, string> = {
   pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  approved: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  rejected: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  cancelled: 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
-  in_progress: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  completed: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
+  approved: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
+  rejected: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
+  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] ',
+  in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  completed: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ',
 }
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -56,14 +56,14 @@ const LEAVE_TYPE_LABELS: Record<string, string> = {
 }
 
 const LEAVE_TYPE_COLORS: Record<string, string> = {
-  annual: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  sick: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  personal: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  bereavement: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
-  maternity: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
-  paternity: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-  family_medical: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
-  professional_development: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+  annual: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  sick: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
+  personal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  bereavement: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] ',
+  maternity: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] ',
+  paternity: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  family_medical: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] ',
+  professional_development: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
 }
 
 const fadeInUp = {
@@ -185,7 +185,7 @@ export function LeaveManagement({
         </div>
         <button
           onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Request Leave
@@ -195,10 +195,10 @@ export function LeaveManagement({
       {/* Leave Balance Summary */}
       {leaveSummary && (
         <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <CalendarDays className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+                <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))] " />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Total Requests</p>
@@ -206,10 +206,10 @@ export function LeaveManagement({
               </div>
             </div>
           </div>
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <CalendarCheck2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]">
+                <CalendarCheck2 className="w-4 h-4 text-[rgb(var(--state-success-fg))] " />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Used</p>
@@ -217,7 +217,7 @@ export function LeaveManagement({
               </div>
             </div>
           </div>
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-amber-500/10">
                 <Hourglass className="w-4 h-4 text-amber-600 dark:text-amber-400" />
@@ -228,10 +228,10 @@ export function LeaveManagement({
               </div>
             </div>
           </div>
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <CalendarX2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg))]0/10">
+                <CalendarX2 className="w-4 h-4 text-[rgb(var(--state-danger-fg))] " />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Pending</p>
@@ -247,11 +247,11 @@ export function LeaveManagement({
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--background-secondary))] rounded-xl" />
             ))}
           </div>
         ) : !requests || requests.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <CalendarDays className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Leave Requests</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -262,7 +262,7 @@ export function LeaveManagement({
           <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-secondary))]">
             <table className="w-full">
               <thead>
-                <tr className="bg-[rgb(var(--surface-tertiary))]">
+                <tr className="bg-[rgb(var(--background-tertiary))]">
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Type</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Dates</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Duration</th>
@@ -278,11 +278,11 @@ export function LeaveManagement({
                   return (
                     <tr
                       key={request.leaveId}
-                      className="bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+                      className="bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                     >
                       {/* Type */}
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAVE_TYPE_COLORS[request.leaveType] || 'bg-slate-500/10 text-slate-600'}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAVE_TYPE_COLORS[request.leaveType] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
                           {LEAVE_TYPE_LABELS[request.leaveType] || request.leaveType}
                         </span>
                       </td>
@@ -318,7 +318,7 @@ export function LeaveManagement({
 
                       {/* Reason */}
                       <td className="px-4 py-3">
-                        <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-[200px] truncate">
+                        <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-52 truncate">
                           {request.reason || '—'}
                         </p>
                       </td>
@@ -333,14 +333,14 @@ export function LeaveManagement({
                               <>
                                 <button
                                   onClick={() => handleApprove(request.leaveId)}
-                                  className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-[rgb(var(--text-tertiary))] hover:text-emerald-600 transition-colors"
+                                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-success-fg))] transition-colors"
                                   title="Approve"
                                 >
                                   <Check className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleReject(request.leaveId)}
-                                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                                   title="Reject"
                                 >
                                   <X className="w-4 h-4" />
@@ -350,7 +350,7 @@ export function LeaveManagement({
                             {(request.status === 'pending' || request.status === 'approved') && (
                               <button
                                 onClick={() => handleCancel(request.leaveId)}
-                                className="p-1.5 rounded-lg hover:bg-slate-500/10 text-[rgb(var(--text-tertiary))] hover:text-slate-600 transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
                                 title="Cancel"
                               >
                                 <Ban className="w-4 h-4" />

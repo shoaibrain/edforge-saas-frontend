@@ -35,7 +35,7 @@ function FormSection({
   return (
     <div className="rounded-xl border border-border-secondary p-5 space-y-4">
       <div className="flex items-center gap-2.5">
-        <Icon className="w-4 h-4 text-teal-500" />
+        <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
         <div>
           <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
           {description && (
@@ -67,10 +67,10 @@ function Field({
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-text-secondary">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-[rgb(var(--state-danger-fg))] ml-0.5">*</span>}
       </label>
       {children}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-[rgb(var(--state-danger-fg))]">{error}</p>}
     </div>
   )
 }
@@ -139,7 +139,7 @@ export function SectionForm({ isEdit }: SectionFormProps) {
   }, [academicYears, academicYearId, isEdit, setValue])
 
   const inputClass =
-    'w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors'
+    'w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
   const selectClass = inputClass
 
   return (

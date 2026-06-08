@@ -78,7 +78,7 @@ function StepIndicator({ current }: { current: Step }) {
             {idx > 0 && (
               <div
                 className={`h-px w-6 ${
-                  isDone ? 'bg-teal-500' : 'bg-[rgb(var(--border-primary))]'
+                  isDone ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--border-primary))]'
                 }`}
               />
             )}
@@ -86,10 +86,10 @@ function StepIndicator({ current }: { current: Step }) {
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                   isActive
-                    ? 'bg-teal-600 text-white'
+                    ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]'
                     : isDone
-                      ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400'
-                      : 'bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))]'
+                      ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  '
+                      : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]'
                 }`}
               >
                 {isDone ? (
@@ -270,7 +270,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
   if (formState === 'submitting') {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-4">
-        <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-[rgb(var(--action-secondary-fg))] animate-spin" />
         <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
           Generating invoices for {selectedStudentIds.length} students...
         </p>
@@ -289,7 +289,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
         animate={{ opacity: 1, y: 0 }}
         className="py-12 text-center space-y-4"
       >
-        <CheckCircle2 className="w-12 h-12 mx-auto text-green-500" />
+        <CheckCircle2 className="w-12 h-12 mx-auto text-[rgb(var(--state-success-fg))]" />
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
           Bulk Generation Complete
         </h2>
@@ -311,7 +311,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
             <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
+                  <tr className="bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))]">
                     <th className="text-left px-3 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Student
                     </th>
@@ -327,7 +327,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     {result.errors.map((err, i) => {
                       const student = students.find((s) => s.studentId === err.studentId)
                       return (
-                        <tr key={i} className="hover:bg-[rgb(var(--surface-secondary))]">
+                        <tr key={i} className="hover:bg-[rgb(var(--background-secondary))]">
                           <td className="px-3 py-2 text-sm text-[rgb(var(--text-primary))]">
                             {student?.fullName || (
                               <>
@@ -335,7 +335,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                               </>
                             )}
                           </td>
-                          <td className="px-3 py-2 text-sm text-red-600 dark:text-red-400">
+                          <td className="px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
                             {err.reason}
                           </td>
                         </tr>
@@ -393,7 +393,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   placeholder="Search by name or student number..."
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
 
@@ -403,7 +403,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 <button
                   type="button"
                   onClick={toggleAllStudents}
-                  className="text-teal-600 dark:text-teal-400 hover:underline"
+                  className="text-[rgb(var(--action-secondary-fg))]  hover:underline"
                 >
                   {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                     ? 'Deselect All'
@@ -414,7 +414,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
               {/* Student list */}
               {studentsLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-5 h-5 text-teal-500 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
                 </div>
               ) : filteredStudents.length === 0 ? (
                 <div className="text-center py-12">
@@ -428,13 +428,13 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   {filteredStudents.map((student) => (
                     <label
                       key={student.studentId}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--background-secondary))] cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
                         checked={selectedStudentIds.includes(student.studentId)}
                         onChange={() => toggleAccount(student.studentId)}
-                        className="rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                        className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
                       />
                       <div className="flex-1 min-w-0">
                         <span className="text-sm text-[rgb(var(--text-primary))]">
@@ -472,7 +472,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
 
               {feesLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-5 h-5 text-teal-500 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
                 </div>
               ) : feeStructures.length === 0 ? (
                 <div className="text-center py-12">
@@ -486,13 +486,13 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   {feeStructures.map((fee) => (
                     <label
                       key={fee.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--background-secondary))] cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
                         checked={selectedFeeIds.includes(fee.id)}
                         onChange={() => toggleFee(fee.id)}
-                        className="rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                        className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
                       />
                       <div className="flex-1 min-w-0">
                         <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
@@ -520,7 +520,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
               )}
 
               {selectedFeeIds.length > 0 && (
-                <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3">
+                <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3">
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Per-student subtotal</span>
                     <span>{format(perStudentSubtotal)}</span>
@@ -560,7 +560,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   <select
                     value={academicYear}
                     onChange={(e) => setAcademicYear(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   >
                     <option value="">Select academic year</option>
                     {academicYears.map((y) => (
@@ -578,7 +578,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   />
                 </div>
               </div>
@@ -592,7 +592,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   value={billingPeriod}
                   onChange={(e) => setBillingPeriod(e.target.value)}
                   placeholder="e.g., First Term, Admission"
-                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
 
@@ -605,7 +605,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Optional notes to include on all invoices..."
-                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
             </div>
@@ -680,7 +680,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 </div>
 
                 {/* Totals */}
-                <div className="px-4 py-3 bg-[rgb(var(--surface-secondary))]">
+                <div className="px-4 py-3 bg-[rgb(var(--background-secondary))]">
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Per-student total</span>
                     <span>{format(perStudentTotal)}</span>

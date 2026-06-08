@@ -164,7 +164,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
   const isSaving = createMutation.isPending || updateMutation.isPending
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
@@ -191,7 +191,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
               value={policyName}
               onChange={(e) => setPolicyName(e.target.value)}
               placeholder="e.g., Standard A-F Scale"
-              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -205,7 +205,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of this policy"
-              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -218,7 +218,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
               <select
                 value={roundingRule}
                 onChange={(e) => setRoundingRule(e.target.value as 'up' | 'down' | 'nearest')}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
                 <option value="nearest">Round to Nearest</option>
                 <option value="up">Round Up</option>
@@ -236,7 +236,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                   onChange={(e) => setMinimumPassingGrade(Number(e.target.value))}
                   min={0}
                   max={100}
-                  className="w-20 px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="w-20 px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
                 <span className="text-sm text-text-tertiary">%</span>
               </div>
@@ -246,7 +246,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                 type="checkbox"
                 checked={isDefault}
                 onChange={(e) => setIsDefault(e.target.checked)}
-                className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-teal-500/20"
+                className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
               <span className="text-sm text-text-primary">Set as default</span>
             </label>
@@ -261,7 +261,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                 <select
                   value={gpaScale}
                   onChange={(e) => setGpaScale(e.target.value as GpaScale)}
-                  className="px-2 py-1 bg-surface-secondary border border-border-secondary rounded text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  className="px-2 py-1 bg-surface-secondary border border-border-secondary rounded text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 >
                   <option value="4.0">4.0</option>
                   <option value="5.0">5.0</option>
@@ -275,14 +275,14 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     type="text"
                     value={entry.letter}
                     onChange={(e) => handleLetterGradeChange(i, 'letter', e.target.value)}
-                    className="w-16 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-16 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     placeholder="A"
                   />
                   <input
                     type="number"
                     value={entry.minPercentage}
                     onChange={(e) => handleLetterGradeChange(i, 'minPercentage', Number(e.target.value))}
-                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     min={0}
                     max={100}
                   />
@@ -291,7 +291,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     type="number"
                     value={entry.maxPercentage}
                     onChange={(e) => handleLetterGradeChange(i, 'maxPercentage', Number(e.target.value))}
-                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     min={0}
                     max={100}
                   />
@@ -300,7 +300,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     type="number"
                     value={entry.gpaPoints}
                     onChange={(e) => handleLetterGradeChange(i, 'gpaPoints', Number(e.target.value))}
-                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     step={0.1}
                     min={0}
                     max={parseFloat(gpaScale)}
@@ -321,14 +321,14 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                 <span
                   className={`text-xs font-medium ${
                     isWeightValid
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-red-600 dark:text-red-400'
+                      ? 'text-[rgb(var(--state-success-fg))]'
+                      : 'text-[rgb(var(--state-danger-fg))]'
                   }`}
                 >
                   Total: {totalWeight}%
                 </span>
                 {!isWeightValid && (
-                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                  <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
                 )}
               </div>
             </div>
@@ -355,14 +355,14 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     type="text"
                     value={cat.categoryName}
                     onChange={(e) => handleCategoryChange(i, 'categoryName', e.target.value)}
-                    className="flex-1 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="flex-1 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     placeholder="Category name"
                   />
                   <input
                     type="number"
                     value={cat.weight}
                     onChange={(e) => handleCategoryChange(i, 'weight', Number(e.target.value))}
-                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     min={0}
                     max={100}
                   />
@@ -372,18 +372,18 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                       type="number"
                       value={cat.dropLowest ?? 0}
                       onChange={(e) => handleCategoryChange(i, 'dropLowest', Number(e.target.value))}
-                      className="w-14 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                      className="w-14 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                       min={0}
                       max={5}
                       title="Drop lowest N scores"
                     />
-                    <span className="text-text-tertiary text-[10px] whitespace-nowrap">drop</span>
+                    <span className="text-text-tertiary text-xs whitespace-nowrap">drop</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeCategory(i)}
                     disabled={categories.length <= 1}
-                    className="p-1.5 rounded-md text-text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-30"
+                    className="p-1.5 rounded-md text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors disabled:opacity-30"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -414,7 +414,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
             type="button"
             onClick={handleSubmit}
             disabled={isSaving || !policyName.trim() || !isWeightValid}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             {isEdit ? 'Update Policy' : 'Create Policy'}

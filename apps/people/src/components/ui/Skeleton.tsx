@@ -27,7 +27,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-lg bg-[rgb(var(--surface-tertiary))]',
+        'animate-pulse rounded-lg bg-[rgb(var(--background-tertiary))]',
         className
       )}
     />
@@ -119,7 +119,7 @@ export function SkeletonCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        'rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
@@ -138,7 +138,7 @@ export function SkeletonCard({
         <SkeletonText lines={lines} />
       </div>
       {hasFooter && (
-        <div className="px-6 py-4 border-t border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-tertiary))]">
+        <div className="px-6 py-4 border-t border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
           <div className="flex items-center justify-between">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-8 w-20 rounded-lg" />
@@ -172,14 +172,14 @@ export function SkeletonTable({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        'rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
       <div className="overflow-x-auto">
         <table className="w-full">
           {hasHeader && (
-            <thead className="border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))]">
+            <thead className="border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))]">
               <tr>
                 {Array.from({ length: columns }).map((_, i) => (
                   <th key={i} className="px-6 py-3 text-left">
@@ -273,7 +273,7 @@ export function SkeletonList({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        'rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
@@ -299,7 +299,7 @@ export function SkeletonStatsCard({ className }: SkeletonStatsCardProps) {
   return (
     <div
       className={cn(
-        'p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]',
+        'p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]',
         className
       )}
     >

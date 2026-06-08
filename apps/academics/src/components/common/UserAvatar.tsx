@@ -26,8 +26,8 @@ function getInitials(name: string): string {
 
 function getInitialsBgColor(name: string): string {
   const colors = [
-    'bg-blue-500', 'bg-emerald-500', 'bg-purple-500', 'bg-amber-500',
-    'bg-rose-500', 'bg-cyan-500', 'bg-indigo-500', 'bg-teal-500',
+    'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-success-bg)/0.18)]0', 'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-warning-fg))]',
+    'bg-[rgb(var(--state-danger-fg))]', 'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-info-bg)/0.18)]0',
   ]
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
@@ -46,7 +46,7 @@ export function UserAvatar({ userId, userName, role = 'student', size = 'md', cl
   if (imgError || !avatarUrl) {
     return (
       <div
-        className={`inline-flex items-center justify-center rounded-full text-white font-medium flex-shrink-0 ${bgColor} ${className}`}
+        className={`inline-flex items-center justify-center rounded-full text-[rgb(var(--action-primary-fg))] font-medium flex-shrink-0 ${bgColor} ${className}`}
         style={{ width: px, height: px, fontSize: px * 0.4 }}
         aria-label={userName}
       >

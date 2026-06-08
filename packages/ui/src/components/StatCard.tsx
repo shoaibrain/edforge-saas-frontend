@@ -40,7 +40,7 @@ export interface StatCardProps {
 function KpiSkeleton() {
   return (
     <div
-      className="relative overflow-hidden rounded-xl border p-[18px]"
+      className="relative overflow-hidden rounded-xl border p-4"
       style={{
         background: 'var(--v2-bg-surface)',
         borderColor: 'var(--v2-border-default)',
@@ -129,7 +129,7 @@ export function StatCard({
       {/* Top row: label + icon */}
       <div className="flex items-center justify-between mb-2.5">
         <span
-          className="text-[11px] font-medium uppercase tracking-[0.5px]"
+          className="text-xs font-medium uppercase tracking-[0.5px]"
           style={{ color: 'var(--v2-text-faint)' }}
         >
           {label}
@@ -156,7 +156,7 @@ export function StatCard({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded"
+              className="flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium rounded"
               style={{
                 background: 'var(--v2-warning-bg)',
                 color: 'var(--v2-warning)',
@@ -170,7 +170,7 @@ export function StatCard({
         </div>
       ) : (
         <span
-          className="text-[24px] font-semibold leading-none tracking-tight"
+          className="text-2xl font-semibold leading-none tracking-tight"
           style={{ color: valueColor || 'var(--v2-text-primary)' }}
         >
           {displayValue}
@@ -181,14 +181,14 @@ export function StatCard({
       <div className="flex items-center gap-1.5 mt-1.5">
         {tag && (
           <span
-            className="text-[10px] font-medium px-[7px] py-0.5 rounded-[10px]"
+            className="text-xs font-medium px-2 py-0.5 rounded-[10px]"
             style={{ background: tag.bg, color: tag.color }}
           >
             {tag.text}
           </span>
         )}
         {hint && (
-          <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+          <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
             {hint}
           </span>
         )}

@@ -72,7 +72,7 @@ export function BrandingSettingsPage() {
         <button
           type="button"
           onClick={() => navigate({ to: '/settings' })}
-          className="mt-5 px-4 py-2 rounded-lg text-sm font-medium bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          className="mt-5 px-4 py-2 rounded-lg text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
         >
           {t('forbidden.action')}
         </button>
@@ -94,8 +94,8 @@ export function BrandingSettingsPage() {
       {/* Header */}
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20">
-            <Paintbrush className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] ">
+            <Paintbrush className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -119,7 +119,7 @@ export function BrandingSettingsPage() {
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
               {t('actions.edit')}
@@ -138,18 +138,18 @@ export function BrandingSettingsPage() {
       {/* Body */}
       {isLoading || isPending ? (
         <div className="flex items-center justify-center min-h-[40vh]">
-          <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+          <Loader2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] animate-spin" />
         </div>
       ) : error || !data ? (
         <div className="text-center py-16">
-          <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400" />
+          <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--state-danger-fg))]" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {t('error.failedToLoad')}
           </p>
           <button
             type="button"
             onClick={() => refetch()}
-            className="mt-4 px-4 py-2 rounded-lg text-sm font-medium bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+            className="mt-4 px-4 py-2 rounded-lg text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             {t('error.retry')}
           </button>

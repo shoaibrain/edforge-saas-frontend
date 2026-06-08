@@ -10,7 +10,7 @@ import { useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { X, ArrowRight, Lock, AlertTriangle } from 'lucide-react'
 import type { StudentResponseDto } from '@aibrains/shared-types'
-import { QuickDrawer, AttendanceDonutRing } from '@edforge/ui'
+import { QuickDrawer, AttendanceDonutRing, focusRing, focusRingInset } from '@edforge/ui'
 import { useDateFormatter, adToBS, formatBSDate } from '@edforge/date-utils'
 import { UserAvatar } from '../common/UserAvatar'
 
@@ -34,22 +34,43 @@ export interface StudentQuickProfileProps {
 // STATUS STYLE MAP
 // ============================================================================
 
-const STATUS_STYLES: Record<string, { bg: string; fg: string }> = {
-  active:     { bg: 'rgba(29,158,117,0.10)',  fg: '#1D9E75' },
-  pending:    { bg: 'rgba(239,159,39,0.10)',   fg: '#EF9F27' },
-  inactive:   { bg: 'rgba(154,160,184,0.10)',  fg: '#9aa0b8' },
-  withdrawn:  { bg: 'rgba(226,75,74,0.08)',    fg: '#E24B4A' },
-  suspended:  { bg: 'rgba(226,75,74,0.08)',    fg: '#E24B4A' },
-  graduated:  { bg: 'rgba(55,138,221,0.10)',   fg: '#378ADD' },
-  transferred:{ bg: 'rgba(239,159,39,0.10)',   fg: '#EF9F27' },
+const STATUS_STYLES: Record<string, { pill: string; dot: string }> = {
+  active: {
+    pill: 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]',
+    dot: 'bg-[var(--v2-success)]',
+  },
+  pending: {
+    pill: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
+    dot: 'bg-[var(--v2-warning)]',
+  },
+  inactive: {
+    pill: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
+    dot: 'bg-[var(--v2-text-hint)]',
+  },
+  withdrawn: {
+    pill: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
+    dot: 'bg-[var(--v2-danger)]',
+  },
+  suspended: {
+    pill: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
+    dot: 'bg-[var(--v2-danger)]',
+  },
+  graduated: {
+    pill: 'bg-[var(--v2-info-bg)] text-[var(--v2-info)]',
+    dot: 'bg-[var(--v2-info)]',
+  },
+  transferred: {
+    pill: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
+    dot: 'bg-[var(--v2-warning)]',
+  },
 }
-const DEFAULT_STATUS = { bg: 'rgba(154,160,184,0.10)', fg: '#9aa0b8' }
+const DEFAULT_STATUS = STATUS_STYLES.inactive
 
 function attColor(r: number | undefined) {
   if (r == null) return 'var(--v2-text-ghost)'
-  if (r < 80) return '#E24B4A'
-  if (r < 90) return '#EF9F27'
-  return '#1D9E75'
+  if (r < 80) return 'var(--v2-danger)'
+  if (r < 90) return 'var(--v2-warning)'
+  return 'var(--v2-success)'
 }
 
 // ============================================================================
@@ -105,22 +126,21 @@ export function StudentQuickProfile({
           <div className="flex-1 min-w-0 pt-[1px]">
             <h2
               id="sqp-name"
-              className="text-[15px] font-semibold truncate"
+              className="text-sm font-semibold truncate"
               style={{ color: 'var(--v2-text-primary)', letterSpacing: '-0.2px', lineHeight: 1.25 }}
             >
               {student.fullName}
             </h2>
             <div className="flex items-center gap-2 mt-[3px]">
               {student.studentNumber && (
-                <span className="font-mono text-[10px]" style={{ color: 'var(--v2-text-hint)' }}>
+                <span className="font-mono text-xs" style={{ color: 'var(--v2-text-hint)' }}>
                   #{student.studentNumber}
                 </span>
               )}
               <span
-                className="inline-flex items-center gap-[4px] text-[9px] font-medium px-[7px] py-[1px]"
-                style={{ borderRadius: 6, background: ss.bg, color: ss.fg }}
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-px text-xs font-medium ${ss.pill}`}
               >
-                <span style={{ width: 5, height: 5, borderRadius: '50%', background: ss.fg }} />
+                <span className={`h-1.5 w-1.5 rounded-full ${ss.dot}`} />
                 {statusText}
               </span>
             </div>
@@ -130,15 +150,10 @@ export function StudentQuickProfile({
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center justify-center flex-shrink-0 transition-colors hover:opacity-80"
-            style={{
-              width: 26, height: 26, borderRadius: 6,
-              background: 'var(--v2-surface-interactive)',
-              border: '1px solid var(--v2-border-default)',
-            }}
+            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[var(--v2-border-default)] bg-[var(--v2-surface-interactive)] transition-colors hover:opacity-80 ${focusRingInset}`}
             aria-label="Close"
           >
-            <X className="w-[13px] h-[13px]" style={{ color: 'var(--v2-text-hint)' }} />
+            <X className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint)' }} />
           </button>
         </div>
       </QuickDrawer.Header>
@@ -150,12 +165,11 @@ export function StudentQuickProfile({
           {/* ── At-risk banner ── */}
           {isAtRisk && (
             <div
-              className="flex items-center gap-2 px-3 py-[7px]"
-              style={{ background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.14)', borderRadius: 8 }}
+              className="flex items-center gap-2 rounded-lg border border-[var(--v2-danger-border)] bg-[var(--v2-danger-bg)] px-3 py-2"
               role="alert"
             >
-              <AlertTriangle className="w-[13px] h-[13px] flex-shrink-0" style={{ color: '#E24B4A' }} />
-              <span className="text-[11px] font-medium" style={{ color: '#E24B4A' }}>
+              <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[var(--v2-danger)]" />
+              <span className="text-xs font-medium text-[var(--v2-danger)]">
                 At-risk &middot; {attendanceRate!.toFixed(0)}% attendance (30-day)
               </span>
             </div>
@@ -177,18 +191,18 @@ export function StudentQuickProfile({
               muted
             />
             <div
-              className="relative overflow-hidden flex flex-col items-center justify-center gap-[2px] py-[8px]"
+              className="relative overflow-hidden flex flex-col items-center justify-center gap-0.5 py-2"
               style={{ background: 'var(--v2-surface-inset)', border: '1px solid var(--v2-border-default)', borderRadius: 9 }}
             >
               {attendanceRate != null ? (
                 <AttendanceDonutRing rate={attendanceRate} size={36} strokeWidth={3} showLabel />
               ) : (
-                <div className="w-[22px] h-[22px] rounded-full" style={{ border: '2px solid var(--v2-text-ghost)' }} />
+                <div className="w-5 h-5 rounded-full" style={{ border: '2px solid var(--v2-text-ghost)' }} />
               )}
-              <div className="text-[8px] font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'var(--v2-text-ghost)' }}>
+              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'var(--v2-text-ghost)' }}>
                 Attendance
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: accent, opacity: 0.7 }} />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: 0.7 }} />
             </div>
           </div>
 
@@ -202,7 +216,7 @@ export function StudentQuickProfile({
             }}
           >
             <div
-              className="text-[9px] font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px]"
+              className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px]"
               style={{ color: 'var(--v2-text-ghost)', borderBottom: '1px solid var(--v2-border-default)' }}
             >
               Enrollment
@@ -217,11 +231,11 @@ export function StudentQuickProfile({
 
           {/* ── Privacy note ── */}
           <div
-            className="flex gap-2 px-3 py-[8px]"
+            className="flex gap-2 px-3 py-2"
             style={{ background: 'rgba(55,138,221,0.04)', border: '1px solid rgba(55,138,221,0.10)', borderRadius: 7 }}
           >
             <Lock className="flex-shrink-0 mt-[1px]" style={{ width: 11, height: 11, color: 'var(--v2-info, #378ADD)' }} />
-            <span className="text-[10px] leading-snug" style={{ color: 'var(--v2-text-muted)' }}>
+            <span className="text-xs leading-snug" style={{ color: 'var(--v2-text-muted)' }}>
               Demographics, contact info, and guardian details are on the full profile page.
             </span>
           </div>
@@ -230,21 +244,11 @@ export function StudentQuickProfile({
           <button
             type="button"
             onClick={handleViewProfile}
-            className="flex items-center justify-center gap-[6px] w-full transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
-            style={{
-              height: 38,
-              background: 'var(--v2-brand-primary)',
-              borderRadius: 8,
-              border: 'none',
-              color: '#fff',
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: 'pointer',
-            }}
+            className={`flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] text-xs font-medium text-[rgb(var(--action-primary-fg))] transition-all hover:bg-[rgb(var(--action-primary-bg-hover))] active:scale-[0.98] ${focusRing}`}
             aria-label={`View full profile for ${student.fullName}`}
           >
             View Full Profile
-            <ArrowRight className="w-[13px] h-[13px]" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </QuickDrawer.Body>
@@ -271,20 +275,20 @@ function Tile({
 }) {
   return (
     <div
-      className="relative overflow-hidden flex flex-col items-center gap-[4px] py-[10px]"
+      className="relative overflow-hidden flex flex-col items-center gap-1 py-2.5"
       style={{ background: 'var(--v2-surface-inset)', border: '1px solid var(--v2-border-default)', borderRadius: 9 }}
     >
       {icon}
       <div
-        className="text-[17px] font-semibold leading-none"
+        className="text-lg font-semibold leading-none"
         style={{ color: muted ? 'var(--v2-text-hint)' : 'var(--v2-text-primary)', letterSpacing: '-0.4px' }}
       >
         {value}
       </div>
-      <div className="text-[8px] font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
+      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
         {label}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: accent, opacity: muted ? 0.3 : 0.6 }} />
+      <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: muted ? 0.3 : 0.6 }} />
     </div>
   )
 }
@@ -292,18 +296,18 @@ function Tile({
 function Field({ label, value, sub }: { label: string; value: string; sub?: string | null }) {
   const empty = !value || value === '—'
   return (
-    <div className="flex flex-col gap-[2px]">
-      <div className="text-[9px] font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
+    <div className="flex flex-col gap-0.5">
+      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
         {label}
       </div>
       <div
-        className="text-[12px] font-medium leading-tight"
+        className="text-xs font-medium leading-tight"
         style={{ color: empty ? 'var(--v2-text-hint)' : 'var(--v2-text-secondary)' }}
       >
         {value}
       </div>
       {sub && (
-        <div className="text-[10px]" style={{ color: 'var(--v2-text-hint)' }}>{sub}</div>
+        <div className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>{sub}</div>
       )}
     </div>
   )

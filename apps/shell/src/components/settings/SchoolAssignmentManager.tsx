@@ -181,7 +181,7 @@ export function SchoolAssignmentManager({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-50 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm"
         onClick={onClose}
       />
 
@@ -195,15 +195,15 @@ export function SchoolAssignmentManager({
           'fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
           'w-full max-w-4xl max-h-[85vh] overflow-hidden',
           'rounded-2xl border border-[rgb(var(--border-primary))]',
-          'bg-[rgb(var(--surface-primary))] shadow-2xl'
+          'bg-[rgb(var(--background-primary))] shadow-2xl'
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-cyan-500/10">
-              <School className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+              <School className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -216,14 +216,14 @@ export function SchoolAssignmentManager({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
         </div>
 
         {/* Filters and Search */}
-        <div className="flex items-center gap-3 p-4 border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+        <div className="flex items-center gap-3 p-4 border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
           {/* Search */}
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -234,9 +234,9 @@ export function SchoolAssignmentManager({
               onChange={(e) => setSearchTerm(e.target.value)}
               className={cn(
                 'w-full pl-9 pr-3 py-2 text-sm rounded-lg border',
-                'bg-[rgb(var(--surface-primary))] border-[rgb(var(--border-primary))]',
+                'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))]',
                 'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
-                'focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500'
+                'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]'
               )}
             />
           </div>
@@ -249,9 +249,9 @@ export function SchoolAssignmentManager({
               onChange={(e) => setFilterType(e.target.value)}
               className={cn(
                 'px-3 py-2 text-sm rounded-lg border',
-                'bg-[rgb(var(--surface-primary))] border-[rgb(var(--border-primary))]',
+                'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))]',
                 'text-[rgb(var(--text-primary))]',
-                'focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500'
+                'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]'
               )}
             >
               <option value="all">All Schools</option>
@@ -279,9 +279,9 @@ export function SchoolAssignmentManager({
                 }}
                 className={cn(
                   'px-3 py-1.5 text-xs rounded-lg border',
-                  'bg-teal-500/10 border-teal-500/20',
-                  'text-teal-700 dark:text-teal-300',
-                  'focus:outline-none focus:ring-2 focus:ring-teal-500/30'
+                  'bg-[rgb(var(--action-primary-bg))]/10 border-[rgb(var(--border-focus)/0.35)]',
+                  'text-[rgb(var(--state-info-fg))] ',
+                  'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]'
                 )}
               >
                 <option value="">Bulk Assign To...</option>
@@ -314,14 +314,14 @@ export function SchoolAssignmentManager({
             </div>
           ) : (
             <table className="w-full">
-              <thead className="sticky top-0 bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
+              <thead className="sticky top-0 bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))]">
                 <tr>
                   <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
                     <input
                       type="checkbox"
                       checked={allFilteredSelected}
                       onChange={toggleSelectAll}
-                      className="rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/30"
+                      className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
                     />
                   </th>
                   <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
@@ -346,8 +346,8 @@ export function SchoolAssignmentManager({
                       key={assignment.schoolId}
                       className={cn(
                         'border-b border-[rgb(var(--border-primary))] transition-colors',
-                        assignment.selected && 'bg-teal-500/5',
-                        hasChange && 'bg-teal-500/10'
+                        assignment.selected && 'bg-[rgb(var(--action-primary-bg))]/5',
+                        hasChange && 'bg-[rgb(var(--action-primary-bg))]/10'
                       )}
                     >
                       <td className="p-3">
@@ -355,12 +355,12 @@ export function SchoolAssignmentManager({
                           type="checkbox"
                           checked={assignment.selected}
                           onChange={() => toggleSelection(assignment.schoolId)}
-                          className="rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/30"
+                          className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
                         />
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-2">
-                          <School className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                          <School className="w-4 h-4 text-[rgb(var(--state-info-fg))]  shrink-0" />
                           <span className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
                             {assignment.schoolName}
                           </span>
@@ -382,9 +382,9 @@ export function SchoolAssignmentManager({
                           disabled={assignMutation.isPending}
                           className={cn(
                             'w-full px-2 py-1.5 text-sm rounded border',
-                            'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]',
+                            'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]',
                             'text-[rgb(var(--text-primary))]',
-                            'focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30',
+                            'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',
                             'disabled:opacity-50 disabled:cursor-not-allowed'
                           )}
                         >
@@ -398,7 +398,7 @@ export function SchoolAssignmentManager({
                       </td>
                       <td className="p-3 text-center">
                         {hasChange && assignment.selected && (
-                          <Check className="w-4 h-4 text-teal-500 mx-auto" />
+                          <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] mx-auto" />
                         )}
                       </td>
                     </tr>

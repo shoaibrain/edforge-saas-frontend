@@ -100,7 +100,7 @@ function AcademicsInsightStrip({
   }
 
   return (
-    <p className="text-[11px] leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+    <p className="text-xs leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
       {parts.join(' · ')}
     </p>
   )
@@ -114,8 +114,8 @@ function NoSchoolGuard() {
   return (
     <div className="max-w-6xl mx-auto pt-16 pb-12">
       <Card className="p-8 border-border-secondary max-w-lg mx-auto text-center">
-        <div className="inline-flex p-3 rounded-2xl bg-teal-500/10 mb-4">
-          <School className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
+        <div className="inline-flex p-3 rounded-2xl bg-[rgb(var(--state-info-bg)/0.18)] mb-4">
+          <School className="w-7 h-7 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <h2 className="text-lg font-bold text-text-primary">Select a school</h2>
         <p className="text-sm text-text-secondary mt-1.5">
@@ -131,7 +131,7 @@ function NoAcademicYearGuard() {
     <div className="max-w-6xl mx-auto pt-16 pb-12">
       <Card className="p-8 border-border-secondary max-w-lg mx-auto text-center">
         <div className="inline-flex p-3 rounded-2xl bg-amber-400/15 mb-4">
-          <CalendarClock className="w-7 h-7 text-amber-600 dark:text-amber-400" />
+          <CalendarClock className="w-7 h-7 text-[rgb(var(--state-warning-fg))]" />
         </div>
         <h2 className="text-lg font-bold text-text-primary">No active academic year</h2>
         <p className="text-sm text-text-secondary mt-1.5 max-w-sm mx-auto">
@@ -158,11 +158,6 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   const data = useAcademicsOverviewV2(schoolId)
   const { staggerContainer, fadeInUp } = useMotionVariants()
 
-  // Guards
-  if (!data.academicYear.isLoading && !data.academicYear.id && !data.academicYear.isError) {
-    return <NoAcademicYearGuard />
-  }
-
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: overviewKeys.all })
   }, [queryClient])
@@ -178,6 +173,11 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   // Attendance rate color
   const attendanceRate = data.overview.todayAttendanceRate
   const attendanceColor = attendanceRate != null ? getAttendanceColor(attendanceRate) : undefined
+
+  // Guards
+  if (!data.academicYear.isLoading && !data.academicYear.id && !data.academicYear.isError) {
+    return <NoAcademicYearGuard />
+  }
 
   return (
     <div data-v2 className="p-5 pb-10">
@@ -198,20 +198,20 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
                 <GraduationCap className="w-4 h-4" style={{ color: '#1D9E75' }} />
               </div>
               <h1
-                className="text-[14px] font-semibold"
+                className="text-sm font-semibold"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 Academics
               </h1>
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+              <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               {data.academicYear.name && (
                 <>
-                  <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+                  <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
                   <span
-                    className="text-[11px] px-2.5 py-1 rounded-md"
+                    className="text-xs px-2.5 py-1 rounded-md"
                     style={{
                       background: 'var(--v2-bg-elevated)',
                       color: 'var(--v2-text-hint)',
@@ -227,7 +227,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <button
                 onClick={() => navigate({ to: '/students/enrollment' })}
                 aria-label="Enroll a student"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                 style={{
                   background: 'var(--v2-bg-elevated)',
                   borderColor: 'var(--v2-border-default)',
@@ -240,7 +240,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <button
                 onClick={() => navigate({ to: '/classrooms', search: { tab: 'attendance' } })}
                 aria-label="Take attendance"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                 style={{
                   background: 'var(--v2-brand-primary)',
                   color: '#fff',

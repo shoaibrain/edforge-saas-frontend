@@ -61,7 +61,7 @@ export function IntegrationCard({
       transition={{ delay: index * 0.05, duration: 0.3 }}
       className={`
         group relative rounded-2xl border overflow-hidden
-        bg-[rgb(var(--surface-secondary))]
+        bg-[rgb(var(--background-secondary))]
         transition-all duration-300
         ${isConnected 
           ? 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))]' 
@@ -119,7 +119,7 @@ export function IntegrationCard({
         
         {/* Connected Account Info */}
         {isConnected && integration && (
-          <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--surface-tertiary))]">
+          <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--background-tertiary))]">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
@@ -131,7 +131,7 @@ export function IntegrationCard({
               </div>
               <button
                 onClick={handleRefresh}
-                className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+                className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 title="Refresh sync"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -147,13 +147,13 @@ export function IntegrationCard({
               {platform.features.slice(0, 4).map((feature) => (
                 <span
                   key={feature}
-                  className="px-2 py-1 text-xs rounded-md bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                  className="px-2 py-1 text-xs rounded-md bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]"
                 >
                   {feature}
                 </span>
               ))}
               {platform.features.length > 4 && (
-                <span className="px-2 py-1 text-xs rounded-md bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+                <span className="px-2 py-1 text-xs rounded-md bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
                   +{platform.features.length - 4} more
                 </span>
               )}
@@ -168,8 +168,8 @@ export function IntegrationCard({
               <button
                 onClick={onManage}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-                  bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))]
-                  hover:bg-[rgb(var(--interactive-hover))] transition-colors
+                  bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))]
+                  hover:bg-[rgb(var(--background-tertiary))] transition-colors
                   text-sm font-medium"
               >
                 <Settings className="w-4 h-4" />
@@ -189,9 +189,9 @@ export function IntegrationCard({
             <button
               onClick={onConnect}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-                bg-teal-500/15 dark:bg-cyan-500/20 
-                text-teal-700 dark:text-cyan-400
-                hover:bg-teal-500/25 dark:hover:bg-cyan-500/30
+                bg-[rgb(var(--state-info-bg)/0.18)] 
+                text-[rgb(var(--state-info-fg))] 
+                hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:hover:bg-[rgb(var(--state-info-bg)/0.26)]
                 transition-colors text-sm font-medium"
             >
               <LinkIcon className="w-4 h-4" />
@@ -229,8 +229,8 @@ export function IntegrationCardCompact({
         group flex items-center gap-3 p-3 rounded-xl border w-full text-left
         transition-all duration-200
         ${isConnected 
-          ? 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] cursor-default' 
-          : 'bg-[rgb(var(--surface-secondary))] border-dashed border-[rgb(var(--border-secondary))] hover:border-[rgb(var(--border-primary))] hover:shadow-md cursor-pointer'
+          ? 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] cursor-default' 
+          : 'bg-[rgb(var(--background-secondary))] border-dashed border-[rgb(var(--border-secondary))] hover:border-[rgb(var(--border-primary))] hover:shadow-md cursor-pointer'
         }
       `}
     >

@@ -68,9 +68,9 @@ class FinanceErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <div className="flex items-center justify-center min-h-[60vh] p-6">
-          <div className="w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
-            <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+          <div className="w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
+            <div className="mx-auto w-12 h-12 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]  flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
             </div>
 
             <div>
@@ -84,7 +84,7 @@ class FinanceErrorBoundary extends Component<
             </div>
 
             {this.state.error && (
-              <p className="text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-secondary))] rounded-lg px-3 py-2 font-mono break-all">
+              <p className="text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-secondary))] rounded-lg px-3 py-2 font-mono break-all">
                 {this.state.error.message}
               </p>
             )}
@@ -92,14 +92,14 @@ class FinanceErrorBoundary extends Component<
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={this.handleReload}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
               >
                 <RotateCw className="w-4 h-4" />
                 Reload
               </button>
               <button
                 onClick={this.handleGoToOverview}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
               >
                 <Home className="w-4 h-4" />
                 Go to Overview
@@ -218,9 +218,9 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
   if (!hasSchool) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6">
-        <div className="w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
-          <div className="mx-auto w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+        <div className="w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
+          <div className="mx-auto w-12 h-12 rounded-full bg-[rgb(var(--state-info-bg)/0.18)]  flex items-center justify-center">
+            <Building2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -232,7 +232,7 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
           </div>
           <button
             onClick={() => { window.location.href = '/settings' }}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             Go to Settings
           </button>

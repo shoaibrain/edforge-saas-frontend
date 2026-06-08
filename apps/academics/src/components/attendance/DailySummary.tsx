@@ -35,17 +35,17 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
   const rate = summary.attendanceRate
   const rateColor =
     rate >= 95
-      ? 'text-emerald-600 dark:text-emerald-400'
+      ? 'text-[rgb(var(--state-success-fg))]'
       : rate >= 90
-        ? 'text-amber-600 dark:text-amber-400'
-        : 'text-red-600 dark:text-red-400'
+        ? 'text-[rgb(var(--state-warning-fg))]'
+        : 'text-[rgb(var(--state-danger-fg))]'
 
   const stats = [
-    { label: 'Present', value: summary.present, dot: 'bg-emerald-500' },
-    { label: 'Absent', value: summary.absent, dot: 'bg-red-500' },
-    { label: 'Late', value: summary.late, dot: 'bg-amber-500' },
-    { label: 'Excused', value: summary.excused, dot: 'bg-blue-500' },
-    ...(summary.remote ? [{ label: 'Remote', value: summary.remote, dot: 'bg-indigo-500' }] : []),
+    { label: 'Present', value: summary.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
+    { label: 'Absent', value: summary.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
+    { label: 'Late', value: summary.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
+    { label: 'Excused', value: summary.excused, dot: 'bg-[rgb(var(--state-info-fg))]' },
+    ...(summary.remote ? [{ label: 'Remote', value: summary.remote, dot: 'bg-[rgb(var(--state-info-fg))]' }] : []),
   ]
 
   return (

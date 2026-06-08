@@ -35,9 +35,9 @@ export function TimeRangePicker({ startTime, endTime, onChange, disabled }: Time
           className={`
             w-full pl-10 pr-3 py-2.5 rounded-xl
             border border-[rgb(var(--border-primary))]
-            bg-[rgb(var(--surface-secondary))]
+            bg-[rgb(var(--background-secondary))]
             text-sm text-[rgb(var(--text-primary))]
-            focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500
+            focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))]
             transition-all
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}
@@ -56,9 +56,9 @@ export function TimeRangePicker({ startTime, endTime, onChange, disabled }: Time
           className={`
             w-full pl-10 pr-3 py-2.5 rounded-xl
             border border-[rgb(var(--border-primary))]
-            bg-[rgb(var(--surface-secondary))]
+            bg-[rgb(var(--background-secondary))]
             text-sm text-[rgb(var(--text-primary))]
-            focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500
+            focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))]
             transition-all
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}

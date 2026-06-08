@@ -1,5 +1,5 @@
 import type { DataTableEmptyStateConfig } from './types'
-import { cn } from '../../utils'
+import { cn, focusRing } from '../../utils'
 
 interface DataTableEmptyProps {
   config: DataTableEmptyStateConfig
@@ -10,7 +10,7 @@ export function DataTableEmpty({ config, className }: DataTableEmptyProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-primary))]',
+        'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-primary))]',
         className
       )}
     >
@@ -31,7 +31,10 @@ export function DataTableEmpty({ config, className }: DataTableEmptyProps) {
         <button
           type="button"
           onClick={config.action.onClick}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:ring-offset-2"
+          className={cn(
+            'inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors',
+            focusRing
+          )}
         >
           {config.action.label}
         </button>

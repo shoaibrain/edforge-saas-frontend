@@ -272,7 +272,7 @@ export function EditDemographicsModal({
                 type="button"
                 onClick={() => disabilitiesArray.remove(index)}
                 aria-label="Remove disability"
-                className="p-2 rounded-md text-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-colors self-start"
+                className="p-2 rounded-md text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors self-start"
                 disabled={isSubmitting}
               >
                 <Trash2 className="w-4 h-4" aria-hidden />

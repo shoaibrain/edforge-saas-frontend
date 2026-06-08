@@ -275,15 +275,15 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
   }
 
   const inputBase =
-    'w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:opacity-50'
+    'w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50'
   const labelBase = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5'
-  const errorBase = 'mt-1 text-xs text-red-500'
+  const errorBase = 'mt-1 text-xs text-[rgb(var(--state-danger-fg))]'
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
         {/* Identity section */}
-        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] p-5 space-y-4">
+        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-5 space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] pb-2 border-b border-[rgb(var(--border-primary))]">
             {t('sections.identity')}
           </h3>
@@ -348,7 +348,7 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
         </section>
 
         {/* Contact section */}
-        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] p-5 space-y-4">
+        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-5 space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] pb-2 border-b border-[rgb(var(--border-primary))]">
             {t('sections.contact')}
           </h3>
@@ -403,7 +403,7 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
         </section>
 
         {/* Colors section */}
-        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] p-5 space-y-4">
+        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-5 space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] pb-2 border-b border-[rgb(var(--border-primary))]">
             {t('sections.colors')}
           </h3>
@@ -424,7 +424,7 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
             included in the PATCH on Save. The current asset URL (from
             BrandingResponse.urls) is shown as a thumbnail so the
             operator can see what's currently set. */}
-        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] p-5 space-y-4">
+        <section className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-5 space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] pb-2 border-b border-[rgb(var(--border-primary))]">
             {t('sections.assets')}
           </h3>
@@ -472,7 +472,7 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
             type="button"
             onClick={guardedClose}
             disabled={mutation.isPending}
-            className="px-4 py-2 text-sm rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+            className="px-4 py-2 text-sm rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
           >
             <X className="w-4 h-4" />
             {t('form.cancel')}
@@ -480,7 +480,7 @@ export function BrandingForm({ schoolId, data, onCancel, onSaved }: BrandingForm
           <button
             type="submit"
             disabled={mutation.isPending || !isDirty}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
           >
             {mutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />

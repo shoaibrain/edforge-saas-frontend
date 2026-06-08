@@ -20,13 +20,13 @@ export const CategoryBar = forwardRef<HTMLDivElement, CategoryBarProps>(
       <div ref={ref} className={cn('space-y-1', className)} {...props}>
         <div className="flex items-center justify-between">
           <span
-            className="text-[12px] font-medium"
+            className="text-xs font-medium"
             style={{ color: 'var(--v2-text-secondary)' }}
           >
             {label}
           </span>
           <span
-            className="text-[11px] font-mono tabular-nums"
+            className="text-xs font-mono tabular-nums"
             style={{ color: 'var(--v2-text-muted)' }}
           >
             {weight}%

@@ -63,16 +63,16 @@ export function FinanceInfoBanner({
       }}
     >
       <IconComponent
-        className="w-[14px] h-[14px] flex-shrink-0"
+        className="w-3.5 h-3.5 flex-shrink-0"
         style={{ color: styles.icon }}
         strokeWidth={2}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+        <p className="text-xs font-medium" style={{ color: 'var(--v2-text-primary)' }}>
           {message}
         </p>
         {subtitle && (
-          <p className="text-[10px] mt-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-hint)' }}>
             {subtitle}
           </p>
         )}
@@ -80,7 +80,7 @@ export function FinanceInfoBanner({
       {action && (
         <button
           onClick={action.onClick}
-          className="flex-shrink-0 text-[10px] font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80"
+          className="flex-shrink-0 text-xs font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80"
           style={{
             background: styles.icon,
             color: '#fff',

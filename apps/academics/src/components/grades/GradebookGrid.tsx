@@ -49,19 +49,19 @@ interface EditingCell {
 // ============================================================================
 
 function getGradeColor(percentage: number): string {
-  if (percentage >= 90) return 'text-emerald-600 dark:text-emerald-400'
-  if (percentage >= 80) return 'text-blue-600 dark:text-blue-400'
-  if (percentage >= 70) return 'text-amber-600 dark:text-amber-400'
-  if (percentage >= 60) return 'text-orange-600 dark:text-orange-400'
-  return 'text-red-600 dark:text-red-400'
+  if (percentage >= 90) return 'text-[rgb(var(--state-success-fg))]'
+  if (percentage >= 80) return 'text-[rgb(var(--state-info-fg))]'
+  if (percentage >= 70) return 'text-[rgb(var(--state-warning-fg))]'
+  if (percentage >= 60) return 'text-[rgb(var(--state-warning-fg))]'
+  return 'text-[rgb(var(--state-danger-fg))]'
 }
 
 function getGradeBg(percentage: number): string {
-  if (percentage >= 90) return 'bg-emerald-50 dark:bg-emerald-500/10'
-  if (percentage >= 80) return 'bg-blue-50 dark:bg-blue-500/10'
-  if (percentage >= 70) return 'bg-amber-50 dark:bg-amber-500/10'
-  if (percentage >= 60) return 'bg-orange-50 dark:bg-orange-500/10'
-  return 'bg-red-50 dark:bg-red-500/10'
+  if (percentage >= 90) return 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]'
+  if (percentage >= 80) return 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]'
+  if (percentage >= 70) return 'bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10'
+  if (percentage >= 60) return 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/10'
+  return 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]'
 }
 
 // ============================================================================
@@ -294,29 +294,29 @@ export function GradebookGrid({
         <thead>
           <tr className="bg-surface-secondary">
             {/* Frozen student column */}
-            <th className="sticky left-0 z-10 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-[200px]">
+            <th className="sticky left-0 z-10 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
               Student
             </th>
             {/* Assignment columns with tooltips (Ticket 3.1) */}
             {assignmentColumns.map((col) => (
               <th
                 key={col.name}
-                className="px-3 py-3 text-center font-medium text-text-secondary min-w-[100px] border-r border-border-secondary group relative"
+                className="px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
                 title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
               >
-                <div className="truncate max-w-[120px]">{col.name}</div>
-                <div className="text-[10px] text-text-tertiary font-normal mt-0.5">
+                <div className="truncate max-w-32">{col.name}</div>
+                <div className="text-xs text-text-tertiary font-normal mt-0.5">
                   {col.possiblePoints} pts
                 </div>
               </th>
             ))}
             {/* Add Assignment column */}
             {canEdit && onAddAssignment && (
-              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-[60px]">
+              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-16">
                 <button
                   type="button"
                   onClick={onAddAssignment}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 rounded transition-colors"
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded transition-colors"
                   title="Add assignment"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -324,10 +324,10 @@ export function GradebookGrid({
               </th>
             )}
             {/* Overall Grade */}
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-[100px] bg-surface-hover">
+            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
               Overall
             </th>
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-[80px] bg-surface-hover">
+            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
               Letter
             </th>
           </tr>
@@ -352,7 +352,7 @@ export function GradebookGrid({
                       <button
                         type="button"
                         onClick={() => onViewReportCard(student.studentId, student.studentName)}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-teal-500 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--action-secondary-fg))] transition-all"
                         title="View Report Card"
                       >
                         <FileText className="w-3.5 h-3.5" />
@@ -397,7 +397,7 @@ export function GradebookGrid({
                             }
                             onBlur={() => handleBlur(student, aName, editingCell.value)}
                             onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                            className="w-16 px-1.5 py-1 bg-white dark:bg-surface-secondary border-2 border-teal-500 rounded text-sm text-center text-text-primary focus:outline-none"
+                            className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
                             min={0}
                             step="any"
                           />
@@ -434,7 +434,7 @@ export function GradebookGrid({
                           }
                           onBlur={() => handleBlur(student, aName, editingCell.value)}
                           onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                          className="w-16 px-1.5 py-1 bg-white dark:bg-surface-secondary border-2 border-teal-500 rounded text-sm text-center text-text-primary focus:outline-none"
+                          className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
                           min={0}
                           step="any"
                         />

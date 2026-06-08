@@ -119,44 +119,81 @@
   /* Font */
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  /* Surface colors - Light mode uses warm neutrals */
-  --surface-primary: 251 249 245; /* warm off-white */
-  --surface-secondary: 255 255 255;
-  --surface-tertiary: 246 243 235; /* vanilla-100 tint */
-  --surface-elevated: 255 255 255;
+  /* Background colors - Light mode uses warm neutrals */
+  --background-primary: 251 249 245; /* warm off-white */
+  --background-secondary: 255 255 255;
+  --background-tertiary: 246 243 235; /* vanilla-100 tint */
+  --background-elevated: 255 255 255;
+  --background-overlay: 0 18 25;
+  --background-inverse: 0 18 25;
 
   /* Text colors */
   --text-primary: 0 18 25; /* ink-500 */
   --text-secondary: 0 95 115; /* teal-500 */
-  --text-tertiary: 107 114 128; /* neutral gray */
+  --text-tertiary: 71 85 105; /* slate-600, AA on warm tertiary surface */
   --text-inverted: 251 249 245;
 
   /* Border colors */
-  --border-primary: 233 216 166; /* vanilla-400 */
-  --border-secondary: 246 239 219; /* vanilla-100 */
-  --border-tertiary: 213 196 146;
+  --border-primary: 127 103 32; /* vanilla-700, >=3:1 on warm surfaces */
+  --border-secondary: 63 151 122; /* aqua-700, >=3:1 on warm surfaces */
+  --border-tertiary: 0 122 147; /* teal-400, strong divider/focus-adjacent */
 
-  /* Interactive states */
-  --interactive-hover: 246 243 235;
-  --interactive-active: 233 216 166;
-  --interactive-focus: 10 147 150;
+  /* Semantic roles */
+  --text-muted: var(--text-tertiary);
+  --text-disabled: 148 163 184;
+  --text-on-accent: 251 249 245;
 
-  /* Brand accent */
-  --brand-primary: 0 95 115; /* teal-500 */
-  --brand-secondary: 10 147 150; /* cyan-500 */
-  --brand-accent: 238 155 0; /* golden-400 */
+  --border-subtle: var(--border-secondary);
+  --border-default: var(--border-primary);
+  --border-strong: var(--border-tertiary);
+  --border-focus: 0 95 115;
 
-  /* Icon colors - subtle brand tint for warmth */
-  --icon-inactive: 71 85 105; /* slate-600 with slight warmth */
-  --icon-inactive-hover: 51 65 85; /* slate-700 - darker on hover */
+  --action-primary-bg: 0 95 115;
+  --action-primary-bg-hover: 0 78 94;
+  --action-primary-bg-active: 0 59 70;
+  --action-primary-fg: var(--text-on-accent);
+  --action-secondary-bg: var(--background-tertiary);
+  --action-secondary-fg: var(--text-secondary);
+  --action-danger-bg: 174 32 18;
+  --action-danger-fg: var(--text-on-accent);
+
+  --state-success-bg: 232 246 242;
+  --state-success-fg: 0 95 73;
+  --state-success-border: 63 151 122;
+  --state-warning-bg: 255 236 201;
+  --state-warning-fg: 127 67 0;
+  --state-warning-border: 192 125 0;
+  --state-danger-bg: 249 202 198;
+  --state-danger-fg: 105 19 11;
+  --state-danger-border: 174 32 18;
+  --state-info-bg: 189 250 251;
+  --state-info-fg: 0 95 115;
+  --state-info-border: 0 122 147;
+
+  /* Elevation + motion */
+  --elevation-flat: none;
+  --elevation-raised: 0 1px 2px rgba(0, 18, 25, 0.08), 0 1px 3px rgba(0, 18, 25, 0.06);
+  --elevation-overlay: 0 8px 24px rgba(0, 18, 25, 0.14);
+  --elevation-modal: 0 24px 64px rgba(0, 18, 25, 0.22);
+  --elevation-popover: 0 12px 32px rgba(0, 18, 25, 0.16);
+  --motion-duration-instant: 80ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-slow: 320ms;
+  --motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
+
 }
 
 .dark {
-  /* Surface colors - Dark mode uses ink palette */
-  --surface-primary: 0 18 25;
-  --surface-secondary: 0 39 47;
-  --surface-tertiary: 0 59 70;
-  --surface-elevated: 0 78 94;
+  /* Background colors - Dark mode uses ink palette */
+  --background-primary: 0 18 25;
+  --background-secondary: 0 39 47;
+  --background-tertiary: 0 59 70;
+  --background-elevated: 0 78 94;
+  --background-overlay: 0 0 0;
+  --background-inverse: 251 249 245;
 
   /* Text colors - Dark mode */
   --text-primary: 251 247 237;
@@ -165,21 +202,56 @@
   --text-inverted: 0 18 25;
 
   /* Border colors - Dark mode */
-  --border-primary: 0 78 94;
-  --border-secondary: 0 59 70;
+  --border-primary: 97 189 158;
+  --border-secondary: 58 122 138;
+  --border-tertiary: 10 179 182;
 
-  /* Interactive states - Dark mode */
-  --interactive-hover: 0 59 70;
-  --interactive-active: 0 78 94;
+  /* Semantic roles */
+  --text-muted: var(--text-tertiary);
+  --text-disabled: 100 116 139;
+  --text-on-accent: 251 249 245;
 
-  /* Brand accent */
-  --brand-primary: 10 147 150;
-  --brand-secondary: 148 210 189;
-  --brand-accent: 238 155 0;
+  --border-subtle: var(--border-secondary);
+  --border-default: var(--border-primary);
+  --border-strong: var(--border-tertiary);
+  --border-focus: 10 179 182;
 
-  /* Icon colors */
-  --icon-inactive: 125 164 152;
-  --icon-inactive-hover: 148 210 189;
+  --action-primary-bg: 0 95 115;
+  --action-primary-bg-hover: 0 122 147;
+  --action-primary-bg-active: 0 78 94;
+  --action-primary-fg: var(--text-on-accent);
+  --action-secondary-bg: var(--background-tertiary);
+  --action-secondary-fg: var(--text-secondary);
+  --action-danger-bg: 174 32 18;
+  --action-danger-fg: var(--text-on-accent);
+
+  --state-success-bg: 6 88 89;
+  --state-success-fg: 110 231 183;
+  --state-success-border: 63 151 122;
+  --state-warning-bg: 96 62 0;
+  --state-warning-fg: 253 208 77;
+  --state-warning-border: 192 125 0;
+  --state-danger-bg: 105 19 11;
+  --state-danger-fg: 252 165 165;
+  --state-danger-border: 174 32 18;
+  --state-info-bg: 0 78 94;
+  --state-info-fg: 125 244 247;
+  --state-info-border: 0 122 147;
+
+  /* Elevation + motion */
+  --elevation-flat: none;
+  --elevation-raised: 0 1px 2px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(233, 216, 166, 0.04);
+  --elevation-overlay: 0 10px 28px rgba(0, 0, 0, 0.32);
+  --elevation-modal: 0 28px 72px rgba(0, 0, 0, 0.42);
+  --elevation-popover: 0 14px 36px rgba(0, 0, 0, 0.34);
+  --motion-duration-instant: 80ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-slow: 320ms;
+  --motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
+
 }
 
 /* Base layer styles */
@@ -200,7 +272,7 @@ html[lang="ne"] {
 }
 
 body {
-  background-color: rgb(var(--surface-primary));
+  background-color: rgb(var(--background-primary));
   color: rgb(var(--text-primary));
   min-height: 100vh;
   transition:

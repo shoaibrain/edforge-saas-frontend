@@ -51,7 +51,7 @@ export function SidebarEdgeTrigger({ collapsed, onToggle }: SidebarEdgeTriggerPr
     >
       {/* Visual edge line - subtle indicator that appears on hover */}
       <motion.div
-        className="absolute right-0 top-0 bottom-0 w-0.5 bg-teal-500/50 dark:bg-cyan-500/50"
+        className="absolute right-0 top-0 bottom-0 w-0.5 bg-[rgb(var(--action-primary-bg))]/50 /50"
         initial={{ opacity: 0 }}
         animate={{ opacity: isHovered ? 1 : 0 }}
         transition={{ duration: 0.15 }}
@@ -81,12 +81,12 @@ export function SidebarEdgeTrigger({ collapsed, onToggle }: SidebarEdgeTriggerPr
               'absolute right-0 translate-x-1/2 -translate-y-1/2',
               'w-5 h-5 rounded-full',
               'flex items-center justify-center',
-              'bg-[rgb(var(--surface-secondary))]',
+              'bg-[rgb(var(--background-secondary))]',
               'border border-[rgb(var(--border-secondary))]',
               'shadow-sm',
               'text-[rgb(var(--text-tertiary))]',
-              'hover:bg-teal-500 dark:hover:bg-cyan-500',
-              'hover:text-white',
+              'hover:bg-[rgb(var(--action-primary-bg))] dark:hover:bg-[rgb(var(--action-primary-bg-hover))]',
+              'hover:text-[rgb(var(--action-primary-fg))]',
               'hover:border-transparent',
               'transition-colors duration-150',
               'focus:outline-none'

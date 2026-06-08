@@ -136,29 +136,29 @@ export const MATERIAL_TYPE_OPTIONS = [
 // ============================================================================
 
 export const SUBJECT_AREA_COLORS: Record<string, { bg: string; text: string }> = {
-  mathematics: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  english_language_arts: { bg: 'bg-purple-50', text: 'text-purple-700' },
-  science: { bg: 'bg-green-50', text: 'text-green-700' },
+  mathematics: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
+  english_language_arts: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
+  science: { bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', text: 'text-[rgb(var(--state-success-fg))]' },
   social_studies: { bg: 'bg-amber-50', text: 'text-amber-700' },
-  world_languages: { bg: 'bg-rose-50', text: 'text-rose-700' },
-  arts: { bg: 'bg-pink-50', text: 'text-pink-700' },
-  physical_education: { bg: 'bg-orange-50', text: 'text-orange-700' },
-  technology: { bg: 'bg-cyan-50', text: 'text-cyan-700' },
-  business: { bg: 'bg-slate-50', text: 'text-slate-700' },
-  vocational: { bg: 'bg-teal-50', text: 'text-teal-700' },
-  other: { bg: 'bg-gray-50', text: 'text-gray-700' },
+  world_languages: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))]' },
+  arts: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))]' },
+  physical_education: { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]', text: 'text-[rgb(var(--state-warning-fg))]' },
+  technology: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
+  business: { bg: 'bg-[rgb(var(--background-tertiary))]', text: 'text-[rgb(var(--text-secondary))]' },
+  vocational: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
+  other: { bg: 'bg-[rgb(var(--background-tertiary))]', text: 'text-[rgb(var(--text-secondary))]' },
 }
 
 export const COURSE_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  required: { bg: 'bg-indigo-50', text: 'text-indigo-700' },
-  elective: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
+  required: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
+  elective: { bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', text: 'text-[rgb(var(--state-success-fg))]' },
   enrichment: { bg: 'bg-violet-50', text: 'text-violet-700' },
-  remedial: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
+  remedial: { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]', text: 'text-[rgb(var(--state-warning-fg))]' },
   honors: { bg: 'bg-sky-50', text: 'text-sky-700' },
-  ap: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  ib: { bg: 'bg-cyan-50', text: 'text-cyan-700' },
+  ap: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
+  ib: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
   dual_enrollment: { bg: 'bg-fuchsia-50', text: 'text-fuchsia-700' },
-  vocational: { bg: 'bg-teal-50', text: 'text-teal-700' },
+  vocational: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
 }
 
 // ============================================================================

@@ -37,10 +37,10 @@ export const PortalCourseCard = forwardRef<HTMLElement, PortalCourseCardProps>(
       courseName,
       courseCode,
       letterGrade,
-      numericGrade,
+      numericGrade: _numericGrade,
       categories,
-      teacherName,
-      teacherInitials,
+      teacherName: _teacherName,
+      teacherInitials: _teacherInitials,
       teacherColor = 'ind',
       missedWorkMessage,
       ...props

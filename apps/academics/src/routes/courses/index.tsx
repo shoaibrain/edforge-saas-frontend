@@ -15,8 +15,8 @@ export function CoursesModule() {
         <div className="px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20">
-                <BookOpen className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.10)]">
+                <BookOpen className="w-6 h-6 text-[rgb(var(--state-danger-fg))] " />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-text-primary">Course Catalog</h1>
@@ -25,7 +25,7 @@ export function CoursesModule() {
                 </p>
               </div>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-white rounded-lg hover:bg-accent-primary/90 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-accent-primary/90 transition-colors">
               <Plus className="w-4 h-4" />
               <span>Add Course</span>
             </button>
@@ -35,10 +35,10 @@ export function CoursesModule() {
 
       <div className="p-6 space-y-6">
         {/* Redirect Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <div className="bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <div className="p-2 rounded-lg bg-blue-500/20">
-              <ArrowRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-info-fg))]/20">
+              <ArrowRight className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -50,7 +50,7 @@ export function CoursesModule() {
               </p>
               <Link
                 to="/curriculum"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
               >
                 <span>Go to Curriculum Management</span>
                 <ArrowRight className="w-4 h-4" />
@@ -65,29 +65,29 @@ export function CoursesModule() {
             icon={BookOpen}
             label="Total Courses"
             value="87"
-            accent="text-rose-600 dark:text-rose-400"
-            bg="bg-rose-500/10"
+            accent="text-[rgb(var(--state-danger-fg))] "
+            bg="bg-[rgb(var(--state-danger-fg))]/10"
           />
           <StatCard
             icon={CheckCircle}
             label="Active This Term"
             value="64"
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            accent="text-[rgb(var(--state-success-fg))]"
+            bg="bg-[rgb(var(--state-success-bg)/0.18)]"
           />
           <StatCard
             icon={FileText}
             label="Electives"
             value="23"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={Clock}
             label="Pending Approval"
             value="5"
-            accent="text-amber-600 dark:text-amber-400"
-            bg="bg-amber-500/10"
+            accent="text-[rgb(var(--state-warning-fg))]"
+            bg="bg-[rgb(var(--state-warning-fg))]/10"
           />
         </div>
 
@@ -110,8 +110,8 @@ export function CoursesModule() {
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-rose-500/10">
-              <BookOpen className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-danger-fg))]/10">
+              <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] " />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">

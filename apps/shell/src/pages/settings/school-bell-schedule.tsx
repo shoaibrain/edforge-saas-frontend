@@ -69,15 +69,15 @@ const PERIOD_TYPE_OPTIONS = [
 ]
 
 const PERIOD_TYPE_COLORS: Record<string, string> = {
-  instructional: 'bg-teal-500',
-  homeroom: 'bg-indigo-500',
+  instructional: 'bg-[rgb(var(--action-primary-bg))]',
+  homeroom: 'bg-[rgb(var(--state-info-fg))]',
   lunch: 'bg-amber-500',
-  recess: 'bg-green-500',
-  passing: 'bg-slate-400',
-  advisory: 'bg-purple-500',
-  assembly: 'bg-cyan-500',
-  study_hall: 'bg-blue-500',
-  extracurricular: 'bg-rose-500',
+  recess: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+  passing: 'bg-[rgb(var(--text-tertiary))]',
+  advisory: 'bg-[rgb(var(--state-info-bg)/0.18)]0',
+  assembly: 'bg-[rgb(var(--state-info-fg))]',
+  study_hall: 'bg-[rgb(var(--state-info-bg)/0.18)]0',
+  extracurricular: 'bg-[rgb(var(--state-danger-fg))]',
 }
 
 const PERIOD_TYPE_DROPDOWN_OPTIONS: DropdownOption[] = [
@@ -103,13 +103,13 @@ const DAY_TYPE_OPTIONS: DropdownOption[] = [
 ]
 
 const DAY_TYPE_COLORS: Record<string, string> = {
-  regular: 'bg-teal-500/10 text-teal-600',
+  regular: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]',
   early_release: 'bg-amber-500/10 text-amber-600',
-  late_start: 'bg-blue-500/10 text-blue-600',
-  assembly: 'bg-purple-500/10 text-purple-600',
-  testing: 'bg-red-500/10 text-red-600',
-  half_day: 'bg-orange-500/10 text-orange-600',
-  special: 'bg-indigo-500/10 text-indigo-600',
+  late_start: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))]',
+  assembly: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  testing: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))]',
+  half_day: 'bg-[rgb(var(--state-warning-bg)/0.18)]0/10 text-[rgb(var(--state-warning-fg))]',
+  special: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
 }
 
 // Common bell schedule presets
@@ -295,7 +295,7 @@ function BellTimeline({ periods, onEdit }: TimelineProps) {
           const end = minutesSinceMidnight(period.endTime) - dayStart
           const left = (start / totalMinutes) * 100
           const width = ((end - start) / totalMinutes) * 100
-          const color = PERIOD_TYPE_COLORS[period.periodType] || 'bg-gray-400'
+          const color = PERIOD_TYPE_COLORS[period.periodType] || 'bg-[rgb(var(--text-tertiary))]'
 
           return (
             <button
@@ -305,10 +305,10 @@ function BellTimeline({ periods, onEdit }: TimelineProps) {
               className={`absolute top-0 bottom-0 ${color} rounded-lg shadow-sm hover:shadow-md hover:brightness-110 transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden`}
               style={{ left: `${left}%`, width: `${Math.max(width, 2)}%` }}
             >
-              <span className="text-white text-[10px] font-semibold truncate px-1.5 leading-tight drop-shadow-sm">
+              <span className="text-[rgb(var(--action-primary-fg))] text-xs font-semibold truncate px-1.5 leading-tight drop-shadow-sm">
                 {period.classPeriodName}
               </span>
-              <span className="text-white/80 text-[8px] truncate px-1 leading-tight">
+              <span className="text-[rgb(var(--action-primary-fg))]/80 text-xs truncate px-1 leading-tight">
                 {formatTime(period.startTime)}–{formatTime(period.endTime)}
               </span>
             </button>
@@ -331,7 +331,7 @@ function BellTimeline({ periods, onEdit }: TimelineProps) {
               style={{ left: `${left}%` }}
             >
               <div className="w-px h-1.5 bg-[rgb(var(--text-tertiary))] opacity-40" />
-              <span className="absolute top-2 text-[9px] text-[rgb(var(--text-tertiary))] -translate-x-1/2 whitespace-nowrap tabular-nums">
+              <span className="absolute top-2 text-xs text-[rgb(var(--text-tertiary))] -translate-x-1/2 whitespace-nowrap tabular-nums">
                 {displayHour}{ampm}
               </span>
             </div>
@@ -729,7 +729,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
     return (
       <div className="space-y-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-16 bg-[rgb(var(--surface-secondary))] rounded-xl animate-pulse" />
+          <div key={i} className="h-16 bg-[rgb(var(--background-secondary))] rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -740,8 +740,8 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20">
-            <Clock className="w-5 h-5 text-indigo-600" />
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-fg))]/10 to-violet-500/10 border border-[rgb(var(--state-info-border)/0.35)]">
+            <Clock className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Bell Schedule</h2>
@@ -771,12 +771,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
       </div>
 
       {/* How It Works — collapsible guide */}
-      <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]/50 overflow-hidden">
+      <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]/50 overflow-hidden">
         <button
           onClick={() => setShowHowItWorks(v => !v)}
-          className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+          className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-[rgb(var(--background-secondary))] transition-colors"
         >
-          <Info className="w-4 h-4 text-teal-500 flex-shrink-0" />
+          <Info className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
           <span className="text-sm font-medium text-[rgb(var(--text-secondary))] flex-1">How bell schedules work</span>
           {showHowItWorks
             ? <ChevronUp className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -794,39 +794,39 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             >
               <div className="px-4 pb-4 space-y-3">
                 {/* Visual hierarchy */}
-                <div className="p-3 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] text-[11px] font-mono text-[rgb(var(--text-tertiary))] leading-relaxed">
+                <div className="p-3 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-tertiary))] leading-relaxed">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <CalendarDays className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
+                    <CalendarDays className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
                     <span className="text-xs font-sans font-medium text-[rgb(var(--text-primary))]">Regular Day</span>
-                    <span className="text-[10px] font-sans px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-600">bell schedule = the whole day</span>
+                    <span className="text-xs font-sans px-1.5 py-0.5 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">bell schedule = the whole day</span>
                   </div>
-                  <div className="pl-4 border-l-2 border-teal-500/20 ml-1.5 space-y-0.5">
+                  <div className="pl-4 border-l-2 border-[rgb(var(--border-focus)/0.35)] ml-1.5 space-y-0.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[rgb(var(--state-info-fg))] flex-shrink-0" />
                       <span>Homeroom &nbsp;&nbsp;8:00 – 8:15</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] flex-shrink-0" />
                       <span>Period 1 &nbsp;&nbsp;&nbsp;8:15 – 9:00</span>
-                      <span className="text-[10px] font-sans px-1 rounded bg-teal-500/10 text-teal-600">academic</span>
+                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">academic</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] flex-shrink-0" />
                       <span>Period 2 &nbsp;&nbsp;&nbsp;9:05 – 9:50</span>
-                      <span className="text-[10px] font-sans px-1 rounded bg-teal-500/10 text-teal-600">academic</span>
+                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">academic</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
                       <span>Lunch &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11:30 – 12:00</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] flex-shrink-0" />
                       <span>Period 5 &nbsp;&nbsp;&nbsp;1:00 – 1:50</span>
-                      <span className="text-[10px] font-sans px-1 rounded bg-teal-500/10 text-teal-600">academic</span>
+                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">academic</span>
                     </div>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] font-sans text-[11px]">
-                    <span className="w-2 h-2 rounded-full bg-teal-500 inline-block mr-1" /> = time slots (periods) inside the schedule
+                  <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] font-sans text-xs">
+                    <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] inline-block mr-1" /> = time slots (periods) inside the schedule
                   </div>
                 </div>
 
@@ -837,10 +837,10 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     { step: '2', label: 'Add periods to it', sub: 'Class times, lunch, homeroom' },
                     { step: '3', label: 'Assign to calendar', sub: 'Which days use which schedule' },
                   ].map(s => (
-                    <div key={s.step} className="p-2 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))]">
-                      <div className="w-5 h-5 rounded-full bg-teal-500/10 text-teal-600 text-[10px] font-bold flex items-center justify-center mx-auto mb-1">{s.step}</div>
-                      <div className="text-[11px] font-medium text-[rgb(var(--text-secondary))]">{s.label}</div>
-                      <div className="text-[10px] text-[rgb(var(--text-tertiary))]">{s.sub}</div>
+                    <div key={s.step} className="p-2 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))]">
+                      <div className="w-5 h-5 rounded-full bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))] text-xs font-bold flex items-center justify-center mx-auto mb-1">{s.step}</div>
+                      <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{s.label}</div>
+                      <div className="text-xs text-[rgb(var(--text-tertiary))]">{s.sub}</div>
                     </div>
                   ))}
                 </div>
@@ -859,12 +859,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               onClick={() => setSelectedScheduleId(schedule.bellScheduleId)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 selectedScheduleId === schedule.bellScheduleId
-                  ? 'bg-teal-500/10 text-teal-600 border border-teal-500/30'
-                  : 'bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-secondary))] border border-transparent hover:border-[rgb(var(--border-primary))]'
+                  ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))] border border-[rgb(var(--border-focus)/0.35)]'
+                  : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))] border border-transparent hover:border-[rgb(var(--border-primary))]'
               }`}
             >
               {schedule.bellScheduleName}
-              <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${DAY_TYPE_COLORS[schedule.dayType] || 'bg-slate-500/10 text-slate-600'}`}>
+              <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${DAY_TYPE_COLORS[schedule.dayType] || 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))]'}`}>
                 {DAY_TYPE_OPTIONS.find(d => d.id === schedule.dayType)?.label || schedule.dayType}
               </span>
               {schedule.isDefault && (
@@ -874,7 +874,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           ))}
           <button
             onClick={openScheduleCreate}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors whitespace-nowrap"
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors whitespace-nowrap"
           >
             <Plus className="w-3.5 h-3.5" />
             New Schedule
@@ -884,7 +884,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
 
       {/* Selected Schedule — unified info + timeline card */}
       {selectedSchedule && (
-        <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] overflow-hidden">
+        <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] overflow-hidden">
           {/* Header */}
           <div className="px-5 pt-4 pb-3">
             <div className="flex items-center justify-between">
@@ -896,12 +896,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   <span className="text-xs text-[rgb(var(--text-tertiary))]">({selectedSchedule.alternateDayName})</span>
                 )}
                 {selectedSchedule.isDefault && (
-                  <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
                     Default
                   </span>
                 )}
                 {!selectedSchedule.isActive && (
-                  <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-red-500/10 text-red-600 border border-red-500/20">
+                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] border border-[rgb(var(--state-danger-border)/0.35)]">
                     Inactive
                   </span>
                 )}
@@ -918,13 +918,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 )}
                 <button
                   onClick={() => openScheduleEdit(selectedSchedule)}
-                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setShowScheduleDeleteConfirm(selectedSchedule.bellScheduleId)}
-                  className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -947,7 +947,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
                     <span>{stats.daySpan}</span>
                     <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
-                    <span className="text-teal-600 font-medium">{stats.instructionalTime} instructional</span>
+                    <span className="text-[rgb(var(--action-secondary-fg))] font-medium">{stats.instructionalTime} instructional</span>
                     {stats.nonInstructionalTime !== '0m' && (
                       <>
                         <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
@@ -969,8 +969,8 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 {PERIOD_TYPE_OPTIONS.filter(t =>
                   displayPeriods.some(p => p.periodType === t.value)
                 ).map(t => (
-                  <span key={t.value} className="flex items-center gap-1 text-[10px]">
-                    <span className={`w-1.5 h-1.5 rounded-full ${PERIOD_TYPE_COLORS[t.value] || 'bg-gray-400'}`} />
+                  <span key={t.value} className="flex items-center gap-1 text-xs">
+                    <span className={`w-1.5 h-1.5 rounded-full ${PERIOD_TYPE_COLORS[t.value] || 'bg-[rgb(var(--text-tertiary))]'}`} />
                     <span className="text-[rgb(var(--text-tertiary))]">{t.label}</span>
                   </span>
                 ))}
@@ -1037,7 +1037,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 ) : null}
               </div>
               {selectedSchedule && (
-                <p className="text-[11px] text-[rgb(var(--text-tertiary))]">
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">
                   Tip: Most schools have 6–9 periods including homeroom, classes, lunch, and passing time.
                 </p>
               )}
@@ -1064,7 +1064,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 {gapMinutes > 0 && (
                   <div className="flex items-center gap-2 px-5 py-1 bg-amber-500/5">
                     <div className="flex-1 border-t border-dashed border-amber-300/40" />
-                    <span className="text-[10px] font-medium text-amber-500 whitespace-nowrap">
+                    <span className="text-xs font-medium text-amber-500 whitespace-nowrap">
                       {gapMinutes}m gap
                     </span>
                     <div className="flex-1 border-t border-dashed border-amber-300/40" />
@@ -1072,19 +1072,19 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 )}
 
                 <div
-                  className={`group flex items-center gap-4 px-5 py-3.5 hover:bg-[rgb(var(--surface-secondary))]/50 transition-colors ${
+                  className={`group flex items-center gap-4 px-5 py-3.5 hover:bg-[rgb(var(--background-secondary))]/50 transition-colors ${
                     !isLast ? 'border-b border-[rgb(var(--border-secondary))]' : ''
                   }`}
                 >
                   {/* Color accent bar */}
-                  <div className={`w-1 self-stretch rounded-full flex-shrink-0 ${PERIOD_TYPE_COLORS[period.periodType] || 'bg-gray-400'}`} />
+                  <div className={`w-1 self-stretch rounded-full flex-shrink-0 ${PERIOD_TYPE_COLORS[period.periodType] || 'bg-[rgb(var(--text-tertiary))]'}`} />
 
                   {/* Time column */}
                   <div className="w-24 flex-shrink-0">
                     <div className="text-sm font-medium text-[rgb(var(--text-primary))] tabular-nums">
                       {formatTime(period.startTime)}
                     </div>
-                    <div className="text-[11px] text-[rgb(var(--text-tertiary))] tabular-nums">
+                    <div className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
                       {formatTime(period.endTime)}
                     </div>
                   </div>
@@ -1096,12 +1096,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                         {period.classPeriodName}
                       </span>
                       {period.isAcademic && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-teal-500/10 text-teal-600">
+                        <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">
                           Academic
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-[rgb(var(--text-tertiary))] mt-0.5">
+                    <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
                       {period.durationMinutes} min
                       <span className="mx-1">·</span>
                       {PERIOD_TYPE_OPTIONS.find(t => t.value === period.periodType)?.label || period.periodType}
@@ -1112,13 +1112,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => openEdit(period)}
-                      className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(period.id)}
-                      className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1146,14 +1146,14 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           {/* Name */}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Period Name <span className="text-red-500">*</span>
+              Period Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               type="text"
               value={form.classPeriodName}
               onChange={(e) => setForm(f => ({ ...f, classPeriodName: e.target.value }))}
               placeholder="e.g., Period 1, Homeroom, Lunch"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -1161,31 +1161,31 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                Start Time <span className="text-red-500">*</span>
+                Start Time <span className="text-[rgb(var(--state-danger-fg))]">*</span>
               </label>
               <input
                 type="time"
                 value={form.startTime}
                 onChange={(e) => setForm(f => ({ ...f, startTime: e.target.value }))}
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                End Time <span className="text-red-500">*</span>
+                End Time <span className="text-[rgb(var(--state-danger-fg))]">*</span>
               </label>
               <input
                 type="time"
                 value={form.endTime}
                 onChange={(e) => setForm(f => ({ ...f, endTime: e.target.value }))}
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
           </div>
 
           {/* Duration preview */}
           {form.startTime && form.endTime && form.startTime < form.endTime && (
-            <div className="text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-secondary))] rounded-lg px-3 py-2">
+            <div className="text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-secondary))] rounded-lg px-3 py-2">
               Duration: {minutesSinceMidnight(form.endTime) - minutesSinceMidnight(form.startTime)} minutes
             </div>
           )}
@@ -1217,7 +1217,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               max={20}
               value={form.sortOrder}
               onChange={(e) => setForm(f => ({ ...f, sortOrder: parseInt(e.target.value) || 0 }))}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -1240,14 +1240,14 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Optional description"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           {/* Concept footer */}
-          <div className="rounded-lg bg-[rgb(var(--surface-secondary))]/50 px-3 py-2.5 space-y-1">
-            <p className="text-[10px] uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">What is a period?</p>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+          <div className="rounded-lg bg-[rgb(var(--background-secondary))]/50 px-3 py-2.5 space-y-1">
+            <p className="text-xs uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">What is a period?</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
               A period is a <strong className="text-[rgb(var(--text-secondary))]">single time slot</strong> inside
               a bell schedule — one block in the school day. "Academic" periods (classes, labs)
               count toward required instructional hours. Non-academic periods (lunch, recess, passing time) do not.
@@ -1278,16 +1278,16 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPresets(false)} />
+            <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={() => setShowPresets(false)} />
             <motion.div
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl overflow-hidden"
+              className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl overflow-hidden"
             >
               <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
                 <h3 className="font-semibold text-[rgb(var(--text-primary))]">Start from Template</h3>
-                <button onClick={() => setShowPresets(false)} className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-secondary))]">
+                <button onClick={() => setShowPresets(false)} className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))]">
                   <X className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                 </button>
               </div>
@@ -1298,7 +1298,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <button
                   onClick={() => applyPreset('elementary')}
                   disabled={isApplyingPreset || createScheduleMutation.isPending}
-                  className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-teal-500/30 hover:bg-teal-500/5 transition-colors disabled:opacity-50"
+                  className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
                 >
                   <div className="font-medium text-sm text-[rgb(var(--text-primary))]">Elementary Schedule</div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
@@ -1308,7 +1308,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <button
                   onClick={() => applyPreset('highSchool')}
                   disabled={isApplyingPreset || createScheduleMutation.isPending}
-                  className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-teal-500/30 hover:bg-teal-500/5 transition-colors disabled:opacity-50"
+                  className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
                 >
                   <div className="font-medium text-sm text-[rgb(var(--text-primary))]">High School Schedule</div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
@@ -1330,16 +1330,16 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
+            <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
             <motion.div
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="relative w-full max-w-sm bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6 space-y-4"
+              className="relative w-full max-w-sm bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6 space-y-4"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-red-500/10">
-                  <AlertCircle className="w-5 h-5 text-red-500" />
+                <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10">
+                  <AlertCircle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
                 </div>
                 <h3 className="font-semibold text-[rgb(var(--text-primary))]">Delete Period</h3>
               </div>
@@ -1381,14 +1381,14 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           {/* Schedule Name */}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Schedule Name <span className="text-red-500">*</span>
+              Schedule Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               type="text"
               value={scheduleForm.bellScheduleName}
               onChange={(e) => setScheduleForm(f => ({ ...f, bellScheduleName: e.target.value }))}
               placeholder="e.g., Regular Day"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -1414,7 +1414,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               value={scheduleForm.alternateDayName}
               onChange={(e) => setScheduleForm(f => ({ ...f, alternateDayName: e.target.value }))}
               placeholder="e.g., A Day, B Day"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -1422,13 +1422,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                Effective Date <span className="text-red-500">*</span>
+                Effective Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
               </label>
               <input
                 type="date"
                 value={scheduleForm.effectiveDate}
                 onChange={(e) => setScheduleForm(f => ({ ...f, effectiveDate: e.target.value }))}
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
             <div>
@@ -1439,7 +1439,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 type="date"
                 value={scheduleForm.endDate}
                 onChange={(e) => setScheduleForm(f => ({ ...f, endDate: e.target.value }))}
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
           </div>
@@ -1463,20 +1463,20 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               value={scheduleForm.description}
               onChange={(e) => setScheduleForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Optional description"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           {/* Concept footer */}
-          <div className="rounded-lg bg-[rgb(var(--surface-secondary))]/50 px-3 py-2.5 space-y-1.5">
-            <p className="text-[10px] uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">What is a bell schedule?</p>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+          <div className="rounded-lg bg-[rgb(var(--background-secondary))]/50 px-3 py-2.5 space-y-1.5">
+            <p className="text-xs uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">What is a bell schedule?</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
               A bell schedule is your school's <strong className="text-[rgb(var(--text-secondary))]">daily timetable</strong> for a type of day.
               After creating it, you add individual time slots (periods) to it:
             </p>
-            <div className="text-[11px] text-[rgb(var(--text-tertiary))] font-mono leading-relaxed pl-1">
+            <div className="text-xs text-[rgb(var(--text-tertiary))] font-mono leading-relaxed pl-1">
               <div className="flex items-center gap-1.5">
-                <CalendarDays className="w-3 h-3 text-teal-500 flex-shrink-0" />
+                <CalendarDays className="w-3 h-3 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
                 <span className="text-[rgb(var(--text-secondary))]">Regular Day</span>
                 <span className="text-[rgb(var(--text-tertiary))]">← this is a bell schedule</span>
               </div>
@@ -1513,16 +1513,16 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowScheduleDeleteConfirm(null)} />
+            <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={() => setShowScheduleDeleteConfirm(null)} />
             <motion.div
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="relative w-full max-w-sm bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6 space-y-4"
+              className="relative w-full max-w-sm bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6 space-y-4"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-red-500/10">
-                  <AlertCircle className="w-5 h-5 text-red-500" />
+                <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10">
+                  <AlertCircle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
                 </div>
                 <h3 className="font-semibold text-[rgb(var(--text-primary))]">Delete Schedule</h3>
               </div>

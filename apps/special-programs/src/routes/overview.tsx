@@ -25,8 +25,8 @@ export function Overview() {
             change: '+8',
             changeType: 'positive',
             icon: FileText,
-            iconBg: 'bg-indigo-500/15 dark:bg-indigo-500/20',
-            iconColor: 'text-indigo-600 dark:text-indigo-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             label: '504 Plans',
@@ -34,8 +34,8 @@ export function Overview() {
             change: '+3',
             changeType: 'positive',
             icon: ShieldCheck,
-            iconBg: 'bg-purple-400/20',
-            iconColor: 'text-purple-600 dark:text-purple-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             label: 'Upcoming Meetings',
@@ -43,8 +43,8 @@ export function Overview() {
             change: 'This week',
             changeType: 'neutral',
             icon: Calendar,
-            iconBg: 'bg-blue-400/20',
-            iconColor: 'text-blue-600 dark:text-blue-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             label: 'Goal Progress',
@@ -52,8 +52,8 @@ export function Overview() {
             change: '+5%',
             changeType: 'positive',
             icon: TrendingUp,
-            iconBg: 'bg-emerald-400/20',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-success-fg))]',
         },
     ]
 
@@ -65,8 +65,8 @@ export function Overview() {
             description: 'Manage Individualized Education Programs',
             icon: FileText,
             href: '/special-programs/ieps',
-            iconBg: 'bg-indigo-500/15 group-hover:bg-indigo-500/25',
-            iconColor: 'text-indigo-600 dark:text-indigo-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             id: 'iep-meetings',
@@ -74,8 +74,8 @@ export function Overview() {
             description: 'Schedule and manage IEP meetings',
             icon: Calendar,
             href: '/special-programs/ieps/meetings',
-            iconBg: 'bg-blue-400/20 group-hover:bg-blue-400/30',
-            iconColor: 'text-blue-600 dark:text-blue-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             id: 'iep-goals',
@@ -83,8 +83,8 @@ export function Overview() {
             description: 'Track IEP goals and progress',
             icon: TrendingUp,
             href: '/special-programs/ieps/goals',
-            iconBg: 'bg-emerald-400/20 group-hover:bg-emerald-400/30',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-[rgb(var(--state-success-bg)/0.18)] group-hover:bg-[rgb(var(--state-success-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-success-fg))]',
         },
         {
             id: '504-plans',
@@ -92,8 +92,8 @@ export function Overview() {
             description: 'Manage Section 504 accommodation plans',
             icon: ShieldCheck,
             href: '/special-programs/504-plans',
-            iconBg: 'bg-purple-400/20 group-hover:bg-purple-400/30',
-            iconColor: 'text-purple-600 dark:text-purple-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             id: 'accommodations',
@@ -101,8 +101,8 @@ export function Overview() {
             description: 'Configure student accommodations',
             icon: Settings,
             href: '/special-programs/accommodations',
-            iconBg: 'bg-slate-400/20 group-hover:bg-slate-400/30',
-            iconColor: 'text-slate-600 dark:text-slate-400',
+            iconBg: 'bg-[rgb(var(--background-tertiary))] group-hover:bg-[rgb(var(--background-tertiary))]',
+            iconColor: 'text-[rgb(var(--text-secondary))]',
         },
         {
             id: 'accessibility',
@@ -119,8 +119,8 @@ export function Overview() {
             description: 'Student counseling services',
             icon: Users,
             href: '/special-programs/counseling',
-            iconBg: 'bg-rose-400/20 group-hover:bg-rose-400/30',
-            iconColor: 'text-rose-600 dark:text-rose-400',
+            iconBg: 'bg-[rgb(var(--state-danger-bg)/0.18)] group-hover:bg-[rgb(var(--state-danger-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-danger-fg))]',
         },
         {
             id: 'interventions',
@@ -128,8 +128,8 @@ export function Overview() {
             description: 'RTI and intervention tracking',
             icon: TrendingUp,
             href: '/special-programs/interventions',
-            iconBg: 'bg-cyan-400/20 group-hover:bg-cyan-400/30',
-            iconColor: 'text-cyan-600 dark:text-cyan-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
     ]
 

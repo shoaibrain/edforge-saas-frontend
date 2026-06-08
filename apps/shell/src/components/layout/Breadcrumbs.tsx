@@ -315,7 +315,7 @@ export function Breadcrumbs() {
                     crumb.isCurrentPage
                       ? 'font-medium text-[rgb(var(--text-primary))]'
                       : 'text-[rgb(var(--text-tertiary))]',
-                    'max-w-[200px] truncate',
+                    'max-w-52 truncate',
                     crumb.isDynamic && 'italic'
                   )}
                   aria-current={crumb.isCurrentPage ? 'page' : undefined}
@@ -330,9 +330,9 @@ export function Breadcrumbs() {
                     'flex items-center gap-1.5',
                     'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]',
                     'transition-colors duration-150',
-                    'max-w-[150px] truncate',
+                    'max-w-36 truncate',
                     'hover:underline underline-offset-2',
-                    'focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-1 rounded-sm',
+                    'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:ring-offset-1 rounded-sm',
                     crumb.isDynamic && 'italic'
                   )}
                   title={crumb.label}

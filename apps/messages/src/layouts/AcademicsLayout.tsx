@@ -16,8 +16,8 @@ export function AcademicsLayout({ children }: { children: ReactNode }) {
             <div className="bg-surface-secondary border-b border-border-primary">
                 <div className="max-w-7xl mx-auto px-6 py-6">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500">
-                            <GraduationCap className="w-8 h-8 text-white" />
+                        <div className="p-3 rounded-2xl bg-[rgb(var(--action-primary-bg))]">
+                            <GraduationCap className="w-8 h-8 text-[rgb(var(--action-primary-fg))]" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-text-primary">Academics</h1>

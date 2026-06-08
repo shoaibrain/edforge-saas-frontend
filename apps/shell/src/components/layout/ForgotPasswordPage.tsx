@@ -188,7 +188,7 @@ export function ForgotPasswordPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-[400px]"
+          className="w-full max-w-96"
         >
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2.5 group">
@@ -432,7 +432,7 @@ export function ForgotPasswordPage() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md transition-colors hover:bg-gray-100"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md transition-colors hover:bg-[rgb(var(--background-tertiary))]"
                           style={{ color: '#94A3B8' }}
                           tabIndex={-1}
                           aria-label={showPassword ? 'Hide password' : 'Show password'}

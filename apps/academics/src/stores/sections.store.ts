@@ -65,7 +65,9 @@ export const useSectionsStore = create<SectionsStoreState>((set, get) => ({
   viewMode: (typeof window !== 'undefined' && localStorage.getItem('edforge.classrooms.viewMode') === 'list' ? 'list' : 'grid') as 'grid' | 'list',
   setViewMode: (mode: 'grid' | 'list') => {
     set({ viewMode: mode })
-    try { localStorage.setItem('edforge.classrooms.viewMode', mode) } catch {}
+    try { localStorage.setItem('edforge.classrooms.viewMode', mode) } catch {
+      // Ignore persistence failures in restricted browser contexts.
+    }
   },
 
   setCourseId: (id: string | null) => {

@@ -173,7 +173,7 @@ export default function FeeStructuresPage() {
 
       {/* Delete confirmation */}
       {deletingFee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]">
           <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--bg-primary))] rounded-2xl shadow-xl">
             <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
               {t('feeStructure.deleteFee')}
@@ -192,7 +192,7 @@ export default function FeeStructuresPage() {
                 type="button"
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending}
-                className="flex-1 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-1 py-2 rounded-xl bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50"
               >
                 {deleteMutation.isPending ? '...' : t('feeStructure.deleteFee')}
               </button>

@@ -34,12 +34,12 @@ const HOLIDAY_TYPE_OPTIONS: { value: Holiday['holidayType']; label: string }[] =
 ]
 
 const HOLIDAY_TYPE_COLORS: Record<Holiday['holidayType'], string> = {
-  federal: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
-  state: 'bg-purple-500/10 text-purple-700 dark:text-purple-400',
-  local: 'bg-teal-500/10 text-teal-700 dark:text-teal-400',
+  federal: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]',
+  state: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  local: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))] ',
   school: 'bg-golden-500/10 text-golden-700 dark:text-golden-400',
-  religious: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400',
-  other: 'bg-slate-500/10 text-slate-700 dark:text-slate-400',
+  religious: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  other: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
 }
 
 // ============================================================================
@@ -77,12 +77,12 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl overflow-hidden"
+        className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
@@ -94,7 +94,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -110,7 +110,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
               placeholder="e.g., Thanksgiving"
               required
             />
@@ -125,7 +125,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
                 required
               />
             </div>
@@ -137,7 +137,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
               />
             </div>
           </div>
@@ -149,7 +149,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
             <select
               value={holidayType}
               onChange={(e) => setHolidayType(e.target.value as Holiday['holidayType'])}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             >
               {HOLIDAY_TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -166,7 +166,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
                   type="checkbox"
                   checked={affectsStudents}
                   onChange={(e) => setAffectsStudents(e.target.checked)}
-                  className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/40"
+                  className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.40)]"
                 />
                 <span className="text-sm text-[rgb(var(--text-secondary))] flex items-center gap-1.5">
                   <UserCircle className="w-4 h-4" />
@@ -178,7 +178,7 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
                   type="checkbox"
                   checked={affectsStaff}
                   onChange={(e) => setAffectsStaff(e.target.checked)}
-                  className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/40"
+                  className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.40)]"
                 />
                 <span className="text-sm text-[rgb(var(--text-secondary))] flex items-center gap-1.5">
                   <Users className="w-4 h-4" />
@@ -220,12 +220,12 @@ function DeleteConfirmModal({ isOpen, holiday, onClose, onConfirm, isDeleting }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-sm bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6"
+        className="relative w-full max-w-sm bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6"
       >
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-full bg-rust-500/10">
@@ -271,9 +271,9 @@ function HolidayItem({ holiday, onDelete }: HolidayItemProps) {
     : formatDate(holiday.date)
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-tertiary))] group">
+    <div className="flex items-center justify-between p-3 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-tertiary))] group">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+        <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
           <Calendar className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         </div>
         <div>
@@ -366,7 +366,7 @@ export function HolidayManager({ schoolId, yearId }: HolidayManagerProps) {
         </h4>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-lg transition-colors"
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:bg-[rgb(var(--action-primary-bg))]/10 rounded-lg transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Holiday
@@ -377,7 +377,7 @@ export function HolidayManager({ schoolId, yearId }: HolidayManagerProps) {
       {isLoading && (
         <div className="space-y-2">
           {[1, 2].map((i) => (
-            <div key={i} className="h-16 bg-[rgb(var(--surface-tertiary))] rounded-lg animate-pulse" />
+            <div key={i} className="h-16 bg-[rgb(var(--background-tertiary))] rounded-lg animate-pulse" />
           ))}
         </div>
       )}
@@ -402,7 +402,7 @@ export function HolidayManager({ schoolId, yearId }: HolidayManagerProps) {
           <p className="text-sm">No holidays scheduled</p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="text-sm text-teal-600 dark:text-teal-400 hover:underline mt-1"
+            className="text-sm text-[rgb(var(--action-secondary-fg))]  hover:underline mt-1"
           >
             Add your first holiday
           </button>

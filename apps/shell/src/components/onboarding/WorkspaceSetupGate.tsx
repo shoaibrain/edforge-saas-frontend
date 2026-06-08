@@ -91,7 +91,7 @@ export function WorkspaceSetupGate({ onComplete }: WorkspaceSetupGateProps) {
         style={{
           maxWidth: 520,
           width: '100%',
-          background: 'var(--surface-primary, #ffffff)',
+          background: 'var(--background-primary, #ffffff)',
           borderRadius: 12,
           border: '1px solid var(--border-primary, #e4e7f0)',
           padding: '2rem',
@@ -196,7 +196,7 @@ function SettingRow({ label, value }: { label: string; value: string }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '0.5rem 0.75rem',
-        background: 'var(--surface-secondary, #f8f9fc)',
+        background: 'var(--background-secondary, #f8f9fc)',
         borderRadius: 6,
       }}
     >

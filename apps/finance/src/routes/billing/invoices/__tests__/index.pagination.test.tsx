@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import type * as FinanceServices from '@edforge/finance-services'
 
 const loadMore = vi.fn()
 
 vi.mock('@edforge/finance-services', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@edforge/finance-services')>()
+  const actual = await importOriginal<typeof FinanceServices>()
   return {
     ...actual,
     useInvoicesInfinite: () => ({

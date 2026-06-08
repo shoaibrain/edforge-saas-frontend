@@ -187,7 +187,7 @@ export default function GradeLevelsTab({ schoolId, school }: GradeLevelsTabProps
             type="button"
             onClick={save}
             disabled={saveDisabled}
-            className="text-xs px-3 py-1.5 rounded-md bg-[#1D9E75] text-white hover:bg-[#168862] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="text-xs px-3 py-1.5 rounded-md bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:bg-[#168862] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
           >
             <Save size={12} /> {mutation.isPending ? 'Saving…' : 'Save changes'}
           </button>
@@ -210,7 +210,7 @@ interface BandSectionProps {
 
 function BandSection({ band, selected, canEdit, onToggle }: BandSectionProps) {
   return (
-    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2">
         <div className="w-7 h-7 rounded-lg bg-[rgba(127,119,221,0.1)] flex items-center justify-center text-sm">
           {band.emoji}
@@ -253,7 +253,7 @@ function GradeLevelOption({ code, checked, disabled, onToggle }: GradeLevelOptio
         'flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors',
         checked
           ? 'bg-[rgba(29,158,117,0.08)] border-[rgba(29,158,117,0.4)]'
-          : 'bg-[rgb(var(--surface-secondary))] border-[rgba(255,255,255,0.08)]',
+          : 'bg-[rgb(var(--background-secondary))] border-[rgba(255,255,255,0.08)]',
         disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-[#1D9E75]/40',
       ].join(' ')}
     >
@@ -270,7 +270,7 @@ function GradeLevelOption({ code, checked, disabled, onToggle }: GradeLevelOptio
       </span>
       {descriptor && (
         <span
-          className="shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-[rgba(127,119,221,0.1)] text-[#7F77DD]"
+          className="shrink-0 text-xs uppercase tracking-wide px-1.5 py-0.5 rounded bg-[rgba(127,119,221,0.1)] text-[#7F77DD]"
           title={`Ed-Fi descriptor for ${code}`}
         >
           → {descriptor}

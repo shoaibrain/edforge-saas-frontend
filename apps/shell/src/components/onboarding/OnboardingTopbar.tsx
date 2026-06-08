@@ -12,13 +12,13 @@ export function OnboardingTopbar({ currentStep, totalSteps }: OnboardingTopbarPr
 
   return (
     <div
-      className="fixed top-[2px] left-0 right-0 z-40 h-[52px] flex items-center justify-between px-6"
+      className="fixed top-0.5 left-0 right-0 z-40 h-14 flex items-center justify-between px-6"
       style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(var(--bg-primary), 0.85)' }}
     >
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-400 flex items-center justify-center">
-          <span className="text-white font-bold text-xs">E</span>
+        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] flex items-center justify-center">
+          <span className="text-[rgb(var(--action-primary-fg))] font-bold text-xs">E</span>
         </div>
         <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">EdForge</span>
       </div>

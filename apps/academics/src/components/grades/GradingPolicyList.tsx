@@ -35,12 +35,12 @@ function PolicyCard({
   const totalWeight = policy.categoryWeights.reduce((sum, c) => sum + c.weight, 0)
 
   return (
-    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:border-teal-500/30 transition-colors">
+    <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5 hover:border-[rgb(var(--border-focus)/0.35)] transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <h4 className="text-sm font-semibold text-text-primary">{policy.policyName}</h4>
           {policy.isDefault && (
-            <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-full">
+            <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 dark:text-amber-400 rounded-full">
               <Star className="w-3 h-3" />
               Default
             </span>
@@ -90,7 +90,7 @@ function PolicyCard({
             <div key={cat.categoryId} className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-surface-hover rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-teal-500 rounded-full"
+                  className="h-full bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-full"
                   style={{ width: `${cat.weight}%` }}
                 />
               </div>
@@ -154,7 +154,7 @@ export function GradingPolicyList() {
           <button
             type="button"
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             New Policy
@@ -175,7 +175,7 @@ export function GradingPolicyList() {
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
             >
               <Plus className="w-4 h-4" />
               Create Policy

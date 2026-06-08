@@ -65,10 +65,10 @@ const TYPE_OPTIONS: Array<{
   color: string
   bg: string
 }> = [
-  { value: 'assignment', label: 'Assignment', icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-  { value: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-  { value: 'material', label: 'Material', icon: FileText, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-  { value: 'question', label: 'Question', icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+  { value: 'assignment', label: 'Assignment', icon: ClipboardList, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  { value: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-amber-500', bg: 'bg-[rgb(var(--state-warning-fg))]/10' },
+  { value: 'material', label: 'Material', icon: FileText, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  { value: 'question', label: 'Question', icon: MessageCircle, color: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' },
 ]
 
 // ============================================================================
@@ -271,7 +271,7 @@ export function ClassworkDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={handleBackdropClick}
             aria-hidden="true"
           />
@@ -290,8 +290,8 @@ export function ClassworkDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex-shrink-0">
-                      <ClipboardList className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)] flex-shrink-0">
+                      <ClipboardList className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -302,7 +302,7 @@ export function ClassworkDrawer({
                           {title}
                         </h2>
                         {isEditMode && (
-                          <span className="flex-shrink-0 text-xs bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                          <span className="flex-shrink-0 text-xs bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
                             Editing
                           </span>
                         )}
@@ -337,7 +337,7 @@ export function ClassworkDrawer({
                             className={`
                               inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all
                               ${isSelected
-                                ? `border-teal-500 bg-teal-500/10 text-teal-700 dark:text-teal-300 ring-1 ring-teal-500/20`
+                                ? `border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))]  ring-1 ring-[rgb(var(--border-focus)/0.35)]`
                                 : 'border-border-primary bg-surface-primary text-text-secondary hover:bg-surface-secondary'
                               }
                               ${isEditMode ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
@@ -354,7 +354,7 @@ export function ClassworkDrawer({
                   {/* Title */}
                   <div>
                     <label htmlFor="cw-title" className="block text-xs font-medium text-text-secondary mb-1.5">
-                      Title <span className="text-red-500">*</span>
+                      Title <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                     </label>
                     <input
                       id="cw-title"
@@ -362,10 +362,10 @@ export function ClassworkDrawer({
                       value={form.title}
                       onChange={(e) => updateField('title', e.target.value)}
                       placeholder="e.g. Chapter 3 Reading Response"
-                      className={`w-full px-3 py-2 text-sm bg-surface-primary border rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors ${errors.title ? 'border-red-400' : 'border-border-primary'}`}
+                      className={`w-full px-3 py-2 text-sm bg-surface-primary border rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors ${errors.title ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-primary'}`}
                       autoFocus
                     />
-                    {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+                    {errors.title && <p className="mt-1 text-xs text-[rgb(var(--state-danger-fg))]">{errors.title}</p>}
                   </div>
 
                   {/* Description */}
@@ -379,7 +379,7 @@ export function ClassworkDrawer({
                       onChange={(e) => updateField('description', e.target.value)}
                       placeholder={form.type === 'question' ? 'Write your question here...' : 'Add instructions or details...'}
                       rows={form.type === 'material' || form.type === 'question' ? 5 : 4}
-                      className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors resize-y min-h-[80px]"
+                      className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors resize-y min-h-20"
                     />
                   </div>
 
@@ -392,7 +392,7 @@ export function ClassworkDrawer({
                       id="cw-topic"
                       value={form.topicId}
                       onChange={(e) => updateField('topicId', e.target.value)}
-                      className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+                      className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     >
                       <option value="">No topic</option>
                       {topics.map((t) => (
@@ -419,7 +419,7 @@ export function ClassworkDrawer({
                             type="date"
                             value={form.dueDate}
                             onChange={(e) => updateField('dueDate', e.target.value)}
-                            className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+                            className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                           />
                         </div>
                         <div>
@@ -434,9 +434,9 @@ export function ClassworkDrawer({
                             value={form.possiblePoints}
                             onChange={(e) => updateField('possiblePoints', e.target.value === '' ? '' : Number(e.target.value))}
                             placeholder="100"
-                            className={`w-full px-3 py-2 text-sm bg-surface-primary border rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors ${errors.possiblePoints ? 'border-red-400' : 'border-border-primary'}`}
+                            className={`w-full px-3 py-2 text-sm bg-surface-primary border rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors ${errors.possiblePoints ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-primary'}`}
                           />
-                          {errors.possiblePoints && <p className="mt-1 text-xs text-red-500">{errors.possiblePoints}</p>}
+                          {errors.possiblePoints && <p className="mt-1 text-xs text-[rgb(var(--state-danger-fg))]">{errors.possiblePoints}</p>}
                         </div>
                       </div>
                     </div>
@@ -455,13 +455,13 @@ export function ClassworkDrawer({
                             inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all
                             ${form.status === s
                               ? s === 'published'
-                                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20'
-                                : 'border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20'
+                                ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]  ring-1 ring-[rgb(var(--state-success-border)/0.35)]'
+                                : 'border-amber-500 bg-[rgb(var(--state-warning-fg))]/10 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20'
                               : 'border-border-primary bg-surface-primary text-text-secondary hover:bg-surface-secondary'
                             }
                           `}
                         >
-                          <div className={`w-1.5 h-1.5 rounded-full ${form.status === s ? (s === 'published' ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-text-tertiary'}`} />
+                          <div className={`w-1.5 h-1.5 rounded-full ${form.status === s ? (s === 'published' ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--state-warning-fg))]') : 'bg-text-tertiary'}`} />
                           {s === 'draft' ? 'Draft' : 'Published'}
                         </button>
                       ))}
@@ -483,7 +483,7 @@ export function ClassworkDrawer({
                     type="button"
                     onClick={handleSubmit}
                     disabled={isPending}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   >
                     {isPending ? (
                       <>
@@ -505,7 +505,7 @@ export function ClassworkDrawer({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-l-xl"
+                      className="absolute inset-0 z-10 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)] backdrop-blur-sm rounded-l-xl"
                     >
                       <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
@@ -530,7 +530,7 @@ export function ClassworkDrawer({
                           <button
                             type="button"
                             onClick={() => { setShowDiscardConfirm(false); onClose() }}
-                            className="px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                            className="px-3 py-1.5 text-sm font-medium text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-lg transition-colors"
                           >
                             Discard
                           </button>

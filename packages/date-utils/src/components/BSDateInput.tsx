@@ -170,7 +170,7 @@ export function BSDateInput({
             onChange={handleYearChange}
             disabled={disabled}
             placeholder="2082"
-            className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgb(10,147,150)] ${
+            className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgb(10,147,150)] ${
               displayError ? 'border-[rgb(185,62,3)]' : 'border-[rgb(var(--border-primary))]'
             }`}
           />
@@ -183,7 +183,7 @@ export function BSDateInput({
             value={month}
             onChange={handleMonthChange}
             disabled={disabled}
-            className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] appearance-none focus:outline-none focus:border-[rgb(10,147,150)] ${
+            className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] appearance-none focus:outline-none focus:border-[rgb(10,147,150)] ${
               displayError ? 'border-[rgb(185,62,3)]' : 'border-[rgb(var(--border-primary))]'
             }`}
           >
@@ -206,7 +206,7 @@ export function BSDateInput({
             onChange={handleDayChange}
             disabled={disabled}
             placeholder="1"
-            className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgb(10,147,150)] ${
+            className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgb(10,147,150)] ${
               displayError ? 'border-[rgb(185,62,3)]' : 'border-[rgb(var(--border-primary))]'
             }`}
           />

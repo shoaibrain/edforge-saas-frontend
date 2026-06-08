@@ -61,13 +61,13 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
         <div className="flex items-center gap-2">
           <CalendarDays className="w-4 h-4" style={{ color: '#378ADD' }} />
           <h3
-            className="text-[13px] font-medium"
+            className="text-sm font-medium"
             style={{ color: 'var(--v2-text-secondary)' }}
           >
             {t('homeV2.teacher.mySections')}
           </h3>
           {!isLoading && (
-            <span className="text-[11px]" style={{ color: 'var(--v2-text-hint)' }}>
+            <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
               ({sections.length})
             </span>
           )}
@@ -75,7 +75,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
         <Link
           to="/academics/$"
           params={{ _splat: 'classrooms' }}
-          className="flex items-center gap-1 text-[11px] font-medium transition-opacity hover:opacity-80"
+          className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           {t('homeV2.teacher.viewAll')}
@@ -91,14 +91,14 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
           <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
             {t('homeV2.teacher.noSectionsAssigned')}
           </p>
-          <p className="text-[11px] mt-1" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs mt-1" style={{ color: 'var(--v2-text-hint)' }}>
             {t('homeV2.teacher.contactAdmin')}
           </p>
         </div>
       ) : (
         <>
           <div
-            className="flex items-center gap-4 mb-3 text-[11px]"
+            className="flex items-center gap-4 mb-3 text-xs"
             style={{ color: 'var(--v2-text-hint)' }}
           >
             <span className="flex items-center gap-1">
@@ -134,7 +134,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
                     </span>
                   </p>
                   <p
-                    className="text-[11px] mt-0.5"
+                    className="text-xs mt-0.5"
                     style={{ color: 'var(--v2-text-hint)' }}
                   >
                     {section.currentEnrollment}/{section.maxEnrollment} students

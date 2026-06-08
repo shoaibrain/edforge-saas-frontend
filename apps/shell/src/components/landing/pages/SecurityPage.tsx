@@ -17,21 +17,21 @@ export default function SecurityLandingPage() {
 
         {/* Compliance badges */}
         <div className="mb-12 flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            <span className="text-sm font-medium text-green-600">FERPA Compliant</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] border border-[rgb(var(--state-success-border)/0.35)]">
+            <CheckCircle className="h-4 w-4 text-[rgb(var(--state-success-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-success-fg))]">FERPA Compliant</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            <span className="text-sm font-medium text-green-600">COPPA Ready</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] border border-[rgb(var(--state-success-border)/0.35)]">
+            <CheckCircle className="h-4 w-4 text-[rgb(var(--state-success-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-success-fg))]">COPPA Ready</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20">
-            <Shield className="h-4 w-4 text-blue-500" />
-            <span className="text-sm font-medium text-blue-600">SOC 2 Roadmap</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
+            <Shield className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">SOC 2 Roadmap</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20">
-            <CheckCircle className="h-4 w-4 text-purple-500" />
-            <span className="text-sm font-medium text-purple-600">GDPR Compatible</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
+            <CheckCircle className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">GDPR Compatible</span>
           </div>
         </div>
 

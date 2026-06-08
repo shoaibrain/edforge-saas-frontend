@@ -6,7 +6,7 @@
  */
 
 // Utilities
-export { cn, getUserAvatar } from './utils'
+export { cn, focusRing, focusRingInset, getUserAvatar } from './utils'
 
 // Components
 export { Button, buttonVariants, type ButtonProps } from './components/Button'
@@ -54,6 +54,13 @@ export {
 export { Dropdown, type DropdownOption } from './components/Dropdown'
 export { Tag, tagVariants, type TagProps } from './components/Tag'
 export { Accordion, type AccordionItem, type AccordionProps } from './components/Accordion'
+export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
+export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
+export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader'
+export { SectionCard, type SectionCardProps } from './components/layout/SectionCard'
+export { Stack, stackVariants, type StackProps } from './components/layout/Stack'
+export { Heading, headingVariants, type HeadingProps } from './components/typography/Heading'
+export { Text, textVariants, type TextProps } from './components/typography/Text'
 
 // TanStack Data Table
 export {

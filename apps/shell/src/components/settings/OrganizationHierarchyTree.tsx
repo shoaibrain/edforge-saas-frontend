@@ -50,16 +50,16 @@ const ORG_TYPE_CONFIG: Record<
   stateEducationAgency: {
     label: 'SEA',
     icon: Landmark,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bgColor: 'bg-indigo-500/10',
-    borderColor: 'border-indigo-500/20',
+    color: 'text-[rgb(var(--state-info-fg))] ',
+    bgColor: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+    borderColor: 'border-[rgb(var(--state-info-border)/0.35)]',
   },
   localEducationAgency: {
     label: 'LEA',
     icon: Building2,
-    color: 'text-teal-600 dark:text-teal-400',
-    bgColor: 'bg-teal-500/10',
-    borderColor: 'border-teal-500/20',
+    color: 'text-[rgb(var(--action-secondary-fg))] ',
+    bgColor: 'bg-[rgb(var(--action-primary-bg))]/10',
+    borderColor: 'border-[rgb(var(--border-focus)/0.35)]',
   },
   educationServiceCenter: {
     label: 'ESC',
@@ -71,25 +71,25 @@ const ORG_TYPE_CONFIG: Record<
   school: {
     label: 'School',
     icon: School,
-    color: 'text-cyan-600 dark:text-cyan-400',
-    bgColor: 'bg-cyan-500/10',
-    borderColor: 'border-cyan-500/20',
+    color: 'text-[rgb(var(--state-info-fg))] ',
+    bgColor: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+    borderColor: 'border-[rgb(var(--state-info-border)/0.35)]',
   },
 }
 
 const STATUS_CONFIG: Record<string, { dot: string; label: string }> = {
-  Active: { dot: 'bg-emerald-500', label: 'Active' },
-  active: { dot: 'bg-emerald-500', label: 'Active' },
+  Active: { dot: 'bg-[rgb(var(--state-success-fg))]', label: 'Active' },
+  active: { dot: 'bg-[rgb(var(--state-success-fg))]', label: 'Active' },
   Setup: { dot: 'bg-amber-500', label: 'Setup' },
   setup: { dot: 'bg-amber-500', label: 'Setup' },
-  Inactive: { dot: 'bg-slate-400', label: 'Inactive' },
-  inactive: { dot: 'bg-slate-400', label: 'Inactive' },
-  Suspended: { dot: 'bg-orange-500', label: 'Suspended' },
-  suspended: { dot: 'bg-orange-500', label: 'Suspended' },
-  Closed: { dot: 'bg-red-500', label: 'Closed' },
-  closed: { dot: 'bg-red-500', label: 'Closed' },
-  Added: { dot: 'bg-blue-500', label: 'Added' },
-  added: { dot: 'bg-blue-500', label: 'Added' },
+  Inactive: { dot: 'bg-[rgb(var(--text-tertiary))]', label: 'Inactive' },
+  inactive: { dot: 'bg-[rgb(var(--text-tertiary))]', label: 'Inactive' },
+  Suspended: { dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0', label: 'Suspended' },
+  suspended: { dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0', label: 'Suspended' },
+  Closed: { dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', label: 'Closed' },
+  closed: { dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', label: 'Closed' },
+  Added: { dot: 'bg-[rgb(var(--state-info-bg)/0.18)]0', label: 'Added' },
+  added: { dot: 'bg-[rgb(var(--state-info-bg)/0.18)]0', label: 'Added' },
   New: { dot: 'bg-violet-500', label: 'New' },
   new: { dot: 'bg-violet-500', label: 'New' },
 }
@@ -104,16 +104,16 @@ function TypeBadge({ type }: { type: string }) {
   const config = ORG_TYPE_CONFIG[type] || {
     label: type,
     icon: Building2,
-    color: 'text-slate-600 dark:text-slate-400',
-    bgColor: 'bg-slate-500/10',
-    borderColor: 'border-slate-500/20',
+    color: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
+    bgColor: 'bg-[rgb(var(--background-tertiary))]0/10',
+    borderColor: 'border-[rgb(var(--border-secondary))]',
   }
   const Icon = config.icon
 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border',
+        'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border',
         config.bgColor,
         config.color,
         config.borderColor
@@ -130,12 +130,12 @@ function TypeBadge({ type }: { type: string }) {
 // ============================================================================
 
 function StatusDot({ status }: { status: string }) {
-  const config = STATUS_CONFIG[status] || { dot: 'bg-slate-400', label: status }
+  const config = STATUS_CONFIG[status] || { dot: 'bg-[rgb(var(--text-tertiary))]', label: status }
 
   return (
     <span className="inline-flex items-center gap-1.5" title={config.label}>
       <span className={cn('w-2 h-2 rounded-full', config.dot)} />
-      <span className="text-[11px] text-[rgb(var(--text-tertiary))]">{config.label}</span>
+      <span className="text-xs text-[rgb(var(--text-tertiary))]">{config.label}</span>
     </span>
   )
 }
@@ -148,7 +148,7 @@ function CountPill({ icon: Icon, count, label }: { icon: LucideIcon; count?: num
   if (count === undefined || count === null) return null
   return (
     <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))]"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))]"
       title={`${count} ${label}`}
     >
       <Icon className="w-3 h-3" />
@@ -197,7 +197,7 @@ function TreeNodeActionMenu({
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        className="p-1 rounded-md hover:bg-[rgb(var(--surface-tertiary))] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+        className="p-1 rounded-md hover:bg-[rgb(var(--background-tertiary))] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         <MoreHorizontal className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -206,7 +206,7 @@ function TreeNodeActionMenu({
       <MenuItems
         anchor="bottom end"
         transition
-        className="z-50 w-52 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] shadow-lg focus:outline-none overflow-hidden origin-top-right transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+        className="z-50 w-52 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] shadow-lg focus:outline-none overflow-hidden origin-top-right transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
       >
         <div className="py-1">
           {actions.map(({ action, label, icon: Icon, destructive }) => (
@@ -219,9 +219,9 @@ function TreeNodeActionMenu({
                   }}
                   className={cn(
                     'flex items-center gap-2 w-full px-3 py-2 text-sm',
-                    focus && 'bg-[rgb(var(--surface-tertiary))]',
+                    focus && 'bg-[rgb(var(--background-tertiary))]',
                     destructive
-                      ? 'text-red-600 dark:text-red-400'
+                      ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]'
                       : 'text-[rgb(var(--text-secondary))]'
                   )}
                 >
@@ -282,8 +282,8 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction
         transition={{ ...springTransition, delay: depth * 0.02 }}
         className={cn(
           'group flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer',
-          'hover:bg-[rgb(var(--surface-tertiary))] transition-colors',
-          searchTerm && matchesSearch && 'bg-teal-500/5'
+          'hover:bg-[rgb(var(--background-tertiary))] transition-colors',
+          searchTerm && matchesSearch && 'bg-[rgb(var(--action-primary-bg))]/5'
         )}
         style={{ paddingLeft: `${depth * 24 + 12}px` }}
         onClick={() => hasChildren && onToggle(node.id)}
@@ -321,7 +321,7 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction
 
         {/* Ed-Fi ID */}
         {node.edfiId !== undefined && (
-          <span className="text-[10px] text-[rgb(var(--text-tertiary))] font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono opacity-0 group-hover:opacity-100 transition-opacity">
             #{node.edfiId}
           </span>
         )}
@@ -488,9 +488,9 @@ export function OrganizationHierarchyTree({
             onChange={(e) => setSearchTerm(e.target.value)}
             className={cn(
               'w-full pl-9 pr-3 py-2 text-sm rounded-lg',
-              'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]',
+              'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]',
               'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
-              'focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30',
+              'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',
               'transition-colors'
             )}
             aria-label="Search organizations"
@@ -519,7 +519,7 @@ export function OrganizationHierarchyTree({
       <div
         role="tree"
         aria-label="Organization hierarchy"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-2"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-2"
       >
         {/* SEA + Children */}
         {sea && (
@@ -540,7 +540,7 @@ export function OrganizationHierarchyTree({
               <div className="my-2 mx-3 border-t border-[rgb(var(--border-primary))]" />
             )}
             <div className="px-3 py-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
                 Education Service Centers
               </span>
             </div>
@@ -563,7 +563,7 @@ export function OrganizationHierarchyTree({
           <>
             <div className="my-2 mx-3 border-t border-[rgb(var(--border-primary))]" />
             <div className="px-3 py-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                 Unassigned Schools ({unassigned.length})
               </span>
             </div>

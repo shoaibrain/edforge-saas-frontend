@@ -75,7 +75,7 @@ function FieldRow({
 }) {
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
-      <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-[160px]">{label}</span>
+      <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       <div className="flex-1 text-right">
         {display.kind === 'unset' && (
           <span className="text-sm italic text-[rgb(var(--text-tertiary))]">Not specified</span>
@@ -87,7 +87,7 @@ function FieldRow({
           <div className="inline-flex flex-col items-end gap-0.5">
             <span className="text-sm text-[rgb(var(--text-secondary))]">{display.label}</span>
             <span
-              className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+              className="inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded border border-amber-500/30 bg-[rgb(var(--state-warning-fg))]/10 text-[rgb(var(--state-warning-fg))]"
               data-testid="derived-badge"
             >
               <AlertTriangle className="w-2.5 h-2.5" aria-hidden />
@@ -103,7 +103,7 @@ function FieldRow({
 function BooleanRow({ label, value }: { label: string; value: boolean | undefined }) {
   return (
     <div className="flex items-center justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
-      <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-[160px]">{label}</span>
+      <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       {value === true && (
         <span className="text-sm font-medium text-[#1D9E75]">Yes</span>
       )}
@@ -120,7 +120,7 @@ function BooleanRow({ label, value }: { label: string; value: boolean | undefine
 function TextRow({ label, value }: { label: string; value?: string }) {
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
-      <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-[160px]">{label}</span>
+      <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       {value ? (
         <span className="text-sm text-[rgb(var(--text-primary))] text-right">{value}</span>
       ) : (
@@ -216,7 +216,7 @@ export function DemographicsTab({ student, canEdit = false, locale = 'en' }: Dem
             type="button"
             onClick={() => setEditing(true)}
             data-testid="open-edit-demographics"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[rgb(var(--border-primary))] text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[rgb(var(--border-primary))] text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <Pencil className="w-3.5 h-3.5" aria-hidden />
             Edit

@@ -6,7 +6,6 @@
  */
 
 import { useMemo } from 'react'
-import { useTranslation } from '@edforge/i18n'
 import type { CourseGradeResponseDto } from '@aibrains/shared-types'
 import { Skeleton } from '@edforge/ui'
 import { FileText, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
@@ -57,8 +56,6 @@ function formatDate(dateStr?: string): string {
 }
 
 export function GradedItemTimeline({ grades, loading }: GradedItemTimelineProps) {
-  const { t } = useTranslation('portal')
-
   const items = useMemo(() => {
     if (!grades) return []
     return flattenAssignments(grades)
@@ -71,9 +68,9 @@ export function GradedItemTimeline({ grades, loading }: GradedItemTimelineProps)
           <h2 className="fp-section-title">Graded items</h2>
         </div>
         <div className="fp-timeline-card">
-          <Skeleton className="h-[64px] w-full mb-4" />
-          <Skeleton className="h-[64px] w-full mb-4" />
-          <Skeleton className="h-[64px] w-full" />
+          <Skeleton className="h-16 w-full mb-4" />
+          <Skeleton className="h-16 w-full mb-4" />
+          <Skeleton className="h-16 w-full" />
         </div>
       </section>
     )
@@ -137,11 +134,11 @@ export function GradedItemTimeline({ grades, loading }: GradedItemTimelineProps)
 
                 {/* Main Content Body */}
                 <div className="fp-t-body flex flex-col justify-center">
-                  <strong className="text-[15px] mb-[2px] tracking-tight">{item.assignmentName}</strong>
+                  <strong className="text-sm mb-[2px] tracking-tight">{item.assignmentName}</strong>
                   <div className="flex items-center gap-2">
                     <span>{item.courseName}</span>
-                    <div className="w-[3px] h-[3px] rounded-full bg-[var(--fp-hairline)]" />
-                    <div className="flex items-center gap-[4px]" style={{ color: iconColor }}>
+                    <div className="w-1 h-1 rounded-full bg-[var(--fp-hairline)]" />
+                    <div className="flex items-center gap-1" style={{ color: iconColor }}>
                       <StatusIcon size={12} strokeWidth={2.5} />
                       <span style={{ color: 'inherit', fontWeight: 600, fontSize: '10px' }}>{statusText}</span>
                     </div>

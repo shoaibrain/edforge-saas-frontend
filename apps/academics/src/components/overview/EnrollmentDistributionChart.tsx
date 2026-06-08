@@ -93,8 +93,8 @@ export function EnrollmentDistributionChart({
     <Card className="p-5 border-border-secondary h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 rounded-lg bg-teal-500/10">
-          <GraduationCap className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+        <div className="p-1.5 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+          <GraduationCap className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <h3 className="text-sm font-semibold text-text-primary">
           Enrollment by Grade Level
@@ -188,7 +188,7 @@ export function EnrollmentDistributionChart({
       <div className="pt-3 mt-auto border-t border-border-secondary">
         <Link
           to="/students/enrollment"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:text-teal-700 dark:hover:text-cyan-300 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           View Enrollment
           <ArrowRight className="w-3.5 h-3.5" />

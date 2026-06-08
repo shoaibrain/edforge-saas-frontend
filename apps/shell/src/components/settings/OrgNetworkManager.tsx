@@ -42,11 +42,11 @@ import { OrgNetworkForm } from './OrgNetworkForm'
 // ============================================================================
 
 const purposeColors: Record<string, string> = {
-  Collaborative: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  Disciplinary: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  Governance: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  Collaborative: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]',
+  Disciplinary: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]',
+  Governance: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   'Shared Services': 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  Other: 'bg-gray-500/10 text-gray-600 dark:text-gray-400',
+  Other: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] ',
 }
 
 function PurposeBadge({ purpose }: { purpose: string }) {
@@ -68,11 +68,11 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
         isActive
-          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-          : 'bg-gray-500/10 text-gray-600 dark:text-gray-400'
+          ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] '
+          : 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
       }`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
       {status}
     </span>
   )
@@ -128,7 +128,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
   }
 
   const selectClass =
-    'px-3 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors'
+    'px-3 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
 
   return (
     <div className="px-4 pb-4 space-y-3">
@@ -160,7 +160,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-col sm:flex-row sm:items-end gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+            className="flex flex-col sm:flex-row sm:items-end gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
           >
             <div>
               <label className="block text-xs text-[rgb(var(--text-tertiary))] mb-1">Type</label>
@@ -220,7 +220,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
       {isLoading ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-10 rounded-lg bg-[rgb(var(--surface-tertiary))] animate-pulse" />
+            <div key={i} className="h-10 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse" />
           ))}
         </div>
       ) : members.length === 0 ? (
@@ -232,7 +232,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
           {members.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
             >
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
@@ -251,7 +251,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
                   onClick={() => handleRemoveMember(member)}
                   disabled={removeMemberMutation.isPending}
                   aria-label={`Remove ${member.memberName} from network`}
-                  className="p-1 rounded text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                  className="p-1 rounded text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -296,10 +296,10 @@ function DeleteNetworkModal({
       size="md"
     >
       <div className="py-2">
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-3 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)]0/10 border border-[rgb(var(--state-danger-border)/0.35)]">
+          <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-red-600 dark:text-red-400">
+            <p className="font-medium text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
               This action cannot be undone.
             </p>
             <p className="mt-1 text-[rgb(var(--text-secondary))]">
@@ -359,7 +359,7 @@ export function OrgNetworkManager() {
             }}
             aria-label={expandedId === item.id ? 'Collapse members' : 'Expand members'}
             aria-expanded={expandedId === item.id}
-            className="p-1 rounded hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-1 rounded hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             {expandedId === item.id ? (
               <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -426,7 +426,7 @@ export function OrgNetworkManager() {
                       formModal.openEdit({ id: item.id })
                     }}
                     aria-label={`Edit ${item.nameOfInstitution}`}
-                    className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-teal-600 hover:bg-teal-500/10 transition-colors"
+                    className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--action-primary-bg))]/10 transition-colors"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -437,7 +437,7 @@ export function OrgNetworkManager() {
                       deleteModal.openDelete(item)
                     }}
                     aria-label={`Delete ${item.nameOfInstitution}`}
-                    className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                    className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -499,7 +499,7 @@ export function OrgNetworkManager() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] overflow-hidden"
+            className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] overflow-hidden"
           >
             <div className="px-4 pt-3 pb-1 border-b border-[rgb(var(--border-primary))]">
               <p className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">

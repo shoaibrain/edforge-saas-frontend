@@ -75,10 +75,10 @@ export function TagInput({
 
       <div
         className={`
-          min-h-[42px] rounded-lg border border-[rgb(var(--border-primary))]
-          bg-[rgb(var(--surface-primary))] px-3 py-2
+          min-h-10 rounded-lg border border-[rgb(var(--border-primary))]
+          bg-[rgb(var(--background-primary))] px-3 py-2
           flex flex-wrap items-center gap-2
-          focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:border-teal-500
+          focus-within:ring-2 focus-within:ring-[rgb(var(--border-focus)/0.35)] focus-within:border-[rgb(var(--border-focus))]
           transition-colors
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-text'}
         `}
@@ -92,7 +92,7 @@ export function TagInput({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.15 }}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-700 text-sm font-medium"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] text-sm font-medium"
             >
               {tag}
               {!disabled && (
@@ -102,7 +102,7 @@ export function TagInput({
                     e.stopPropagation()
                     removeTag(index)
                   }}
-                  className="p-0.5 rounded hover:bg-teal-100 transition-colors"
+                  className="p-0.5 rounded hover:bg-[rgb(var(--state-info-bg)/0.26)] transition-colors"
                   aria-label={`Remove ${tag}`}
                 >
                   <X className="w-3 h-3" />
@@ -113,7 +113,7 @@ export function TagInput({
         </AnimatePresence>
 
         {value.length < maxTags && !disabled && (
-          <div className="flex items-center gap-1 flex-1 min-w-[120px]">
+          <div className="flex items-center gap-1 flex-1 min-w-32">
             <Plus className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
             <input
               ref={inputRef}

@@ -25,8 +25,8 @@ export function Overview() {
             change: '+12%',
             changeType: 'positive',
             icon: Users,
-            iconBg: 'bg-violet-500/15 dark:bg-violet-500/20',
-            iconColor: 'text-violet-600 dark:text-violet-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             label: 'Attendance Rate',
@@ -34,8 +34,8 @@ export function Overview() {
             change: '+1.2%',
             changeType: 'positive',
             icon: Calendar,
-            iconBg: 'bg-blue-400/20',
-            iconColor: 'text-blue-600 dark:text-blue-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             label: 'Avg. GPA',
@@ -43,8 +43,8 @@ export function Overview() {
             change: '+0.08',
             changeType: 'positive',
             icon: TrendingUp,
-            iconBg: 'bg-emerald-400/20',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-success-fg))]',
         },
         {
             label: 'Revenue MTD',
@@ -52,8 +52,8 @@ export function Overview() {
             change: '+8.5%',
             changeType: 'positive',
             icon: DollarSign,
-            iconBg: 'bg-amber-400/20',
-            iconColor: 'text-amber-600 dark:text-amber-400',
+            iconBg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+            iconColor: 'text-[rgb(var(--state-warning-fg))]',
         },
     ]
 
@@ -65,8 +65,8 @@ export function Overview() {
             description: 'Enrollment trends and projections',
             icon: Users,
             href: '/analytics/enrollment',
-            iconBg: 'bg-violet-500/15 group-hover:bg-violet-500/25',
-            iconColor: 'text-violet-600 dark:text-violet-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             id: 'attendance',
@@ -74,8 +74,8 @@ export function Overview() {
             description: 'Attendance patterns and trends',
             icon: Calendar,
             href: '/analytics/attendance',
-            iconBg: 'bg-blue-400/20 group-hover:bg-blue-400/30',
-            iconColor: 'text-blue-600 dark:text-blue-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
         {
             id: 'performance',
@@ -83,8 +83,8 @@ export function Overview() {
             description: 'Grades and academic outcomes',
             icon: TrendingUp,
             href: '/analytics/performance',
-            iconBg: 'bg-emerald-400/20 group-hover:bg-emerald-400/30',
-            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-[rgb(var(--state-success-bg)/0.18)] group-hover:bg-[rgb(var(--state-success-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-success-fg))]',
         },
         {
             id: 'finance',
@@ -92,8 +92,8 @@ export function Overview() {
             description: 'Revenue and expense analysis',
             icon: DollarSign,
             href: '/analytics/finance',
-            iconBg: 'bg-amber-400/20 group-hover:bg-amber-400/30',
-            iconColor: 'text-amber-600 dark:text-amber-400',
+            iconBg: 'bg-[rgb(var(--state-warning-bg)/0.18)] group-hover:bg-[rgb(var(--state-warning-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-warning-fg))]',
         },
         {
             id: 'reports',
@@ -101,8 +101,8 @@ export function Overview() {
             description: 'Build and export reports',
             icon: FileText,
             href: '/analytics/reports',
-            iconBg: 'bg-rose-400/20 group-hover:bg-rose-400/30',
-            iconColor: 'text-rose-600 dark:text-rose-400',
+            iconBg: 'bg-[rgb(var(--state-danger-bg)/0.18)] group-hover:bg-[rgb(var(--state-danger-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-danger-fg))]',
         },
         {
             id: 'dashboards',
@@ -110,8 +110,8 @@ export function Overview() {
             description: 'Custom analytics dashboards',
             icon: LayoutDashboard,
             href: '/analytics/dashboards',
-            iconBg: 'bg-cyan-400/20 group-hover:bg-cyan-400/30',
-            iconColor: 'text-cyan-600 dark:text-cyan-400',
+            iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)] group-hover:bg-[rgb(var(--state-info-bg)/0.26)]',
+            iconColor: 'text-[rgb(var(--state-info-fg))]',
         },
     ]
 

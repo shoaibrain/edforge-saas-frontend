@@ -126,8 +126,8 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
                 }}
                 className={`flex items-center gap-2 w-full px-3 py-2 text-sm transition-colors ${
                   course.isActive
-                    ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10'
-                    : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                    ? 'text-[rgb(var(--state-warning-fg))] hover:bg-amber-50 dark:hover:bg-[rgb(var(--state-warning-fg))]/10'
+                    : 'text-[rgb(var(--state-success-fg))] hover:bg-[rgb(var(--state-success-bg)/0.18)] dark:hover:bg-[rgb(var(--state-success-bg)/0.18)]'
                 }`}
               >
                 {course.isActive ? (
@@ -201,7 +201,7 @@ function StatusDot({ isActive }: { isActive: boolean }) {
     <div className="flex items-center gap-1.5">
       <div
         className={`w-2 h-2 rounded-full ${
-          isActive ? 'bg-emerald-500' : 'bg-gray-400'
+          isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
         }`}
       />
       <span className="text-xs text-text-secondary">

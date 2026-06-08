@@ -192,11 +192,11 @@ function ParentScheduleContent({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           {!loading && sections && sections.slice(0,2).map((sec, i) => {
+           {!loading && sections && sections.slice(0,2).map((sec) => {
              const isMath = sec.courseName.toLowerCase().includes('math') || sec.courseName.toLowerCase().includes('arith')
              const period = sec.periodId ? periodMap.get(sec.periodId) : null
              let timeStr = 'Time TBD'
-             let room = sec.room ?? 'Room TBD'
+             const room = sec.room ?? 'Room TBD'
 
              if (period) {
                 const startHour = parseInt(period.startTime.split(':')[0]) % 12 || 12

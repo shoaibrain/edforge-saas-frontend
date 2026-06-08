@@ -117,12 +117,12 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
           }}
         >
           <h2
-            className="text-[13px] font-medium mb-1"
+            className="text-sm font-medium mb-1"
             style={{ color: 'var(--v2-text-secondary)' }}
           >
             {t('homeV2.student.welcomeTitle')}
           </h2>
-          <p className="text-[11px] mb-4" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--v2-text-hint)' }}>
             {t('homeV2.student.welcomeDescription')}
           </p>
 
@@ -146,7 +146,7 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
                     <p className="text-xs font-medium" style={{ color: 'var(--v2-text-muted)' }}>
                       {link.label}
                     </p>
-                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-hint)' }}>
                       {link.description}
                     </p>
                   </div>

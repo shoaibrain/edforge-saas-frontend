@@ -94,7 +94,7 @@ function SectionHeader({
       <button
         type="button"
         onClick={() => goToStep(stepIndex)}
-        className="flex items-center gap-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 transition-colors"
+        className="flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] transition-colors"
       >
         <Edit2 className="w-3 h-3" />
         Edit
@@ -110,7 +110,7 @@ function TagList({ tags }: { tags: string[] }) {
       {tags.map((tag) => (
         <span
           key={tag}
-          className="inline-flex px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 text-xs font-medium"
+          className="inline-flex px-2 py-0.5 rounded-md bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] text-xs font-medium"
         >
           {tag}
         </span>
@@ -160,36 +160,36 @@ export function ReviewStep({ data }: WizardStepProps) {
   return (
     <div className="space-y-8">
       {isSubmitting && (
-        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700 flex items-center gap-3">
-          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] p-4 text-sm text-[rgb(var(--state-info-fg))] flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-[rgb(var(--state-info-border))] border-t-transparent rounded-full animate-spin" />
           Creating student record and enrollment...
         </div>
       )}
 
       {/* Enrollment Summary Confirmation Card */}
-      <div className="rounded-xl border-2 border-teal-200 bg-teal-50/50 p-5">
-        <h3 className="text-sm font-semibold text-teal-800 mb-3">
+      <div className="rounded-xl border-2 border-[rgb(var(--state-info-border)/0.35)] bg-[rgb(var(--state-info-bg)/0.18)]/50 p-5">
+        <h3 className="text-sm font-semibold text-[rgb(var(--state-info-fg))] mb-3">
           What will happen when you click "Create Student"
         </h3>
         <div className="space-y-2">
           <div className="flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-            <span className="text-sm text-teal-700">
+            <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
+            <span className="text-sm text-[rgb(var(--text-secondary))]">
               A student record will be created for <strong>{display(data.firstName)} {display(data.lastName)}</strong>
             </span>
           </div>
           {hasEnrollment ? (
             <>
               <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-teal-700">
+                <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
+                <span className="text-sm text-[rgb(var(--text-secondary))]">
                   Enrolled in <strong>{academicYearName}</strong> as{' '}
                   <strong>{labelFor(data.currentGradeLevel as string, GRADE_LEVEL_OPTIONS)}</strong>
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-teal-700">
+                <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
+                <span className="text-sm text-[rgb(var(--text-secondary))]">
                   Enrollment type: <strong>{labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS)}</strong> — Date: <strong>{formatDate(enrollment.enrollmentDate as string)}</strong>
                 </span>
               </div>
@@ -255,17 +255,17 @@ export function ReviewStep({ data }: WizardStepProps) {
             {guardians.map((g, i) => (
               <div
                 key={i}
-                className="rounded-lg bg-[rgb(var(--surface-secondary))] p-4"
+                className="rounded-lg bg-[rgb(var(--background-secondary))] p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
                     {display(g.firstName)} {display(g.lastName)}
                   </span>
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]">
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]">
                     {labelFor(g.relationship, RELATIONSHIP_OPTIONS)}
                   </span>
                   {g.isPrimary && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-medium">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] font-medium">
                       Primary
                     </span>
                   )}

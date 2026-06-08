@@ -149,8 +149,8 @@ function CourseDetailView({
         {showCreditBadge && (
           <Badge
             label={creditTypeLabel}
-            bg="bg-slate-50"
-            text="text-slate-700"
+            bg="bg-[rgb(var(--background-tertiary))]"
+            text="text-[rgb(var(--text-secondary))]"
           />
         )}
       </div>
@@ -205,7 +205,7 @@ function CourseDetailView({
           <ul className="space-y-1.5">
             {course.objectives.map((obj, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[rgb(var(--state-info-bg)/0.18)]0 flex-shrink-0" />
                 {obj}
               </li>
             ))}
@@ -401,7 +401,7 @@ function CourseFormView({
           <button
             type="submit"
             disabled={isPending}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             {isPending ? (
               <>
@@ -507,7 +507,7 @@ export function CourseDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={handleBackdropClick}
             aria-hidden="true"
           />
@@ -526,8 +526,8 @@ export function CourseDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex-shrink-0">
-                      <BookOpen className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-danger-bg)/0.18)] to-[rgb(var(--state-danger-bg)/0.10)] flex-shrink-0">
+                      <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] " />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -538,7 +538,7 @@ export function CourseDrawer({
                           {title}
                         </h2>
                         {internalMode === 'edit' && (
-                          <span className="flex-shrink-0 text-xs bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                          <span className="flex-shrink-0 text-xs bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
                             Editing
                           </span>
                         )}
@@ -549,7 +549,7 @@ export function CourseDrawer({
                           <span className="font-mono text-xs text-text-tertiary bg-surface-tertiary px-1.5 py-0.5 rounded">
                             {course.courseCode}
                           </span>
-                          <span className={`text-[10px] font-medium ${course.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'}`}>
+                          <span className={`text-xs font-medium ${course.isActive ? 'text-[rgb(var(--state-success-fg))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                             {course.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </div>

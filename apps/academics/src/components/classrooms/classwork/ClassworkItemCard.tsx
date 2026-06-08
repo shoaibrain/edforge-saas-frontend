@@ -6,10 +6,10 @@ import { ClipboardList, HelpCircle, FileText, MessageCircle, Paperclip, Calendar
 import type { ClassworkItemResponseDto } from '@aibrains/shared-types'
 
 const typeConfig = {
-  assignment: { icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-  quiz: { icon: HelpCircle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-  material: { icon: FileText, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-  question: { icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+  assignment: { icon: ClipboardList, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  quiz: { icon: HelpCircle, color: 'text-amber-500', bg: 'bg-[rgb(var(--state-warning-fg))]/10' },
+  material: { icon: FileText, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  question: { icon: MessageCircle, color: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' },
 }
 
 interface ClassworkItemCardProps {
@@ -57,7 +57,7 @@ export function ClassworkItemCard({ item, onClick }: ClassworkItemCardProps) {
         </div>
       </div>
       {item.status === 'draft' && (
-        <span className="px-2 py-0.5 text-[10px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 rounded-full">
+        <span className="px-2 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/15 dark:text-amber-400 rounded-full">
           Draft
         </span>
       )}

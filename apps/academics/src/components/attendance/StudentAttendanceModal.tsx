@@ -36,10 +36,10 @@ interface StudentAttendanceModalProps {
 function RateBadge({ rate }: { rate: number }) {
   const style =
     rate >= 95
-      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+      ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 '
       : rate >= 90
-        ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
-        : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
+        ? 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400'
+        : 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 '
   return (
     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${style}`}>
       {rate.toFixed(1)}%
@@ -52,14 +52,14 @@ function RateBadge({ rate }: { rate: number }) {
 // ============================================================================
 
 const statusColorMap: Record<string, string> = {
-  present: 'bg-emerald-400 dark:bg-emerald-500',
-  absent: 'bg-red-400 dark:bg-red-500',
-  late: 'bg-amber-400 dark:bg-amber-500',
-  tardy: 'bg-amber-400 dark:bg-amber-500',
-  excused: 'bg-blue-400 dark:bg-blue-500',
-  half_day: 'bg-purple-400 dark:bg-purple-500',
-  remote: 'bg-indigo-400 dark:bg-indigo-500',
-  early_departure: 'bg-orange-400 dark:bg-orange-500',
+  present: 'bg-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0',
+  absent: 'bg-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0',
+  late: 'bg-amber-400 dark:bg-[rgb(var(--state-warning-fg))]',
+  tardy: 'bg-amber-400 dark:bg-[rgb(var(--state-warning-fg))]',
+  excused: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',
+  half_day: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',
+  remote: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',
+  early_departure: 'bg-[rgb(var(--state-warning-fg))] dark:bg-[rgb(var(--state-warning-fg))]',
 }
 
 function CalendarHeatmap({
@@ -98,8 +98,8 @@ function CalendarHeatmap({
             key={day.date}
             className={`w-full aspect-square rounded-sm ${
               day.status
-                ? statusColorMap[day.status] || 'bg-gray-300 dark:bg-gray-600'
-                : 'bg-gray-100 dark:bg-gray-800'
+                ? statusColorMap[day.status] || 'bg-[rgb(var(--border-secondary))] '
+                : 'bg-[rgb(var(--background-tertiary))] '
             }`}
             title={`${day.label}: ${day.status || 'No record'}`}
           />
@@ -108,13 +108,13 @@ function CalendarHeatmap({
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mt-2">
         {[
-          { label: 'Present', color: 'bg-emerald-400' },
-          { label: 'Absent', color: 'bg-red-400' },
+          { label: 'Present', color: 'bg-[rgb(var(--state-success-fg))]' },
+          { label: 'Absent', color: 'bg-[rgb(var(--state-danger-fg))]' },
           { label: 'Late', color: 'bg-amber-400' },
-          { label: 'Excused', color: 'bg-blue-400' },
-          { label: 'No Record', color: 'bg-gray-100 dark:bg-gray-800' },
+          { label: 'Excused', color: 'bg-[rgb(var(--state-info-fg))]' },
+          { label: 'No Record', color: 'bg-[rgb(var(--background-tertiary))] ' },
         ].map((item) => (
-          <span key={item.label} className="flex items-center gap-1 text-[10px] text-text-tertiary">
+          <span key={item.label} className="flex items-center gap-1 text-xs text-text-tertiary">
             <span className={`w-2 h-2 rounded-sm ${item.color}`} />
             {item.label}
           </span>
@@ -140,7 +140,7 @@ function SummaryStatRow({
   return (
     <div className="text-center">
       <p className={`text-lg font-bold ${color || 'text-text-primary'}`}>{value}</p>
-      <p className="text-[10px] text-text-tertiary uppercase tracking-wider mt-0.5">{label}</p>
+      <p className="text-xs text-text-tertiary uppercase tracking-wider mt-0.5">{label}</p>
     </div>
   )
 }
@@ -248,7 +248,7 @@ export function StudentAttendanceModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.40)] backdrop-blur-sm" />
         </Transition.Child>
 
         {/* Modal */}
@@ -267,7 +267,7 @@ export function StudentAttendanceModal({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center text-sm font-bold text-teal-600 dark:text-teal-400">
+                    <div className="w-10 h-10 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center text-sm font-bold text-[rgb(var(--action-secondary-fg))]">
                       {studentName
                         .split(' ')
                         .map((w) => w[0])
@@ -308,30 +308,30 @@ export function StudentAttendanceModal({
                           <SummaryStatRow
                             label="Present"
                             value={summary.present}
-                            color="text-emerald-600 dark:text-emerald-400"
+                            color="text-[rgb(var(--state-success-fg))]"
                           />
                           <SummaryStatRow
                             label="Absent"
                             value={summary.absent}
-                            color="text-red-600 dark:text-red-400"
+                            color="text-[rgb(var(--state-danger-fg))]"
                           />
                           <SummaryStatRow
                             label="Late"
                             value={summary.late}
-                            color="text-amber-600 dark:text-amber-400"
+                            color="text-[rgb(var(--state-warning-fg))]"
                           />
                           <SummaryStatRow
                             label="Excused"
                             value={summary.excused}
-                            color="text-blue-600 dark:text-blue-400"
+                            color="text-[rgb(var(--state-info-fg))]"
                           />
                           <SummaryStatRow
                             label="Rate"
                             value={`${summary.attendanceRate.toFixed(1)}%`}
                             color={
                               summary.attendanceRate >= 90
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : 'text-red-600 dark:text-red-400'
+                                ? 'text-[rgb(var(--state-success-fg))]'
+                                : 'text-[rgb(var(--state-danger-fg))]'
                             }
                           />
                         </div>
@@ -383,7 +383,7 @@ export function StudentAttendanceModal({
                                           variant="compact"
                                         />
                                       </td>
-                                      <td className="py-2 pl-4 text-text-secondary text-xs truncate max-w-[160px]">
+                                      <td className="py-2 pl-4 text-text-secondary text-xs truncate max-w-40">
                                         {record.notes || '—'}
                                       </td>
                                     </tr>

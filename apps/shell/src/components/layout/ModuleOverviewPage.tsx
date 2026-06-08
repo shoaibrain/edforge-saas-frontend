@@ -103,7 +103,7 @@ function ActionCard({
       transition={{ delay, type: 'spring', stiffness: 300, damping: 20 }}
     >
       <Link to={card.href}>
-        <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-teal-500/30 dark:hover:border-cyan-500/30">
+        <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] dark:hover:border-[rgb(var(--border-focus)/0.35)]">
           <div className="flex items-start justify-between mb-4">
             <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
               <card.icon className={`w-6 h-6 ${card.iconColor}`} />
@@ -116,7 +116,7 @@ function ActionCard({
               <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
             </motion.div>
           </div>
-          <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-teal-600 dark:group-hover:text-cyan-400 transition-colors">
+          <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-[rgb(var(--text-primary))] transition-colors">
             {card.title}
           </h3>
           <p className="text-sm text-[rgb(var(--text-tertiary))]">

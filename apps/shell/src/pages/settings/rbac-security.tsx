@@ -132,12 +132,12 @@ interface RoleCardProps {
 
 function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
   const colorClasses: Record<string, string> = {
-    teal: 'bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20',
-    cyan: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20',
+    teal: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))]  border-[rgb(var(--border-focus)/0.35)]',
+    cyan: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
     golden: 'bg-golden-500/10 text-golden-700 dark:text-golden-400 border-golden-500/20',
-    slate: 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20',
-    blue: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-    purple: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20',
+    slate: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
+    blue: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))] border-[rgb(var(--state-info-border)/0.35)]',
+    purple: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
   }
 
   return (
@@ -146,8 +146,8 @@ function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
       onClick={onSelect}
       className={`w-full p-4 rounded-xl border transition-all text-left group ${
         isSelected
-          ? 'border-teal-500/40 ring-1 ring-teal-500/20 bg-[rgb(var(--surface-secondary))]'
-          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30'
+          ? 'border-[rgb(var(--border-focus)/0.40)] ring-1 ring-[rgb(var(--border-focus))]/20 bg-[rgb(var(--background-secondary))]'
+          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
       }`}
     >
       <div className="flex items-start justify-between">
@@ -159,10 +159,10 @@ function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{role.name}</h3>
             <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">{role.description}</p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]">
                 {role.permissionCount} resources
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] capitalize">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] capitalize">
                 {role.category}
               </span>
             </div>
@@ -205,7 +205,7 @@ function PermissionMatrix({ selectedRole }: { selectedRole: SchoolRole }) {
                 <tr>
                   <td
                     colSpan={MATRIX_ACTIONS.length + 1}
-                    className="py-2 px-4 text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider bg-[rgb(var(--surface-tertiary))]"
+                    className="py-2 px-4 text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider bg-[rgb(var(--background-tertiary))]"
                   >
                     {category.label}
                   </td>
@@ -220,7 +220,7 @@ function PermissionMatrix({ selectedRole }: { selectedRole: SchoolRole }) {
                       {MATRIX_ACTIONS.map((action) => (
                         <td key={action} className="text-center py-2.5 px-2">
                           {(actions as readonly string[]).includes(action) ? (
-                            <Check className="w-4 h-4 text-teal-500 mx-auto" />
+                            <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] mx-auto" />
                           ) : (
                             <X className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto opacity-20" />
                           )}
@@ -321,7 +321,7 @@ export default function RBACSecurityPage() {
                 `}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-500' : 'opacity-70'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
                   {tab.label}
                 </span>
 
@@ -329,7 +329,7 @@ export default function RBACSecurityPage() {
                 {isActive && (
                   <motion.div
                     layoutId="securityPolicyTab"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-500 rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))] rounded-t-full"
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
@@ -340,7 +340,7 @@ export default function RBACSecurityPage() {
         </div>
 
         {/* Tab Content with AnimatePresence */}
-        <div className="min-h-[400px] pt-6">
+        <div className="min-h-96 pt-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedTab}
@@ -398,12 +398,12 @@ export default function RBACSecurityPage() {
                         placeholder="Search users..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))]"
                       />
                     </div>
                     <button
                       onClick={() => setIsAssignModalOpen(true)}
-                      className="px-4 py-2.5 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors inline-flex items-center gap-2"
+                      className="px-4 py-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] font-medium hover:bg-[rgb(var(--action-primary-bg))] transition-colors inline-flex items-center gap-2"
                     >
                       <UserPlus className="w-4 h-4" />
                       Assign User
@@ -418,9 +418,9 @@ export default function RBACSecurityPage() {
                       <div className="py-8 text-center text-[rgb(var(--text-secondary))]">No users found.</div>
                     ) : (
                       filteredUsers.map((user) => (
-                        <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
+                        <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-medium">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] flex items-center justify-center text-[rgb(var(--action-primary-fg))] font-medium">
                               {user.firstName?.charAt(0) || user.email.charAt(0)}
                             </div>
                             <div>
@@ -435,7 +435,7 @@ export default function RBACSecurityPage() {
                             <Link
                               to="/people/$"
                               params={{ _splat: `staff/${user.userId}` }}
-                              className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                              className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                             >
                               <Edit className="w-4 h-4" />
                             </Link>

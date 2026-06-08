@@ -31,23 +31,23 @@ import { formatDate } from '../../lib/utils'
 // ============================================================================
 
 const TRAINING_TYPE_COLORS: Record<string, string> = {
-  pedagogical: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  subject_matter: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  technology: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+  pedagogical: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  subject_matter: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  technology: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   inclusion: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  leadership: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
-  safety: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
-  assessment: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
-  language: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  induction: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-  other: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+  leadership: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] ',
+  safety: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] ',
+  assessment: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ',
+  language: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
+  induction: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  other: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] ',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   scheduled: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  in_progress: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-  completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  cancelled: 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
+  in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  completed: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
+  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] ',
 }
 
 const fadeInUp = {
@@ -141,7 +141,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
         </div>
         <button
           onClick={handleAdd}
-          className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Training
@@ -153,11 +153,11 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2].map((i) => (
-              <div key={i} className="animate-pulse h-32 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+              <div key={i} className="animate-pulse h-32 bg-[rgb(var(--background-secondary))] rounded-xl" />
             ))}
           </div>
         ) : sorted.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <GraduationCap className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Trainings</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -165,7 +165,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
             </p>
             <button
               onClick={handleAdd}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add First Training
@@ -177,7 +177,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
               <motion.div
                 key={training.trainingId}
                 variants={fadeInUp}
-                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
+                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-focus)/0.35)] transition-all group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 min-w-0">
@@ -226,7 +226,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
                             href={training.certificateUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-teal-600 dark:text-teal-400 hover:underline"
+                            className="flex items-center gap-1 text-[rgb(var(--action-secondary-fg))]  hover:underline"
                           >
                             <ExternalLink className="w-3 h-3" />
                             Certificate
@@ -240,14 +240,14 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
                     <button
                       onClick={() => handleEdit(training)}
-                      className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                       title="Edit training"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(training.trainingId)}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                       title="Delete training"
                       disabled={deletingId === training.trainingId}
                     >

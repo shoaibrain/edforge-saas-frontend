@@ -113,11 +113,11 @@ export function GovernanceProfileCard({ archetype, country }: GovernanceProfileC
     <motion.div variants={fadeInUpFallback}>
       <div
         data-testid="governance-profile-card"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4"
       >
         <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-            <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+          <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
+            <ShieldCheck className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">

@@ -87,13 +87,13 @@ export class SectionErrorBoundary extends Component<Props, State> {
           {DEBUG && this.state.error && (
             <details className="w-full max-w-lg text-left mt-2">
               <summary
-                className="text-[10px] cursor-pointer"
+                className="text-xs cursor-pointer"
                 style={{ color: 'var(--v2-text-faint)' }}
               >
                 Error details (debug mode)
               </summary>
               <pre
-                className="mt-1 p-2 rounded text-[10px] overflow-x-auto max-h-32"
+                className="mt-1 p-2 rounded text-xs overflow-x-auto max-h-32"
                 style={{
                   background: 'var(--v2-bg-elevated)',
                   color: 'var(--v2-danger)',

@@ -73,7 +73,7 @@ function GuardianRow({
               {guardian.firstName} {guardian.lastName}
             </p>
             {guardian.isPrimary && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] rounded-full">
                 <Shield className="w-3 h-3" />
                 {t('guardian.primary')}
               </span>
@@ -86,13 +86,13 @@ function GuardianRow({
           {/* Permission tags */}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {guardian.hasPortalAccess && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] rounded-full">
                 <UserCheck className="w-3 h-3" />
                 {t('guardian.portalAccess')}
               </span>
             )}
             {guardian.canPickup && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] rounded-full">
                 <UserCheck className="w-3 h-3" />
                 {t('guardian.pickupAuth')}
               </span>
@@ -208,7 +208,7 @@ function GuardianRow({
 function EmergencyContactRow({ contact, index }: { contact: EmergencyContact; index: number }) {
   return (
     <div className="flex items-center gap-4 py-3 border-b border-border-tertiary last:border-0">
-      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-red-500/10 flex items-center justify-center text-xs font-semibold text-red-600 dark:text-red-400">
+      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center text-xs font-semibold text-[rgb(var(--state-danger-fg))]">
         {index + 1}
       </div>
       <div className="flex-1 min-w-0">
@@ -258,7 +258,7 @@ export function FamilyTab({
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-            <Users className="w-4 h-4 text-purple-500" />
+            <Users className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
             {t('sections.guardians')}
             {guardians.length > 0 && (
               <span className="text-xs text-text-tertiary font-normal ml-1">
@@ -315,7 +315,7 @@ export function FamilyTab({
       {/* Emergency Contacts Section */}
       <section>
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <AlertTriangle className="w-4 h-4 text-red-500" />
+          <AlertTriangle className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
           {t('sections.emergencyContacts')}
           {emergencyContacts.length > 0 && (
             <span className="text-xs text-text-tertiary font-normal ml-1">

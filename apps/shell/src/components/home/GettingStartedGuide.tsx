@@ -97,19 +97,19 @@ export function GettingStartedGuide({
               }}
             >
               <Sparkles
-                className="w-[15px] h-[15px]"
+                className="w-4 h-4"
                 style={{ color: 'var(--v2-brand-primary)' }}
               />
             </div>
             <div>
               <h3
-                className="text-[13px] font-semibold leading-tight"
+                className="text-sm font-semibold leading-tight"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 Get started with EdForge
               </h3>
               <p
-                className="text-[11px] mt-0.5"
+                className="text-xs mt-0.5"
                 style={{ color: 'var(--v2-text-faint)' }}
               >
                 {completedCount} of {totalCount} complete
@@ -119,7 +119,7 @@ export function GettingStartedGuide({
 
           <button
             onClick={onDismiss}
-            className="p-1.5 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+            className="p-1.5 rounded-lg transition-colors hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--background-primary)/0.05)]"
             aria-label="Dismiss getting started guide"
           >
             <X className="w-4 h-4" style={{ color: 'var(--v2-text-faint)' }} />
@@ -181,17 +181,17 @@ export function GettingStartedGuide({
                   <div className="shrink-0">
                     {item.completed ? (
                       <CheckCircle2
-                        className="w-[18px] h-[18px]"
+                        className="w-5 h-5"
                         style={{ color: '#1D9E75' }}
                       />
                     ) : item.blocked ? (
                       <Lock
-                        className="w-[15px] h-[15px] ml-[1.5px]"
+                        className="w-4 h-4 ml-[1.5px]"
                         style={{ color: 'var(--v2-text-faint)' }}
                       />
                     ) : (
                       <Circle
-                        className="w-[18px] h-[18px]"
+                        className="w-5 h-5"
                         style={{
                           color: isFirstIncomplete
                             ? 'var(--v2-brand-primary)'
@@ -213,7 +213,7 @@ export function GettingStartedGuide({
                     }}
                   >
                     <Icon
-                      className="w-[14px] h-[14px]"
+                      className="w-3.5 h-3.5"
                       style={{
                         color: item.completed
                           ? '#1D9E75'
@@ -238,7 +238,7 @@ export function GettingStartedGuide({
                       </span>
                       {isFirstIncomplete && (
                         <span
-                          className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                          className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
                           style={{
                             background: 'var(--v2-brand-primary)',
                             color: '#fff',
@@ -249,7 +249,7 @@ export function GettingStartedGuide({
                       )}
                     </div>
                     <span
-                      className="text-[11px] leading-tight mt-0.5 block"
+                      className="text-xs leading-tight mt-0.5 block"
                       style={{ color: 'var(--v2-text-faint)' }}
                     >
                       {item.blocked ? item.blockedHint : item.description}

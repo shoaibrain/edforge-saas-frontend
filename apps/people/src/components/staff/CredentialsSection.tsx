@@ -30,23 +30,23 @@ import { formatDate } from '../../lib/utils'
 // ============================================================================
 
 const CREDENTIAL_TYPE_COLORS: Record<string, string> = {
-  certification: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  license: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  endorsement: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
-  degree: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  registration: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-  permit: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
-  clearance: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  training: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-  other: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+  certification: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  license: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  endorsement: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
+  degree: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  registration: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  permit: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  clearance: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
+  training: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  other: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
 }
 
 const VERIFICATION_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  verified: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  rejected: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  expired: 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
-  revoked: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  pending: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  verified: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
+  rejected: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  expired: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
+  revoked: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
 }
 
 const fadeInUp = {
@@ -72,9 +72,9 @@ const staggerChildren = {
 
 function getExpirationColor(credential: CredentialResponseDto): string {
   if (!credential.expirationDate) return 'text-[rgb(var(--text-tertiary))]'
-  if (credential.isExpired) return 'text-red-600 dark:text-red-400'
-  if (credential.isExpiringSoon) return 'text-amber-600 dark:text-amber-400'
-  return 'text-emerald-600 dark:text-emerald-400'
+  if (credential.isExpired) return 'text-[rgb(var(--state-danger-fg))]'
+  if (credential.isExpiringSoon) return 'text-[rgb(var(--state-warning-fg))]'
+  return 'text-[rgb(var(--state-success-fg))]'
 }
 
 function getExpirationLabel(credential: CredentialResponseDto): string {
@@ -152,7 +152,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
         </div>
         <button
           onClick={handleAdd}
-          className="flex items-center gap-2 px-3.5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Credential
@@ -164,11 +164,11 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2].map((i) => (
-              <div key={i} className="animate-pulse h-32 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+              <div key={i} className="animate-pulse h-32 bg-[rgb(var(--background-secondary))] rounded-xl" />
             ))}
           </div>
         ) : !credentials || credentials.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <Award className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Credentials</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -176,7 +176,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
             </p>
             <button
               onClick={handleAdd}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add First Credential
@@ -188,7 +188,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
               <motion.div
                 key={credential.credentialId}
                 variants={fadeInUp}
-                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-teal-500/30 transition-all group"
+                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-focus))] transition-all group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 min-w-0">
@@ -212,7 +212,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                           {formatCredentialType(credential.credentialTypeDescriptor)}
                         </span>
                         {credential.credentialFieldDescriptor && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]">
                             {formatFieldDescriptor(credential.credentialFieldDescriptor)}
                           </span>
                         )}
@@ -244,7 +244,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                             href={credential.documentUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-teal-600 dark:text-teal-400 hover:underline"
+                            className="flex items-center gap-1 text-[rgb(var(--action-secondary-fg))] hover:underline"
                           >
                             <ExternalLink className="w-3 h-3" />
                             Document
@@ -259,7 +259,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                           {credential.gradeLevels.map((grade) => (
                             <span
                               key={grade}
-                              className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                              className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]"
                             >
                               {formatFieldDescriptor(grade)}
                             </span>
@@ -273,14 +273,14 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
                     <button
                       onClick={() => handleEdit(credential)}
-                      className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                       title="Edit credential"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(credential.credentialId)}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-600 transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                       title="Delete credential"
                       disabled={deletingId === credential.credentialId}
                     >

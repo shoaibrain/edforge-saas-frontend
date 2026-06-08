@@ -108,7 +108,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
         className={cn('overflow-x-auto', className)}
         {...props}
       >
-        <div className="min-w-[600px]">
+        <div className="min-w-3xl">
           {/* ---- Header row: day labels ---- */}
           <div className="grid grid-cols-[72px_repeat(5,1fr)] gap-1 mb-1">
             {/* Time column header */}
@@ -134,7 +134,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                       />
                     )}
                     <p
-                      className="text-[11px] font-medium"
+                      className="text-xs font-medium"
                       style={{ color: isToday ? 'var(--v2-brand-primary)' : 'var(--v2-text-muted)' }}
                     >
                       {label}
@@ -142,7 +142,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   </div>
                   {weekStartDate && (
                     <p
-                      className="text-[10px]"
+                      className="text-xs"
                       style={{ color: isToday ? 'var(--v2-brand-primary)' : 'var(--v2-text-hint)' }}
                     >
                       {dayDate(weekStartDate, i)}
@@ -162,13 +162,13 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
               {/* Time label */}
               <div className="flex flex-col justify-center pr-2 text-right">
                 <span
-                  className="text-[11px] font-mono tabular-nums leading-tight"
+                  className="text-xs font-mono tabular-nums leading-tight"
                   style={{ color: 'var(--v2-text-muted)' }}
                 >
                   {period.startTime}
                 </span>
                 <span
-                  className="text-[9px] font-mono tabular-nums"
+                  className="text-xs font-mono tabular-nums"
                   style={{ color: 'var(--v2-text-ghost)' }}
                 >
                   {period.endTime}
@@ -185,21 +185,21 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   return (
                     <div
                       key={dow}
-                      className="rounded-lg p-2 min-h-[52px] border transition-colors"
+                      className="rounded-lg p-2 min-h-14 border transition-colors"
                       style={{
                         background: `color-mix(in srgb, ${color} 10%, transparent)`,
                         borderColor: `color-mix(in srgb, ${color} 20%, transparent)`,
                       }}
                     >
                       <p
-                        className="text-[11px] font-semibold truncate leading-tight"
+                        className="text-xs font-semibold truncate leading-tight"
                         style={{ color }}
                       >
                         {block.courseName}
                       </p>
                       {block.room && (
                         <p
-                          className="text-[10px] truncate mt-0.5"
+                          className="text-xs truncate mt-0.5"
                           style={{ color: 'var(--v2-text-muted)' }}
                         >
                           {block.room}
@@ -214,11 +214,11 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   return (
                     <div
                       key={dow}
-                      className="rounded-lg p-2 min-h-[52px] flex items-center justify-center"
+                      className="rounded-lg p-2 min-h-14 flex items-center justify-center"
                       style={{ background: 'var(--v2-surface-inset)' }}
                     >
                       <span
-                        className="text-[10px] italic"
+                        className="text-xs italic"
                         style={{ color: 'var(--v2-text-ghost)' }}
                       >
                         {period.periodName}
@@ -231,7 +231,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                 return (
                   <div
                     key={dow}
-                    className="rounded-lg min-h-[52px] border border-dashed"
+                    className="rounded-lg min-h-14 border border-dashed"
                     style={{ borderColor: 'var(--v2-border-default)' }}
                   />
                 )

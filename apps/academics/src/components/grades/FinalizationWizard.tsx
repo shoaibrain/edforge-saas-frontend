@@ -110,12 +110,12 @@ export function FinalizationWizard({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-lg">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
           <div className="flex items-center gap-2">
-            <Lock className="w-5 h-5 text-teal-500" />
+            <Lock className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
             <h3 className="text-lg font-semibold text-text-primary">
               Finalize Grades{termName ? ` — ${termName}` : ''}
             </h3>
@@ -150,15 +150,15 @@ export function FinalizationWizard({
                     {/* Summary stats */}
                     <div className="grid grid-cols-3 gap-3">
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className="text-2xl font-bold text-teal-600">{analysis.eligibleGrades.length}</p>
+                        <p className="text-2xl font-bold text-[rgb(var(--action-secondary-fg))]">{analysis.eligibleGrades.length}</p>
                         <p className="text-xs text-text-tertiary">To Finalize</p>
                       </div>
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className="text-2xl font-bold text-emerald-600">{analysis.finalizedGrades.length}</p>
+                        <p className="text-2xl font-bold text-[rgb(var(--state-success-fg))]">{analysis.finalizedGrades.length}</p>
                         <p className="text-xs text-text-tertiary">Already Final</p>
                       </div>
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className={`text-2xl font-bold ${analysis.emptyStubs.length > 0 ? 'text-text-tertiary' : 'text-emerald-600'}`}>
+                        <p className={`text-2xl font-bold ${analysis.emptyStubs.length > 0 ? 'text-text-tertiary' : 'text-[rgb(var(--state-success-fg))]'}`}>
                           {analysis.emptyStubs.length}
                         </p>
                         <p className="text-xs text-text-tertiary">No Scores</p>
@@ -177,9 +177,9 @@ export function FinalizationWizard({
 
                     {/* Low grades warning */}
                     {analysis.lowGrades.length > 0 && (
-                      <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
+                      <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
-                        <p className="text-xs text-amber-700 dark:text-amber-400">
+                        <p className="text-xs text-[rgb(var(--state-warning-fg))]">
                           {analysis.lowGrades.length} student(s) are below passing grade.
                         </p>
                       </div>
@@ -187,7 +187,7 @@ export function FinalizationWizard({
 
                     {/* Student-level preview table */}
                     {analysis.eligibleGrades.length > 0 && (
-                      <div className="rounded-lg border border-border-secondary overflow-hidden max-h-[250px] overflow-y-auto">
+                      <div className="rounded-lg border border-border-secondary overflow-hidden max-h-64 overflow-y-auto">
                         <table className="w-full text-sm">
                           <thead className="bg-surface-secondary sticky top-0">
                             <tr>
@@ -214,8 +214,8 @@ export function FinalizationWizard({
                                   <td className="px-3 py-2 text-center">
                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
                                       isPassing
-                                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                                        : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
+                                        ? 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] '
+                                        : 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] '
                                     }`}>
                                       {isPassing ? 'Pass' : 'Fail'}
                                     </span>
@@ -229,9 +229,9 @@ export function FinalizationWizard({
                     )}
 
                     {analysis.eligibleGrades.length === 0 && analysis.finalizedGrades.length > 0 && (
-                      <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
-                        <CheckCircle className="w-4 h-4 text-emerald-500" />
-                        <p className="text-sm text-emerald-700 dark:text-emerald-400">
+                      <div className="flex items-center gap-2 p-3 bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] rounded-lg">
+                        <CheckCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
+                        <p className="text-sm text-[rgb(var(--state-success-fg))] ">
                           All grades are already finalized!
                         </p>
                       </div>
@@ -259,13 +259,13 @@ export function FinalizationWizard({
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-500/10 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                    <p className="text-sm font-semibold text-[rgb(var(--state-danger-fg))] ">
                       This action cannot be undone
                     </p>
-                    <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+                    <p className="text-sm text-[rgb(var(--state-danger-fg))] text-[rgb(var(--state-danger-fg))] mt-1">
                       You are about to finalize <strong>{analysis.eligibleGrades.length}</strong> grade(s).
                       Finalized grades are locked and cannot be modified.
                     </p>
@@ -274,7 +274,7 @@ export function FinalizationWizard({
 
                 {isProcessing && (
                   <div className="py-4 text-center">
-                    <Loader2 className="w-6 h-6 mx-auto animate-spin text-teal-500" />
+                    <Loader2 className="w-6 h-6 mx-auto animate-spin text-[rgb(var(--action-secondary-fg))]" />
                     <p className="text-sm text-text-secondary mt-2">
                       Finalizing grades...
                     </p>
@@ -292,14 +292,14 @@ export function FinalizationWizard({
                 exit={{ opacity: 0, x: -20 }}
                 className="py-4 text-center space-y-3"
               >
-                <CheckCircle className="w-12 h-12 mx-auto text-emerald-500" />
+                <CheckCircle className="w-12 h-12 mx-auto text-[rgb(var(--state-success-fg))]" />
                 <h4 className="text-lg font-semibold text-text-primary">
                   Grades Finalized
                 </h4>
                 <p className="text-sm text-text-secondary">
                   Successfully finalized {finalizedCount} grade(s). These grades are now locked.
                   {errorCount > 0 && (
-                    <span className="block mt-1 text-amber-600 dark:text-amber-400">
+                    <span className="block mt-1 text-[rgb(var(--state-warning-fg))]">
                       {errorCount} grade(s) could not be finalized.
                     </span>
                   )}
@@ -320,7 +320,7 @@ export function FinalizationWizard({
                 type="button"
                 onClick={() => setStep('confirm')}
                 disabled={analysis.eligibleGrades.length === 0 || isLoading}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue
                 <ChevronRight className="w-4 h-4" />
@@ -342,7 +342,7 @@ export function FinalizationWizard({
                 type="button"
                 onClick={handleFinalize}
                 disabled={isProcessing}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-danger-bg)/0.18)]0 hover:bg-[rgb(var(--state-danger-fg))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
                 Finalize {analysis.eligibleGrades.length} Grades
@@ -354,7 +354,7 @@ export function FinalizationWizard({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
               >
                 Done
               </button>

@@ -64,7 +64,7 @@ export function ConfirmationDialog({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.40)] backdrop-blur-sm" />
         </Transition.Child>
 
         {/* Dialog */}
@@ -85,16 +85,16 @@ export function ConfirmationDialog({
                   <div
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                       isDestructive
-                        ? 'bg-red-100 dark:bg-red-500/20'
-                        : 'bg-teal-100 dark:bg-teal-500/20'
+                        ? 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20'
+                        : 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20'
                     }`}
                   >
                     {icon || (
                       <AlertTriangle
                         className={`w-5 h-5 ${
                           isDestructive
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-teal-600 dark:text-teal-400'
+                            ? 'text-[rgb(var(--state-danger-fg))]'
+                            : 'text-[rgb(var(--action-secondary-fg))]'
                         }`}
                       />
                     )}

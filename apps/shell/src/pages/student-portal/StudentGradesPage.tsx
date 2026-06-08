@@ -25,7 +25,6 @@ import { PortalCourseCard, type PortalCourseCardCategory } from '../portal-share
 // ============================================================================
 
 export default function StudentGradesPage() {
-  const { t } = useTranslation('portal')
   const { studentId, studentProfile } = useStudentPortal()
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { activeSchoolYear } = useShell()

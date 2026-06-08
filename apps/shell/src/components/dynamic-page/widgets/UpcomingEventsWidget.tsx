@@ -113,7 +113,7 @@ function EmptyState() {
 
 function EventItem({ event }: { event: UpcomingEvent }) {
   return (
-    <div className="group flex items-start gap-4 py-1.5 px-2 -mx-2 rounded-lg hover:bg-[rgb(var(--surface-hover))] transition-colors cursor-pointer">
+    <div className="group flex items-start gap-4 py-1.5 px-2 -mx-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors cursor-pointer">
       {/* Time Column */}
       <div className="w-16 flex-shrink-0 text-right pt-0.5">
         <div className="text-sm font-medium text-[rgb(var(--text-secondary))]">{event.time}</div>
@@ -124,9 +124,9 @@ function EventItem({ event }: { event: UpcomingEvent }) {
 
       {/* Vertical Line Marker */}
       <div className={`w-1 h-full min-h-[2.5rem] rounded-full flex-shrink-0 ${event.type === 'meeting' ? 'bg-violet-400' :
-        event.type === 'deadline' ? 'bg-rose-400' :
-          event.type === 'class' ? 'bg-teal-400' :
-            'bg-[rgb(var(--brand-primary))]'
+        event.type === 'deadline' ? 'bg-[rgb(var(--state-danger-fg))]' :
+          event.type === 'class' ? 'bg-[rgb(var(--state-info-fg))]' :
+            'bg-[rgb(var(--action-primary-bg))]'
         }`} />
 
       {/* Content */}
@@ -157,7 +157,7 @@ function EventItem({ event }: { event: UpcomingEvent }) {
       {/* Join/Action Button (Visible on Hover) */}
       <div className="opacity-0 group-hover:opacity-100 transition-opacity">
         {event.hasConferencing && (
-          <button className="px-2 py-1 text-xs bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))] rounded shadow-sm text-[rgb(var(--text-primary))]">
+          <button className="px-2 py-1 text-xs bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-secondary))] rounded shadow-sm text-[rgb(var(--text-primary))]">
             Join
           </button>
         )}
@@ -208,7 +208,7 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
               <div key={dateKey} className="flex gap-4">
                 {/* Left Column: Date */}
                 <div className="w-24 flex-shrink-0 pt-2">
-                  <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
+                  <div className={`text-sm font-semibold ${isToday ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--text-secondary))]'}`}>
                     {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
                   </div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))]">

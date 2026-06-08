@@ -191,7 +191,7 @@ export function BlocksPanel({
 
   return (
     <section
-      className="bg-[rgb(var(--surface-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl p-3.5 mt-3"
+      className="bg-[rgb(var(--background-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl p-3.5 mt-3"
       aria-labelledby="multi-day-events-heading"
     >
       {/* Header */}
@@ -203,14 +203,14 @@ export function BlocksPanel({
           >
             Multi-Day Events
           </h3>
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))] mt-0.5">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
             Declare Dashain, vacations, exam blocks, and other multi-day events. Each block writes one calendar-date row per day in the range.
           </p>
         </div>
         <button
           type="button"
           onClick={openCreate}
-          className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-lg bg-teal-500 text-white hover:bg-teal-600"
+          className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))]"
         >
           + New Block
         </button>
@@ -225,9 +225,9 @@ export function BlocksPanel({
               key={opt.value}
               type="button"
               onClick={() => setFilter(opt.value)}
-              className={`px-2.5 py-1 text-[10px] font-medium rounded-full border transition-colors ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
                 active
-                  ? 'bg-teal-500/15 border-teal-500/30 text-teal-400'
+                  ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.35)] text-[rgb(var(--action-secondary-fg))]'
                   : 'bg-transparent border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]'
               }`}
             >
@@ -239,20 +239,20 @@ export function BlocksPanel({
 
       {/* List */}
       {isLoading && (
-        <div className="text-[11px] text-[rgb(var(--text-tertiary))] py-6 text-center">
+        <div className="text-xs text-[rgb(var(--text-tertiary))] py-6 text-center">
           Loading blocks…
         </div>
       )}
 
       {isError && (
-        <div className="text-[11px] text-red-500 py-6 text-center">
+        <div className="text-xs text-[rgb(var(--state-danger-fg))] py-6 text-center">
           Failed to load blocks: {error?.message ?? 'Unknown error'}
         </div>
       )}
 
       {!isLoading && !isError && items.length === 0 && (
         <div className="bg-[rgba(255,255,255,0.02)] border border-dashed border-[rgb(var(--border-primary))] rounded-xl px-3 py-6 text-center">
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))]">
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">
             {filter === 'all'
               ? 'No multi-day blocks yet. Click "+ New Block" to declare your first one (Dashain, Summer Vacation, exam window, etc.).'
               : `No "${FILTER_OPTIONS.find((o) => o.value === filter)?.label}" blocks. Adjust the filter above or create one.`}
@@ -279,7 +279,7 @@ export function BlocksPanel({
                         {block.blockName}
                       </h4>
                       <span
-                        className="flex-shrink-0 text-[9px] font-medium px-1.5 py-0.5 rounded border"
+                        className="flex-shrink-0 text-xs font-medium px-1.5 py-0.5 rounded border"
                         style={{
                           background: meta.bgChip,
                           borderColor: meta.borderChip,
@@ -289,11 +289,11 @@ export function BlocksPanel({
                         {meta.label}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[rgb(var(--text-secondary))] mb-1">
+                    <p className="text-xs text-[rgb(var(--text-secondary))] mb-1">
                       {formatDate(block.startDate, calendarSystem)} —{' '}
                       {formatDate(block.endDate, calendarSystem)}
                     </p>
-                    <div className="flex flex-wrap gap-2 text-[10px] text-[rgb(var(--text-tertiary))]">
+                    <div className="flex flex-wrap gap-2 text-xs text-[rgb(var(--text-tertiary))]">
                       <span>
                         {block.childDateCount} day{block.childDateCount === 1 ? '' : 's'}
                       </span>
@@ -305,7 +305,7 @@ export function BlocksPanel({
                     <button
                       type="button"
                       onClick={() => openEdit(block.blockId)}
-                      className="px-2 py-1 text-[10px] font-medium text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] rounded"
+                      className="px-2 py-1 text-xs font-medium text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] rounded"
                       aria-label={`Edit ${block.blockName}`}
                     >
                       ✎
@@ -313,7 +313,7 @@ export function BlocksPanel({
                     <button
                       type="button"
                       onClick={() => setDeletingBlock(block)}
-                      className="px-2 py-1 text-[10px] font-medium text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-[rgba(255,255,255,0.04)] rounded"
+                      className="px-2 py-1 text-xs font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgba(255,255,255,0.04)] rounded"
                       aria-label={`Delete ${block.blockName}`}
                     >
                       🗑
@@ -342,17 +342,17 @@ export function BlocksPanel({
 
       {/* Delete confirm modal — inline (matches school-rooms pattern) */}
       {deletingBlock && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl max-w-md w-full p-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)] px-4">
+          <div className="bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl max-w-md w-full p-5">
             <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-2">
               Delete "{deletingBlock.blockName}"?
             </h3>
-            <p className="text-[12px] text-[rgb(var(--text-secondary))] leading-relaxed mb-1">
+            <p className="text-xs text-[rgb(var(--text-secondary))] leading-relaxed mb-1">
               This will cascade-delete the block plus all{' '}
               <strong>{deletingBlock.childDateCount}</strong> underlying calendar date
               {deletingBlock.childDateCount === 1 ? '' : 's'}.
             </p>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-4">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mb-4">
               Per-day notes on those dates will be lost. To regenerate the SYSTEM
               versions of those dates, re-run Generate Calendar afterward.
             </p>
@@ -360,7 +360,7 @@ export function BlocksPanel({
               <button
                 type="button"
                 onClick={() => setDeletingBlock(null)}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgba(255,255,255,0.04)]"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgba(255,255,255,0.04)]"
               >
                 Cancel
               </button>
@@ -368,7 +368,7 @@ export function BlocksPanel({
                 type="button"
                 onClick={confirmDelete}
                 disabled={deleteMutation.isPending}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[rgb(var(--state-danger-fg))] text-[rgb(var(--action-primary-fg))] hover:brightness-95 disabled:opacity-50"
               >
                 {deleteMutation.isPending ? 'Deleting…' : 'Delete Block'}
               </button>

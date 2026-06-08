@@ -138,7 +138,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           animate={{ borderColor, boxShadow }}
           transition={springTransition}
           className={cn(
-            'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-colors',
+            'relative flex items-center rounded-xl border bg-[rgb(var(--background-secondary))] transition-colors',
             disabled && 'opacity-60 cursor-not-allowed',
             inputClassName
           )}

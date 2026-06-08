@@ -45,6 +45,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Playwright artifacts
+e2e/test-results/
+playwright-report/
+
 # Runtime data
 pids
 *.pid

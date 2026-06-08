@@ -33,6 +33,7 @@ import {
   Building2,
 } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
+import { focusRing, focusRingInset, SectionCard as UiSectionCard } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffStatusBadge } from './StaffStatusBadge'
 import { getRoleI18nKey } from './StaffRoleBadge'
@@ -75,7 +76,7 @@ function ActionsDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
+        className={`p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors ${focusRingInset}`}
         aria-label="Actions"
       >
         <MoreVertical className="w-5 h-5" />
@@ -92,7 +93,7 @@ function ActionsDropdown({
                 onClose()
                 navigate({ to: '/staff/$staffId', params: { staffId: staff.staffId } })
               }}
-              className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+              className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors ${focusRingInset}`}
             >
               <Eye className="w-4 h-4" />
               {t('drawer.viewFullProfile')}
@@ -104,7 +105,7 @@ function ActionsDropdown({
                   setIsOpen(false)
                   onEdit(staff)
                 }}
-                className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
+                className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors ${focusRingInset}`}
               >
                 <Pencil className="w-4 h-4" />
                 {t('drawer.editStaff')}
@@ -119,7 +120,7 @@ function ActionsDropdown({
                     setIsOpen(false)
                     onDelete(staff)
                   }}
-                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                  className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-[var(--v2-danger)] hover:bg-[var(--v2-danger-bg)] transition-colors ${focusRingInset}`}
                 >
                   <Trash2 className="w-4 h-4" />
                   {t('drawer.deleteStaff')}
@@ -134,28 +135,21 @@ function ActionsDropdown({
 }
 
 // ============================================================================
-// SECTION CARD
+// SECTION TITLE
 // ============================================================================
 
-function SectionCard({
+function SectionTitle({
   icon: Icon,
   title,
-  children,
 }: {
   icon: typeof User
   title: string
-  children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border-secondary bg-surface-secondary/50 overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-secondary bg-surface-secondary/80">
-        <Icon className="w-3.5 h-3.5 text-text-tertiary" />
-        <h4 className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
-          {title}
-        </h4>
-      </div>
-      <div className="px-4 py-3.5">{children}</div>
-    </div>
+    <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+      <Icon className="h-3.5 w-3.5 text-text-tertiary" />
+      {title}
+    </span>
   )
 }
 
@@ -176,7 +170,7 @@ function DetailField({
 }) {
   return (
     <div className="py-1">
-      <dt className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide mb-1 flex items-center gap-1.5">
+      <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1 flex items-center gap-1.5">
         {Icon && <Icon className={`w-3 h-3 ${accent ?? 'text-text-tertiary'}`} />}
         {label}
       </dt>
@@ -255,7 +249,7 @@ export function StaffDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={handleBackdropClick}
             aria-hidden="true"
           />
@@ -274,8 +268,8 @@ export function StaffDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
-                      <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <div className="p-2.5 rounded-xl bg-[rgb(var(--state-info-bg)/0.20)]">
+                      <User className="w-5 h-5 text-[rgb(var(--action-primary-bg))]" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary">
                       {t('drawer.title')}
@@ -291,7 +285,7 @@ export function StaffDrawer({
                     <button
                       type="button"
                       onClick={onClose}
-                      className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
+                      className={`p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors ${focusRingInset}`}
                       aria-label="Close drawer"
                     >
                       <X className="w-5 h-5" />
@@ -304,7 +298,7 @@ export function StaffDrawer({
                   {/* Hero identity section */}
                   <div className="px-6 py-5 bg-surface-secondary/40 border-b border-border-secondary">
                     <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-surface-tertiary shadow-md ring-1 ring-white/10">
+                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-surface-tertiary shadow-md ring-1 ring-[rgb(var(--border-secondary))]">
                         <img
                           src={getStaffAvatar(staff.staffId, { size: 80 })}
                           alt={`${staff.firstName} ${staff.lastSurname}`}
@@ -319,7 +313,7 @@ export function StaffDrawer({
                           {staff.email}
                         </p>
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          <span className="font-mono text-[11px] text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-md border border-border-secondary truncate max-w-[200px]">
+                          <span className="font-mono text-xs text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-md border border-border-secondary truncate max-w-52">
                             #{staff.staffUniqueId}
                           </span>
                           <StaffStatusBadge status={staff.employmentStatus} />
@@ -330,25 +324,25 @@ export function StaffDrawer({
                     {/* Quick Stats */}
                     <div className="grid grid-cols-3 gap-3 mt-5">
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
+                        <Briefcase className="w-4 h-4 text-[rgb(var(--action-primary-bg))] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {t(`roles.${getRoleI18nKey(staff.role)}`, { defaultValue: staff.role })}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">{t('tableHeaders.role')}</p>
+                        <p className="text-xs text-text-tertiary">{t('tableHeaders.role')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <BookOpen className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
+                        <BookOpen className="w-4 h-4 text-[var(--v2-success)] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {staff.departmentName || '—'}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">{t('tableHeaders.department')}</p>
+                        <p className="text-xs text-text-tertiary">{t('tableHeaders.department')}</p>
                       </div>
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <Clock className="w-4 h-4 text-amber-500 mx-auto mb-1" />
+                        <Clock className="w-4 h-4 text-[rgb(var(--state-warning-fg))] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {formatEmploymentType(staff.employmentType)}
                         </p>
-                        <p className="text-[11px] text-text-tertiary">{t('drawer.type')}</p>
+                        <p className="text-xs text-text-tertiary">{t('drawer.type')}</p>
                       </div>
                     </div>
                   </div>
@@ -356,7 +350,7 @@ export function StaffDrawer({
                   {/* Section cards */}
                   <div className="px-6 py-5 space-y-4">
                     {/* Employment Info */}
-                    <SectionCard icon={Briefcase} title={t('sections.employmentInfo')}>
+                    <UiSectionCard title={<SectionTitle icon={Briefcase} title={t('sections.employmentInfo')} />}>
                       <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                         <DetailField
                           icon={Calendar}
@@ -372,7 +366,7 @@ export function StaffDrawer({
                           <DetailField
                             icon={Briefcase}
                             label={t('fields.title')}
-                            accent="text-indigo-500"
+                            accent="text-[rgb(var(--action-primary-bg))]"
                             value={staff.title}
                           />
                         )}
@@ -384,21 +378,21 @@ export function StaffDrawer({
                           />
                         )}
                       </div>
-                    </SectionCard>
+                    </UiSectionCard>
 
                     {/* Contact Information */}
-                    <SectionCard icon={Mail} title={t('sections.contactInfo')}>
+                    <UiSectionCard title={<SectionTitle icon={Mail} title={t('sections.contactInfo')} />}>
                       <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                         <DetailField
                           icon={Mail}
                           label={t('fields.email')}
-                          accent="text-blue-500"
+                          accent="text-[rgb(var(--action-primary-bg))]"
                           value={staff.email}
                         />
                         <DetailField
                           icon={Phone}
                           label={t('fields.phone')}
-                          accent="text-green-500"
+                          accent="text-[var(--v2-success)]"
                           value={staff.phone}
                         />
                       </div>
@@ -411,11 +405,11 @@ export function StaffDrawer({
                           />
                         </div>
                       )}
-                    </SectionCard>
+                    </UiSectionCard>
 
                     {/* School Assignments */}
                     {staff.schoolAssignments && staff.schoolAssignments.length > 0 && (
-                      <SectionCard icon={Building2} title={t('sections.schoolAssignments')}>
+                      <UiSectionCard title={<SectionTitle icon={Building2} title={t('sections.schoolAssignments')} />}>
                         <div className="space-y-3">
                           {staff.schoolAssignments.map((assignment, i) => (
                             <div
@@ -428,12 +422,12 @@ export function StaffDrawer({
                                 </p>
                                 <div className="flex items-center gap-2">
                                   {assignment.departmentName && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-surface-tertiary text-text-secondary">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-surface-tertiary text-text-secondary">
                                       {assignment.departmentName}
                                     </span>
                                   )}
                                   {assignment.isPrimary && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]">
                                       {t('drawer.primary')}
                                     </span>
                                   )}
@@ -454,26 +448,26 @@ export function StaffDrawer({
                             </div>
                           ))}
                         </div>
-                      </SectionCard>
+                      </UiSectionCard>
                     )}
 
                     {/* System Access */}
-                    <SectionCard icon={Key} title={t('sections.systemAccess')}>
+                    <UiSectionCard title={<SectionTitle icon={Key} title={t('sections.systemAccess')} />}>
                       <div className="flex items-center gap-3">
                         {staff.userId ? (
                           <>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/10">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--v2-success-bg)] text-[var(--v2-success)] border border-[var(--v2-success-border)]">
                               <Key className="w-3.5 h-3.5" />
                               {t('systemAccess.linkedAccount')}
                             </span>
                           </>
                         ) : (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-500/20 dark:text-slate-400 border border-slate-500/10">
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-text-tertiary border border-border-secondary">
                             {t('systemAccess.noAccountLinked')}
                           </span>
                         )}
                       </div>
-                    </SectionCard>
+                    </UiSectionCard>
                   </div>
                 </div>
 
@@ -482,7 +476,7 @@ export function StaffDrawer({
                   <button
                     type="button"
                     onClick={handleViewFullProfile}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium text-sm transition-colors shadow-sm"
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--state-info-fg))] text-[rgb(var(--text-inverted))] rounded-xl font-medium text-sm transition-colors shadow-sm ${focusRing}`}
                   >
                     {t('drawer.viewFullProfile')}
                     <ArrowRight className="w-4 h-4" />

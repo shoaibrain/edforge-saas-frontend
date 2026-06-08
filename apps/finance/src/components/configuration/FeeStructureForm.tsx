@@ -208,10 +208,10 @@ export function FeeStructureForm({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
+      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))] flex-shrink-0">
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -220,7 +220,7 @@ export function FeeStructureForm({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
@@ -349,12 +349,12 @@ export function FeeStructureForm({
           {/* ── Enrollment Rules ── */}
           <SectionHeader title="Enrollment Rules" />
 
-          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 {...register('autoApplyOnEnrollment')}
-                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
               <span className="text-sm text-[rgb(var(--text-primary))]">Auto-apply on enrollment</span>
             </label>
@@ -362,7 +362,7 @@ export function FeeStructureForm({
               <input
                 type="checkbox"
                 {...register('proRateOnMidTermEntry')}
-                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
               <span className="text-sm text-[rgb(var(--text-primary))]">Pro-rate on mid-term entry</span>
             </label>
@@ -496,14 +496,14 @@ function GradeLevelSelect({
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="absolute z-20 mt-1 w-full bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg max-h-48 overflow-y-auto">
+          <div className="absolute z-20 mt-1 w-full bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg max-h-48 overflow-y-auto">
             {/* All Grades option */}
-            <label className="flex items-center gap-2 px-3 py-2 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer border-b border-[rgb(var(--border-primary))]">
+            <label className="flex items-center gap-2 px-3 py-2 hover:bg-[rgb(var(--background-secondary))] cursor-pointer border-b border-[rgb(var(--border-primary))]">
               <input
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleAll}
-                className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-teal-600 focus:ring-teal-500"
+                className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
               <span className="text-sm font-medium text-[rgb(var(--text-primary))]">All Grades</span>
             </label>
@@ -512,13 +512,13 @@ function GradeLevelSelect({
             {gradeOptions.map((grade) => (
               <label
                 key={grade}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer"
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-[rgb(var(--background-secondary))] cursor-pointer"
               >
                 <input
                   type="checkbox"
                   checked={value.includes(grade)}
                   onChange={() => toggleGrade(grade)}
-                  className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-blue-600 focus:ring-blue-500"
+                  className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--state-info-fg))] focus:ring-[rgb(var(--border-focus))]"
                 />
                 <span className="text-sm text-[rgb(var(--text-primary))]">Grade {grade}</span>
               </label>
@@ -532,13 +532,13 @@ function GradeLevelSelect({
             {value.map((grade) => (
               <span
                 key={grade}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-600/10 text-blue-400 border border-blue-600/20"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] border border-[rgb(var(--state-info-border)/0.35)]"
               >
                 {grade}
                 <button
                   type="button"
                   onClick={() => toggleGrade(grade)}
-                  className="hover:text-blue-200"
+                  className="hover:text-[rgb(var(--state-info-fg))]"
                 >
                   &times;
                 </button>
@@ -558,7 +558,7 @@ function GradeLevelSelect({
 function SectionHeader({ title }: { title: string }) {
   return (
     <div className="flex items-center gap-2 pt-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+      <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
         {title}
       </span>
       <div className="flex-1 h-px bg-[rgb(var(--border-primary))]" />
@@ -585,7 +585,7 @@ function Field({
         {label}
       </label>
       {children}
-      {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
+      {error && <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-0.5">{error}</p>}
     </div>
   )
 }

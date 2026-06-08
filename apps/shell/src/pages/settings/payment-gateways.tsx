@@ -79,7 +79,7 @@ export default function PaymentGatewaysPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] animate-spin" />
           </div>
         ) : (
           <div className="space-y-3">

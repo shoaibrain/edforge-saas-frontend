@@ -190,34 +190,34 @@ function MatrixCell({
         className={`
           w-7 h-7 rounded border-2 flex items-center justify-center mx-auto transition-all
           ${hasConflict
-            ? 'border-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20'
+            ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/20'
             : checked
               ? isPending && pendingAction === 'add'
-                ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100'
-                : 'border-teal-500 bg-teal-500 hover:bg-teal-600 hover:border-teal-600'
+                ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)]'
+                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-[rgb(var(--state-info-border))]'
               : isPending && pendingAction === 'remove'
-                ? 'border-red-300 bg-red-50/50 dark:bg-red-500/5 hover:bg-red-100'
-                : 'border-border-secondary hover:border-teal-400 hover:bg-surface-hover'
+                ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/5 hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
+                : 'border-border-secondary hover:border-[rgb(var(--border-focus))] hover:bg-surface-hover'
           }
         `}
         aria-label={`${checked ? 'Remove from' : 'Add to'} ${sectionLabel}`}
       >
         {checked && !hasConflict && (
-          <Check className="w-4 h-4 text-white" />
+          <Check className="w-4 h-4 text-[rgb(var(--action-primary-fg))]" />
         )}
         {checked && hasConflict && (
-          <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+          <AlertTriangle className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
         )}
         {!checked && isPending && pendingAction === 'remove' && (
-          <Minus className="w-3.5 h-3.5 text-red-400" />
+          <Minus className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
         )}
         {checked && isPending && pendingAction === 'add' && (
-          <Plus className="w-3.5 h-3.5 text-emerald-500" />
+          <Plus className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
         )}
       </button>
       {/* Conflict tooltip */}
       {hasConflict && (
-        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-red-600 text-white text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
+        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
           <div className="font-medium mb-0.5">Schedule Conflict</div>
           <div>Same class period as {conflict.conflictingSectionIds.length} other section(s)</div>
           <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600" />
@@ -226,7 +226,7 @@ function MatrixCell({
       {/* Pending change indicator dot */}
       {isPending && (
         <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
-          pendingAction === 'add' ? 'bg-emerald-500' : 'bg-red-500'
+          pendingAction === 'add' ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
         }`} />
       )}
     </td>
@@ -261,8 +261,8 @@ function MatrixStudentRow({
       }}
     >
       {/* Sticky student name column */}
-      <td className="sticky left-0 z-10 bg-surface-primary px-3 py-2 border-r-2 border-border-secondary whitespace-nowrap min-w-[220px]">
-        <div className="text-sm font-medium text-text-primary truncate max-w-[200px]">
+      <td className="sticky left-0 z-10 bg-surface-primary px-3 py-2 border-r-2 border-border-secondary whitespace-nowrap min-w-56">
+        <div className="text-sm font-medium text-text-primary truncate max-w-52">
           {student.lastName}, {student.firstName}
         </div>
         <div className="text-xs text-text-tertiary">
@@ -328,7 +328,7 @@ function SummaryBar({
       {isSubmitting && total > 0 && (
         <div className="h-1 bg-surface-secondary">
           <div
-            className="h-full bg-teal-500 transition-all duration-300 ease-out"
+            className="h-full bg-[rgb(var(--state-info-bg)/0.18)]0 transition-all duration-300 ease-out"
             style={{ width: `${Math.round((progress / total) * 100)}%` }}
           />
         </div>
@@ -337,19 +337,19 @@ function SummaryBar({
       <div className="px-6 py-3 flex items-center justify-between max-w-screen-2xl mx-auto">
         <div className="flex items-center gap-4">
           {addCount > 0 && (
-            <span className="flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-success-fg))]">
               <Plus className="w-4 h-4" />
               {addCount} addition{addCount !== 1 ? 's' : ''}
             </span>
           )}
           {removeCount > 0 && (
-            <span className="flex items-center gap-1.5 text-sm font-medium text-red-600 dark:text-red-400">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-danger-fg))]">
               <Minus className="w-4 h-4" />
               {removeCount} removal{removeCount !== 1 ? 's' : ''}
             </span>
           )}
           {conflictCount > 0 && (
-            <span className="flex items-center gap-1.5 text-sm font-medium text-amber-600 dark:text-amber-400">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-warning-fg))]">
               <AlertTriangle className="w-4 h-4" />
               {conflictCount} conflict{conflictCount !== 1 ? 's' : ''}
             </span>
@@ -364,7 +364,7 @@ function SummaryBar({
           type="button"
           onClick={onApply}
           disabled={!hasChanges || isSubmitting}
-          className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -673,15 +673,15 @@ export function BulkRosteringPage() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20">
-              <Grid3x3 className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
+              <Grid3x3 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Bulk Rostering</h1>
               <p className="text-text-secondary mt-0.5">
                 Manage student-to-section assignments across all active sections
                 {currentYear && (
-                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]">
                     {currentYear.name}
                   </span>
                 )}
@@ -705,7 +705,7 @@ export function BulkRosteringPage() {
               studentsLoadedRef.current = false
             }}
             disabled={gradeOptionsLoading}
-            className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
             {!gradeOptionsLoading && gradeLevelOptions.map((opt) => (
@@ -723,7 +723,7 @@ export function BulkRosteringPage() {
             id="course-filter"
             value={courseFilter}
             onChange={(e) => setCourseFilter(e.target.value)}
-            className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors"
+            className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
           >
             <option value="">All Courses</option>
             {uniqueCourseNames.map((name) => (
@@ -743,7 +743,7 @@ export function BulkRosteringPage() {
       <div className="flex-1 overflow-auto relative" style={{ paddingBottom: pendingChanges.size > 0 || isSubmitting ? '72px' : '0' }}>
         {isInitialLoading ? (
           <div className="flex flex-col items-center justify-center py-24">
-            <Loader2 className="w-10 h-10 text-teal-500 animate-spin mb-4" />
+            <Loader2 className="w-10 h-10 text-[rgb(var(--action-secondary-fg))] animate-spin mb-4" />
             <p className="text-sm text-text-secondary">Loading rostering data...</p>
             <p className="text-xs text-text-tertiary mt-1">
               Fetching students, sections, and current enrollments
@@ -765,7 +765,7 @@ export function BulkRosteringPage() {
             <thead className="sticky top-0 z-20">
               <tr className="bg-surface-secondary">
                 {/* Top-left corner cell */}
-                <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-r-2 border-b border-border-secondary min-w-[220px] text-left">
+                <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-r-2 border-b border-border-secondary min-w-56 text-left">
                   <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
                     Student
                   </span>
@@ -773,15 +773,15 @@ export function BulkRosteringPage() {
                 {allSections.map((section) => (
                   <th
                     key={section.sectionId}
-                    className="px-1 py-2 border-r border-b border-border-secondary min-w-[80px] max-w-[120px]"
+                    className="px-1 py-2 border-r border-b border-border-secondary min-w-20 max-w-32"
                   >
                     <div className="text-xs font-semibold text-text-primary truncate" title={`${section.courseName ?? ''} - Section ${section.sectionNumber}`}>
                       {section.courseCode ?? section.courseName ?? ''}
                     </div>
-                    <div className="text-[10px] text-text-tertiary truncate">
+                    <div className="text-xs text-text-tertiary truncate">
                       Sec {section.sectionNumber}
                     </div>
-                    <div className="text-[10px] text-text-tertiary">
+                    <div className="text-xs text-text-tertiary">
                       {section.currentEnrollment}/{section.maxEnrollment}
                     </div>
                   </th>

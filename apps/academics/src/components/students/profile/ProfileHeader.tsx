@@ -31,34 +31,34 @@ export interface ProfileHeaderProps {
 
 const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
   active: {
-    bg: 'bg-emerald-500/10',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    dot: 'bg-emerald-500',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-success-fg))]',
+    dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
   },
   inactive: {
-    bg: 'bg-slate-500/10',
-    text: 'text-slate-600 dark:text-slate-400',
-    dot: 'bg-gray-400',
+    bg: 'bg-[rgb(var(--background-tertiary))]0/10',
+    text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
+    dot: 'bg-[rgb(var(--text-tertiary))]',
   },
   graduated: {
-    bg: 'bg-blue-500/10',
-    text: 'text-blue-600 dark:text-blue-400',
-    dot: 'bg-blue-500',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-info-fg))]',
+    dot: 'bg-[rgb(var(--state-info-fg))]',
   },
   transferred: {
-    bg: 'bg-amber-500/10',
-    text: 'text-amber-600 dark:text-amber-400',
-    dot: 'bg-amber-500',
+    bg: 'bg-[rgb(var(--state-warning-fg))]/10',
+    text: 'text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
   withdrawn: {
-    bg: 'bg-red-500/10',
-    text: 'text-red-600 dark:text-red-400',
-    dot: 'bg-red-500',
+    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
+    text: 'text-[rgb(var(--state-danger-fg))]',
+    dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
   },
   suspended: {
-    bg: 'bg-orange-500/10',
-    text: 'text-orange-600 dark:text-orange-400',
-    dot: 'bg-amber-500',
+    bg: 'bg-[rgb(var(--state-warning-fg))]/10',
+    text: 'text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
 }
 
@@ -97,12 +97,12 @@ function ActionsDropdown({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
             {canEdit && (
               <button
                 type="button"
                 onClick={() => { setIsOpen(false); onEdit?.() }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
               >
                 <Pencil className="w-4 h-4" />
                 {t('actions.editStudent')}
@@ -112,7 +112,7 @@ function ActionsDropdown({
               <button
                 type="button"
                 onClick={() => { setIsOpen(false); onEnroll?.() }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
               >
                 <GraduationCap className="w-4 h-4" />
                 {t('actions.schoolEnrollment')}
@@ -162,10 +162,10 @@ export function ProfileHeader({
           name={student.fullName}
           src={avatarUrl}
           shape="circle"
-          className="w-16 h-16 ring-4 ring-white dark:ring-[rgb(var(--surface-primary))] shadow-sm bg-[rgb(var(--surface-secondary))]"
+          className="w-16 h-16 ring-4 ring-[rgb(var(--border-inverse))] dark:ring-[rgb(var(--background-primary))] shadow-sm bg-[rgb(var(--background-secondary))]"
         />
         <div
-          className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white dark:border-[rgb(var(--surface-primary))] ${statusStyle.dot}`}
+          className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-[rgb(var(--border-inverse))] dark:border-[rgb(var(--background-primary))] ${statusStyle.dot}`}
         />
       </div>
 
@@ -185,7 +185,7 @@ export function ProfileHeader({
             <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
           )}
           {student.currentGradeLevel && (
-            <span className="font-medium text-teal-600 dark:text-teal-400">
+            <span className="font-medium text-[rgb(var(--action-secondary-fg))]">
               {t('gradeLabel', { level: student.currentGradeLevel })}
             </span>
           )}
@@ -209,16 +209,16 @@ export function ProfileHeader({
 export function ProfileHeaderSkeleton() {
   return (
     <div className="flex items-start gap-5 pb-2">
-      <div className="w-16 h-16 rounded-xl bg-[rgb(var(--surface-tertiary))] animate-pulse flex-shrink-0" />
+      <div className="w-16 h-16 rounded-xl bg-[rgb(var(--background-tertiary))] animate-pulse flex-shrink-0" />
       <div className="flex-1 min-w-0 space-y-3">
-        <div className="h-7 w-56 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
+        <div className="h-7 w-56 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
         <div className="flex items-center gap-3">
-          <div className="h-4 w-32 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
-          <div className="h-4 w-20 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
-          <div className="h-5 w-16 bg-[rgb(var(--surface-tertiary))] rounded-full animate-pulse" />
+          <div className="h-4 w-32 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
+          <div className="h-4 w-20 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
+          <div className="h-5 w-16 bg-[rgb(var(--background-tertiary))] rounded-full animate-pulse" />
         </div>
       </div>
-      <div className="h-10 w-10 bg-[rgb(var(--surface-tertiary))] rounded-lg animate-pulse" />
+      <div className="h-10 w-10 bg-[rgb(var(--background-tertiary))] rounded-lg animate-pulse" />
     </div>
   )
 }

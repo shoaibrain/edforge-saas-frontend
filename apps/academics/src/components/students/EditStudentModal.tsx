@@ -159,7 +159,7 @@ export function EditStudentModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -190,7 +190,7 @@ export function EditStudentModal({
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-1.5">
-              First Name <span className="text-red-500">*</span>
+              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="firstName"
@@ -205,7 +205,7 @@ export function EditStudentModal({
               disabled={isSubmitting}
             />
             {errors.firstName && (
-              <p className="mt-1 text-sm text-red-500">{errors.firstName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
             )}
           </div>
           <div>
@@ -223,7 +223,7 @@ export function EditStudentModal({
           </div>
           <div>
             <label htmlFor="lastName" className="block text-sm font-medium text-text-primary mb-1.5">
-              Last Name <span className="text-red-500">*</span>
+              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="lastName"
@@ -234,7 +234,7 @@ export function EditStudentModal({
               disabled={isSubmitting}
             />
             {errors.lastName && (
-              <p className="mt-1 text-sm text-red-500">{errors.lastName.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastName.message}</p>
             )}
           </div>
         </div>
@@ -243,7 +243,7 @@ export function EditStudentModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="dateOfBirth" className="block text-sm font-medium text-text-primary mb-1.5">
-              Date of Birth <span className="text-red-500">*</span>
+              Date of Birth <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="dateOfBirth"
@@ -253,12 +253,12 @@ export function EditStudentModal({
               disabled={isSubmitting}
             />
             {errors.dateOfBirth && (
-              <p className="mt-1 text-sm text-red-500">{errors.dateOfBirth.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.dateOfBirth.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="gender" className="block text-sm font-medium text-text-primary mb-1.5">
-              Gender <span className="text-red-500">*</span>
+              Gender <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="gender"
@@ -271,7 +271,7 @@ export function EditStudentModal({
               ))}
             </select>
             {errors.gender && (
-              <p className="mt-1 text-sm text-red-500">{errors.gender.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.gender.message}</p>
             )}
           </div>
         </div>
@@ -279,7 +279,7 @@ export function EditStudentModal({
         {/* Grade Level */}
         <div>
           <label htmlFor="currentGradeLevel" className="block text-sm font-medium text-text-primary mb-1.5">
-            Grade Level <span className="text-red-500">*</span>
+            Grade Level <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             id="currentGradeLevel"
@@ -293,7 +293,7 @@ export function EditStudentModal({
             ))}
           </select>
           {errors.currentGradeLevel && (
-            <p className="mt-1 text-sm text-red-500">{errors.currentGradeLevel.message}</p>
+            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.currentGradeLevel.message}</p>
           )}
         </div>
 
@@ -312,7 +312,7 @@ export function EditStudentModal({
               disabled={isSubmitting}
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.email.message}</p>
             )}
           </div>
           <div>
@@ -328,13 +328,13 @@ export function EditStudentModal({
               disabled={isSubmitting}
             />
             {errors.phone && (
-              <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
             )}
           </div>
         </div>
 
         {isDirty && (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
+          <p className="text-sm text-[rgb(var(--state-warning-fg))]">
             You have unsaved changes
           </p>
         )}
@@ -351,7 +351,7 @@ export function EditStudentModal({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[100px]"
+            className="min-w-24"
           >
             {isSubmitting ? (
               <>

@@ -636,7 +636,9 @@ export function useDownloadInvoicePdf() {
       // races Safari's download-initiation; 100ms is the documented
       // safe window across browsers.
       setTimeout(() => {
-        document.body.removeChild(a)
+        if (typeof document !== 'undefined' && document.body.contains(a)) {
+          document.body.removeChild(a)
+        }
         URL.revokeObjectURL(url)
       }, 100)
     },

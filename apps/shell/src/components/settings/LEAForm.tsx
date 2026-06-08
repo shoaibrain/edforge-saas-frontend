@@ -52,10 +52,10 @@ export interface LEAFormProps {
 // ============================================================================
 
 const inputClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors'
+  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
 const selectClass = inputClass
 const labelClass = 'block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5'
-const errorClass = 'mt-1 text-xs text-red-500'
+const errorClass = 'mt-1 text-xs text-[rgb(var(--state-danger-fg))]'
 
 // ============================================================================
 // COMPONENT
@@ -180,14 +180,14 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
           {/* Basic Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
-              <Building2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <Building2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
               <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Basic Info</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>
-                  Ed-Fi ID <span className="text-red-500">*</span>
+                  Ed-Fi ID <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                   <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
                     <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                   </Tooltip>
@@ -205,7 +205,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               </div>
               <div>
                 <label className={labelClass}>
-                  Name <span className="text-red-500">*</span>
+                  Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                 </label>
                 <input
                   type="text"
@@ -244,7 +244,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className={labelClass}>
-                  LEA Category <span className="text-red-500">*</span>
+                  LEA Category <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                   <Tooltip content="The classification of this district. 'Independent' is the most common for standard school districts." side="top">
                     <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                   </Tooltip>

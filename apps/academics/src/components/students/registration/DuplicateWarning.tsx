@@ -19,15 +19,15 @@ interface DuplicateWarningProps {
 
 const confidenceStyles = {
   high: {
-    badge: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    badge: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] border-[rgb(var(--state-danger-border))]/20',
     label: 'High',
   },
   medium: {
-    badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    badge: 'bg-[rgb(var(--state-warning-fg))]/10 text-[rgb(var(--state-warning-fg))] border-amber-500/20',
     label: 'Medium',
   },
   low: {
-    badge: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
+    badge: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
     label: 'Low',
   },
 }
@@ -58,9 +58,9 @@ export function DuplicateWarning({
         exit={{ opacity: 0, height: 0 }}
         className="mb-6"
       >
-        <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15 flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-[rgb(var(--state-warning-fg))]/5 border border-amber-500/15 flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-amber-600 dark:text-amber-400">
+          <p className="text-sm text-[rgb(var(--state-warning-fg))]">
             Checking for existing student records...
           </p>
         </div>
@@ -83,8 +83,8 @@ export function DuplicateWarning({
         <div
           className={`rounded-xl border ${
             highConfidence.length > 0
-              ? 'bg-red-500/5 border-red-500/15'
-              : 'bg-amber-500/5 border-amber-500/15'
+              ? 'bg-[rgb(var(--state-danger-bg)/0.18)]0/5 border-[rgb(var(--state-danger-border))]/15'
+              : 'bg-[rgb(var(--state-warning-fg))]/5 border-amber-500/15'
           }`}
         >
           {/* Header */}
@@ -93,7 +93,7 @@ export function DuplicateWarning({
               <AlertTriangle
                 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
                   highConfidence.length > 0
-                    ? 'text-red-500'
+                    ? 'text-[rgb(var(--state-danger-fg))]'
                     : 'text-amber-500'
                 }`}
               />
@@ -101,8 +101,8 @@ export function DuplicateWarning({
                 <h4
                   className={`text-sm font-semibold ${
                     highConfidence.length > 0
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-amber-600 dark:text-amber-400'
+                      ? 'text-[rgb(var(--state-danger-fg))]'
+                      : 'text-[rgb(var(--state-warning-fg))]'
                   }`}
                 >
                   {highConfidence.length > 0
@@ -134,10 +134,10 @@ export function DuplicateWarning({
               return (
                 <div
                   key={match.studentId}
-                  className="flex items-center justify-between p-3 rounded-lg bg-[rgb(var(--surface-primary))]/60 border border-[rgb(var(--border-tertiary))]"
+                  className="flex items-center justify-between p-3 rounded-lg bg-[rgb(var(--background-primary))]/60 border border-[rgb(var(--border-tertiary))]"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-[rgb(var(--surface-tertiary))] flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[rgb(var(--background-tertiary))] flex items-center justify-center flex-shrink-0">
                       <User className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                     </div>
                     <div className="min-w-0">
@@ -159,7 +159,7 @@ export function DuplicateWarning({
 
                   <div className="flex items-center gap-2 flex-shrink-0 ml-3">
                     <span
-                      className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border ${style.badge}`}
+                      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium border ${style.badge}`}
                     >
                       {style.label}
                     </span>

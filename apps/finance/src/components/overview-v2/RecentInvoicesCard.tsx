@@ -65,14 +65,14 @@ export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardPr
         padding: 18,
       }}
     >
-      <h3 className="text-[13px] font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+      <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
         Recent invoices
       </h3>
 
       {isLoading ? (
         <FeedSkeleton />
       ) : top5.length === 0 ? (
-        <p className="text-[11px] py-4" style={{ color: 'var(--v2-text-hint)' }}>No invoices yet.</p>
+        <p className="text-xs py-4" style={{ color: 'var(--v2-text-hint)' }}>No invoices yet.</p>
       ) : (
         <div className="space-y-1">
           {top5.map((invoice) => {
@@ -85,35 +85,35 @@ export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardPr
               >
                 {/* Status bar */}
                 <div
-                  className="w-[3px] h-7 rounded-sm flex-shrink-0"
+                  className="w-1 h-7 rounded-sm flex-shrink-0"
                   style={{ background: statusColor }}
                 />
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
                       {invoice.invoiceNumber}
                     </span>
                     <span
-                      className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                      className="text-xs font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
                       style={{ background: `${statusColor}18`, color: statusColor }}
                     >
                       {formatInvoiceStatus(invoice.status)}
                     </span>
                   </div>
-                  <div className="text-[10px] truncate" style={{ color: 'var(--v2-text-faint)' }}>
+                  <div className="text-xs truncate" style={{ color: 'var(--v2-text-faint)' }}>
                     {invoice.studentName || 'Unknown'} · {formatRelativeDate(invoice.createdAt)}
                   </div>
                 </div>
 
                 {/* Amount */}
                 <div className="text-right flex-shrink-0">
-                  <div className="text-[11px] font-semibold" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <div className="text-xs font-semibold" style={{ color: 'var(--v2-text-secondary)' }}>
                     {format(invoice.grandTotal, { decimals: 0 })}
                   </div>
                   {invoice.amountDue > 0 && invoice.status !== 'paid' && (
-                    <div className="text-[9px]" style={{ color: '#E24B4A' }}>
+                    <div className="text-xs" style={{ color: '#E24B4A' }}>
                       {format(invoice.amountDue, { decimals: 0 })} due
                     </div>
                   )}

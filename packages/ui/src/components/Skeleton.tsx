@@ -17,7 +17,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-lg bg-slate-200 dark:bg-slate-700',
+        'animate-pulse rounded-lg bg-[rgb(var(--background-tertiary))]',
         className
       )}
     />
@@ -91,12 +91,12 @@ export function SkeletonCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden',
+        'rounded-2xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
       {hasHeader && (
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="px-6 py-4 border-b border-[rgb(var(--border-secondary))]">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <Skeleton className="h-5 w-32" />
@@ -110,7 +110,7 @@ export function SkeletonCard({
         <SkeletonText lines={lines} />
       </div>
       {hasFooter && (
-        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+        <div className="px-6 py-4 border-t border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
           <div className="flex items-center justify-between">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-8 w-20 rounded-lg" />
@@ -137,14 +137,14 @@ export function SkeletonTable({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden',
+        'rounded-2xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
       <div className="overflow-x-auto">
         <table className="w-full">
           {hasHeader && (
-            <thead className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+            <thead className="border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
               <tr>
                 {Array.from({ length: columns }).map((_, i) => (
                   <th key={i} className="px-6 py-3 text-left">
@@ -154,7 +154,7 @@ export function SkeletonTable({
               </tr>
             </thead>
           )}
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
             {Array.from({ length: rows }).map((_, rowIndex) => (
               <tr key={rowIndex}>
                 {Array.from({ length: columns }).map((_, colIndex) => (
@@ -200,7 +200,7 @@ export function SkeletonListItem({
   return (
     <div
       className={cn(
-        'flex items-center gap-4 px-4 py-3 border-b border-slate-100 dark:border-slate-800 last:border-0',
+        'flex items-center gap-4 px-4 py-3 border-b border-[rgb(var(--border-secondary))] last:border-0',
         className
       )}
     >
@@ -230,7 +230,7 @@ export function SkeletonList({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden',
+        'rounded-2xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
@@ -249,7 +249,7 @@ export function SkeletonStatsCard({ className }: SkeletonStatsCardProps) {
   return (
     <div
       className={cn(
-        'p-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900',
+        'p-6 rounded-2xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]',
         className
       )}
     >

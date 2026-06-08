@@ -18,7 +18,7 @@ export function DataTableSkeleton({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-secondary))]',
+        'overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-secondary))]',
         className
       )}
     >
@@ -28,7 +28,7 @@ export function DataTableSkeleton({
             {Array.from({ length: totalCols }).map((_, i) => (
               <th
                 key={i}
-                className="px-4 py-2.5 text-left bg-[rgb(var(--surface-tertiary))]"
+                className="px-4 py-2.5 text-left bg-[rgb(var(--background-tertiary))]"
               >
                 <div
                   className="h-2.5 bg-[rgb(var(--border-secondary))] rounded animate-pulse"
@@ -47,7 +47,7 @@ export function DataTableSkeleton({
               {Array.from({ length: columnCount }).map((_, colIndex) => (
                 <td key={colIndex} className="px-4 py-2.5">
                   <div
-                    className="h-3.5 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse"
+                    className="h-3.5 bg-[rgb(var(--background-tertiary))] rounded animate-pulse"
                     style={{
                       width:
                         colIndex === 0
@@ -62,7 +62,7 @@ export function DataTableSkeleton({
               {showActions && (
                 <td className="px-4 py-2.5">
                   <div className="flex justify-end gap-2">
-                    <div className="w-8 h-8 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
+                    <div className="w-8 h-8 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
                   </div>
                 </td>
               )}

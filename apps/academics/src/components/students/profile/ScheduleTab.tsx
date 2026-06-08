@@ -47,10 +47,10 @@ type Classroom = NonNullable<StudentProfileResponseDto['classrooms']>[number]
 // ============================================================================
 
 function getRateColor(rate: number) {
-  if (rate >= 95) return { text: 'text-emerald-600 dark:text-emerald-400', label: 'Excellent' }
-  if (rate >= 90) return { text: 'text-amber-600 dark:text-amber-400', label: 'Good' }
-  if (rate >= 85) return { text: 'text-orange-600 dark:text-orange-400', label: 'At Risk' }
-  return { text: 'text-red-600 dark:text-red-400', label: 'Critical' }
+  if (rate >= 95) return { text: 'text-[rgb(var(--state-success-fg))]', label: 'Excellent' }
+  if (rate >= 90) return { text: 'text-[rgb(var(--state-warning-fg))]', label: 'Good' }
+  if (rate >= 85) return { text: 'text-[rgb(var(--state-warning-fg))]', label: 'At Risk' }
+  return { text: 'text-[rgb(var(--state-danger-fg))]', label: 'Critical' }
 }
 
 // ============================================================================
@@ -77,24 +77,24 @@ function AttendanceSection({ summary }: { summary: AttendanceSummary }) {
         </div>
         {/* Stats */}
         <StatCard label="Total Days" value={summary.totalDays} />
-        <StatCard label="Present" value={summary.present} color="text-emerald-600 dark:text-emerald-400" />
-        <StatCard label="Absent" value={summary.absent} color="text-red-600 dark:text-red-400" />
-        <StatCard label="Late" value={summary.late} color="text-amber-600 dark:text-amber-400" />
-        <StatCard label="Excused" value={summary.excused} color="text-blue-600 dark:text-blue-400" />
+        <StatCard label="Present" value={summary.present} color="text-[rgb(var(--state-success-fg))]" />
+        <StatCard label="Absent" value={summary.absent} color="text-[rgb(var(--state-danger-fg))]" />
+        <StatCard label="Late" value={summary.late} color="text-[rgb(var(--state-warning-fg))]" />
+        <StatCard label="Excused" value={summary.excused} color="text-[rgb(var(--state-info-fg))]" />
       </div>
 
       {/* Alerts */}
       {summary.attendanceRate < 90 && (
-        <div className="mt-4 p-3 rounded-lg bg-amber-500/5 border border-amber-500/15">
-          <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
+        <div className="mt-4 p-3 rounded-lg bg-[rgb(var(--state-warning-fg))]/5 border border-amber-500/15">
+          <p className="text-sm text-[rgb(var(--state-warning-fg))] flex items-center gap-2">
             <TrendingDown className="w-4 h-4 flex-shrink-0" />
             Attendance below 90% may affect academic performance. Consider follow-up.
           </p>
         </div>
       )}
       {summary.attendanceRate >= 98 && (
-        <div className="mt-4 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
-          <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+        <div className="mt-4 p-3 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]0/5 border border-[rgb(var(--state-success-border))]/15">
+          <p className="text-sm text-[rgb(var(--state-success-fg))] flex items-center gap-2">
             <TrendingUp className="w-4 h-4 flex-shrink-0" />
             Outstanding attendance record!
           </p>
@@ -126,23 +126,23 @@ function StatCard({
 // ============================================================================
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
+  if (!subject) return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
-    return { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400' }
+    return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
   if (s.includes('english') || s.includes('language') || s.includes('literature'))
-    return { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400' }
+    return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
   if (s.includes('science') || s.includes('biology') || s.includes('chemistry') || s.includes('physics'))
-    return { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' }
+    return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)]', text: 'text-[rgb(var(--state-success-fg))]' }
   if (s.includes('history') || s.includes('social') || s.includes('geography'))
-    return { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400' }
+    return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('art') || s.includes('music') || s.includes('drama'))
-    return { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400' }
+    return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))] ' }
   if (s.includes('physical') || s.includes('pe') || s.includes('health'))
-    return { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400' }
+    return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
-    return { bg: 'bg-cyan-500/10', text: 'text-cyan-600 dark:text-cyan-400' }
-  return { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400' }
+    return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-[rgb(var(--state-info-fg))] ' }
+  return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================
@@ -184,7 +184,7 @@ function ScheduleTable({
     <section>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-indigo-500" />
+          <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
           Current Classes
           <span className="text-xs text-text-tertiary font-normal ml-1">
             ({classrooms.length})
@@ -240,7 +240,7 @@ function ScheduleTable({
                       type="button"
                       onClick={() => handleRemove(classroom)}
                       disabled={isRemoving}
-                      className="p-1.5 text-text-tertiary hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-1.5 text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50"
                       title="Remove from section"
                     >
                       {isRemoving ? (
@@ -341,7 +341,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
           <Link
             to="/classrooms"
             search={{ tab: 'attendance' }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 dark:text-teal-400 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
             Attendance History
@@ -350,7 +350,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
           <Link
             to="/classrooms"
             search={{ tab: 'gradebook' }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/10 dark:hover:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-lg transition-colors"
           >
             <GraduationCap className="w-3.5 h-3.5" />
             View Grades
@@ -370,7 +370,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
       ) : (
         <section>
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
-            <BookOpen className="w-4 h-4 text-indigo-500" />
+            <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
             Current Classes
           </h3>
           <div className="text-center py-8">

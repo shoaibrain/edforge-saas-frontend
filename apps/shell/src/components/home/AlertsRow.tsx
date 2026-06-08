@@ -151,7 +151,7 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                       {alert.title}
                     </p>
                     <p
-                      className="text-[11px] mt-0.5 truncate"
+                      className="text-xs mt-0.5 truncate"
                       style={{ color: 'var(--v2-text-faint)' }}
                     >
                       {alert.description}
@@ -161,7 +161,7 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                   {/* CTA button */}
                   <Link
                     to={alert.href as any}
-                    className="text-[11px] font-medium px-2.5 py-1 rounded-md border whitespace-nowrap flex-shrink-0 transition-opacity hover:opacity-80"
+                    className="text-xs font-medium px-2.5 py-1 rounded-md border whitespace-nowrap flex-shrink-0 transition-opacity hover:opacity-80"
                     style={{
                       color: config.ctaColor,
                       borderColor: config.ctaBorder,

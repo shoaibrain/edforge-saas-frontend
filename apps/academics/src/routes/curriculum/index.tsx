@@ -302,7 +302,7 @@ export function CurriculumModule() {
 
           {/* Title */}
           <h1
-            className="text-[18px] font-semibold"
+            className="text-lg font-semibold"
             style={{ color: 'var(--v2-text-primary, var(--text-primary, #e8eaf0))', letterSpacing: -0.3 }}
           >
             Curriculum
@@ -311,7 +311,7 @@ export function CurriculumModule() {
           {/* Separator + Date */}
           <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13 }}>|</span>
           <span
-            className="text-[13px]"
+            className="text-sm"
             style={{ color: 'var(--v2-text-faint, var(--text-muted, #4a5068))' }}
           >
             {today}
@@ -346,7 +346,7 @@ export function CurriculumModule() {
 
       {/* ---- Context Banner ---- */}
       <p
-        className="text-[12px]"
+        className="text-xs"
         style={{
           color: 'var(--v2-text-faint, var(--text-muted, #4a5068))',
           marginBottom: 14,

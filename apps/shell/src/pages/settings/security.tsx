@@ -60,14 +60,14 @@ function PasswordRequirements({ password }: { password: string }) {
         return (
           <div key={req.label} className="flex items-center gap-2 text-xs">
             {met ? (
-              <Check className="w-3.5 h-3.5 text-emerald-500" />
+              <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
             ) : (
               <X className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
             )}
             <span
               className={
                 met
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-[rgb(var(--state-success-fg))] '
                   : 'text-[rgb(var(--text-tertiary))]'
               }
             >
@@ -94,10 +94,10 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
     if (/[0-9]/.test(pwd)) score++
     if (/[^A-Za-z0-9]/.test(pwd)) score++
 
-    if (score <= 2) return { score: 1, label: 'Weak', color: 'bg-red-500' }
+    if (score <= 2) return { score: 1, label: 'Weak', color: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' }
     if (score <= 4) return { score: 2, label: 'Fair', color: 'bg-amber-500' }
-    if (score <= 5) return { score: 3, label: 'Good', color: 'bg-emerald-500' }
-    return { score: 4, label: 'Strong', color: 'bg-teal-500' }
+    if (score <= 5) return { score: 3, label: 'Good', color: 'bg-[rgb(var(--state-success-fg))]' }
+    return { score: 4, label: 'Strong', color: 'bg-[rgb(var(--action-primary-bg))]' }
   }
 
   const strength = getStrength(password)
@@ -111,14 +111,14 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
           <div
             key={level}
             className={`h-1 flex-1 rounded-full transition-colors ${
-              level <= strength.score ? strength.color : 'bg-[rgb(var(--surface-tertiary))]'
+              level <= strength.score ? strength.color : 'bg-[rgb(var(--background-tertiary))]'
             }`}
           />
         ))}
       </div>
       <p
         className={`text-xs ${
-          strength.score <= 1 ? 'text-red-500' : strength.score <= 2 ? 'text-amber-500' : 'text-emerald-500'
+          strength.score <= 1 ? 'text-[rgb(var(--state-danger-fg))]' : strength.score <= 2 ? 'text-amber-500' : 'text-[rgb(var(--state-success-fg))]'
         }`}
       >
         {strength.label}
@@ -245,10 +245,10 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-2.5 p-3 mb-5 rounded-xl bg-red-500/10 border border-red-500/20"
+          className="flex items-start gap-2.5 p-3 mb-5 rounded-xl bg-[rgb(var(--state-danger-bg)/0.18)]0/10 border border-[rgb(var(--state-danger-border)/0.35)]"
         >
-          <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-red-600 dark:text-red-400">{formError}</span>
+          <AlertCircle className="w-4 h-4 text-[rgb(var(--state-danger-fg))] mt-0.5 flex-shrink-0" />
+          <span className="text-sm text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">{formError}</span>
         </motion.div>
       )}
 
@@ -323,7 +323,7 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
 type StatusTone = 'good' | 'warn' | 'neutral'
 
 const STATUS_DOT: Record<StatusTone, string> = {
-  good: 'bg-emerald-500',
+  good: 'bg-[rgb(var(--state-success-fg))]',
   warn: 'bg-amber-500',
   neutral: 'bg-[rgb(var(--text-tertiary))]',
 }
@@ -367,7 +367,7 @@ function SecurityOverviewCard({
     return (
       <motion.div
         variants={fadeInUp}
-        className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+        className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -394,7 +394,7 @@ function SecurityOverviewCard({
   return (
     <motion.div
       variants={fadeInUp}
-      className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] space-y-4"
+      className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] space-y-4"
     >
       <div>
         <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Security Overview</h2>
@@ -467,7 +467,7 @@ function SecurityTabs({
               onClick={() => onChange(tab.id)}
               className={`relative py-3 px-1 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'text-teal-600 dark:text-cyan-400'
+                  ? 'text-[rgb(var(--action-secondary-fg))] '
                   : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
               }`}
             >
@@ -475,7 +475,7 @@ function SecurityTabs({
               {isActive && (
                 <motion.div
                   layoutId="security-tab-underline"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))]"
                 />
               )}
             </button>

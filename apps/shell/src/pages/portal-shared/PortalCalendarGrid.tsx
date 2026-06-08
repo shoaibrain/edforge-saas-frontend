@@ -2,7 +2,6 @@
  * PortalCalendarGrid — Monthly square calendar grid mimicking "April 2026 at a glance"
  */
 
-import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { HeatmapDay } from '@edforge/ui'
 

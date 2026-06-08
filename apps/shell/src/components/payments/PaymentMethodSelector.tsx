@@ -89,10 +89,10 @@ export function PaymentMethodSelector({
                 className={`
                   relative flex items-start gap-3 p-4 rounded-xl border-2
                   text-left transition-all duration-150
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--border-focus))] focus-visible:ring-offset-2
                   ${
                     isSelected
-                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-500/10 shadow-sm'
+                      ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  shadow-sm'
                       : 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--bg-tertiary))]'
                   }
                 `}
@@ -100,7 +100,7 @@ export function PaymentMethodSelector({
                 <div
                   className={`p-2 rounded-lg ${
                     isSelected
-                      ? 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400'
+                      ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  '
                       : 'bg-[rgb(var(--bg-tertiary))] text-[rgb(var(--text-secondary))]'
                   }`}
                 >
@@ -115,14 +115,14 @@ export function PaymentMethodSelector({
                     {t(`gateway.${i18nKey}Description`)}
                   </p>
                   {gw.isTestMode && (
-                    <span className="inline-flex items-center mt-1.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
+                    <span className="inline-flex items-center mt-1.5 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
                       {t('gateway.testMode')}
                     </span>
                   )}
                 </div>
 
                 {isSelected && (
-                  <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]  shrink-0 mt-0.5" />
                 )}
               </button>
             )

@@ -76,7 +76,7 @@ export function FormSection({
     className: cn(
       variant === 'card' && [
         'p-6 rounded-2xl',
-        'bg-[rgb(var(--surface-secondary))]',
+        'bg-[rgb(var(--background-secondary))]',
         'border border-[rgb(var(--border-primary))]',
       ],
       'scroll-mt-24',

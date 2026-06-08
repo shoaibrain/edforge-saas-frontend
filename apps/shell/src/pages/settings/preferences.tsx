@@ -96,20 +96,20 @@ function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
             className={`
               relative p-4 rounded-xl border-2 transition-all text-left
               ${isSelected 
-                ? 'border-teal-500 bg-teal-500/5' 
-                : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))]/5' 
+                : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }
             `}
           >
             <div className="flex items-center gap-3">
               <div className={`
                 p-2 rounded-lg 
-                ${isSelected ? 'bg-teal-500/10' : 'bg-[rgb(var(--surface-tertiary))]'}
+                ${isSelected ? 'bg-[rgb(var(--action-primary-bg))]/10' : 'bg-[rgb(var(--background-tertiary))]'}
               `}>
-                <Icon className={`w-4 h-4 ${isSelected ? 'text-teal-600 dark:text-cyan-400' : 'text-[rgb(var(--text-tertiary))]'}`} />
+                <Icon className={`w-4 h-4 ${isSelected ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
               </div>
               <div>
-                <p className={`text-sm font-medium ${isSelected ? 'text-teal-600 dark:text-cyan-400' : 'text-[rgb(var(--text-primary))]'}`}>
+                <p className={`text-sm font-medium ${isSelected ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-primary))]'}`}>
                   {option.label}
                 </p>
               </div>
@@ -127,8 +127,8 @@ function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
                   exit={{ scale: 0, opacity: 0 }}
                   className="absolute top-2 right-2"
                 >
-                  <div className="p-0.5 rounded-full bg-teal-500">
-                    <Check className="w-3 h-3 text-white" />
+                  <div className="p-0.5 rounded-full bg-[rgb(var(--action-primary-bg))]">
+                    <Check className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />
                   </div>
                 </motion.div>
               )}
@@ -159,7 +159,7 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
 
   if (schools.length === 1) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))]">
+      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))]">
         <School className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         <span className="text-sm text-[rgb(var(--text-primary))]">{schools[0].name}</span>
       </div>
@@ -170,7 +170,7 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
     <select
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
-      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 min-w-[200px]"
+      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))] min-w-52"
     >
       <option value="">Select default school</option>
       {schools.map((school) => (
@@ -392,8 +392,8 @@ export default function PreferencesPage() {
           icon={Bell}
           description="Choose which notifications you'd like to receive"
         >
-          <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-teal-500/5 border border-teal-500/10">
-            <Bell className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+          <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-[rgb(var(--action-primary-bg))]/5 border border-[rgb(var(--border-focus))]/10">
+            <Bell className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]  flex-shrink-0" />
             <p className="text-sm text-[rgb(var(--text-secondary))]">
               Notification preferences are coming soon. We'll let you know when this is ready!
             </p>

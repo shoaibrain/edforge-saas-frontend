@@ -39,8 +39,8 @@ export function FormSection({
       {hasHeader && (
         <div className="flex items-start gap-3 mb-6">
           {Icon && (
-            <div className="p-2.5 rounded-xl bg-teal-500/10 dark:bg-cyan-500/15">
-              <Icon className="w-5 h-5 text-teal-600 dark:text-cyan-400" />
+            <div className="p-2.5 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)] ">
+              <Icon className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
           )}
           <div>
@@ -85,7 +85,7 @@ export function FormSection({
       transition={{ duration: 0.3 }}
       className={cn(
         'p-6 rounded-2xl',
-        'bg-[rgb(var(--surface-secondary))]',
+        'bg-[rgb(var(--background-secondary))]',
         'border border-[rgb(var(--border-primary))]',
         'scroll-mt-24',
         className

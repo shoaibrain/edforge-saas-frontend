@@ -107,31 +107,103 @@ export default {
         },
         // Semantic colors using CSS vars
         surface: {
-          primary: 'rgb(var(--surface-primary) / <alpha-value>)',
-          secondary: 'rgb(var(--surface-secondary) / <alpha-value>)',
-          tertiary: 'rgb(var(--surface-tertiary) / <alpha-value>)',
-          elevated: 'rgb(var(--surface-elevated) / <alpha-value>)',
+          primary: 'rgb(var(--background-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--background-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--background-tertiary) / <alpha-value>)',
+          elevated: 'rgb(var(--background-elevated) / <alpha-value>)',
+        },
+        background: {
+          primary: 'rgb(var(--background-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--background-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--background-tertiary) / <alpha-value>)',
+          elevated: 'rgb(var(--background-elevated) / <alpha-value>)',
+          overlay: 'rgb(var(--background-overlay) / <alpha-value>)',
+          inverse: 'rgb(var(--background-inverse) / <alpha-value>)',
         },
         text: {
           primary: 'rgb(var(--text-primary) / <alpha-value>)',
           secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
           tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
           inverted: 'rgb(var(--text-inverted) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          disabled: 'rgb(var(--text-disabled) / <alpha-value>)',
+          onAccent: 'rgb(var(--text-on-accent) / <alpha-value>)',
         },
         border: {
           primary: 'rgb(var(--border-primary) / <alpha-value>)',
           secondary: 'rgb(var(--border-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--border-tertiary) / <alpha-value>)',
+          subtle: 'rgb(var(--border-subtle) / <alpha-value>)',
+          DEFAULT: 'rgb(var(--border-default) / <alpha-value>)',
+          strong: 'rgb(var(--border-strong) / <alpha-value>)',
+          focus: 'rgb(var(--border-focus) / <alpha-value>)',
         },
         brand: {
-          primary: 'rgb(var(--brand-primary) / <alpha-value>)',
-          secondary: 'rgb(var(--brand-secondary) / <alpha-value>)',
-          accent: 'rgb(var(--brand-accent) / <alpha-value>)',
+          primary: 'rgb(var(--action-primary-bg) / <alpha-value>)',
+          secondary: 'rgb(var(--state-info-fg) / <alpha-value>)',
+          accent: 'rgb(var(--state-warning-fg) / <alpha-value>)',
+        },
+        action: {
+          primary: {
+            DEFAULT: 'rgb(var(--action-primary-bg) / <alpha-value>)',
+            hover: 'rgb(var(--action-primary-bg-hover) / <alpha-value>)',
+            active: 'rgb(var(--action-primary-bg-active) / <alpha-value>)',
+            fg: 'rgb(var(--action-primary-fg) / <alpha-value>)',
+          },
+          secondary: {
+            DEFAULT: 'rgb(var(--action-secondary-bg) / <alpha-value>)',
+            fg: 'rgb(var(--action-secondary-fg) / <alpha-value>)',
+          },
+          danger: {
+            DEFAULT: 'rgb(var(--action-danger-bg) / <alpha-value>)',
+            fg: 'rgb(var(--action-danger-fg) / <alpha-value>)',
+          },
+        },
+        state: {
+          success: {
+            bg: 'rgb(var(--state-success-bg) / <alpha-value>)',
+            fg: 'rgb(var(--state-success-fg) / <alpha-value>)',
+            border: 'rgb(var(--state-success-border) / <alpha-value>)',
+          },
+          warning: {
+            bg: 'rgb(var(--state-warning-bg) / <alpha-value>)',
+            fg: 'rgb(var(--state-warning-fg) / <alpha-value>)',
+            border: 'rgb(var(--state-warning-border) / <alpha-value>)',
+          },
+          danger: {
+            bg: 'rgb(var(--state-danger-bg) / <alpha-value>)',
+            fg: 'rgb(var(--state-danger-fg) / <alpha-value>)',
+            border: 'rgb(var(--state-danger-border) / <alpha-value>)',
+          },
+          info: {
+            bg: 'rgb(var(--state-info-bg) / <alpha-value>)',
+            fg: 'rgb(var(--state-info-fg) / <alpha-value>)',
+            border: 'rgb(var(--state-info-border) / <alpha-value>)',
+          },
         },
       },
       animation: {
         'fade-in': 'fade-in 0.2s ease-out',
         'slide-up': 'slide-up 0.3s ease-out',
         'slide-in-right': 'slide-in-right 0.3s ease-out',
+      },
+      boxShadow: {
+        flat: 'var(--elevation-flat)',
+        raised: 'var(--elevation-raised)',
+        overlay: 'var(--elevation-overlay)',
+        modal: 'var(--elevation-modal)',
+        popover: 'var(--elevation-popover)',
+      },
+      transitionDuration: {
+        instant: 'var(--motion-duration-instant)',
+        fast: 'var(--motion-duration-fast)',
+        base: 'var(--motion-duration-base)',
+        slow: 'var(--motion-duration-slow)',
+      },
+      transitionTimingFunction: {
+        standard: 'var(--motion-easing-standard)',
+        enter: 'var(--motion-easing-enter)',
+        exit: 'var(--motion-easing-exit)',
       },
       keyframes: {
         'fade-in': {

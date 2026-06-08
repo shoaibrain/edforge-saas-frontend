@@ -67,7 +67,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Academic Year</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
         Set up the academic year for {data.schoolName || 'your school'}.
@@ -76,13 +76,13 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
       {/* Year Name */}
       <div className="mb-5">
         <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-          Year Name <span className="text-red-400">*</span>
+          Year Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
         </label>
         <input
           type="text"
           value={yearName}
           onChange={(e) => { setYearName(e.target.value); setError(null) }}
-          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           placeholder={isBs ? 'e.g. 2082' : 'e.g. 2025-2026'}
         />
       </div>
@@ -97,7 +97,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           />
         </div>
         <div>
@@ -108,7 +108,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           />
         </div>
       </div>
@@ -125,8 +125,8 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
               onClick={() => setTermStructure(ts.value)}
               className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
                 termStructure === ts.value
-                  ? 'bg-teal-500/15 border-teal-500/40 text-teal-600 dark:text-cyan-400'
-                  : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                  ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--action-secondary-fg))] '
+                  : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }`}
             >
               {ts.label}
@@ -136,7 +136,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 mb-4">{error}</p>
+        <p className="text-xs text-[rgb(var(--state-danger-fg))] mb-4">{error}</p>
       )}
 
       {showSkipWarning && (
@@ -168,7 +168,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
         <button
           onClick={handleCreate}
           disabled={saving || !yearName.trim()}
-          className="px-6 py-2.5 rounded-full bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
+          className="px-6 py-2.5 rounded-full bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))]  dark: text-[rgb(var(--action-primary-fg))] font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
         >
           {saving ? 'Creating...' : 'Create Year'}
         </button>

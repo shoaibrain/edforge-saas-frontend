@@ -51,10 +51,10 @@ function SaveStatusIndicator({
   if (status === 'idle' && isOnline) return null
 
   const config = {
-    saved: { icon: Check, text: 'Saved', className: 'text-emerald-600 dark:text-emerald-400' },
-    saving: { icon: Loader2, text: 'Saving...', className: 'text-amber-600 dark:text-amber-400' },
-    offline: { icon: WifiOff, text: 'Offline — changes saved locally', className: 'text-red-600 dark:text-red-400' },
-    error: { icon: CloudOff, text: 'Save failed — will retry', className: 'text-red-600 dark:text-red-400' },
+    saved: { icon: Check, text: 'Saved', className: 'text-[rgb(var(--state-success-fg))]' },
+    saving: { icon: Loader2, text: 'Saving...', className: 'text-[rgb(var(--state-warning-fg))]' },
+    offline: { icon: WifiOff, text: 'Offline — changes saved locally', className: 'text-[rgb(var(--state-danger-fg))]' },
+    error: { icon: CloudOff, text: 'Save failed — will retry', className: 'text-[rgb(var(--state-danger-fg))]' },
     idle: { icon: Wifi, text: '', className: 'text-text-tertiary' },
   }
 
@@ -75,11 +75,11 @@ function SaveStatusIndicator({
 
 function CalendarBanner({ description, eventType }: { description: string; eventType: string }) {
   return (
-    <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+    <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 border border-amber-200 dark:border-amber-500/20">
       <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
       <div>
         <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Non-Instructional Day</p>
-        <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+        <p className="text-xs text-[rgb(var(--state-warning-fg))] mt-0.5">
           {description || `This is a ${eventType} day.`} Attendance cannot be submitted for this date.
         </p>
       </div>

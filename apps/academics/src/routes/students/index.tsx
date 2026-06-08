@@ -97,7 +97,7 @@ function StudentsInsightStrip({
     : undefined
 
   return (
-    <p className="text-[11px] leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+    <p className="text-xs leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
       {totalEnrolled} student{totalEnrolled !== 1 ? 's' : ''} enrolled across {gradeCount} grade{gradeCount !== 1 ? 's' : ''}
       {' · '}
       {attendanceRate != null ? (
@@ -223,20 +223,20 @@ function EmptyFilterState({ onClear }: { onClear: () => void }) {
         style={{ color: 'var(--v2-text-hint)', opacity: 0.5 }}
       />
       <p
-        className="text-[14px] font-medium mb-1"
+        className="text-sm font-medium mb-1"
         style={{ color: 'var(--v2-text-primary)' }}
       >
         No students found
       </p>
       <p
-        className="text-[12px] mb-4"
+        className="text-xs mb-4"
         style={{ color: 'var(--v2-text-muted)' }}
       >
         Try adjusting your filters or search term
       </p>
       <button
         onClick={onClear}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80"
         style={{
           background: 'var(--v2-bg-elevated)',
           borderColor: 'var(--v2-border-default)',
@@ -257,8 +257,8 @@ function NoSchoolGuard() {
   return (
     <div className="max-w-6xl mx-auto pt-16 pb-12">
       <Card className="p-8 border-border-secondary max-w-lg mx-auto text-center">
-        <div className="inline-flex p-3 rounded-2xl bg-teal-500/10 mb-4">
-          <School className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
+        <div className="inline-flex p-3 rounded-2xl bg-[rgb(var(--state-info-bg)/0.18)] mb-4">
+          <School className="w-7 h-7 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <h2 className="text-lg font-bold text-text-primary">Select a school</h2>
         <p className="text-sm text-text-secondary mt-1.5">
@@ -271,7 +271,7 @@ function NoSchoolGuard() {
 
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="min-h-[400px] flex items-center justify-center">
+    <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
         <div
           className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
@@ -439,13 +439,13 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <Users className="w-4 h-4" style={{ color: '#1D9E75' }} />
               </div>
               <h1
-                className="text-[14px] font-semibold"
+                className="text-sm font-semibold"
                 style={{ color: 'var(--v2-text-primary)' }}
               >
                 Students
               </h1>
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-              <span className="text-[11px]" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+              <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
@@ -456,7 +456,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={() => setShowImport(true)}
                   aria-label="Import students"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                   style={{
                     background: 'var(--v2-bg-elevated)',
                     borderColor: 'var(--v2-border-default)',
@@ -477,7 +477,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={() => navigate({ to: '/students/import/iemis' })}
                   aria-label="Import from IEMIS"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                   style={{
                     background: 'var(--v2-bg-elevated)',
                     borderColor: 'var(--v2-border-default)',
@@ -496,7 +496,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={() => navigate({ to: '/reports/government' })}
                   aria-label="Government reports"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                   style={{
                     background: 'var(--v2-bg-elevated)',
                     borderColor: 'var(--v2-border-default)',
@@ -509,7 +509,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={handleAddStudent}
                   aria-label="Enroll student"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
                   style={{
                     background: 'var(--v2-brand-primary)',
                     color: '#fff',
@@ -684,7 +684,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         cancelText="Cancel"
         variant="destructive"
         isLoading={deleteStudentMutation.isPending}
-        icon={<UserMinus className="w-5 h-5 text-red-600 dark:text-red-400" />}
+        icon={<UserMinus className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />}
       />
 
       {/* CSV Import Modal */}

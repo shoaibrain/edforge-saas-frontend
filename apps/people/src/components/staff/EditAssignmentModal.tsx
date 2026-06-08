@@ -108,7 +108,7 @@ export function EditAssignmentModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   if (!assignment) return null
@@ -154,7 +154,7 @@ export function EditAssignmentModal({
               ))}
             </select>
             {errors.role && (
-              <p className="mt-1 text-sm text-red-500">{errors.role.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.role.message}</p>
             )}
           </div>
           <div>
@@ -232,7 +232,7 @@ export function EditAssignmentModal({
             id="edit-assign-isPrimary"
             type="checkbox"
             {...register('isPrimary')}
-            className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-2 focus:ring-accent-primary/20"
+            className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-2 focus:ring-accent-primary/20"
             disabled={isSubmitting}
           />
           <label htmlFor="edit-assign-isPrimary" className="text-sm text-text-primary">
@@ -252,7 +252,7 @@ export function EditAssignmentModal({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[140px]"
+            className="min-w-36"
           >
             {isSubmitting ? (
               <>

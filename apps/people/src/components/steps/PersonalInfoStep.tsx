@@ -54,7 +54,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
                 : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]">
@@ -131,7 +131,7 @@ const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
                 : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] z-10">
@@ -242,9 +242,9 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
         className={cn(
           'relative flex flex-col items-center justify-center',
           'w-32 h-32 rounded-2xl border-2 border-dashed',
-          'bg-[rgb(var(--surface-tertiary))]',
+          'bg-[rgb(var(--background-tertiary))]',
           'transition-colors cursor-pointer',
-          dragOver && 'bg-teal-500/10 dark:bg-cyan-500/10'
+          dragOver && 'bg-[rgb(var(--state-info-bg)/0.18)]'
         )}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -269,14 +269,14 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
                 e.stopPropagation()
                 onChange(undefined)
               }}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rust-500 text-white flex items-center justify-center shadow-md hover:bg-rust-600 transition-colors"
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] flex items-center justify-center shadow-md hover:brightness-95 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </>
         ) : (
           <div className="flex flex-col items-center gap-2 text-[rgb(var(--text-tertiary))]">
-            <div className="w-12 h-12 rounded-full bg-[rgb(var(--surface-secondary))] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-[rgb(var(--background-secondary))] flex items-center justify-center">
               <Camera className="w-6 h-6" />
             </div>
             <span className="text-xs text-center">

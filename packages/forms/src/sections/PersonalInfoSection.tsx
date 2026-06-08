@@ -65,7 +65,7 @@ export function PersonalInfoSection({
         <div className="mb-6">
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-[rgb(var(--surface-tertiary))] border-2 border-dashed border-[rgb(var(--border-primary))] flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-[rgb(var(--background-tertiary))] border-2 border-dashed border-[rgb(var(--border-primary))] flex items-center justify-center">
                 <Camera className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
               </div>
             </div>

@@ -60,7 +60,7 @@ function MeetingRow({ meeting, index }: MeetingRowProps) {
       transition={{ delay: index * 0.03 }}
       className={`
         group flex items-center gap-4 p-4 rounded-xl
-        bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]
+        bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]
         hover:border-[rgb(var(--border-tertiary))] hover:shadow-md
         transition-all duration-200
         ${isInProgress ? 'ring-2 ring-aqua-500/20 dark:ring-aqua-400/20' : ''}
@@ -89,7 +89,7 @@ function MeetingRow({ meeting, index }: MeetingRowProps) {
           {/* Date/Time */}
           <span className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            <span className={isToday ? 'font-medium text-teal-600 dark:text-cyan-400' : ''}>
+            <span className={isToday ? 'font-medium text-[rgb(var(--action-secondary-fg))]' : ''}>
               {relativeDate}
             </span>
             <span className="text-[rgb(var(--text-tertiary))]">
@@ -120,8 +120,8 @@ function MeetingRow({ meeting, index }: MeetingRowProps) {
               flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm
               transition-colors
               ${isInProgress
-                ? 'bg-aqua-500 hover:bg-aqua-600 text-white'
-                : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))]'
+                ? 'bg-aqua-500 hover:bg-aqua-600 text-[rgb(var(--action-primary-fg))]'
+                : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
               }
             `}
           >
@@ -139,7 +139,7 @@ function MeetingRow({ meeting, index }: MeetingRowProps) {
           </button>
         )}
         
-        <button className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors opacity-0 group-hover:opacity-100">
+        <button className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors opacity-0 group-hover:opacity-100">
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
@@ -154,7 +154,7 @@ function MeetingRow({ meeting, index }: MeetingRowProps) {
 function EmptyState() {
   return (
     <div className="py-12 text-center">
-      <div className="w-16 h-16 mx-auto rounded-2xl bg-[rgb(var(--surface-tertiary))] flex items-center justify-center mb-4">
+      <div className="w-16 h-16 mx-auto rounded-2xl bg-[rgb(var(--background-tertiary))] flex items-center justify-center mb-4">
         <Calendar className="w-8 h-8 text-[rgb(var(--text-tertiary))]" />
       </div>
       <h3 className="font-medium text-[rgb(var(--text-primary))] mb-1">
@@ -210,13 +210,13 @@ export function ScheduledMeetingsList({
             <h2 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
               Scheduled Meetings
             </h2>
-            <span className="px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-xs text-[rgb(var(--text-tertiary))]">
+            <span className="px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-xs text-[rgb(var(--text-tertiary))]">
               {sortedMeetings.length}
             </span>
           </div>
           
           {maxItems && sortedMeetings.length > maxItems && (
-            <button className="flex items-center gap-1 text-xs font-medium text-teal-600 dark:text-cyan-400 hover:underline">
+            <button className="flex items-center gap-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:underline">
               View all
               <ChevronRight className="w-3 h-3" />
             </button>
@@ -254,7 +254,7 @@ export function MeetingRowCompact({ meeting }: MeetingRowCompactProps) {
   }
   
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-colors group">
+    <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-[rgb(var(--background-tertiary))] transition-colors group">
       <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${platform.bgColor}`}>
         <PlatformLogo platformId={meeting.platformId} size={20} />
       </div>
@@ -264,7 +264,7 @@ export function MeetingRowCompact({ meeting }: MeetingRowCompactProps) {
           {meeting.title}
         </p>
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          <span className={isToday ? 'text-teal-600 dark:text-cyan-400' : ''}>
+          <span className={isToday ? 'text-[rgb(var(--action-secondary-fg))]' : ''}>
             {relativeDate}
           </span>
           {' · '}{meeting.startTime}
@@ -274,7 +274,7 @@ export function MeetingRowCompact({ meeting }: MeetingRowCompactProps) {
       {meeting.meetingUrl && (
         <button
           onClick={handleJoin}
-          className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-teal-600 dark:hover:text-cyan-400 hover:bg-teal-500/10 dark:hover:bg-cyan-500/10 transition-colors opacity-0 group-hover:opacity-100"
+          className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--action-secondary-fg))] dark:hover:text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] transition-colors opacity-0 group-hover:opacity-100"
         >
           <ExternalLink className="w-4 h-4" />
         </button>

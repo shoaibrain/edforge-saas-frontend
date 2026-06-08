@@ -218,7 +218,7 @@ export function DescriptorMapper() {
                 flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-200
                 ${
                   selectedCategory.id === category.id
-                    ? 'bg-teal-500/10 text-teal-600 dark:text-cyan-400 border-2 border-teal-500'
+                    ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] border-2 border-[rgb(var(--border-focus))]'
                     : 'bg-surface-tertiary text-text-secondary border-2 border-transparent hover:border-border-primary'
                 }
               `}
@@ -262,7 +262,7 @@ export function DescriptorMapper() {
             <div className="w-64">
               <div className="h-2 bg-surface-tertiary rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-teal-500 to-cyan-500"
+                  className="h-full bg-gradient-to-r from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))]"
                   initial={{ width: 0 }}
                   animate={{ width: `${(stats.mapped / stats.total) * 100}%` }}
                   transition={{ duration: 0.5 }}
@@ -311,7 +311,7 @@ export function DescriptorMapper() {
           <CardHeader>
             <h3 className="font-semibold text-text-primary">Local Codes</h3>
           </CardHeader>
-          <CardContent className="p-0 max-h-[500px] overflow-y-auto">
+          <CardContent className="p-0 max-h-128 overflow-y-auto">
             <div className="divide-y divide-border-primary">
               {filteredCodes.map((code) => (
                 <LocalCodeRow
@@ -339,7 +339,7 @@ export function DescriptorMapper() {
           <CardHeader>
             <h3 className="font-semibold text-text-primary">Ed-Fi Descriptors</h3>
           </CardHeader>
-          <CardContent className="p-0 max-h-[500px] overflow-y-auto">
+          <CardContent className="p-0 max-h-128 overflow-y-auto">
             <div className="divide-y divide-border-primary">
               {selectedCategory.edfiDescriptors.map((descriptor) => {
                 const usedBy = selectedCategory.localCodes.filter(
@@ -354,7 +354,7 @@ export function DescriptorMapper() {
                       <div>
                         <p className="font-medium text-text-primary">{descriptor.shortDescription}</p>
                         <p className="text-sm text-text-tertiary">{descriptor.description}</p>
-                        <code className="text-xs text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded mt-1 inline-block">
+                        <code className="text-xs text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)] px-2 py-0.5 rounded mt-1 inline-block">
                           {descriptor.codeValue}
                         </code>
                       </div>
@@ -507,7 +507,7 @@ function LocalCodeRow({
                         }}
                         className={`
                           w-full px-4 py-3 text-left hover:bg-surface-tertiary transition-colors
-                          ${mappedTo?.uri === descriptor.uri ? 'bg-teal-500/10' : ''}
+                          ${mappedTo?.uri === descriptor.uri ? 'bg-[rgb(var(--state-info-bg)/0.18)]' : ''}
                         `}
                       >
                         <p className="font-medium text-text-primary">

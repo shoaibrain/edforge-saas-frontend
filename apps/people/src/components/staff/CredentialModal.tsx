@@ -176,7 +176,7 @@ export function CredentialModal({
     placeholder:text-text-tertiary
     focus:outline-none focus:ring-2 focus:ring-accent-primary/20
     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-red-500' : 'border-border-secondary'}
+    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
   `
 
   return (
@@ -192,7 +192,7 @@ export function CredentialModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="cred-name" className="block text-sm font-medium text-text-primary mb-1.5">
-              Name <span className="text-red-500">*</span>
+              Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="cred-name"
@@ -207,12 +207,12 @@ export function CredentialModal({
               disabled={isSubmitting}
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.name.message}</p>
             )}
           </div>
           <div>
             <label htmlFor="cred-identifier" className="block text-sm font-medium text-text-primary mb-1.5">
-              Credential ID <span className="text-red-500">*</span>
+              Credential ID <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="cred-identifier"
@@ -223,7 +223,7 @@ export function CredentialModal({
               disabled={isSubmitting || isEditing}
             />
             {errors.credentialIdentifier && (
-              <p className="mt-1 text-sm text-red-500">{errors.credentialIdentifier.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.credentialIdentifier.message}</p>
             )}
           </div>
         </div>
@@ -232,7 +232,7 @@ export function CredentialModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="cred-type" className="block text-sm font-medium text-text-primary mb-1.5">
-              Type <span className="text-red-500">*</span>
+              Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <select
               id="cred-type"
@@ -267,7 +267,7 @@ export function CredentialModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="cred-org" className="block text-sm font-medium text-text-primary mb-1.5">
-              Issuing Organization <span className="text-red-500">*</span>
+              Issuing Organization <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="cred-org"
@@ -278,7 +278,7 @@ export function CredentialModal({
               disabled={isSubmitting}
             />
             {errors.issuingOrganization && (
-              <p className="mt-1 text-sm text-red-500">{errors.issuingOrganization.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.issuingOrganization.message}</p>
             )}
           </div>
           <div>
@@ -300,7 +300,7 @@ export function CredentialModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="cred-issuance" className="block text-sm font-medium text-text-primary mb-1.5">
-              Issuance Date <span className="text-red-500">*</span>
+              Issuance Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               id="cred-issuance"
@@ -310,7 +310,7 @@ export function CredentialModal({
               disabled={isSubmitting}
             />
             {errors.issuanceDate && (
-              <p className="mt-1 text-sm text-red-500">{errors.issuanceDate.message}</p>
+              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.issuanceDate.message}</p>
             )}
           </div>
           <div>
@@ -364,7 +364,7 @@ export function CredentialModal({
               id="cred-renewable"
               type="checkbox"
               {...register('isRenewable')}
-              className="w-4 h-4 rounded border-border-secondary text-teal-500 focus:ring-2 focus:ring-accent-primary/20"
+              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-2 focus:ring-accent-primary/20"
               disabled={isSubmitting}
             />
             <label htmlFor="cred-renewable" className="text-sm text-text-primary">
@@ -399,7 +399,7 @@ export function CredentialModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="min-w-[140px]"
+            className="min-w-36"
           >
             {isSubmitting ? (
               <>

@@ -42,9 +42,9 @@ export function WelcomeStep({ onNext }: OnboardingStepProps) {
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
-        className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-400 flex items-center justify-center mb-8 shadow-lg shadow-teal-500/20 relative z-10"
+        className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] flex items-center justify-center mb-8 shadow-lg shadow-teal-500/20 relative z-10"
       >
-        <span className="text-white font-bold text-2xl">E</span>
+        <span className="text-[rgb(var(--action-primary-fg))] font-bold text-2xl">E</span>
       </motion.div>
 
       <motion.h1
@@ -84,11 +84,11 @@ export function WelcomeStep({ onNext }: OnboardingStepProps) {
         {FEATURE_PILLS.map((pill) => (
           <span
             key={pill}
-            className="text-[11px] px-3 py-1 rounded-full border font-medium"
+            className="text-xs px-3 py-1 rounded-full border font-medium"
             style={{
               color: 'rgb(var(--text-secondary))',
               borderColor: 'rgb(var(--border-primary))',
-              background: 'rgb(var(--surface-tertiary))',
+              background: 'rgb(var(--background-tertiary))',
             }}
           >
             {pill}
@@ -103,7 +103,7 @@ export function WelcomeStep({ onNext }: OnboardingStepProps) {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={onNext}
-        className="px-8 py-3 rounded-full bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-semibold text-base transition-colors hover:shadow-lg hover:shadow-teal-500/25 relative z-10"
+        className="px-8 py-3 rounded-full bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))]  dark: text-[rgb(var(--action-primary-fg))] font-semibold text-base transition-colors hover:shadow-lg hover:shadow-teal-500/25 relative z-10"
       >
         Get Started
       </motion.button>

@@ -17,7 +17,16 @@ import {
   Clock,
   BarChart3,
 } from 'lucide-react'
-import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import {
+  Container,
+  focusRing,
+  focusRingInset,
+  Inline,
+  PageHeader,
+  StatCard,
+  Text,
+  WidgetErrorBoundaryV2,
+} from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 
 import { useStaffList } from '../hooks'
@@ -111,145 +120,56 @@ export function Overview() {
   }, [staff])
 
   return (
-    <div data-v2 style={{ padding: '24px 28px', overflow: 'auto' }}>
+    <Container data-v2 size="full" padding="lg" className="overflow-auto py-6">
       {/* PAGE HEADER */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 6,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              background: 'rgba(216,90,48,0.10)',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Users style={{ width: 16, height: 16, color: '#D85A30' }} />
-          </div>
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 10,
-              }}
-            >
-              <h1
-                style={{
-                  fontSize: 18,
-                  fontWeight: 600,
-                  letterSpacing: '-0.3px',
-                  color: 'var(--v2-text-primary, #e8eaf0)',
-                  margin: 0,
-                }}
-              >
-                People & HR
-              </h1>
-              <div
-                style={{
-                  width: 1,
-                  height: 14,
-                  background: 'rgba(255,255,255,0.10)',
-                  alignSelf: 'center',
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 12,
-                  color: 'var(--v2-text-muted, #7a8099)',
-                }}
-              >
-                {new Date().toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Header buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <PageHeader
+        className="mb-2"
+        title="People & HR"
+        description={new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })}
+        actions={(
+          <Inline gap="sm">
           <button
             type="button"
             onClick={() => navigate({ to: '/staff' as string })}
-            style={{
-              height: 36,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.09)',
-              borderRadius: 8,
-              padding: '0 14px',
-              fontSize: 11,
-              fontWeight: 500,
-              color: '#9aa0b8',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-            }}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border border-border-secondary bg-surface-secondary px-3.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-tertiary hover:text-text-primary ${focusRingInset}`}
           >
-            <Users style={{ width: 12, height: 12 }} />
+            <Users className="h-3.5 w-3.5" />
             Staff Directory
           </button>
           <button
             type="button"
             onClick={() => modal.openCreate()}
-            style={{
-              height: 36,
-              background: '#1D9E75',
-              border: 'none',
-              borderRadius: 8,
-              padding: '0 14px',
-              fontSize: 11,
-              fontWeight: 500,
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-            }}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
           >
-            <UserPlus style={{ width: 12, height: 12 }} />
+            <UserPlus className="h-3.5 w-3.5" />
             Add Staff Member
           </button>
-        </div>
-      </div>
+          </Inline>
+        )}
+      />
 
       {/* CONTEXT BANNER */}
-      <p
-        style={{
-          fontSize: 11,
-          color: 'var(--v2-text-muted, #7a8099)',
-          marginBottom: 18,
-        }}
-      >
-        <em style={{ fontStyle: 'normal', fontWeight: 500, color: '#D85A30' }}>
+      <Text variant="caption" className="mb-5">
+        <em className="font-medium not-italic text-[var(--v2-brand-accent,#D85A30)]">
           {stats.total} staff member{stats.total !== 1 ? 's' : ''}
         </em>
         {' · '}
-        <span style={{ color: '#1D9E75', fontStyle: 'normal', fontWeight: 500 }}>
+        <span className="font-medium text-[var(--v2-success)]">
           {stats.teachers} teacher{stats.teachers !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span style={{ color: '#7F77DD', fontStyle: 'normal', fontWeight: 500 }}>
+        <span className="font-medium text-[rgb(var(--state-info-fg))]">
           {stats.principals} principal{stats.principals !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span style={{ color: '#378ADD', fontStyle: 'normal', fontWeight: 500 }}>
+        <span className="font-medium text-[rgb(var(--action-primary-bg))]">
           {stats.withAccess} with system access enabled
         </span>
-      </p>
+      </Text>
 
       {/* KPI TILES */}
       <WidgetErrorBoundaryV2>
@@ -828,7 +748,7 @@ export function Overview() {
         open={modal.mode === 'create'}
         onClose={modal.close}
       />
-    </div>
+    </Container>
   )
 }
 

@@ -44,15 +44,15 @@ function AnimatedButton({
       'disabled:opacity-50 disabled:shadow-none'
     ),
     secondary: cn(
-      'bg-[rgb(var(--surface-tertiary))]',
+      'bg-[rgb(var(--background-tertiary))]',
       'text-[rgb(var(--text-primary))]',
       'border border-[rgb(var(--border-primary))]',
-      'hover:bg-[rgb(var(--interactive-hover))]',
+      'hover:bg-[rgb(var(--background-tertiary))]',
       'disabled:opacity-50'
     ),
     ghost: cn(
       'text-[rgb(var(--text-secondary))]',
-      'hover:bg-[rgb(var(--interactive-hover))]',
+      'hover:bg-[rgb(var(--background-tertiary))]',
       'hover:text-[rgb(var(--text-primary))]',
       'disabled:opacity-50'
     ),
@@ -217,7 +217,7 @@ export function WizardFooter({ fixed = true, ...props }: WizardFooterProps) {
   return (
     <div
       className={cn(
-        'bg-[rgb(var(--surface-secondary))] border-t border-[rgb(var(--border-primary))]',
+        'bg-[rgb(var(--background-secondary))] border-t border-[rgb(var(--border-primary))]',
         fixed && 'fixed bottom-0 left-0 right-0 z-40'
       )}
     >

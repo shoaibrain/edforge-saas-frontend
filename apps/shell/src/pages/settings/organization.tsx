@@ -76,7 +76,7 @@ function TabButton({
       onClick={() => onSelect(id)}
       className={`relative px-4 py-2 text-sm font-medium transition-colors ${
         isActive
-          ? 'text-teal-600 dark:text-teal-400'
+          ? 'text-[rgb(var(--action-secondary-fg))] '
           : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
       }`}
       role="tab"
@@ -86,7 +86,7 @@ function TabButton({
       {isActive && (
         <motion.div
           layoutId="org-tab-indicator"
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500 rounded-full"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))] rounded-full"
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         />
       )}
@@ -145,10 +145,10 @@ function DeleteEdOrgModal({
       size="md"
     >
       <div className="space-y-4 py-2">
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-3 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)]0/10 border border-[rgb(var(--state-danger-border)/0.35)]">
+          <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-red-600 dark:text-red-400">This action cannot be undone.</p>
+            <p className="font-medium text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">This action cannot be undone.</p>
             {isLea && schoolCount > 0 && (
               <p className="mt-1 text-[rgb(var(--text-secondary))]">
                 This district has <strong>{schoolCount}</strong> {schoolCount === 1 ? 'school' : 'schools'} that will become unassigned.
@@ -167,7 +167,7 @@ function DeleteEdOrgModal({
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={node.name}
-              className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-colors"
+              className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--state-danger-border))] transition-colors"
             />
           </div>
         )}
@@ -201,8 +201,8 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
     <div className="relative min-h-[calc(100vh-300px)] flex flex-col">
       {/* Gradient background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[rgb(var(--state-info-bg)/0.12)] rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[rgb(var(--action-primary-bg))]/5 rounded-full blur-3xl" />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
@@ -218,11 +218,11 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             className="relative"
           >
-            <div className="w-28 h-28 rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-teal-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-              <Network className="w-14 h-14 text-white" strokeWidth={1.5} />
+            <div className="w-28 h-28 rounded-2xl bg-gradient-to-br from-[rgb(var(--state-info-fg))] via-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg))] flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+              <Network className="w-14 h-14 text-[rgb(var(--action-primary-fg))]" strokeWidth={1.5} />
             </div>
             <motion.div
-              className="absolute inset-0 rounded-2xl border-2 border-indigo-400/40"
+              className="absolute inset-0 rounded-2xl border-2 border-[rgb(var(--state-info-border)/0.40)]"
               animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0, 0.5] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }}
             />
@@ -284,7 +284,7 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
           >
             <Button
               onClick={onSetupSea}
-              className="gap-2 bg-gradient-to-r from-indigo-500 to-teal-600 hover:from-indigo-600 hover:to-teal-700 shadow-lg shadow-indigo-500/25"
+              className="gap-2 bg-gradient-to-r from-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg))] hover:from-[rgb(var(--state-info-fg))] hover:to-[rgb(var(--action-primary-bg-hover))] shadow-lg shadow-indigo-500/25"
             >
               <Landmark className="w-4 h-4" />
               Set Up State Agency
@@ -500,7 +500,7 @@ export default function OrganizationSettingsPage() {
           icon={Building2}
           action={
             canManage ? (
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
                 {!sea ? (
                   <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={seaModal.openCreate}>
                     <Landmark className="w-3.5 h-3.5" />
@@ -603,10 +603,10 @@ export default function OrganizationSettingsPage() {
             >
               {/* SEA Summary Card */}
               {sea ? (
-                <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+                <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 rounded-lg bg-indigo-500/10">
-                      <Landmark className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+                      <Landmark className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
@@ -645,7 +645,7 @@ export default function OrganizationSettingsPage() {
                           href={sea.webSite}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-medium text-teal-600 dark:text-teal-400 hover:underline"
+                          className="font-medium text-[rgb(var(--action-secondary-fg))]  hover:underline"
                         >
                           {sea.webSite}
                         </a>

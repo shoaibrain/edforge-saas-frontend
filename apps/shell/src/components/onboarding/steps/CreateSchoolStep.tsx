@@ -78,18 +78,18 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Create Your First School</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
         Add a school to your organization. You can add more later.
       </p>
 
       {/* Info banner */}
-      <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 mb-6">
-        <svg className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] mb-6">
+        <svg className="w-4 h-4 text-[rgb(var(--state-info-fg))] mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
         </svg>
-        <span className="text-xs text-blue-600 dark:text-blue-400">
+        <span className="text-xs text-[rgb(var(--state-info-fg))]">
           This school inherits your organization's {currency} currency, calendar, and timezone settings.
         </span>
       </div>
@@ -97,13 +97,13 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
       {/* School Name */}
       <div className="mb-5">
         <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-          School Name <span className="text-red-400">*</span>
+          School Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => { setName(e.target.value); setError(null) }}
-          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           placeholder="e.g. Sunrise Academy"
           autoFocus
         />
@@ -121,8 +121,8 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
               onClick={() => setSchoolType(type.value)}
               className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
                 schoolType === type.value
-                  ? 'bg-teal-500/15 border-teal-500/40 text-teal-600 dark:text-cyan-400'
-                  : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                  ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--action-secondary-fg))] '
+                  : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }`}
             >
               {type.label}
@@ -140,7 +140,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
           <select
             value={gradeFrom}
             onChange={(e) => setGradeFrom(e.target.value)}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           >
             {GRADE_OPTIONS.map((g) => (
               <option key={g} value={g}>{g}</option>
@@ -150,7 +150,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
           <select
             value={gradeTo}
             onChange={(e) => setGradeTo(e.target.value)}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           >
             {GRADE_OPTIONS.map((g) => (
               <option key={g} value={g}>{g}</option>
@@ -160,7 +160,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 mb-4">{error}</p>
+        <p className="text-xs text-[rgb(var(--state-danger-fg))] mb-4">{error}</p>
       )}
 
       {showSkipWarning && (
@@ -192,7 +192,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
         <button
           onClick={handleCreate}
           disabled={saving || !name.trim()}
-          className="px-6 py-2.5 rounded-full bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
+          className="px-6 py-2.5 rounded-full bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))]  dark: text-[rgb(var(--action-primary-fg))] font-semibold text-sm transition-all disabled:opacity-50 active:scale-[0.98]"
         >
           {saving ? 'Creating...' : 'Create School'}
         </button>

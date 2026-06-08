@@ -27,6 +27,7 @@
 
 import { useEffect } from 'react'
 import { AlertTriangle, Home } from 'lucide-react'
+import { focusRing } from '../utils'
 
 export interface MfeNotFoundBoundaryProps {
   /**
@@ -68,15 +69,15 @@ export function MfeNotFoundBoundary({ mfe }: MfeNotFoundBoundaryProps) {
       role="alert"
       className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center"
     >
-      <div className="mb-4 p-3 rounded-full bg-amber-100 dark:bg-amber-500/10">
-        <AlertTriangle className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+      <div className="mb-4 p-3 rounded-full bg-[rgb(var(--state-warning-bg))]">
+        <AlertTriangle className="w-8 h-8 text-[rgb(var(--state-warning-fg))]" />
       </div>
       <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">
         Page not found
       </h1>
       <p className="text-sm text-[rgb(var(--text-secondary))] max-w-md mb-1">
         We couldn&apos;t find anything at{' '}
-        <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--surface-tertiary))]">
+        <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))]">
           {attemptedPath}
         </code>
         .
@@ -87,7 +88,7 @@ export function MfeNotFoundBoundary({ mfe }: MfeNotFoundBoundaryProps) {
       <button
         type="button"
         onClick={goHome}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 active:bg-teal-800 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-medium hover:bg-[rgb(var(--action-primary-bg-hover))] active:bg-[rgb(var(--action-primary-bg-active))] shadow-sm transition-colors ${focusRing}`}
       >
         <Home className="w-4 h-4" />
         Return to home

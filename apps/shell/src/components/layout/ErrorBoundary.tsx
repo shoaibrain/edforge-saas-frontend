@@ -57,7 +57,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
   )
 
   return (
-    <div className="min-h-[400px] flex items-center justify-center p-6">
+    <div className="min-h-96 flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
         {/* Error Icon */}
         <div className="flex justify-center mb-6">
@@ -84,10 +84,10 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
             onClick={isDeploymentError ? () => window.location.reload() : resetError}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-xl',
-              'bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600',
-              'text-white font-medium text-sm',
+              'bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg))]  dark:hover:bg-[rgb(var(--action-primary-bg-hover))]',
+              'text-[rgb(var(--action-primary-fg))] font-medium text-sm',
               'transition-colors duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:ring-offset-2'
             )}
           >
             <RefreshCw className="w-4 h-4" />
@@ -97,11 +97,11 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
             href="/home"
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-xl',
-              'bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))]',
+              'bg-[rgb(var(--background-tertiary))] hover:bg-[rgb(var(--background-tertiary))]',
               'text-[rgb(var(--text-primary))] font-medium text-sm',
               'border border-[rgb(var(--border-primary))]',
               'transition-colors duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:ring-offset-2'
             )}
           >
             <Home className="w-4 h-4" />
@@ -111,7 +111,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
 
         {/* Error Details (Dev Mode) */}
         {shouldShowDetails && error && (
-          <div className="mt-6 p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+          <div className="mt-6 p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <div className="flex items-center gap-2 mb-3">
               <Bug className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
               <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
@@ -136,7 +136,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
                   <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer hover:text-[rgb(var(--text-secondary))]">
                     Show stack trace
                   </summary>
-                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
+                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
                     {error.stack}
                   </pre>
                 </details>
@@ -148,7 +148,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
                   <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer hover:text-[rgb(var(--text-secondary))]">
                     Show component stack
                   </summary>
-                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
+                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
                     {errorInfo.componentStack}
                   </pre>
                 </details>

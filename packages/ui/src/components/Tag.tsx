@@ -1,6 +1,10 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import {
+  forwardRef,
+  type HTMLAttributes,
+  type KeyboardEvent,
+} from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '../utils'
+import { cn, focusRing } from '../utils'
 
 /**
  * Tag — compact pill used for eyebrows, section tags, status markers.
@@ -40,9 +44,28 @@ export interface TagProps
 }
 
 export const Tag = forwardRef<HTMLSpanElement, TagProps>(
-  ({ className, variant, dot = false, children, ...props }, ref) => {
+  ({ className, variant, dot = false, children, onClick, onKeyDown, tabIndex, role, ...props }, ref) => {
+    const isInteractive = typeof onClick === 'function' || role === 'button'
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
+      onKeyDown?.(event)
+      if (event.defaultPrevented || !isInteractive) return
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        event.currentTarget.click()
+      }
+    }
+
     return (
-      <span ref={ref} className={cn(tagVariants({ variant }), className)} {...props}>
+      <span
+        ref={ref}
+        className={cn(tagVariants({ variant }), isInteractive && focusRing, className)}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role={role}
+        tabIndex={isInteractive ? (tabIndex ?? 0) : tabIndex}
+        {...props}
+      >
         {dot ? (
           <span
             aria-hidden

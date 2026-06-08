@@ -108,7 +108,7 @@ export function SectionAssociations({
         className="space-y-6"
       >
         <motion.div variants={fadeInUp}>
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">Not Applicable</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -153,11 +153,11 @@ export function SectionAssociations({
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2].map((i) => (
-              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--background-secondary))] rounded-xl" />
             ))}
           </div>
         ) : isError || !sections || sections.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <GraduationCap className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Sections Assigned</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -170,11 +170,11 @@ export function SectionAssociations({
           <>
             {/* Summary Stats */}
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+              <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
                 <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Total Sections</p>
                 <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">{totalSections}</p>
               </div>
-              <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+              <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
                 <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Total Students</p>
                 <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">{totalStudents}</p>
               </div>
@@ -194,7 +194,7 @@ export function SectionAssociations({
                 <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-secondary))]">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-[rgb(var(--surface-tertiary))]">
+                      <tr className="bg-[rgb(var(--background-tertiary))]">
                         <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
@@ -208,7 +208,7 @@ export function SectionAssociations({
                       {schoolSections.map((section) => (
                         <tr
                           key={section.sectionId}
-                          className="bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+                          className="bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                         >
                           <td className="px-4 py-3">
                             <div>
@@ -238,7 +238,7 @@ export function SectionAssociations({
                           <td className="px-4 py-3">
                             <a
                               href={`/academics/sections/${section.sectionId}`}
-                              className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-teal-600 transition-colors inline-block"
+                              className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--action-secondary-fg))] transition-colors inline-block"
                               title="View in Academics"
                             >
                               <ExternalLink className="w-4 h-4" />

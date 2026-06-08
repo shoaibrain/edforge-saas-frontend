@@ -141,7 +141,7 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm"
         onClick={handleClose}
       >
         <motion.div
@@ -149,13 +149,13 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md mx-4 p-6 rounded-2xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-xl"
+          className="w-full max-w-md mx-4 p-6 rounded-2xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-xl"
         >
           {step === 'setup' && (
             <>
               <div className="text-center mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-teal-500/10 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-teal-600 dark:text-cyan-400" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--action-primary-bg))]/10 flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-[rgb(var(--action-secondary-fg))] " />
                 </div>
                 <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
                   Enable Two-Factor Authentication
@@ -197,18 +197,18 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
               </p>
 
               <div className="flex justify-center mb-4">
-                <div className="p-4 bg-white rounded-xl">
+                <div className="p-4 bg-[rgb(var(--background-secondary))] rounded-xl">
                   {setupData.qrCodeUrl ? (
                     <img src={setupData.qrCodeUrl} alt="QR Code" className="w-48 h-48" />
                   ) : (
-                    <div className="w-48 h-48 flex items-center justify-center bg-gray-100 rounded">
-                      <QrCode className="w-16 h-16 text-gray-400" />
+                    <div className="w-48 h-48 flex items-center justify-center bg-[rgb(var(--background-tertiary))] rounded">
+                      <QrCode className="w-16 h-16 text-[rgb(var(--text-tertiary))]" />
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="mb-4 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+              <div className="mb-4 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
                 <p className="text-xs text-[rgb(var(--text-tertiary))] mb-1">
                   Or enter this code manually:
                 </p>
@@ -219,10 +219,10 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
                   <button
                     type="button"
                     onClick={handleCopySecret}
-                    className="p-1.5 rounded hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                    className="p-1.5 rounded hover:bg-[rgb(var(--background-secondary))] transition-colors"
                   >
                     {copiedCode ? (
-                      <Check className="w-4 h-4 text-emerald-500" />
+                      <Check className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
                     ) : (
                       <Copy className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                     )}
@@ -262,8 +262,8 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
           {step === 'backup' && setupData && (
             <>
               <div className="text-center mb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8 text-[rgb(var(--state-success-fg))]" />
                 </div>
                 <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">2FA Enabled!</h2>
                 <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
@@ -271,12 +271,12 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
                 </p>
               </div>
 
-              <div className="mb-4 p-4 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+              <div className="mb-4 p-4 rounded-lg bg-[rgb(var(--background-tertiary))]">
                 <div className="grid grid-cols-2 gap-2">
                   {setupData.backupCodes.map((code, i) => (
                     <code
                       key={i}
-                      className="text-sm font-mono text-[rgb(var(--text-primary))] p-2 bg-[rgb(var(--surface-secondary))] rounded"
+                      className="text-sm font-mono text-[rgb(var(--text-primary))] p-2 bg-[rgb(var(--background-secondary))] rounded"
                     >
                       {code}
                     </code>
@@ -317,13 +317,13 @@ export function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps)
       variants={fadeInUp}
       className={`p-4 rounded-xl border transition-colors ${
         session.isCurrent
-          ? 'bg-teal-500/5 border-teal-500/20'
-          : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]'
+          ? 'bg-[rgb(var(--action-primary-bg))]/5 border-[rgb(var(--border-focus)/0.35)]'
+          : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]'
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-teal-500/10' : 'bg-[rgb(var(--surface-tertiary))]'}`}>
-          <Icon className={`w-4 h-4 ${session.isCurrent ? 'text-teal-600 dark:text-cyan-400' : 'text-[rgb(var(--text-tertiary))]'}`} />
+        <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-[rgb(var(--action-primary-bg))]/10' : 'bg-[rgb(var(--background-tertiary))]'}`}>
+          <Icon className={`w-4 h-4 ${session.isCurrent ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -332,7 +332,7 @@ export function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps)
               {session.browser} on {session.os}
             </p>
             {session.isCurrent && (
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-teal-500/10 text-teal-600 dark:text-cyan-400">
+              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))] ">
                 Current
               </span>
             )}
@@ -358,7 +358,7 @@ export function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps)
             size="sm"
             onClick={() => onRevoke(session.sessionId)}
             disabled={isRevoking}
-            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+            className="text-[rgb(var(--state-danger-fg))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10"
           >
             <LogOut className="w-4 h-4" />
           </Button>
@@ -381,8 +381,8 @@ export function LoginHistoryItem({ entry }: LoginHistoryItemProps) {
     LoginHistoryEntry['status'],
     { icon: LucideIcon; color: string; bg: string }
   > = {
-    success: { icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    failed: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
+    success: { icon: CheckCircle2, color: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' },
+    failed: { icon: XCircle, color: 'text-[rgb(var(--state-danger-fg))]', bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10' },
     blocked: { icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
   }
 
@@ -400,7 +400,7 @@ export function LoginHistoryItem({ entry }: LoginHistoryItemProps) {
           {entry.ipAddress} • {new Date(entry.timestamp).toLocaleString()}
         </p>
       </div>
-      {entry.failureReason && <span className="text-xs text-red-500">{entry.failureReason}</span>}
+      {entry.failureReason && <span className="text-xs text-[rgb(var(--state-danger-fg))]">{entry.failureReason}</span>}
     </div>
   )
 }

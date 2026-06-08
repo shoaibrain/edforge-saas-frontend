@@ -31,7 +31,7 @@ function SummaryCard({ title, icon, stepIndex, children }: SummaryCardProps) {
 
   return (
     <div className="border border-[rgb(var(--border-secondary))] rounded-xl overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-secondary))]">
+      <div className="flex items-center justify-between px-4 py-3 bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-secondary))]">
         <div className="flex items-center gap-2">
           <div className="text-[rgb(var(--text-tertiary))]">{icon}</div>
           <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{title}</h4>
@@ -39,7 +39,7 @@ function SummaryCard({ title, icon, stepIndex, children }: SummaryCardProps) {
         <button
           type="button"
           onClick={() => goToStep(stepIndex)}
-          className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+          className="flex items-center gap-1 text-xs text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Pencil className="w-3 h-3" />
           Edit
@@ -173,10 +173,10 @@ export function ReviewStep({ data }: WizardStepProps) {
       {/* Account Creation */}
       <div className={`flex items-center gap-3 p-4 rounded-xl border-2 ${
         createAccount
-          ? 'border-teal-500/30 bg-teal-500/5'
-          : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]'
+          ? 'border-[rgb(var(--border-focus)/0.35)] bg-[rgb(var(--state-info-bg)/0.12)]'
+          : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]'
       }`}>
-        <UserPlus className={`w-5 h-5 ${createAccount ? 'text-teal-600 dark:text-teal-400' : 'text-[rgb(var(--text-tertiary))]'}`} />
+        <UserPlus className={`w-5 h-5 ${createAccount ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
         <div>
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {createAccount ? 'User account will be created' : 'No user account'}

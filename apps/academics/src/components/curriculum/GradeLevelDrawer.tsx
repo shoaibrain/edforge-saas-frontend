@@ -143,7 +143,7 @@ function CourseRow({
     <button
       type="button"
       onClick={onView}
-      className="w-full flex items-center gap-4 p-4 bg-surface-primary rounded-xl border border-border-secondary hover:border-teal-400 transition-all text-left group"
+      className="w-full flex items-center gap-4 p-4 bg-surface-primary rounded-xl border border-border-secondary hover:border-[rgb(var(--border-focus))] transition-all text-left group"
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
@@ -151,7 +151,7 @@ function CourseRow({
             {course.courseCode}
           </span>
           <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium ${subjectColors.bg} ${subjectColors.text}`}
+            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${subjectColors.bg} ${subjectColors.text}`}
           >
             {getSubjectAreaLabel(course.subjectArea)}
           </span>
@@ -223,7 +223,7 @@ export function GradeLevelDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.30)] backdrop-blur-sm"
             onClick={handleBackdropClick}
             aria-hidden="true"
           />
@@ -242,8 +242,8 @@ export function GradeLevelDrawer({
                 {/* Header */}
                 <div className="flex items-center justify-between px-8 py-5 border-b border-border-secondary">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20">
-                      <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-violet-500/20">
+                      <Layers className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary">
                       {gradeLevel.label} Details
@@ -267,8 +267,8 @@ export function GradeLevelDrawer({
                   {/* Hero section */}
                   <div className="px-8 py-7 bg-surface-secondary/40 border-b border-border-secondary">
                     <div className="flex items-center gap-6">
-                      <div className="w-[88px] h-[88px] rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center shadow-lg ring-2 ring-white/10">
-                        <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                      <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-violet-500/20 flex items-center justify-center shadow-lg ring-2 ring-[rgb(var(--border-secondary))]">
+                        <span className="text-3xl font-bold text-[rgb(var(--state-info-fg))]">
                           {gradeLevel.value}
                         </span>
                       </div>
@@ -287,7 +287,7 @@ export function GradeLevelDrawer({
                     {/* Quick Stats - inside hero */}
                     <div className="grid grid-cols-3 gap-4 mt-6">
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
-                        <BookOpen className="w-5 h-5 text-rose-500 mx-auto mb-1.5" />
+                        <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
                           {gradeLevel.courseCount}
                         </p>
@@ -296,7 +296,7 @@ export function GradeLevelDrawer({
                         </p>
                       </div>
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
-                        <GraduationCap className="w-5 h-5 text-emerald-500 mx-auto mb-1.5" />
+                        <GraduationCap className="w-5 h-5 text-[rgb(var(--state-success-fg))] mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
                           {activeCourses.length}
                         </p>
@@ -305,7 +305,7 @@ export function GradeLevelDrawer({
                         </p>
                       </div>
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
-                        <Users className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
+                        <Users className="w-5 h-5 text-[rgb(var(--state-info-fg))] mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
                           {showStudentCount ? gradeLevel.studentCount : <>&mdash;</>}
                         </p>
@@ -334,7 +334,7 @@ export function GradeLevelDrawer({
                         <div className="space-y-3">
                           {activeCourses.length > 0 && (
                             <>
-                              <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider mb-2">
+                              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">
                                 Active ({activeCourses.length})
                               </p>
                               {activeCourses.map((course) => (
@@ -352,7 +352,7 @@ export function GradeLevelDrawer({
                           )}
                           {inactiveCourses.length > 0 && (
                             <>
-                              <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider mt-5 mb-2">
+                              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mt-5 mb-2">
                                 Inactive ({inactiveCourses.length})
                               </p>
                               {inactiveCourses.map((course) => (

@@ -23,16 +23,16 @@ const SETUP_STEPS = [
     title: 'Add your first students',
     description: 'Import or create student records to get started',
     href: '/academics/students',
-    iconBg: 'bg-teal-500/15',
-    iconColor: 'text-teal-600 dark:text-cyan-400',
+    iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/15',
+    iconColor: 'text-[rgb(var(--action-secondary-fg))] ',
   },
   {
     icon: GraduationCap,
     title: 'Create course sections',
     description: 'Set up your classes and assign teachers',
     href: '/academics/classrooms',
-    iconBg: 'bg-purple-500/15',
-    iconColor: 'text-purple-600 dark:text-purple-400',
+    iconBg: 'bg-[rgb(var(--state-info-fg))]/15',
+    iconColor: 'text-[rgb(var(--state-info-fg))]',
   },
   {
     icon: Calendar,
@@ -40,15 +40,15 @@ const SETUP_STEPS = [
     description: 'Configure academic years, terms, and holidays',
     href: '/academics/schoolcalendar',
     iconBg: 'bg-amber-400/20',
-    iconColor: 'text-amber-600 dark:text-amber-400',
+    iconColor: 'text-[rgb(var(--state-warning-fg))]',
   },
   {
     icon: BookOpen,
     title: 'Configure grading policies',
     description: 'Define grading scales, categories, and weights',
     href: '/academics/classrooms?tab=gradebook',
-    iconBg: 'bg-emerald-400/20',
-    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    iconBg: 'bg-[rgb(var(--state-success-fg))]/20',
+    iconColor: 'text-[rgb(var(--state-success-fg))]',
   },
 ]
 
@@ -66,9 +66,9 @@ export function EmptyOverviewState() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-teal-500/15 to-cyan-500/15 border border-teal-500/20 mb-4"
+            className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)] border border-[rgb(var(--border-focus)/0.35)] mb-4"
           >
-            <Sparkles className="w-7 h-7 text-teal-600 dark:text-cyan-400" />
+            <Sparkles className="w-7 h-7 text-[rgb(var(--action-secondary-fg))] " />
           </motion.div>
           <h2 className="text-xl font-bold text-text-primary">
             Welcome to Academics
@@ -93,7 +93,7 @@ export function EmptyOverviewState() {
                     <step.icon className={`w-5 h-5 ${step.iconColor}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-primary group-hover:text-teal-600 dark:group-hover:text-cyan-400 transition-colors">
+                    <p className="text-sm font-medium text-text-primary group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-[rgb(var(--state-info-fg))] transition-colors">
                       {step.title}
                     </p>
                     <p className="text-xs text-text-tertiary mt-0.5">

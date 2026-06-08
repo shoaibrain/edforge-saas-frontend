@@ -50,7 +50,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
               : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]">
@@ -123,7 +123,7 @@ const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
               : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           <select
             ref={ref}
@@ -173,8 +173,8 @@ AnimatedSelect.displayName = 'AnimatedSelect'
 function SectionHeader({ icon: Icon, title }: { icon: React.ComponentType<{ className?: string }>, title: string }) {
   return (
     <div className="flex items-center gap-3 mb-4">
-      <div className="p-2 rounded-xl bg-teal-500/10 dark:bg-cyan-500/15">
-        <Icon className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+      <div className="p-2 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]">
+        <Icon className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
       </div>
       <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
     </div>

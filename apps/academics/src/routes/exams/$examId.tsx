@@ -100,7 +100,7 @@ function StatusPipeline({ status }: { status: ExamStatus }) {
             <span
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
                 current
-                  ? `${meta.className} ring-2 ring-purple-400/50`
+                  ? `${meta.className} ring-2 ring-[rgb(var(--state-info-border)/0.50)]`
                   : done
                     ? 'text-text-secondary'
                     : 'text-text-tertiary opacity-60'
@@ -138,17 +138,17 @@ function ResultGenerationBadge({
   const meta = {
     pending: {
       label: 'Generating result cards…',
-      cls: 'text-amber-600 dark:text-amber-400',
+      cls: 'text-[rgb(var(--state-warning-fg))]',
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
     },
     generated: {
       label: 'Result cards generated',
-      cls: 'text-emerald-600 dark:text-emerald-400',
+      cls: 'text-[rgb(var(--state-success-fg))]',
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
     },
     failed: {
       label: 'Result generation failed',
-      cls: 'text-red-600 dark:text-red-400',
+      cls: 'text-[rgb(var(--state-danger-fg))]',
       icon: <AlertCircle className="w-3.5 h-3.5" />,
     },
   }[status]
@@ -169,8 +169,8 @@ function ResultGenerationBadge({
 
 function transitionToneClass(tone: ExamTransitionAction['tone']): string {
   const base = 'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50'
-  if (tone === 'primary') return `${base} text-white bg-purple-600 hover:bg-purple-700`
-  if (tone === 'warning') return `${base} text-white bg-amber-600 hover:bg-amber-700`
+  if (tone === 'primary') return `${base} text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] hover:brightness-95`
+  if (tone === 'warning') return `${base} text-[rgb(var(--action-primary-fg))] bg-amber-600 hover:bg-amber-700`
   return `${base} text-text-secondary border border-border-secondary hover:bg-surface-secondary`
 }
 
@@ -269,7 +269,7 @@ export function ExamDetailModule() {
           <button
             type="button"
             onClick={() => navigate({ to: '/exams' })}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] rounded-lg hover:brightness-95 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Exams
@@ -297,8 +297,8 @@ export function ExamDetailModule() {
 
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-                <ClipboardList className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
+                <ClipboardList className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-3">
@@ -396,7 +396,7 @@ export function ExamDetailModule() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
                   activeTab === tab.id
-                    ? 'text-text-primary border-purple-500'
+                    ? 'text-text-primary border-[rgb(var(--state-info-border))]'
                     : 'text-text-tertiary border-transparent hover:text-text-secondary'
                 }`}
               >

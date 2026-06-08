@@ -56,7 +56,7 @@ const TYPE_CONFIG: Record<PersonType, TypeConfig> = {
   teacher: {
     label: 'Teacher',
     icon: User,
-    color: 'text-teal-500',
+    color: 'text-[rgb(var(--action-secondary-fg))]',
   },
   staff: {
     label: 'Staff',
@@ -152,7 +152,7 @@ export function PersonForm({
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]"
+            className="p-6 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]"
           >
             <SelectField
               name="type"
@@ -168,7 +168,7 @@ export function PersonForm({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className="mt-4 flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface-tertiary))]"
+              className="mt-4 flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--background-tertiary))]"
             >
               <typeConfig.icon className={`w-5 h-5 ${typeConfig.color}`} />
               <span className="text-sm text-[rgb(var(--text-secondary))]">
@@ -243,13 +243,13 @@ export function PersonForm({
           <Button
             type="submit"
             disabled={isSubmitting || !isDirty}
-            className="min-w-[120px]"
+            className="min-w-32"
           >
             {isSubmitting ? (
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                className="w-4 h-4 border-2 border-[rgb(var(--border-secondary))] border-t-white rounded-full"
               />
             ) : (
               <>

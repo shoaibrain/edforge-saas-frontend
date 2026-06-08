@@ -70,9 +70,9 @@ export function WidgetVisibilityMenu() {
         className={`
           p-1.5 rounded-md
           text-[rgb(var(--text-tertiary))]
-          hover:bg-[rgb(var(--surface-tertiary))]
+          hover:bg-[rgb(var(--background-tertiary))]
           transition-colors
-          ${isOpen ? 'bg-[rgb(var(--surface-tertiary))]' : ''}
+          ${isOpen ? 'bg-[rgb(var(--background-tertiary))]' : ''}
         `}
         title="Page options"
         aria-label="Page options"
@@ -94,7 +94,7 @@ export function WidgetVisibilityMenu() {
             className={`
               absolute right-0 top-full mt-1 z-50
               w-52 py-1
-              bg-[rgb(var(--surface-primary))]
+              bg-[rgb(var(--background-primary))]
               border border-[rgb(var(--border-primary))]
               rounded-lg shadow-xl
             `}
@@ -105,7 +105,7 @@ export function WidgetVisibilityMenu() {
               onClick={() => setShowWidgets(true)}
               className={`
                 w-full px-3 py-2 flex items-center gap-3
-                hover:bg-[rgb(var(--interactive-hover))]
+                hover:bg-[rgb(var(--background-tertiary))]
                 transition-colors text-left text-sm
                 text-[rgb(var(--text-primary))]
               `}
@@ -128,7 +128,7 @@ export function WidgetVisibilityMenu() {
                 w-full px-3 py-2 flex items-center gap-3
                 text-left text-sm
                 text-[rgb(var(--text-secondary))]
-                hover:bg-[rgb(var(--interactive-hover))]
+                hover:bg-[rgb(var(--background-tertiary))]
                 transition-colors
               `}
             >
@@ -151,7 +151,7 @@ export function WidgetVisibilityMenu() {
             className={`
               absolute right-0 top-full mt-1 z-50
               w-52 py-1
-              bg-[rgb(var(--surface-primary))]
+              bg-[rgb(var(--background-primary))]
               border border-[rgb(var(--border-primary))]
               rounded-lg shadow-xl
             `}
@@ -162,7 +162,7 @@ export function WidgetVisibilityMenu() {
               onClick={() => setShowWidgets(false)}
               className={`
                 w-full px-3 py-2 flex items-center gap-2
-                hover:bg-[rgb(var(--interactive-hover))]
+                hover:bg-[rgb(var(--background-tertiary))]
                 transition-colors text-left text-sm
                 text-[rgb(var(--text-tertiary))]
                 border-b border-[rgb(var(--border-secondary))]
@@ -183,7 +183,7 @@ export function WidgetVisibilityMenu() {
                   onClick={() => toggleWidget(widget.id)}
                   className={`
                     w-full px-3 py-2 flex items-center gap-3
-                    hover:bg-[rgb(var(--interactive-hover))]
+                    hover:bg-[rgb(var(--background-tertiary))]
                     transition-colors text-left text-sm
                   `}
                   role="menuitemcheckbox"

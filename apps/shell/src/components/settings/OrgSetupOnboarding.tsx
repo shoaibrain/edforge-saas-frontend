@@ -88,10 +88,10 @@ function StepCard({
       transition={{ delay: stepNumber * 0.1, type: 'spring', stiffness: 300, damping: 25 }}
       className={`relative w-full text-left p-5 rounded-xl border transition-all group ${
         step.isComplete
-          ? 'border-emerald-500/30 bg-emerald-500/5'
+          ? 'border-[rgb(var(--state-success-border)/0.35)] bg-[rgb(var(--state-success-fg))]/5'
           : isActive
-          ? 'border-teal-500/40 bg-teal-500/5 shadow-lg shadow-teal-500/10 ring-1 ring-teal-500/20'
-          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] opacity-60'
+          ? 'border-[rgb(var(--border-focus)/0.40)] bg-[rgb(var(--action-primary-bg))]/5 shadow-lg shadow-teal-500/10 ring-1 ring-[rgb(var(--border-focus))]/20'
+          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] opacity-60'
       }`}
     >
       <div className="flex items-start gap-4">
@@ -99,14 +99,14 @@ function StepCard({
         <div
           className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
             step.isComplete
-              ? 'bg-emerald-500/15'
+              ? 'bg-[rgb(var(--state-success-fg))]/15'
               : isActive
               ? step.color
-              : 'bg-[rgb(var(--surface-tertiary))]'
+              : 'bg-[rgb(var(--background-tertiary))]'
           }`}
         >
           {step.isComplete ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            <CheckCircle2 className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />
           ) : (
             <Icon
               className={`w-5 h-5 ${
@@ -123,7 +123,7 @@ function StepCard({
               Step {stepNumber + 1}
             </span>
             {step.isComplete && (
-              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-medium text-[rgb(var(--state-success-fg))] ">
                 Complete
               </span>
             )}
@@ -138,7 +138,7 @@ function StepCard({
 
         {/* Arrow */}
         {isActive && !step.isComplete && onClick && (
-          <ChevronRight className="w-5 h-5 text-teal-500 shrink-0 mt-2 group-hover:translate-x-0.5 transition-transform" />
+          <ChevronRight className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-2 group-hover:translate-x-0.5 transition-transform" />
         )}
       </div>
     </motion.button>
@@ -171,7 +171,7 @@ export function OrgSetupOnboarding({
       description:
         'Create your SEA — the root of your organization hierarchy. This represents your state education department.',
       icon: Landmark,
-      color: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+      color: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
       isComplete: hasSea,
     },
     {
@@ -180,7 +180,7 @@ export function OrgSetupOnboarding({
       description:
         'Add a Local Education Agency (LEA) — your school district. Districts organize schools for administration and reporting.',
       icon: Building2,
-      color: 'bg-teal-500/15 text-teal-600 dark:text-teal-400',
+      color: 'bg-[rgb(var(--action-primary-bg))]/15 text-[rgb(var(--action-secondary-fg))] ',
       isComplete: hasLeas,
     },
     {
@@ -189,7 +189,7 @@ export function OrgSetupOnboarding({
       description:
         'Assign schools to your district. Schools are where students enroll and staff teach.',
       icon: School,
-      color: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400',
+      color: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
       isComplete: false, // We don't track this in the onboarding — becomes irrelevant
     },
   ]
@@ -243,16 +243,16 @@ export function OrgSetupOnboarding({
     >
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10 overflow-hidden rounded-2xl">
-        <div className="absolute -top-20 -left-20 w-60 h-60 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-teal-500/5 rounded-full blur-3xl" />
+        <div className="absolute -top-20 -left-20 w-60 h-60 bg-[rgb(var(--state-info-bg)/0.12)] rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-[rgb(var(--action-primary-bg))]/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))]">
+      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/15 to-teal-500/15">
-              <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)]">
+              <Sparkles className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] tracking-tight">
@@ -266,7 +266,7 @@ export function OrgSetupOnboarding({
           <button
             type="button"
             onClick={handleDismiss}
-            className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
             aria-label="Dismiss onboarding"
           >
             <X className="w-4 h-4" />
@@ -280,13 +280,13 @@ export function OrgSetupOnboarding({
               {steps.filter((s) => s.isComplete).length} of {steps.length} steps complete
             </span>
             {allComplete && (
-              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-medium text-[rgb(var(--state-success-fg))] ">
                 All done!
               </span>
             )}
           </div>
           <div
-            className="h-1.5 rounded-full bg-[rgb(var(--surface-tertiary))] overflow-hidden"
+            className="h-1.5 rounded-full bg-[rgb(var(--background-tertiary))] overflow-hidden"
             role="progressbar"
             aria-valuenow={steps.filter((s) => s.isComplete).length}
             aria-valuemin={0}
@@ -294,7 +294,7 @@ export function OrgSetupOnboarding({
             aria-label="Onboarding progress"
           >
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-teal-500"
+              className="h-full rounded-full bg-gradient-to-r from-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg))]"
               initial={{ width: 0 }}
               animate={{
                 width: `${(steps.filter((s) => s.isComplete).length / steps.length) * 100}%`,

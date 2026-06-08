@@ -40,11 +40,11 @@ const PAYABLE_STATUSES = ['issued', 'partially_paid', 'overdue'] as const
 function statusBadgeClass(status: string): string {
   switch (status) {
     case 'overdue':
-      return 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+      return 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]  dark:text-[rgb(var(--state-danger-fg))]'
     case 'partially_paid':
-      return 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
+      return 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]  '
     default:
-      return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+      return 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  dark:text-[rgb(var(--state-info-fg))]'
   }
 }
 
@@ -86,7 +86,7 @@ function StudentInvoiceList({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
         <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading invoices...</span>
       </div>
     )
@@ -120,8 +120,8 @@ function StudentInvoiceList({
             }
             className={`w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${
               isSelected
-                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 dark:border-teal-600'
-                : 'border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-secondary))]'
+                ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  border-[rgb(var(--border-focus))]'
+                : 'border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]'
             }`}
           >
             <div className="flex items-start gap-2.5">
@@ -131,7 +131,7 @@ function StudentInvoiceList({
                   <span className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
                     {invoice.invoiceNumber}
                   </span>
-                  <span className="text-sm font-semibold text-teal-600 dark:text-teal-400 flex-shrink-0">
+                  <span className="text-sm font-semibold text-[rgb(var(--action-secondary-fg))]  flex-shrink-0">
                     {format(invoice.amountDue)}
                   </span>
                 </div>
@@ -260,7 +260,7 @@ export default function RecordPaymentPage() {
     return (
       <div className="p-6 max-w-lg mx-auto">
         <div className="text-center py-16 space-y-4">
-          <CheckCircle2 className="w-16 h-16 mx-auto text-green-500" />
+          <CheckCircle2 className="w-16 h-16 mx-auto text-[rgb(var(--state-success-fg))]" />
           <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">
             Payment Recorded
           </h2>
@@ -334,8 +334,8 @@ export default function RecordPaymentPage() {
                   key={method.value}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium cursor-pointer transition-colors ${
                     paymentMethod === method.value
-                      ? 'border-teal-500 bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-600'
-                      : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
+                      ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]   border-[rgb(var(--border-focus))]'
+                      : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
                   }`}
                 >
                   <input
@@ -364,7 +364,7 @@ export default function RecordPaymentPage() {
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -379,7 +379,7 @@ export default function RecordPaymentPage() {
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
                 placeholder={paymentMethod === 'bank_transfer' ? 'Bank reference number' : 'Cheque number'}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
             </div>
           )}
@@ -393,7 +393,7 @@ export default function RecordPaymentPage() {
               type="date"
               value={paidDate}
               onChange={(e) => setPaidDate(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -407,14 +407,14 @@ export default function RecordPaymentPage() {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Optional notes about this payment..."
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
         </div>
 
         {/* Preview */}
         {parsedAmount > 0 && (
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-4 space-y-2">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-4 space-y-2">
             <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Preview</h3>
             <div className="space-y-1.5">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">

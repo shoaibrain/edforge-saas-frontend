@@ -8,10 +8,10 @@
 /* Shell-specific utilities */
 
 /* Semantic color classes using CSS variables */
-.bg-surface-primary { background-color: rgb(var(--surface-primary)); }
-.bg-surface-secondary { background-color: rgb(var(--surface-secondary)); }
-.bg-surface-tertiary { background-color: rgb(var(--surface-tertiary)); }
-.bg-surface-elevated { background-color: rgb(var(--surface-elevated)); }
+.bg-surface-primary { background-color: rgb(var(--background-primary)); }
+.bg-surface-secondary { background-color: rgb(var(--background-secondary)); }
+.bg-surface-tertiary { background-color: rgb(var(--background-tertiary)); }
+.bg-surface-elevated { background-color: rgb(var(--background-elevated)); }
 
 .text-text-primary { color: rgb(var(--text-primary)); }
 .text-text-secondary { color: rgb(var(--text-secondary)); }

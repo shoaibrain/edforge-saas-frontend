@@ -164,7 +164,7 @@ function ActionMenu({
             <button
               type="button"
               onClick={() => { onWithdraw(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
               style={{ color: '#E24B4A' }}
             >
               <UserMinus className="w-3.5 h-3.5" />
@@ -173,7 +173,7 @@ function ActionMenu({
             <button
               type="button"
               onClick={() => { onTransfer(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
               style={{ color: '#378ADD' }}
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -183,7 +183,7 @@ function ActionMenu({
               <button
                 type="button"
                 onClick={() => { onMarkNoShow(); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-[11px] transition-colors hover:opacity-80"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
                 style={{ color: '#EF9F27' }}
               >
                 <UserX className="w-3.5 h-3.5" />
@@ -360,7 +360,7 @@ export function EnrollmentTable({
             value={gradeLevel ?? ''}
             onChange={(e) => onGradeLevelChange(e.target.value || null)}
             disabled={gradeOptionsLoading}
-            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               background: 'rgba(255, 255, 255, 0.04)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -375,7 +375,7 @@ export function EnrollmentTable({
           <select
             value={statusFilter ?? ''}
             onChange={(e) => onStatusChange(e.target.value || null)}
-            className="px-2.5 py-1.5 text-[11px] rounded-[8px] focus:outline-none"
+            className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none"
             style={{
               background: 'rgba(255, 255, 255, 0.04)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -391,7 +391,7 @@ export function EnrollmentTable({
             <button
               type="button"
               onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] rounded-[8px] transition-colors hover:opacity-80"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-[8px] transition-colors hover:opacity-80"
               style={{
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
