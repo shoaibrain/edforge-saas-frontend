@@ -225,7 +225,7 @@ export function ScrollSpyNav({
               className={cn(
                 'block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors',
                 isActive
-                  ? 'text-teal-600 dark:text-cyan-400 font-medium'
+                  ? 'text-[rgb(var(--action-secondary-fg))]  font-medium'
                   : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
               )}
             >
@@ -244,7 +244,7 @@ export function ScrollSpyNav({
       <motion.div
         animate={{ y: activeIndex * 44 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="absolute left-0 w-0.5 h-10 bg-gradient-to-b from-teal-500 to-cyan-500 rounded-full"
+        className="absolute left-0 w-0.5 h-10 bg-gradient-to-b from-[rgb(var(--action-primary-bg))] to-[rgb(var(--state-info-fg))] rounded-full"
       />
 
       {sections.map((section) => {
@@ -258,14 +258,14 @@ export function ScrollSpyNav({
             className={cn(
               'w-full flex items-center gap-3 px-4 py-2.5 text-sm rounded-xl transition-all',
               isActive
-                ? 'bg-teal-500/10 text-teal-700 dark:text-cyan-300 font-medium'
+                ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))]  font-medium'
                 : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))]'
             )}
           >
             {Icon && (
               <Icon className={cn(
                 'w-4 h-4',
-                isActive ? 'text-teal-500 dark:text-cyan-400' : ''
+                isActive ? 'text-[rgb(var(--action-secondary-fg))] ' : ''
               )} />
             )}
             <span>{section.label}</span>

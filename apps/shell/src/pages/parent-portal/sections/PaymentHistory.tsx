@@ -81,7 +81,7 @@ export function PaymentHistory({
             <div className="flex items-center gap-3 px-4 py-3">
               {/* Date */}
               <span
-                className="text-[11px] font-mono tabular-nums w-24 shrink-0"
+                className="text-xs font-mono tabular-nums w-24 shrink-0"
                 style={{ color: 'var(--v2-text-muted)' }}
               >
                 {formatDate(payment.date)}
@@ -90,14 +90,14 @@ export function PaymentHistory({
               {/* Description */}
               <div className="flex-1 min-w-0">
                 <p
-                  className="text-[12px] truncate"
+                  className="text-xs truncate"
                   style={{ color: 'var(--v2-text-secondary)' }}
                 >
                   {payment.description}
                 </p>
                 {payment.method && (
                   <p
-                    className="text-[10px]"
+                    className="text-xs"
                     style={{ color: 'var(--v2-text-hint)' }}
                   >
                     via {payment.method}
@@ -107,7 +107,7 @@ export function PaymentHistory({
 
               {/* Amount */}
               <span
-                className="text-[12px] font-semibold font-mono tabular-nums shrink-0"
+                className="text-xs font-semibold font-mono tabular-nums shrink-0"
                 style={{ color: 'var(--v2-brand-primary)' }}
               >
                 {formatCurrency(payment.amount)}
@@ -117,7 +117,7 @@ export function PaymentHistory({
               {payment.paymentId && (
                 <a
                   href={`/payments/${payment.paymentId}/receipt`}
-                  className="text-[10px] font-medium shrink-0"
+                  className="text-xs font-medium shrink-0"
                   style={{ color: 'var(--v2-info)' }}
                 >
                   {t('fees.receipt')}

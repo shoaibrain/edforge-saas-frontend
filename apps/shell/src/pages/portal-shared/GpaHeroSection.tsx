@@ -17,7 +17,7 @@ export function GpaHeroSection({ data, loading, childName }: GpaHeroSectionProps
     return (
       <section className="fp-progress-hero" style={{ padding: '40px 44px' }}>
         <div className="flex gap-8 items-center w-full">
-          <Skeleton className="w-[200px] h-[200px] rounded-full shrink-0" />
+          <Skeleton className="w-52 h-52 rounded-full shrink-0" />
           <div className="space-y-4 flex-1">
             <Skeleton className="h-6 w-3/4" />
             <Skeleton className="h-4 w-full" />

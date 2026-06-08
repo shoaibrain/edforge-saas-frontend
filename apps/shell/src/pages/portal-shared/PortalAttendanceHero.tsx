@@ -16,8 +16,8 @@ export function PortalAttendanceHero({ summary, loading }: PortalAttendanceHeroP
   if (loading || !summary) {
     return (
       <div className="fp-a-hero">
-        <Skeleton className="h-[320px] rounded-2xl" />
-        <Skeleton className="h-[320px] rounded-2xl" />
+        <Skeleton className="h-80 rounded-2xl" />
+        <Skeleton className="h-80 rounded-2xl" />
       </div>
     )
   }

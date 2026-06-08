@@ -129,7 +129,7 @@ function SettingsOverviewContent({
           transition={{ delay: 0.2 }}
           className="mt-3"
         >
-          <span className="px-3 py-1 text-xs font-medium rounded-full bg-teal-500/10 text-teal-600 dark:text-cyan-400 border border-teal-500/20">
+          <span className="px-3 py-1 text-xs font-medium rounded-full bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  border border-[rgb(var(--border-focus)/0.35)]">
             {userRole || 'User'}
           </span>
         </motion.div>
@@ -177,7 +177,7 @@ function SettingsOverviewContent({
       >
         <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-md mx-auto">
           {t('privacyNote')}{' '}
-          <a href="/privacy" className="text-teal-600 dark:text-cyan-400 hover:underline">
+          <a href="/privacy" className="text-[rgb(var(--action-secondary-fg))]  hover:underline">
             {t('privacyLearnMore')}
           </a>
         </p>

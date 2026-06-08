@@ -77,7 +77,7 @@ export function AttendanceRecordsList({
                <div key={rec.id} className="fp-t-row border-b-0 py-4" style={{ borderRadius: 0, paddingLeft: 0, paddingRight: 0 }}>
                  
                  {/* Left Date */}
-                 <div className="fp-t-num flex flex-col items-start min-w-[50px]">
+                 <div className="fp-t-num flex flex-col items-start min-w-12">
                    <span style={{ fontSize: '10px', marginTop: 0 }}>{wk}</span>
                    <div style={{ color: 'var(--fp-ink-3)', fontSize: '12px' }}>{md}</div>
                  </div>

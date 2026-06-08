@@ -237,7 +237,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
           <div className="p-8 text-center">
             <div className="text-2xl opacity-40 mb-2">👥</div>
             <h4 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1">No departments found</h4>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[250px] mx-auto leading-relaxed">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-64 mx-auto leading-relaxed">
               Create your first department to organize your school's academic structure.
             </p>
           </div>
@@ -443,7 +443,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
           <div className="p-8 text-center">
             <div className="text-2xl opacity-40 mb-2">📍</div>
             <h4 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1">No rooms configured</h4>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[250px] mx-auto leading-relaxed">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-64 mx-auto leading-relaxed">
               Add physical rooms and locations for scheduling. Rooms are assigned to class sections.
             </p>
           </div>

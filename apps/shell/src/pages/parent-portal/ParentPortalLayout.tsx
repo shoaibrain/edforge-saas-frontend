@@ -139,7 +139,7 @@ function ChildSelector({
         {isOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-            <div className="absolute top-full left-0 mt-1 z-20 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg min-w-[240px]">
+            <div className="absolute top-full left-0 mt-1 z-20 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg min-w-60">
               {children.map((child) => (
                 <button
                   key={child.studentId}

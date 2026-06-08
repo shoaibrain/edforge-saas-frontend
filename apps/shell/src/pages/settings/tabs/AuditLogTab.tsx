@@ -149,7 +149,7 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
           <div className="p-10 text-center">
             <div className="text-3xl opacity-40 mb-3">🛡️</div>
             <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No audit entries yet</h3>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-72 mx-auto leading-relaxed">
               Changes to this school's configuration will appear here with actor, timestamp, and before/after values.
             </p>
           </div>

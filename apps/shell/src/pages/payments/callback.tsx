@@ -104,7 +104,7 @@ export default function PaymentCallbackPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 mx-auto mb-4 text-teal-500 animate-spin" />
+          <Loader2 className="w-10 h-10 mx-auto mb-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {t('flow.verifying')}
           </p>
@@ -121,8 +121,8 @@ export default function PaymentCallbackPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-sm">
-          <div className="p-4 rounded-full bg-red-100 dark:bg-red-500/10 inline-flex mb-4">
-            <XCircle className="w-8 h-8 text-red-500" />
+          <div className="p-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]  inline-flex mb-4">
+            <XCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
           </div>
           <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             {t('error.failedToVerify')}
@@ -142,8 +142,8 @@ export default function PaymentCallbackPage() {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="px-6 py-2 rounded-xl bg-teal-600 text-white text-sm font-semibold
-                hover:bg-teal-700 transition-colors"
+              className="px-6 py-2 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold
+                hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
             >
               {t('actions.retry')}
             </button>
@@ -158,8 +158,8 @@ export default function PaymentCallbackPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <div className="p-4 rounded-full bg-emerald-100 dark:bg-emerald-500/10 inline-flex mb-4">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+          <div className="p-4 rounded-full bg-[rgb(var(--state-success-bg)/0.18)]  inline-flex mb-4">
+            <CheckCircle2 className="w-8 h-8 text-[rgb(var(--state-success-fg))] " />
           </div>
           <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             {t('flow.paymentSuccessful')}
@@ -178,8 +178,8 @@ export default function PaymentCallbackPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-sm">
-          <div className="p-4 rounded-full bg-red-100 dark:bg-red-500/10 inline-flex mb-4">
-            <XCircle className="w-8 h-8 text-red-500" />
+          <div className="p-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]  inline-flex mb-4">
+            <XCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
           </div>
           <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             {t('flow.paymentFailed')}
@@ -199,8 +199,8 @@ export default function PaymentCallbackPage() {
             <button
               type="button"
               onClick={() => navigate({ to: '/parent-portal/fees' })}
-              className="px-6 py-2 rounded-xl bg-teal-600 text-white text-sm font-semibold
-                hover:bg-teal-700 transition-colors"
+              className="px-6 py-2 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold
+                hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
             >
               {t('flow.tryAgain')}
             </button>
@@ -227,8 +227,8 @@ export default function PaymentCallbackPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/parent-portal/fees' })}
-            className="mt-6 px-6 py-2 rounded-xl bg-teal-600 text-white text-sm font-semibold
-              hover:bg-teal-700 transition-colors"
+            className="mt-6 px-6 py-2 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold
+              hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             {t('flow.returnToInvoices')}
           </button>

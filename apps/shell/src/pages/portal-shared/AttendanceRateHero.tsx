@@ -74,14 +74,14 @@ export function AttendanceRateHero({
               {displayRate}
             </p>
             <p
-              className="text-[11px] uppercase tracking-[0.04em] mt-1"
+              className="text-xs uppercase tracking-[0.04em] mt-1"
               style={{ color: 'var(--v2-text-muted)' }}
             >
               {t('attendance.yearToDate')}
             </p>
             {hasData && (
               <p
-                className="text-[12px] mt-2 max-w-[200px]"
+                className="text-xs mt-2 max-w-52"
                 style={{ color: 'var(--v2-text-secondary)' }}
               >
                 {attendanceRate >= 95
@@ -95,7 +95,7 @@ export function AttendanceRateHero({
             )}
             {!hasData && (
               <p
-                className="text-[12px] mt-2"
+                className="text-xs mt-2"
                 style={{ color: 'var(--v2-text-hint)' }}
               >
                 {t('attendance.noRecords')}

@@ -167,7 +167,7 @@ export function AssignmentList({
       {viewAllHref && thisWeekItems.length > 0 && (
         <a
           href={viewAllHref}
-          className="inline-block text-[12px] font-medium mt-2"
+          className="inline-block text-xs font-medium mt-2"
           style={{ color: 'var(--v2-brand-primary)' }}
         >
           {t('home.viewAll')} →

@@ -806,7 +806,7 @@ function YearsStep({
         <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-10 text-center">
           <div className="text-3xl opacity-40 mb-3">📅</div>
           <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No academic years yet</h3>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-72 mx-auto leading-relaxed mb-4">
             Create your first academic year to begin setting up your school's academic structure.
           </p>
           <button onClick={onCreateYear} className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
@@ -1139,7 +1139,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📋</div>
+            <div className="w-6 h-6 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📋</div>
             <div>
               <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{yearLabel} Sessions</h3>
               <p className="text-xs text-[rgb(var(--text-tertiary))]">{sessions.length} sessions configured</p>
@@ -1224,7 +1224,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
           <div className="p-6 text-center">
             <div className="text-2xl opacity-40 mb-2">📋</div>
             <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1">No sessions yet</h3>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-72 mx-auto leading-relaxed">
               Create your first session above — e.g., "First Semester" covering April through September. Sessions define when report cards are generated.
             </p>
           </div>
@@ -2588,7 +2588,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
         <div className="px-4 py-3 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-sm">💡</div>
+            <div className="w-6 h-6 rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-sm">💡</div>
             <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">How bell schedules work</h3>
           </div>
           <button onClick={() => setShowHowItWorksOverride(!showHowItWorks)} className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]">
@@ -2666,7 +2666,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📄</div>
+            <div className="w-6 h-6 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📄</div>
             <div>
               <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">Start from Template</h3>
               <p className="text-xs text-[rgb(var(--text-tertiary))]">Pre-built schedules — edit after applying</p>
@@ -2781,7 +2781,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                     return (
                       <div key={idx} className="flex items-center gap-2.5 px-3 py-1.5">
                         <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: colors.text }} />
-                        <span className="text-xs text-[rgb(var(--text-secondary))] min-w-[80px]">{period.classPeriodName || period.name}</span>
+                        <span className="text-xs text-[rgb(var(--text-secondary))] min-w-20">{period.classPeriodName || period.name}</span>
                         <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">{period.startTime} – {period.endTime}</span>
                         <span
                           className="text-xs font-medium px-1.5 py-px rounded ml-auto"
@@ -2803,7 +2803,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
           <div className="p-10 text-center">
             <div className="text-3xl opacity-40 mb-3">🕐</div>
             <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No bell schedules yet</h3>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-72 mx-auto leading-relaxed mb-4">
               Apply a template above or create your first schedule to define how each type of school day is structured.
             </p>
             <button className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">

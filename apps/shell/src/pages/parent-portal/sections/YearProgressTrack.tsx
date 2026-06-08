@@ -135,7 +135,7 @@ export function YearProgressTrack({
                     <AlertTriangle className="w-3 h-3" style={{ color: styles.icon }} />
                   ) : (
                     <span
-                      className="text-[10px] font-bold tabular-nums"
+                      className="text-xs font-bold tabular-nums"
                       style={{ color: styles.text }}
                     >
                       {i + 1}
@@ -143,13 +143,13 @@ export function YearProgressTrack({
                   )}
                 </div>
                 <span
-                  className="text-[9px] font-mono tabular-nums text-center max-w-[60px] truncate"
+                  className="text-xs font-mono tabular-nums text-center max-w-16 truncate"
                   style={{ color: styles.text }}
                 >
                   {node.label}
                 </span>
                 <span
-                  className="text-[9px] font-mono tabular-nums"
+                  className="text-xs font-mono tabular-nums"
                   style={{ color: 'var(--v2-text-hint)' }}
                 >
                   {formatCurrency(node.amount)}

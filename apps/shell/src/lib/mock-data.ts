@@ -408,7 +408,7 @@ export function getPersonStatusColor(status: PersonStatus): { bg: string; text: 
     active: { bg: 'bg-aqua-400/20', text: 'text-aqua-700 dark:text-aqua-400' },
     inactive: { bg: 'bg-vanilla-400/30', text: 'text-vanilla-700 dark:text-vanilla-400' },
     on_leave: { bg: 'bg-golden-400/20', text: 'text-golden-700 dark:text-golden-400' },
-    graduated: { bg: 'bg-teal-500/20', text: 'text-teal-700 dark:text-cyan-400' },
+    graduated: { bg: 'bg-[rgb(var(--action-primary-bg))]/20', text: 'text-[rgb(var(--state-info-fg))] ' },
     suspended: { bg: 'bg-rust-100 dark:bg-rust-900/30', text: 'text-rust-600 dark:text-rust-400' },
   }
   return colors[status]
@@ -418,7 +418,7 @@ export function getPersonTypeColor(type: PersonType): { bg: string; text: string
   const colors: Record<PersonType, { bg: string; text: string; icon: string }> = {
     student: { bg: 'bg-golden-400/20', text: 'text-golden-700 dark:text-golden-400', icon: 'text-golden-500' },
     guardian: { bg: 'bg-vanilla-400/30', text: 'text-vanilla-700 dark:text-vanilla-400', icon: 'text-vanilla-600' },
-    teacher: { bg: 'bg-teal-500/20', text: 'text-teal-700 dark:text-cyan-400', icon: 'text-teal-500 dark:text-cyan-400' },
+    teacher: { bg: 'bg-[rgb(var(--action-primary-bg))]/20', text: 'text-[rgb(var(--state-info-fg))] ', icon: 'text-[rgb(var(--action-secondary-fg))] ' },
     staff: { bg: 'bg-aqua-400/20', text: 'text-aqua-700 dark:text-aqua-400', icon: 'text-aqua-600 dark:text-aqua-400' },
     admin: { bg: 'bg-caramel-400/20', text: 'text-caramel-700 dark:text-caramel-400', icon: 'text-caramel-500' },
   }

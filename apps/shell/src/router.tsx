@@ -603,10 +603,10 @@ function RemoteModuleError({ error, reset }: ErrorComponentProps) {
   )
 
   return (
-    <div className="min-h-[400px] flex items-center justify-center p-6">
+    <div className="min-h-96 flex items-center justify-center p-6">
       <div className="max-w-lg w-full text-center">
-        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <div className="w-16 h-16 rounded-2xl bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182M2.985 19.644l3.181-3.183" />
           </svg>
         </div>
@@ -621,7 +621,7 @@ function RemoteModuleError({ error, reset }: ErrorComponentProps) {
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => window.location.reload()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-medium text-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg))]  dark:hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] font-medium text-sm transition-colors"
           >
             Reload Page
           </button>
@@ -706,10 +706,10 @@ function PortalPageError({ error, reset }: ErrorComponentProps) {
   const { t } = useTranslation('errors')
 
   return (
-    <div className="min-h-[400px] flex items-center justify-center p-6">
+    <div className="min-h-96 flex items-center justify-center p-6">
       <div className="max-w-lg w-full text-center">
-        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <div className="w-16 h-16 rounded-2xl bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
           </svg>
         </div>
@@ -722,7 +722,7 @@ function PortalPageError({ error, reset }: ErrorComponentProps) {
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-medium text-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg))]  dark:hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] font-medium text-sm transition-colors"
           >
             {t('tryAgain', { ns: 'common' })}
           </button>
@@ -736,7 +736,7 @@ function PortalPageError({ error, reset }: ErrorComponentProps) {
         {import.meta.env.DEV && error && (
           <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
             <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">{t('developerInfo')}</summary>
-            <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-red-500 font-mono overflow-x-auto max-h-40">
+            <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-[rgb(var(--state-danger-fg))] font-mono overflow-x-auto max-h-40">
               {error.message}
               {'\n\n'}
               {error.stack}

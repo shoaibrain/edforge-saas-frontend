@@ -34,7 +34,7 @@ export function ViewSwitcher({ activeView, onChange }: ViewSwitcherProps) {
           onClick={() => onChange(key)}
           role="tab"
           aria-selected={activeView === key}
-          className="px-3.5 py-1.5 rounded-md text-[12px] font-medium transition-colors"
+          className="px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors"
           style={{
             background: activeView === key ? 'var(--v2-bg-surface)' : 'transparent',
             color: activeView === key ? 'var(--v2-text-primary)' : 'var(--v2-text-muted)',

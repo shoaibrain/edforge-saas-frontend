@@ -152,7 +152,7 @@ export function InvoiceLedger({
                     )}
                   </p>
                   <p
-                    className="text-[11px]"
+                    className="text-xs"
                     style={{ color: 'var(--v2-text-hint)' }}
                   >
                     {formatDate(inv.dueDate)}
@@ -180,7 +180,7 @@ export function InvoiceLedger({
                       e.stopPropagation()
                       onPayInvoice(inv)
                     }}
-                    className="text-[11px] font-medium px-2.5 py-1 rounded-lg shrink-0 transition-colors"
+                    className="text-xs font-medium px-2.5 py-1 rounded-lg shrink-0 transition-colors"
                     style={{
                       background: 'var(--v2-brand-primary)',
                       color: '#fff',

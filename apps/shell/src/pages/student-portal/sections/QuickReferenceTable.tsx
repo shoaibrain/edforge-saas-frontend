@@ -45,7 +45,7 @@ export function QuickReferenceTable({
           borderColor: 'var(--v2-border-default)',
         }}
       >
-        <table className="w-full text-[12px]">
+        <table className="w-full text-xs">
           <thead>
             <tr
               className="border-b"
