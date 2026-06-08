@@ -1,18 +1,19 @@
 /**
  * EditUserModal Component
- * 
+ *
  * Modal for editing an existing user with form validation.
  * Features dirty form warning when closing with unsaved changes.
  */
 
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
 import { updateUserSchema, type UpdateUserDto, type UserResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
+import { TextField, SelectField } from '@edforge/forms'
 import { peopleService, parseApiError } from '../../services/people.service'
 
 export interface EditUserModalProps {
@@ -23,15 +24,8 @@ export interface EditUserModalProps {
 
 export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
   const queryClient = useQueryClient()
-  const firstInputRef = useRef<HTMLInputElement>(null)
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<UpdateUserDto>({
+  const methods = useForm<UpdateUserDto>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       firstName: '',
@@ -40,6 +34,13 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
       status: 'active',
     },
   })
+
+  const {
+    handleSubmit,
+    reset,
+    setError,
+    formState: { isSubmitting, isDirty },
+  } = methods
 
   // Reset form when user changes or modal opens
   useEffect(() => {
@@ -52,15 +53,6 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
       })
     }
   }, [open, user, reset])
-
-  // Auto-focus first input when modal opens
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        firstInputRef.current?.focus()
-      }, 100)
-    }
-  }, [open])
 
   // Handle close with dirty form warning
   const handleClose = () => {
@@ -85,7 +77,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
     },
     onError: (error) => {
       const parsed = parseApiError(error)
-      
+
       // Set field-level errors if available
       if (parsed.fieldErrors) {
         Object.entries(parsed.fieldErrors).forEach(([field, message]) => {
@@ -111,179 +103,103 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
       description={`Update information for ${user.firstName ?? ''} ${user.lastName ?? ''}`}
       size="md"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Email (read-only) */}
-        <div>
-          <label 
-            htmlFor="email" 
-            className="block text-sm font-medium text-text-primary mb-1.5"
-          >
-            Email Address
-          </label>
-          <div className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary">
-            {user.email}
-          </div>
-          <p className="mt-1 text-xs text-text-tertiary">
-            Email address cannot be changed
-          </p>
-        </div>
-
-        {/* Name Row */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* First Name */}
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-4">
+          {/* Email (read-only) */}
           <div>
-            <label 
-              htmlFor="firstName" 
+            <label
+              htmlFor="email"
               className="block text-sm font-medium text-text-primary mb-1.5"
             >
-              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+              Email Address
             </label>
-            <input
-              id="firstName"
+            <div className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary">
+              {user.email}
+            </div>
+            <p className="mt-1 text-xs text-text-tertiary">
+              Email address cannot be changed
+            </p>
+          </div>
+
+          {/* Name Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <TextField
+              name="firstName"
+              label="First Name"
               type="text"
-            {...register('firstName')}
-            ref={(e) => {
-              register('firstName').ref(e)
-              if (e) firstInputRef.current = e
-            }}
-              className={`
-                w-full px-3 py-2 rounded-lg border
-                bg-surface-secondary text-text-primary
-                placeholder:text-text-tertiary
-                focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-                transition-colors
-                ${errors.firstName ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-              `}
               placeholder="John"
+              required
+              autoFocus
               disabled={isSubmitting}
             />
-            {errors.firstName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
-            )}
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label 
-              htmlFor="lastName" 
-              className="block text-sm font-medium text-text-primary mb-1.5"
-            >
-              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="lastName"
+            <TextField
+              name="lastName"
+              label="Last Name"
               type="text"
-              {...register('lastName')}
-              className={`
-                w-full px-3 py-2 rounded-lg border
-                bg-surface-secondary text-text-primary
-                placeholder:text-text-tertiary
-                focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-                transition-colors
-                ${errors.lastName ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-              `}
               placeholder="Doe"
+              required
               disabled={isSubmitting}
             />
-            {errors.lastName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastName.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Phone */}
-        <div>
-          <label 
-            htmlFor="phone" 
-            className="block text-sm font-medium text-text-primary mb-1.5"
-          >
-            Phone Number
-          </label>
-          <input
-            id="phone"
+          {/* Phone */}
+          <TextField
+            name="phone"
+            label="Phone Number"
             type="tel"
-            {...register('phone')}
-            className={`
-              w-full px-3 py-2 rounded-lg border
-              bg-surface-secondary text-text-primary
-              placeholder:text-text-tertiary
-              focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-              transition-colors
-              ${errors.phone ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-            `}
             placeholder="+1 (555) 123-4567"
             disabled={isSubmitting}
           />
-          {errors.phone && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
-          )}
-        </div>
 
-        {/* Status */}
-        <div>
-          <label 
-            htmlFor="status" 
-            className="block text-sm font-medium text-text-primary mb-1.5"
-          >
-            Account Status
-          </label>
-          <select
-            id="status"
-            {...register('status')}
-            className={`
-              w-full px-3 py-2 rounded-lg border
-              bg-surface-secondary text-text-primary
-              focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-              transition-colors
-              ${errors.status ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-            `}
+          {/* Status */}
+          <SelectField
+            name="status"
+            label="Account Status"
+            options={[
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+              { value: 'suspended', label: 'Suspended' },
+            ]}
             disabled={isSubmitting}
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-          </select>
-          {errors.status && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.status.message}</p>
+          />
+
+          {/* Dirty form indicator */}
+          {isDirty && (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              You have unsaved changes
+            </p>
           )}
-        </div>
 
-        {/* Dirty form indicator */}
-        {isDirty && (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
-            You have unsaved changes
-          </p>
-        )}
-
-        {/* Footer with actions */}
-        <ModalFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !isDirty}
-            className="min-w-24"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          {/* Footer with actions */}
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !isDirty}
+              className="min-w-24"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }
