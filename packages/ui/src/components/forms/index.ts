@@ -41,3 +41,4 @@ export {
   type RadioOption,
 } from './RadioGroup'
 export { Switch, SwitchField, type SwitchFieldProps, type SwitchProps } from './Switch'
+export { GradeRangeField, type GradeRangeFieldProps } from './GradeRangeField'

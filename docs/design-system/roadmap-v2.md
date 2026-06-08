@@ -143,9 +143,9 @@ This restates the FINAL plan's intent with the actual post-#134 state baked in. 
 ### Epic P — Primitive completion & correctness
 *Close the defects so downstream consumers build on solid ground.*
 - **P.1** ✅ **Done.** Part D must-fixes #1–#3 + should-fixes #6–#7: Checkbox indeterminate, Tabs roving-tabindex/keyboard + correct SegmentedControl semantics, RadioGroup name fallback, Switch label wiring (+`Field.labelId`, consumed by Select), aria-busy/aria-live on loading/counter states. Validated: typecheck 33/33, vitest 962/962, lint 0 errors.
-- **P.2** Resolve two-form-systems; codify in `forms.md`; delete shim patterns.
-- **P.3** Fill the remaining catalog gaps the audit/plan name and the migration will need: **Modal/Drawer form-footer recipes**, **status-badge** primitive (state-token-backed, to replace ad-hoc emerald/red/gray), and a documented **GradeRangeField** recipe (composed dual-`Select` with shared error region).
-- *Exit:* every primitive passes its own a11y test; one canonical form API.
+- **P.2** ✅ **Decided + codified.** Canonical rule in `forms.md` ("Which form API to use"): `@edforge/forms` RHF adapters for any validated/multi-field form; `@edforge/ui` primitives directly only for trivial local-state forms; never hand-roll `forwardRef` shims onto native controls. Retiring the `BasicInfoStep` shims is scheduled into Epic T.
+- **P.3** ✅ **Done.** **StatusBadge** primitive (state-token-backed, theme-aware tones, replaces ad-hoc emerald/red/gray) and **GradeRangeField** recipe (composed dual-`Select` with shared label + error region; added an `aria-label` passthrough to `Select`) shipped with tests + docs. Note: **Modal/Drawer form-footer recipes already existed** (`ModalFooter`/`DrawerFooter`) — no rebuild needed.
+- *Exit:* every primitive passes its own a11y test; one canonical form API. ✅
 
 ### Epic S — People pilot (honor the plan's pilot rule)
 *Prove the full-journey recipe on one MFE before fan-out — the step #134 skipped.*

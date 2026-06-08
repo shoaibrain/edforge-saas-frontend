@@ -59,6 +59,7 @@ export interface SelectProps
   leadingIcon?: ReactNode
   buttonClassName?: string
   optionsClassName?: string
+  'aria-label'?: string
 }
 
 interface SelectControlProps
@@ -74,6 +75,7 @@ interface SelectControlProps
       | 'leadingIcon'
       | 'buttonClassName'
       | 'optionsClassName'
+      | 'aria-label'
     >,
     VariantProps<typeof selectButtonVariants> {
   disabled?: boolean
@@ -96,6 +98,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
       leadingIcon,
       buttonClassName,
       optionsClassName,
+      'aria-label': ariaLabel,
     },
     ref
   ) => {
@@ -111,7 +114,8 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
           <ListboxButton
             ref={ref}
             id={field?.controlId}
-            aria-labelledby={field?.labelId}
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabel ? undefined : field?.labelId}
             aria-invalid={resolvedInvalid ? true : undefined}
             aria-describedby={field?.describedBy}
             className={cn(

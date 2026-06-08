@@ -53,6 +53,12 @@ export {
 } from './components/Table'
 export { Dropdown, type DropdownOption } from './components/Dropdown'
 export { Tag, tagVariants, type TagProps } from './components/Tag'
+export {
+  StatusBadge,
+  statusBadgeVariants,
+  type StatusBadgeProps,
+  type StatusTone,
+} from './components/StatusBadge'
 export { Accordion, type AccordionItem, type AccordionProps } from './components/Accordion'
 export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
@@ -68,6 +74,7 @@ export {
   Checkbox,
   CheckboxField,
   Combobox,
+  GradeRangeField,
   Input,
   RadioGroup,
   RadioGroupField,
@@ -88,6 +95,7 @@ export {
   type ComboboxProps,
   type FieldContextValue,
   type FieldProps,
+  type GradeRangeFieldProps,
   type InputProps,
   type RadioGroupFieldProps,
   type RadioGroupProps,

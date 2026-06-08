@@ -25,8 +25,26 @@ Owns presentation primitives:
 - `Checkbox`
 - `RadioGroup`
 - `Switch`
+- `GradeRangeField` (composed dual-`Select` recipe with a shared label + error region)
 
 These primitives must not depend on React Hook Form. They receive normal React props, semantic state props, generated IDs where needed, and class names for layout-only adjustment.
+
+## Which form API to use (canonical rule)
+
+There are two layers; do not improvise a third. Pick by whether the form has React Hook Form behind it.
+
+| Your form is… | Use | Examples |
+|---|---|---|
+| **RHF-bound** — has validation, multiple fields, dirty/touched/submit state, or a Zod resolver | **`@edforge/forms`** adapters (`TextField`, `SelectField`, `TextareaField`, `ToggleField`, `CheckboxField`, `RadioGroupField`) inside a `FormProvider` | school wizard, organization SEA/LEA/ESC forms, student registration, staff forms |
+| **Trivial local state** — one or two `useState` controls, no RHF, no resolver | **`@edforge/ui` form primitives** directly (`Field` + `Input`/`Select`/…) | a single inline filter, a one-toggle settings row, a quick search box |
+
+Rules that follow from this:
+
+- **Never hand-roll a `forwardRef` shim** that adapts a primitive back onto a native `<select>`/`<input>` event API (the retired `AnimatedInput`/`AnimatedSelect` pattern). If a screen needs RHF, use `@edforge/forms`; if it doesn't, use the primitive directly.
+- `@edforge/forms` adapters **must** wrap `@edforge/ui` primitives — they own RHF wiring only, never colors/focus/borders/native-select styling.
+- AdminWeb and any MFE may import `@edforge/forms` and `@edforge/ui` (both are published / workspace-resolvable for backend builds); neither may import workspace-only `@edforge/*` packages into a Docker/CodeBuild-built target.
+
+> Migration note: screens still using local `AnimatedInput`/`AnimatedSelect` shims (e.g. `BasicInfoStep`) are scheduled to move onto `@edforge/forms` adapters during the settings/onboarding sweep (roadmap-v2 Epic T).
 
 ### `@edforge/forms`
 
