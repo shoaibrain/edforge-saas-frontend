@@ -58,6 +58,7 @@ export { Container, containerVariants, type ContainerProps } from './components/
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
 export { Stack, stackVariants, type StackProps } from './components/layout/Stack'
 export { Heading, headingVariants, type HeadingProps } from './components/typography/Heading'
+export { Text, textVariants, type TextProps } from './components/typography/Text'
 
 // TanStack Data Table
 export {
