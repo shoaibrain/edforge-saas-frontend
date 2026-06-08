@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { Loader2, AlertTriangle, Trash2 } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
 import type { StaffResponseDto } from '@aibrains/shared-types'
+import { Input } from '@edforge/ui'
 import { Modal, ModalFooter, Button } from '../ui'
 
 export interface DeleteConfirmDialogProps {
@@ -94,19 +95,12 @@ export function DeleteConfirmDialog({
             {t('delete.typeToConfirm', { email: '' })}
             <span className="font-mono text-[rgb(var(--state-danger-fg))]">{staff.email}</span>
           </label>
-          <input
+          <Input
             id="confirmEmail"
             type="email"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
-            className={`
-              w-full px-3 py-2 rounded-lg border
-              bg-surface-secondary text-text-primary
-              placeholder:text-text-tertiary
-              focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]
-              transition-colors
-              ${confirmText && !canDelete ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-            `}
+            invalid={Boolean(confirmText && !canDelete)}
             placeholder={t('delete.emailPlaceholder')}
             disabled={isDeleting}
             autoComplete="off"
