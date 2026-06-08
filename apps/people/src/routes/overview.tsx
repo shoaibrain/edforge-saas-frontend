@@ -328,8 +328,8 @@ export function Overview() {
         </div>
       </div>
 
-      {/* THREE-COL: Activity + Dir shortcut + HR shortcut */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* TWO-COL: Activity (wide) + Staff Directory shortcut (HR shortcut removed — out of scope) */}
+      <div className="grid grid-cols-[2fr_1fr] gap-3">
         {/* RECENT ACTIVITY */}
         <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
           <div className="flex items-center gap-2 border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
