@@ -55,6 +55,7 @@ import ParentAttendancePage from './pages/parent-portal/ParentAttendancePage'
 import ParentSchedulePage from './pages/parent-portal/ParentSchedulePage'
 import FeePaymentPage from './pages/parent-portal/FeePaymentPage'
 import PaymentCallbackPage from './pages/payments/callback'
+import DesignSystemDevPage from './pages/dev/design-system'
 import {
   AccountPage,
   SecurityPage,
@@ -468,6 +469,12 @@ const homeRoute = createRoute({
   component: HomePage,
 })
 
+const devDesignSystemRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '/dev/design-system',
+  component: DesignSystemDevPage,
+})
+
 // ============================================================================
 // SETTINGS ROUTES
 // ============================================================================
@@ -864,6 +871,7 @@ const routeTree = rootRoute.addChildren([
   ]),
   protectedRoute.addChildren([
     homeRoute,
+    devDesignSystemRoute,
     settingsRoute.addChildren([
       settingsIndexRoute,
       settingsAccountRoute,
