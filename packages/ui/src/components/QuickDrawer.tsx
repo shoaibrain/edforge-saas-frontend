@@ -220,7 +220,7 @@ function Body({ children, className }: QuickDrawerBodyProps) {
     <div
       className={cn(
         'flex-1 overflow-y-auto',
-        '[&::-webkit-scrollbar]:w-[3px]',
+        '[&::-webkit-scrollbar]:w-1',
         '[&::-webkit-scrollbar-track]:bg-transparent',
         '[&::-webkit-scrollbar-thumb]:bg-[var(--v2-scrollbar-thumb,rgba(255,255,255,0.1))]',
         '[&::-webkit-scrollbar-thumb]:rounded-full',

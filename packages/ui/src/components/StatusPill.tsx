@@ -61,7 +61,7 @@ export const StatusPill = forwardRef<HTMLSpanElement, StatusPillProps>(
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium leading-tight border',
+          'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium leading-tight border',
           className
         )}
         style={{

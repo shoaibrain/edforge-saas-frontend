@@ -45,7 +45,7 @@ function StatTileSkeleton() {
         boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
       }}
     >
-      <div className="h-[34px] w-[34px] rounded-[10px] v2-skeleton-pulse mb-3" style={{ background: 'var(--v2-bg-elevated)' }} />
+      <div className="h-8 w-8 rounded-[10px] v2-skeleton-pulse mb-3" style={{ background: 'var(--v2-bg-elevated)' }} />
       <div className="h-3 w-14 rounded v2-skeleton-pulse mb-3" style={{ background: 'var(--v2-bg-elevated)' }} />
       <div className="h-10 w-20 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
     </div>
@@ -125,7 +125,7 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
           {onRetry && (
             <button
               onClick={onRetry}
-              className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+              className="text-xs font-medium px-1.5 py-0.5 rounded"
               style={{ background: 'var(--v2-warning-bg)', color: 'var(--v2-warning)' }}
             >
               Retry
