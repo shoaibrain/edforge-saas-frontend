@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from 'react'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { ChevronDown, Check } from 'lucide-react'
-import { cn } from '../utils'
+import { cn, focusRing, focusRingInset } from '../utils'
 
 export interface DropdownOption {
   id: string
@@ -38,7 +38,8 @@ export function Dropdown({
         className={cn(
           'flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-left',
           'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
-          'hover:bg-[rgb(var(--surface-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30',
+          'hover:bg-[rgb(var(--surface-tertiary))]',
+          focusRing,
           'transition-colors duration-150',
           buttonClassName
         )}
@@ -67,6 +68,7 @@ export function Dropdown({
                     onClick={() => onChange(option.id)}
                     className={cn(
                       'flex items-center w-full px-3 py-2.5 text-sm',
+                      focusRingInset,
                       active ? 'bg-[rgb(var(--surface-secondary))]' : '',
                       value === option.id ? 'text-teal-500' : 'text-[rgb(var(--text-primary))]'
                     )}
