@@ -1,7 +1,7 @@
-import { type ReactNode } from 'react'
+import { type KeyboardEvent, type ReactNode } from 'react'
 import { flexRender } from '@tanstack/react-table'
 import type { Row } from '@tanstack/react-table'
-import { cn } from '../../utils'
+import { cn, focusRingInset } from '../../utils'
 import { useDataTable } from './hooks/useDataTable'
 import { DataTableColumnHeader } from './DataTableColumnHeader'
 import { DataTableSkeleton } from './DataTableSkeleton'
@@ -286,6 +286,15 @@ function TableRowWithExpansion<TData>({
   const isSelected = row.getIsSelected()
   const isExpanded = enableExpanding && row.getIsExpanded()
   const isEvenRow = rowIndex % 2 === 0
+  const isInteractive = typeof onRowClick === 'function'
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>) => {
+    if (!isInteractive) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onRowClick(row.original)
+    }
+  }
 
   return (
     <>
@@ -297,11 +306,13 @@ function TableRowWithExpansion<TData>({
             : isEvenRow
               ? 'bg-[rgb(var(--surface-tertiary)/0.35)]'
               : '',
-          !isSelected && onRowClick && 'cursor-pointer',
+          !isSelected && isInteractive && ['cursor-pointer', focusRingInset],
           !isSelected && 'hover:bg-[rgb(var(--brand-primary)/0.06)]',
           isExpanded && 'border-b-0'
         )}
-        onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+        onClick={isInteractive ? () => onRowClick(row.original) : undefined}
+        onKeyDown={handleKeyDown}
+        tabIndex={isInteractive ? 0 : undefined}
         data-state={isSelected ? 'selected' : undefined}
         aria-selected={isSelected || undefined}
       >
