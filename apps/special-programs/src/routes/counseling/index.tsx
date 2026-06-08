@@ -14,8 +14,8 @@ export function CounselingModule() {
         <div className="px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20">
-                <Users className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)]">
+                <Users className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-text-primary">School Counseling</h1>
@@ -24,7 +24,7 @@ export function CounselingModule() {
                 </p>
               </div>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-white rounded-lg hover:bg-accent-primary/90 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg))]/90 transition-colors">
               <Plus className="w-4 h-4" />
               <span>New Session</span>
             </button>
@@ -39,22 +39,22 @@ export function CounselingModule() {
             icon={Users}
             label="Active Cases"
             value="67"
-            accent="text-teal-600 dark:text-teal-400"
-            bg="bg-teal-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={Calendar}
             label="Sessions Today"
             value="8"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={MessageCircle}
             label="Sessions (MTD)"
             value="156"
-            accent="text-purple-600 dark:text-purple-400"
-            bg="bg-purple-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={TrendingUp}
@@ -74,8 +74,8 @@ export function CounselingModule() {
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-teal-500/10">
-              <Users className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+              <Users className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -89,15 +89,15 @@ export function CounselingModule() {
               </p>
               <ul className="text-sm text-text-secondary space-y-1">
                 <li className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-teal-500" />
+                  <FileText className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                   <span>Confidential session documentation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-teal-500" />
+                  <Clock className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                   <span>Appointment scheduling and reminders</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-teal-500" />
+                  <TrendingUp className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                   <span>Crisis intervention protocols and tracking</span>
                 </li>
               </ul>

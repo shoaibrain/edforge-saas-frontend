@@ -13,8 +13,8 @@ export function AccommodationsModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-              <Settings className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.18)] to-[rgb(var(--state-info-bg)/0.10)]">
+              <Settings className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Accommodations Registry</h1>
@@ -33,22 +33,22 @@ export function AccommodationsModule() {
             icon={FileText}
             label="Accommodation Types"
             value="48"
-            accent="text-purple-600 dark:text-purple-400"
-            bg="bg-purple-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={Users}
             label="Students Served"
             value="236"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={BookOpen}
             label="Testing Accommodations"
             value="18"
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            accent="text-[rgb(var(--state-success-fg))]"
+            bg="bg-[rgb(var(--state-success-bg)/0.18)]"
           />
           <StatCard
             icon={ClipboardCheck}
@@ -62,8 +62,8 @@ export function AccommodationsModule() {
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-purple-500/10">
-              <Settings className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+              <Settings className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -77,15 +77,15 @@ export function AccommodationsModule() {
               </p>
               <ul className="text-sm text-text-secondary space-y-1">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-purple-500" />
+                  <CheckCircle className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                   <span>Standardized accommodation definitions</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-purple-500" />
+                  <CheckCircle className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                   <span>State testing eligibility mapping</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-purple-500" />
+                  <CheckCircle className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
                   <span>Teacher notification and implementation guidance</span>
                 </li>
               </ul>
@@ -157,7 +157,7 @@ function CategoryCard({
     <div className="bg-surface-secondary rounded-xl border border-border-secondary p-5">
       <div className="flex items-center justify-between mb-2">
         <h4 className="font-medium text-text-primary">{title}</h4>
-        <span className="text-sm text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">
+        <span className="text-sm text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)] px-2 py-0.5 rounded">
           {count}
         </span>
       </div>

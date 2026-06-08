@@ -13,8 +13,8 @@ export function InterventionsModule() {
       <div className="border-b border-border-secondary bg-surface-secondary/50">
         <div className="px-6 py-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20">
-              <TrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-warning-bg)/0.18)] to-amber-500/20">
+              <TrendingUp className="w-6 h-6 text-[rgb(var(--state-warning-fg))]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Interventions</h1>
@@ -34,8 +34,8 @@ export function InterventionsModule() {
             label="Tier 1 (Universal)"
             value="1,089"
             subtext="87%"
-            accent="text-emerald-600 dark:text-emerald-400"
-            bg="bg-emerald-500/10"
+            accent="text-[rgb(var(--state-success-fg))]"
+            bg="bg-[rgb(var(--state-success-bg)/0.18)]"
           />
           <StatCard
             icon={Users}
@@ -50,24 +50,24 @@ export function InterventionsModule() {
             label="Tier 3 (Intensive)"
             value="34"
             subtext="3%"
-            accent="text-red-600 dark:text-red-400"
-            bg="bg-red-500/10"
+            accent="text-[rgb(var(--state-danger-fg))]"
+            bg="bg-[rgb(var(--state-danger-bg)/0.18)]"
           />
           <StatCard
             icon={ArrowUpCircle}
             label="Movement (MTD)"
             value="18"
             subtext="↑ Positive"
-            accent="text-blue-600 dark:text-blue-400"
-            bg="bg-blue-500/10"
+            accent="text-[rgb(var(--state-info-fg))]"
+            bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
         </div>
 
         {/* Product Description */}
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-orange-500/10">
-              <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+            <div className="p-3 rounded-lg bg-[rgb(var(--state-warning-bg)/0.18)]">
+              <TrendingUp className="w-5 h-5 text-[rgb(var(--state-warning-fg))]" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -80,15 +80,15 @@ export function InterventionsModule() {
               </p>
               <ul className="text-sm text-text-secondary space-y-1">
                 <li className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-orange-500" />
+                  <BarChart3 className="w-4 h-4 text-[rgb(var(--state-warning-fg))]" />
                   <span>Progress monitoring with visual trend charts</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-orange-500" />
+                  <Clock className="w-4 h-4 text-[rgb(var(--state-warning-fg))]" />
                   <span>Intervention fidelity tracking and documentation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <ArrowUpCircle className="w-4 h-4 text-orange-500" />
+                  <ArrowUpCircle className="w-4 h-4 text-[rgb(var(--state-warning-fg))]" />
                   <span>Team meeting support and tier movement recommendations</span>
                 </li>
               </ul>
@@ -174,7 +174,7 @@ function AreaCard({
       <p className="text-sm text-text-secondary mb-4">{description}</p>
       <div className="flex items-center gap-4 text-sm">
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="w-2 h-2 rounded-full bg-[rgb(var(--state-success-fg))]" />
           <span className="text-text-tertiary">T2: {tiers[0]}</span>
         </span>
         <span className="flex items-center gap-1">
@@ -182,7 +182,7 @@ function AreaCard({
           <span className="text-text-tertiary">T2: {tiers[1]}</span>
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-red-500" />
+          <span className="w-2 h-2 rounded-full bg-[rgb(var(--state-danger-fg))]" />
           <span className="text-text-tertiary">T3: {tiers[2]}</span>
         </span>
       </div>
