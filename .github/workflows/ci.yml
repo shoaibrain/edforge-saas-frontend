@@ -1,0 +1,54 @@
+name: CI
+
+# Stop-the-line gates for the design-system effort (roadmap-v2 Epic G).
+# These mirror the gates in docs/design-system-sprint-plan-FINAL.md §1 that
+# were previously only run manually. Baseline at introduction was fully green:
+# typecheck 33/33, lint 0 errors (warnings are the intentional ratchet
+# backlog), vitest 958/958.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: typecheck · lint · test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # vitest resolves apps against built workspace package dist/, so build
+      # the packages before the gates. turbo typecheck/lint also depend on
+      # ^build and reuse this cache.
+      - name: Build workspace packages
+        run: pnpm build:packages
+
+      - name: Typecheck
+        run: pnpm turbo typecheck
+
+      # Lint gate fails on errors only. The ~1.2k no-explicit-any /
+      # no-unused-vars warnings are the documented ratchet backlog, held on
+      # new code via review — not a build breaker (no --max-warnings 0 yet).
+      - name: Lint
+        run: pnpm turbo lint
+
+      - name: Unit tests
+        run: pnpm vitest run
