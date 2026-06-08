@@ -25,7 +25,7 @@ import {
   Building2,
   RefreshCw,
 } from 'lucide-react'
-import { Button, FieldLockTooltip, FieldLockIcon } from '@edforge/ui'
+import { Button, FieldLockTooltip, FieldLockIcon, InlineAlert, Select, Switch } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
@@ -153,7 +153,41 @@ const NUMBER_FORMAT_OPTIONS = [
 // COMING SOON — re-enable when Organization Branding section ships
 // const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
-const SELECT_CLASS = 'min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+type WorkspaceSelectOption = {
+  value: string
+  label: string
+  offset?: string
+  example?: string
+}
+
+function WorkspaceSelect({
+  value,
+  onChange,
+  disabled,
+  options,
+}: {
+  value: string
+  onChange: (value: string) => void
+  disabled?: boolean
+  options: WorkspaceSelectOption[]
+}) {
+  return (
+    <Select
+      value={value}
+      onChange={(nextValue) => nextValue && onChange(nextValue)}
+      disabled={disabled}
+      buttonClassName="min-w-52"
+      options={options.map((option) => ({
+        value: option.value,
+        label: option.offset
+          ? `${option.label} (${option.offset})`
+          : option.example
+            ? `${option.label} (${option.example})`
+            : option.label,
+      }))}
+    />
+  )
+}
 
 // ============================================================================
 // DEFAULT SETTINGS (fallback when API data unavailable)
@@ -591,178 +625,122 @@ export default function WorkspaceSettingsPage() {
                 admin learns exactly which school+year to close to unlock.
               Display-only fields (locale, date/time/number format,
               enableDualDateDisplay) remain editable in either state. */}
-          <div
-            className={`flex items-start gap-2.5 px-3 py-2.5 rounded-lg mb-2 border text-xs ${
-              isLocked
-                ? 'bg-golden-500/5 border-golden-500/20 text-golden-700 dark:text-golden-400'
-                : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-tertiary))] text-[rgb(var(--text-tertiary))]'
-            }`}
+          <InlineAlert
+            variant={isLocked ? 'warning' : 'info'}
+            icon={<Lock className="w-3.5 h-3.5" />}
+            className="mb-2 text-xs"
           >
-            <Lock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 leading-relaxed">
-              {isLocked ? (
-                <>
-                  <p>
-                    <strong className="font-semibold">Locked.</strong>{' '}
-                    {displaySettings.lockReason ||
-                      'Regional settings that affect stored data are frozen while an academic year is active.'}{' '}
-                    Display-only fields (language, date/time format, number grouping) remain editable.
-                  </p>
-                  {lockHolders.length > 0 && (
-                    <ul className="mt-2 space-y-0.5 text-xs opacity-90">
-                      {lockHolders.map((h) => (
-                        <li key={`${h.schoolId}#${h.yearId}`}>
-                          Blocked by <strong className="font-semibold">{h.schoolName}</strong>
-                          {' · '}
-                          <span>{h.yearName}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              ) : (
+            {isLocked ? (
+              <>
                 <p>
-                  <strong className="font-semibold">Heads up —</strong> fields that
-                  affect stored data (currency, calendar system, timezone, week start)
-                  become read-only when an academic year is active, to preserve
-                  consistency across reports, invoices, and audit trails. Display-only
-                  fields remain editable throughout.
+                  <strong className="font-semibold">Locked.</strong>{' '}
+                  {displaySettings.lockReason ||
+                    'Regional settings that affect stored data are frozen while an academic year is active.'}{' '}
+                  Display-only fields (language, date/time format, number grouping) remain editable.
                 </p>
-              )}
-            </div>
-          </div>
+                {lockHolders.length > 0 && (
+                  <ul className="mt-2 space-y-0.5 text-xs opacity-90">
+                    {lockHolders.map((h) => (
+                      <li key={`${h.schoolId}#${h.yearId}`}>
+                        Blocked by <strong className="font-semibold">{h.schoolName}</strong>
+                        {' · '}
+                        <span>{h.yearName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            ) : (
+              <p>
+                <strong className="font-semibold">Heads up —</strong> fields that
+                affect stored data (currency, calendar system, timezone, week start)
+                become read-only when an academic year is active, to preserve
+                consistency across reports, invoices, and audit trails. Display-only
+                fields remain editable throughout.
+              </p>
+            )}
+          </InlineAlert>
 
           <SettingsFieldRow label={renderLabel('Default Timezone', lkTimezone)} description="Organization's primary timezone for scheduling and timestamps" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultTimezone}
-              onChange={(e) => updateField('regional', 'defaultTimezone', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultTimezone', value)}
               disabled={lkTimezone.locked}
-              className={SELECT_CLASS}
-            >
-              {constrainOptionsByArchetype(TIMEZONE_OPTIONS, 'timezone', { archetype, country, current: displaySettings.regional.defaultTimezone }).map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label} ({opt.offset})
-                </option>
-              ))}
-            </select>
+              options={constrainOptionsByArchetype(TIMEZONE_OPTIONS, 'timezone', { archetype, country, current: displaySettings.regional.defaultTimezone })}
+            />
           </SettingsFieldRow>
 
           <SettingsFieldRow label={renderLabel('Default Language', lkLocale)} description="Primary language for new users and system communications" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultLocale}
-              onChange={(e) => updateField('regional', 'defaultLocale', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultLocale', value)}
               disabled={lkLocale.locked}
-              className={SELECT_CLASS}
-            >
-              {LOCALE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              options={LOCALE_OPTIONS}
+            />
           </SettingsFieldRow>
 
           <SettingsFieldRow label={renderLabel('Date Format', lkDateFormat)} description="How dates are displayed across the platform" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultDateFormat}
-              onChange={(e) => updateField('regional', 'defaultDateFormat', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultDateFormat', value)}
               disabled={lkDateFormat.locked}
-              className={SELECT_CLASS}
-            >
-              {DATE_FORMAT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label} ({opt.example})
-                </option>
-              ))}
-            </select>
+              options={DATE_FORMAT_OPTIONS}
+            />
           </SettingsFieldRow>
 
           <SettingsFieldRow label={renderLabel('Time Format', lkTimeFormat)} description="12 or 24 hour clock" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultTimeFormat}
-              onChange={(e) => updateField('regional', 'defaultTimeFormat', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultTimeFormat', value)}
               disabled={lkTimeFormat.locked}
-              className={SELECT_CLASS}
-            >
-              {TIME_FORMAT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label} ({opt.example})
-                </option>
-              ))}
-            </select>
+              options={TIME_FORMAT_OPTIONS}
+            />
           </SettingsFieldRow>
 
           <SettingsFieldRow label={renderLabel('Week Starts On', lkWeekStartsOn)} description="First day of the week in calendars" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultWeekStartsOn}
-              onChange={(e) => updateField('regional', 'defaultWeekStartsOn', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultWeekStartsOn', value)}
               disabled={lkWeekStartsOn.locked}
-              className={SELECT_CLASS}
-            >
-              {WEEK_START_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              options={WEEK_START_OPTIONS}
+            />
           </SettingsFieldRow>
 
           <SettingsFieldRow label={renderLabel('Default Currency', lkCurrency)} description="Currency used for invoices, payments, and financial reports" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultCurrency}
-              onChange={(e) => updateField('regional', 'defaultCurrency', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultCurrency', value)}
               disabled={lkCurrency.locked}
-              className={SELECT_CLASS}
-            >
-              {constrainOptionsByArchetype(CURRENCY_OPTIONS, 'currency', { archetype, country, current: displaySettings.regional.defaultCurrency }).map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              options={constrainOptionsByArchetype(CURRENCY_OPTIONS, 'currency', { archetype, country, current: displaySettings.regional.defaultCurrency })}
+            />
           </SettingsFieldRow>
 
           <SettingsFieldRow label={renderLabel('Calendar System', lkCalendarSystem)} description="Primary calendar system for date display" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultCalendarSystem}
-              onChange={(e) => updateField('regional', 'defaultCalendarSystem', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultCalendarSystem', value)}
               disabled={lkCalendarSystem.locked}
-              className={SELECT_CLASS}
-            >
-              {constrainOptionsByArchetype(CALENDAR_SYSTEM_OPTIONS, 'calendarSystem', { archetype, country, current: displaySettings.regional.defaultCalendarSystem }).map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              options={constrainOptionsByArchetype(CALENDAR_SYSTEM_OPTIONS, 'calendarSystem', { archetype, country, current: displaySettings.regional.defaultCalendarSystem })}
+            />
           </SettingsFieldRow>
 
           {displaySettings.regional.defaultCalendarSystem === 'bikram_sambat' && (
             <SettingsFieldRow label={renderLabel('Show Bikram Sambat Dates', lkDualDate)} description="Display BS dates alongside Gregorian dates in finance and academic modules" inline>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={displaySettings.regional.enableDualDateDisplay}
-                onClick={() => updateField('regional', 'enableDualDateDisplay', !displaySettings.regional.enableDualDateDisplay)}
+              <Switch
+                checked={displaySettings.regional.enableDualDateDisplay}
+                onChange={(checked) => updateField('regional', 'enableDualDateDisplay', checked)}
                 disabled={lkDualDate.locked}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] ${
-                  displaySettings.regional.enableDualDateDisplay
-                    ? 'bg-[rgb(var(--action-primary-bg))]'
-                    : 'bg-[rgb(var(--border-primary))]'
-                } ${lkDualDate.locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-[rgb(var(--background-secondary))] transition-transform ${
-                    displaySettings.regional.enableDualDateDisplay ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
+              />
             </SettingsFieldRow>
           )}
 
           <SettingsFieldRow label={renderLabel('Number Format', lkNumberFormat)} description="How numbers are grouped in financial displays" inline>
-            <select
+            <WorkspaceSelect
               value={displaySettings.regional.defaultNumberFormat}
-              onChange={(e) => updateField('regional', 'defaultNumberFormat', e.target.value)}
+              onChange={(value) => updateField('regional', 'defaultNumberFormat', value)}
               disabled={lkNumberFormat.locked}
-              className={SELECT_CLASS}
-            >
-              {NUMBER_FORMAT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              options={NUMBER_FORMAT_OPTIONS}
+            />
           </SettingsFieldRow>
         </SettingsSection>
 
