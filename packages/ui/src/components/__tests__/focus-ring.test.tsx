@@ -111,6 +111,27 @@ const checks: FocusCheck[] = [
     focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
     semanticEvidence: /--border-focus|focusRing/,
   },
+  {
+    primitive: 'Checkbox',
+    file: 'packages/ui/src/components/forms/Checkbox.tsx',
+    interactiveEvidence: /type="checkbox"/,
+    focusEvidence: /focus-visible:ring|focus:ring|peer-focus-visible:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'RadioGroup',
+    file: 'packages/ui/src/components/forms/RadioGroup.tsx',
+    interactiveEvidence: /type="radio"/,
+    focusEvidence: /focus-visible:ring|focus:ring|peer-focus-visible:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
+  {
+    primitive: 'Switch',
+    file: 'packages/ui/src/components/forms/Switch.tsx',
+    interactiveEvidence: /role="switch"/,
+    focusEvidence: /focus-visible:ring|focus:ring|focusRing/,
+    semanticEvidence: /--border-focus|focusRing/,
+  },
 ]
 
 function source(file: string): string {
@@ -153,6 +174,9 @@ describe('interactive primitive focus-ring baseline', () => {
       Select: 'semantic-pass',
       Combobox: 'semantic-pass',
       Tabs: 'semantic-pass',
+      Checkbox: 'semantic-pass',
+      RadioGroup: 'semantic-pass',
+      Switch: 'semantic-pass',
     })
   })
 })

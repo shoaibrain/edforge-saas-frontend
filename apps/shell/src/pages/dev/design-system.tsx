@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   Combobox,
   Container,
   Dropdown,
@@ -18,9 +19,11 @@ import {
   LoadingState,
   PageHeader,
   PageShell,
+  RadioGroup,
   SectionCard,
   Select,
   Stack,
+  Switch,
   Tag,
   Tabs,
   Text,
@@ -97,6 +100,8 @@ export default function DesignSystemDevPage() {
   const [dropdownValue, setDropdownValue] = useState<string | null>('compact')
   const [selectValue, setSelectValue] = useState<string | null>('high')
   const [comboboxValue, setComboboxValue] = useState<string | null>(null)
+  const [radioValue, setRadioValue] = useState('high')
+  const [switchValue, setSwitchValue] = useState(true)
 
   if (!import.meta.env.DEV) {
     return (
@@ -209,6 +214,29 @@ export default function DesignSystemDevPage() {
                 { value: 'central', label: 'Central Learning Network' },
               ]}
             />
+            <Field label="School type options" helperText="Card-style radio controls for high-confidence choices.">
+              <RadioGroup
+                variant="card"
+                direction="horizontal"
+                value={radioValue}
+                onChange={setRadioValue}
+                options={[
+                  { value: 'elementary', label: 'Elementary' },
+                  { value: 'high', label: 'High School' },
+                ]}
+              />
+            </Field>
+            <Field label="Operational settings">
+              <Stack space="sm">
+                <Checkbox label="Include inactive schools" description="Show archived schools in lists." />
+                <Switch
+                  checked={switchValue}
+                  onChange={setSwitchValue}
+                  label="Auto-sync calendars"
+                  description="Keep term dates aligned with workspace defaults."
+                />
+              </Stack>
+            </Field>
           </div>
         </SectionCard>
 
