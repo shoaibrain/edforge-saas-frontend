@@ -1,6 +1,6 @@
 import type { ColumnDef, Row } from '@tanstack/react-table'
 import { ChevronRight } from 'lucide-react'
-import { cn } from '../../utils'
+import { cn, focusRingInset } from '../../utils'
 
 // ============================================================================
 // SELECT (CHECKBOX) COLUMN
@@ -25,7 +25,7 @@ export function createSelectColumn<TData>(): ColumnDef<TData, unknown> {
             }
           }}
           onChange={table.getToggleAllPageRowsSelectedHandler()}
-          className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/30"
+          className={`w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] ${focusRingInset}`}
           aria-label="Select all rows"
         />
       </div>
@@ -40,7 +40,7 @@ export function createSelectColumn<TData>(): ColumnDef<TData, unknown> {
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}
           onChange={row.getToggleSelectedHandler()}
-          className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/30 disabled:opacity-50"
+          className={`w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] disabled:opacity-50 ${focusRingInset}`}
           aria-label="Select row"
         />
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { cn } from '../../utils'
+import { cn, focusRingInset } from '../../utils'
 import type { ServerPaginationConfig } from './types'
 
 interface DataTablePaginationProps<TData> {
@@ -75,7 +75,10 @@ export function DataTablePagination<TData>({
             table.setPageSize(Number(e.target.value))
             table.setPageIndex(0)
           }}
-          className="mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-1 focus:ring-teal-500/30"
+          className={cn(
+            'mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]',
+            focusRingInset
+          )}
         >
           {pageSizeOptions.map((size) => (
             <option key={size} value={size}>
@@ -114,7 +117,7 @@ export function DataTablePagination<TData>({
                 className={cn(
                   'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
                   pageIndex === page
-                    ? 'bg-teal-600 text-white shadow-sm'
+                    ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] shadow-sm'
                     : 'border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))]'
                 )}
               >

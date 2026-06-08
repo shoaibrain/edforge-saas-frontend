@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react'
 import { SlidersHorizontal } from 'lucide-react'
 import type { Table } from '@tanstack/react-table'
+import { focusRingInset } from '../../utils'
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>
@@ -48,7 +49,7 @@ export function DataTableViewOptions<TData>({
                   type="checkbox"
                   checked={column.getIsVisible()}
                   onChange={column.getToggleVisibilityHandler()}
-                  className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-teal-500 focus:ring-teal-500/30 mr-2.5"
+                  className={`w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] mr-2.5 ${focusRingInset}`}
                 />
                 <span className="text-[rgb(var(--text-primary))] capitalize">
                   {typeof column.columnDef.header === 'string'

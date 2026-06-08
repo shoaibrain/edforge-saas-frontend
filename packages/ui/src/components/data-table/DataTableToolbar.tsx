@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { X } from 'lucide-react'
-import { cn } from '../../utils'
+import { cn, focusRingInset } from '../../utils'
 import { DataTableFacetedFilter } from './DataTableFacetedFilter'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import type { FacetedFilterConfig } from './types'
@@ -51,7 +51,10 @@ export function DataTableToolbar<TData>({
               table.setGlobalFilter(e.target.value)
               table.setPageIndex(0)
             }}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+            className={cn(
+              'w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
+              focusRingInset
+            )}
           />
         </div>
       )}

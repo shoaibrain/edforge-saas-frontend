@@ -1,5 +1,5 @@
 import type { DataTableEmptyStateConfig } from './types'
-import { cn } from '../../utils'
+import { cn, focusRing } from '../../utils'
 
 interface DataTableEmptyProps {
   config: DataTableEmptyStateConfig
@@ -31,7 +31,10 @@ export function DataTableEmpty({ config, className }: DataTableEmptyProps) {
         <button
           type="button"
           onClick={config.action.onClick}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:ring-offset-2"
+          className={cn(
+            'inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors',
+            focusRing
+          )}
         >
           {config.action.label}
         </button>
