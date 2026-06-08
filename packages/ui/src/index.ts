@@ -57,6 +57,7 @@ export { Accordion, type AccordionItem, type AccordionProps } from './components
 export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
 export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader'
+export { SectionCard, type SectionCardProps } from './components/layout/SectionCard'
 export { Stack, stackVariants, type StackProps } from './components/layout/Stack'
 export { Heading, headingVariants, type HeadingProps } from './components/typography/Heading'
 export { Text, textVariants, type TextProps } from './components/typography/Text'
