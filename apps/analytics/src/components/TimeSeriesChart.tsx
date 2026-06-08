@@ -109,10 +109,10 @@ function ChartTooltip({
     timeZone: 'UTC',
   })
   return (
-    <div className="rounded-md shadow-lg px-3 py-2 border text-xs bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-      <p className="text-gray-500 dark:text-gray-400">{dateLabel}</p>
+    <div className="rounded-md shadow-lg px-3 py-2 border text-xs bg-[rgb(var(--surface-elevated))] border-[rgb(var(--border-secondary))]">
+      <p className="text-[rgb(var(--text-tertiary))]">{dateLabel}</p>
       {row.dateSecondary && (
-        <p className="text-gray-400 dark:text-gray-500 text-[11px] mt-0.5">
+        <p className="text-[rgb(var(--text-tertiary))] text-xs mt-0.5">
           {row.dateSecondary.value} {row.dateSecondary.system}
         </p>
       )}
@@ -120,8 +120,8 @@ function ChartTooltip({
         {payload.map((p) => (
           <li key={p.name} className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full" style={{ background: p.color }} />
-            <span className="text-gray-900 dark:text-gray-100 font-mono">{p.value}</span>
-            <span className="text-gray-500 dark:text-gray-400 truncate">{p.name}</span>
+            <span className="text-[rgb(var(--text-primary))] font-mono">{p.value}</span>
+            <span className="text-[rgb(var(--text-tertiary))] truncate">{p.name}</span>
           </li>
         ))}
       </ul>
@@ -140,7 +140,7 @@ function GranularityToggle({
   onChange,
 }: { value: Granularity; onChange: (g: Granularity) => void }) {
   return (
-    <div className="inline-flex rounded-md ring-1 ring-gray-200 dark:ring-gray-800 overflow-hidden">
+    <div className="inline-flex rounded-md ring-1 ring-[rgb(var(--border-secondary))] overflow-hidden">
       {GRANULARITIES.map((g) => (
         <button
           key={g}
@@ -148,8 +148,8 @@ function GranularityToggle({
           onClick={() => onChange(g)}
           className={`px-3 py-1 text-xs font-medium transition-colors ${
             value === g
-              ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+              ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]'
+              : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))]'
           }`}
         >
           {g}
@@ -184,8 +184,8 @@ function MetricPicker({
             onClick={() => onToggle(m)}
             className={`px-2 py-0.5 rounded-full text-xs font-medium ring-1 transition-all ${
               isOn
-                ? 'bg-gray-900 text-white ring-gray-900 dark:bg-gray-100 dark:text-gray-900 dark:ring-gray-100'
-                : 'text-gray-600 dark:text-gray-400 ring-gray-200 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] ring-[rgb(var(--action-primary-bg))]'
+                : 'text-[rgb(var(--text-secondary))] ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--surface-tertiary))]'
             }`}
             style={isOn ? undefined : { color }}
           >
@@ -233,7 +233,7 @@ export function TimeSeriesChart({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Activity over time</h3>
+          <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Activity over time</h3>
           <GranularityToggle value={granularity} onChange={onGranularityChange} />
         </div>
       </CardHeader>
@@ -245,11 +245,11 @@ export function TimeSeriesChart({
           </div>
         ) : error ? (
           <div className="flex items-start gap-3 py-12 justify-center">
-            <AlertCircle className="h-5 w-5 text-rose-500 mt-0.5" />
-            <p className="text-sm text-rose-700 dark:text-rose-400">{error.message}</p>
+            <AlertCircle className="h-5 w-5 text-[rgb(var(--state-danger-fg))] mt-0.5" />
+            <p className="text-sm text-[rgb(var(--state-danger-fg))]">{error.message}</p>
           </div>
         ) : metricKeys.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400 py-12 text-center">
+          <p className="text-sm text-[rgb(var(--text-tertiary))] py-12 text-center">
             No activity recorded for this date range yet.
           </p>
         ) : (
