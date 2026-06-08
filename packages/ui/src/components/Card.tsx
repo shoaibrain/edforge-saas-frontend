@@ -27,10 +27,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'rounded-2xl border transition-all duration-200',
+          'rounded-2xl border transition-all duration-base ease-standard',
           glass
             ? 'glass'
-            : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary)/0.6)] shadow-sm hover:shadow-md',
+            : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary)/0.6)] shadow-raised hover:shadow-overlay',
           isInteractive && ['cursor-pointer', focusRing],
           className
         )}

@@ -40,7 +40,7 @@ export function Dropdown({
           'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
           'hover:bg-[rgb(var(--surface-tertiary))]',
           focusRing,
-          'transition-colors duration-150',
+          'transition-colors duration-fast ease-standard',
           buttonClassName
         )}
       >
@@ -52,14 +52,14 @@ export function Dropdown({
 
       <Transition
         as={Fragment}
-        enter="transition ease-out duration-100"
+        enter="transition ease-enter duration-fast"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
+        leave="transition ease-exit duration-instant"
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute z-50 mt-1 w-full min-w-[200px] origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+        <MenuItems className="absolute z-50 mt-1 w-full min-w-[200px] origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
           <div className="py-1">
             {options.map((option) => (
               <MenuItem key={option.id}>

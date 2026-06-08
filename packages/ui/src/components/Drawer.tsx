@@ -50,7 +50,7 @@ import {
   TransitionChild,
 } from '@headlessui/react'
 import { X } from 'lucide-react'
-import { cn } from '../utils'
+import { cn, focusRingInset } from '../utils'
 
 // ============================================================================
 // TYPES
@@ -117,10 +117,10 @@ export function Drawer({
         {/* Backdrop */}
         <TransitionChild
           as={Fragment}
-          enter="ease-out duration-300"
+          enter="ease-enter duration-slow"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-200"
+          leave="ease-exit duration-base"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
@@ -134,10 +134,10 @@ export function Drawer({
         <div className="fixed inset-0 flex justify-end">
           <TransitionChild
             as={Fragment}
-            enter="ease-out duration-300"
+            enter="ease-enter duration-slow"
             enterFrom="translate-x-full"
             enterTo="translate-x-0"
-            leave="ease-in duration-200"
+            leave="ease-exit duration-base"
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
@@ -146,7 +146,7 @@ export function Drawer({
                 'w-full',
                 sizeClasses[size],
                 'h-full flex flex-col',
-                'bg-surface-primary shadow-2xl',
+                'bg-surface-primary shadow-modal',
                 'border-l border-border-secondary',
                 'transform transition-all',
                 className
@@ -171,7 +171,7 @@ export function Drawer({
                     className={cn(
                       'p-1.5 rounded-lg text-text-tertiary flex-shrink-0',
                       'hover:text-text-primary hover:bg-surface-secondary',
-                      'focus:outline-none focus:ring-2 focus:ring-teal-500/20',
+                      focusRingInset,
                       'transition-colors'
                     )}
                     aria-label="Close drawer"

@@ -62,7 +62,7 @@ import {
   TransitionChild,
 } from '@headlessui/react'
 import { X } from 'lucide-react'
-import { cn } from '../utils'
+import { cn, focusRingInset } from '../utils'
 
 // ============================================================================
 // TYPES
@@ -133,10 +133,10 @@ export function Modal({
         {/* Backdrop */}
         <TransitionChild
           as={Fragment}
-          enter="ease-out duration-200"
+          enter="ease-enter duration-base"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-150"
+          leave="ease-exit duration-fast"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
@@ -150,10 +150,10 @@ export function Modal({
         <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
           <TransitionChild
             as={Fragment}
-            enter="ease-out duration-200"
+            enter="ease-enter duration-base"
             enterFrom="opacity-0 scale-95"
             enterTo="opacity-100 scale-100"
-            leave="ease-in duration-150"
+            leave="ease-exit duration-fast"
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
@@ -161,7 +161,7 @@ export function Modal({
               className={cn(
                 'w-full',
                 sizeClasses[size],
-                'bg-surface-primary rounded-xl shadow-xl',
+                'bg-surface-primary rounded-xl shadow-modal',
                 'border border-border-secondary',
                 'transform transition-all',
                 className
@@ -186,7 +186,7 @@ export function Modal({
                     className={cn(
                       'p-1.5 rounded-lg text-text-tertiary',
                       'hover:text-text-primary hover:bg-surface-secondary',
-                      'focus:outline-none focus:ring-2 focus:ring-teal-500/20',
+                      focusRingInset,
                       'transition-colors'
                     )}
                     aria-label="Close modal"
