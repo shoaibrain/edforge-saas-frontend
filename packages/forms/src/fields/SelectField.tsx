@@ -5,7 +5,7 @@
  * Features animated focus states, error handling, and accessibility.
  */
 
-import { forwardRef, type Ref } from 'react'
+import { forwardRef, type ReactNode, type Ref } from 'react'
 import { Controller, useFormContext, type RegisterOptions } from 'react-hook-form'
 import { type LucideIcon } from 'lucide-react'
 import { Select } from '@edforge/ui/forms'
@@ -21,12 +21,12 @@ export interface SelectOption {
 export interface SelectFieldProps {
   /** Field name (supports dot notation for nested fields) */
   name: string
-  /** Field label */
-  label?: string
+  /** Field label (ReactNode so callers can compose inline label hints/tooltips) */
+  label?: ReactNode
   /** Placeholder text */
   placeholder?: string
   /** Select options */
-  options: SelectOption[]
+  options: readonly SelectOption[]
   /** Leading icon */
   icon?: LucideIcon
   /** Helper text shown below input */

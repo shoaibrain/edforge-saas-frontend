@@ -14,8 +14,8 @@ import { getNestedError, getNestedTouched, getNestedDirty } from '../utils'
 export interface TextFieldProps {
   /** Field name (supports dot notation for nested fields) */
   name: string
-  /** Field label */
-  label?: string
+  /** Field label (ReactNode so callers can compose inline label hints/tooltips) */
+  label?: ReactNode
   /** Placeholder text */
   placeholder?: string
   /** Input type */
