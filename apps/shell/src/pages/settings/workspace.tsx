@@ -150,9 +150,6 @@ const NUMBER_FORMAT_OPTIONS = [
 //   { value: 'both', label: 'Both Daily & Period' },
 // ]
 
-// COMING SOON — re-enable when Organization Branding section ships
-// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
-
 type WorkspaceSelectOption = {
   value: string
   label: string
@@ -532,7 +529,7 @@ export default function WorkspaceSettingsPage() {
           icon={Building2}
         />
         <div className="mt-8 flex flex-col items-center justify-center py-12">
-          <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center mb-4">
             <AlertTriangle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
           </div>
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">

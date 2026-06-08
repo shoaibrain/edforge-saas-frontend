@@ -1,4 +1,12 @@
-import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useId,
+  useRef,
+  type InputHTMLAttributes,
+  type MutableRefObject,
+  type ReactNode,
+} from 'react'
 import { Check, Minus } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn, focusRing } from '../../utils'
@@ -72,11 +80,24 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const describedBy = [ariaDescribedBy, field?.describedBy, descriptionId].filter(Boolean).join(' ') || undefined
     const iconSize = size === 'sm' ? 'h-3 w-3' : size === 'lg' ? 'h-4 w-4' : 'h-3.5 w-3.5'
 
+    // `indeterminate` is a DOM property, not an HTML attribute — React won't set
+    // it from JSX. Mirror it onto the underlying input so native + AT semantics
+    // (the browser derives aria-checked="mixed" from this) are correct.
+    const innerRef = useRef<HTMLInputElement | null>(null)
+    const setRefs = (node: HTMLInputElement | null) => {
+      innerRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) (ref as MutableRefObject<HTMLInputElement | null>).current = node
+    }
+    useEffect(() => {
+      if (innerRef.current) innerRef.current.indeterminate = indeterminate
+    }, [indeterminate])
+
     return (
       <span className={cn('flex items-start gap-3', className)}>
         <span className="relative mt-0.5 inline-flex">
           <input
-            ref={ref}
+            ref={setRefs}
             id={resolvedId}
             type="checkbox"
             checked={checked}
@@ -84,7 +105,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             disabled={resolvedDisabled}
             aria-invalid={ariaInvalid ?? (resolvedInvalid ? true : undefined)}
             aria-describedby={describedBy}
-            aria-checked={indeterminate ? 'mixed' : undefined}
             className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
             {...props}
           />

@@ -111,12 +111,12 @@ The token system already encodes the right instincts — warm off-white canvas, 
 
 Tightly scoped; none require redesign.
 
-**Must-fix (blockers):**
-1. Fix `Checkbox` indeterminate (ref effect to set `input.indeterminate`). (B.2 #1)
-2. Fix or remove the dropped ref in `AnimatedSelect` — better, **delete the shim** and use `Field`+`Select` directly to match `CreateSchoolStep`. (B.2 #2, B.4)
-3. Either wire or remove the dead `SelectField` props. (B.2 #3)
-4. Resolve the **two-form-systems** question and document the rule in `forms.md` (recommendation: `@edforge/forms` for any RHF-bound form; `@edforge/ui` primitives only for trivial local-state forms). (B.3)
-5. Remove dead `INPUT_CLASS` + fix the malformed className in `workspace.tsx`. (B.2 #8)
+**Must-fix (blockers):** — _items 1, 2, 3, 5 applied on `claude/lucid-sagan-571epa` (see commit following this doc); item 4 deferred as a deliberate decision._
+1. ✅ Fix `Checkbox` indeterminate (ref effect to set `input.indeterminate`; manual `aria-checked="mixed"` removed so the browser derives it). (B.2 #1)
+2. ✅ Fix the dropped ref in `AnimatedSelect` — now `forwardRef<HTMLButtonElement>` forwarding to the `Select` button. (Full shim deletion left for the Epic P form-API consolidation.) (B.2 #2, B.4)
+3. ✅ `SelectField` props resolved — `icon` is now **wired** through a new additive `leadingIcon` slot on the `Select` primitive (≈10 consumers passed it and silently got nothing); truly-unused `prefix`/`showSuccessState` removed. (B.2 #3)
+4. ⏳ Resolve the **two-form-systems** question and document the rule in `forms.md` (recommendation: `@edforge/forms` for any RHF-bound form; `@edforge/ui` primitives only for trivial local-state forms) — **deferred** to Epic P. (B.3)
+5. ✅ Remove dead `INPUT_CLASS` + fix the malformed className in `workspace.tsx`. (B.2 #8)
 
 **Should-fix (this PR or immediate follow-up):**
 6. `RadioGroup` `useId()` fallback `name`; `Switch` label wiring; `Tabs` roving-tabindex + arrow keys (or rename roles). (B.2 #4–6)

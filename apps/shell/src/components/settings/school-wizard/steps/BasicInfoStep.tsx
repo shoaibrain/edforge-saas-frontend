@@ -65,7 +65,7 @@ interface AnimatedSelectProps extends React.SelectHTMLAttributes<HTMLSelectEleme
   options: readonly { value: string; label: string }[]
 }
 
-const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
+const AnimatedSelect = React.forwardRef<HTMLButtonElement, AnimatedSelectProps>(
   ({ label, error, required, options, id, className, ...props }, ref) => {
     const fieldId = id || label.toLowerCase().replace(/\s+/g, '-')
     const value = typeof props.value === 'string' ? props.value : undefined
@@ -76,10 +76,9 @@ const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
       } as React.ChangeEvent<HTMLSelectElement>)
     }
 
-    void ref
-
     return (
       <Select
+        ref={ref}
         label={label || undefined}
         controlId={fieldId}
         required={required}

@@ -5,11 +5,11 @@
  * Features animated focus states, error handling, and accessibility.
  */
 
-import { forwardRef, type ReactNode, type Ref } from 'react'
+import { forwardRef, type Ref } from 'react'
 import { Controller, useFormContext, type RegisterOptions } from 'react-hook-form'
 import { type LucideIcon } from 'lucide-react'
 import { Select } from '@edforge/ui/forms'
-import { getNestedError, getNestedTouched, getNestedDirty } from '../utils'
+import { getNestedError } from '../utils'
 
 export interface SelectOption {
   value: string
@@ -41,10 +41,6 @@ export interface SelectFieldProps {
   selectClassName?: string
   /** Validation rules */
   rules?: RegisterOptions
-  /** Show checkmark on valid input */
-  showSuccessState?: boolean
-  /** Prefix content */
-  prefix?: ReactNode
 }
 
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
@@ -61,24 +57,17 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
       className,
       selectClassName,
       rules,
-      showSuccessState = false,
-      prefix,
     },
     ref
   ) => {
     const {
       control,
-      formState: { errors, touchedFields, dirtyFields },
+      formState: { errors },
     } = useFormContext()
 
     // Get nested error
     const error = getNestedError(errors, name)
-    const isTouched = getNestedTouched(touchedFields, name)
-    const isDirty = getNestedDirty(dirtyFields, name)
     const errorMessage = error?.message as string | undefined
-    void (showSuccessState && isDirty && isTouched)
-    void prefix
-    void Icon
 
     return (
       <Controller
@@ -90,6 +79,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
             ref={ref as Ref<HTMLButtonElement>}
             className={className}
             buttonClassName={selectClassName}
+            leadingIcon={Icon ? <Icon className="h-4 w-4" /> : undefined}
             label={label}
             required={required}
             helperText={helperText}

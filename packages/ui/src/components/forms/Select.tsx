@@ -56,6 +56,7 @@ export interface SelectProps
   clearable?: boolean
   loading?: boolean
   emptyMessage?: string
+  leadingIcon?: ReactNode
   buttonClassName?: string
   optionsClassName?: string
 }
@@ -70,6 +71,7 @@ interface SelectControlProps
       | 'clearable'
       | 'loading'
       | 'emptyMessage'
+      | 'leadingIcon'
       | 'buttonClassName'
       | 'optionsClassName'
     >,
@@ -91,6 +93,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
       disabled,
       invalid,
       size,
+      leadingIcon,
       buttonClassName,
       optionsClassName,
     },
@@ -121,6 +124,8 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
             <span className="flex min-w-0 flex-1 items-center gap-2">
               {selectedOption?.icon ? (
                 <span className="shrink-0 text-[rgb(var(--text-tertiary))]">{selectedOption.icon}</span>
+              ) : leadingIcon ? (
+                <span className="shrink-0 text-[rgb(var(--text-tertiary))]">{leadingIcon}</span>
               ) : null}
               <span
                 className={cn(
