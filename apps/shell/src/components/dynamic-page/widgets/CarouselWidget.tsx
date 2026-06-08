@@ -57,45 +57,45 @@ interface CarouselWidgetProps {
 
 const moduleColors: Record<string, { bg: string; icon: string }> = {
   academics: {
-    bg: 'bg-teal-500/15 dark:bg-teal-500/25',
-    icon: 'text-teal-600 dark:text-teal-400',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+    icon: 'text-[rgb(var(--state-info-fg))]',
   },
   finance: {
     bg: 'bg-amber-500/15 dark:bg-amber-500/25',
     icon: 'text-amber-600 dark:text-amber-400',
   },
   people: {
-    bg: 'bg-blue-500/15 dark:bg-blue-500/25',
-    icon: 'text-blue-600 dark:text-blue-400',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+    icon: 'text-[rgb(var(--state-info-fg))]',
   },
   messages: {
     bg: 'bg-violet-500/15 dark:bg-violet-500/25',
     icon: 'text-violet-600 dark:text-violet-400',
   },
   analytics: {
-    bg: 'bg-orange-500/15 dark:bg-orange-500/25',
-    icon: 'text-orange-600 dark:text-orange-400',
+    bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+    icon: 'text-[rgb(var(--state-warning-fg))]',
   },
   settings: {
-    bg: 'bg-slate-500/15 dark:bg-slate-500/25',
-    icon: 'text-slate-600 dark:text-slate-400',
+    bg: 'bg-[rgb(var(--surface-tertiary))]',
+    icon: 'text-[rgb(var(--text-secondary))]',
   },
   home: {
-    bg: 'bg-emerald-500/15 dark:bg-emerald-500/25',
-    icon: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+    icon: 'text-[rgb(var(--state-success-fg))]',
   },
   // Stat card specific colors
   positive: {
-    bg: 'bg-emerald-500/15 dark:bg-emerald-500/25',
-    icon: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+    icon: 'text-[rgb(var(--state-success-fg))]',
   },
   negative: {
-    bg: 'bg-rose-500/15 dark:bg-rose-500/25',
-    icon: 'text-rose-600 dark:text-rose-400',
+    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
+    icon: 'text-[rgb(var(--state-danger-fg))]',
   },
   neutral: {
-    bg: 'bg-slate-500/15 dark:bg-slate-500/25',
-    icon: 'text-slate-600 dark:text-slate-400',
+    bg: 'bg-[rgb(var(--surface-tertiary))]',
+    icon: 'text-[rgb(var(--text-secondary))]',
   },
 }
 
@@ -121,7 +121,7 @@ function PageCard({ card, index }: PageCardProps) {
     >
       <div
         className={`
-          group relative flex flex-col w-[180px] h-[160px] p-4 rounded-2xl
+          group relative flex flex-col w-44 h-40 p-4 rounded-2xl
           bg-[rgb(var(--surface-secondary))]
           border border-[rgb(var(--border-primary))]
           shadow-sm hover:shadow-md
@@ -131,7 +131,7 @@ function PageCard({ card, index }: PageCardProps) {
         `}
       >
         {/* Subtle inner glow */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
 
         {/* Icon */}
         <div className={`
@@ -144,7 +144,7 @@ function PageCard({ card, index }: PageCardProps) {
 
         {/* Title - positioned at bottom */}
         <div className="mt-auto relative z-10">
-          <h3 className="font-semibold text-[rgb(var(--text-primary))] text-[15px] leading-tight mb-1">
+          <h3 className="font-semibold text-[rgb(var(--text-primary))] text-sm leading-tight mb-1">
             {card.title}
           </h3>
 
@@ -198,7 +198,7 @@ function StatCard({ card, index }: StatCardProps) {
     >
       <div
         className={`
-          group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl
+          group relative flex flex-col w-44 h-36 p-4 rounded-2xl
           bg-[rgb(var(--surface-secondary))]
           border border-[rgb(var(--border-primary))]
           shadow-sm
@@ -207,7 +207,7 @@ function StatCard({ card, index }: StatCardProps) {
         `}
       >
         {/* Subtle inner glow */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
 
         {/* Icon */}
         <div className={`
@@ -228,8 +228,8 @@ function StatCard({ card, index }: StatCardProps) {
               {card.value}
             </span>
             {card.change && (
-              <div className={`flex items-center gap-0.5 text-xs ${card.changeType === 'positive' ? 'text-emerald-600' :
-                  card.changeType === 'negative' ? 'text-rose-600' :
+              <div className={`flex items-center gap-0.5 text-xs ${card.changeType === 'positive' ? 'text-[rgb(var(--state-success-fg))]' :
+                  card.changeType === 'negative' ? 'text-[rgb(var(--state-danger-fg))]' :
                     'text-[rgb(var(--text-tertiary))]'
                 }`}>
                 <TrendIcon className="w-3 h-3" />

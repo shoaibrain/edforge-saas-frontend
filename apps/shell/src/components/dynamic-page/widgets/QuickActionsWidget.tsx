@@ -63,9 +63,9 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
     icon: Users,
     href: '/academics/students',
     color: {
-      bg: 'bg-teal-50 dark:bg-teal-900/10',
-      text: 'text-teal-600 dark:text-teal-400',
-      border: 'border-teal-200 dark:border-teal-800/30',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-info-fg))]',
+      border: 'border-[rgb(var(--state-info-border)/0.35)]',
     },
   },
   {
@@ -77,9 +77,9 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
     icon: Calendar,
     href: '/academics/classrooms?tab=attendance',
     color: {
-      bg: 'bg-orange-50 dark:bg-orange-900/10',
-      text: 'text-orange-600 dark:text-orange-400',
-      border: 'border-orange-200 dark:border-orange-800/30',
+      bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-warning-fg))]',
+      border: 'border-[rgb(var(--state-warning-border)/0.35)]',
     },
   },
 ]
@@ -94,9 +94,9 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     icon: BookOpen,
     href: '/academics/gradebooks',
     color: {
-      bg: 'bg-teal-50 dark:bg-teal-900/10',
-      text: 'text-teal-600 dark:text-teal-400',
-      border: 'border-teal-200 dark:border-teal-800/30',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-info-fg))]',
+      border: 'border-[rgb(var(--state-info-border)/0.35)]',
     },
   },
   {
@@ -108,9 +108,9 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     icon: ClipboardCheck,
     href: '/academics/classrooms?tab=attendance',
     color: {
-      bg: 'bg-orange-50 dark:bg-orange-900/10',
-      text: 'text-orange-600 dark:text-orange-400',
-      border: 'border-orange-200 dark:border-orange-800/30',
+      bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-warning-fg))]',
+      border: 'border-[rgb(var(--state-warning-border)/0.35)]',
     },
   },
   {
@@ -122,9 +122,9 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
     icon: GraduationCap,
     href: '/academics/gradebooks',
     color: {
-      bg: 'bg-indigo-50 dark:bg-indigo-900/10',
-      text: 'text-indigo-600 dark:text-indigo-400',
-      border: 'border-indigo-200 dark:border-indigo-800/30',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-info-fg))]',
+      border: 'border-[rgb(var(--state-info-border)/0.35)]',
     },
   },
 ]
@@ -139,9 +139,9 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     icon: GraduationCap,
     href: '/student-portal/grades',
     color: {
-      bg: 'bg-teal-50 dark:bg-teal-900/10',
-      text: 'text-teal-600 dark:text-teal-400',
-      border: 'border-teal-200 dark:border-teal-800/30',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-info-fg))]',
+      border: 'border-[rgb(var(--state-info-border)/0.35)]',
     },
   },
   {
@@ -153,9 +153,9 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     icon: Calendar,
     href: '/student-portal/schedule',
     color: {
-      bg: 'bg-orange-50 dark:bg-orange-900/10',
-      text: 'text-orange-600 dark:text-orange-400',
-      border: 'border-orange-200 dark:border-orange-800/30',
+      bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-warning-fg))]',
+      border: 'border-[rgb(var(--state-warning-border)/0.35)]',
     },
   },
   {
@@ -167,9 +167,9 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
     icon: FileText,
     href: '/student-portal/assignments',
     color: {
-      bg: 'bg-indigo-50 dark:bg-indigo-900/10',
-      text: 'text-indigo-600 dark:text-indigo-400',
-      border: 'border-indigo-200 dark:border-indigo-800/30',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-info-fg))]',
+      border: 'border-[rgb(var(--state-info-border)/0.35)]',
     },
   },
 ]
@@ -184,9 +184,9 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     icon: Baby,
     href: '/parent-portal',
     color: {
-      bg: 'bg-rose-50 dark:bg-rose-900/10',
-      text: 'text-rose-600 dark:text-rose-400',
-      border: 'border-rose-200 dark:border-rose-800/30',
+      bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-danger-fg))]',
+      border: 'border-[rgb(var(--state-danger-border)/0.35)]',
     },
   },
   {
@@ -198,9 +198,9 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     icon: GraduationCap,
     href: '/parent-portal/grades',
     color: {
-      bg: 'bg-teal-50 dark:bg-teal-900/10',
-      text: 'text-teal-600 dark:text-teal-400',
-      border: 'border-teal-200 dark:border-teal-800/30',
+      bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-info-fg))]',
+      border: 'border-[rgb(var(--state-info-border)/0.35)]',
     },
   },
   {
@@ -212,9 +212,9 @@ const PARENT_QUICK_ACTIONS: QuickAction[] = [
     icon: CreditCard,
     href: '/parent-portal/fees',
     color: {
-      bg: 'bg-orange-50 dark:bg-orange-900/10',
-      text: 'text-orange-600 dark:text-orange-400',
-      border: 'border-orange-200 dark:border-orange-800/30',
+      bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
+      text: 'text-[rgb(var(--state-warning-fg))]',
+      border: 'border-[rgb(var(--state-warning-border)/0.35)]',
     },
   },
 ]

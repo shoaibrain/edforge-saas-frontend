@@ -124,8 +124,8 @@ function EventItem({ event }: { event: UpcomingEvent }) {
 
       {/* Vertical Line Marker */}
       <div className={`w-1 h-full min-h-[2.5rem] rounded-full flex-shrink-0 ${event.type === 'meeting' ? 'bg-violet-400' :
-        event.type === 'deadline' ? 'bg-rose-400' :
-          event.type === 'class' ? 'bg-teal-400' :
+        event.type === 'deadline' ? 'bg-[rgb(var(--state-danger-fg))]' :
+          event.type === 'class' ? 'bg-[rgb(var(--state-info-fg))]' :
             'bg-[rgb(var(--brand-primary))]'
         }`} />
 
@@ -208,7 +208,7 @@ export function UpcomingEventsWidget({ events: propEvents, maxDays = 3 }: { even
               <div key={dateKey} className="flex gap-4">
                 {/* Left Column: Date */}
                 <div className="w-24 flex-shrink-0 pt-2">
-                  <div className={`text-sm font-semibold ${isToday ? 'text-rose-500' : 'text-[rgb(var(--text-secondary))]'}`}>
+                  <div className={`text-sm font-semibold ${isToday ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--text-secondary))]'}`}>
                     {relativeDate === t('today') || relativeDate === t('tomorrow') ? relativeDate : date.toLocaleDateString(locale, { weekday: 'short' })}
                   </div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))]">
