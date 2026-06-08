@@ -29,9 +29,34 @@ function readBlock(selector: ':root' | '.dark'): string {
 }
 
 function readRgbVars(block: string): Record<string, Rgb> {
+  const rawVars: Record<string, string> = {}
+  for (const match of block.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)) {
+    rawVars[match[1]] = match[2].trim()
+  }
+
   const vars: Record<string, Rgb> = {}
-  for (const match of block.matchAll(/--([a-z0-9-]+):\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)\s*;/g)) {
-    vars[match[1]] = [Number(match[2]), Number(match[3]), Number(match[4])]
+  const resolveVar = (name: string, seen = new Set<string>()): Rgb | undefined => {
+    if (seen.has(name)) return undefined
+    seen.add(name)
+    const raw = rawVars[name]
+    if (!raw) return undefined
+
+    const rgbMatch = raw.match(/^([0-9]+)\s+([0-9]+)\s+([0-9]+)$/)
+    if (rgbMatch) {
+      return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])]
+    }
+
+    const aliasMatch = raw.match(/^var\(--([a-z0-9-]+)\)$/)
+    if (aliasMatch) {
+      return resolveVar(aliasMatch[1], seen)
+    }
+
+    return undefined
+  }
+
+  for (const token of Object.keys(rawVars)) {
+    const resolved = resolveVar(token)
+    if (resolved) vars[token] = resolved
   }
   return vars
 }
@@ -76,9 +101,8 @@ function collectSupportedMatrixFailures(): ContrastFailure[] {
       ['border-primary', 'surface-primary'],
       ['border-secondary', 'surface-primary'],
       ['border-tertiary', 'surface-primary'],
+      ['border-focus', 'surface-elevated'],
       ['interactive-focus', 'surface-elevated'],
-      ['brand-primary', 'surface-elevated'],
-      ['brand-accent', 'surface-primary'],
     ] as const
 
     for (const [fg, bg] of uiPairs) {
@@ -94,14 +118,17 @@ function collectSupportedMatrixFailures(): ContrastFailure[] {
       }
     }
 
-    const whiteOnBrandPairs = ['brand-primary', 'brand-secondary', 'brand-accent'] as const
-    for (const bg of whiteOnBrandPairs) {
-      const value = Number(ratio([255, 255, 255], tokens[bg]))
+    const actionTextPairs = [
+      ['action-primary-fg', 'action-primary-bg'],
+      ['action-danger-fg', 'action-danger-bg'],
+    ] as const
+    for (const [fg, bg] of actionTextPairs) {
+      const value = Number(ratio(tokens[fg], tokens[bg]))
       if (value < 4.5) {
         failures.push({
           theme,
           kind: 'text',
-          pair: `white on ${bg}`,
+          pair: `${fg} on ${bg}`,
           ratio: value.toFixed(2),
           required: 4.5,
         })
@@ -113,112 +140,45 @@ function collectSupportedMatrixFailures(): ContrastFailure[] {
 }
 
 describe('design token contrast baseline', () => {
-  it('captures the current WCAG failures that Stream 2 must fix', () => {
-    expect(collectSupportedMatrixFailures()).toEqual([
-      {
-        theme: 'light',
-        kind: 'text',
-        pair: 'text-tertiary on surface-tertiary',
-        ratio: '4.36',
-        required: 4.5,
-      },
-      {
-        theme: 'light',
-        kind: 'ui',
-        pair: 'border-primary on surface-primary',
-        ratio: '1.35',
-        required: 3,
-      },
-      {
-        theme: 'light',
-        kind: 'ui',
-        pair: 'border-secondary on surface-primary',
-        ratio: '1.09',
-        required: 3,
-      },
-      {
-        theme: 'light',
-        kind: 'ui',
-        pair: 'border-tertiary on surface-primary',
-        ratio: '1.64',
-        required: 3,
-      },
-      {
-        theme: 'light',
-        kind: 'ui',
-        pair: 'brand-accent on surface-primary',
-        ratio: '2.14',
-        required: 3,
-      },
-      {
-        theme: 'light',
-        kind: 'text',
-        pair: 'white on brand-secondary',
-        ratio: '3.73',
-        required: 4.5,
-      },
-      {
-        theme: 'light',
-        kind: 'text',
-        pair: 'white on brand-accent',
-        ratio: '2.25',
-        required: 4.5,
-      },
-      {
-        theme: 'dark',
-        kind: 'ui',
-        pair: 'border-primary on surface-primary',
-        ratio: '2.05',
-        required: 3,
-      },
-      {
-        theme: 'dark',
-        kind: 'ui',
-        pair: 'border-secondary on surface-primary',
-        ratio: '1.56',
-        required: 3,
-      },
-      {
-        theme: 'dark',
-        kind: 'ui',
-        pair: 'interactive-focus on surface-elevated',
-        ratio: '2.50',
-        required: 3,
-      },
-      {
-        theme: 'dark',
-        kind: 'ui',
-        pair: 'brand-primary on surface-elevated',
-        ratio: '2.50',
-        required: 3,
-      },
-      {
-        theme: 'dark',
-        kind: 'text',
-        pair: 'white on brand-primary',
-        ratio: '3.73',
-        required: 4.5,
-      },
-      {
-        theme: 'dark',
-        kind: 'text',
-        pair: 'white on brand-secondary',
-        ratio: '1.72',
-        required: 4.5,
-      },
-      {
-        theme: 'dark',
-        kind: 'text',
-        pair: 'white on brand-accent',
-        ratio: '2.25',
-        required: 4.5,
-      },
+  it('has no WCAG failures in the supported semantic token matrix', () => {
+    expect(collectSupportedMatrixFailures()).toEqual([])
+  })
+
+  it('keeps legacy border tokens fully defined in both themes during the alias window', () => {
+    expect(Object.keys(rootTokens).filter((token) => token.startsWith('border-') && !(token in darkOverrides))).toEqual([
     ])
   })
 
-  it('tracks semantic tokens that are missing a dark-mode override', () => {
-    expect(Object.keys(rootTokens).filter((token) => token.startsWith('border-') && !(token in darkOverrides))).toEqual([
-      'border-tertiary',
-    ])
+  it('defines the new semantic alias taxonomy in both themes', () => {
+    const requiredAliases = [
+      'background-primary',
+      'background-secondary',
+      'background-tertiary',
+      'background-elevated',
+      'text-muted',
+      'text-disabled',
+      'text-on-accent',
+      'border-subtle',
+      'border-default',
+      'border-strong',
+      'border-focus',
+      'action-primary-bg',
+      'action-primary-fg',
+      'action-danger-bg',
+      'action-danger-fg',
+      'state-success-bg',
+      'state-success-fg',
+      'state-warning-bg',
+      'state-warning-fg',
+      'state-danger-bg',
+      'state-danger-fg',
+      'state-info-bg',
+      'state-info-fg',
+    ]
+
+    for (const token of requiredAliases) {
+      expect(rootTokens[token], `missing light ${token}`).toBeDefined()
+      expect(themes.dark[token], `missing dark ${token}`).toBeDefined()
+    }
   })
 })

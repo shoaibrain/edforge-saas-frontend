@@ -128,23 +128,63 @@
   /* Text colors */
   --text-primary: 0 18 25; /* ink-500 */
   --text-secondary: 0 95 115; /* teal-500 */
-  --text-tertiary: 107 114 128; /* neutral gray */
+  --text-tertiary: 71 85 105; /* slate-600, AA on warm tertiary surface */
   --text-inverted: 251 249 245;
 
   /* Border colors */
-  --border-primary: 233 216 166; /* vanilla-400 */
-  --border-secondary: 246 239 219; /* vanilla-100 */
-  --border-tertiary: 213 196 146;
+  --border-primary: 127 103 32; /* vanilla-700, >=3:1 on warm surfaces */
+  --border-secondary: 63 151 122; /* aqua-700, >=3:1 on warm surfaces */
+  --border-tertiary: 0 122 147; /* teal-400, strong divider/focus-adjacent */
 
   /* Interactive states */
   --interactive-hover: 246 243 235;
   --interactive-active: 233 216 166;
-  --interactive-focus: 10 147 150;
+  --interactive-focus: 0 95 115;
 
   /* Brand accent */
   --brand-primary: 0 95 115; /* teal-500 */
   --brand-secondary: 10 147 150; /* cyan-500 */
   --brand-accent: 238 155 0; /* golden-400 */
+
+  /* New semantic aliases — Stream 2 migration window. Keep legacy names above
+     until every consumer has moved to the taxonomy below. */
+  --background-primary: var(--surface-primary);
+  --background-secondary: var(--surface-secondary);
+  --background-tertiary: var(--surface-tertiary);
+  --background-elevated: var(--surface-elevated);
+  --background-overlay: 0 18 25;
+  --background-inverse: 0 18 25;
+
+  --text-muted: var(--text-tertiary);
+  --text-disabled: 148 163 184;
+  --text-on-accent: 251 249 245;
+
+  --border-subtle: var(--border-secondary);
+  --border-default: var(--border-primary);
+  --border-strong: var(--border-tertiary);
+  --border-focus: var(--interactive-focus);
+
+  --action-primary-bg: var(--brand-primary);
+  --action-primary-bg-hover: 0 78 94;
+  --action-primary-bg-active: 0 59 70;
+  --action-primary-fg: var(--text-on-accent);
+  --action-secondary-bg: var(--surface-tertiary);
+  --action-secondary-fg: var(--text-secondary);
+  --action-danger-bg: 174 32 18;
+  --action-danger-fg: var(--text-on-accent);
+
+  --state-success-bg: 232 246 242;
+  --state-success-fg: 0 95 73;
+  --state-success-border: 63 151 122;
+  --state-warning-bg: 255 236 201;
+  --state-warning-fg: 127 67 0;
+  --state-warning-border: 192 125 0;
+  --state-danger-bg: 249 202 198;
+  --state-danger-fg: 105 19 11;
+  --state-danger-border: 174 32 18;
+  --state-info-bg: 189 250 251;
+  --state-info-fg: 0 95 115;
+  --state-info-border: 0 122 147;
 
   /* Icon colors - subtle brand tint for warmth */
   --icon-inactive: 71 85 105; /* slate-600 with slight warmth */
@@ -165,17 +205,58 @@
   --text-inverted: 0 18 25;
 
   /* Border colors - Dark mode */
-  --border-primary: 0 78 94;
-  --border-secondary: 0 59 70;
+  --border-primary: 97 189 158;
+  --border-secondary: 58 122 138;
+  --border-tertiary: 10 179 182;
 
   /* Interactive states - Dark mode */
   --interactive-hover: 0 59 70;
   --interactive-active: 0 78 94;
+  --interactive-focus: 10 179 182;
 
   /* Brand accent */
-  --brand-primary: 10 147 150;
+  --brand-primary: 0 95 115;
   --brand-secondary: 148 210 189;
   --brand-accent: 238 155 0;
+
+  /* New semantic aliases — Stream 2 migration window */
+  --background-primary: var(--surface-primary);
+  --background-secondary: var(--surface-secondary);
+  --background-tertiary: var(--surface-tertiary);
+  --background-elevated: var(--surface-elevated);
+  --background-overlay: 0 0 0;
+  --background-inverse: 251 249 245;
+
+  --text-muted: var(--text-tertiary);
+  --text-disabled: 100 116 139;
+  --text-on-accent: 251 249 245;
+
+  --border-subtle: var(--border-secondary);
+  --border-default: var(--border-primary);
+  --border-strong: var(--border-tertiary);
+  --border-focus: var(--interactive-focus);
+
+  --action-primary-bg: 0 95 115;
+  --action-primary-bg-hover: 0 122 147;
+  --action-primary-bg-active: 0 78 94;
+  --action-primary-fg: var(--text-on-accent);
+  --action-secondary-bg: var(--surface-tertiary);
+  --action-secondary-fg: var(--text-secondary);
+  --action-danger-bg: 174 32 18;
+  --action-danger-fg: var(--text-on-accent);
+
+  --state-success-bg: 6 88 89;
+  --state-success-fg: 110 231 183;
+  --state-success-border: 63 151 122;
+  --state-warning-bg: 96 62 0;
+  --state-warning-fg: 253 208 77;
+  --state-warning-border: 192 125 0;
+  --state-danger-bg: 105 19 11;
+  --state-danger-fg: 252 165 165;
+  --state-danger-border: 174 32 18;
+  --state-info-bg: 0 78 94;
+  --state-info-fg: 125 244 247;
+  --state-info-border: 0 122 147;
 
   /* Icon colors */
   --icon-inactive: 125 164 152;
