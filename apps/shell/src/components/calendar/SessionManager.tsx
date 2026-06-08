@@ -58,12 +58,12 @@ const TERM_OPTIONS = [
 
 const TERM_COLORS: Record<string, string> = {
   fall_semester:   'bg-amber-500',
-  spring_semester: 'bg-emerald-500',
-  year_round:      'bg-blue-500',
-  summer:          'bg-orange-500',
+  spring_semester: 'bg-[rgb(var(--state-success-fg))]',
+  year_round:      'bg-[rgb(var(--state-info-fg))]',
+  summer:          'bg-[rgb(var(--state-warning-fg))]',
   first_quarter:   'bg-violet-500',
-  second_quarter:  'bg-cyan-500',
-  third_quarter:   'bg-pink-500',
+  second_quarter:  'bg-[rgb(var(--state-info-fg))]',
+  third_quarter:   'bg-[rgb(var(--state-danger-fg))]',
   fourth_quarter:  'bg-lime-500',
 }
 
@@ -116,11 +116,11 @@ function SessionTimeline({
         return (
           <div
             key={s.academicSessionId}
-            className={`absolute top-0 bottom-0 ${TERM_COLORS[s.termDescriptor] || 'bg-gray-400'} opacity-70 flex items-center justify-center`}
+            className={`absolute top-0 bottom-0 ${TERM_COLORS[s.termDescriptor] || 'bg-[rgb(var(--text-tertiary))]'} opacity-70 flex items-center justify-center`}
             style={{ left: `${left}%`, width: `${Math.max(width, 1)}%` }}
             title={`${s.sessionName}: ${s.beginDate} to ${s.endDate}`}
           >
-            <span className="text-[9px] font-semibold text-white truncate px-1">
+            <span className="text-xs font-semibold text-[rgb(var(--action-primary-fg))] truncate px-1">
               {s.sessionName}
             </span>
           </div>
@@ -317,7 +317,7 @@ export function SessionManager({
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <Layers className="w-4 h-4 text-teal-500" />
+          <Layers className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
           <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
             {sessions.length} session{sessions.length !== 1 ? 's' : ''}
           </span>
@@ -374,7 +374,7 @@ export function SessionManager({
             {gaps.map((gap, i) => (
               <div
                 key={i}
-                className="flex items-start gap-2 bg-[rgba(217,119,6,0.06)] border border-[rgba(217,119,6,0.15)] rounded-lg p-2.5 text-[11px] text-[#D97706] leading-relaxed"
+                className="flex items-start gap-2 bg-[rgba(217,119,6,0.06)] border border-[rgba(217,119,6,0.15)] rounded-lg p-2.5 text-xs text-[#D97706] leading-relaxed"
               >
                 <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                 <span>
@@ -392,7 +392,7 @@ export function SessionManager({
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-5 h-5 text-teal-500 animate-spin" />
+            <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
             <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading sessions...</span>
           </div>
         )}
@@ -417,7 +417,7 @@ export function SessionManager({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4"
+              className="rounded-xl border border-[rgb(var(--border-focus)/0.35)] bg-[rgb(var(--action-primary-bg))]/5 p-4"
             >
               <h4 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-3">New Session</h4>
               <SessionForm
@@ -436,7 +436,7 @@ export function SessionManager({
         {sessions.map((session) => {
           const isEditing = editingId === session.academicSessionId
           const isDeleting = deletingId === session.academicSessionId
-          const termColor = TERM_COLORS[session.termDescriptor] || 'bg-gray-400'
+          const termColor = TERM_COLORS[session.termDescriptor] || 'bg-[rgb(var(--text-tertiary))]'
 
           return (
             <motion.div
@@ -466,7 +466,7 @@ export function SessionManager({
               ) : isDeleting ? (
                 <div className="p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
                         Delete "{session.sessionName}"?
@@ -501,7 +501,7 @@ export function SessionManager({
                         <span className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">
                           {session.sessionName}
                         </span>
-                        <span className="text-[10px] font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))] px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))] px-1.5 py-0.5 rounded">
                           {getTermLabel(session.termDescriptor)}
                         </span>
                       </div>
@@ -509,7 +509,7 @@ export function SessionManager({
                         <TenantDateRange start={session.beginDate} end={session.endDate} />
 
                         {session.totalInstructionalDays > 0 ? (
-                          <span className="text-emerald-600 font-medium bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                          <span className="text-[rgb(var(--state-success-fg))] font-medium bg-[rgb(var(--state-success-fg))]/10 px-1.5 py-0.5 rounded">
                             {session.totalInstructionalDays} instructional days
                           </span>
                         ) : (
@@ -530,7 +530,7 @@ export function SessionManager({
                     </button>
                     <button
                       onClick={() => setDeletingId(session.academicSessionId)}
-                      className="p-1.5 rounded-lg hover:bg-red-50 text-[rgb(var(--text-tertiary))] hover:text-red-500 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                       title="Delete session"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -677,21 +677,21 @@ function SessionTemplatePicker({
             key={tpl.id}
             onClick={() => applyTemplate(tpl)}
             disabled={applying !== null}
-            className="text-left p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]/40 hover:border-teal-500 hover:bg-teal-500/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-left p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]/40 hover:border-[rgb(var(--border-focus))] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
                 {tpl.label}
               </span>
               {applying === tpl.id && (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-500" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[rgb(var(--action-secondary-fg))]" />
               )}
             </div>
             <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">{tpl.hint}</p>
           </button>
         ))}
       </div>
-      <p className="text-[11px] text-[rgb(var(--text-tertiary))] text-center">
+      <p className="text-xs text-[rgb(var(--text-tertiary))] text-center">
         Templates split the year evenly. Real schools have term breaks
         (Dashain/Tihar in Nepal, holiday breaks in the US) — edit each
         session's begin/end dates after applying.

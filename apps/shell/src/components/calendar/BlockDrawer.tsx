@@ -353,7 +353,7 @@ export function BlockDrawer({
         {/* Block name */}
         <div>
           <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-            Block Name <span className="text-red-500">*</span>
+            Block Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <input
             type="text"
@@ -361,24 +361,24 @@ export function BlockDrawer({
             onChange={(e) => setForm((f) => ({ ...f, blockName: e.target.value }))}
             placeholder="e.g., Dashain 2082, Summer Vacation, Term 1 Final Exam"
             maxLength={120}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           />
           {errors.blockName && (
-            <p className="mt-1 text-[11px] text-red-500">{errors.blockName}</p>
+            <p className="mt-1 text-xs text-[rgb(var(--state-danger-fg))]">{errors.blockName}</p>
           )}
         </div>
 
         {/* Descriptor */}
         <div>
           <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-            Block Type <span className="text-red-500">*</span>
+            Block Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </label>
           <select
             value={form.blockDescriptor}
             onChange={(e) =>
               setForm((f) => ({ ...f, blockDescriptor: e.target.value as CalendarBlockDescriptor }))
             }
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           >
             {DESCRIPTOR_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -386,7 +386,7 @@ export function BlockDrawer({
               </option>
             ))}
           </select>
-          <p className="mt-1 text-[11px] text-[rgb(var(--text-tertiary))]">
+          <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
             {DESCRIPTOR_OPTIONS.find((o) => o.value === form.blockDescriptor)?.description}
           </p>
         </div>
@@ -415,12 +415,12 @@ export function BlockDrawer({
           </div>
         </div>
         {dayCount > 0 && !errors.endDate && (
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))] -mt-2">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] -mt-2">
             {dayCount} day{dayCount === 1 ? '' : 's'} (inclusive)
           </p>
         )}
         {isEdit && (
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))] -mt-2 italic">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] -mt-2 italic">
             Date range is locked. To change the range, delete this block and create a new one — per-day notes on the existing dates will be lost.
           </p>
         )}
@@ -436,7 +436,7 @@ export function BlockDrawer({
             placeholder="Shown in the calendar grid hover tooltip"
             maxLength={500}
             rows={2}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 resize-none"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] resize-none"
           />
         </div>
 
@@ -460,7 +460,7 @@ export function BlockDrawer({
                 }))
               }
               disabled={isEdit}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 disabled:opacity-60"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] disabled:opacity-60"
             >
               {CHILD_EVENT_TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -468,7 +468,7 @@ export function BlockDrawer({
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-[11px] text-[rgb(var(--text-tertiary))]">
+            <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
               Written onto each child date in the block range. Defaults to{' '}
               <strong>break</strong> (or <strong>exam_window</strong> for exam blocks).
               {isEdit && ' Locked on edit — only mutable at create time.'}
@@ -486,13 +486,13 @@ export function BlockDrawer({
               type="button"
               onClick={addSubEvent}
               disabled={form.subEvents.length >= 50}
-              className="text-[11px] font-medium text-teal-500 hover:underline disabled:opacity-50"
+              className="text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:underline disabled:opacity-50"
             >
               + Add sub-event
             </button>
           </div>
           {form.subEvents.length === 0 && (
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] italic">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] italic">
               Optional. Use for named days within a block — e.g., Dashain Day 8 (Mahaastami), Day 9 (Nawami), Day 10 (Vijaya Dashami).
             </p>
           )}
@@ -517,20 +517,20 @@ export function BlockDrawer({
                       onChange={(e) => updateSubEvent(idx, { name: e.target.value })}
                       placeholder="Sub-event name (e.g., Mahaastami)"
                       maxLength={80}
-                      className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                      className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => removeSubEvent(idx)}
-                    className="flex-shrink-0 text-[rgb(var(--text-tertiary))] hover:text-red-500 px-2 py-1"
+                    className="flex-shrink-0 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] px-2 py-1"
                     aria-label="Remove sub-event"
                   >
                     ✕
                   </button>
                 </div>
                 {errors.subEvents?.[idx] && (
-                  <p className="mt-1.5 text-[11px] text-red-500">{errors.subEvents[idx]}</p>
+                  <p className="mt-1.5 text-xs text-[rgb(var(--state-danger-fg))]">{errors.subEvents[idx]}</p>
                 )}
               </div>
             ))}
@@ -538,7 +538,7 @@ export function BlockDrawer({
         </div>
 
         {errors.global && (
-          <p className="text-[11px] text-red-500">{errors.global}</p>
+          <p className="text-xs text-[rgb(var(--state-danger-fg))]">{errors.global}</p>
         )}
 
         <DrawerFooter>
