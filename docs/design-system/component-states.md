@@ -26,6 +26,21 @@ Both are backed by the `--border-focus` semantic token.
 | `AttendanceHeatmap` cell | status color | future tooltip/hover | today border/status | `focusRingInset` | future prop | n/a |
 | Clickable `Card` | surface + raised shadow | overlay shadow | consumer-selected | `focusRing` | future prop | skeleton/consumer |
 | Clickable `Tag` | variant pill | consumer hover | consumer-selected | `focusRing` | future prop | n/a |
+| `Field` | label + optional helper | n/a | child-focused state optional | child control owns focus | muted metadata | n/a |
+| `Input` | semantic surface + default border | border/surface lift | n/a | `focusRing`/focus border token | muted, non-interactive | spinner/suffix, geometry stable |
+| `Textarea` | semantic surface + default border | border/surface lift | n/a | `focusRing`/focus border token | muted, non-interactive | n/a |
+| `Select` trigger | semantic surface + default border | surface lift | open trigger state | `focusRing` | muted, no menu open | loading option/trigger state |
+| `Select` option | elevated menu surface | highlighted option | selected check + state text | roving/active descendant visible | disabled option muted | n/a |
+| `Combobox` input | semantic surface + default border | surface lift | open/filtering state | `focusRing` | muted, no typing | loading list state |
+| `Combobox` option | elevated menu surface | highlighted option | selected check + state text | active descendant visible | disabled option muted | loading/empty state |
+| `Checkbox` | border + transparent bg | border lift | checked/indeterminate fill | `focusRing` | muted, no toggle | n/a |
+| `RadioGroup` option | border + option text | border/surface lift | selected dot/card state | visible radio/card focus | muted, no selection | n/a |
+| `Switch` | off track + thumb | track lift | on track + translated thumb | `focusRing` | muted, no toggle | n/a |
+| `Tabs` | tab text + indicator/border | text/surface lift | active indicator/surface | `focusRing` / roving focus | muted, no activation | n/a |
+| `SegmentedControl` | grouped button surface | surface lift | selected segment | `focusRingInset` | muted | n/a |
+| `InlineAlert` | semantic state bg/fg/border | n/a | n/a | links/actions inside own focus | n/a | n/a |
+| `EmptyState` | icon/title/copy/action | action hover | n/a | action owns focus | n/a | n/a |
+| `ErrorState` | danger icon/title/copy/retry | retry hover | n/a | retry owns focus | n/a | retry loading |
 
 ## Review checklist
 
@@ -38,3 +53,6 @@ Before merging a presentation-layer PR:
 5. Does loading state preserve geometry and avoid layout jump?
 6. Do all text/state pairs meet WCAG AA?
 7. Is motion tokenized and compatible with reduced motion?
+8. If the change adds a form control, is there a label, helper/error ID wiring, and a keyboard path?
+9. If the change adds a select/combobox, does the menu render correctly in both light and dark themes?
+10. If the change adds a non-data state, does it use `EmptyState`, `LoadingState`, `ErrorState`, or `InlineAlert` instead of a page-local pattern?
