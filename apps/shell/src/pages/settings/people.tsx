@@ -146,7 +146,7 @@ function ChangeRoleModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-md text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] transition-colors"
+            className="p-1 rounded-md text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -303,7 +303,7 @@ function UserActionsDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] transition-colors"
+        className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
@@ -322,7 +322,7 @@ function UserActionsDropdown({
                 type="button"
                 onClick={() => { onChangeRole(user); setOpen(false) }}
                 disabled={isSelf}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <UserCog className="w-4 h-4" />
                 Change Role
@@ -332,7 +332,7 @@ function UserActionsDropdown({
                 <button
                   type="button"
                   onClick={() => { onAction(user, 'activate'); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-success-fg))]  hover:bg-[rgb(var(--surface-hover))] transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-success-fg))]  hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   <UserCheck className="w-4 h-4" />
                   Activate
@@ -343,7 +343,7 @@ function UserActionsDropdown({
                 <button
                   type="button"
                   onClick={() => { onAction(user, 'deactivate'); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-[rgb(var(--surface-hover))] transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-warning-fg))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   <UserX className="w-4 h-4" />
                   Deactivate
@@ -354,7 +354,7 @@ function UserActionsDropdown({
                 <button
                   type="button"
                   onClick={() => { onAction(user, 'suspend'); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--surface-hover))] transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   <ShieldAlert className="w-4 h-4" />
                   Suspend
@@ -549,7 +549,7 @@ export default function PeopleSettingsPage() {
           <StatCard label="Total Users" value={stats.total} icon={Users} color="bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--action-primary-bg))]/20 text-[rgb(var(--action-secondary-fg))] " />
           <StatCard label="Active" value={stats.active} icon={UserCheck} color="bg-[rgb(var(--state-success-bg)/0.18)]  text-[rgb(var(--state-success-fg))] " />
           <StatCard label="Suspended" value={stats.suspended} icon={ShieldAlert} color="bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
-          <StatCard label="Pending" value={stats.pending} icon={Clock} color="bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400" />
+          <StatCard label="Pending" value={stats.pending} icon={Clock} color="bg-amber-100 dark:bg-amber-500/20 text-[rgb(var(--state-warning-fg))]" />
         </motion.div>
 
         {/* Filters */}

@@ -113,7 +113,7 @@ function EmptyState() {
 
 function EventItem({ event }: { event: UpcomingEvent }) {
   return (
-    <div className="group flex items-start gap-4 py-1.5 px-2 -mx-2 rounded-lg hover:bg-[rgb(var(--surface-hover))] transition-colors cursor-pointer">
+    <div className="group flex items-start gap-4 py-1.5 px-2 -mx-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors cursor-pointer">
       {/* Time Column */}
       <div className="w-16 flex-shrink-0 text-right pt-0.5">
         <div className="text-sm font-medium text-[rgb(var(--text-secondary))]">{event.time}</div>
