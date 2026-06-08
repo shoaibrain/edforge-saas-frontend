@@ -17,6 +17,31 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
   })
 }
 
+if (typeof window !== 'undefined' && !window.ResizeObserver) {
+  class TestResizeObserver {
+    observe() {
+      return undefined
+    }
+
+    unobserve() {
+      return undefined
+    }
+
+    disconnect() {
+      return undefined
+    }
+  }
+
+  Object.defineProperty(window, 'ResizeObserver', {
+    writable: true,
+    value: TestResizeObserver,
+  })
+  Object.defineProperty(globalThis, 'ResizeObserver', {
+    writable: true,
+    value: TestResizeObserver,
+  })
+}
+
 // Start MSW server before all tests
 beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }))
 

@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Combobox,
   Container,
   Dropdown,
   FilterTabs,
@@ -13,6 +14,7 @@ import {
   Inline,
   PageHeader,
   SectionCard,
+  Select,
   Stack,
   Tag,
   Text,
@@ -79,6 +81,8 @@ function TokenSwatch({
 export default function DesignSystemDevPage() {
   const [activeTab, setActiveTab] = useState('all')
   const [dropdownValue, setDropdownValue] = useState<string | null>('compact')
+  const [selectValue, setSelectValue] = useState<string | null>('high')
+  const [comboboxValue, setComboboxValue] = useState<string | null>(null)
 
   if (!import.meta.env.DEV) {
     return (
@@ -169,6 +173,27 @@ export default function DesignSystemDevPage() {
             <Field label="School notes" helperText="Shown to administrators only.">
               <Textarea defaultValue="Calm, readable multi-line input." maxLength={120} showCharacterCount />
             </Field>
+            <Select
+              label="School type"
+              value={selectValue}
+              onChange={setSelectValue}
+              options={[
+                { value: 'elementary', label: 'Elementary' },
+                { value: 'middle', label: 'Middle' },
+                { value: 'high', label: 'High School', description: 'Grades 9–12' },
+              ]}
+            />
+            <Combobox
+              label="Parent district"
+              value={comboboxValue}
+              onChange={setComboboxValue}
+              placeholder="Search districts"
+              options={[
+                { value: 'north', label: 'North District' },
+                { value: 'south', label: 'South District' },
+                { value: 'central', label: 'Central Learning Network' },
+              ]}
+            />
           </div>
         </SectionCard>
 

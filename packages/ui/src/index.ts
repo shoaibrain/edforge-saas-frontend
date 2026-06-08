@@ -64,15 +64,23 @@ export { Text, textVariants, type TextProps } from './components/typography/Text
 export {
   Field,
   FormField,
+  Combobox,
   Input,
+  Select,
   Textarea,
+  comboboxInputVariants,
+  comboboxShellVariants,
   inputElementVariants,
   inputShellVariants,
+  selectButtonVariants,
   textareaVariants,
   useFieldContext,
+  type ComboboxProps,
   type FieldContextValue,
   type FieldProps,
   type InputProps,
+  type SelectOption,
+  type SelectProps,
   type TextareaProps,
 } from './components/forms'
 
