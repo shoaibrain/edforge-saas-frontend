@@ -187,6 +187,24 @@ export default {
         'slide-up': 'slide-up 0.3s ease-out',
         'slide-in-right': 'slide-in-right 0.3s ease-out',
       },
+      boxShadow: {
+        flat: 'var(--elevation-flat)',
+        raised: 'var(--elevation-raised)',
+        overlay: 'var(--elevation-overlay)',
+        modal: 'var(--elevation-modal)',
+        popover: 'var(--elevation-popover)',
+      },
+      transitionDuration: {
+        instant: 'var(--motion-duration-instant)',
+        fast: 'var(--motion-duration-fast)',
+        base: 'var(--motion-duration-base)',
+        slow: 'var(--motion-duration-slow)',
+      },
+      transitionTimingFunction: {
+        standard: 'var(--motion-easing-standard)',
+        enter: 'var(--motion-easing-enter)',
+        exit: 'var(--motion-easing-exit)',
+      },
       keyframes: {
         'fade-in': {
           from: { opacity: '0', transform: 'translateY(-8px)' },
