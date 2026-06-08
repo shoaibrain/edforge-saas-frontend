@@ -6,7 +6,7 @@
  */
 
 import { useEffect } from 'react'
-import { useForm, FormProvider, zodResolver } from '@edforge/forms'
+import { useForm, FormProvider, zodResolver, TextField, SelectField } from '@edforge/forms'
 import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
 import { MapPin, Network, Info } from 'lucide-react'
@@ -41,16 +41,6 @@ export interface ESCFormProps {
 }
 
 // ============================================================================
-// STYLES
-// ============================================================================
-
-const inputClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
-const selectClass = inputClass
-const labelClass = 'block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5'
-const errorClass = 'mt-1 text-xs text-[rgb(var(--state-danger-fg))]'
-
-// ============================================================================
 // COMPONENT
 // ============================================================================
 
@@ -78,7 +68,7 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
     },
   })
 
-  const { register, handleSubmit, reset, formState: { errors, isDirty } } = methods
+  const { handleSubmit, reset, formState: { isDirty } } = methods
   const { guardedClose } = useFormDirtyGuard({ isDirty, onClose })
 
   // Populate form for edit mode
@@ -148,75 +138,57 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>
-                  Ed-Fi ID <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-                  <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
-                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
-                  </Tooltip>
-                </label>
-                <input
-                  type="number"
-                  {...register('educationServiceCenterId', { valueAsNumber: true })}
-                  placeholder="e.g., 200001"
-                  readOnly={isEdit}
-                  className={`${inputClass} ${isEdit ? 'opacity-60 cursor-not-allowed' : ''}`}
-                />
-                {errors.educationServiceCenterId && (
-                  <p className={errorClass}>{errors.educationServiceCenterId.message}</p>
-                )}
-              </div>
-              <div>
-                <label className={labelClass}>
-                  Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-                </label>
-                <input
-                  type="text"
-                  {...register('nameOfInstitution')}
-                  placeholder="e.g., Region 13 ESC"
-                  className={inputClass}
-                />
-                {errors.nameOfInstitution && (
-                  <p className={errorClass}>{errors.nameOfInstitution.message}</p>
-                )}
-              </div>
+              <TextField
+                name="educationServiceCenterId"
+                type="number"
+                required
+                readOnly={isEdit}
+                placeholder="e.g., 200001"
+                rules={{ valueAsNumber: true }}
+                label={
+                  <>
+                    Ed-Fi ID
+                    <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                    </Tooltip>
+                  </>
+                }
+              />
+              <TextField
+                name="nameOfInstitution"
+                label="Name"
+                required
+                placeholder="e.g., Region 13 ESC"
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Short Name</label>
-                <input
-                  type="text"
-                  {...register('shortNameOfInstitution')}
-                  placeholder="e.g., ESC 13"
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Website</label>
-                <input
-                  type="url"
-                  {...register('webSite')}
-                  placeholder="https://www.esc13.net"
-                  className={inputClass}
-                />
-                {errors.webSite && <p className={errorClass}>{errors.webSite.message}</p>}
-              </div>
+              <TextField
+                name="shortNameOfInstitution"
+                label="Short Name"
+                placeholder="e.g., ESC 13"
+              />
+              <TextField
+                name="webSite"
+                label="Website"
+                type="url"
+                placeholder="https://www.esc13.net"
+              />
             </div>
 
-            <div className="w-48">
-              <label className={labelClass}>
-                Operational Status
-                <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
-                  <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
-                </Tooltip>
-              </label>
-              <select {...register('operationalStatusDescriptor')} className={selectClass}>
-                {OPERATIONAL_STATUS_DESCRIPTORS.map((d) => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
-                ))}
-              </select>
-            </div>
+            <SelectField
+              name="operationalStatusDescriptor"
+              className="w-48"
+              options={OPERATIONAL_STATUS_DESCRIPTORS}
+              label={
+                <>
+                  Operational Status
+                  <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                    <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                  </Tooltip>
+                </>
+              }
+            />
           </div>
 
           <div className="border-t border-[rgb(var(--border-primary))]" />
@@ -227,13 +199,15 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
               <Network className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
               <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Hierarchy</h3>
             </div>
-            <div className="w-72">
-              <label className={labelClass}>State Education Agency</label>
-              <select {...register('stateEducationAgencyId')} className={selectClass}>
-                <option value="">None</option>
-                {sea && <option value={sea.id}>{sea.nameOfInstitution}</option>}
-              </select>
-            </div>
+            <SelectField
+              name="stateEducationAgencyId"
+              label="State Education Agency"
+              className="w-72"
+              placeholder="None"
+              clearable
+              emptyValue={undefined}
+              options={sea ? [{ value: sea.id, label: sea.nameOfInstitution }] : []}
+            />
           </div>
 
           <div className="border-t border-[rgb(var(--border-primary))]" />

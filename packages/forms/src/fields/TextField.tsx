@@ -14,8 +14,8 @@ import { getNestedError, getNestedTouched, getNestedDirty } from '../utils'
 export interface TextFieldProps {
   /** Field name (supports dot notation for nested fields) */
   name: string
-  /** Field label */
-  label?: string
+  /** Field label (ReactNode so callers can compose inline label hints/tooltips) */
+  label?: ReactNode
   /** Placeholder text */
   placeholder?: string
   /** Input type */
@@ -32,6 +32,8 @@ export interface TextFieldProps {
   required?: boolean
   /** Autocomplete attribute */
   autoComplete?: string
+  /** Autofocus the input on mount */
+  autoFocus?: boolean
   /** Container class name */
   className?: string
   /** Input container class name */
@@ -67,6 +69,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       readOnly = false,
       required = false,
       autoComplete,
+      autoFocus,
       className,
       inputClassName,
       rules,
@@ -136,6 +139,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           disabled={disabled}
           readOnly={readOnly}
           autoComplete={autoComplete}
+          autoFocus={autoFocus}
           maxLength={maxLength}
           min={min}
           max={max}

@@ -5,7 +5,7 @@
  * Must be used inside a FormProvider context.
  */
 
-import { useFieldArray, useFormContext } from '@edforge/forms'
+import { useFieldArray, useFormContext, TextField, SelectField } from '@edforge/forms'
 import { Plus, Trash2, Phone } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS } from '@aibrains/shared-types'
@@ -14,20 +14,9 @@ interface TelephoneArraySectionProps {
   name?: string
 }
 
-const inputClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
-const selectClass = inputClass
-const labelClass = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1'
-const errorClass = 'mt-0.5 text-xs text-[rgb(var(--state-danger-fg))]'
-
 export function TelephoneArraySection({ name = 'telephones' }: TelephoneArraySectionProps) {
-  const { control, register, formState: { errors } } = useFormContext()
+  const { control } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name })
-
-  const getError = (index: number, field: string) => {
-    const arr = (errors as Record<string, any>)[name]
-    return arr?.[index]?.[field]?.message as string | undefined
-  }
 
   return (
     <div className="space-y-3">
@@ -64,29 +53,19 @@ export function TelephoneArraySection({ name = 'telephones' }: TelephoneArraySec
           key={field.id}
           className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
         >
-          <div className="w-40 shrink-0">
-            <label className={labelClass}>Type</label>
-            <select
-              {...register(`${name}.${index}.institutionTelephoneNumberTypeDescriptor`)}
-              className={selectClass}
-            >
-              {INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS.map((d) => (
-                <option key={d.value} value={d.value}>{d.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-1">
-            <label className={labelClass}>Number</label>
-            <input
-              type="tel"
-              {...register(`${name}.${index}.telephoneNumber`)}
-              placeholder="(512) 555-0100"
-              className={inputClass}
-            />
-            {getError(index, 'telephoneNumber') && (
-              <p className={errorClass}>{getError(index, 'telephoneNumber')}</p>
-            )}
-          </div>
+          <SelectField
+            name={`${name}.${index}.institutionTelephoneNumberTypeDescriptor`}
+            label="Type"
+            options={INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS}
+            className="w-40 shrink-0"
+          />
+          <TextField
+            name={`${name}.${index}.telephoneNumber`}
+            label="Number"
+            type="tel"
+            placeholder="(512) 555-0100"
+            className="flex-1"
+          />
           <button
             type="button"
             onClick={() => remove(index)}

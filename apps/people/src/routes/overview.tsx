@@ -124,7 +124,7 @@ export function Overview() {
       {/* PAGE HEADER */}
       <PageHeader
         className="mb-2"
-        title="People & HR"
+        title="People"
         description={new Date().toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -154,11 +154,11 @@ export function Overview() {
 
       {/* CONTEXT BANNER */}
       <Text variant="caption" className="mb-5">
-        <em className="font-medium not-italic text-[var(--v2-brand-accent,#D85A30)]">
+        <em className="font-medium not-italic text-[rgb(var(--action-secondary-fg))]">
           {stats.total} staff member{stats.total !== 1 ? 's' : ''}
         </em>
         {' · '}
-        <span className="font-medium text-[var(--v2-success)]">
+        <span className="font-medium text-[rgb(var(--state-success-fg))]">
           {stats.teachers} teacher{stats.teachers !== 1 ? 's' : ''}
         </span>
         {' · '}
@@ -173,14 +173,7 @@ export function Overview() {
 
       {/* KPI TILES */}
       <WidgetErrorBoundaryV2>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-            gap: 10,
-            marginBottom: 18,
-          }}
-        >
+        <div className="mb-4 grid grid-cols-4 gap-2.5">
           <StatCard
             label="Total Staff"
             value={isLoading ? '—' : stats.total.toString()}
@@ -237,86 +230,35 @@ export function Overview() {
       </WidgetErrorBoundaryV2>
 
       {/* TWO-COL: Staff Roster + Employment Breakdown */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1.6fr 1fr',
-          gap: 12,
-          marginBottom: 12,
-        }}
-      >
+      <div className="mb-3 grid grid-cols-[1.6fr_1fr] gap-3">
         {/* STAFF ROSTER */}
-        <div
-          style={{
-            background: 'var(--v2-bg-surface, #161b27)',
-            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              padding: '12px 14px',
-              borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--v2-text-primary, #e8eaf0)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-            >
-              <div
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 5,
-                  background: 'rgba(216,90,48,0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Users style={{ width: 12, height: 12, color: '#D85A30' }} />
+        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
+          <div className="flex items-center justify-between border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[rgb(var(--text-primary))]">
+              <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--action-secondary-fg))]/10">
+                <Users className="h-3 w-3 text-[rgb(var(--action-secondary-fg))]" />
               </div>
               Staff roster
             </div>
             <button
               type="button"
               onClick={() => navigate({ to: '/staff' as string })}
-              style={{
-                fontSize: 11,
-                color: '#D85A30',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 3,
-                fontWeight: 500,
-              }}
+              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))]"
             >
               View directory{' '}
-              <ChevronRight style={{ width: 10, height: 10 }} />
+              <ChevronRight className="h-2.5 w-2.5" />
             </button>
           </div>
-          <div style={{ padding: '4px 14px 10px' }}>
+          <div className="px-3.5 pb-2.5 pt-1">
             {isLoading ? (
-              <div style={{ padding: '20px 0', textAlign: 'center' }}>
-                <span style={{ fontSize: 11, color: 'var(--v2-text-hint, #4a5068)' }}>
+              <div className="py-5 text-center">
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">
                   Loading staff...
                 </span>
               </div>
             ) : staff.length === 0 ? (
-              <div style={{ padding: '20px 0', textAlign: 'center' }}>
-                <span style={{ fontSize: 11, color: 'var(--v2-text-hint, #4a5068)' }}>
+              <div className="py-5 text-center">
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">
                   No staff members yet
                 </span>
               </div>
@@ -329,60 +271,17 @@ export function Overview() {
         </div>
 
         {/* EMPLOYMENT BREAKDOWN */}
-        <div
-          style={{
-            background: 'var(--v2-bg-surface, #161b27)',
-            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              padding: '12px 14px',
-              borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--v2-text-primary, #e8eaf0)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-            >
-              <div
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 5,
-                  background: 'rgba(55,138,221,0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <BarChart3 style={{ width: 12, height: 12, color: '#378ADD' }} />
+        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
+          <div className="flex items-center justify-between border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[rgb(var(--text-primary))]">
+              <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--state-info-fg))]/10">
+                <BarChart3 className="h-3 w-3 text-[rgb(var(--state-info-fg))]" />
               </div>
               Employment breakdown
             </div>
           </div>
-          <div style={{ padding: '10px 14px' }}>
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                color: 'var(--v2-text-ghost, #2a3045)',
-                marginBottom: 8,
-              }}
-            >
+          <div className="px-3.5 py-2.5">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[rgb(var(--text-disabled))]">
               Employment type
             </div>
             <BarRow
@@ -404,28 +303,13 @@ export function Overview() {
               color="#378ADD"
             />
 
-            <div
-              style={{
-                height: 1,
-                background: 'rgba(255,255,255,0.05)',
-                margin: '10px 0',
-              }}
-            />
+            <div className="my-2.5 h-px bg-[rgb(var(--border-primary))]" />
 
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                color: 'var(--v2-text-ghost, #2a3045)',
-                marginBottom: 8,
-              }}
-            >
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[rgb(var(--text-disabled))]">
               By department
             </div>
             {stats.departments.length === 0 ? (
-              <div style={{ fontSize: 11, color: 'var(--v2-text-hint, #4a5068)' }}>
+              <div className="text-xs text-[rgb(var(--text-tertiary))]">
                 No departments assigned
               </div>
             ) : (
@@ -444,88 +328,28 @@ export function Overview() {
         </div>
       </div>
 
-      {/* THREE-COL: Activity + Dir shortcut + HR shortcut */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: 12,
-        }}
-      >
+      {/* TWO-COL: Activity (wide) + Staff Directory shortcut (HR shortcut removed — out of scope) */}
+      <div className="grid grid-cols-[2fr_1fr] gap-3">
         {/* RECENT ACTIVITY */}
-        <div
-          style={{
-            background: 'var(--v2-bg-surface, #161b27)',
-            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              padding: '12px 14px',
-              borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <div
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: 5,
-                background: 'rgba(239,159,39,0.10)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Clock style={{ width: 12, height: 12, color: '#EF9F27' }} />
+        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
+          <div className="flex items-center gap-2 border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
+            <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--state-warning-fg))]/10">
+              <Clock className="h-3 w-3 text-[rgb(var(--state-warning-fg))]" />
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--v2-text-primary, #e8eaf0)',
-              }}
-            >
+            <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">
               Recent activity
             </span>
           </div>
-          <div style={{ padding: '4px 14px 10px' }}>
+          <div className="px-3.5 pb-2.5 pt-1">
             {activityFeed.length === 0 ? (
               <>
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 8,
-                      padding: '7px 0',
-                      borderBottom:
-                        i < 3
-                          ? '1px solid rgba(255,255,255,0.04)'
-                          : 'none',
-                    }}
+                    className={`flex items-start gap-2 py-1.5 ${i < 3 ? 'border-b border-[rgb(var(--border-primary))]' : ''}`}
                   >
-                    <div
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: 'var(--v2-text-hint, #4a5068)',
-                        flexShrink: 0,
-                        marginTop: 4,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: 'var(--v2-text-hint, #4a5068)',
-                      }}
-                    >
+                    <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[rgb(var(--text-tertiary))]" />
+                    <span className="text-xs text-[rgb(var(--text-tertiary))]">
                       No recent activity
                     </span>
                   </div>
@@ -535,44 +359,18 @@ export function Overview() {
               activityFeed.map((item, i) => (
                 <div
                   key={item.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 8,
-                    padding: '7px 0',
-                    borderBottom:
-                      i < activityFeed.length - 1
-                        ? '1px solid rgba(255,255,255,0.04)'
-                        : 'none',
-                  }}
+                  className={`flex items-start gap-2 py-1.5 ${i < activityFeed.length - 1 ? 'border-b border-[rgb(var(--border-primary))]' : ''}`}
                 >
                   <div
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      background: item.color,
-                      flexShrink: 0,
-                      marginTop: 4,
-                    }}
+                    // allow-presentation-style: dot color is data-driven (per-activity success/role tone)
+                    style={{ background: item.color }}
+                    className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full"
                   />
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: 'var(--v2-text-secondary, #c8ccd8)',
-                        lineHeight: 1.5,
-                      }}
-                    >
+                  <div className="flex-1">
+                    <div className="text-xs leading-normal text-[rgb(var(--text-secondary))]">
                       {item.text}
                     </div>
-                    <div
-                      style={{
-                        fontSize: 9,
-                        color: 'var(--v2-text-ghost, #2a3045)',
-                        marginTop: 2,
-                      }}
-                    >
+                    <div className="mt-0.5 text-xs text-[rgb(var(--text-disabled))]">
                       {item.time}
                     </div>
                   </div>
@@ -586,160 +384,20 @@ export function Overview() {
         <button
           type="button"
           onClick={() => navigate({ to: '/staff' as string })}
-          style={{
-            background: 'var(--v2-bg-surface, #161b27)',
-            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-            borderRadius: 10,
-            padding: 14,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            cursor: 'pointer',
-            textAlign: 'left',
-            transition: 'border-color 0.12s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor =
-              'var(--v2-border-default, rgba(255,255,255,0.06))'
-          }}
+          className={`flex cursor-pointer flex-col gap-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-3.5 text-left transition-colors hover:border-[rgb(var(--border-secondary))] ${focusRing}`}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 7,
-                background: 'rgba(29,158,117,0.10)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Users style={{ width: 14, height: 14, color: '#1D9E75' }} />
+          <div className="flex items-center justify-between">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[rgb(var(--state-success-fg))]/10">
+              <Users className="h-3.5 w-3.5 text-[rgb(var(--state-success-fg))]" />
             </div>
-            <ChevronRight
-              style={{
-                width: 14,
-                height: 14,
-                color: 'var(--v2-text-ghost, #2a3045)',
-              }}
-            />
+            <ChevronRight className="h-3.5 w-3.5 text-[rgb(var(--text-disabled))]" />
           </div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: 'var(--v2-text-primary, #e8eaf0)',
-            }}
-          >
+          <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">
             Staff Directory
           </div>
-          <div
-            style={{
-              fontSize: 10,
-              color: 'var(--v2-text-muted, #7a8099)',
-              lineHeight: 1.5,
-            }}
-          >
+          <div className="text-xs leading-normal text-[rgb(var(--text-tertiary))]">
             View, search and manage all staff members, roles and system access.
           </div>
-        </button>
-
-        {/* HR ADMIN SHORTCUT */}
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/hr' as string })}
-          style={{
-            background: 'var(--v2-bg-surface, #161b27)',
-            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-            borderRadius: 10,
-            padding: 14,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            cursor: 'pointer',
-            textAlign: 'left',
-            transition: 'border-color 0.12s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor =
-              'var(--v2-border-default, rgba(255,255,255,0.06))'
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 7,
-                background: 'rgba(127,119,221,0.10)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Briefcase style={{ width: 14, height: 14, color: '#7F77DD' }} />
-            </div>
-            <ChevronRight
-              style={{
-                width: 14,
-                height: 14,
-                color: 'var(--v2-text-ghost, #2a3045)',
-              }}
-            />
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: 'var(--v2-text-primary, #e8eaf0)',
-            }}
-          >
-            HR Administration
-          </div>
-          <div
-            style={{
-              fontSize: 10,
-              color: 'var(--v2-text-muted, #7a8099)',
-              lineHeight: 1.5,
-            }}
-          >
-            Payroll, performance reviews, contracts and professional development.
-          </div>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              fontSize: 9,
-              fontWeight: 500,
-              padding: '2px 6px',
-              borderRadius: 4,
-              background: 'rgba(239,159,39,0.12)',
-              color: '#EF9F27',
-              width: 'fit-content',
-            }}
-          >
-            Coming in v2.0
-          </span>
         </button>
       </div>
 
@@ -758,58 +416,25 @@ export function Overview() {
 
 function StaffRow({ staff: s }: { staff: StaffResponseDto }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '8px 0',
-        borderBottom: '1px solid rgba(255,255,255,0.04)',
-      }}
-    >
+    <div className="flex items-center gap-2.5 border-b border-[rgb(var(--border-primary))] py-2">
       <img
         src={getStaffAvatar(s.staffId)}
         alt={`${s.firstName} ${s.lastSurname}`}
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: '50%',
-          flexShrink: 0,
-          objectFit: 'cover',
-        }}
+        className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
         loading="lazy"
       />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: 'var(--v2-text-primary, #e8eaf0)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
+      <div className="min-w-0 flex-1">
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[rgb(var(--text-primary))]">
           {s.firstName} {s.lastSurname}
         </div>
-        <div
-          style={{
-            fontSize: 10,
-            color: 'var(--v2-text-ghost, #2a3045)',
-          }}
-        >
+        <div className="text-xs text-[rgb(var(--text-disabled))]">
           {s.role?.replace('_', ' ')} · {s.email}
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div className="flex items-center gap-1.5">
         <StaffRoleChip role={s.role} />
         <div
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: s.userId ? '#1D9E75' : 'var(--v2-text-hint, #4a5068)',
-          }}
+          className={`h-1.5 w-1.5 rounded-full ${s.userId ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`}
           title={s.userId ? 'System Access Active' : 'No System Access'}
         />
       </div>
@@ -832,51 +457,18 @@ function BarRow({
 }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 8,
-      }}
-    >
-      <span
-        style={{
-          fontSize: 11,
-          color: 'var(--v2-text-muted, #7a8099)',
-          width: 68,
-          flexShrink: 0,
-        }}
-      >
+    <div className="mb-2 flex items-center gap-2">
+      <span className="w-16 flex-shrink-0 text-xs text-[rgb(var(--text-tertiary))]">
         {label}
       </span>
-      <div
-        style={{
-          flex: 1,
-          height: 5,
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: 3,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="h-1.5 flex-1 overflow-hidden rounded bg-[rgb(var(--border-primary))]">
         <div
-          style={{
-            height: '100%',
-            borderRadius: 3,
-            background: color,
-            width: `${pct}%`,
-            transition: 'width 0.8s cubic-bezier(0.16,1,0.3,1)',
-          }}
+          // allow-presentation-style: bar fill width is the data value (%) and color is the per-series prop
+          style={{ background: color, width: `${pct}%` }}
+          className="h-full rounded transition-[width] duration-700 ease-out"
         />
       </div>
-      <span
-        style={{
-          fontSize: 10,
-          color: 'var(--v2-text-hint, #4a5068)',
-          width: 32,
-          textAlign: 'right',
-        }}
-      >
+      <span className="w-8 text-right text-xs text-[rgb(var(--text-tertiary))]">
         {showCount ? value : `${pct}%`}
       </span>
     </div>

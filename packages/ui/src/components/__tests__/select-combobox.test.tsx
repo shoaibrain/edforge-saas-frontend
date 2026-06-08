@@ -51,6 +51,21 @@ describe('Select', () => {
     expect(trigger.textContent).toContain('High School')
   })
 
+  it('sizes the dropdown panel to its content, not the trigger width', async () => {
+    // Guards the narrow-trigger truncation bug: a fit-content trigger (e.g. the
+    // wizard "Address Type" select) must not clip option labels. The panel grows
+    // to fit content (w-max) while staying at least as wide as the trigger
+    // (min-w-full) — never a plain w-full that locks to a narrow trigger.
+    const user = userEvent.setup()
+    render(<SelectHarness />)
+
+    await user.click(screen.getByRole('button', { name: /School type/ }))
+    const panel = screen.getByRole('listbox')
+    expect(panel.className).toContain('w-max')
+    expect(panel.className).toContain('min-w-full')
+    expect(panel.className.split(/\s+/)).not.toContain('w-full')
+  })
+
   it('renders invalid field state and error message', () => {
     render(
       <Select

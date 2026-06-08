@@ -22,7 +22,6 @@ import { DepartmentsModule } from './routes/departments'
 import { RolesModule } from './routes/roles'
 import { SettingsModule } from './routes/settings'
 import { AnalyticsModule } from './routes/analytics'
-import { HRAdminModule } from './routes/hr'
 
 // ============================================================================
 // ROOT ROUTE
@@ -95,13 +94,6 @@ const analyticsRoute = createRoute({
     component: AnalyticsModule,
 })
 
-// HR Admin - Consolidated Payroll/Contracts/PD/Reviews
-const hrRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/hr',
-    component: HRAdminModule,
-})
-
 const routeTree = rootRoute.addChildren([
     indexRoute,
     staffRoute,
@@ -112,7 +104,6 @@ const routeTree = rootRoute.addChildren([
     rolesRoute,
     settingsRoute,
     analyticsRoute,
-    hrRoute,
 ])
 
 export const router = createRouter({

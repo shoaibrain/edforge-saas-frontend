@@ -6,15 +6,15 @@
  */
 
 import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2, Plus, Save } from 'lucide-react'
 import {
   createCredentialSchema,
   type CreateCredentialDto,
   type CredentialResponseDto,
 } from '@aibrains/shared-types'
+import { TextField, SelectField, DateField, TextareaField, CheckboxField } from '@edforge/forms'
 import { Modal, ModalFooter, Button } from '../ui'
 import { useCreateCredential, useUpdateCredential } from '../../hooks'
 import { parseApiError } from '../../services/people.service'
@@ -55,6 +55,11 @@ const CREDENTIAL_FIELD_OPTIONS = [
   { value: 'other', label: 'Other' },
 ]
 
+const CREDENTIAL_FIELD_SELECT_OPTIONS = [
+  { value: '', label: 'None' },
+  ...CREDENTIAL_FIELD_OPTIONS,
+]
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -81,12 +86,7 @@ export function CredentialModal({
   const createCredential = useCreateCredential()
   const updateCredential = useUpdateCredential()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<CreateCredentialDto>({
+  const methods = useForm<CreateCredentialDto>({
     resolver: zodResolver(createCredentialSchema),
     defaultValues: {
       credentialIdentifier: '',
@@ -99,6 +99,12 @@ export function CredentialModal({
       renewalReminderDays: 90,
     },
   })
+
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting, isDirty },
+  } = methods
 
   // Populate form when editing
   useEffect(() => {
@@ -170,15 +176,6 @@ export function CredentialModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
-
   return (
     <Modal
       open={open}
@@ -187,234 +184,139 @@ export function CredentialModal({
       description={isEditing ? 'Update credential information' : 'Add a new credential for this staff member'}
       size="lg"
     >
-      <form onSubmit={onSubmit} className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
-        {/* Name & Identifier */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="cred-name" className="block text-sm font-medium text-text-primary mb-1.5">
-              Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="cred-name"
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+          {/* Name & Identifier */}
+          <div className="grid grid-cols-2 gap-4">
+            <TextField
+              ref={firstInputRef}
+              name="name"
+              label="Name"
               type="text"
-              {...register('name')}
-              ref={(e) => {
-                register('name').ref(e)
-                if (e) firstInputRef.current = e
-              }}
-              className={inputClass(!!errors.name)}
+              required
               placeholder="e.g., State Teaching License"
               disabled={isSubmitting}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="cred-identifier" className="block text-sm font-medium text-text-primary mb-1.5">
-              Credential ID <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="cred-identifier"
+            <TextField
+              name="credentialIdentifier"
+              label="Credential ID"
               type="text"
-              {...register('credentialIdentifier')}
-              className={inputClass(!!errors.credentialIdentifier)}
+              required
               placeholder="e.g., LIC-2024-12345"
               disabled={isSubmitting || isEditing}
             />
-            {errors.credentialIdentifier && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.credentialIdentifier.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Type & Field */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="cred-type" className="block text-sm font-medium text-text-primary mb-1.5">
-              Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <select
-              id="cred-type"
-              {...register('credentialTypeDescriptor')}
-              className={inputClass(!!errors.credentialTypeDescriptor)}
+          {/* Type & Field */}
+          <div className="grid grid-cols-2 gap-4">
+            <SelectField
+              name="credentialTypeDescriptor"
+              label="Type"
+              required
+              options={CREDENTIAL_TYPE_OPTIONS}
               disabled={isSubmitting}
-            >
-              {CREDENTIAL_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="cred-field" className="block text-sm font-medium text-text-primary mb-1.5">
-              Field/Subject Area
-            </label>
-            <select
-              id="cred-field"
-              {...register('credentialFieldDescriptor')}
-              className={inputClass(!!errors.credentialFieldDescriptor)}
+            />
+            <SelectField
+              name="credentialFieldDescriptor"
+              label="Field/Subject Area"
+              options={CREDENTIAL_FIELD_SELECT_OPTIONS}
+              placeholder="None"
               disabled={isSubmitting}
-            >
-              <option value="">None</option>
-              {CREDENTIAL_FIELD_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            />
           </div>
-        </div>
 
-        {/* Issuing Organization & State */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="cred-org" className="block text-sm font-medium text-text-primary mb-1.5">
-              Issuing Organization <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="cred-org"
+          {/* Issuing Organization & State */}
+          <div className="grid grid-cols-2 gap-4">
+            <TextField
+              name="issuingOrganization"
+              label="Issuing Organization"
               type="text"
-              {...register('issuingOrganization')}
-              className={inputClass(!!errors.issuingOrganization)}
+              required
               placeholder="e.g., State Board of Education"
               disabled={isSubmitting}
             />
-            {errors.issuingOrganization && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.issuingOrganization.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="cred-state" className="block text-sm font-medium text-text-primary mb-1.5">
-              Issuing State
-            </label>
-            <input
-              id="cred-state"
+            <TextField
+              name="issuingState"
+              label="Issuing State"
               type="text"
-              {...register('issuingState')}
-              className={inputClass(!!errors.issuingState)}
               placeholder="e.g., Texas"
               disabled={isSubmitting}
             />
           </div>
-        </div>
 
-        {/* Dates */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="cred-issuance" className="block text-sm font-medium text-text-primary mb-1.5">
-              Issuance Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="cred-issuance"
-              type="date"
-              {...register('issuanceDate')}
-              className={inputClass(!!errors.issuanceDate)}
+          {/* Dates */}
+          <div className="grid grid-cols-2 gap-4">
+            <DateField
+              name="issuanceDate"
+              label="Issuance Date"
+              required
               disabled={isSubmitting}
             />
-            {errors.issuanceDate && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.issuanceDate.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="cred-expiration" className="block text-sm font-medium text-text-primary mb-1.5">
-              Expiration Date
-            </label>
-            <input
-              id="cred-expiration"
-              type="date"
-              {...register('expirationDate')}
-              className={inputClass(!!errors.expirationDate)}
+            <DateField
+              name="expirationDate"
+              label="Expiration Date"
               disabled={isSubmitting}
             />
           </div>
-        </div>
 
-        {/* Description */}
-        <div>
-          <label htmlFor="cred-description" className="block text-sm font-medium text-text-primary mb-1.5">
-            Description
-          </label>
-          <textarea
-            id="cred-description"
-            {...register('description')}
-            className={inputClass(!!errors.description)}
+          {/* Description */}
+          <TextareaField
+            name="description"
+            label="Description"
             rows={2}
             placeholder="Additional details about this credential..."
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* Document URL */}
-        <div>
-          <label htmlFor="cred-docUrl" className="block text-sm font-medium text-text-primary mb-1.5">
-            Document URL
-          </label>
-          <input
-            id="cred-docUrl"
+          {/* Document URL */}
+          <TextField
+            name="documentUrl"
+            label="Document URL"
             type="url"
-            {...register('documentUrl')}
-            className={inputClass(!!errors.documentUrl)}
             placeholder="https://..."
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* Renewal Settings */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              id="cred-renewable"
-              type="checkbox"
-              {...register('isRenewable')}
-              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-2 focus:ring-accent-primary/20"
-              disabled={isSubmitting}
-            />
-            <label htmlFor="cred-renewable" className="text-sm text-text-primary">
-              Renewable credential
-            </label>
-          </div>
-          <div>
-            <label htmlFor="cred-reminder" className="block text-sm font-medium text-text-primary mb-1.5">
-              Reminder Days Before Expiry
-            </label>
-            <input
-              id="cred-reminder"
+          {/* Renewal Settings */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center pt-6">
+              <CheckboxField
+                name="isRenewable"
+                label="Renewable credential"
+                disabled={isSubmitting}
+              />
+            </div>
+            <TextField
+              name="renewalReminderDays"
+              label="Reminder Days Before Expiry"
               type="number"
-              {...register('renewalReminderDays', { valueAsNumber: true })}
-              className={inputClass(!!errors.renewalReminderDays)}
+              rules={{ valueAsNumber: true }}
               min={0}
               max={365}
               disabled={isSubmitting}
             />
           </div>
-        </div>
 
-        <ModalFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="min-w-36"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {isEditing ? 'Saving...' : 'Adding...'}
-              </>
-            ) : (
-              <>
-                {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-                {isEditing ? 'Save Changes' : 'Add Credential'}
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
+              className="min-w-36"
+            >
+              {isEditing ? 'Save Changes' : 'Add Credential'}
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }

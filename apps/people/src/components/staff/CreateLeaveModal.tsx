@@ -6,11 +6,11 @@
  */
 
 import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2, Plus } from 'lucide-react'
 import { createLeaveRequestSchema, type CreateLeaveRequestDto } from '@aibrains/shared-types'
+import { TextField, SelectField, DateField, TextareaField } from '@edforge/forms'
 import { Modal, ModalFooter, Button } from '../ui'
 import { useCreateLeaveRequest } from '../../hooks'
 import { parseApiError } from '../../services/people.service'
@@ -66,13 +66,7 @@ export function CreateLeaveModal({
   const firstInputRef = useRef<HTMLSelectElement>(null)
   const createLeave = useCreateLeaveRequest()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<CreateLeaveRequestDto>({
+  const methods = useForm<CreateLeaveRequestDto>({
     resolver: zodResolver(createLeaveRequestSchema),
     defaultValues: {
       leaveType: '' as CreateLeaveRequestDto['leaveType'],
@@ -83,6 +77,13 @@ export function CreateLeaveModal({
       notes: '',
     },
   })
+
+  const {
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitting, isDirty },
+  } = methods
 
   const durationType = watch('durationType')
 
@@ -126,15 +127,6 @@ export function CreateLeaveModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
-
   return (
     <Modal
       open={open}
@@ -143,188 +135,107 @@ export function CreateLeaveModal({
       description={`Create a leave request for ${staffName}`}
       size="lg"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Leave Type */}
-        <div>
-          <label htmlFor="leave-type" className="block text-sm font-medium text-text-primary mb-1.5">
-            Leave Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <select
-            id="leave-type"
-            {...register('leaveType')}
-            ref={(e) => {
-              register('leaveType').ref(e)
-              if (e) firstInputRef.current = e
-            }}
-            className={inputClass(!!errors.leaveType)}
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-4">
+          {/* Leave Type */}
+          <SelectField
+            ref={firstInputRef}
+            name="leaveType"
+            label="Leave Type"
+            required
+            options={LEAVE_TYPE_OPTIONS}
+            placeholder="Select leave type..."
             disabled={isSubmitting}
-          >
-            <option value="">Select leave type...</option>
-            {LEAVE_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          {errors.leaveType && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.leaveType.message}</p>
-          )}
-        </div>
+          />
 
-        {/* Date Range */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="leave-start" className="block text-sm font-medium text-text-primary mb-1.5">
-              Start Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="leave-start"
-              type="date"
-              {...register('startDate')}
-              className={inputClass(!!errors.startDate)}
+          {/* Date Range */}
+          <div className="grid grid-cols-2 gap-4">
+            <DateField
+              name="startDate"
+              label="Start Date"
+              required
               disabled={isSubmitting}
             />
-            {errors.startDate && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.startDate.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="leave-end" className="block text-sm font-medium text-text-primary mb-1.5">
-              End Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="leave-end"
-              type="date"
-              {...register('endDate')}
-              className={inputClass(!!errors.endDate)}
+            <DateField
+              name="endDate"
+              label="End Date"
+              required
               disabled={isSubmitting}
             />
-            {errors.endDate && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.endDate.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Duration Type */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="leave-duration" className="block text-sm font-medium text-text-primary mb-1.5">
-              Duration Type
-            </label>
-            <select
-              id="leave-duration"
-              {...register('durationType')}
-              className={inputClass(!!errors.durationType)}
+          {/* Duration Type */}
+          <div className="grid grid-cols-2 gap-4">
+            <SelectField
+              name="durationType"
+              label="Duration Type"
+              options={DURATION_TYPE_OPTIONS}
               disabled={isSubmitting}
-            >
-              {DURATION_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          {durationType === 'hours' && (
-            <div>
-              <label htmlFor="leave-hours" className="block text-sm font-medium text-text-primary mb-1.5">
-                Hours
-              </label>
-              <input
-                id="leave-hours"
+            />
+            {durationType === 'hours' && (
+              <TextField
+                name="hours"
+                label="Hours"
                 type="number"
                 step={0.5}
                 min={0.5}
                 max={24}
-                {...register('hours', { valueAsNumber: true })}
-                className={inputClass(!!errors.hours)}
+                rules={{ valueAsNumber: true }}
                 placeholder="e.g., 4"
                 disabled={isSubmitting}
               />
-              {errors.hours && (
-                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.hours.message}</p>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Reason */}
-        <div>
-          <label htmlFor="leave-reason" className="block text-sm font-medium text-text-primary mb-1.5">
-            Reason
-          </label>
-          <input
-            id="leave-reason"
+          {/* Reason */}
+          <TextField
+            name="reason"
+            label="Reason"
             type="text"
-            {...register('reason')}
-            className={inputClass(!!errors.reason)}
             placeholder="Brief reason for leave..."
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* Notes */}
-        <div>
-          <label htmlFor="leave-notes" className="block text-sm font-medium text-text-primary mb-1.5">
-            Notes
-          </label>
-          <textarea
-            id="leave-notes"
-            {...register('notes')}
-            className={inputClass(!!errors.notes)}
+          {/* Notes */}
+          <TextareaField
+            name="notes"
+            label="Notes"
             rows={2}
             placeholder="Additional details..."
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* Emergency Contact */}
-        <div className="border-t border-[rgb(var(--border-secondary))] pt-4">
-          <h4 className="text-sm font-medium text-text-primary mb-3">Emergency Contact During Leave</h4>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="leave-ec-name" className="block text-xs text-text-tertiary mb-1">
-                Name
-              </label>
-              <input
-                id="leave-ec-name"
+          {/* Emergency Contact */}
+          <div className="border-t border-[rgb(var(--border-secondary))] pt-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-3">Emergency Contact During Leave</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <TextField
+                name="emergencyContact.name"
+                label="Name"
                 type="text"
-                {...register('emergencyContact.name')}
-                className={inputClass(false)}
                 placeholder="Contact name"
                 disabled={isSubmitting}
               />
-            </div>
-            <div>
-              <label htmlFor="leave-ec-phone" className="block text-xs text-text-tertiary mb-1">
-                Phone
-              </label>
-              <input
-                id="leave-ec-phone"
+              <TextField
+                name="emergencyContact.phone"
+                label="Phone"
                 type="tel"
-                {...register('emergencyContact.phone')}
-                className={inputClass(false)}
                 placeholder="Phone number"
                 disabled={isSubmitting}
               />
             </div>
           </div>
-        </div>
 
-        <ModalFooter>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-40">
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Plus className="w-4 h-4 mr-2" />
-                Submit Request
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          <ModalFooter>
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting} className="min-w-40">
+              Submit Request
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }

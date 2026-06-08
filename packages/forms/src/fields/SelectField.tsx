@@ -5,7 +5,7 @@
  * Features animated focus states, error handling, and accessibility.
  */
 
-import { forwardRef, type Ref } from 'react'
+import { forwardRef, type ReactNode, type Ref } from 'react'
 import { Controller, useFormContext, type RegisterOptions } from 'react-hook-form'
 import { type LucideIcon } from 'lucide-react'
 import { Select } from '@edforge/ui/forms'
@@ -21,12 +21,12 @@ export interface SelectOption {
 export interface SelectFieldProps {
   /** Field name (supports dot notation for nested fields) */
   name: string
-  /** Field label */
-  label?: string
+  /** Field label (ReactNode so callers can compose inline label hints/tooltips) */
+  label?: ReactNode
   /** Placeholder text */
   placeholder?: string
   /** Select options */
-  options: SelectOption[]
+  options: readonly SelectOption[]
   /** Leading icon */
   icon?: LucideIcon
   /** Helper text shown below input */
@@ -35,6 +35,15 @@ export interface SelectFieldProps {
   disabled?: boolean
   /** Whether field is required */
   required?: boolean
+  /** Show a clear ("none") affordance for optional selects */
+  clearable?: boolean
+  /**
+   * Value stored when nothing is selected / the field is cleared. Defaults to
+   * `''`. Optional reference selects validated by `z.string().uuid().optional()`
+   * or `.enum(...).optional()` must use `undefined` so an empty selection
+   * doesn't fail validation as a non-uuid/non-enum empty string.
+   */
+  emptyValue?: string | undefined
   /** Container class name */
   className?: string
   /** Select container class name */
@@ -54,6 +63,8 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
       helperText,
       disabled = false,
       required = false,
+      clearable = false,
+      emptyValue = '',
       className,
       selectClassName,
       rules,
@@ -85,9 +96,10 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
             helperText={helperText}
             error={errorMessage}
             disabled={disabled}
+            clearable={clearable}
             placeholder={placeholder}
             value={(field.value as string | undefined) || null}
-            onChange={(nextValue: string | null) => field.onChange(nextValue ?? '')}
+            onChange={(nextValue: string | null) => field.onChange(nextValue ?? emptyValue)}
             options={options.map((option) => ({
               value: option.value,
               label: option.label,

@@ -5,13 +5,14 @@
  * Uses react-hook-form + zod (updateStaffAssignmentSchema).
  */
 
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
 import { updateStaffAssignmentSchema, type UpdateStaffAssignmentDto, type StaffAssignmentResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
+import { TextField, SelectField, DateField, CheckboxField } from '@edforge/forms'
 import { useUpdateAssignment } from '../../hooks'
 import { STAFF_ROLE_OPTIONS } from './wizard/staff-wizard.utils'
 import { useDepartments } from './wizard/steps/AssignmentStep'
@@ -38,19 +39,19 @@ export function EditAssignmentModal({
   staffId,
   assignment,
 }: EditAssignmentModalProps) {
-  const firstInputRef = useRef<HTMLSelectElement>(null)
   const updateAssignment = useUpdateAssignment()
 
+  const methods = useForm<UpdateStaffAssignmentDto>({
+    resolver: zodResolver(updateStaffAssignmentSchema),
+  })
+
   const {
-    register,
     handleSubmit,
     reset,
     watch,
     setValue,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<UpdateStaffAssignmentDto>({
-    resolver: zodResolver(updateStaffAssignmentSchema),
-  })
+    formState: { isSubmitting, isDirty },
+  } = methods
 
   const fteValue = watch('fullTimeEquivalency')
   const { data: departments = [], isLoading: loadingDepts } = useDepartments(assignment?.schoolId)
@@ -68,13 +69,6 @@ export function EditAssignmentModal({
       })
     }
   }, [open, assignment, reset])
-
-  // Auto-focus first input
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => firstInputRef.current?.focus(), 100)
-    }
-  }, [open])
 
   const handleClose = () => {
     if (isDirty) {
@@ -102,15 +96,6 @@ export function EditAssignmentModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
-
   if (!assignment) return null
 
   return (
@@ -121,153 +106,112 @@ export function EditAssignmentModal({
       description={`Update assignment at ${assignment.schoolName || 'school'}`}
       size="lg"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* School (read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-1.5">
-            School
-          </label>
-          <p className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary text-sm">
-            {assignment.schoolName || assignment.schoolId}
-          </p>
-        </div>
-
-        {/* Role & Department */}
-        <div className="grid grid-cols-2 gap-4">
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-4">
+          {/* School (read-only) */}
           <div>
-            <label htmlFor="edit-assign-role" className="block text-sm font-medium text-text-primary mb-1.5">
-              Role
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              School
             </label>
-            <select
-              id="edit-assign-role"
-              {...register('role')}
-              ref={(e) => {
-                register('role').ref(e)
-                if (e) firstInputRef.current = e
-              }}
-              className={inputClass(!!errors.role)}
+            <p className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary text-sm">
+              {assignment.schoolName || assignment.schoolId}
+            </p>
+          </div>
+
+          {/* Role & Department */}
+          <div className="grid grid-cols-2 gap-4">
+            <SelectField
+              name="role"
+              label="Role"
+              placeholder="Select role..."
+              options={STAFF_ROLE_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
               disabled={isSubmitting}
-            >
-              <option value="">Select role...</option>
-              {STAFF_ROLE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            {errors.role && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.role.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="edit-assign-departmentId" className="block text-sm font-medium text-text-primary mb-1.5">
-              Department
-            </label>
-            <select
-              id="edit-assign-departmentId"
-              {...register('departmentId')}
-              className={inputClass(!!errors.departmentId)}
+            />
+            <SelectField
+              name="departmentId"
+              label="Department"
+              placeholder={loadingDepts ? 'Loading...' : 'Select department...'}
+              options={departments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` }))}
               disabled={isSubmitting || loadingDepts}
-            >
-              <option value="">{loadingDepts ? 'Loading...' : 'Select department...'}</option>
-              {departments.map((d) => (
-                <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
-              ))}
-            </select>
+            />
           </div>
-        </div>
 
-        {/* Position Title */}
-        <div>
-          <label htmlFor="edit-assign-positionTitle" className="block text-sm font-medium text-text-primary mb-1.5">
-            Position Title
-          </label>
-          <input
-            id="edit-assign-positionTitle"
+          {/* Position Title */}
+          <TextField
+            name="positionTitle"
+            label="Position Title"
             type="text"
-            {...register('positionTitle')}
-            className={inputClass(!!errors.positionTitle)}
             placeholder="e.g., Lead Teacher"
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* End Date */}
-        <div>
-          <label htmlFor="edit-assign-endDate" className="block text-sm font-medium text-text-primary mb-1.5">
-            End Date <span className="text-xs text-text-tertiary">(leave blank for ongoing)</span>
-          </label>
-          <input
-            id="edit-assign-endDate"
-            type="date"
-            {...register('endDate')}
-            className={inputClass(!!errors.endDate)}
+          {/* End Date */}
+          <DateField
+            name="endDate"
+            label="End Date"
+            helperText="Leave blank for ongoing"
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* FTE Slider */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-text-primary">
-            Full-Time Equivalency (FTE)
-          </label>
-          <div className="flex items-center gap-4">
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={fteValue ?? 1}
-              onChange={(e) => setValue('fullTimeEquivalency', parseFloat(e.target.value), { shouldDirty: true })}
-              className="flex-1 h-2 rounded-full appearance-none bg-[rgb(var(--border-primary))] accent-teal-500"
-              disabled={isSubmitting}
-            />
-            <span className="text-sm font-mono font-medium text-text-primary w-12 text-right">
-              {(fteValue ?? 1).toFixed(2)}
-            </span>
+          {/* FTE Slider */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-text-primary">
+              Full-Time Equivalency (FTE)
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                // allow-native-form-control: range slider has no shared adapter; preserves watch()/setValue() FTE behavior
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={fteValue ?? 1}
+                onChange={(e) => setValue('fullTimeEquivalency', parseFloat(e.target.value), { shouldDirty: true })}
+                className="flex-1 h-2 rounded-full appearance-none bg-[rgb(var(--border-primary))] accent-teal-500"
+                disabled={isSubmitting}
+              />
+              <span className="text-sm font-mono font-medium text-text-primary w-12 text-right">
+                {(fteValue ?? 1).toFixed(2)}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Primary */}
-        <div className="flex items-center gap-2">
-          <input
-            id="edit-assign-isPrimary"
-            type="checkbox"
-            {...register('isPrimary')}
-            className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-2 focus:ring-accent-primary/20"
+          {/* Primary */}
+          <CheckboxField
+            name="isPrimary"
+            label="Set as primary assignment"
             disabled={isSubmitting}
           />
-          <label htmlFor="edit-assign-isPrimary" className="text-sm text-text-primary">
-            Set as primary assignment
-          </label>
-        </div>
 
-        <ModalFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !isDirty}
-            className="min-w-36"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !isDirty}
+              className="min-w-36"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }

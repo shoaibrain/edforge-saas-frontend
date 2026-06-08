@@ -10,7 +10,7 @@
  */
 
 import { useEffect } from 'react'
-import { useFieldArray, useFormContext } from '@edforge/forms'
+import { useFieldArray, useFormContext, SelectField } from '@edforge/forms'
 import { Plus, Trash2, Tag, Info } from 'lucide-react'
 import { Button, Tooltip } from '@edforge/ui'
 import {
@@ -24,13 +24,8 @@ interface CategoryArraySectionProps {
   orgType?: 'sea' | 'lea' | 'esc' | 'school' | 'network'
 }
 
-const selectClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
-const labelClass = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1'
-const errorClass = 'mt-0.5 text-xs text-[rgb(var(--state-danger-fg))]'
-
 export function CategoryArraySection({ name = 'categories', orgType }: CategoryArraySectionProps) {
-  const { control, register, setValue, getValues, formState: { errors } } = useFormContext()
+  const { control, setValue, getValues } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name })
 
   // Auto-populate default category when orgType is provided and the first field is empty
@@ -45,11 +40,6 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
       }
     }
   }, [orgType, fields.length, name, setValue, getValues])
-
-  const getError = (index: number, field: string) => {
-    const arr = (errors as Record<string, any>)[name]
-    return arr?.[index]?.[field]?.message as string | undefined
-  }
 
   return (
     <div className="space-y-3">
@@ -89,21 +79,12 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
           className="flex items-start gap-3"
         >
           <div className="flex-1">
-            <label className={labelClass}>Category Descriptor</label>
-            <select
-              {...register(`${name}.${index}.educationOrganizationCategoryDescriptor`)}
-              className={selectClass}
-            >
-              <option value="">Select a category...</option>
-              {EDUCATION_ORGANIZATION_CATEGORY_DESCRIPTORS.map((d) => (
-                <option key={d.value} value={d.value}>{d.label}</option>
-              ))}
-            </select>
-            {getError(index, 'educationOrganizationCategoryDescriptor') && (
-              <p className={errorClass}>
-                {getError(index, 'educationOrganizationCategoryDescriptor')}
-              </p>
-            )}
+            <SelectField
+              name={`${name}.${index}.educationOrganizationCategoryDescriptor`}
+              label="Category Descriptor"
+              placeholder="Select a category..."
+              options={EDUCATION_ORGANIZATION_CATEGORY_DESCRIPTORS}
+            />
           </div>
           {fields.length > 1 && (
             <button

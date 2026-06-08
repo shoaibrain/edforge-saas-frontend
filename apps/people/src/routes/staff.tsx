@@ -347,7 +347,7 @@ export default function StaffPage() {
 
       {/* KPI TILES */}
       <WidgetErrorBoundaryV2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10, marginBottom: 18 }}>
+        <div className="grid grid-cols-4 gap-2.5 mb-4">
           <StatCard
             label="Total Staff"
             value={isLoading ? '—' : totalLoaded.toString()}

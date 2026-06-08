@@ -1,0 +1,83 @@
+name: Visual Regression
+
+# Render gate against the PRODUCTION build (roadmap-v2 Stream 0).
+#
+# Why this exists: the People CSS regressions (collapsed grids, transparent
+# dropdowns) were a *production-only* Tailwind-purge issue — invisible to
+# typecheck/lint/unit tests because none of them compile or render the
+# production CSS, and invisible to the dev server because Tailwind JIT generates
+# every class on demand in dev. Only a render of the production build catches
+# this class of bug. The fast, deterministic counterpart (a CSS-class contract)
+# lives in the unit suite: apps/shell/src/styles/host-css-contract.test.ts.
+#
+# OPT-IN until baselines exist: this job runs on manual dispatch or when a PR
+# carries the `visual` label — it does NOT block every PR yet. Baselines are
+# captured in a browser-capable environment first:
+#   VISUAL_REGRESSION=1 pnpm playwright test \
+#     e2e/tests/design-system-visual-regression.spec.ts --update-snapshots
+# then committed. Once baselines are in, flip the `on:` triggers to `pull_request`
+# to make it a blocking gate (Stream 5 ratchet).
+#
+# Coverage today: the public landing surfaces (render in production, no auth).
+# The design-system showcase (/dev/design-system) and PABSON tenant routes —
+# which exercise the Select/Combobox dropdowns and remote-app grids that broke —
+# require a visual-harness build flag (un-gate the DEV-only showcase) plus the
+# seeded auth fixture in e2e/fixtures/pabson-tenant.ts. That is the next step.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: visual-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    name: production render — visual regression
+    # Manual dispatch always runs; on PRs only when the `visual` label is added.
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'visual'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build production (host + remotes)
+        run: pnpm build:mvp
+
+      - name: Serve production preview
+        run: pnpm --filter @edforge/shell preview &
+      - name: Wait for preview
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run visual regression (production build)
+        env:
+          VISUAL_REGRESSION: '1'
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: pnpm playwright test e2e/tests/design-system-visual-regression.spec.ts
+
+      - name: Upload report + diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-report
+          path: |
+            playwright-report/
+            e2e/test-results/
+          retention-days: 14

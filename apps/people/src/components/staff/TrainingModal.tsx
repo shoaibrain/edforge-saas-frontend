@@ -7,15 +7,15 @@
  */
 
 import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2, Plus, Save } from 'lucide-react'
 import {
   createStaffTrainingSchema,
   type CreateStaffTrainingDto,
   type StaffTrainingResponseDto,
 } from '@aibrains/shared-types'
+import { TextField, SelectField, DateField, TextareaField } from '@edforge/forms'
 import { Modal, ModalFooter, Button } from '../ui'
 import { useCreateStaffTraining, useUpdateStaffTraining } from '../../hooks'
 import { parseApiError } from '../../services/people.service'
@@ -70,13 +70,7 @@ export function TrainingModal({
   const createTraining = useCreateStaffTraining()
   const updateTraining = useUpdateStaffTraining()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<CreateStaffTrainingDto>({
+  const methods = useForm<CreateStaffTrainingDto>({
     resolver: zodResolver(createStaffTrainingSchema),
     defaultValues: {
       trainingTitle: '',
@@ -87,6 +81,13 @@ export function TrainingModal({
       status: 'completed',
     },
   })
+
+  const {
+    handleSubmit,
+    reset,
+    setError,
+    formState: { isSubmitting, isDirty },
+  } = methods
 
   // Populate when editing
   useEffect(() => {
@@ -168,9 +169,6 @@ export function TrainingModal({
     }
   })
 
-  const inputClass = (hasError: boolean) =>
-    `w-full px-3 py-2 rounded-lg border bg-surface-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-colors ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}`
-
   return (
     <Modal
       open={open}
@@ -183,237 +181,128 @@ export function TrainingModal({
       }
       size="2xl"
     >
-      <form onSubmit={onSubmit} className="space-y-5">
-        {/* Row 1 — Title (full width) */}
-        <div>
-          <label htmlFor="trainingTitle" className="block text-sm font-medium text-text-primary mb-1.5">
-            Training Title <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <input
-            id="trainingTitle"
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-5">
+          {/* Row 1 — Title (full width) */}
+          <TextField
+            ref={firstInputRef}
+            name="trainingTitle"
+            label="Training Title"
             type="text"
-            {...register('trainingTitle')}
-            ref={(e) => {
-              register('trainingTitle').ref(e)
-              if (e) firstInputRef.current = e
-            }}
-            className={inputClass(!!errors.trainingTitle)}
+            required
             placeholder="Inclusive Education Workshop"
             disabled={isSubmitting}
           />
-          {errors.trainingTitle && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.trainingTitle.message}</p>
-          )}
-        </div>
 
-        {/* Row 2 — Type / Status / Hours (3-col, all short fixed-shape inputs) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="trainingType" className="block text-sm font-medium text-text-primary mb-1.5">
-              Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <select
-              id="trainingType"
-              {...register('trainingType')}
-              className={inputClass(!!errors.trainingType)}
+          {/* Row 2 — Type / Status / Hours (3-col, all short fixed-shape inputs) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <SelectField
+              name="trainingType"
+              label="Type"
+              required
+              options={TRAINING_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
               disabled={isSubmitting}
-            >
-              {TRAINING_TYPE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {errors.trainingType && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.trainingType.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium text-text-primary mb-1.5">
-              Status <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <select
-              id="status"
-              {...register('status')}
-              className={inputClass(!!errors.status)}
+            />
+            <SelectField
+              name="status"
+              label="Status"
+              required
+              options={TRAINING_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
               disabled={isSubmitting}
-            >
-              {TRAINING_STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {errors.status && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.status.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="durationHours" className="block text-sm font-medium text-text-primary mb-1.5">
-              Hours <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="durationHours"
+            />
+            <TextField
+              name="durationHours"
+              label="Hours"
               type="number"
+              required
               min={0}
               max={9999}
               step={1}
-              {...register('durationHours', { valueAsNumber: true })}
-              className={inputClass(!!errors.durationHours)}
+              rules={{ valueAsNumber: true }}
               disabled={isSubmitting}
             />
-            {errors.durationHours && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.durationHours.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Row 3 — Provider (col-span 2) + Start / End dates */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2">
-            <label htmlFor="trainingProvider" className="block text-sm font-medium text-text-primary mb-1.5">
-              Provider <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="trainingProvider"
+          {/* Row 3 — Provider (col-span 2) + Start / End dates */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <TextField
+              className="md:col-span-2"
+              name="trainingProvider"
+              label="Provider"
               type="text"
-              {...register('trainingProvider')}
-              className={inputClass(!!errors.trainingProvider)}
+              required
               placeholder="CEHRD Bagmati Resource Center"
               disabled={isSubmitting}
             />
-            {errors.trainingProvider && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.trainingProvider.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-text-primary mb-1.5">
-              Start Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="startDate"
-              type="date"
-              {...register('startDate')}
-              className={inputClass(!!errors.startDate)}
+            <DateField
+              name="startDate"
+              label="Start Date"
+              required
               disabled={isSubmitting}
             />
-            {errors.startDate && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.startDate.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-text-primary mb-1.5">
-              End Date
-            </label>
-            <input
-              id="endDate"
-              type="date"
-              {...register('endDate', {
-                // empty input → undefined (Zod date refinement on optional
-                // field is too strict on empty string otherwise)
-                setValueAs: (v: string) => (v === '' ? undefined : v),
-              })}
-              className={inputClass(!!errors.endDate)}
+            <DateField
+              name="endDate"
+              label="End Date"
+              // empty input → undefined (Zod date refinement on optional
+              // field is too strict on empty string otherwise)
+              rules={{ setValueAs: (v: string) => (v === '' ? undefined : v) }}
               disabled={isSubmitting}
             />
-            {errors.endDate && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.endDate.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Row 4 — Certificate Number / URL (optional pair) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="certificateNumber" className="block text-sm font-medium text-text-primary mb-1.5">
-              Certificate Number
-            </label>
-            <input
-              id="certificateNumber"
+          {/* Row 4 — Certificate Number / URL (optional pair) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              name="certificateNumber"
+              label="Certificate Number"
               type="text"
-              {...register('certificateNumber', {
-                setValueAs: (v: string) => (v === '' ? undefined : v),
-              })}
-              className={inputClass(!!errors.certificateNumber)}
+              rules={{ setValueAs: (v: string) => (v === '' ? undefined : v) }}
               placeholder="(optional)"
               disabled={isSubmitting}
             />
-            {errors.certificateNumber && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.certificateNumber.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="certificateUrl" className="block text-sm font-medium text-text-primary mb-1.5">
-              Certificate URL
-            </label>
-            <input
-              id="certificateUrl"
+            <TextField
+              name="certificateUrl"
+              label="Certificate URL"
               type="url"
-              {...register('certificateUrl', {
-                // CRITICAL: empty string fails z.string().url() even with
-                // .optional() because Zod treats '' as a present-but-invalid
-                // value. Coerce to undefined so the optional path runs.
-                setValueAs: (v: string) => (v === '' ? undefined : v),
-              })}
-              className={inputClass(!!errors.certificateUrl)}
+              // CRITICAL: empty string fails z.string().url() even with
+              // .optional() because Zod treats '' as a present-but-invalid
+              // value. Coerce to undefined so the optional path runs.
+              rules={{ setValueAs: (v: string) => (v === '' ? undefined : v) }}
               placeholder="https://… (optional)"
               disabled={isSubmitting}
             />
-            {errors.certificateUrl && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.certificateUrl.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Row 5 — Notes (full width) */}
-        <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-text-primary mb-1.5">
-            Notes
-          </label>
-          <textarea
-            id="notes"
+          {/* Row 5 — Notes (full width) */}
+          <TextareaField
+            name="notes"
+            label="Notes"
             rows={3}
-            {...register('notes', {
-              setValueAs: (v: string) => (v === '' ? undefined : v),
-            })}
-            className={inputClass(!!errors.notes)}
+            rules={{ setValueAs: (v: string) => (v === '' ? undefined : v) }}
             placeholder="(optional, max 1000 chars)"
             disabled={isSubmitting}
           />
-          {errors.notes && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.notes.message}</p>
-          )}
-        </div>
 
-        <ModalFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="min-w-32"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : isEditing ? (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            ) : (
-              <>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Training
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
+              className="min-w-32"
+            >
+              {isEditing ? 'Save Changes' : 'Add Training'}
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }

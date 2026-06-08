@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
@@ -14,8 +14,6 @@ import {
   History,
   Plus,
   ArrowRight,
-  Loader2,
-  Save,
   Calendar,
   User as UserIcon,
 } from 'lucide-react'
@@ -24,6 +22,7 @@ import {
   type UpdateEmploymentStatusDto,
   type EmploymentHistoryResponseDto,
 } from '@aibrains/shared-types'
+import { TextField, SelectField, DateField, TextareaField } from '@edforge/forms'
 import { Modal, ModalFooter, Button } from '../ui'
 import { useStaffEmploymentHistory, useUpdateEmploymentStatus } from '../../hooks'
 import { StaffStatusBadge } from './StaffStatusBadge'
@@ -86,12 +85,7 @@ function UpdateStatusModal({
 }) {
   const updateStatus = useUpdateEmploymentStatus()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<UpdateEmploymentStatusDto>({
+  const methods = useForm<UpdateEmploymentStatusDto>({
     resolver: zodResolver(updateEmploymentStatusSchema),
     defaultValues: {
       employmentStatus: '' as UpdateEmploymentStatusDto['employmentStatus'],
@@ -100,6 +94,12 @@ function UpdateStatusModal({
       notes: '',
     },
   })
+
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting, isDirty },
+  } = methods
 
   const handleClose = () => {
     if (isDirty) {
@@ -122,14 +122,7 @@ function UpdateStatusModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
+  const statusOptions = EMPLOYMENT_STATUS_OPTIONS.filter((opt) => opt.value !== currentStatus)
 
   return (
     <Modal
@@ -139,94 +132,54 @@ function UpdateStatusModal({
       description={`Current status: ${currentStatus.replace('_', ' ')}`}
       size="md"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* New Status */}
-        <div>
-          <label htmlFor="emp-status" className="block text-sm font-medium text-text-primary mb-1.5">
-            New Status <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <select
-            id="emp-status"
-            {...register('employmentStatus')}
-            className={inputClass(!!errors.employmentStatus)}
-            disabled={isSubmitting}
-          >
-            <option value="">Select status...</option>
-            {EMPLOYMENT_STATUS_OPTIONS.filter(opt => opt.value !== currentStatus).map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          {errors.employmentStatus && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.employmentStatus.message}</p>
-          )}
-        </div>
-
-        {/* Effective Date */}
-        <div>
-          <label htmlFor="emp-date" className="block text-sm font-medium text-text-primary mb-1.5">
-            Effective Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <input
-            id="emp-date"
-            type="date"
-            {...register('effectiveDate')}
-            className={inputClass(!!errors.effectiveDate)}
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-4">
+          {/* New Status */}
+          <SelectField
+            name="employmentStatus"
+            label="New Status"
+            required
+            options={statusOptions}
+            placeholder="Select status..."
             disabled={isSubmitting}
           />
-          {errors.effectiveDate && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.effectiveDate.message}</p>
-          )}
-        </div>
 
-        {/* Reason */}
-        <div>
-          <label htmlFor="emp-reason" className="block text-sm font-medium text-text-primary mb-1.5">
-            Reason
-          </label>
-          <input
-            id="emp-reason"
+          {/* Effective Date */}
+          <DateField
+            name="effectiveDate"
+            label="Effective Date"
+            required
+            disabled={isSubmitting}
+          />
+
+          {/* Reason */}
+          <TextField
+            name="reason"
+            label="Reason"
             type="text"
-            {...register('reason')}
-            className={inputClass(!!errors.reason)}
             placeholder="e.g., End of contract, Promotion, Medical leave"
             disabled={isSubmitting}
           />
-        </div>
 
-        {/* Notes */}
-        <div>
-          <label htmlFor="emp-notes" className="block text-sm font-medium text-text-primary mb-1.5">
-            Notes
-          </label>
-          <textarea
-            id="emp-notes"
-            {...register('notes')}
-            className={inputClass(!!errors.notes)}
+          {/* Notes */}
+          <TextareaField
+            name="notes"
+            label="Notes"
             rows={3}
             placeholder="Additional details..."
             disabled={isSubmitting}
           />
-        </div>
 
-        <ModalFooter>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-36">
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Update Status
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          <ModalFooter>
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting} className="min-w-36">
+              Update Status
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }

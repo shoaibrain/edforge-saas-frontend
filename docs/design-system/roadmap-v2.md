@@ -128,9 +128,23 @@ Tightly scoped; none require redesign.
 
 ---
 
-## Part E — Roadmap Epic v2
+## Part D2 — Refinement rules & non-goals (learned the hard way)
 
-This restates the FINAL plan's intent with the actual post-#134 state baked in. **Re-sequenced so governance comes before fan-out** (you cannot safely fan out across 80 files with no CI). Epics are independently shippable; PR cap stays ~15 files.
+The People pilot drifted from "look and feel" into structural/behavioral change twice (HR-card removal → grid imbalance; wizard inputs → animated borders stripped), and a token migration shipped a **production-only** CSS regression (collapsed grids, transparent dropdowns) that every gate missed. These rules are now binding:
+
+1. **Refine the surface, never move the walls.** Migrations preserve DOM structure, grid/flex containers, element counts, routes, data, and **motion**. Removing/moving a visible element is a *separate, design-reviewed* task that must rebalance the layout — never bundled into a styling sweep.
+2. **Standardize by leveling *up*, not stripping *down*.** When a screen has bespoke polish (a focus animation, a distinctive card), lift that polish into the shared primitive so the whole app gains it — don't swap it for a plainer primitive "for consistency."
+3. **Definition of done = visual parity or improvement, not zero lint warnings.** Warnings are a guide; some bespoke styling is preserved (allow-commented). The real bar is "same or better, more consistent, more modern, no regression," confirmed by a render check.
+4. **Gates can't see production CSS or layout.** typecheck/lint/unit never compile the production stylesheet or render the page; the dev server hides Tailwind-purge bugs (JIT). A production render/CSS check is mandatory for any slice touching layout, element presence, motion, or token classes.
+
+## Epic 0 — Build/CSS foundation & gates (blocking; do before any further migration)
+
+*Why: the design system is undeliverable to the MFEs until the host actually compiles its class surface, and the missing gate let a production regression reach the preview.*
+
+- **0.1 ✅ MFE CSS ownership (host-owns-CSS).** EdForge is a Module-Federation host (shell) + remotes that ship no CSS — remotes render on the host stylesheet. Tailwind v4 scans only the building app and ignores `node_modules`, so classes used solely in a shared package or remote were never emitted. Fixed by declaring `@source` for `packages/*/src` + `apps/*/src` on the host's own entry CSS (`apps/shell/src/index.css` — a real file, so globs resolve into the workspace, not through `@edforge/*` symlinks), and adding `--shadow-*` elevation utilities to the theme `@theme`. New MFEs are covered by the `apps/*` glob. *(commit: MFE CSS ownership)*
+- **0.2 ✅ Production CSS-contract gate.** `apps/shell/src/styles/host-css-contract.test.ts` compiles the host CSS with the real `@tailwindcss/postcss` (auto-detection pinned to an empty base) and asserts the critical class surface is present — fails the moment the `@source` config stops covering the packages/remotes. Runs in the `vitest` gate; would have caught this regression.
+- **0.3 ⏳ Production visual-regression gate.** `.github/workflows/visual-regression.yml` builds the production preview and runs the Playwright harness (opt-in until baselines exist). **Next:** capture/commit baselines in a browser-capable env; un-gate the `/dev/design-system` showcase behind a visual-harness build flag + seed the auth fixture so the dropdown/grid surfaces are covered; then flip the trigger to `pull_request` (blocking).
+- **0.4 Consumption contract:** an MFE is only eligible to migrate to primitive/token utility classes once 0.1–0.3 confirm its build+host emit and render the full surface. Until then it stays on its existing approach.
 
 ### Epic G — Governance hardening (do this FIRST)
 *Why first: the audit and plan both depend on enforceable gates, and none exist.*

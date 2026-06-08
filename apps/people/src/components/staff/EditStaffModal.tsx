@@ -5,14 +5,15 @@
  * Features dirty form warning when closing with unsaved changes.
  */
 
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
 import { updateStaffSchema, type UpdateStaffDto, type StaffResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
+import { TextField, SelectField, DateField } from '@edforge/forms'
 import { staffService } from '../../services/staff.service'
 import { useDepartments } from './wizard/steps/AssignmentStep'
 import { parseApiError } from '../../services/people.service'
@@ -83,10 +84,17 @@ const NATIONALITY_OPTIONS = [
   { value: 'OTHER', label: 'Other' },
 ] as const
 
+// Empty input → undefined so Zod's optional path runs and the format/enum
+// check doesn't fire on a cleared field.
+const emptyToUndefined = { setValueAs: (v: string) => (v === '' ? undefined : v) }
+
 export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
   const queryClient = useQueryClient()
-  const firstInputRef = useRef<HTMLInputElement>(null)
   const { data: departments = [], isLoading: loadingDepts } = useDepartments(staff?.primarySchoolId || undefined)
+
+  const methods = useForm<UpdateStaffDto>({
+    resolver: zodResolver(updateStaffSchema),
+  })
 
   const {
     register,
@@ -94,9 +102,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
     reset,
     setError,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm<UpdateStaffDto>({
-    resolver: zodResolver(updateStaffSchema),
-  })
+  } = methods
 
   // Reset form when staff changes or modal opens
   useEffect(() => {
@@ -118,13 +124,6 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
       } as UpdateStaffDto)
     }
   }, [open, staff, reset])
-
-  // Auto-focus first input when modal opens
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => firstInputRef.current?.focus(), 100)
-    }
-  }, [open])
 
   const handleClose = () => {
     if (isDirty) {
@@ -162,7 +161,11 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
 
   if (!staff) return null
 
-  const inputClass = (hasError: boolean) => `
+  // Native-select base styling for the three IEMIS selects that rely on
+  // register() setValueAs (empty → undefined). The shared SelectField is
+  // Controller-based and cannot apply setValueAs, so keeping native preserves
+  // the optional-field validation behavior exactly.
+  const nativeSelectClass = (hasError: boolean) => `
     w-full px-3 py-2 rounded-lg border
     bg-surface-secondary text-text-primary
     placeholder:text-text-tertiary
@@ -179,315 +182,213 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
       description={`Update information for ${staff.firstName} ${staff.lastSurname}`}
       size="2xl"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Email (read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-text-primary mb-1.5">
-            Email Address
-          </label>
-          <div className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary">
-            {staff.email}
+      <FormProvider {...methods}>
+        <form onSubmit={onSubmit} className="space-y-4">
+          {/* Email (read-only) */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              Email Address
+            </label>
+            <div className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary">
+              {staff.email}
+            </div>
+            <p className="mt-1 text-xs text-text-tertiary">
+              Email address cannot be changed
+            </p>
           </div>
-          <p className="mt-1 text-xs text-text-tertiary">
-            Email address cannot be changed
-          </p>
-        </div>
 
-        {/* Name + Phone Row (3-col) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-1.5">
-              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="firstName"
+          {/* Name + Phone Row (3-col) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <TextField
+              name="firstName"
+              label="First Name"
               type="text"
-              {...register('firstName')}
-              ref={(e) => {
-                register('firstName').ref(e)
-                if (e) firstInputRef.current = e
-              }}
-              className={inputClass(!!errors.firstName)}
               placeholder="John"
+              required
+              autoFocus
               disabled={isSubmitting}
             />
-            {errors.firstName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="lastSurname" className="block text-sm font-medium text-text-primary mb-1.5">
-              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="lastSurname"
+            <TextField
+              name="lastSurname"
+              label="Last Name"
               type="text"
-              {...register('lastSurname')}
-              className={inputClass(!!errors.lastSurname)}
               placeholder="Doe"
+              required
               disabled={isSubmitting}
             />
-            {errors.lastSurname && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastSurname.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-1.5">
-              Phone Number
-            </label>
-            <input
-              id="phone"
+            <TextField
+              name="phone"
+              label="Phone Number"
               type="tel"
-              {...register('phone')}
-              className={inputClass(!!errors.phone)}
               placeholder="+1 (555) 123-4567"
               disabled={isSubmitting}
             />
-            {errors.phone && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* Role & Employment Status */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-text-primary mb-1.5">
-              Role
-            </label>
-            <select
-              id="role"
-              {...register('role')}
-              className={inputClass(!!errors.role)}
+          {/* Role & Employment Status */}
+          <div className="grid grid-cols-2 gap-4">
+            <SelectField
+              name="role"
+              label="Role"
+              options={ROLE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
               disabled={isSubmitting}
-            >
-              {ROLE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {errors.role && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.role.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="employmentStatus" className="block text-sm font-medium text-text-primary mb-1.5">
-              Employment Status
-            </label>
-            <select
-              id="employmentStatus"
-              {...register('employmentStatus')}
-              className={inputClass(!!errors.employmentStatus)}
+            />
+            <SelectField
+              name="employmentStatus"
+              label="Employment Status"
+              options={EMPLOYMENT_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
               disabled={isSubmitting}
-            >
-              {EMPLOYMENT_STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {errors.employmentStatus && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.employmentStatus.message}</p>
-            )}
+            />
           </div>
-        </div>
 
-        {/* Department & Title */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="departmentId" className="block text-sm font-medium text-text-primary mb-1.5">
-              Department
-            </label>
-            <select
-              id="departmentId"
-              {...register('departmentId')}
-              className={inputClass(!!errors.departmentId)}
+          {/* Department & Title */}
+          <div className="grid grid-cols-2 gap-4">
+            <SelectField
+              name="departmentId"
+              label="Department"
+              placeholder={loadingDepts ? 'Loading...' : 'Select department...'}
+              options={departments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` }))}
               disabled={isSubmitting || loadingDepts}
-            >
-              <option value="">{loadingDepts ? 'Loading...' : 'Select department...'}</option>
-              {departments.map((d) => (
-                <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
-              ))}
-            </select>
-            {errors.departmentId && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.departmentId.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-text-primary mb-1.5">
-              Title
-            </label>
-            <input
-              id="title"
+            />
+            <TextField
+              name="title"
+              label="Title"
               type="text"
-              {...register('title')}
-              className={inputClass(!!errors.title)}
               placeholder="Senior Teacher"
               disabled={isSubmitting}
             />
-            {errors.title && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.title.message}</p>
-            )}
           </div>
-        </div>
 
-        {/* IEMIS Identity (Sprint B.9) — Nepal CEHRD register fields */}
-        <div className="pt-4 border-t border-border-secondary">
-          <h3 className="text-sm font-semibold text-text-primary mb-1">
-            IEMIS / CEHRD Identity
-          </h3>
-          <p className="text-xs text-text-tertiary mb-4">
-            Optional — populate to support CEHRD Flash-II Staff register exports.
-          </p>
+          {/* IEMIS Identity (Sprint B.9) — Nepal CEHRD register fields */}
+          <div className="pt-4 border-t border-border-secondary">
+            <h3 className="text-sm font-semibold text-text-primary mb-1">
+              IEMIS / CEHRD Identity
+            </h3>
+            <p className="text-xs text-text-tertiary mb-4">
+              Optional — populate to support CEHRD Flash-II Staff register exports.
+            </p>
 
-          {/* Row 1 — IEMIS Staff ID + Nationality */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="emisStaffId" className="block text-sm font-medium text-text-primary mb-1.5">
-                IEMIS Staff ID
-              </label>
-              <input
-                id="emisStaffId"
+            {/* Row 1 — IEMIS Staff ID + Nationality */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TextField
+                name="emisStaffId"
+                label="IEMIS Staff ID"
                 type="text"
-                inputMode="numeric"
-                // Empty input → undefined so Zod's optional path runs and the
-                // 16-digit format check doesn't fire on a cleared field.
-                {...register('emisStaffId', {
-                  setValueAs: (v: string) => (v === '' ? undefined : v),
-                })}
-                className={inputClass(!!errors.emisStaffId)}
                 placeholder="16-digit CEHRD ID"
                 maxLength={16}
                 disabled={isSubmitting}
+                rules={emptyToUndefined}
+                helperText="CEHRD-issued 16-digit identifier (V1 placeholder format)."
               />
-              {errors.emisStaffId && (
-                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.emisStaffId.message}</p>
-              )}
-              <p className="mt-1 text-xs text-text-tertiary">
-                CEHRD-issued 16-digit identifier (V1 placeholder format).
-              </p>
+              <div>
+                <label htmlFor="nationality" className="block text-sm font-medium text-text-primary mb-1.5">
+                  Nationality
+                </label>
+                <select
+                  // allow-native-form-control: setValueAs (empty → undefined) keeps the optional alpha-3 check from firing on a cleared field; the Controller-based SelectField cannot apply setValueAs
+                  id="nationality"
+                  {...register('nationality', emptyToUndefined)}
+                  className={nativeSelectClass(!!errors.nationality)}
+                  disabled={isSubmitting}
+                >
+                  <option value="">Select…</option>
+                  {NATIONALITY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                {errors.nationality && (
+                  <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.nationality.message}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <label htmlFor="nationality" className="block text-sm font-medium text-text-primary mb-1.5">
-                Nationality
-              </label>
-              <select
-                id="nationality"
-                {...register('nationality', {
-                  setValueAs: (v: string) => (v === '' ? undefined : v),
-                })}
-                className={inputClass(!!errors.nationality)}
+
+            {/* Row 2 — Marital Status / Appointment Type / Appointment Date (3-col) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div>
+                <label htmlFor="maritalStatus" className="block text-sm font-medium text-text-primary mb-1.5">
+                  Marital Status
+                </label>
+                <select
+                  // allow-native-form-control: setValueAs (empty → undefined) keeps the optional enum check from firing on a cleared field; the Controller-based SelectField cannot apply setValueAs
+                  id="maritalStatus"
+                  {...register('maritalStatus', emptyToUndefined)}
+                  className={nativeSelectClass(!!errors.maritalStatus)}
+                  disabled={isSubmitting}
+                >
+                  <option value="">Select…</option>
+                  {MARITAL_STATUS_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                {errors.maritalStatus && (
+                  <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.maritalStatus.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="appointmentType" className="block text-sm font-medium text-text-primary mb-1.5">
+                  Appointment Type
+                </label>
+                <select
+                  // allow-native-form-control: setValueAs (empty → undefined) keeps the optional enum check from firing on a cleared field; the Controller-based SelectField cannot apply setValueAs
+                  id="appointmentType"
+                  {...register('appointmentType', emptyToUndefined)}
+                  className={nativeSelectClass(!!errors.appointmentType)}
+                  disabled={isSubmitting}
+                >
+                  <option value="">Select…</option>
+                  {APPOINTMENT_TYPE_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                {errors.appointmentType && (
+                  <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.appointmentType.message}</p>
+                )}
+              </div>
+              <DateField
+                name="appointmentDate"
+                label="Appointment Date"
                 disabled={isSubmitting}
-              >
-                <option value="">Select…</option>
-                {NATIONALITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              {errors.nationality && (
-                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.nationality.message}</p>
-              )}
+                rules={emptyToUndefined}
+                helperText="Per CEHRD register."
+              />
             </div>
           </div>
 
-          {/* Row 2 — Marital Status / Appointment Type / Appointment Date (3-col) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div>
-              <label htmlFor="maritalStatus" className="block text-sm font-medium text-text-primary mb-1.5">
-                Marital Status
-              </label>
-              <select
-                id="maritalStatus"
-                {...register('maritalStatus', {
-                  setValueAs: (v: string) => (v === '' ? undefined : v),
-                })}
-                className={inputClass(!!errors.maritalStatus)}
-                disabled={isSubmitting}
-              >
-                <option value="">Select…</option>
-                {MARITAL_STATUS_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              {errors.maritalStatus && (
-                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.maritalStatus.message}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="appointmentType" className="block text-sm font-medium text-text-primary mb-1.5">
-                Appointment Type
-              </label>
-              <select
-                id="appointmentType"
-                {...register('appointmentType', {
-                  setValueAs: (v: string) => (v === '' ? undefined : v),
-                })}
-                className={inputClass(!!errors.appointmentType)}
-                disabled={isSubmitting}
-              >
-                <option value="">Select…</option>
-                {APPOINTMENT_TYPE_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              {errors.appointmentType && (
-                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.appointmentType.message}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="appointmentDate" className="block text-sm font-medium text-text-primary mb-1.5">
-                Appointment Date
-              </label>
-              <input
-                id="appointmentDate"
-                type="date"
-                {...register('appointmentDate', {
-                  setValueAs: (v: string) => (v === '' ? undefined : v),
-                })}
-                className={inputClass(!!errors.appointmentDate)}
-                disabled={isSubmitting}
-              />
-              {errors.appointmentDate && (
-                <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.appointmentDate.message}</p>
-              )}
-              <p className="mt-1 text-xs text-text-tertiary">
-                Per CEHRD register.
-              </p>
-            </div>
-          </div>
-        </div>
+          {isDirty && (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              You have unsaved changes
+            </p>
+          )}
 
-        {isDirty && (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
-            You have unsaved changes
-          </p>
-        )}
-
-        <ModalFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !isDirty}
-            className="min-w-24"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </ModalFooter>
-      </form>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !isDirty}
+              className="min-w-24"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </ModalFooter>
+        </form>
+      </FormProvider>
     </Modal>
   )
 }
