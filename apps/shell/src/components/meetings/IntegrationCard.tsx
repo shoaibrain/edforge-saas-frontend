@@ -189,9 +189,9 @@ export function IntegrationCard({
             <button
               onClick={onConnect}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-                bg-teal-500/15 dark:bg-cyan-500/20 
-                text-teal-700 dark:text-cyan-400
-                hover:bg-teal-500/25 dark:hover:bg-cyan-500/30
+                bg-[rgb(var(--state-info-bg)/0.18)] 
+                text-[rgb(var(--state-info-fg))] 
+                hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:hover:bg-[rgb(var(--state-info-bg)/0.26)]
                 transition-colors text-sm font-medium"
             >
               <LinkIcon className="w-4 h-4" />
