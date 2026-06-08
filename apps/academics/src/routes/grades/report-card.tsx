@@ -219,19 +219,19 @@ export function ReportCardPage() {
             {/* GPA Summary */}
             {gpa && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print:grid-cols-3">
-                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--surface-tertiary))]">
+                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--background-tertiary))]">
                   <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Term GPA</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.termGpa).text} print:text-[rgb(var(--text-primary))]`}>
                     {gpa.termGpa.toFixed(2)}
                   </p>
                 </div>
-                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--surface-tertiary))]">
+                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--background-tertiary))]">
                   <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Cumulative GPA</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.cumulativeGpa).text} print:text-[rgb(var(--text-primary))]`}>
                     {gpa.cumulativeGpa.toFixed(2)}
                   </p>
                 </div>
-                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--surface-tertiary))]">
+                <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--background-tertiary))]">
                   <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Weighted GPA</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.weightedGpa).text} print:text-[rgb(var(--text-primary))]`}>
                     {gpa.weightedGpa.toFixed(2)}
@@ -244,7 +244,7 @@ export function ReportCardPage() {
             <div className="rounded-xl border border-border-secondary overflow-hidden print:rounded print:border-[rgb(var(--border-primary))]">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-surface-secondary print:bg-[rgb(var(--surface-tertiary))]">
+                  <tr className="bg-surface-secondary print:bg-[rgb(var(--background-tertiary))]">
                     <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">Course</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Assignments</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Numeric</th>
@@ -282,12 +282,12 @@ export function ReportCardPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {grade.isFinal ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full print:text-[rgb(var(--text-secondary))] print:bg-[rgb(var(--surface-tertiary))]">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full print:text-[rgb(var(--text-secondary))] print:bg-[rgb(var(--background-tertiary))]">
                             <Lock className="w-3 h-3 print:hidden" />
                             Final
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full print:text-[rgb(var(--text-tertiary))] print:bg-[rgb(var(--surface-tertiary))]">
+                          <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full print:text-[rgb(var(--text-tertiary))] print:bg-[rgb(var(--background-tertiary))]">
                             In Progress
                           </span>
                         )}

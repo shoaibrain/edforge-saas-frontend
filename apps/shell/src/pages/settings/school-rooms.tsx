@@ -54,8 +54,8 @@ const LOCATION_TYPE_ICONS: Record<string, string> = {
   gym: 'bg-[rgb(var(--state-success-bg)/0.18)]0/10 text-[rgb(var(--state-success-fg))]',
   auditorium: 'bg-amber-500/10 text-amber-600',
   library: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
-  office: 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))]',
-  other: 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))]',
+  office: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))]',
+  other: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))]',
 }
 
 // ============================================================================
@@ -200,7 +200,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
     return (
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-14 bg-[rgb(var(--surface-secondary))] rounded-xl animate-pulse" />
+          <div key={i} className="h-14 bg-[rgb(var(--background-secondary))] rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -234,7 +234,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
           {Object.entries(typeBreakdown).map(([type, count]) => (
             <span
               key={type}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${LOCATION_TYPE_ICONS[type] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'}`}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${LOCATION_TYPE_ICONS[type] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}
             >
               {LOCATION_TYPE_OPTIONS.find(t => t.value === type)?.label || type}: {count}
             </span>
@@ -251,7 +251,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search rooms..."
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           />
         </div>
       )}
@@ -272,7 +272,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
       ) : (
         <div className="border border-[rgb(var(--border-primary))] rounded-xl overflow-hidden">
           {/* Table header */}
-          <div className="grid grid-cols-12 gap-2 px-4 py-2.5 bg-[rgb(var(--surface-secondary))] text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+          <div className="grid grid-cols-12 gap-2 px-4 py-2.5 bg-[rgb(var(--background-secondary))] text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
             <div className="col-span-2">Room</div>
             <div className="col-span-2">Building</div>
             <div className="col-span-2">Type</div>
@@ -288,7 +288,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               <motion.div
                 key={loc.locationId}
                 variants={fadeInUp}
-                className="group grid grid-cols-12 gap-2 items-center px-4 py-3 border-t border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-secondary))]/50 transition-colors"
+                className="group grid grid-cols-12 gap-2 items-center px-4 py-3 border-t border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]/50 transition-colors"
               >
                 <div className="col-span-2">
                   <span className="font-medium text-sm text-[rgb(var(--text-primary))]">{loc.roomNumber}</span>
@@ -297,7 +297,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                   {loc.buildingName || '-'}
                 </div>
                 <div className="col-span-2">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${LOCATION_TYPE_ICONS[loc.locationType] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${LOCATION_TYPE_ICONS[loc.locationType] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
                     {LOCATION_TYPE_OPTIONS.find(t => t.value === loc.locationType)?.label || loc.locationType}
                   </span>
                 </div>
@@ -316,7 +316,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                 <div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => openEdit(loc)}
-                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -358,7 +358,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               value={form.roomNumber}
               onChange={(e) => setForm(f => ({ ...f, roomNumber: e.target.value }))}
               placeholder="e.g., 101, A-205"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -370,7 +370,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               value={form.buildingName}
               onChange={(e) => setForm(f => ({ ...f, buildingName: e.target.value }))}
               placeholder="e.g., Main Building"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -383,7 +383,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                 value={form.floorNumber}
                 onChange={(e) => setForm(f => ({ ...f, floorNumber: e.target.value }))}
                 placeholder="e.g., 1"
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
             <div>
@@ -395,7 +395,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                 value={form.capacity}
                 onChange={(e) => setForm(f => ({ ...f, capacity: e.target.value }))}
                 placeholder="e.g., 30"
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
           </div>
@@ -406,7 +406,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
             <select
               value={form.locationType}
               onChange={(e) => setForm(f => ({ ...f, locationType: e.target.value }))}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             >
               {LOCATION_TYPE_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -433,7 +433,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Optional notes"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
@@ -466,7 +466,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="relative w-full max-w-sm bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6 space-y-4"
+              className="relative w-full max-w-sm bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6 space-y-4"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10">

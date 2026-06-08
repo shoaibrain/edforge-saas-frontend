@@ -93,7 +93,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
         <div className="relative" ref={menuRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-1.5 rounded-md text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors ${isOpen ? 'bg-[rgb(var(--surface-tertiary))]' : ''}`}
+                className={`p-1.5 rounded-md text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors ${isOpen ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
                 title="Page options"
             >
                 <MoreHorizontal className="w-5 h-5" />
@@ -103,11 +103,11 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
                 >
                     <button
                         onClick={() => setShowWidgets(true)}
-                        className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--interactive-hover))] text-left text-sm text-[rgb(var(--text-primary))]"
+                        className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] text-left text-sm text-[rgb(var(--text-primary))]"
                     >
                         <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>Show/hide widgets</span>
@@ -116,7 +116,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     <div className="my-1 border-t border-[rgb(var(--border-secondary))]" />
                     <button
                         onClick={() => { onReset(); setIsOpen(false) }}
-                        className="w-full px-3 py-2 flex items-center gap-3 text-left text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))]"
+                        className="w-full px-3 py-2 flex items-center gap-3 text-left text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]"
                     >
                         <RotateCcw className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>Reset to default</span>
@@ -128,11 +128,11 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 <motion.div
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
                 >
                     <button
                         onClick={() => setShowWidgets(false)}
-                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--interactive-hover))] text-left text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
+                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--background-tertiary))] text-left text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
                     >
                         <span>‹</span>
                         <span>Back</span>
@@ -141,7 +141,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                         <button
                             key={widget.id}
                             onClick={() => onToggle(widget.id)}
-                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--interactive-hover))] text-left text-sm"
+                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] text-left text-sm"
                         >
                             <div className="w-4 h-4 flex items-center justify-center">
                                 {widget.visible && <Check className="w-4 h-4 text-[rgb(var(--text-primary))]" />}
@@ -170,8 +170,8 @@ function StatCard({ stat, index }: { stat: ModuleStat; index: number }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-44 h-36 p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
+            <div className="group relative flex flex-col w-44 h-36 p-4 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--background-elevated)/0.10)] to-transparent pointer-events-none" />
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
                 </div>
@@ -224,13 +224,13 @@ function StatsCarousel({ stats }: { stats: ModuleStat[] }) {
         <div className="relative group/carousel px-4" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             {isHovered && canScrollLeft && (
                 <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => smoothScroll('left')}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]">
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]">
                     <ChevronLeft className="w-5 h-5" />
                 </motion.button>
             )}
             {isHovered && canScrollRight && (
                 <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => smoothScroll('right')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]">
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]">
                     <ChevronRight className="w-5 h-5" />
                 </motion.button>
             )}

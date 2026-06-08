@@ -73,7 +73,7 @@ export function DataTable<TData>({
     return (
       <div
         className={cn(
-          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-primary))]',
+          'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-primary))]',
           className
         )}
       >
@@ -113,7 +113,7 @@ export function DataTable<TData>({
   return (
     <div
       className={cn(
-        'flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        'flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
       style={maxHeight ? { maxHeight, height: maxHeight } : undefined}
@@ -154,7 +154,7 @@ export function DataTable<TData>({
                   action.variant === 'danger'
                     ? 'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95'
                     : action.variant === 'outline'
-                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))]'
+                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]'
                       : 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))]',
                   action.disabled && 'opacity-50 cursor-not-allowed'
                 )}
@@ -179,7 +179,7 @@ export function DataTable<TData>({
         {/* Fetching progress bar — sticky at top of scroll area */}
         {isFetching && data.length > 0 && (
           <div className="sticky top-0 z-20">
-            <div className="h-0.5 w-full bg-[rgb(var(--surface-tertiary))] overflow-hidden">
+            <div className="h-0.5 w-full bg-[rgb(var(--background-tertiary))] overflow-hidden">
               <div className="h-full w-1/3 bg-[rgb(var(--action-primary-bg))] animate-shimmer" />
             </div>
           </div>
@@ -190,7 +190,7 @@ export function DataTable<TData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
                 key={headerGroup.id}
-                className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--surface-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
+                className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
               >
                 {headerGroup.headers.map((header) => {
                   const meta = header.column.columnDef
@@ -304,10 +304,10 @@ function TableRowWithExpansion<TData>({
           isSelected
             ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-l-2 border-l-[rgb(var(--border-focus))]'
             : isEvenRow
-              ? 'bg-[rgb(var(--surface-tertiary)/0.35)]'
+              ? 'bg-[rgb(var(--background-tertiary)/0.35)]'
               : '',
           !isSelected && isInteractive && ['cursor-pointer', focusRingInset],
-          !isSelected && 'hover:bg-[rgb(var(--brand-primary)/0.06)]',
+          !isSelected && 'hover:bg-[rgb(var(--action-primary-bg)/0.06)]',
           isExpanded && 'border-b-0'
         )}
         onClick={isInteractive ? () => onRowClick(row.original) : undefined}
@@ -339,7 +339,7 @@ function TableRowWithExpansion<TData>({
         <tr className="border-b border-[rgb(var(--border-secondary)/0.7)]">
           <td
             colSpan={visibleCellCount}
-            className="bg-[rgb(var(--surface-tertiary)/0.2)] border-l-2 border-l-teal-500/30 px-4 py-3"
+            className="bg-[rgb(var(--background-tertiary)/0.2)] border-l-2 border-l-teal-500/30 px-4 py-3"
           >
             {renderSubComponent({ row })}
           </td>

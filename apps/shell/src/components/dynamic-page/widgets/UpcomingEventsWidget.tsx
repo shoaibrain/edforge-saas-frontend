@@ -126,7 +126,7 @@ function EventItem({ event }: { event: UpcomingEvent }) {
       <div className={`w-1 h-full min-h-[2.5rem] rounded-full flex-shrink-0 ${event.type === 'meeting' ? 'bg-violet-400' :
         event.type === 'deadline' ? 'bg-[rgb(var(--state-danger-fg))]' :
           event.type === 'class' ? 'bg-[rgb(var(--state-info-fg))]' :
-            'bg-[rgb(var(--brand-primary))]'
+            'bg-[rgb(var(--action-primary-bg))]'
         }`} />
 
       {/* Content */}
@@ -157,7 +157,7 @@ function EventItem({ event }: { event: UpcomingEvent }) {
       {/* Join/Action Button (Visible on Hover) */}
       <div className="opacity-0 group-hover:opacity-100 transition-opacity">
         {event.hasConferencing && (
-          <button className="px-2 py-1 text-xs bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-secondary))] rounded shadow-sm text-[rgb(var(--text-primary))]">
+          <button className="px-2 py-1 text-xs bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-secondary))] rounded shadow-sm text-[rgb(var(--text-primary))]">
             Join
           </button>
         )}

@@ -71,7 +71,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
         <select
           value={actionFilter}
           onChange={(e) => setActionFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+          className="px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
         >
           <option value="">All Actions</option>
           <option value="create">Create</option>
@@ -128,12 +128,12 @@ function AuditEntry({
   return (
     <div className="relative pl-12">
       {/* Timeline dot */}
-      <div className={`absolute left-3.5 top-3 w-3 h-3 rounded-full border-2 border-[rgb(var(--surface-primary))] ${
+      <div className={`absolute left-3.5 top-3 w-3 h-3 rounded-full border-2 border-[rgb(var(--background-primary))] ${
         entry.severity === 'high' ? 'bg-amber-500' : 'bg-[rgb(var(--action-primary-bg))]'
       }`} />
 
       <div
-        className="p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] cursor-pointer hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+        className="p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] cursor-pointer hover:bg-[rgb(var(--background-tertiary))] transition-colors"
         onClick={onToggle}
       >
         <div className="flex items-start justify-between gap-2">

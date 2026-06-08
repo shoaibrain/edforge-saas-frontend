@@ -39,7 +39,7 @@ export function DataTableFacetedFilter<TData>({
           focusRingInset,
           selectedValues.size > 0
             ? 'border-[rgb(var(--state-info-border)/0.35)] bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-primary))]'
-            : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
+            : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
         )}
       >
         <ListFilter className="w-3.5 h-3.5" />
@@ -60,7 +60,7 @@ export function DataTableFacetedFilter<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute z-50 mt-1 w-56 origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute z-50 mt-1 w-56 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
           <div className="py-1 max-h-64 overflow-y-auto">
             {options.map((option) => {
               const isSelected = selectedValues.has(option.value)
@@ -71,7 +71,7 @@ export function DataTableFacetedFilter<TData>({
                   onClick={() => toggleValue(option.value)}
                   className={cn(
                     'flex items-center w-full px-3 py-2 text-sm transition-colors',
-                    'hover:bg-[rgb(var(--surface-secondary))]',
+                    'hover:bg-[rgb(var(--background-secondary))]',
                     focusRingInset,
                     isSelected && 'text-[rgb(var(--action-secondary-fg))]'
                   )}

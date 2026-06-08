@@ -103,7 +103,7 @@ function ModalContent({
           className={cn(
             'p-2 rounded-lg',
             'text-[rgb(var(--text-tertiary))]',
-            'hover:bg-[rgb(var(--interactive-hover))]',
+            'hover:bg-[rgb(var(--background-tertiary))]',
             'transition-colors'
           )}
         >
@@ -112,7 +112,7 @@ function ModalContent({
       </div>
 
       {/* Progress */}
-      <div className="px-6 py-3 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-tertiary))]">
+      <div className="px-6 py-3 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
         <WizardProgressCompact />
       </div>
 
@@ -130,7 +130,7 @@ function ModalContent({
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 bg-[rgb(var(--surface-tertiary))] border-t border-[rgb(var(--border-secondary))]">
+      <div className="px-6 py-4 bg-[rgb(var(--background-tertiary))] border-t border-[rgb(var(--border-secondary))]">
         <WizardNavigation submitText={submitText} />
       </div>
     </>
@@ -212,7 +212,7 @@ export function WizardModal({
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className={cn(
                 'w-full pointer-events-auto',
-                'bg-[rgb(var(--surface-secondary))] rounded-2xl shadow-2xl overflow-hidden',
+                'bg-[rgb(var(--background-secondary))] rounded-2xl shadow-2xl overflow-hidden',
                 sizeClasses[size]
               )}
               onClick={(e) => e.stopPropagation()}

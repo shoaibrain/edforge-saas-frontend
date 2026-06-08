@@ -49,7 +49,7 @@ export function PeopleLayout({ children }: { children: ReactNode }) {
     if (!hasSchool) {
       return (
         <div className="flex items-center justify-center min-h-[60vh] p-6">
-          <div className="w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
+          <div className="w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
             <div className="mx-auto w-12 h-12 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
               <Building2 className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
             </div>

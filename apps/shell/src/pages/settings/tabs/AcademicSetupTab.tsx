@@ -294,7 +294,7 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
   return (
     <div className="grid gap-5" style={{ gridTemplateColumns: '260px 1fr' }}>
       {/* ── Wizard Navigation ── */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-3 h-fit sticky top-0">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-3 h-fit sticky top-0">
         <p className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] px-2.5 pb-2">
           Setup Steps
         </p>
@@ -471,7 +471,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+      <div className="relative w-full max-w-lg bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
         <h2 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-3">Create Academic Year</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -588,7 +588,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+      <div className="relative w-full max-w-lg bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-[rgb(var(--text-primary))]">
             {canEdit ? 'Edit Academic Year' : 'View Academic Year'}
@@ -692,7 +692,7 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+      <div className="relative w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
         <h2 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">Activate Academic Year</h2>
         <p className="text-xs text-[rgb(var(--text-secondary))] mb-3">
           You are about to activate <strong>{year.name}</strong>. This action:
@@ -800,10 +800,10 @@ function YearsStep({
 
       {isLoading ? (
         <div className="space-y-3 animate-pulse">
-          <div className="h-24 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+          <div className="h-24 bg-[rgb(var(--background-secondary))] rounded-xl" />
         </div>
       ) : years.length === 0 ? (
-        <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-10 text-center">
+        <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-10 text-center">
           <div className="text-3xl opacity-40 mb-3">📅</div>
           <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No academic years yet</h3>
           <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-72 mx-auto leading-relaxed mb-4">
@@ -824,7 +824,7 @@ function YearsStep({
             const status = statusConfig[year.status] || statusConfig.planning
 
             return (
-              <div key={year.id} className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+              <div key={year.id} className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
                 <div className="px-4 py-3 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📅</div>
@@ -1136,7 +1136,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
       )}
 
       {/* Sessions card */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-6 h-6 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📋</div>
@@ -1571,7 +1571,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
       {/* Month navigation */}
       <div className="px-4 py-2.5 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
         <button onClick={prevMonth} className="px-2 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
@@ -1806,7 +1806,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
         : 'rgba(55,138,221,0.15)'
 
   return (
-    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl mb-3 p-3.5">
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl mb-3 p-3.5">
       {/* Header with close button */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
@@ -1860,7 +1860,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
           <div className="w-full border-t border-[rgba(255,255,255,0.06)]" />
         </div>
         <div className="relative flex justify-center">
-          <span className="px-2 text-xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-primary))]">Edit</span>
+          <span className="px-2 text-xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-primary))]">Edit</span>
         </div>
       </div>
 
@@ -2154,7 +2154,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
       </div>
 
       {/* Calendar Stats */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3">
         <div className="grid grid-cols-3 gap-2 p-3.5">
           <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
             <p className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Academic Year</p>
@@ -2380,7 +2380,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
       {showConfirm && !calendarExists && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
-          <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
+          <div className="relative w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
             <h3 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">
               Generate Calendar
             </h3>
@@ -2585,7 +2585,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       </div>
 
       {/* How it works — collapsible */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
         <div className="px-4 py-3 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
           <div className="flex items-center gap-2.5">
             <div className="w-6 h-6 rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-sm">💡</div>
@@ -2614,7 +2614,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
 
       {/* Inline Create Form */}
       {showCreateForm && (
-        <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 p-4">
+        <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 p-4">
           <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Bell Schedule</h4>
           <div className="flex flex-col gap-1 mb-2.5">
             <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Schedule Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
@@ -2663,7 +2663,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
 
       {/* Template Picker */}
       {showTemplates && (
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)]">
           <div className="flex items-center gap-2.5">
             <div className="w-6 h-6 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📄</div>
@@ -2799,7 +2799,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
           })}
         </div>
       ) : (
-        <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
+        <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
           <div className="p-10 text-center">
             <div className="text-3xl opacity-40 mb-3">🕐</div>
             <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No bell schedules yet</h3>

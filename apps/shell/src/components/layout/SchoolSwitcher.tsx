@@ -124,10 +124,10 @@ export function SchoolSwitcher() {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 h-10 px-2">
-        <div className="w-8 h-8 rounded-lg bg-[rgb(var(--surface-tertiary))] animate-pulse flex-shrink-0" />
+        <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse flex-shrink-0" />
         <div className="space-y-1">
-          <div className="h-3 w-20 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
-          <div className="h-2 w-12 bg-[rgb(var(--surface-tertiary))] rounded animate-pulse" />
+          <div className="h-3 w-20 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
+          <div className="h-2 w-12 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
         </div>
       </div>
     )
@@ -145,7 +145,7 @@ export function SchoolSwitcher() {
               placeholder="Find School..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-[rgb(var(--border-focus))] transition-all"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
           </div>
         </div>
@@ -179,7 +179,7 @@ export function SchoolSwitcher() {
                     className={cn(
                       'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150',
                       isTransitioning && 'opacity-60 pointer-events-none',
-                      active && 'bg-[rgb(var(--interactive-hover))]',
+                      active && 'bg-[rgb(var(--background-tertiary))]',
                       isSelected && 'bg-[rgb(var(--action-primary-bg))]/10 /15'
                     )}
                   >
@@ -287,7 +287,7 @@ export function SchoolSwitcher() {
           anchor="bottom start"
           className={cn(
             'w-80 rounded-2xl z-50 overflow-hidden',
-            'bg-[rgb(var(--surface-secondary))]/85 backdrop-blur-xl',
+            'bg-[rgb(var(--background-secondary))]/85 backdrop-blur-xl',
             'border border-[rgb(var(--border-secondary))] ',
             'shadow-xl shadow-black/10 dark:shadow-black/40',
             'ring-1 ring-inset ring-[rgb(var(--border-secondary))]',

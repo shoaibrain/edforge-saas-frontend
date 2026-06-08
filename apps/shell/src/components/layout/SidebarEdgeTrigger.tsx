@@ -81,7 +81,7 @@ export function SidebarEdgeTrigger({ collapsed, onToggle }: SidebarEdgeTriggerPr
               'absolute right-0 translate-x-1/2 -translate-y-1/2',
               'w-5 h-5 rounded-full',
               'flex items-center justify-center',
-              'bg-[rgb(var(--surface-secondary))]',
+              'bg-[rgb(var(--background-secondary))]',
               'border border-[rgb(var(--border-secondary))]',
               'shadow-sm',
               'text-[rgb(var(--text-tertiary))]',

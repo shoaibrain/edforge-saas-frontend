@@ -94,7 +94,7 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
     <button
       type="button"
       onClick={handleCopy}
-      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
       title={label}
     >
       {copied ? (
@@ -181,7 +181,7 @@ function StatusBadge({
     warning:
       'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
     neutral:
-      'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))]',
+      'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))]',
   }
 
   return (
@@ -203,7 +203,7 @@ function TokenRawDisplay({ token }: { token: string }) {
       <div className="absolute top-2 right-2">
         <CopyButton text={token} label="Copy Token" />
       </div>
-      <pre className="p-4 pr-24 rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-24 break-all whitespace-pre-wrap">
+      <pre className="p-4 pr-24 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-24 break-all whitespace-pre-wrap">
         {token}
       </pre>
     </div>
@@ -222,7 +222,7 @@ function JsonDisplay({ data }: { data: Record<string, unknown> | string }) {
       <div className="absolute top-2 right-2">
         <CopyButton text={text} />
       </div>
-      <pre className="p-4 pr-20 rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-80 whitespace-pre-wrap">
+      <pre className="p-4 pr-20 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-80 whitespace-pre-wrap">
         {text}
       </pre>
     </div>
@@ -246,7 +246,7 @@ function TokenAnalysisCard({
     return (
       <motion.div
         variants={fadeInUp}
-        className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+        className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
       >
         <div className="flex items-center gap-2.5 mb-4">
           <Icon className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
@@ -264,7 +264,7 @@ function TokenAnalysisCard({
   return (
     <motion.div
       variants={fadeInUp}
-      className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+      className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
     >
       <div className="flex items-center gap-2.5 mb-4">
         <Icon className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
@@ -293,7 +293,7 @@ function TokenAnalysisCard({
           </CollapsibleSection>
 
           <CollapsibleSection title="Signature">
-            <pre className="p-4 rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto break-all whitespace-pre-wrap">
+            <pre className="p-4 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto break-all whitespace-pre-wrap">
               {token.decoded.signature}
             </pre>
           </CollapsibleSection>
@@ -375,13 +375,13 @@ export default function AuthDebugPage() {
     return (
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="space-y-6">
-          <div className="h-8 w-64 rounded-lg bg-[rgb(var(--surface-tertiary))] animate-pulse" />
-          <div className="h-4 w-96 rounded-lg bg-[rgb(var(--surface-tertiary))] animate-pulse" />
+          <div className="h-8 w-64 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse" />
+          <div className="h-4 w-96 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="h-64 rounded-2xl bg-[rgb(var(--surface-tertiary))] animate-pulse"
+                className="h-64 rounded-2xl bg-[rgb(var(--background-tertiary))] animate-pulse"
               />
             ))}
           </div>
@@ -422,7 +422,7 @@ export default function AuthDebugPage() {
           {/* User Profile */}
           <motion.div
             variants={fadeInUp}
-            className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+            className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
           >
             <div className="flex items-center gap-2.5 mb-5">
               <User className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
@@ -490,7 +490,7 @@ export default function AuthDebugPage() {
           {/* Token Information */}
           <motion.div
             variants={fadeInUp}
-            className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+            className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
           >
             <div className="flex items-center gap-2.5 mb-5">
               <Shield className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />

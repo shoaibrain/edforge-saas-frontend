@@ -363,7 +363,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           className="grid grid-cols-2 sm:grid-cols-4 gap-3"
         >
           {/* Academic Year Progress */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-teal-500">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-teal-500">
             <div className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">{activeYear?.name || 'Academic Year'}</div>
             {stats.progressPercentage != null ? (
               <>
@@ -382,7 +382,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           {/* Instructional Days */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-emerald-500">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-emerald-500">
             <div className="text-2xl font-bold text-[rgb(var(--state-success-fg))] ">{stats.instructionalDays ?? 0}</div>
             <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Instructional Days</div>
             {stats.instructionalDaysRemaining != null && (
@@ -393,7 +393,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           {/* Holidays */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-red-500">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-red-500">
             <div className="text-2xl font-bold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">{stats.holidays ?? 0}</div>
             <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Holidays</div>
             <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
@@ -402,7 +402,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           {/* Non-Instructional */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-4 py-3 border-l-4 border-l-slate-400">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-slate-400">
             <div className="text-2xl font-bold text-[rgb(var(--text-secondary))]">{stats.nonInstructionalDays ?? 0}</div>
             <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Non-Instructional</div>
             {(stats.teacherOnlyDays ?? 0) > 0 && (
@@ -447,27 +447,27 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             return (
               <div className={`rounded-xl px-4 py-3 border ${
                 isWeekendWithHoliday
-                  ? 'bg-[rgb(var(--surface-tertiary))]0/5 border-[rgb(var(--border-secondary))]'
+                  ? 'bg-[rgb(var(--background-tertiary))]0/5 border-[rgb(var(--border-secondary))]'
                   : editCalendarDate.isWeekend
-                    ? 'bg-[rgb(var(--surface-tertiary))]0/5 border-[rgb(var(--border-secondary))]'
+                    ? 'bg-[rgb(var(--background-tertiary))]0/5 border-[rgb(var(--border-secondary))]'
                     : editCalendarDate.isHoliday || evt?.eventType === 'holiday'
                       ? 'bg-[rgb(var(--state-danger-bg)/0.18)]0/5 border-[rgb(var(--state-danger-border))]/30'
                       : editCalendarDate.isInstructionalDay
                         ? 'bg-[rgb(var(--state-success-fg))]/5 border-[rgb(var(--state-success-border)/0.35)]'
-                        : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]'
+                        : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]'
               }`}>
                 {/* Primary badge */}
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full ${
                     isWeekendWithHoliday
-                      ? 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'
+                      ? 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'
                       : editCalendarDate.isWeekend
-                        ? 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'
+                        ? 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'
                         : editCalendarDate.isHoliday || evt?.eventType === 'holiday'
                           ? 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]'
                           : editCalendarDate.isInstructionalDay
                             ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] '
-                            : 'bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-secondary))]'
+                            : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]'
                   }`}>
                     {isWeekendWithHoliday
                       ? 'Weekend'
@@ -521,7 +521,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               <div className="w-full border-t border-[rgb(var(--border-primary))]" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-2 text-xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-primary))]">
+              <span className="px-2 text-xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-primary))]">
                 Edit
               </span>
             </div>
@@ -546,7 +546,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                   setEditIsInstructional(meta.autoInstructional)
                 }
               }}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
             >
               {CURATED_OPTIONS_FOR_DROPDOWN.map(opt => (
                 <option key={opt.key} value={opt.key}>{opt.label}</option>
@@ -571,7 +571,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                   setEditEventType(e.target.value)
                   setEditIsInstructional(e.target.value === 'instructional_day')
                 }}
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
+                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
               >
                 <option value="">Select...</option>
                 {EVENT_TYPE_OPTIONS.map(o => (
@@ -587,12 +587,12 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
               placeholder="Optional description (e.g., Dashain Holiday)"
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
             />
           </div>
 
           {/* Instructional toggle */}
-          <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5">
+          <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
             <span className="text-sm text-[rgb(var(--text-secondary))]">Instructional Day</span>
             <button
               type="button"
@@ -604,7 +604,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               }`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-[rgb(var(--surface-secondary))] shadow transition-transform ${
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-[rgb(var(--background-secondary))] shadow transition-transform ${
                   editIsInstructional ? 'translate-x-4.5' : 'translate-x-0.5'
                 }`}
               />
@@ -655,7 +655,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6 space-y-4"
+              className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6 space-y-4"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-[rgb(var(--action-primary-bg))]/10">
@@ -730,7 +730,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               onClick={() => toggleType(item.type)}
               className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
                 isActive
-                  ? 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-secondary))]'
+                  ? 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]'
                   : 'border-transparent bg-transparent text-[rgb(var(--text-tertiary))] opacity-40 hover:opacity-70'
               }`}
             >

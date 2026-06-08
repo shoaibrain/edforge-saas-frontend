@@ -90,7 +90,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
 
   return (
     <div
-      className={`bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-popover p-3 w-72 ${className || ''}`}
+      className={`bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-popover p-3 w-72 ${className || ''}`}
       role="dialog"
       aria-modal="true"
       aria-label={`Bikram Sambat calendar: ${getBsMonthName(viewMonth, bsLocale)} ${viewYear}`}
@@ -100,7 +100,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
         <button
           type="button"
           onClick={() => navigateYear(-1)}
-          className="p-1 rounded text-xs text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))] transition-colors"
+          className="p-1 rounded text-xs text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
           aria-label={`Previous year: ${viewYear - 1}`}
         >
           &laquo;
@@ -111,7 +111,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
         <button
           type="button"
           onClick={() => navigateYear(1)}
-          className="p-1 rounded text-xs text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))] transition-colors"
+          className="p-1 rounded text-xs text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
           aria-label={`Next year: ${viewYear + 1}`}
         >
           &raquo;
@@ -123,7 +123,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
         <button
           type="button"
           onClick={() => navigateMonth(-1)}
-          className="p-1.5 rounded-lg hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-secondary))] transition-colors"
+          className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] transition-colors"
           aria-label="Previous month"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -139,7 +139,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
         <button
           type="button"
           onClick={() => navigateMonth(1)}
-          className="p-1.5 rounded-lg hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-secondary))] transition-colors"
+          className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] transition-colors"
           aria-label="Next month"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -177,7 +177,7 @@ export function BsDatePicker({ value, onChange, disabled, className }: BsDatePic
                 aspect-square flex items-center justify-center text-xs rounded-lg transition-colors
                 ${selected
                   ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] font-semibold shadow-sm'
-                  : 'hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))]'
+                  : 'hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))]'
                 }
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
@@ -281,7 +281,7 @@ export function DateInput({ value, onChange, calendarSystem = 'gregorian', label
               ? 'border-[rgb(var(--border-focus))] ring-2 ring-[rgb(var(--border-focus)/0.24)]'
               : 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
             }
-            bg-[rgb(var(--surface-secondary))]
+            bg-[rgb(var(--background-secondary))]
             ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
         >
@@ -325,7 +325,7 @@ export function DateInput({ value, onChange, calendarSystem = 'gregorian', label
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className={`w-full px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm transition-all ${focusRingInset}`}
+        className={`w-full px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm transition-all ${focusRingInset}`}
       />
       {error && <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-1">{error}</p>}
     </div>

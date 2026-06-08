@@ -108,7 +108,7 @@ function InvoiceDownloadIconButton({
         })
       }
       disabled={downloadInvoice.isPending}
-      className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
+      className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
       title={label}
       aria-label={label}
     >
@@ -310,7 +310,7 @@ export default function InvoicesPage() {
             <div className="flex items-center justify-end gap-1">
               <button
                 onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
-                className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]"
                 title="View"
               >
                 <Eye className="w-4 h-4" />
@@ -605,7 +605,7 @@ function CancelInvoiceDialog({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
       >
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] ">
@@ -631,7 +631,7 @@ function CancelInvoiceDialog({
             onChange={(e) => setReason(e.target.value)}
             placeholder="Enter the reason for cancelling this invoice..."
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
           />
         </div>
@@ -679,7 +679,7 @@ function BulkIssueConfirmModal({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
       >
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] ">
@@ -795,7 +795,7 @@ function GenerateInvoiceModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
       >
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-4">
           Generate Invoice
@@ -826,7 +826,7 @@ function GenerateInvoiceModal({
                 feeStructures.map((fee: any) => (
                   <label
                     key={fee.id}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgb(var(--surface-secondary))] cursor-pointer"
+                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgb(var(--background-secondary))] cursor-pointer"
                   >
                     <input
                       type="checkbox"
@@ -853,7 +853,7 @@ function GenerateInvoiceModal({
               <select
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
               >
                 <option value="">Select academic year</option>
                 {academicYears.map((y) => (
@@ -871,7 +871,7 @@ function GenerateInvoiceModal({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
               />
             </div>
           </div>
@@ -886,7 +886,7 @@ function GenerateInvoiceModal({
               value={billingPeriod}
               onChange={(e) => setBillingPeriod(e.target.value)}
               placeholder="e.g., First Term, Admission"
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))]"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
             />
           </div>
 
@@ -899,13 +899,13 @@ function GenerateInvoiceModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none"
             />
           </div>
 
           {/* Totals Preview */}
           {selectedFees.length > 0 && (
-            <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 space-y-1">
+            <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 space-y-1">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                 <span>Subtotal</span>
                 <span>{formatCurr(subtotal)}</span>

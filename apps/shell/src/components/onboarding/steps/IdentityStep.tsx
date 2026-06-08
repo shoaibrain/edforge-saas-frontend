@@ -89,12 +89,12 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
     }
   }
 
-  const inputBase = 'w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-colors'
+  const inputBase = 'w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 transition-colors'
   const inputNormal = `${inputBase} border-[rgb(var(--border-primary))] focus:ring-[rgb(var(--border-focus)/0.40)]`
   const inputError = `${inputBase} border-[rgb(var(--state-danger-border)/0.60)] ring-2 ring-[rgb(var(--state-danger-border)/0.30)] focus:ring-[rgb(var(--state-danger-border)/0.50)]`
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Your Profile</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-8">How should we address you?</p>
 
@@ -105,7 +105,7 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
             {initials || '?'}
           </span>
         </div>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
           Photo upload coming soon
         </span>
       </div>

@@ -191,7 +191,7 @@ export function BlocksPanel({
 
   return (
     <section
-      className="bg-[rgb(var(--surface-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl p-3.5 mt-3"
+      className="bg-[rgb(var(--background-primary))] border border-[rgba(55,138,221,0.15)] rounded-xl p-3.5 mt-3"
       aria-labelledby="multi-day-events-heading"
     >
       {/* Header */}
@@ -343,7 +343,7 @@ export function BlocksPanel({
       {/* Delete confirm modal — inline (matches school-rooms pattern) */}
       {deletingBlock && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)] px-4">
-          <div className="bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-xl max-w-md w-full p-5">
+          <div className="bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl max-w-md w-full p-5">
             <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-2">
               Delete "{deletingBlock.blockName}"?
             </h3>

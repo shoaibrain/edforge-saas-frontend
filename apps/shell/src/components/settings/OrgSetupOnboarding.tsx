@@ -91,7 +91,7 @@ function StepCard({
           ? 'border-[rgb(var(--state-success-border)/0.35)] bg-[rgb(var(--state-success-fg))]/5'
           : isActive
           ? 'border-[rgb(var(--border-focus)/0.40)] bg-[rgb(var(--action-primary-bg))]/5 shadow-lg shadow-teal-500/10 ring-1 ring-[rgb(var(--border-focus))]/20'
-          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] opacity-60'
+          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] opacity-60'
       }`}
     >
       <div className="flex items-start gap-4">
@@ -102,7 +102,7 @@ function StepCard({
               ? 'bg-[rgb(var(--state-success-fg))]/15'
               : isActive
               ? step.color
-              : 'bg-[rgb(var(--surface-tertiary))]'
+              : 'bg-[rgb(var(--background-tertiary))]'
           }`}
         >
           {step.isComplete ? (
@@ -247,7 +247,7 @@ export function OrgSetupOnboarding({
         <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-[rgb(var(--action-primary-bg))]/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))]">
+      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -266,7 +266,7 @@ export function OrgSetupOnboarding({
           <button
             type="button"
             onClick={handleDismiss}
-            className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
             aria-label="Dismiss onboarding"
           >
             <X className="w-4 h-4" />
@@ -286,7 +286,7 @@ export function OrgSetupOnboarding({
             )}
           </div>
           <div
-            className="h-1.5 rounded-full bg-[rgb(var(--surface-tertiary))] overflow-hidden"
+            className="h-1.5 rounded-full bg-[rgb(var(--background-tertiary))] overflow-hidden"
             role="progressbar"
             aria-valuenow={steps.filter((s) => s.isComplete).length}
             aria-valuemin={0}

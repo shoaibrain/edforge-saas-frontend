@@ -69,7 +69,7 @@ export function createExpandColumn<TData>(): ColumnDef<TData, unknown> {
             e.stopPropagation()
             row.toggleExpanded()
           }}
-          className="p-1 rounded hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+          className="p-1 rounded hover:bg-[rgb(var(--background-secondary))] transition-colors"
           aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
         >
           <ChevronRight

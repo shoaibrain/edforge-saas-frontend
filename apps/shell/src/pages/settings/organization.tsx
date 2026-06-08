@@ -167,7 +167,7 @@ function DeleteEdOrgModal({
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={node.name}
-              className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--state-danger-border))] transition-colors"
+              className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--state-danger-border))] transition-colors"
             />
           </div>
         )}
@@ -500,7 +500,7 @@ export default function OrganizationSettingsPage() {
           icon={Building2}
           action={
             canManage ? (
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
                 {!sea ? (
                   <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={seaModal.openCreate}>
                     <Landmark className="w-3.5 h-3.5" />
@@ -603,7 +603,7 @@ export default function OrganizationSettingsPage() {
             >
               {/* SEA Summary Card */}
               {sea ? (
-                <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+                <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
                       <Landmark className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />

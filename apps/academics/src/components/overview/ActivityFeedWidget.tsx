@@ -91,7 +91,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
       <Link to={alert.href as any}>
         <div className={`group flex items-center gap-3 p-4 rounded-r-lg ${style.bg} ${style.border} cursor-pointer hover:brightness-[0.98] dark:hover:brightness-110 transition-all`}>
           {/* Severity + Type icons */}
-          <div className="relative p-2 rounded-lg bg-[rgb(var(--surface-secondary)/0.60)]  flex-shrink-0">
+          <div className="relative p-2 rounded-lg bg-[rgb(var(--background-secondary)/0.60)]  flex-shrink-0">
             <TypeIcon className={`w-5 h-5 ${style.text}`} />
             <div className="absolute -top-1 -right-1">
               <SeverityIcon className={`w-3.5 h-3.5 ${style.text}`} />
@@ -117,7 +117,7 @@ function AlertItem({ alert, index }: { alert: AcademicAlert; index: number }) {
 
           {/* Count badge */}
           {alert.count != null && (
-            <span className="text-xs font-medium text-text-secondary bg-[rgb(var(--surface-secondary)/0.60)]  px-2 py-0.5 rounded-full flex-shrink-0">
+            <span className="text-xs font-medium text-text-secondary bg-[rgb(var(--background-secondary)/0.60)]  px-2 py-0.5 rounded-full flex-shrink-0">
               {alert.count}
             </span>
           )}

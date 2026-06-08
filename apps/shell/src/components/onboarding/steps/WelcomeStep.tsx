@@ -88,7 +88,7 @@ export function WelcomeStep({ onNext }: OnboardingStepProps) {
             style={{
               color: 'rgb(var(--text-secondary))',
               borderColor: 'rgb(var(--border-primary))',
-              background: 'rgb(var(--surface-tertiary))',
+              background: 'rgb(var(--background-tertiary))',
             }}
           >
             {pill}

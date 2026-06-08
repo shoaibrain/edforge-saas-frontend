@@ -11,7 +11,7 @@ export default function MeetingsPage() {
             >
 
 
-                <div className="text-center py-20 bg-[rgb(var(--surface-secondary))] rounded-2xl border border-[rgb(var(--border-primary))] border-dashed">
+                <div className="text-center py-20 bg-[rgb(var(--background-secondary))] rounded-2xl border border-[rgb(var(--border-primary))] border-dashed">
                     <Calendar className="w-16 h-16 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-50" />
                     <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">No Upcoming Meetings</h2>
                     <p className="text-[rgb(var(--text-tertiary))] max-w-sm mx-auto mt-2">

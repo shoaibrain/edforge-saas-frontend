@@ -87,8 +87,8 @@ export const FilterTabs = forwardRef<HTMLDivElement, FilterTabsProps>(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
                 focusRing,
                 isActive
-                  ? 'bg-[rgb(var(--brand-primary))] text-[rgb(var(--text-inverted))] shadow-sm'
-                  : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] hover:text-[rgb(var(--text-primary))]'
+                  ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--text-inverted))] shadow-sm'
+                  : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))]'
               )}
             >
               {tab.label}
@@ -97,8 +97,8 @@ export const FilterTabs = forwardRef<HTMLDivElement, FilterTabsProps>(
                   className={cn(
                     'text-xs px-1.5 py-0.5 rounded-full leading-none font-semibold',
                     isActive
-                      ? 'bg-[rgb(var(--surface-primary)/0.18)] text-[rgb(var(--text-inverted))]'
-                      : 'bg-[rgb(var(--surface-elevated))] text-[rgb(var(--text-tertiary))]'
+                      ? 'bg-[rgb(var(--background-primary)/0.18)] text-[rgb(var(--text-inverted))]'
+                      : 'bg-[rgb(var(--background-elevated))] text-[rgb(var(--text-tertiary))]'
                   )}
                 >
                   {tab.count}

@@ -19,8 +19,8 @@
 
 :root {
   --fc-border-color: rgb(var(--border-primary));
-  --fc-page-bg-color: rgb(var(--surface-primary));
-  --fc-neutral-bg-color: rgb(var(--surface-secondary));
+  --fc-page-bg-color: rgb(var(--background-primary));
+  --fc-neutral-bg-color: rgb(var(--background-secondary));
   --fc-today-bg-color: rgb(var(--state-info-bg) / 0.18);
   --fc-neutral-text-color: rgb(var(--text-tertiary));
   --fc-event-border-color: transparent;
@@ -53,7 +53,7 @@
 
 .fc .fc-toolbar.fc-header-toolbar {
   padding: 0.75rem 1rem;
-  background: rgb(var(--surface-secondary));
+  background: rgb(var(--background-secondary));
   border-bottom: 1px solid rgb(var(--border-primary));
   margin-bottom: 0;
   gap: 0.5rem;
@@ -100,7 +100,7 @@
    ══════════════════════════════════════════════════════════════════════════════ */
 
 .fc .fc-col-header-cell {
-  background: rgb(var(--surface-secondary));
+  background: rgb(var(--background-secondary));
   padding: 0.625rem 0;
   font-size: 0.75rem;
   font-weight: 600;
@@ -178,7 +178,7 @@
   padding: 0.625rem 0 0.5rem;
   border: 1px solid rgb(var(--border-primary));
   border-bottom: none;
-  background: rgb(var(--surface-secondary));
+  background: rgb(var(--background-secondary));
   border-radius: 0.75rem 0.75rem 0 0;
 }
 
@@ -190,7 +190,7 @@
 /* Weekend cells */
 .fc .fc-day-sat,
 .fc .fc-day-sun {
-  background-color: rgb(var(--surface-secondary));
+  background-color: rgb(var(--background-secondary));
 }
 
 /* Other-month days */
@@ -498,7 +498,7 @@
 }
 
 .fc .fc-list-day-cushion {
-  background: rgb(var(--surface-secondary));
+  background: rgb(var(--background-secondary));
   color: rgb(var(--text-primary));
   font-weight: 600;
   font-size: 0.875rem;
@@ -519,7 +519,7 @@
 }
 
 .fc .fc-list-empty {
-  background: rgb(var(--surface-primary));
+  background: rgb(var(--background-primary));
 }
 
 .fc .fc-list-empty-cushion {
@@ -713,7 +713,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(var(--surface-primary) / 0.6);
+  background: rgb(var(--background-primary) / 0.6);
   backdrop-filter: blur(2px);
   border-radius: 0.75rem;
   pointer-events: none;

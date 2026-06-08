@@ -82,7 +82,7 @@ function InfoCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+    <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
       <div className="flex items-center gap-2 mb-4">
         <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
@@ -121,7 +121,7 @@ function ChildOrgItem({ node, onNavigate }: { node: HierarchyNode; onNavigate: (
   return (
     <button
       onClick={() => onNavigate(node)}
-      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors text-left"
+      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left"
     >
       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${typeColors[node.type] || ''}`}>
         {typeLabels[node.type] || node.type}
@@ -423,7 +423,7 @@ export default function EducationOrgDetailPage() {
                 {categories.map((cat, i) => (
                   <span
                     key={i}
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]"
+                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]"
                   >
                     {cat.educationOrganizationCategoryDescriptor}
                   </span>
@@ -437,7 +437,7 @@ export default function EducationOrgDetailPage() {
             <InfoCard title="Addresses" icon={MapPin}>
               <div className="space-y-3">
                 {addresses.map((addr, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
                     <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
                       {addr.addressTypeDescriptor}
                     </p>
@@ -459,7 +459,7 @@ export default function EducationOrgDetailPage() {
             <InfoCard title="Telephones" icon={Phone}>
               <div className="grid grid-cols-2 gap-3">
                 {telephones.map((tel, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
                     <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
                       {tel.institutionTelephoneNumberTypeDescriptor}
                     </p>
@@ -475,7 +475,7 @@ export default function EducationOrgDetailPage() {
             <InfoCard title="Identification Codes" icon={Hash}>
               <div className="grid grid-cols-2 gap-3">
                 {identificationCodes.map((code, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
                     <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
                       {code.educationOrganizationIdentificationSystemDescriptor}
                     </p>
@@ -511,7 +511,7 @@ export default function EducationOrgDetailPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] divide-y divide-[rgb(var(--border-primary))]">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
             {schools.length > 0 ? (
               schools.map((s) => <ChildOrgItem key={s.id} node={s} onNavigate={handleChildNavigate} />)
             ) : (
@@ -530,7 +530,7 @@ export default function EducationOrgDetailPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] divide-y divide-[rgb(var(--border-primary))]">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
             {(orgType === 'sea' ? seaDirectChildren : nonSchoolChildren).map((child) => (
               <ChildOrgItem key={child.id} node={child} onNavigate={handleChildNavigate} />
             ))}

@@ -123,7 +123,7 @@ function ChildSelector({
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors text-sm"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors text-sm"
         >
           <span className="font-medium text-[rgb(var(--text-primary))]">
             {active ? `${active.firstName} ${active.lastName}` : 'Select child'}
@@ -139,7 +139,7 @@ function ChildSelector({
         {isOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-            <div className="absolute top-full left-0 mt-1 z-20 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg min-w-60">
+            <div className="absolute top-full left-0 mt-1 z-20 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg min-w-60">
               {children.map((child) => (
                 <button
                   key={child.studentId}
@@ -147,9 +147,9 @@ function ChildSelector({
                     onSelect(child.studentId)
                     setIsOpen(false)
                   }}
-                  className={`w-full text-left px-4 py-3 hover:bg-[rgb(var(--surface-secondary))] transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                  className={`w-full text-left px-4 py-3 hover:bg-[rgb(var(--background-secondary))] transition-colors first:rounded-t-lg last:rounded-b-lg ${
                     child.studentId === activeChildId
-                      ? 'bg-[rgb(var(--surface-secondary))]'
+                      ? 'bg-[rgb(var(--background-secondary))]'
                       : ''
                   }`}
                 >

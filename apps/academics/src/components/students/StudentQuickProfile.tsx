@@ -44,7 +44,7 @@ const STATUS_STYLES: Record<string, { pill: string; dot: string }> = {
     dot: 'bg-[var(--v2-warning)]',
   },
   inactive: {
-    pill: 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]',
+    pill: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
     dot: 'bg-[var(--v2-text-hint)]',
   },
   withdrawn: {

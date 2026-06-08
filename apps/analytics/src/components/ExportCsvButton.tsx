@@ -56,7 +56,7 @@ export function ExportCsvButton({
       type="button"
       onClick={handleClick}
       disabled={disabled || isBusy}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md ring-1 ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--surface-tertiary))] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md ring-1 ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--background-tertiary))] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
       {isBusy ? (
         <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -216,7 +216,7 @@ export function DemographicsTab({ student, canEdit = false, locale = 'en' }: Dem
             type="button"
             onClick={() => setEditing(true)}
             data-testid="open-edit-demographics"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[rgb(var(--border-primary))] text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[rgb(var(--border-primary))] text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <Pencil className="w-3.5 h-3.5" aria-hidden />
             Edit

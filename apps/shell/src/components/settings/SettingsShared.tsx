@@ -117,7 +117,7 @@ export function SettingsSection({
     <motion.div
       variants={fadeInUp}
       className={cn(
-        'rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] overflow-hidden',
+        'rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
     >
@@ -125,12 +125,12 @@ export function SettingsSection({
       <div
         className={cn(
           'flex items-center gap-3 p-4',
-          collapsible && 'cursor-pointer hover:bg-[rgb(var(--surface-tertiary))] transition-colors'
+          collapsible && 'cursor-pointer hover:bg-[rgb(var(--background-tertiary))] transition-colors'
         )}
         onClick={() => collapsible && setIsOpen(!isOpen)}
       >
         {Icon && (
-          <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+          <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
           </div>
         )}
@@ -189,7 +189,7 @@ export function SettingsCard({
   return (
     <div className={cn(
       'flex items-center justify-between p-4 rounded-xl',
-      'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]',
+      'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]',
       className
     )}>
       <div>
@@ -224,7 +224,7 @@ export function SettingsFormCard({
     <motion.div
       variants={fadeInUp}
       className={cn(
-        'p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]',
+        'p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]',
         className
       )}
     >
@@ -268,12 +268,12 @@ export function SettingsRow({
   return (
     <div className={cn(
       'flex items-center justify-between p-4 rounded-xl',
-      'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]',
+      'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]',
       'hover:border-[rgb(var(--border-secondary))] transition-colors',
       className
     )}>
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+        <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
           <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         </div>
         <div>
@@ -328,7 +328,7 @@ export function SettingsToggleRow({
     >
       <div className="flex items-center gap-3">
         {Icon && (
-          <div className="p-1.5 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+          <div className="p-1.5 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           </div>
         )}
@@ -352,7 +352,7 @@ export function SettingsToggleRow({
           'transition-colors duration-200 ease-in-out',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--border-focus))] focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          checked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--surface-tertiary))]'
+          checked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--background-tertiary))]'
         )}
       >
         <motion.span
@@ -360,7 +360,7 @@ export function SettingsToggleRow({
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
           className={cn(
             'pointer-events-none inline-block h-5 w-5 rounded-full shadow-lg ring-0',
-            'bg-[rgb(var(--surface-secondary))]'
+            'bg-[rgb(var(--background-secondary))]'
           )}
         >
           {loading && (
@@ -454,7 +454,7 @@ export function SettingsAlert({
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="p-0.5 rounded hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--surface-primary)/0.05)] transition-colors"
+          className="p-0.5 rounded hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--background-primary)/0.05)] transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -552,8 +552,8 @@ export function QuickActionPill({ label, icon: Icon, href, delay = 0 }: QuickAct
           className={cn(
             'flex items-center gap-2 px-4 py-2.5 rounded-full',
             'border border-[rgb(var(--border-primary))]',
-            'bg-[rgb(var(--surface-secondary))]',
-            'hover:bg-[rgb(var(--surface-tertiary))] hover:border-[rgb(var(--border-focus)/0.35)]',
+            'bg-[rgb(var(--background-secondary))]',
+            'hover:bg-[rgb(var(--background-tertiary))] hover:border-[rgb(var(--border-focus)/0.35)]',
             'transition-colors cursor-pointer'
           )}
         >
@@ -591,10 +591,10 @@ export function SettingsSkeleton({
       {showHeader && (
         <div className="flex items-center justify-between">
           <div>
-            <div className="h-8 w-40 bg-[rgb(var(--surface-tertiary))] rounded" />
-            <div className="h-4 w-56 bg-[rgb(var(--surface-tertiary))] rounded mt-2" />
+            <div className="h-8 w-40 bg-[rgb(var(--background-tertiary))] rounded" />
+            <div className="h-4 w-56 bg-[rgb(var(--background-tertiary))] rounded mt-2" />
           </div>
-          <div className="h-10 w-24 bg-[rgb(var(--surface-tertiary))] rounded" />
+          <div className="h-10 w-24 bg-[rgb(var(--background-tertiary))] rounded" />
         </div>
       )}
 
@@ -603,16 +603,16 @@ export function SettingsSkeleton({
         {Array.from({ length: rows }).map((_, i) => (
           <div 
             key={i} 
-            className="p-4 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+            className="p-4 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
             style={{ animationDelay: `${i * 100}ms` }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[rgb(var(--surface-tertiary))] rounded-lg" />
+              <div className="w-10 h-10 bg-[rgb(var(--background-tertiary))] rounded-lg" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-32 bg-[rgb(var(--surface-tertiary))] rounded" />
-                <div className="h-3 w-48 bg-[rgb(var(--surface-tertiary))] rounded" />
+                <div className="h-4 w-32 bg-[rgb(var(--background-tertiary))] rounded" />
+                <div className="h-3 w-48 bg-[rgb(var(--background-tertiary))] rounded" />
               </div>
-              <div className="h-6 w-11 bg-[rgb(var(--surface-tertiary))] rounded-full" />
+              <div className="h-6 w-11 bg-[rgb(var(--background-tertiary))] rounded-full" />
             </div>
           </div>
         ))}
@@ -656,7 +656,7 @@ export function SettingsEmptyState({
       animate={{ opacity: 1, y: 0 }}
       className={cn('text-center py-12', className)}
     >
-      <div className="inline-flex p-4 rounded-full bg-[rgb(var(--surface-tertiary))] mb-4">
+      <div className="inline-flex p-4 rounded-full bg-[rgb(var(--background-tertiary))] mb-4">
         <Icon className="w-8 h-8 text-[rgb(var(--text-tertiary))]" />
       </div>
       <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-1">{title}</h3>
@@ -694,7 +694,7 @@ export function UnsavedChangesBar({
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-2xl border border-[rgb(var(--border-primary))]"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-4 bg-[rgb(var(--background-primary))] rounded-2xl shadow-2xl border border-[rgb(var(--border-primary))]"
         >
           <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
             {message}

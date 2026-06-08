@@ -7,13 +7,13 @@
 
 const STATUS_STYLES: Record<string, string> = {
   // Invoice statuses
-  draft: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]',
+  draft: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]',
   issued: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
   partially_paid: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
   paid: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
   overdue: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
-  cancelled: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]',
-  written_off: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]',
+  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
+  written_off: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
 
   // Payment statuses
   completed: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
@@ -28,7 +28,7 @@ const STATUS_STYLES: Record<string, string> = {
   credit: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
 }
 
-const DEFAULT_STYLE = 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'
+const DEFAULT_STYLE = 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
 
 export function StatusBadge({ status, size = 'sm' }: { status: string; size?: 'xs' | 'sm' }) {
   const sizeClass = size === 'xs'

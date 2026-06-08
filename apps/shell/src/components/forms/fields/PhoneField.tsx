@@ -95,7 +95,7 @@ export function PhoneField({
       {/* Input Container */}
       <div
         className={cn(
-          'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-all duration-200',
+          'relative flex items-center rounded-xl border bg-[rgb(var(--background-secondary))] transition-all duration-200',
           hasError 
             ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
             : isFocused 
@@ -112,7 +112,7 @@ export function PhoneField({
             className={cn(
               'flex items-center gap-1 pl-3 pr-2 py-2.5 border-r border-[rgb(var(--border-primary))]',
               'text-sm text-[rgb(var(--text-primary))]',
-              'hover:bg-[rgb(var(--interactive-hover))] transition-colors',
+              'hover:bg-[rgb(var(--background-tertiary))] transition-colors',
               disabled && 'pointer-events-none'
             )}
           >
@@ -174,7 +174,7 @@ export function PhoneField({
             transition={{ duration: 0.15 }}
             className={cn(
               'absolute z-50 left-0 mt-1 py-1 rounded-xl border',
-              'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]',
+              'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]',
               'shadow-xl shadow-black/10 dark:shadow-black/30',
               'max-h-48 overflow-auto scrollbar-thin'
             )}
@@ -192,7 +192,7 @@ export function PhoneField({
                   'transition-colors duration-150',
                   country.code === countryCode
                     ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] '
-                    : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]'
+                    : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))]'
                 )}
               >
                 <span>{country.flag}</span>

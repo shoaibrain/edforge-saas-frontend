@@ -74,7 +74,7 @@ export function GuardiansStep({
         ) : (
           /* Empty State */
           <div className="rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))] p-8 text-center">
-            <div className="mx-auto w-12 h-12 rounded-xl bg-[rgb(var(--surface-secondary))] flex items-center justify-center mb-3">
+            <div className="mx-auto w-12 h-12 rounded-xl bg-[rgb(var(--background-secondary))] flex items-center justify-center mb-3">
               <Users className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
             </div>
             <h3 className="text-sm font-medium text-[rgb(var(--text-primary))]">

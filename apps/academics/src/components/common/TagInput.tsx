@@ -76,7 +76,7 @@ export function TagInput({
       <div
         className={`
           min-h-10 rounded-lg border border-[rgb(var(--border-primary))]
-          bg-[rgb(var(--surface-primary))] px-3 py-2
+          bg-[rgb(var(--background-primary))] px-3 py-2
           flex flex-wrap items-center gap-2
           focus-within:ring-2 focus-within:ring-[rgb(var(--border-focus)/0.35)] focus-within:border-[rgb(var(--border-focus))]
           transition-colors

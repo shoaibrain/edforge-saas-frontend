@@ -96,15 +96,15 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
       </div>
 
       {/* Audit entries */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
         {isLoading ? (
           <div className="p-4 animate-pulse space-y-3">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex gap-3">
-                <div className="w-7 h-7 rounded-lg bg-[rgb(var(--surface-secondary))]" />
+                <div className="w-7 h-7 rounded-lg bg-[rgb(var(--background-secondary))]" />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3 w-48 bg-[rgb(var(--surface-secondary))] rounded" />
-                  <div className="h-2.5 w-32 bg-[rgb(var(--surface-secondary))] rounded" />
+                  <div className="h-3 w-48 bg-[rgb(var(--background-secondary))] rounded" />
+                  <div className="h-2.5 w-32 bg-[rgb(var(--background-secondary))] rounded" />
                 </div>
               </div>
             ))}

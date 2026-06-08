@@ -174,7 +174,7 @@ function QuickDrawerRoot({
           willChange: 'transform',
           visibility: isOpen ? 'visible' : 'hidden',
           transition: panelTransition,
-          background: 'var(--v2-bg-surface, rgb(var(--surface-primary)))',
+          background: 'var(--v2-bg-surface, rgb(var(--background-primary)))',
           borderLeft: mode === 'side' ? '1px solid var(--v2-border-default, rgb(var(--border-secondary)))' : 'none',
           borderTop: mode === 'sheet' ? '1px solid var(--v2-border-default, rgb(var(--border-secondary)))' : 'none',
           borderRadius: mode === 'sheet' ? '14px 14px 0 0' : undefined,
@@ -238,7 +238,7 @@ function Footer({ children, className }: QuickDrawerFooterProps) {
       className={cn('flex-shrink-0', className)}
       style={{
         borderTop: '1px solid var(--v2-border-default, rgba(255,255,255,0.07))',
-        background: 'var(--v2-bg-surface, rgb(var(--surface-primary)))',
+        background: 'var(--v2-bg-surface, rgb(var(--background-primary)))',
       }}
     >
       {children}

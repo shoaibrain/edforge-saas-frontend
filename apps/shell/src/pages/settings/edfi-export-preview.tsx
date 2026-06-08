@@ -166,7 +166,7 @@ function EntitySelector({
           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
             selected === type
               ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  ring-1 ring-[rgb(var(--border-focus))]/30'
-              : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))]'
+              : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
           }`}
         >
           <Icon className="w-4 h-4" />
@@ -197,7 +197,7 @@ function EntityPicker<T>({
   isLoading: boolean
 }) {
   if (isLoading) {
-    return <div className="h-10 rounded-lg bg-[rgb(var(--surface-tertiary))] animate-pulse" />
+    return <div className="h-10 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse" />
   }
 
   if (items.length === 0) {
@@ -214,7 +214,7 @@ function EntityPicker<T>({
         value={selectedId || ''}
         onChange={(e) => onSelect(e.target.value)}
         aria-label="Select an entity to preview"
-        className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors appearance-none pr-8"
+        className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors appearance-none pr-8"
       >
         <option value="">Select an entity to preview...</option>
         {items.map((item) => (
@@ -301,14 +301,14 @@ function JsonPreviewPanel({
       </div>
 
       {/* JSON */}
-      <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] overflow-hidden">
+      <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] overflow-hidden">
         <pre className="p-4 text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-[50vh] overflow-y-auto">
           {jsonString}
         </pre>
       </div>
 
       {/* Validation Details */}
-      <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4">
+      <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4">
         <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] uppercase tracking-wider mb-3">
           Validation
         </h4>
@@ -411,7 +411,7 @@ export default function EdFiExportPreviewPage() {
         <motion.div variants={fadeInUp}>
           {entityType === 'sea' ? (
             sea ? (
-              <div className="flex items-center gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
                 <Landmark className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />
                 <div>
                   <p className="text-sm font-medium text-[rgb(var(--text-primary))]">

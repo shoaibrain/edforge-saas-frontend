@@ -67,7 +67,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Academic Year</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
         Set up the academic year for {data.schoolName || 'your school'}.
@@ -82,7 +82,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
           type="text"
           value={yearName}
           onChange={(e) => { setYearName(e.target.value); setError(null) }}
-          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           placeholder={isBs ? 'e.g. 2082' : 'e.g. 2025-2026'}
         />
       </div>
@@ -97,7 +97,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           />
         </div>
         <div>
@@ -108,7 +108,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           />
         </div>
       </div>
@@ -126,7 +126,7 @@ export function AcademicYearStep({ data, setData, onNext, onBack }: OnboardingSt
               className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
                 termStructure === ts.value
                   ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--action-secondary-fg))] '
-                  : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                  : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }`}
             >
               {ts.label}

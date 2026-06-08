@@ -100,7 +100,7 @@ function SettingsOverviewContent({
           <img
             src={avatarUrl}
             alt={userName}
-            className="w-24 h-24 rounded-full object-cover ring-4 ring-[rgb(var(--surface-tertiary))]"
+            className="w-24 h-24 rounded-full object-cover ring-4 ring-[rgb(var(--background-tertiary))]"
           />
         </div>
 
@@ -151,7 +151,7 @@ function SettingsOverviewContent({
             placeholder="Search settings (coming soon)"
             disabled
             aria-disabled="true"
-            className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] opacity-60 cursor-not-allowed"
+            className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] opacity-60 cursor-not-allowed"
           />
         </motion.div>
       </motion.div>

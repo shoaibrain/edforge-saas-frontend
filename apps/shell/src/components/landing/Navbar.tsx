@@ -317,7 +317,7 @@ export function Navbar() {
                               className="group flex flex-col p-5 transition-all duration-200 hover:shadow-md"
                               style={{
                                 borderRadius: 'var(--lp-radius-md)',
-                                backgroundColor: 'rgb(var(--surface-primary))',
+                                backgroundColor: 'rgb(var(--background-primary))',
                                 border: '1px solid rgba(226, 232, 240, 0.8)',
                               }}
                             >
@@ -341,12 +341,12 @@ export function Navbar() {
                           <div
                             className="p-4 grid grid-cols-3 gap-4"
                             style={{
-                              backgroundColor: 'rgb(var(--surface-primary))',
+                              backgroundColor: 'rgb(var(--background-primary))',
                               borderTop: '1px solid rgba(226, 232, 240, 0.8)',
                             }}
                           >
                             {item.dropdown.footerItems.map((footerItem, idx) => (
-                              <NavLink key={idx} href={footerItem.href} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[rgb(var(--surface-secondary))] transition-colors group">
+                              <NavLink key={idx} href={footerItem.href} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[rgb(var(--background-secondary))] transition-colors group">
                                 <div
                                   className="p-1.5 rounded-lg transition-colors"
                                   style={{
@@ -378,7 +378,7 @@ export function Navbar() {
                               className="group flex items-start gap-4 p-4 transition-all duration-200 hover:shadow-md"
                               style={{
                                 borderRadius: 'var(--lp-radius-md)',
-                                backgroundColor: 'rgb(var(--surface-primary))',
+                                backgroundColor: 'rgb(var(--background-primary))',
                                 border: '1px solid rgba(226, 232, 240, 0.8)',
                               }}
                             >
@@ -473,7 +473,7 @@ export function Navbar() {
                     <NavLink
                       key={idx}
                       href={subItem.href}
-                      className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-11 transition-colors touch-manipulation hover:bg-[rgb(var(--surface-secondary))]"
+                      className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-11 transition-colors touch-manipulation hover:bg-[rgb(var(--background-secondary))]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <subItem.icon className="w-4 h-4 shrink-0" style={{ color: subItem.iconColor }} />

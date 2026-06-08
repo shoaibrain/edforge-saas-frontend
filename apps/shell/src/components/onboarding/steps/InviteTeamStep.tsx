@@ -81,7 +81,7 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Invite Your Team</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
         Add team members who'll help manage your organization. They'll receive an email invitation.
@@ -94,14 +94,14 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
             placeholder="First name"
           />
           <input
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
             placeholder="Last name"
           />
         </div>
@@ -110,14 +110,14 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
             type="email"
             value={email}
             onChange={(e) => { setEmail(e.target.value); setAddError(null) }}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
             placeholder="Email address"
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd() } }}
           />
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           >
             {ROLE_OPTIONS.map((r) => (
               <option key={r.value} value={r.value}>{r.label}</option>
@@ -125,7 +125,7 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
           </select>
           <button
             onClick={handleAdd}
-            className="px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm font-medium text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+            className="px-4 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm font-medium text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             Add
           </button>
@@ -142,7 +142,7 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
           {invitees.map((inv) => (
             <div
               key={inv.email}
-              className="flex items-center justify-between px-3 py-2 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]"
+              className="flex items-center justify-between px-3 py-2 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]"
             >
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-[rgb(var(--action-primary-bg))]/15 flex items-center justify-center">
@@ -156,7 +156,7 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))]">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]">
                   {ROLE_OPTIONS.find((r) => r.value === inv.globalRole)?.label}
                 </span>
                 <button

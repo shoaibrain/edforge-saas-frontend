@@ -54,7 +54,7 @@ export function ToggleField({
             sizeClasses.track,
             'rounded-full transition-colors duration-200',
             'peer-focus:ring-4 peer-focus:ring-[rgb(var(--border-focus)/0.35)]',
-            isChecked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--surface-tertiary))]',
+            isChecked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--background-tertiary))]',
             disabled && 'opacity-60 cursor-not-allowed'
           )}
         />
@@ -63,7 +63,7 @@ export function ToggleField({
         <div
           className={cn(
             sizeClasses.thumb,
-            'absolute left-0.5 top-0.5 bg-[rgb(var(--surface-primary))] rounded-full shadow-sm',
+            'absolute left-0.5 top-0.5 bg-[rgb(var(--background-primary))] rounded-full shadow-sm',
             'pointer-events-none transition-transform duration-200',
             isChecked && sizeClasses.translate
           )}

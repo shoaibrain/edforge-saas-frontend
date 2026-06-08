@@ -113,7 +113,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
   const validationColors = {
     valid: 'text-[rgb(var(--state-success-fg))]  bg-[rgb(var(--state-success-bg)/0.18)] border-[rgb(var(--state-success-border)/0.35)]',
     partial: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
-    minimal: 'text-[rgb(var(--text-tertiary))] dark:text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))]0/10 border-[rgb(var(--border-secondary))]',
+    minimal: 'text-[rgb(var(--text-tertiary))] dark:text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))]0/10 border-[rgb(var(--border-secondary))]',
   }
 
   const handleCopy = async () => {
@@ -127,11 +127,11 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] overflow-hidden">
+    <div className="rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] overflow-hidden">
       {/* Toggle Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[rgb(var(--surface-tertiary))]/50 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[rgb(var(--background-tertiary))]/50 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
@@ -179,7 +179,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
                 </p>
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   {copied ? (
                     <>
@@ -196,7 +196,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
               </div>
 
               {/* JSON display */}
-              <div className="rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] overflow-hidden">
+              <div className="rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] overflow-hidden">
                 <pre
                   className="p-4 text-xs font-mono leading-relaxed overflow-x-auto max-h-96 overflow-y-auto"
                   dangerouslySetInnerHTML={{ __html: highlightJson(edfiJson) }}

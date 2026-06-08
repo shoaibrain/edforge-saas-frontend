@@ -133,7 +133,7 @@ export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>
           animate={{ borderColor, boxShadow }}
           transition={springTransition}
           className={cn(
-            'relative rounded-xl border bg-[rgb(var(--surface-secondary))] transition-colors',
+            'relative rounded-xl border bg-[rgb(var(--background-secondary))] transition-colors',
             disabled && 'opacity-60 cursor-not-allowed',
             textareaClassName
           )}

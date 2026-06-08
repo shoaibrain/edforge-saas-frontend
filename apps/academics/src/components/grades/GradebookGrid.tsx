@@ -397,7 +397,7 @@ export function GradebookGrid({
                             }
                             onBlur={() => handleBlur(student, aName, editingCell.value)}
                             onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                            className="w-16 px-1.5 py-1 bg-[rgb(var(--surface-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
+                            className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
                             min={0}
                             step="any"
                           />
@@ -434,7 +434,7 @@ export function GradebookGrid({
                           }
                           onBlur={() => handleBlur(student, aName, editingCell.value)}
                           onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                          className="w-16 px-1.5 py-1 bg-[rgb(var(--surface-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
+                          className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
                           min={0}
                           step="any"
                         />

@@ -116,7 +116,7 @@ export function BrandingColorPicker({
                 }}
                 placeholder="#RRGGBB"
                 maxLength={7}
-                className="flex-1 max-w-40 px-3 py-2 text-sm font-mono rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50"
+                className="flex-1 max-w-40 px-3 py-2 text-sm font-mono rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50"
                 aria-invalid={!!fieldState.error}
                 aria-describedby={
                   fieldState.error ? `${id}-error` : helperText ? `${id}-help` : undefined

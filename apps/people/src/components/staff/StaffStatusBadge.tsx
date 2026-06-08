@@ -39,11 +39,11 @@ const statusStyles: Record<
     textColor: 'text-[rgb(var(--state-danger-fg))]',
   },
   retired: {
-    bgColor: 'bg-[rgb(var(--surface-tertiary))]',
+    bgColor: 'bg-[rgb(var(--background-tertiary))]',
     textColor: 'text-[rgb(var(--text-tertiary))]',
   },
   resigned: {
-    bgColor: 'bg-[rgb(var(--surface-tertiary))]',
+    bgColor: 'bg-[rgb(var(--background-tertiary))]',
     textColor: 'text-[rgb(var(--text-tertiary))]',
   },
 }

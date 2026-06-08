@@ -266,7 +266,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
         {showCreditBadge && (
           <Badge
             label={creditTypeLabel}
-            bg="bg-[rgb(var(--surface-tertiary))]"
+            bg="bg-[rgb(var(--background-tertiary))]"
             text="text-[rgb(var(--text-secondary))]"
           />
         )}
@@ -690,7 +690,7 @@ export function CourseDetailPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
                   course.isActive
                     ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)] '
-                    : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] dark:bg-[rgb(var(--surface-tertiary))]0/10 '
+                    : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/10 '
                 }`}
               >
                 <div

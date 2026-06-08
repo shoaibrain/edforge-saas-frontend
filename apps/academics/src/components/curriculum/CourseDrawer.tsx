@@ -149,7 +149,7 @@ function CourseDetailView({
         {showCreditBadge && (
           <Badge
             label={creditTypeLabel}
-            bg="bg-[rgb(var(--surface-tertiary))]"
+            bg="bg-[rgb(var(--background-tertiary))]"
             text="text-[rgb(var(--text-secondary))]"
           />
         )}

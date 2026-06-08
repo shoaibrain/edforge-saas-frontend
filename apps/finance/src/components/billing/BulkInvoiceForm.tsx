@@ -89,7 +89,7 @@ function StepIndicator({ current }: { current: Step }) {
                     ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]'
                     : isDone
                       ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  '
-                      : 'bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))]'
+                      : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]'
                 }`}
               >
                 {isDone ? (
@@ -311,7 +311,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
             <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
+                  <tr className="bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))]">
                     <th className="text-left px-3 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Student
                     </th>
@@ -327,7 +327,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     {result.errors.map((err, i) => {
                       const student = students.find((s) => s.studentId === err.studentId)
                       return (
-                        <tr key={i} className="hover:bg-[rgb(var(--surface-secondary))]">
+                        <tr key={i} className="hover:bg-[rgb(var(--background-secondary))]">
                           <td className="px-3 py-2 text-sm text-[rgb(var(--text-primary))]">
                             {student?.fullName || (
                               <>
@@ -393,7 +393,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   placeholder="Search by name or student number..."
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
 
@@ -428,7 +428,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   {filteredStudents.map((student) => (
                     <label
                       key={student.studentId}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--background-secondary))] cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
@@ -486,7 +486,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   {feeStructures.map((fee) => (
                     <label
                       key={fee.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--background-secondary))] cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
@@ -520,7 +520,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
               )}
 
               {selectedFeeIds.length > 0 && (
-                <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3">
+                <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3">
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Per-student subtotal</span>
                     <span>{format(perStudentSubtotal)}</span>
@@ -560,7 +560,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   <select
                     value={academicYear}
                     onChange={(e) => setAcademicYear(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   >
                     <option value="">Select academic year</option>
                     {academicYears.map((y) => (
@@ -578,7 +578,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   />
                 </div>
               </div>
@@ -592,7 +592,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   value={billingPeriod}
                   onChange={(e) => setBillingPeriod(e.target.value)}
                   placeholder="e.g., First Term, Admission"
-                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
 
@@ -605,7 +605,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Optional notes to include on all invoices..."
-                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                  className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
               </div>
             </div>
@@ -680,7 +680,7 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 </div>
 
                 {/* Totals */}
-                <div className="px-4 py-3 bg-[rgb(var(--surface-secondary))]">
+                <div className="px-4 py-3 bg-[rgb(var(--background-secondary))]">
                   <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                     <span>Per-student total</span>
                     <span>{format(perStudentTotal)}</span>

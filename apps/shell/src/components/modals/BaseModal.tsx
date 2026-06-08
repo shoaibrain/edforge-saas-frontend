@@ -215,7 +215,7 @@ export function BaseModal({
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className={cn(
                 'relative w-full rounded-2xl',
-                'bg-[rgb(var(--surface-primary))]',
+                'bg-[rgb(var(--background-primary))]',
                 'border border-[rgb(var(--border-primary))]',
                 'shadow-2xl shadow-ink-900/20 dark:shadow-black/40',
                 sizeClasses[size],
@@ -236,7 +236,7 @@ export function BaseModal({
                     'p-2 rounded-xl',
                     'text-[rgb(var(--text-tertiary))]',
                     'hover:text-[rgb(var(--text-primary))]',
-                    'hover:bg-[rgb(var(--interactive-hover))]',
+                    'hover:bg-[rgb(var(--background-tertiary))]',
                     'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50',
                     'transition-all duration-200'
                   )}
@@ -341,7 +341,7 @@ export function ModalFooter({ children, className, align = 'right' }: ModalFoote
       className={cn(
         'px-6 py-4',
         'border-t border-[rgb(var(--border-secondary))]',
-        'bg-[rgb(var(--surface-secondary))]',
+        'bg-[rgb(var(--background-secondary))]',
         'rounded-b-2xl',
         'flex items-center gap-3',
         alignClasses[align],

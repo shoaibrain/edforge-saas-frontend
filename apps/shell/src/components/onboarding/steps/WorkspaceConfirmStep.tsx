@@ -68,7 +68,7 @@ export function WorkspaceConfirmStep({ onNext, onBack }: OnboardingStepProps) {
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Workspace Settings</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
         We've auto-configured your workspace based on your region. Confirm to continue.

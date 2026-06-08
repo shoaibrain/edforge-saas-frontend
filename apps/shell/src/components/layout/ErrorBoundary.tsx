@@ -97,7 +97,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
             href="/home"
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-xl',
-              'bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))]',
+              'bg-[rgb(var(--background-tertiary))] hover:bg-[rgb(var(--background-tertiary))]',
               'text-[rgb(var(--text-primary))] font-medium text-sm',
               'border border-[rgb(var(--border-primary))]',
               'transition-colors duration-150',
@@ -111,7 +111,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
 
         {/* Error Details (Dev Mode) */}
         {shouldShowDetails && error && (
-          <div className="mt-6 p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+          <div className="mt-6 p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <div className="flex items-center gap-2 mb-3">
               <Bug className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
               <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
@@ -136,7 +136,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
                   <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer hover:text-[rgb(var(--text-secondary))]">
                     Show stack trace
                   </summary>
-                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
+                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
                     {error.stack}
                   </pre>
                 </details>
@@ -148,7 +148,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
                   <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer hover:text-[rgb(var(--text-secondary))]">
                     Show component stack
                   </summary>
-                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
+                  <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--text-secondary))] font-mono overflow-x-auto max-h-40 scrollbar-thin">
                     {errorInfo.componentStack}
                   </pre>
                 </details>

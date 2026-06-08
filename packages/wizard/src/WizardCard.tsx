@@ -92,7 +92,7 @@ function CardContent({
       )}
 
       {/* Progress */}
-      <div className="px-6 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-tertiary))]">
+      <div className="px-6 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
         <WizardProgressCompact />
       </div>
 
@@ -110,7 +110,7 @@ function CardContent({
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 bg-[rgb(var(--surface-tertiary))] border-t border-[rgb(var(--border-secondary))]">
+      <div className="px-6 py-4 bg-[rgb(var(--background-tertiary))] border-t border-[rgb(var(--border-secondary))]">
         <WizardNavigation submitText={submitText} />
       </div>
     </>
@@ -140,7 +140,7 @@ export function WizardCard({
     >
       <div
         className={cn(
-          'bg-[rgb(var(--surface-secondary))] rounded-2xl border border-[rgb(var(--border-primary))] shadow-lg overflow-hidden',
+          'bg-[rgb(var(--background-secondary))] rounded-2xl border border-[rgb(var(--border-primary))] shadow-lg overflow-hidden',
           className
         )}
       >

@@ -135,7 +135,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               isConfigured
                 ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]  '
-                : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]  '
+                : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]  '
             }`}>
               {isConfigured ? t('gateway.configured') : t('gateway.notConfigured')}
             </span>

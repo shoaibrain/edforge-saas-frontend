@@ -107,7 +107,7 @@ export function FeatureToggles({ features, onChange, disabled }: FeatureTogglesP
               border transition-colors
               ${isEnabled
                 ? 'bg-[rgb(var(--action-primary-bg))]/5 border-[rgb(var(--border-focus)/0.35)]'
-                : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]'
+                : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]'
               }
               ${disabled ? 'opacity-60' : ''}
             `}
@@ -117,7 +117,7 @@ export function FeatureToggles({ features, onChange, disabled }: FeatureTogglesP
                 p-2 rounded-lg
                 ${isEnabled
                   ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))] '
-                  : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'
+                  : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
                 }
               `}>
                 <Icon className="w-5 h-5" />
@@ -139,15 +139,15 @@ export function FeatureToggles({ features, onChange, disabled }: FeatureTogglesP
               disabled={disabled}
               className={`
                 relative w-11 h-6 rounded-full transition-colors
-                ${isEnabled ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--surface-tertiary))]'}
+                ${isEnabled ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--background-tertiary))]'}
                 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
-                focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:ring-offset-2 focus:ring-offset-[rgb(var(--surface-primary))]
+                focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:ring-offset-2 focus:ring-offset-[rgb(var(--background-primary))]
               `}
               role="switch"
               aria-checked={isEnabled}
             >
               <motion.span
-                className="absolute top-1 left-1 w-4 h-4 bg-[rgb(var(--surface-secondary))] rounded-full shadow"
+                className="absolute top-1 left-1 w-4 h-4 bg-[rgb(var(--background-secondary))] rounded-full shadow"
                 animate={{ x: isEnabled ? 20 : 0 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />

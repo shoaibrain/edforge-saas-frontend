@@ -84,7 +84,7 @@ function ProfileLoadingState() {
           {[80, 100, 70, 85].map((w, i) => (
             <div key={i} className="px-4 py-3">
               <div
-                className="h-4 rounded animate-pulse bg-[rgb(var(--surface-tertiary))]"
+                className="h-4 rounded animate-pulse bg-[rgb(var(--background-tertiary))]"
                 style={{ width: w }}
               />
             </div>

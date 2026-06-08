@@ -287,7 +287,7 @@ export default function StaffPage() {
         <button
           type="button"
           onClick={() => navigate({ to: '/staff/new' })}
-          className={`inline-flex h-9 items-center gap-1.5 rounded-l-lg border-r border-[rgb(var(--surface-primary)/0.18)] bg-[rgb(var(--brand-primary))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--brand-secondary))] ${focusRing}`}
+          className={`inline-flex h-9 items-center gap-1.5 rounded-l-lg border-r border-[rgb(var(--background-primary)/0.18)] bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
         >
           <UserPlus className="h-3.5 w-3.5" />
           Add Staff Member
@@ -295,7 +295,7 @@ export default function StaffPage() {
         <button
           type="button"
           onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-          className={`inline-flex h-9 w-8 items-center justify-center rounded-r-lg bg-[rgb(var(--brand-primary))] text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--brand-secondary))] ${focusRing}`}
+          className={`inline-flex h-9 w-8 items-center justify-center rounded-r-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
           aria-label="More add options"
         >
           <ChevronDown className="h-3 w-3" />
@@ -338,11 +338,11 @@ export default function StaffPage() {
           {teacherCount} teacher{teacherCount !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span className="font-medium text-[rgb(var(--brand-secondary))]">
+        <span className="font-medium text-[rgb(var(--state-info-fg))]">
           {principalCount} principal{principalCount !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span className="font-medium text-[rgb(var(--brand-primary))]">
+        <span className="font-medium text-[rgb(var(--action-primary-bg))]">
           {accessCount} with system access enabled
         </span>
       </Text>
@@ -408,7 +408,7 @@ export default function StaffPage() {
             key={chip}
             type="button"
             onClick={() => handleQuickFilter(chip)}
-            className={`inline-flex h-8 items-center whitespace-nowrap rounded-lg border px-3 text-xs font-medium transition-colors ${focusRingInset} ${quickFilter === chip ? 'border-[rgb(var(--brand-primary)/0.35)] bg-[rgb(var(--brand-primary)/0.10)] text-[rgb(var(--brand-primary))]' : 'border-border-secondary bg-surface-secondary text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary'}`}
+            className={`inline-flex h-8 items-center whitespace-nowrap rounded-lg border px-3 text-xs font-medium transition-colors ${focusRingInset} ${quickFilter === chip ? 'border-[rgb(var(--action-primary-bg)/0.35)] bg-[rgb(var(--action-primary-bg)/0.10)] text-[rgb(var(--action-primary-bg))]' : 'border-border-secondary bg-surface-secondary text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary'}`}
           >
             {chip === 'all' ? 'All' : chip === 'teacher' ? 'Teachers' : chip === 'principal' ? 'Principal' : 'Support'}
           </button>

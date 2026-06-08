@@ -111,7 +111,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-[rgb(var(--surface-secondary))]  p-6 text-left align-middle shadow-xl transition-all border border-[rgb(var(--border-secondary))] ">
+                            <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-[rgb(var(--background-secondary))]  p-6 text-left align-middle shadow-xl transition-all border border-[rgb(var(--border-secondary))] ">
                                 <div className="flex items-center justify-between mb-6">
                                     <Dialog.Title
                                         as="h3"
@@ -121,7 +121,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                     </Dialog.Title>
                                     <button
                                         onClick={handleClose}
-                                        className="p-1 rounded-full text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-tertiary))] dark:hover:bg-[rgb(var(--surface-tertiary))] transition"
+                                        className="p-1 rounded-full text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] dark:hover:bg-[rgb(var(--background-tertiary))] transition"
                                     >
                                         <X className="w-5 h-5" />
                                     </button>
@@ -136,7 +136,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                             </label>
                                             <Combobox value={selectedUser} onChange={setSelectedUser}>
                                                 <div className="relative mt-1">
-                                                    <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-[rgb(var(--surface-secondary))]  text-left border border-[rgb(var(--border-primary))]  focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] sm:text-sm">
+                                                    <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-[rgb(var(--background-secondary))]  text-left border border-[rgb(var(--border-primary))]  focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] sm:text-sm">
                                                         <Combobox.Input
                                                             className="w-full border-none py-2.5 pl-3 pr-10 text-sm leading-5 text-[rgb(var(--text-primary))]  bg-transparent focus:ring-0"
                                                             displayValue={(userId: string) => {
@@ -160,7 +160,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                         leaveTo="opacity-0"
                                                         afterLeave={() => setSearchUserQuery('')}
                                                     >
-                                                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[rgb(var(--surface-secondary))]  py-1 text-base shadow-lg ring-1 ring-[rgb(var(--border-secondary))] ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[rgb(var(--background-secondary))]  py-1 text-base shadow-lg ring-1 ring-[rgb(var(--border-secondary))] ring-opacity-5 focus:outline-none sm:text-sm z-50">
                                                             {filteredUsers.length === 0 && searchUserQuery !== '' ? (
                                                                 <div className="relative cursor-default select-none py-2 px-4 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]">
                                                                     Nothing found.
@@ -223,7 +223,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                         }
                                 `}
                                                 >
-                                                    <div className={`p-2 rounded-md ${selectedSchool === school.id ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]' : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]'}`}>
+                                                    <div className={`p-2 rounded-md ${selectedSchool === school.id ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]' : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'}`}>
                                                         <SchoolIcon className="w-5 h-5" />
                                                     </div>
                                                     <div>
@@ -268,7 +268,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                 <div className="mt-8 flex justify-end gap-3">
                                     <button
                                         type="button"
-                                        className="inline-flex justify-center rounded-lg border border-[rgb(var(--border-primary))]  px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))]  hover:bg-[rgb(var(--surface-tertiary))] dark:hover:bg-[rgb(var(--surface-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] focus:ring-offset-2 transition-colors"
+                                        className="inline-flex justify-center rounded-lg border border-[rgb(var(--border-primary))]  px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))]  hover:bg-[rgb(var(--background-tertiary))] dark:hover:bg-[rgb(var(--background-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] focus:ring-offset-2 transition-colors"
                                         onClick={handleClose}
                                     >
                                         Cancel

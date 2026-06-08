@@ -63,7 +63,7 @@ export function DataTablePagination<TData>({
     : String(totalRows)
 
   return (
-    <div className="flex items-center justify-between px-4 py-2.5 border-t border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--surface-tertiary)/0.25)]">
+    <div className="flex items-center justify-between px-4 py-2.5 border-t border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary)/0.25)]">
       <span className="text-xs text-[rgb(var(--text-secondary))]">
         Showing {start}-{end} of {totalDisplay} results
       </span>
@@ -76,7 +76,7 @@ export function DataTablePagination<TData>({
             table.setPageIndex(0)
           }}
           className={cn(
-            'mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]',
+            'mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]',
             focusRingInset
           )}
         >
@@ -92,7 +92,7 @@ export function DataTablePagination<TData>({
           type="button"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Prev
         </button>
@@ -118,7 +118,7 @@ export function DataTablePagination<TData>({
                   'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
                   pageIndex === page
                     ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] shadow-sm'
-                    : 'border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))]'
+                    : 'border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))]'
                 )}
               >
                 {(page as number) + 1}
@@ -131,7 +131,7 @@ export function DataTablePagination<TData>({
           type="button"
           onClick={handleNext}
           disabled={!canNext || serverPagination?.isFetching}
-          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {serverPagination?.isFetching ? 'Loading…' : 'Next'}
         </button>

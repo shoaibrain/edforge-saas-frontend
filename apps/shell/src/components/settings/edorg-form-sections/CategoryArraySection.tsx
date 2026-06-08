@@ -25,7 +25,7 @@ interface CategoryArraySectionProps {
 }
 
 const selectClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
+  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
 const labelClass = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1'
 const errorClass = 'mt-0.5 text-xs text-[rgb(var(--state-danger-fg))]'
 

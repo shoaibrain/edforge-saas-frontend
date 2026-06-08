@@ -126,7 +126,7 @@ function getAttendanceDotColor(status: string): string {
 }
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
+  if (!subject) return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
     return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
@@ -142,7 +142,7 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
     return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-[rgb(var(--state-info-fg))] ' }
-  return { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
+  return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================
@@ -359,7 +359,7 @@ function AttendanceDailyStrip({ studentId }: { studentId: string }) {
                 ? 'bg-surface-secondary'
                 : day.status
                   ? getAttendanceDotColor(day.status)
-                  : 'bg-[rgb(var(--surface-tertiary))] '
+                  : 'bg-[rgb(var(--background-tertiary))] '
             }`}
           />
         ))}
@@ -614,7 +614,7 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
       <div className="overflow-x-auto rounded-xl shadow-sm border border-[rgb(var(--border-primary)/0.6)] bg-surface-secondary">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[rgb(var(--surface-tertiary)/0.5)]">
+            <tr className="bg-[rgb(var(--background-tertiary)/0.5)]">
               <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider w-12">{tAcad('tableHeaders.number')}</th>
               <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.class')}</th>
               <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.subject')}</th>
@@ -625,7 +625,7 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
             {classrooms.map((classroom, index) => {
               const subjectColor = getSubjectColor(classroom.subject)
               return (
-                <tr key={classroom.classroomId} className="hover:bg-[rgb(var(--surface-tertiary)/0.5)] transition-colors">
+                <tr key={classroom.classroomId} className="hover:bg-[rgb(var(--background-tertiary)/0.5)] transition-colors">
                   <td className="py-4 px-6">
                     <div className={`w-7 h-7 rounded-lg ${subjectColor.bg} flex items-center justify-center`}>
                       <span className={`text-xs font-semibold ${subjectColor.text}`}>{index + 1}</span>

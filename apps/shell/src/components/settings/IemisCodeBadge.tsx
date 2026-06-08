@@ -87,7 +87,7 @@ export function IemisCodeBadge({ code, className }: IemisCodeBadgeProps) {
       {hovering && (
         <span
           role="tooltip"
-          className="absolute left-0 top-full z-20 mt-1.5 w-64 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] px-3 py-2 text-xs font-normal leading-relaxed text-[rgb(var(--text-secondary))] shadow-lg"
+          className="absolute left-0 top-full z-20 mt-1.5 w-64 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] px-3 py-2 text-xs font-normal leading-relaxed text-[rgb(var(--text-secondary))] shadow-lg"
         >
           {tooltipText}
         </span>

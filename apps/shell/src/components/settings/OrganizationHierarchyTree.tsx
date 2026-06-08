@@ -105,7 +105,7 @@ function TypeBadge({ type }: { type: string }) {
     label: type,
     icon: Building2,
     color: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
-    bgColor: 'bg-[rgb(var(--surface-tertiary))]0/10',
+    bgColor: 'bg-[rgb(var(--background-tertiary))]0/10',
     borderColor: 'border-[rgb(var(--border-secondary))]',
   }
   const Icon = config.icon
@@ -148,7 +148,7 @@ function CountPill({ icon: Icon, count, label }: { icon: LucideIcon; count?: num
   if (count === undefined || count === null) return null
   return (
     <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))]"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))]"
       title={`${count} ${label}`}
     >
       <Icon className="w-3 h-3" />
@@ -197,7 +197,7 @@ function TreeNodeActionMenu({
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        className="p-1 rounded-md hover:bg-[rgb(var(--surface-tertiary))] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+        className="p-1 rounded-md hover:bg-[rgb(var(--background-tertiary))] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         <MoreHorizontal className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -206,7 +206,7 @@ function TreeNodeActionMenu({
       <MenuItems
         anchor="bottom end"
         transition
-        className="z-50 w-52 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] shadow-lg focus:outline-none overflow-hidden origin-top-right transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+        className="z-50 w-52 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] shadow-lg focus:outline-none overflow-hidden origin-top-right transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
       >
         <div className="py-1">
           {actions.map(({ action, label, icon: Icon, destructive }) => (
@@ -219,7 +219,7 @@ function TreeNodeActionMenu({
                   }}
                   className={cn(
                     'flex items-center gap-2 w-full px-3 py-2 text-sm',
-                    focus && 'bg-[rgb(var(--surface-tertiary))]',
+                    focus && 'bg-[rgb(var(--background-tertiary))]',
                     destructive
                       ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]'
                       : 'text-[rgb(var(--text-secondary))]'
@@ -282,7 +282,7 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction
         transition={{ ...springTransition, delay: depth * 0.02 }}
         className={cn(
           'group flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer',
-          'hover:bg-[rgb(var(--surface-tertiary))] transition-colors',
+          'hover:bg-[rgb(var(--background-tertiary))] transition-colors',
           searchTerm && matchesSearch && 'bg-[rgb(var(--action-primary-bg))]/5'
         )}
         style={{ paddingLeft: `${depth * 24 + 12}px` }}
@@ -488,7 +488,7 @@ export function OrganizationHierarchyTree({
             onChange={(e) => setSearchTerm(e.target.value)}
             className={cn(
               'w-full pl-9 pr-3 py-2 text-sm rounded-lg',
-              'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]',
+              'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]',
               'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
               'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',
               'transition-colors'
@@ -519,7 +519,7 @@ export function OrganizationHierarchyTree({
       <div
         role="tree"
         aria-label="Organization hierarchy"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-2"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-2"
       >
         {/* SEA + Children */}
         {sea && (

@@ -107,10 +107,10 @@ export default {
         },
         // Semantic colors using CSS vars
         surface: {
-          primary: 'rgb(var(--surface-primary) / <alpha-value>)',
-          secondary: 'rgb(var(--surface-secondary) / <alpha-value>)',
-          tertiary: 'rgb(var(--surface-tertiary) / <alpha-value>)',
-          elevated: 'rgb(var(--surface-elevated) / <alpha-value>)',
+          primary: 'rgb(var(--background-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--background-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--background-tertiary) / <alpha-value>)',
+          elevated: 'rgb(var(--background-elevated) / <alpha-value>)',
         },
         background: {
           primary: 'rgb(var(--background-primary) / <alpha-value>)',
@@ -139,9 +139,9 @@ export default {
           focus: 'rgb(var(--border-focus) / <alpha-value>)',
         },
         brand: {
-          primary: 'rgb(var(--brand-primary) / <alpha-value>)',
-          secondary: 'rgb(var(--brand-secondary) / <alpha-value>)',
-          accent: 'rgb(var(--brand-accent) / <alpha-value>)',
+          primary: 'rgb(var(--action-primary-bg) / <alpha-value>)',
+          secondary: 'rgb(var(--state-info-fg) / <alpha-value>)',
+          accent: 'rgb(var(--state-warning-fg) / <alpha-value>)',
         },
         action: {
           primary: {

@@ -213,7 +213,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       isSelected
                         ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--state-info-fg))] '
-                        : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
+                        : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
                     }`}
                   >
                     {isSelected && <Check className="w-3 h-3" />}
@@ -283,7 +283,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                         className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border transition-all ${
                           isSelected
                             ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-[rgb(var(--state-info-border)/0.40)] text-[rgb(var(--state-info-fg))] '
-                            : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:border-[rgb(var(--state-info-border)/0.35)] hover:text-[rgb(var(--text-secondary))]'
+                            : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:border-[rgb(var(--state-info-border)/0.35)] hover:text-[rgb(var(--text-secondary))]'
                         }`}
                       >
                         {isSelected && <Check className="w-3 h-3 mr-1" />}
@@ -324,14 +324,14 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                 {idCodes.map((code, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+                    className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
                   >
                     <select
                       value={code.educationOrganizationIdentificationSystemDescriptor}
                       onChange={(e) =>
                         updateIdCode(index, 'educationOrganizationIdentificationSystemDescriptor', e.target.value)
                       }
-                      className="w-48 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                      className="w-48 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     >
                       {EDUCATION_ORGANIZATION_IDENTIFICATION_SYSTEM_DESCRIPTORS.map((d) => (
                         <option key={d.value} value={d.value}>{d.label}</option>
@@ -342,7 +342,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       value={code.identificationCode}
                       onChange={(e) => updateIdCode(index, 'identificationCode', e.target.value)}
                       placeholder="e.g., 123456789"
-                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors font-mono"
+                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors font-mono"
                     />
                     <button
                       type="button"
@@ -386,14 +386,14 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                 {phones.map((phone, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+                    className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
                   >
                     <select
                       value={phone.institutionTelephoneNumberTypeDescriptor}
                       onChange={(e) =>
                         updatePhone(index, 'institutionTelephoneNumberTypeDescriptor', e.target.value)
                       }
-                      className="w-40 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                      className="w-40 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     >
                       {INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS.map((d) => (
                         <option key={d.value} value={d.value}>{d.label}</option>
@@ -404,7 +404,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       value={phone.telephoneNumber}
                       onChange={(e) => updatePhone(index, 'telephoneNumber', e.target.value)}
                       placeholder="(555) 123-4567"
-                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     />
                     <button
                       type="button"
@@ -482,7 +482,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                 {ratings.map((rating, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))]/50 space-y-3"
+                    className="p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))]/50 space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
@@ -506,7 +506,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           value={rating.title}
                           onChange={(e) => updateRating(index, 'title', e.target.value)}
                           placeholder="e.g., State Accountability"
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                       <div>
@@ -518,7 +518,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           value={rating.rating}
                           onChange={(e) => updateRating(index, 'rating', e.target.value)}
                           placeholder="e.g., A, Met Standard"
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                       <div>
@@ -530,7 +530,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           value={rating.ratingOrganization}
                           onChange={(e) => updateRating(index, 'ratingOrganization', e.target.value)}
                           placeholder="e.g., Texas Education Agency"
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                       <div>
@@ -544,7 +544,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           placeholder="2025"
                           min={1900}
                           max={2100}
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                     </div>

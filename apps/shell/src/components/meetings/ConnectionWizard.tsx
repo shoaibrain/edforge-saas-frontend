@@ -75,8 +75,8 @@ function PlatformSelectStep() {
                   group flex items-center gap-4 p-4 rounded-xl border text-left w-full
                   transition-all duration-200
                   ${connected
-                    ? 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
-                    : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
+                    ? 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
+                    : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
                   }
                 `}
               >
@@ -124,8 +124,8 @@ function PlatformSelectStep() {
                   group flex items-center gap-4 p-4 rounded-xl border text-left w-full
                   transition-all duration-200
                   ${connected
-                    ? 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
-                    : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
+                    ? 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
+                    : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-tertiary))] hover:shadow-md cursor-pointer'
                   }
                 `}
               >
@@ -218,7 +218,7 @@ function PermissionsStep() {
       </div>
       
       {/* Permissions */}
-      <div className="p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-secondary))]">
+      <div className="p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-secondary))]">
         <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-3 flex items-center gap-2">
           <Shield className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
           Permissions required
@@ -246,7 +246,7 @@ function PermissionsStep() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your.email@school.edu"
-          className="w-full px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] dark:focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] dark:focus:border-[rgb(var(--border-focus))]"
+          className="w-full px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] dark:focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] dark:focus:border-[rgb(var(--border-focus))]"
         />
       </div>
       
@@ -254,7 +254,7 @@ function PermissionsStep() {
       <div className="flex items-center gap-3 pt-2">
         <button
           onClick={() => setWizardStep('select')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
@@ -334,7 +334,7 @@ function SuccessStep() {
       
       {/* Connected Account */}
       {integration && (
-        <div className="inline-flex items-center gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] mb-8">
+        <div className="inline-flex items-center gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--background-tertiary))] mb-8">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${platform.bgColor}`}>
             <PlatformLogo platformId={platform.id} size={24} />
           </div>
@@ -405,7 +405,7 @@ function ErrorStep() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setWizardStep('select')}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+          className="flex-1 px-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
         >
           Choose different platform
         </button>
@@ -463,13 +463,13 @@ export function ConnectionWizard() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', duration: 0.4 }}
-          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-2xl"
+          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-2xl"
         >
           {/* Close Button */}
           {canClose && (
             <button
               onClick={closeWizard}
-              className="absolute top-4 right-4 p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))] transition-colors z-10"
+              className="absolute top-4 right-4 p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors z-10"
             >
               <X className="w-5 h-5" />
             </button>

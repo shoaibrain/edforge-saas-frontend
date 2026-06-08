@@ -96,9 +96,9 @@ function VisitedCard({ page, index }: VisitedCardProps) {
       gradient: 'from-aqua-400/20 to-aqua-400/5',
     },
     settings: {
-      bg: 'bg-[rgb(var(--surface-tertiary))] ',
+      bg: 'bg-[rgb(var(--background-tertiary))] ',
       icon: 'text-[rgb(var(--text-secondary))] ',
-      gradient: 'from-[rgb(var(--surface-tertiary))] to-[rgb(var(--surface-secondary))]',
+      gradient: 'from-[rgb(var(--background-tertiary))] to-[rgb(var(--background-secondary))]',
     },
     home: {
       bg: 'bg-vanilla-400/15',
@@ -256,7 +256,7 @@ export function RecentlyVisitedCarousel() {
             onClick={scrollPrev}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]
+            className="p-2 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]
               text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] 
               hover:border-[rgb(var(--border-tertiary))] hover:shadow-md
               transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -268,7 +268,7 @@ export function RecentlyVisitedCarousel() {
             onClick={scrollNext}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]
+            className="p-2 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]
               text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]
               hover:border-[rgb(var(--border-tertiary))] hover:shadow-md
               transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -299,8 +299,8 @@ export function RecentlyVisitedCarousel() {
       </div>
       
       {/* Edge Gradients */}
-      <div className="pointer-events-none absolute left-0 top-12 bottom-0 w-8 bg-gradient-to-r from-[rgb(var(--surface-primary))] to-transparent" />
-      <div className="pointer-events-none absolute right-0 top-12 bottom-0 w-8 bg-gradient-to-l from-[rgb(var(--surface-primary))] to-transparent" />
+      <div className="pointer-events-none absolute left-0 top-12 bottom-0 w-8 bg-gradient-to-r from-[rgb(var(--background-primary))] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-12 bottom-0 w-8 bg-gradient-to-l from-[rgb(var(--background-primary))] to-transparent" />
     </motion.div>
   )
 }

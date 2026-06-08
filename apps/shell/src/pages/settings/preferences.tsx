@@ -97,14 +97,14 @@ function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
               relative p-4 rounded-xl border-2 transition-all text-left
               ${isSelected 
                 ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))]/5' 
-                : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }
             `}
           >
             <div className="flex items-center gap-3">
               <div className={`
                 p-2 rounded-lg 
-                ${isSelected ? 'bg-[rgb(var(--action-primary-bg))]/10' : 'bg-[rgb(var(--surface-tertiary))]'}
+                ${isSelected ? 'bg-[rgb(var(--action-primary-bg))]/10' : 'bg-[rgb(var(--background-tertiary))]'}
               `}>
                 <Icon className={`w-4 h-4 ${isSelected ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
               </div>
@@ -159,7 +159,7 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
 
   if (schools.length === 1) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))]">
+      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))]">
         <School className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
         <span className="text-sm text-[rgb(var(--text-primary))]">{schools[0].name}</span>
       </div>
@@ -170,7 +170,7 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
     <select
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
-      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))] min-w-52"
+      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))] min-w-52"
     >
       <option value="">Select default school</option>
       {schools.map((school) => (

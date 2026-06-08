@@ -225,7 +225,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl overflow-hidden"
+        className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl overflow-hidden"
       >
         <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
           <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -286,12 +286,12 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={school.name}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-rust-500/40 focus:border-rust-500 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-rust-500/40 focus:border-rust-500 transition-all"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
           <Button variant="ghost" onClick={onClose} disabled={isDeleting}>
             Cancel
           </Button>
@@ -501,15 +501,15 @@ export default function SchoolDetailPage() {
       <div className="mx-auto px-6 py-6">
         <div className="animate-pulse space-y-6">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+            <div className="w-12 h-12 bg-[rgb(var(--background-secondary))] rounded-xl" />
             <div className="space-y-2">
-              <div className="h-5 w-48 bg-[rgb(var(--surface-secondary))] rounded-lg" />
-              <div className="h-3 w-32 bg-[rgb(var(--surface-secondary))] rounded" />
+              <div className="h-5 w-48 bg-[rgb(var(--background-secondary))] rounded-lg" />
+              <div className="h-3 w-32 bg-[rgb(var(--background-secondary))] rounded" />
             </div>
           </div>
-          <div className="h-20 bg-[rgb(var(--surface-secondary))] rounded-xl" />
-          <div className="h-10 bg-[rgb(var(--surface-secondary))] rounded-lg" />
-          <div className="h-64 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+          <div className="h-20 bg-[rgb(var(--background-secondary))] rounded-xl" />
+          <div className="h-10 bg-[rgb(var(--background-secondary))] rounded-lg" />
+          <div className="h-64 bg-[rgb(var(--background-secondary))] rounded-xl" />
         </div>
       </div>
     )
@@ -579,7 +579,7 @@ export default function SchoolDetailPage() {
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <MenuItems className="absolute right-0 z-50 mt-1 w-56 origin-top-right rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+                  <MenuItems className="absolute right-0 z-50 mt-1 w-56 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
                     <div className="py-1">
                       {STATUS_ACTIONS[displaySchool.status]?.map((action) => (
                         <MenuItem key={action.targetStatus}>
@@ -587,7 +587,7 @@ export default function SchoolDetailPage() {
                             <button
                               onClick={() => statusMutation.mutate(action.targetStatus)}
                               disabled={statusMutation.isPending}
-                              className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--surface-secondary))]' : ''} disabled:opacity-50`}
+                              className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--background-secondary))]' : ''} disabled:opacity-50`}
                             >
                               <Power className="w-4 h-4 mr-2.5" />
                               {action.label}

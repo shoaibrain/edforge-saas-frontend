@@ -182,7 +182,7 @@ export function ScrollSpyNav({
 
   if (variant === 'pills') {
     return (
-      <nav className={cn('flex items-center gap-2 p-1 bg-[rgb(var(--surface-tertiary))] rounded-full', className)}>
+      <nav className={cn('flex items-center gap-2 p-1 bg-[rgb(var(--background-tertiary))] rounded-full', className)}>
         {sections.map((section) => {
           const isActive = section.id === activeSection
           const Icon = section.icon
@@ -199,7 +199,7 @@ export function ScrollSpyNav({
               )}
             >
               {isActive && (
-                <div className="absolute inset-0 bg-[rgb(var(--surface-secondary))] rounded-full shadow-sm" />
+                <div className="absolute inset-0 bg-[rgb(var(--background-secondary))] rounded-full shadow-sm" />
               )}
               <span className="relative flex items-center gap-2">
                 {Icon && <Icon className="w-4 h-4" />}
@@ -259,7 +259,7 @@ export function ScrollSpyNav({
               'w-full flex items-center gap-3 px-4 py-2.5 text-sm rounded-xl transition-all',
               isActive
                 ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))]  font-medium'
-                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--interactive-hover))]'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
             )}
           >
             {Icon && (

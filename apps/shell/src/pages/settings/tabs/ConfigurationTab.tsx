@@ -61,7 +61,7 @@ interface SectionCardProps {
 
 function SectionCard({ icon, iconBg = 'bg-[rgba(55,138,221,0.1)]', title, subtitle, children, footer }: SectionCardProps) {
   return (
-    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2.5">
         <div className={`w-6 h-6 rounded-lg ${iconBg} flex items-center justify-center text-sm`}>
           {icon}
@@ -275,7 +275,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
     return (
       <div className="space-y-3 animate-pulse">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-40 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+          <div key={i} className="h-40 bg-[rgb(var(--background-secondary))] rounded-xl" />
         ))}
       </div>
     )
@@ -676,7 +676,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
   const isActionable = !!activeYearId && totalDays > 0
 
   return (
-    <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(239,68,68,0.25)] rounded-xl overflow-hidden">
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(239,68,68,0.25)] rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-[rgba(239,68,68,0.18)] bg-[rgba(239,68,68,0.04)] flex items-center gap-2">
         <span aria-hidden className="text-base">⚠️</span>
         <div>
@@ -722,7 +722,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.05)]5 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(239,68,68,0.35)] rounded-2xl shadow-xl p-5">
+          <div className="relative w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgba(239,68,68,0.35)] rounded-2xl shadow-xl p-5">
             <div className="flex items-start gap-2 mb-3">
               <span aria-hidden className="text-lg">⚠️</span>
               <div>

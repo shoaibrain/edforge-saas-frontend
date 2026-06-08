@@ -66,7 +66,7 @@ export function StudentSearchInput({
   // Selected state — show the chosen student
   if (value) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))]">
+      <div className="flex items-center gap-2 px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))]">
         <div className="flex-1 min-w-0">
           <span className="text-[rgb(var(--text-primary))] font-medium">{value.studentName}</span>
           <span className="text-[rgb(var(--text-tertiary))] ml-2 text-xs">
@@ -76,7 +76,7 @@ export function StudentSearchInput({
         <button
           type="button"
           onClick={handleClear}
-          className="p-0.5 rounded hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))]"
+          className="p-0.5 rounded hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"
         >
           <X className="w-4 h-4" />
         </button>
@@ -98,12 +98,12 @@ export function StudentSearchInput({
           }}
           onFocus={() => search.length >= 2 && setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+          className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
         />
       </div>
 
       {isOpen && debouncedSearch.length >= 2 && (
-        <div className="absolute z-50 mt-1 w-full bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-popover max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-popover max-h-60 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
@@ -120,7 +120,7 @@ export function StudentSearchInput({
                   key={student.studentId}
                   type="button"
                   onClick={() => handleSelect(student)}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                  className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-[rgb(var(--background-secondary))] transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-[rgb(var(--text-primary))]">

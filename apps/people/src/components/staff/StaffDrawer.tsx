@@ -269,7 +269,7 @@ export function StaffDrawer({
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-xl bg-[rgb(var(--state-info-bg)/0.20)]">
-                      <User className="w-5 h-5 text-[rgb(var(--brand-primary))]" />
+                      <User className="w-5 h-5 text-[rgb(var(--action-primary-bg))]" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary">
                       {t('drawer.title')}
@@ -324,7 +324,7 @@ export function StaffDrawer({
                     {/* Quick Stats */}
                     <div className="grid grid-cols-3 gap-3 mt-5">
                       <div className="p-3 rounded-lg bg-surface-primary border border-border-secondary text-center">
-                        <Briefcase className="w-4 h-4 text-[rgb(var(--brand-primary))] mx-auto mb-1" />
+                        <Briefcase className="w-4 h-4 text-[rgb(var(--action-primary-bg))] mx-auto mb-1" />
                         <p className="text-sm font-bold text-text-primary truncate">
                           {t(`roles.${getRoleI18nKey(staff.role)}`, { defaultValue: staff.role })}
                         </p>
@@ -366,7 +366,7 @@ export function StaffDrawer({
                           <DetailField
                             icon={Briefcase}
                             label={t('fields.title')}
-                            accent="text-[rgb(var(--brand-primary))]"
+                            accent="text-[rgb(var(--action-primary-bg))]"
                             value={staff.title}
                           />
                         )}
@@ -386,7 +386,7 @@ export function StaffDrawer({
                         <DetailField
                           icon={Mail}
                           label={t('fields.email')}
-                          accent="text-[rgb(var(--brand-primary))]"
+                          accent="text-[rgb(var(--action-primary-bg))]"
                           value={staff.email}
                         />
                         <DetailField
@@ -462,7 +462,7 @@ export function StaffDrawer({
                             </span>
                           </>
                         ) : (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--surface-tertiary))] text-text-tertiary border border-border-secondary">
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-text-tertiary border border-border-secondary">
                             {t('systemAccess.noAccountLinked')}
                           </span>
                         )}
@@ -476,7 +476,7 @@ export function StaffDrawer({
                   <button
                     type="button"
                     onClick={handleViewFullProfile}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-secondary))] text-[rgb(var(--text-inverted))] rounded-xl font-medium text-sm transition-colors shadow-sm ${focusRing}`}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--state-info-fg))] text-[rgb(var(--text-inverted))] rounded-xl font-medium text-sm transition-colors shadow-sm ${focusRing}`}
                   >
                     {t('drawer.viewFullProfile')}
                     <ArrowRight className="w-4 h-4" />

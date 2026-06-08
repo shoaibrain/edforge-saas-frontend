@@ -249,10 +249,10 @@ function StatCard({
 
 function InboxRow({ name, role, message, time, unread }: { name: string; role: string; message: string; time: string; unread: boolean }) {
   return (
-    <Link to="/inbox" className="block hover:bg-[rgb(var(--interactive-hover))] transition-colors">
+    <Link to="/inbox" className="block hover:bg-[rgb(var(--background-tertiary))] transition-colors">
       <div className="p-4 flex items-center gap-4">
         <div className={`w-2 h-2 rounded-full ${unread ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-transparent'}`} />
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgb(var(--surface-tertiary))] to-[rgb(var(--surface-secondary))] flex items-center justify-center font-medium text-[rgb(var(--text-secondary))]">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgb(var(--background-tertiary))] to-[rgb(var(--background-secondary))] flex items-center justify-center font-medium text-[rgb(var(--text-secondary))]">
           {name.charAt(0)}
         </div>
         <div className="flex-1 min-w-0">
@@ -261,7 +261,7 @@ function InboxRow({ name, role, message, time, unread }: { name: string; role: s
               <span className={`text-sm ${unread ? 'font-semibold text-[rgb(var(--text-primary))]' : 'font-medium text-[rgb(var(--text-secondary))]'}`}>
                 {name}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
                 {role}
               </span>
             </div>

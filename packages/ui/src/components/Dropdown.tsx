@@ -37,8 +37,8 @@ export function Dropdown({
       <MenuButton
         className={cn(
           'flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-left',
-          'bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
-          'hover:bg-[rgb(var(--surface-tertiary))]',
+          'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
+          'hover:bg-[rgb(var(--background-tertiary))]',
           focusRing,
           'transition-colors duration-fast ease-standard',
           buttonClassName
@@ -59,7 +59,7 @@ export function Dropdown({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute z-50 mt-1 w-full min-w-52 origin-top-left rounded-xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
+        <MenuItems className="absolute z-50 mt-1 w-full min-w-52 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
           <div className="py-1">
             {options.map((option) => (
               <MenuItem key={option.id}>
@@ -69,7 +69,7 @@ export function Dropdown({
                     className={cn(
                       'flex items-center w-full px-3 py-2.5 text-sm',
                       focusRingInset,
-                      active ? 'bg-[rgb(var(--surface-secondary))]' : '',
+                      active ? 'bg-[rgb(var(--background-secondary))]' : '',
                       value === option.id ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-[rgb(var(--text-primary))]'
                     )}
                   >

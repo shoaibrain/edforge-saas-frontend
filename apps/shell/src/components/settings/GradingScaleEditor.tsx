@@ -89,7 +89,7 @@ export function GradingScaleEditor({
             value={scaleType}
             onChange={(e) => onScaleTypeChange(e.target.value as typeof scaleType)}
             disabled={disabled}
-            className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50"
+            className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50"
           >
             {SCALE_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -101,7 +101,7 @@ export function GradingScaleEditor({
       {/* Grade Scale Table */}
       <div className="rounded-xl border border-[rgb(var(--border-primary))] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-[rgb(var(--surface-secondary))]">
+          <thead className="bg-[rgb(var(--background-secondary))]">
             <tr>
               <th className="w-8" />
               <th className="px-4 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
@@ -141,7 +141,7 @@ export function GradingScaleEditor({
                       onChange={(e) => handleGradeChange(index, 'letter', e.target.value)}
                       disabled={disabled}
                       maxLength={3}
-                      className="w-16 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] font-medium text-center focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
+                      className="w-16 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] font-medium text-center focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
                     />
                   </td>
                   <td className="px-4 py-2">
@@ -152,7 +152,7 @@ export function GradingScaleEditor({
                       disabled={disabled}
                       min={0}
                       max={100}
-                      className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
+                      className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
                     />
                   </td>
                   <td className="px-4 py-2">
@@ -163,7 +163,7 @@ export function GradingScaleEditor({
                       disabled={disabled}
                       min={0}
                       max={100}
-                      className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
+                      className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
                     />
                   </td>
                   {scaleType === 'letter' && (
@@ -176,7 +176,7 @@ export function GradingScaleEditor({
                         min={0}
                         max={5}
                         step={0.1}
-                        className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
+                        className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
                       />
                     </td>
                   )}
@@ -234,7 +234,7 @@ export function GradingScaleEditor({
             disabled={disabled}
             min={0}
             max={100}
-            className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
+            className="w-20 px-2.5 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] disabled:opacity-50"
           />
         </div>
       </div>

@@ -50,10 +50,10 @@ export function SchoolDaysSelector({ selected, onChange, disabled }: SchoolDaysS
               transition-all duration-150 outline-none
               ${isSelected
                 ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] shadow-sm'
-                : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
+                : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
               }
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-              focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:ring-offset-2 focus:ring-offset-[rgb(var(--surface-primary))]
+              focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:ring-offset-2 focus:ring-offset-[rgb(var(--background-primary))]
             `}
             title={day.fullLabel}
           >

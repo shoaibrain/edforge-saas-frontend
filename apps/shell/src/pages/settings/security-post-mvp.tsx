@@ -149,7 +149,7 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md mx-4 p-6 rounded-2xl bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] shadow-xl"
+          className="w-full max-w-md mx-4 p-6 rounded-2xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-xl"
         >
           {step === 'setup' && (
             <>
@@ -197,18 +197,18 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
               </p>
 
               <div className="flex justify-center mb-4">
-                <div className="p-4 bg-[rgb(var(--surface-secondary))] rounded-xl">
+                <div className="p-4 bg-[rgb(var(--background-secondary))] rounded-xl">
                   {setupData.qrCodeUrl ? (
                     <img src={setupData.qrCodeUrl} alt="QR Code" className="w-48 h-48" />
                   ) : (
-                    <div className="w-48 h-48 flex items-center justify-center bg-[rgb(var(--surface-tertiary))] rounded">
+                    <div className="w-48 h-48 flex items-center justify-center bg-[rgb(var(--background-tertiary))] rounded">
                       <QrCode className="w-16 h-16 text-[rgb(var(--text-tertiary))]" />
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="mb-4 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+              <div className="mb-4 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
                 <p className="text-xs text-[rgb(var(--text-tertiary))] mb-1">
                   Or enter this code manually:
                 </p>
@@ -219,7 +219,7 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
                   <button
                     type="button"
                     onClick={handleCopySecret}
-                    className="p-1.5 rounded hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                    className="p-1.5 rounded hover:bg-[rgb(var(--background-secondary))] transition-colors"
                   >
                     {copiedCode ? (
                       <Check className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
@@ -271,12 +271,12 @@ export function MfaSetupModal({ isOpen, onClose, onSuccess }: MfaSetupModalProps
                 </p>
               </div>
 
-              <div className="mb-4 p-4 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+              <div className="mb-4 p-4 rounded-lg bg-[rgb(var(--background-tertiary))]">
                 <div className="grid grid-cols-2 gap-2">
                   {setupData.backupCodes.map((code, i) => (
                     <code
                       key={i}
-                      className="text-sm font-mono text-[rgb(var(--text-primary))] p-2 bg-[rgb(var(--surface-secondary))] rounded"
+                      className="text-sm font-mono text-[rgb(var(--text-primary))] p-2 bg-[rgb(var(--background-secondary))] rounded"
                     >
                       {code}
                     </code>
@@ -318,11 +318,11 @@ export function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps)
       className={`p-4 rounded-xl border transition-colors ${
         session.isCurrent
           ? 'bg-[rgb(var(--action-primary-bg))]/5 border-[rgb(var(--border-focus)/0.35)]'
-          : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]'
+          : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]'
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-[rgb(var(--action-primary-bg))]/10' : 'bg-[rgb(var(--surface-tertiary))]'}`}>
+        <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-[rgb(var(--action-primary-bg))]/10' : 'bg-[rgb(var(--background-tertiary))]'}`}>
           <Icon className={`w-4 h-4 ${session.isCurrent ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
         </div>
 

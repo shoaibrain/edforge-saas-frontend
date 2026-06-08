@@ -72,7 +72,7 @@ export const ToggleField = forwardRef<HTMLButtonElement, ToggleFieldProps>(
           render={({ field }) => {
             const isOn = !!field.value
 
-            const backgroundColor = isOn ? 'rgb(20, 184, 166)' : 'rgb(var(--surface-tertiary))'
+            const backgroundColor = isOn ? 'rgb(20, 184, 166)' : 'rgb(var(--background-tertiary))'
             const translateX = isOn ? sizeClasses.translateOn : sizeClasses.translateOff
 
             return (

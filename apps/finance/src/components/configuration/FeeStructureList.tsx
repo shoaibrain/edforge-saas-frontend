@@ -141,7 +141,7 @@ export function FeeStructureList({
             <button
               type="button"
               onClick={() => onEdit(row.original)}
-              className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
               aria-label="Edit fee structure"
             >
               <Pencil className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />

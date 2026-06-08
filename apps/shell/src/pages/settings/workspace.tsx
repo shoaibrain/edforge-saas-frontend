@@ -151,9 +151,9 @@ const NUMBER_FORMAT_OPTIONS = [
 // ]
 
 // COMING SOON — re-enable when Organization Branding section ships
-// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
-const SELECT_CLASS = 'min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+const SELECT_CLASS = 'min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
 // ============================================================================
 // DEFAULT SETTINGS (fallback when API data unavailable)
@@ -238,10 +238,10 @@ function TenantInfoCard({
     <motion.div variants={fadeInUp}>
       <div
         data-testid="tenant-info-card"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4"
+        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4"
       >
         <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+          <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <Building2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
@@ -595,7 +595,7 @@ export default function WorkspaceSettingsPage() {
             className={`flex items-start gap-2.5 px-3 py-2.5 rounded-lg mb-2 border text-xs ${
               isLocked
                 ? 'bg-golden-500/5 border-golden-500/20 text-golden-700 dark:text-golden-400'
-                : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-tertiary))] text-[rgb(var(--text-tertiary))]'
+                : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-tertiary))] text-[rgb(var(--text-tertiary))]'
             }`}
           >
             <Lock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
@@ -744,7 +744,7 @@ export default function WorkspaceSettingsPage() {
                 } ${lkDualDate.locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-[rgb(var(--surface-secondary))] transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-[rgb(var(--background-secondary))] transition-transform ${
                     displaySettings.regional.enableDualDateDisplay ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -772,7 +772,7 @@ export default function WorkspaceSettingsPage() {
 
         {/* Lock taxonomy + permissions hint — replaces the older single "Important" note */}
         <motion.div variants={fadeInUp} className="space-y-3">
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <Info className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-1.5">
@@ -810,7 +810,7 @@ export default function WorkspaceSettingsPage() {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <ShieldCheck className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-1.5">

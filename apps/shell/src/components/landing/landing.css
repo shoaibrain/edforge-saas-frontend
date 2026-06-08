@@ -12,13 +12,13 @@
   color: #1E293B;
 
   /* ── Theme Palette (RGB channels for alpha composition) ── */
-  --surface-primary: 250 249 246;
+  --background-primary: 250 249 246;
   /* #FAF9F6 — warm off-white base */
-  --surface-secondary: 255 255 255;
+  --background-secondary: 255 255 255;
   /* #FFFFFF — cards, elevated surfaces */
-  --surface-tertiary: 245 243 238;
+  --background-tertiary: 245 243 238;
   /* #F5F3EE — subtle depth */
-  --surface-elevated: 255 255 255;
+  --background-elevated: 255 255 255;
   /* #FFFFFF */
   --text-primary: 30 41 59;
   /* #1E293B — deep charcoal */
@@ -32,15 +32,15 @@
   /* #E2E8F0 — soft border */
   --border-secondary: 241 245 249;
   /* #F1F5F9 — whisper border */
-  --brand-primary: 249 115 22;
+  --action-primary-bg: 249 115 22;
   /* #F97316 — warm orange */
-  --brand-secondary: 42 157 143;
+  --state-info-fg: 42 157 143;
   /* #2A9D8F — teal accent */
-  --brand-accent: 245 158 11;
+  --state-warning-fg: 245 158 11;
   /* #F59E0B — amber/mustard */
-  --interactive-hover: 241 245 249;
+  --background-tertiary: 241 245 249;
   /* #F1F5F9 */
-  --interactive-active: 249 115 22;
+  --action-secondary-bg: 249 115 22;
   /* Additional landing page specific typography if needed beyond globals */
 
   /* Google-inspired Accents */

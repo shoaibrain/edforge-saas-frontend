@@ -135,7 +135,7 @@ function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
     teal: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))]  border-[rgb(var(--border-focus)/0.35)]',
     cyan: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
     golden: 'bg-golden-500/10 text-golden-700 dark:text-golden-400 border-golden-500/20',
-    slate: 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
+    slate: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
     blue: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))] border-[rgb(var(--state-info-border)/0.35)]',
     purple: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
   }
@@ -146,8 +146,8 @@ function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
       onClick={onSelect}
       className={`w-full p-4 rounded-xl border transition-all text-left group ${
         isSelected
-          ? 'border-[rgb(var(--border-focus)/0.40)] ring-1 ring-[rgb(var(--border-focus))]/20 bg-[rgb(var(--surface-secondary))]'
-          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
+          ? 'border-[rgb(var(--border-focus)/0.40)] ring-1 ring-[rgb(var(--border-focus))]/20 bg-[rgb(var(--background-secondary))]'
+          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
       }`}
     >
       <div className="flex items-start justify-between">
@@ -159,10 +159,10 @@ function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{role.name}</h3>
             <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">{role.description}</p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]">
                 {role.permissionCount} resources
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] capitalize">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] capitalize">
                 {role.category}
               </span>
             </div>
@@ -205,7 +205,7 @@ function PermissionMatrix({ selectedRole }: { selectedRole: SchoolRole }) {
                 <tr>
                   <td
                     colSpan={MATRIX_ACTIONS.length + 1}
-                    className="py-2 px-4 text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider bg-[rgb(var(--surface-tertiary))]"
+                    className="py-2 px-4 text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider bg-[rgb(var(--background-tertiary))]"
                   >
                     {category.label}
                   </td>
@@ -398,7 +398,7 @@ export default function RBACSecurityPage() {
                         placeholder="Search users..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))]"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))]"
                       />
                     </div>
                     <button
@@ -418,7 +418,7 @@ export default function RBACSecurityPage() {
                       <div className="py-8 text-center text-[rgb(var(--text-secondary))]">No users found.</div>
                     ) : (
                       filteredUsers.map((user) => (
-                        <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors">
+                        <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] flex items-center justify-center text-[rgb(var(--action-primary-fg))] font-medium">
                               {user.firstName?.charAt(0) || user.email.charAt(0)}
@@ -435,7 +435,7 @@ export default function RBACSecurityPage() {
                             <Link
                               to="/people/$"
                               params={{ _splat: `staff/${user.userId}` }}
-                              className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                              className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                             >
                               <Edit className="w-4 h-4" />
                             </Link>

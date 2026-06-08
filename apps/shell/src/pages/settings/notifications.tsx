@@ -137,7 +137,7 @@ function DigestSelector({ value, onChange, disabled }: DigestSelectorProps) {
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               ${isSelected 
                 ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))]/5' 
-                : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }
             `}
           >
@@ -414,7 +414,7 @@ export default function NotificationsPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]"
+          className="p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]"
         >
           <p className="text-sm text-[rgb(var(--text-tertiary))]">
             <strong className="text-[rgb(var(--text-secondary))]">Note:</strong>{' '}

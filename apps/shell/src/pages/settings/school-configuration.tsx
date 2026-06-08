@@ -80,7 +80,7 @@ function Section({ title, description, icon: Icon, children }: SectionProps) {
   return (
     <section className="space-y-4">
       <div className="flex items-start gap-3">
-        <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]">
+        <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
           <Icon className="w-5 h-5" />
         </div>
         <div>
@@ -115,7 +115,7 @@ function ToggleSwitch({ checked, onChange, disabled }: ToggleSwitchProps) {
       disabled={disabled}
       className={`
         relative w-11 h-6 rounded-full transition-colors
-        ${checked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--surface-tertiary))]'}
+        ${checked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--background-tertiary))]'}
         ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
         focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:ring-offset-2
       `}
@@ -123,7 +123,7 @@ function ToggleSwitch({ checked, onChange, disabled }: ToggleSwitchProps) {
       aria-checked={checked}
     >
       <motion.span
-        className="absolute top-1 left-1 w-4 h-4 bg-[rgb(var(--surface-secondary))] rounded-full shadow"
+        className="absolute top-1 left-1 w-4 h-4 bg-[rgb(var(--background-secondary))] rounded-full shadow"
         animate={{ x: checked ? 20 : 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       />
@@ -379,15 +379,15 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         {[1, 2, 3].map((i) => (
           <div key={i} className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[rgb(var(--surface-tertiary))] rounded-lg" />
+              <div className="w-9 h-9 bg-[rgb(var(--background-tertiary))] rounded-lg" />
               <div className="space-y-2">
-                <div className="h-4 w-32 bg-[rgb(var(--surface-tertiary))] rounded" />
-                <div className="h-3 w-48 bg-[rgb(var(--surface-tertiary))] rounded" />
+                <div className="h-4 w-32 bg-[rgb(var(--background-tertiary))] rounded" />
+                <div className="h-3 w-48 bg-[rgb(var(--background-tertiary))] rounded" />
               </div>
             </div>
             <div className="pl-12 space-y-4">
-              <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
-              <div className="h-10 bg-[rgb(var(--surface-tertiary))] rounded-xl" />
+              <div className="h-10 bg-[rgb(var(--background-tertiary))] rounded-xl" />
+              <div className="h-10 bg-[rgb(var(--background-tertiary))] rounded-xl" />
             </div>
           </div>
         ))}
@@ -424,7 +424,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             type="text"
             value={formState.displayName}
             onChange={(e) => updateField('displayName', e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </SettingsFieldRow>
 
@@ -432,7 +432,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           <select
             value={formState.schoolType}
             onChange={(e) => updateField('schoolType', e.target.value)}
-            className="min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
+            className="min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           >
             {SCHOOL_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -446,7 +446,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             value={formState.website}
             onChange={(e) => updateField('website', e.target.value)}
             placeholder="https://www.school.edu"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </SettingsFieldRow>
       </Section>
@@ -460,7 +460,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         {/* Render country-adaptive address fields from country config */}
         {(() => {
           const countryConfig = getCountryConfig(formState.address.country || 'USA');
-          const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all";
+          const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all";
 
           // Group address fields into rows (street1 alone, then remaining in pairs)
           const fields = countryConfig.addressFields.filter(f => f.key !== 'country');
@@ -499,14 +499,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               value={formState.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="Phone number"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
             <input
               type="email"
               value={formState.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="Email address"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
           </div>
         </SettingsFieldRow>
@@ -574,7 +574,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               min={15}
               max={120}
               disabled={isFieldLocked('periodDuration', hasActiveAcademicYear)}
-              className={`w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('periodDuration', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('periodDuration', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
             <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
           </div>
@@ -601,7 +601,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             value={formState.termStructure}
             onChange={(e) => updateField('termStructure', e.target.value)}
             disabled={isFieldLocked('academicCalendarType', hasActiveAcademicYear)}
-            className={`min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('academicCalendarType', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('academicCalendarType', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {TERM_STRUCTURE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -610,7 +610,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         </SettingsFieldRow>
 
         <SettingsFieldRow label="Grading Scale" description="Grading policies are managed in the Grades & Assessments module">
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4">
             <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
               Grading scales, category weights, and calculation rules are configured through Grading Policies in the Grades & Assessments module.
             </p>

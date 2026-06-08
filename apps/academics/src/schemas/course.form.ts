@@ -144,9 +144,9 @@ export const SUBJECT_AREA_COLORS: Record<string, { bg: string; text: string }> =
   arts: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))]' },
   physical_education: { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]', text: 'text-[rgb(var(--state-warning-fg))]' },
   technology: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
-  business: { bg: 'bg-[rgb(var(--surface-tertiary))]', text: 'text-[rgb(var(--text-secondary))]' },
+  business: { bg: 'bg-[rgb(var(--background-tertiary))]', text: 'text-[rgb(var(--text-secondary))]' },
   vocational: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
-  other: { bg: 'bg-[rgb(var(--surface-tertiary))]', text: 'text-[rgb(var(--text-secondary))]' },
+  other: { bg: 'bg-[rgb(var(--background-tertiary))]', text: 'text-[rgb(var(--text-secondary))]' },
 }
 
 export const COURSE_TYPE_COLORS: Record<string, { bg: string; text: string }> = {

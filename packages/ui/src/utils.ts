@@ -15,16 +15,16 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Shared semantic focus ring for interactive primitives.
  *
- * Uses the current theme token (`--interactive-focus`) so components stop
+ * Uses the current theme token (`--border-focus`) so components stop
  * baking raw teal utilities into their focus-visible state. Stream 2 can
  * alias this token to `--border-focus` without changing primitive code.
  */
 export const focusRing = [
   'focus-visible:outline-none',
   'focus-visible:ring-2',
-  'focus-visible:ring-[rgb(var(--interactive-focus))]',
+  'focus-visible:ring-[rgb(var(--border-focus))]',
   'focus-visible:ring-offset-2',
-  'focus-visible:ring-offset-[rgb(var(--surface-primary))]',
+  'focus-visible:ring-offset-[rgb(var(--background-primary))]',
 ].join(' ')
 
 /**
@@ -34,7 +34,7 @@ export const focusRingInset = [
   'focus-visible:outline-none',
   'focus-visible:ring-2',
   'focus-visible:ring-inset',
-  'focus-visible:ring-[rgb(var(--interactive-focus))]',
+  'focus-visible:ring-[rgb(var(--border-focus))]',
 ].join(' ')
 
 /**

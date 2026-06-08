@@ -145,7 +145,7 @@ export function InviteForm({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -20 }}
         transition={{ type: 'spring', stiffness: 280, damping: 25 }}
-        className="relative w-full max-w-lg rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-black/20"
+        className="relative w-full max-w-lg rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-2xl shadow-black/20"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
@@ -164,7 +164,7 @@ export function InviteForm({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--interactive-hover))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
@@ -296,7 +296,7 @@ export function InviteForm({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--surface-secondary))]/95 rounded-2xl"
+              className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--background-secondary))]/95 rounded-2xl"
             >
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}

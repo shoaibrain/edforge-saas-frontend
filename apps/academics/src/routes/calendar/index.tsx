@@ -55,9 +55,9 @@ const statusConfig: Record<
   },
   archived: {
     label: 'Archived',
-    bg: 'bg-[rgb(var(--surface-tertiary))] dark:bg-[rgb(var(--surface-tertiary))]0/20',
+    bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/20',
     text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
-    dot: 'bg-[rgb(var(--surface-tertiary))]0',
+    dot: 'bg-[rgb(var(--background-tertiary))]0',
   },
 }
 

@@ -628,14 +628,14 @@ function RemoteModuleError({ error, reset }: ErrorComponentProps) {
           {!isDeploymentError && (
             <button
               onClick={reset}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
             >
               Try Again
             </button>
           )}
           <a
             href="/home"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
           >
             Go Home
           </a>
@@ -728,15 +728,15 @@ function PortalPageError({ error, reset }: ErrorComponentProps) {
           </button>
           <a
             href="/home"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] hover:bg-[rgb(var(--interactive-hover))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] font-medium text-sm border border-[rgb(var(--border-primary))] transition-colors"
           >
             {t('goHome', { ns: 'common' })}
           </a>
         </div>
         {import.meta.env.DEV && error && (
-          <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))]">
+          <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">{t('developerInfo')}</summary>
-            <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] text-xs text-[rgb(var(--state-danger-fg))] font-mono overflow-x-auto max-h-40">
+            <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--state-danger-fg))] font-mono overflow-x-auto max-h-40">
               {error.message}
               {'\n\n'}
               {error.stack}

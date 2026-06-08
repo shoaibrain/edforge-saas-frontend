@@ -54,7 +54,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
                 : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]">
@@ -131,7 +131,7 @@ const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
                 : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] z-10">
@@ -242,7 +242,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
         className={cn(
           'relative flex flex-col items-center justify-center',
           'w-32 h-32 rounded-2xl border-2 border-dashed',
-          'bg-[rgb(var(--surface-tertiary))]',
+          'bg-[rgb(var(--background-tertiary))]',
           'transition-colors cursor-pointer',
           dragOver && 'bg-[rgb(var(--state-info-bg)/0.18)]'
         )}
@@ -276,7 +276,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
           </>
         ) : (
           <div className="flex flex-col items-center gap-2 text-[rgb(var(--text-tertiary))]">
-            <div className="w-12 h-12 rounded-full bg-[rgb(var(--surface-secondary))] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-[rgb(var(--background-secondary))] flex items-center justify-center">
               <Camera className="w-6 h-6" />
             </div>
             <span className="text-xs text-center">

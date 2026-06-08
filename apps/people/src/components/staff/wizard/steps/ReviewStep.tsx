@@ -31,7 +31,7 @@ function SummaryCard({ title, icon, stepIndex, children }: SummaryCardProps) {
 
   return (
     <div className="border border-[rgb(var(--border-secondary))] rounded-xl overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-secondary))]">
+      <div className="flex items-center justify-between px-4 py-3 bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-secondary))]">
         <div className="flex items-center gap-2">
           <div className="text-[rgb(var(--text-tertiary))]">{icon}</div>
           <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{title}</h4>
@@ -174,7 +174,7 @@ export function ReviewStep({ data }: WizardStepProps) {
       <div className={`flex items-center gap-3 p-4 rounded-xl border-2 ${
         createAccount
           ? 'border-[rgb(var(--border-focus)/0.35)] bg-[rgb(var(--state-info-bg)/0.12)]'
-          : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]'
+          : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]'
       }`}>
         <UserPlus className={`w-5 h-5 ${createAccount ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
         <div>

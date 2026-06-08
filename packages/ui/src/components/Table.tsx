@@ -47,7 +47,7 @@ export const TableFooter = forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      'border-t border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-tertiary))] font-medium [&>tr]:last:border-b-0',
+      'border-t border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))] font-medium [&>tr]:last:border-b-0',
       className
     )}
     {...props}
@@ -74,7 +74,7 @@ export const TableRow = forwardRef<
     <tr
       ref={ref}
       className={cn(
-        'border-b border-[rgb(var(--border-secondary))] transition-colors hover:bg-[rgb(var(--interactive-hover))] data-[state=selected]:bg-[rgb(var(--surface-tertiary))]',
+        'border-b border-[rgb(var(--border-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))] data-[state=selected]:bg-[rgb(var(--background-tertiary))]',
         isInteractive && ['cursor-pointer', focusRingInset],
         className
       )}

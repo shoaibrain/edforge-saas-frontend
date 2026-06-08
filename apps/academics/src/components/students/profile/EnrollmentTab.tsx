@@ -42,7 +42,7 @@ const statusStyles: Record<string, { bg: string; text: string }> = {
   withdrawn: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))]' },
   transferred: { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' },
   graduated: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
-  completed: { bg: 'bg-[rgb(var(--surface-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' },
+  completed: { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' },
 }
 
 function getStatusStyle(status: string) {

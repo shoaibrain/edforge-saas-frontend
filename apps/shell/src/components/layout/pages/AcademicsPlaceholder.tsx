@@ -222,7 +222,7 @@ function ActionCardComponent({ card, index, onClick }: ActionCardProps) {
       className={`group p-6 rounded-2xl bg-gradient-to-br ${colorClasses[card.color]} border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))] hover:shadow-lg transition-all duration-200 text-left w-full`}
     >
       <div className="flex items-start gap-4">
-        <div className="p-3 rounded-xl bg-[rgb(var(--surface-secondary))]">
+        <div className="p-3 rounded-xl bg-[rgb(var(--background-secondary))]">
           <Icon className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] " />
         </div>
         <div className="flex-1 min-w-0">

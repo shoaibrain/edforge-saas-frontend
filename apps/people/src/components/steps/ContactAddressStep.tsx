@@ -50,7 +50,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
               : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           {icon && (
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]">
@@ -123,7 +123,7 @@ const AnimatedSelect = React.forwardRef<HTMLSelectElement, AnimatedSelectProps>(
               : '0 0 0 0px transparent',
           }}
           transition={{ duration: 0.2 }}
-          className="relative rounded-xl border-2 bg-[rgb(var(--surface-tertiary))] overflow-hidden transition-colors"
+          className="relative rounded-xl border-2 bg-[rgb(var(--background-tertiary))] overflow-hidden transition-colors"
         >
           <select
             ref={ref}

@@ -77,7 +77,7 @@ const moduleColors: Record<string, { bg: string; icon: string }> = {
     icon: 'text-[rgb(var(--state-warning-fg))]',
   },
   settings: {
-    bg: 'bg-[rgb(var(--surface-tertiary))]',
+    bg: 'bg-[rgb(var(--background-tertiary))]',
     icon: 'text-[rgb(var(--text-secondary))]',
   },
   home: {
@@ -94,7 +94,7 @@ const moduleColors: Record<string, { bg: string; icon: string }> = {
     icon: 'text-[rgb(var(--state-danger-fg))]',
   },
   neutral: {
-    bg: 'bg-[rgb(var(--surface-tertiary))]',
+    bg: 'bg-[rgb(var(--background-tertiary))]',
     icon: 'text-[rgb(var(--text-secondary))]',
   },
 }
@@ -122,7 +122,7 @@ function PageCard({ card, index }: PageCardProps) {
       <div
         className={`
           group relative flex flex-col w-44 h-40 p-4 rounded-2xl
-          bg-[rgb(var(--surface-secondary))]
+          bg-[rgb(var(--background-secondary))]
           border border-[rgb(var(--border-primary))]
           shadow-sm hover:shadow-md
           transition-all duration-200 cursor-pointer overflow-hidden
@@ -131,7 +131,7 @@ function PageCard({ card, index }: PageCardProps) {
         `}
       >
         {/* Subtle inner glow */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--background-elevated)/0.10)] to-transparent pointer-events-none" />
 
         {/* Icon */}
         <div className={`
@@ -199,7 +199,7 @@ function StatCard({ card, index }: StatCardProps) {
       <div
         className={`
           group relative flex flex-col w-44 h-36 p-4 rounded-2xl
-          bg-[rgb(var(--surface-secondary))]
+          bg-[rgb(var(--background-secondary))]
           border border-[rgb(var(--border-primary))]
           shadow-sm
           transition-all duration-200 overflow-hidden
@@ -207,7 +207,7 @@ function StatCard({ card, index }: StatCardProps) {
         `}
       >
         {/* Subtle inner glow */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--background-elevated)/0.10)] to-transparent pointer-events-none" />
 
         {/* Icon */}
         <div className={`
@@ -277,11 +277,11 @@ function NavButton({ direction, onClick, visible }: NavButtonProps) {
             absolute top-1/2 -translate-y-1/2 z-20
             w-9 h-9 rounded-full
             flex items-center justify-center
-            bg-[rgb(var(--surface-secondary))]
+            bg-[rgb(var(--background-secondary))]
             border border-[rgb(var(--border-primary))]
             shadow-lg
             text-[rgb(var(--text-tertiary))]
-            hover:bg-[rgb(var(--interactive-hover))]
+            hover:bg-[rgb(var(--background-tertiary))]
             hover:text-[rgb(var(--text-primary))]
             transition-all duration-150
             ${direction === 'left' ? 'left-2' : 'right-2'}
@@ -408,7 +408,7 @@ function CarouselCore({ cards, cardType }: CarouselCoreProps) {
       <div
         className={`
           pointer-events-none absolute left-0 top-0 bottom-0 w-16
-          bg-gradient-to-r from-[rgb(var(--surface-primary))] via-[rgb(var(--surface-primary))]/80 to-transparent
+          bg-gradient-to-r from-[rgb(var(--background-primary))] via-[rgb(var(--background-primary))]/80 to-transparent
           transition-opacity duration-300
           ${canScrollLeft ? 'opacity-100' : 'opacity-0'}
         `}
@@ -419,7 +419,7 @@ function CarouselCore({ cards, cardType }: CarouselCoreProps) {
       <div
         className={`
           pointer-events-none absolute right-0 top-0 bottom-0 w-16
-          bg-gradient-to-l from-[rgb(var(--surface-primary))] via-[rgb(var(--surface-primary))]/80 to-transparent
+          bg-gradient-to-l from-[rgb(var(--background-primary))] via-[rgb(var(--background-primary))]/80 to-transparent
           transition-opacity duration-300
           ${canScrollRight ? 'opacity-100' : 'opacity-0'}
         `}

@@ -78,7 +78,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
   }
 
   return (
-    <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
+    <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-9 border border-[rgb(var(--border-primary))]">
       <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-1">Create Your First School</h2>
       <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
         Add a school to your organization. You can add more later.
@@ -103,7 +103,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
           type="text"
           value={name}
           onChange={(e) => { setName(e.target.value); setError(null) }}
-          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+          className="w-full px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           placeholder="e.g. Sunrise Academy"
           autoFocus
         />
@@ -122,7 +122,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
               className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
                 schoolType === type.value
                   ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--action-secondary-fg))] '
-                  : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
+                  : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }`}
             >
               {type.label}
@@ -140,7 +140,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
           <select
             value={gradeFrom}
             onChange={(e) => setGradeFrom(e.target.value)}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           >
             {GRADE_OPTIONS.map((g) => (
               <option key={g} value={g}>{g}</option>
@@ -150,7 +150,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
           <select
             value={gradeTo}
             onChange={(e) => setGradeTo(e.target.value)}
-            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
+            className="flex-1 px-3 py-2.5 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
           >
             {GRADE_OPTIONS.map((g) => (
               <option key={g} value={g}>{g}</option>

@@ -111,7 +111,7 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
           <div
             key={level}
             className={`h-1 flex-1 rounded-full transition-colors ${
-              level <= strength.score ? strength.color : 'bg-[rgb(var(--surface-tertiary))]'
+              level <= strength.score ? strength.color : 'bg-[rgb(var(--background-tertiary))]'
             }`}
           />
         ))}
@@ -367,7 +367,7 @@ function SecurityOverviewCard({
     return (
       <motion.div
         variants={fadeInUp}
-        className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+        className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -394,7 +394,7 @@ function SecurityOverviewCard({
   return (
     <motion.div
       variants={fadeInUp}
-      className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] space-y-4"
+      className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] space-y-4"
     >
       <div>
         <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Security Overview</h2>

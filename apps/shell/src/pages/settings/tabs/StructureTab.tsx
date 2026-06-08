@@ -65,7 +65,7 @@ const EMPTY_ROOM_FORM: RoomFormState = {
   description: '',
 }
 
-const inputClass = 'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 focus:border-[#1D9E75] transition-all'
+const inputClass = 'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 focus:border-[#1D9E75] transition-all'
 const labelClass = 'block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5'
 
 // ============================================================================
@@ -171,7 +171,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
       </div>
 
       {/* Department list card */}
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[rgba(127,119,221,0.1)] flex items-center justify-center text-sm">🏛️</div>
@@ -193,7 +193,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
 
         {isLoading ? (
           <div className="p-4 animate-pulse space-y-2">
-            {[1, 2, 3].map(i => <div key={i} className="h-10 bg-[rgb(var(--surface-secondary))] rounded-lg" />)}
+            {[1, 2, 3].map(i => <div key={i} className="h-10 bg-[rgb(var(--background-secondary))] rounded-lg" />)}
           </div>
         ) : filteredDepts.length > 0 ? (
           <div>
@@ -258,14 +258,14 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl overflow-hidden"
+            className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl overflow-hidden"
           >
             <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
               <div>
                 <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Create Department</h3>
                 <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">Add a new department to this school</p>
               </div>
-              <button onClick={closeModal} className="p-2 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))]">
+              <button onClick={closeModal} className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -309,7 +309,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]">
+                <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]">
                   Cancel
                 </button>
                 <button
@@ -389,7 +389,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
         </button>
       </div>
 
-      <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-[rgba(29,158,117,0.1)] flex items-center justify-center text-sm">📍</div>
           <div>
@@ -401,7 +401,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
         {isLoading ? (
           <div className="p-4 animate-pulse">
             <div className="grid grid-cols-2 gap-2">
-              {[1, 2, 3, 4].map(i => <div key={i} className="h-16 bg-[rgb(var(--surface-secondary))] rounded-lg" />)}
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-16 bg-[rgb(var(--background-secondary))] rounded-lg" />)}
             </div>
           </div>
         ) : rooms.length > 0 ? (
@@ -547,7 +547,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
         <DrawerFooter>
           <button
             onClick={closeDrawer}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]"
           >
             Cancel
           </button>

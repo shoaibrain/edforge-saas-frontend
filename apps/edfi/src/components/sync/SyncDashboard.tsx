@@ -225,7 +225,7 @@ export function SyncDashboard() {
             />
             {isGlobalSyncing && (
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgb(var(--surface-primary)/0.30)] to-transparent"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgb(var(--background-primary)/0.30)] to-transparent"
                 animate={{ x: ['-100%', '100%'] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
               />

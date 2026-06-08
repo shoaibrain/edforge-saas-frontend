@@ -40,14 +40,14 @@ const TRAINING_TYPE_COLORS: Record<string, string> = {
   assessment: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ',
   language: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
   induction: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
-  other: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] ',
+  other: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] ',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   scheduled: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   completed: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
-  cancelled: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] ',
+  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] ',
 }
 
 const fadeInUp = {
@@ -153,11 +153,11 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2].map((i) => (
-              <div key={i} className="animate-pulse h-32 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+              <div key={i} className="animate-pulse h-32 bg-[rgb(var(--background-secondary))] rounded-xl" />
             ))}
           </div>
         ) : sorted.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <GraduationCap className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Trainings</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -177,7 +177,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
               <motion.div
                 key={training.trainingId}
                 variants={fadeInUp}
-                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-focus)/0.35)] transition-all group"
+                className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-focus)/0.35)] transition-all group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 min-w-0">
@@ -240,7 +240,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
                     <button
                       onClick={() => handleEdit(training)}
-                      className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                       title="Edit training"
                     >
                       <Edit2 className="w-4 h-4" />

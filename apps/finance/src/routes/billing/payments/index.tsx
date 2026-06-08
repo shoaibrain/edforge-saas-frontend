@@ -103,7 +103,7 @@ function VoidPaymentDialog({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -118,14 +118,14 @@ function VoidPaymentDialog({
           <button
             onClick={onCancel}
             disabled={isPending}
-            className="p-1 rounded-md hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
+            className="p-1 rounded-md hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Payment details */}
-        <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
+        <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
           <div className="flex justify-between text-sm">
             <span className="text-[rgb(var(--text-secondary))]">Amount</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
@@ -173,7 +173,7 @@ function VoidPaymentDialog({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="e.g. Duplicate payment, data entry error"
-            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
           />
         </div>
@@ -288,7 +288,7 @@ function RefundPaymentDialog({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -298,14 +298,14 @@ function RefundPaymentDialog({
           <button
             onClick={onCancel}
             disabled={isPending}
-            className="p-1 rounded-md hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
+            className="p-1 rounded-md hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Payment details */}
-        <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
+        <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
           <div className="flex justify-between text-sm">
             <span className="text-[rgb(var(--text-secondary))]">Original amount</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
@@ -357,7 +357,7 @@ function RefundPaymentDialog({
               max={maxRefundable}
               min="0"
               step="0.01"
-              className={`w-full px-3 py-2 text-sm border rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 ${
+              className={`w-full px-3 py-2 text-sm border rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 ${
                 amountError
                   ? 'border-[rgb(var(--state-danger-border))] focus:ring-[rgb(var(--border-focus)/0.35)]'
                   : 'border-[rgb(var(--border-primary))] focus:ring-[rgb(var(--border-focus)/0.35)]'
@@ -379,7 +379,7 @@ function RefundPaymentDialog({
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               placeholder="Reason for refund..."
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
         </div>
@@ -454,7 +454,7 @@ function ReceiptDownloadIconButton({
         })
       }
       disabled={downloadReceipt.isPending}
-      className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
+      className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] disabled:opacity-50 disabled:cursor-not-allowed"
       // Sprint M1.5-FU.7.5 — `title=` removed; the browser-native tooltip
       // it produced orphaned in the top-left of the page when this row
       // unmounted mid-hover (Issue #22 Hypothesis 2). `aria-label` keeps
@@ -600,7 +600,7 @@ function usePaymentColumns(
                       params: { paymentId: payment.id },
                     })
                   }
-                  className="p-1.5 rounded-md hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]"
+                  className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]"
                   // Sprint M1.5-FU.7.5 — `title=` removed for the same
                   // reason as ReceiptDownloadIconButton; aria-label
                   // preserves the accessible name.

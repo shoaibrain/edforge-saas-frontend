@@ -277,7 +277,7 @@ function BrandingFileFieldInner({
         href={previewSrc}
         target="_blank"
         rel="noopener noreferrer"
-        className="aspect-video rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors flex items-center justify-center text-xs text-[rgb(var(--text-secondary))] font-medium"
+        className="aspect-video rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors flex items-center justify-center text-xs text-[rgb(var(--text-secondary))] font-medium"
       >
         <FileText className="w-4 h-4 mr-1" /> PDF
       </a>
@@ -285,12 +285,12 @@ function BrandingFileFieldInner({
       <img
         src={previewSrc}
         alt={label}
-        className="block w-full aspect-video object-contain rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]"
+        className="block w-full aspect-video object-contain rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
       />
     )
   ) : (
     <div
-      className="aspect-video rounded-md border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] flex items-center justify-center text-xs text-[rgb(var(--text-tertiary))] italic"
+      className="aspect-video rounded-md border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] flex items-center justify-center text-xs text-[rgb(var(--text-tertiary))] italic"
       role="img"
       aria-label={t('emptyField.logo', { defaultValue: 'No file uploaded' })}
     >
@@ -323,7 +323,7 @@ function BrandingFileFieldInner({
         type="button"
         onClick={triggerPicker}
         disabled={disabled || upload.isPending}
-        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {upload.isPending ? (
           <>

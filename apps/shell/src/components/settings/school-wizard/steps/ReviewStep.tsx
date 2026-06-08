@@ -87,7 +87,7 @@ function SummarySection({
   isEmpty?: boolean
 }) {
   return (
-    <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4">
+    <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4">
       <div className="flex items-center gap-2 mb-3">
         <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
         <h4 className="text-sm font-medium text-[rgb(var(--text-primary))]">{title}</h4>

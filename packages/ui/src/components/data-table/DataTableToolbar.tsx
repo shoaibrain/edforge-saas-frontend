@@ -52,7 +52,7 @@ export function DataTableToolbar<TData>({
               table.setPageIndex(0)
             }}
             className={cn(
-              'w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
+              'w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
               focusRingInset
             )}
           />
@@ -84,7 +84,7 @@ export function DataTableToolbar<TData>({
           }}
           className={cn(
             'inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium rounded-lg',
-            'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors'
+            'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors'
           )}
         >
           Reset

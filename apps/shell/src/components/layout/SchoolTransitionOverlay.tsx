@@ -53,7 +53,7 @@ export function SchoolTransitionOverlay() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className={`absolute inset-0 z-10 flex items-center justify-center bg-[rgb(var(--surface-primary))]/60 backdrop-blur-[2px] ${isStalled ? '' : 'pointer-events-none'}`}
+          className={`absolute inset-0 z-10 flex items-center justify-center bg-[rgb(var(--background-primary))]/60 backdrop-blur-[2px] ${isStalled ? '' : 'pointer-events-none'}`}
           aria-live="polite"
           aria-label="Switching school context"
         >
@@ -77,7 +77,7 @@ export function SchoolTransitionOverlay() {
                   <button
                     type="button"
                     onClick={handleDismiss}
-                    className="px-4 py-1.5 text-xs font-medium rounded-lg border border-[rgb(var(--border-secondary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+                    className="px-4 py-1.5 text-xs font-medium rounded-lg border border-[rgb(var(--border-secondary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
                   >
                     Dismiss
                   </button>

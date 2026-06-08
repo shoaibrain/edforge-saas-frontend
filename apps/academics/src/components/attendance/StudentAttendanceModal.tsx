@@ -99,7 +99,7 @@ function CalendarHeatmap({
             className={`w-full aspect-square rounded-sm ${
               day.status
                 ? statusColorMap[day.status] || 'bg-[rgb(var(--border-secondary))] '
-                : 'bg-[rgb(var(--surface-tertiary))] '
+                : 'bg-[rgb(var(--background-tertiary))] '
             }`}
             title={`${day.label}: ${day.status || 'No record'}`}
           />
@@ -112,7 +112,7 @@ function CalendarHeatmap({
           { label: 'Absent', color: 'bg-[rgb(var(--state-danger-fg))]' },
           { label: 'Late', color: 'bg-amber-400' },
           { label: 'Excused', color: 'bg-[rgb(var(--state-info-fg))]' },
-          { label: 'No Record', color: 'bg-[rgb(var(--surface-tertiary))] ' },
+          { label: 'No Record', color: 'bg-[rgb(var(--background-tertiary))] ' },
         ].map((item) => (
           <span key={item.label} className="flex items-center gap-1 text-xs text-text-tertiary">
             <span className={`w-2 h-2 rounded-sm ${item.color}`} />

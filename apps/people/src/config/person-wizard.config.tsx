@@ -35,7 +35,7 @@ import {
 // Academic Info Step - For student academic placement
 function AcademicInfoStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <GraduationCap className="w-5 h-5 text-golden-500" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Academic Placement</h3>
@@ -51,7 +51,7 @@ function AcademicInfoStep(_props: { data: Record<string, unknown>; updateData: (
 // Employment Info Step - For staff employment details
 function EmploymentInfoStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <Briefcase className="w-5 h-5 text-aqua-500" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Employment Information</h3>
@@ -67,7 +67,7 @@ function EmploymentInfoStep(_props: { data: Record<string, unknown>; updateData:
 // Credentials Step - For teacher qualifications
 function CredentialsStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <BookOpen className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Credentials & Qualifications</h3>
@@ -83,7 +83,7 @@ function CredentialsStep(_props: { data: Record<string, unknown>; updateData: (d
 // Class Assignment Step - For assigning teachers to classes
 function ClassAssignmentStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <Users className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Class Assignments</h3>
@@ -99,7 +99,7 @@ function ClassAssignmentStep(_props: { data: Record<string, unknown>; updateData
 // Department Assignment Step - For organizational structure
 function DepartmentAssignmentStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <Building className="w-5 h-5 text-amber-500" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Department Assignment</h3>
@@ -115,7 +115,7 @@ function DepartmentAssignmentStep(_props: { data: Record<string, unknown>; updat
 // Role Permissions Step - For ABAC role assignment
 function RolePermissionsStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <Shield className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Roles & Permissions</h3>
@@ -131,7 +131,7 @@ function RolePermissionsStep(_props: { data: Record<string, unknown>; updateData
 // Student Linking Step - For guardians to link to students
 function StudentLinkingStep(_props: { data: Record<string, unknown>; updateData: (data: Record<string, unknown>) => void }) {
   return (
-    <div className="p-6 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+    <div className="p-6 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
       <div className="flex items-center gap-3 mb-4">
         <GraduationCap className="w-5 h-5 text-golden-500" />
         <h3 className="font-semibold text-[rgb(var(--text-primary))]">Link to Students</h3>
@@ -153,7 +153,7 @@ function ReviewStep({ data }: { data: Record<string, unknown> }) {
           Please review the information below before submitting.
         </p>
       </div>
-      <div className="p-6 bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-primary))]">
+      <div className="p-6 bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-primary))]">
         <pre className="text-xs text-[rgb(var(--text-tertiary))] overflow-auto">
           {JSON.stringify(data, null, 2)}
         </pre>

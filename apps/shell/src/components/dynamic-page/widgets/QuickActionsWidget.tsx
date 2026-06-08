@@ -255,7 +255,7 @@ function QuickActionCard({ action }: QuickActionCardProps) {
         className={`
           relative flex flex-col h-full overflow-hidden
           rounded-2xl transition-all duration-200
-          bg-[rgb(var(--surface-primary))]
+          bg-[rgb(var(--background-primary))]
           border border-[rgb(var(--border-primary))]
           hover:border-[rgb(var(--border-secondary))]
           hover:shadow-lg
@@ -263,7 +263,7 @@ function QuickActionCard({ action }: QuickActionCardProps) {
         `}
       >
         {/* Subtle Background Gradient Overlay */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent to-[rgb(var(--surface-secondary))]" />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-transparent to-[rgb(var(--background-secondary))]" />
 
         <div className="p-5 flex flex-col h-full relative z-10">
           {/* Header: Icon & Arrow */}
@@ -275,7 +275,7 @@ function QuickActionCard({ action }: QuickActionCardProps) {
               <Icon className="w-6 h-6" />
             </div>
 
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))] opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))] opacity-0 group-hover:opacity-100 transition-all duration-300">
               <ArrowRight className="w-4 h-4" />
             </div>
           </div>

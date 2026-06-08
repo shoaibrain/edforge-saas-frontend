@@ -93,7 +93,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         {/* Input Container */}
         <div
           className={cn(
-            'relative flex items-center rounded-xl border bg-[rgb(var(--surface-secondary))] transition-all duration-200',
+            'relative flex items-center rounded-xl border bg-[rgb(var(--background-secondary))] transition-all duration-200',
             hasError 
               ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
               : isFocused 

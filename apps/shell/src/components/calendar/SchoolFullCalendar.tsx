@@ -271,7 +271,7 @@ export function SchoolFullCalendar({
 
       {/* Empty state overlay */}
       {isEmpty && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--surface-primary))]/80 rounded-xl z-10 pointer-events-auto">
+        <div className="absolute inset-0 flex items-center justify-center bg-[rgb(var(--background-primary))]/80 rounded-xl z-10 pointer-events-auto">
           <div className="text-center">
             <p className="text-sm text-[rgb(var(--text-tertiary))] mb-3">
               No calendar dates generated for this academic year.

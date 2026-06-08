@@ -40,12 +40,12 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
   const { archetype, country } = useTenantContext()
 
   return (
-    <div className="rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-primary))] overflow-hidden">
+    <div className="rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-primary))] overflow-hidden">
       {/* Header */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-[rgb(var(--background-secondary))] transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">

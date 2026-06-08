@@ -115,7 +115,7 @@ function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
         published
           ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 '
-          : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] bg-[rgb(var(--surface-tertiary))] '
+          : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-tertiary))] '
       }`}
     >
       {published ? <Lock className="w-3 h-3" /> : null}

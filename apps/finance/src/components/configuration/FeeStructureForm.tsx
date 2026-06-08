@@ -211,7 +211,7 @@ export function FeeStructureForm({
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
+      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))] flex-shrink-0">
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
@@ -220,7 +220,7 @@ export function FeeStructureForm({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
@@ -349,7 +349,7 @@ export function FeeStructureForm({
           {/* ── Enrollment Rules ── */}
           <SectionHeader title="Enrollment Rules" />
 
-          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+          <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -496,9 +496,9 @@ function GradeLevelSelect({
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="absolute z-20 mt-1 w-full bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg max-h-48 overflow-y-auto">
+          <div className="absolute z-20 mt-1 w-full bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg max-h-48 overflow-y-auto">
             {/* All Grades option */}
-            <label className="flex items-center gap-2 px-3 py-2 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer border-b border-[rgb(var(--border-primary))]">
+            <label className="flex items-center gap-2 px-3 py-2 hover:bg-[rgb(var(--background-secondary))] cursor-pointer border-b border-[rgb(var(--border-primary))]">
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -512,7 +512,7 @@ function GradeLevelSelect({
             {gradeOptions.map((grade) => (
               <label
                 key={grade}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-[rgb(var(--surface-secondary))] cursor-pointer"
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-[rgb(var(--background-secondary))] cursor-pointer"
               >
                 <input
                   type="checkbox"

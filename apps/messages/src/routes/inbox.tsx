@@ -137,14 +137,14 @@ function ConversationItem({
             onClick={onClick}
             className={`w-full text-left p-4 border-b border-[rgb(var(--border-secondary))] transition-colors ${isSelected
                 ? 'bg-[rgb(var(--state-info-bg)/0.18)]'
-                : 'hover:bg-[rgb(var(--interactive-hover))]'
+                : 'hover:bg-[rgb(var(--background-tertiary))]'
                 }`}
         >
             <div className="flex items-start gap-3">
                 <div className="relative">
                     <Avatar name={conversation.participant.name} size="md" />
                     {conversation.unread && (
-                        <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[rgb(var(--action-primary-bg))] rounded-full border-2 border-[rgb(var(--surface-secondary))]" />
+                        <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[rgb(var(--action-primary-bg))] rounded-full border-2 border-[rgb(var(--background-secondary))]" />
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -186,7 +186,7 @@ function MessageBubble({ message }: { message: typeof MOCK_MESSAGES[0] }) {
                 )}
                 <div className={`px-4 py-3 rounded-2xl ${message.isOwn
                     ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-br-md'
-                    : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] rounded-bl-md'
+                    : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] rounded-bl-md'
                     }`}>
                     <p className="text-sm">{message.content}</p>
                 </div>
@@ -259,7 +259,7 @@ export default function MessagesInboxPage() {
                                 placeholder="Search messages..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-9 pr-3 py-2 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-secondary))] rounded-lg text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] transition-all"
+                                className="w-full pl-9 pr-3 py-2 text-sm bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-secondary))] rounded-lg text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] transition-all"
                             />
                         </div>
                     </div>
@@ -330,7 +330,7 @@ export default function MessagesInboxPage() {
                                             value={messageInput}
                                             onChange={(e) => setMessageInput(e.target.value)}
                                             rows={1}
-                                            className="w-full px-4 py-2.5 text-sm bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-secondary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] resize-none"
+                                            className="w-full px-4 py-2.5 text-sm bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-secondary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] resize-none"
                                         />
                                     </div>
                                     <Button size="sm" className="flex-shrink-0">

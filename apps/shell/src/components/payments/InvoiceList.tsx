@@ -96,7 +96,7 @@ export function InvoiceList({
             className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
               ${
                 statusFilter === tab.key
-                  ? 'bg-[rgb(var(--surface-secondary))] dark:bg-[rgb(var(--bg-primary))] text-[rgb(var(--text-primary))] shadow-sm'
+                  ? 'bg-[rgb(var(--background-secondary))] dark:bg-[rgb(var(--bg-primary))] text-[rgb(var(--text-primary))] shadow-sm'
                   : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
               }`}
           >

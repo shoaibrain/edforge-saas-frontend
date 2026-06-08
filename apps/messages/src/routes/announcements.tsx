@@ -90,7 +90,7 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
   const statusColors = {
     published: 'bg-aqua-400/20 text-aqua-700 dark:text-aqua-400',
     scheduled: 'bg-golden-400/20 text-golden-600 dark:text-golden-400',
-    draft: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))]',
+    draft: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
   }
 
   const priorityColors = {
@@ -148,7 +148,7 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
             </div>
           </div>
           <Menu as="div" className="relative">
-            <MenuButton className="p-2 rounded-lg hover:bg-[rgb(var(--interactive-hover))] transition-colors">
+            <MenuButton className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors">
               <MoreHorizontal className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             </MenuButton>
             <Transition
@@ -160,10 +160,10 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <MenuItems className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
+              <MenuItems className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
                 <MenuItem>
                   {({ active }) => (
-                    <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''} text-[rgb(var(--text-primary))]`}>
+                    <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''} text-[rgb(var(--text-primary))]`}>
                       <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                       View
                     </button>
@@ -171,7 +171,7 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
                 </MenuItem>
                 <MenuItem>
                   {({ active }) => (
-                    <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''} text-[rgb(var(--text-primary))]`}>
+                    <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''} text-[rgb(var(--text-primary))]`}>
                       <Edit className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                       Edit
                     </button>
@@ -180,7 +180,7 @@ function AnnouncementCard({ announcement }: { announcement: typeof MOCK_ANNOUNCE
                 {announcement.status === 'draft' && (
                   <MenuItem>
                     {({ active }) => (
-                      <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${active ? 'bg-[rgb(var(--interactive-hover))]' : ''} text-[rgb(var(--text-primary))]`}>
+                      <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''} text-[rgb(var(--text-primary))]`}>
                         <Send className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         Publish
                       </button>
@@ -264,18 +264,18 @@ export default function AnnouncementsPage() {
             placeholder="Search announcements..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 text-sm bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus)/0.50)] transition-all"
+            className="w-full pl-11 pr-4 py-2.5 text-sm bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus)/0.50)] transition-all"
           />
         </div>
 
         {/* Status Filter */}
-        <div className="flex items-center gap-2 p-1 bg-[rgb(var(--surface-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
+        <div className="flex items-center gap-2 p-1 bg-[rgb(var(--background-tertiary))] rounded-xl border border-[rgb(var(--border-primary))]">
           {(['all', 'published', 'scheduled', 'draft'] as const).map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${statusFilter === status
-                ? 'bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] shadow-sm'
+                ? 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] shadow-sm'
                 : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
                 }`}
             >

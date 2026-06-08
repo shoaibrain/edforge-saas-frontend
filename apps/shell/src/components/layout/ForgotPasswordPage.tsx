@@ -432,7 +432,7 @@ export function ForgotPasswordPage() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md transition-colors hover:bg-[rgb(var(--surface-tertiary))]"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md transition-colors hover:bg-[rgb(var(--background-tertiary))]"
                           style={{ color: '#94A3B8' }}
                           tabIndex={-1}
                           aria-label={showPassword ? 'Hide password' : 'Show password'}

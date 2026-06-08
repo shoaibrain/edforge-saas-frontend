@@ -361,7 +361,7 @@ export function BlockDrawer({
             onChange={(e) => setForm((f) => ({ ...f, blockName: e.target.value }))}
             placeholder="e.g., Dashain 2082, Summer Vacation, Term 1 Final Exam"
             maxLength={120}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           />
           {errors.blockName && (
             <p className="mt-1 text-xs text-[rgb(var(--state-danger-fg))]">{errors.blockName}</p>
@@ -378,7 +378,7 @@ export function BlockDrawer({
             onChange={(e) =>
               setForm((f) => ({ ...f, blockDescriptor: e.target.value as CalendarBlockDescriptor }))
             }
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           >
             {DESCRIPTOR_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -436,7 +436,7 @@ export function BlockDrawer({
             placeholder="Shown in the calendar grid hover tooltip"
             maxLength={500}
             rows={2}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] resize-none"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] resize-none"
           />
         </div>
 
@@ -460,7 +460,7 @@ export function BlockDrawer({
                 }))
               }
               disabled={isEdit}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] disabled:opacity-60"
+              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] disabled:opacity-60"
             >
               {CHILD_EVENT_TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -517,7 +517,7 @@ export function BlockDrawer({
                       onChange={(e) => updateSubEvent(idx, { name: e.target.value })}
                       placeholder="Sub-event name (e.g., Mahaastami)"
                       maxLength={80}
-                      className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+                      className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                     />
                   </div>
                   <button

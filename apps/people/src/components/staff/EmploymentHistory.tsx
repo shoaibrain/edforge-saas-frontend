@@ -242,7 +242,7 @@ function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto;
     <div className="relative flex gap-4">
       {/* Timeline Line + Dot */}
       <div className="flex flex-col items-center">
-        <div className={`w-3 h-3 rounded-full ${dotColor} ring-4 ring-[rgb(var(--surface-primary))] flex-shrink-0 mt-1.5`} />
+        <div className={`w-3 h-3 rounded-full ${dotColor} ring-4 ring-[rgb(var(--background-primary))] flex-shrink-0 mt-1.5`} />
         {!isLast && (
           <div className="w-0.5 flex-1 bg-[rgb(var(--border-secondary))] mt-1" />
         )}
@@ -250,7 +250,7 @@ function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto;
 
       {/* Content */}
       <div className="pb-8 min-w-0 flex-1">
-        <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))]">
+        <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
           {/* Status Transition */}
           <div className="flex items-center gap-2 flex-wrap">
             <StaffStatusBadge status={entry.previousStatus} />
@@ -334,13 +334,13 @@ export function EmploymentHistory({
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse flex gap-4">
-                <div className="w-3 h-3 rounded-full bg-[rgb(var(--surface-secondary))] mt-1.5" />
-                <div className="flex-1 h-24 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+                <div className="w-3 h-3 rounded-full bg-[rgb(var(--background-secondary))] mt-1.5" />
+                <div className="flex-1 h-24 bg-[rgb(var(--background-secondary))] rounded-xl" />
               </div>
             ))}
           </div>
         ) : !history || history.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <History className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Employment History</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">

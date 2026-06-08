@@ -41,9 +41,9 @@ function getStatusBadge(status: string) {
     active: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 ',
     on_leave: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
     suspended: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 ',
-    terminated: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 ',
+    terminated: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--background-tertiary))]0/20 ',
   }
-  return styles[status] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 '
+  return styles[status] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--background-tertiary))]0/20 '
 }
 
 function getRoleBadge(role: string) {
@@ -54,7 +54,7 @@ function getRoleBadge(role: string) {
     counselor: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
     admin_staff: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
   }
-  return styles[role] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--surface-tertiary))]0/20 '
+  return styles[role] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--background-tertiary))]0/20 '
 }
 
 // ============================================================================
@@ -165,7 +165,7 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
           <select
             value={roleFilter ?? ''}
             onChange={(e) => setRoleFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">All Roles</option>
             {roles.map((r) => (
@@ -178,7 +178,7 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
             <button
               type="button"
               onClick={() => setRoleFilter(null)}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] rounded-lg transition-colors"
+              className="flex items-center gap-1 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--background-tertiary))] rounded-lg transition-colors"
             >
               <X className="w-3.5 h-3.5" />
               Clear

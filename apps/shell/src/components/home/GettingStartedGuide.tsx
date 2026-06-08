@@ -119,7 +119,7 @@ export function GettingStartedGuide({
 
           <button
             onClick={onDismiss}
-            className="p-1.5 rounded-lg transition-colors hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--surface-primary)/0.05)]"
+            className="p-1.5 rounded-lg transition-colors hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--background-primary)/0.05)]"
             aria-label="Dismiss getting started guide"
           >
             <X className="w-4 h-4" style={{ color: 'var(--v2-text-faint)' }} />

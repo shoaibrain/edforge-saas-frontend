@@ -203,7 +203,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="p-1 rounded hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+      className="p-1 rounded hover:bg-[rgb(var(--background-tertiary))] transition-colors"
       title="Copy to clipboard"
     >
       <AnimatePresence mode="wait">
@@ -413,7 +413,7 @@ export default function AccountPage() {
                           ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ' 
                           : userProfile.status === 'pending'
                             ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                            : 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
+                            : 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
                         }
                       `}>
                         {userProfile.status.charAt(0).toUpperCase() + userProfile.status.slice(1)}
@@ -513,7 +513,7 @@ export default function AccountPage() {
                 <SettingsDivider />
                 <motion.div variants={fadeInUp} className="space-y-3">
                   <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Account Details</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
                     <div className="space-y-1">
                       <span className="text-[rgb(var(--text-tertiary))]">User ID</span>
                       <div className="flex items-center gap-2">

@@ -104,7 +104,7 @@ export function QuickSchoolReassign({
       <div className="space-y-4 py-2">
         {/* Current Assignment Display */}
         {currentLeaName && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
             <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
               <School className="w-4 h-4 text-[rgb(var(--state-info-fg))] " />
             </div>
@@ -152,7 +152,7 @@ export function QuickSchoolReassign({
               disabled={isPending}
               className={cn(
                 'w-full px-3 py-2 rounded-lg border',
-                'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))]',
+                'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))]',
                 'text-sm text-[rgb(var(--text-primary))]',
                 'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]',
                 'disabled:opacity-50 disabled:cursor-not-allowed',

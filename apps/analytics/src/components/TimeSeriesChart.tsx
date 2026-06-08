@@ -109,7 +109,7 @@ function ChartTooltip({
     timeZone: 'UTC',
   })
   return (
-    <div className="rounded-md shadow-lg px-3 py-2 border text-xs bg-[rgb(var(--surface-elevated))] border-[rgb(var(--border-secondary))]">
+    <div className="rounded-md shadow-lg px-3 py-2 border text-xs bg-[rgb(var(--background-elevated))] border-[rgb(var(--border-secondary))]">
       <p className="text-[rgb(var(--text-tertiary))]">{dateLabel}</p>
       {row.dateSecondary && (
         <p className="text-[rgb(var(--text-tertiary))] text-xs mt-0.5">
@@ -149,7 +149,7 @@ function GranularityToggle({
           className={`px-3 py-1 text-xs font-medium transition-colors ${
             value === g
               ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]'
-              : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))]'
+              : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
           }`}
         >
           {g}
@@ -185,7 +185,7 @@ function MetricPicker({
             className={`px-2 py-0.5 rounded-full text-xs font-medium ring-1 transition-all ${
               isOn
                 ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] ring-[rgb(var(--action-primary-bg))]'
-                : 'text-[rgb(var(--text-secondary))] ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--surface-tertiary))]'
+                : 'text-[rgb(var(--text-secondary))] ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
             }`}
             style={isOn ? undefined : { color }}
           >

@@ -101,7 +101,7 @@ export function Overview() {
             description: 'Configure student accommodations',
             icon: Settings,
             href: '/special-programs/accommodations',
-            iconBg: 'bg-[rgb(var(--surface-tertiary))] group-hover:bg-[rgb(var(--interactive-hover))]',
+            iconBg: 'bg-[rgb(var(--background-tertiary))] group-hover:bg-[rgb(var(--background-tertiary))]',
             iconColor: 'text-[rgb(var(--text-secondary))]',
         },
         {

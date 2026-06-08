@@ -30,7 +30,7 @@ export function StaffRoleBadge({ role }: { role: StaffRole }) {
   const isLeadership = LEADERSHIP_ROLES.has(role)
   const style = isLeadership
     ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]'
-    : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'
+    : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'
 
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${style}`}>

@@ -121,7 +121,7 @@ function StudentInvoiceList({
             className={`w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${
               isSelected
                 ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  border-[rgb(var(--border-focus))]'
-                : 'border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-secondary))]'
+                : 'border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]'
             }`}
           >
             <div className="flex items-start gap-2.5">
@@ -335,7 +335,7 @@ export default function RecordPaymentPage() {
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium cursor-pointer transition-colors ${
                     paymentMethod === method.value
                       ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]   border-[rgb(var(--border-focus))]'
-                      : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))]'
+                      : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
                   }`}
                 >
                   <input
@@ -364,7 +364,7 @@ export default function RecordPaymentPage() {
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -379,7 +379,7 @@ export default function RecordPaymentPage() {
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
                 placeholder={paymentMethod === 'bank_transfer' ? 'Bank reference number' : 'Cheque number'}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
             </div>
           )}
@@ -393,7 +393,7 @@ export default function RecordPaymentPage() {
               type="date"
               value={paidDate}
               onChange={(e) => setPaidDate(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
@@ -407,14 +407,14 @@ export default function RecordPaymentPage() {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Optional notes about this payment..."
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
         </div>
 
         {/* Preview */}
         {parsedAmount > 0 && (
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-4 space-y-2">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-4 space-y-2">
             <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Preview</h3>
             <div className="space-y-1.5">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">

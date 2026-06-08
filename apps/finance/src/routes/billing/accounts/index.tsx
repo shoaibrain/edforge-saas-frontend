@@ -77,7 +77,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
         <button
           type="button"
           onClick={() => { void refetch() }}
-          className="mt-2 text-xs px-2 py-1 rounded border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--surface-secondary))]"
+          className="mt-2 text-xs px-2 py-1 rounded border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]"
         >
           Retry
         </button>
@@ -175,7 +175,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
         {invoices.map((invoice) => (
           <tr
             key={invoice.id}
-            className="hover:bg-[rgb(var(--surface-primary))] cursor-pointer transition-colors"
+            className="hover:bg-[rgb(var(--background-primary))] cursor-pointer transition-colors"
             onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
           >
             <td className="px-2 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] ">
@@ -283,7 +283,7 @@ function AccountDetail({
     <div className="px-4 pb-4 space-y-3">
       {/* Summary Header */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
+        <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
           <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Outstanding</p>
           <p className={`text-sm font-semibold mt-0.5 ${
             account.balance > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '
@@ -291,13 +291,13 @@ function AccountDetail({
             {format(account.balance)}
           </p>
         </div>
-        <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
+        <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
           <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {format(account.totalPaid)}
           </p>
         </div>
-        <div className="bg-[rgb(var(--surface-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
+        <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
           <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {account.lastPaymentDate ? formatDate(account.lastPaymentDate, detailSettings) : 'Never'}
@@ -310,7 +310,7 @@ function AccountDetail({
         tabs={ACCOUNT_TABS}
         activeTab={activeTab}
         onTabChange={(key) => setActiveTab(key as AccountTab)}
-        className="rounded-lg bg-[rgb(var(--surface-tertiary))] p-1"
+        className="rounded-lg bg-[rgb(var(--background-tertiary))] p-1"
       />
 
       {/* Tab Content */}
@@ -362,7 +362,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
       const account = row.original
       return (
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--surface-tertiary))]">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
             <img
               src={getAvatarUrl(account.studentId)}
               alt={account.studentName || 'Student'}

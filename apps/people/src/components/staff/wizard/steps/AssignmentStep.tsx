@@ -352,7 +352,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
         animate={{
           borderColor: isOvercommitted ? 'rgb(185, 62, 3)' : 'rgb(var(--border-secondary))',
         }}
-        className="flex items-center justify-between p-4 rounded-xl border-2 bg-[rgb(var(--surface-secondary))]"
+        className="flex items-center justify-between p-4 rounded-xl border-2 bg-[rgb(var(--background-secondary))]"
       >
         <div className="flex items-center gap-2">
           {isOvercommitted && <AlertTriangle className="w-4 h-4 text-rust-500" />}

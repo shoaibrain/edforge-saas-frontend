@@ -164,7 +164,7 @@ export default function InvoiceDetailPage() {
 
       {/* Line Items */}
       <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-        <div className="bg-[rgb(var(--surface-secondary))] px-4 py-2.5 border-b border-[rgb(var(--border-primary))]">
+        <div className="bg-[rgb(var(--background-secondary))] px-4 py-2.5 border-b border-[rgb(var(--border-primary))]">
           <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Line Items</h2>
         </div>
         <table className="w-full">
@@ -200,7 +200,7 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* Totals */}
-      <div className="bg-[rgb(var(--surface-secondary))] rounded-lg p-4 space-y-2">
+      <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-4 space-y-2">
         <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
           <span>Subtotal</span>
           <span>{format(invoice.subtotal ?? 0)}</span>
@@ -234,7 +234,7 @@ export default function InvoiceDetailPage() {
       {/* Payment History */}
       {paymentsList.length > 0 && (
         <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
-          <div className="bg-[rgb(var(--surface-secondary))] px-4 py-2.5 border-b border-[rgb(var(--border-primary))]">
+          <div className="bg-[rgb(var(--background-secondary))] px-4 py-2.5 border-b border-[rgb(var(--border-primary))]">
             <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Payment History</h2>
           </div>
           <div className="divide-y divide-[rgb(var(--border-primary))]">
@@ -332,7 +332,7 @@ export default function InvoiceDetailPage() {
           }
 
           /* Light background for totals section */
-          .bg-\\[rgb\\(var\\(--surface-secondary\\)\\)\\] {
+          .bg-\\[rgb\\(var\\(--background-secondary\\)\\)\\] {
             background: #f9fafb !important;
           }
 
@@ -385,7 +385,7 @@ function CancelInvoiceDialog({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
       >
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] ">
@@ -411,7 +411,7 @@ function CancelInvoiceDialog({
             onChange={(e) => setReason(e.target.value)}
             placeholder="Enter the reason for cancelling this invoice..."
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+            className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
           />
         </div>

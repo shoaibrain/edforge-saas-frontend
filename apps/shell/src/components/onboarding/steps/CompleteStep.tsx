@@ -155,7 +155,7 @@ export function CompleteStep({ data, clearSession }: CompleteStepProps) {
 
       {/* Summary */}
       {summaryItems.length > 0 && (
-        <div className="bg-[rgb(var(--surface-secondary))] rounded-2xl p-5 border border-[rgb(var(--border-primary))] mb-8 text-left">
+        <div className="bg-[rgb(var(--background-secondary))] rounded-2xl p-5 border border-[rgb(var(--border-primary))] mb-8 text-left">
           {summaryItems.map((item, i) => (
             <div
               key={i}
@@ -174,7 +174,7 @@ export function CompleteStep({ data, clearSession }: CompleteStepProps) {
           <button
             key={card.path}
             onClick={() => navigate({ to: card.path as any })}
-            className="p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.40)] transition-all text-left group"
+            className="p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.40)] transition-all text-left group"
           >
             <span className="text-xl mb-2 block">{card.icon}</span>
             <p className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-0.5 group-hover:text-[rgb(var(--action-secondary-fg))] dark:group-hover:text-[rgb(var(--text-primary))] transition-colors">

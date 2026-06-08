@@ -706,10 +706,10 @@ export function ClassroomDetailPage() {
             <div className="flex items-center gap-2">
               <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                 section.isActive
-                  ? 'bg-[rgb(var(--surface-primary)/0.20)] text-[rgb(var(--action-primary-fg))]'
+                  ? 'bg-[rgb(var(--background-primary)/0.20)] text-[rgb(var(--action-primary-fg))]'
                   : 'bg-[rgb(var(--background-overlay)/0.20)] text-[rgb(var(--action-primary-fg))]/80'
               }`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--surface-secondary))]' : 'bg-[rgb(var(--surface-primary)/0.50)]'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--background-secondary))]' : 'bg-[rgb(var(--background-primary)/0.50)]'}`} />
                 {section.isActive ? 'Active' : 'Inactive'}
               </div>
               {schedPerms.edit && (
@@ -735,12 +735,12 @@ export function ClassroomDetailPage() {
 
           {/* Compact inline badges: enrollment + room */}
           <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--surface-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--background-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
               <Users className="w-3 h-3" />
               {section.currentEnrollment}/{section.maxEnrollment} students ({percent}%)
             </span>
             {(section.locationRoomNumber || section.roomNumber) && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--surface-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--background-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
                 <MapPin className="w-3 h-3" />
                 {section.locationRoomNumber || section.roomNumber}
               </span>

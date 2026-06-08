@@ -90,7 +90,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
       inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
       ${status === 'planning' && 'bg-golden-500/10 text-golden-700 dark:text-golden-400'}
       ${status === 'active' && 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))] '}
-      ${status === 'completed' && 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'}
+      ${status === 'completed' && 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'}
     `}>
       <Icon className="w-3 h-3" />
       {config.label}
@@ -179,7 +179,7 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
                 flex-1 p-4 rounded-xl border transition-all
                 ${isActive
                   ? 'bg-[rgb(var(--action-primary-bg))]/5 border-[rgb(var(--border-focus)/0.35)] shadow-sm'
-                  : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
+                  : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
                 }
               `}>
                 <div className="flex items-start justify-between">
@@ -281,7 +281,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6"
+        className="relative w-full max-w-lg bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6"
       >
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Create Academic Year</h2>
 
@@ -327,7 +327,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
               onChange={(e) => setName(e.target.value)}
               required
               placeholder={calendarSystem === 'bikram_sambat' ? 'e.g., 2082-2083' : 'e.g., 2025-2026'}
-              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
+              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
             />
             {calendarSystem === 'bikram_sambat' && (
               <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
@@ -337,7 +337,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
           </div>
 
           {/* Info */}
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <AlertCircle className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
               The academic year will be created in "Planning" status with no
@@ -351,7 +351,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
             >
               Cancel
             </button>
@@ -417,7 +417,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6"
+        className="relative w-full max-w-lg bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6"
       >
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -443,7 +443,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
               required
               disabled={!canEdit}
               placeholder="e.g., 2025-2026"
-              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -472,7 +472,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
 
           {/* Info for locked years */}
           {!canEdit && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
               <Lock className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
               <p className="text-xs text-[rgb(var(--text-tertiary))]">
                 This academic year is {year.status} and cannot be modified.
@@ -483,7 +483,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
 
           {/* Info for planning years */}
           {canEdit && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--surface-tertiary))]">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
               <AlertCircle className="w-4 h-4 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
               <p className="text-xs text-[rgb(var(--text-tertiary))]">
                 Once this year is activated, dates will be locked and cannot be changed.
@@ -495,7 +495,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
             >
               {canEdit ? 'Cancel' : 'Close'}
             </button>
@@ -537,7 +537,7 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: A
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] rounded-2xl shadow-xl p-6"
+        className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6"
       >
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-full bg-golden-500/10">
@@ -570,7 +570,7 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: A
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-secondary))] transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
             >
               Cancel
             </button>
@@ -945,7 +945,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
               <motion.div
                 key={year.id}
                 variants={fadeInUp}
-                className="p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-golden-500/30 transition-all cursor-pointer"
+                className="p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] hover:border-golden-500/30 transition-all cursor-pointer"
                 onClick={() => setYearToEdit(year)}
               >
                 <div className="flex items-center justify-between">
@@ -966,7 +966,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => setYearToEdit(year)}
-                      className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                       title="Edit academic year"
                     >
                       <Edit className="w-4 h-4" />
@@ -1025,7 +1025,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
       {/* Info Note */}
       {displayYears.length > 0 && (
         <motion.div variants={fadeInUp}>
-          <div className="flex items-start gap-3 p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
             <AlertCircle className="w-5 h-5 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div className="text-sm text-[rgb(var(--text-tertiary))]">
               <strong className="text-[rgb(var(--text-secondary))]">Note:</strong> Academic years cannot be deleted once created. 
@@ -1039,7 +1039,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
       {/* Empty State */}
       {displayYears.length === 0 && (
         <div className="text-center py-12">
-          <div className="p-4 rounded-full bg-[rgb(var(--surface-tertiary))] inline-flex mb-4">
+          <div className="p-4 rounded-full bg-[rgb(var(--background-tertiary))] inline-flex mb-4">
             <Calendar className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
           </div>
           <h3 className="font-medium text-[rgb(var(--text-primary))] mb-1">No Academic Years</h3>

@@ -63,7 +63,7 @@ export function Avatar({
     <div
       className={cn(
         avatarVariants({ size, shape }),
-        'bg-[rgb(var(--surface-tertiary))]',
+        'bg-[rgb(var(--background-tertiary))]',
         className
       )}
     >

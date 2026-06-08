@@ -195,7 +195,7 @@ export function SchoolAssignmentManager({
           'fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
           'w-full max-w-4xl max-h-[85vh] overflow-hidden',
           'rounded-2xl border border-[rgb(var(--border-primary))]',
-          'bg-[rgb(var(--surface-primary))] shadow-2xl'
+          'bg-[rgb(var(--background-primary))] shadow-2xl'
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -216,14 +216,14 @@ export function SchoolAssignmentManager({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+            className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           </button>
         </div>
 
         {/* Filters and Search */}
-        <div className="flex items-center gap-3 p-4 border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
+        <div className="flex items-center gap-3 p-4 border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
           {/* Search */}
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -234,7 +234,7 @@ export function SchoolAssignmentManager({
               onChange={(e) => setSearchTerm(e.target.value)}
               className={cn(
                 'w-full pl-9 pr-3 py-2 text-sm rounded-lg border',
-                'bg-[rgb(var(--surface-primary))] border-[rgb(var(--border-primary))]',
+                'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))]',
                 'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
                 'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]'
               )}
@@ -249,7 +249,7 @@ export function SchoolAssignmentManager({
               onChange={(e) => setFilterType(e.target.value)}
               className={cn(
                 'px-3 py-2 text-sm rounded-lg border',
-                'bg-[rgb(var(--surface-primary))] border-[rgb(var(--border-primary))]',
+                'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))]',
                 'text-[rgb(var(--text-primary))]',
                 'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]'
               )}
@@ -314,7 +314,7 @@ export function SchoolAssignmentManager({
             </div>
           ) : (
             <table className="w-full">
-              <thead className="sticky top-0 bg-[rgb(var(--surface-secondary))] border-b border-[rgb(var(--border-primary))]">
+              <thead className="sticky top-0 bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))]">
                 <tr>
                   <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
                     <input
@@ -382,7 +382,7 @@ export function SchoolAssignmentManager({
                           disabled={assignMutation.isPending}
                           className={cn(
                             'w-full px-2 py-1.5 text-sm rounded border',
-                            'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]',
+                            'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]',
                             'text-[rgb(var(--text-primary))]',
                             'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',
                             'disabled:opacity-50 disabled:cursor-not-allowed'

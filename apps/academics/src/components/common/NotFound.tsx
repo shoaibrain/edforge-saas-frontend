@@ -98,7 +98,7 @@ export function NotFound({
     <div className="min-h-[60vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
         {/* Icon */}
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[rgb(var(--surface-tertiary))] to-[rgb(var(--surface-secondary))] flex items-center justify-center">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[rgb(var(--background-tertiary))] to-[rgb(var(--background-secondary))] flex items-center justify-center">
           <FileQuestion className="w-10 h-10 text-[rgb(var(--text-tertiary))]" />
         </div>
 

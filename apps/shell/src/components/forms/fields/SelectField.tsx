@@ -110,7 +110,7 @@ export function SelectField({
         disabled={disabled}
         className={cn(
           'relative w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border',
-          'bg-[rgb(var(--surface-secondary))] text-left transition-all duration-200',
+          'bg-[rgb(var(--background-secondary))] text-left transition-all duration-200',
           'focus:outline-none',
           hasError 
             ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
@@ -154,7 +154,7 @@ export function SelectField({
             transition={{ duration: 0.15 }}
             className={cn(
               'absolute z-50 w-full mt-1 py-1 rounded-xl border',
-              'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))]',
+              'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]',
               'shadow-xl shadow-black/10 dark:shadow-black/30',
               'max-h-60 overflow-auto scrollbar-thin'
             )}
@@ -175,7 +175,7 @@ export function SelectField({
                     'transition-colors duration-150',
                     isSelected 
                       ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ' 
-                      : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))]',
+                      : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))]',
                     option.disabled && 'opacity-50 cursor-not-allowed'
                   )}
                   role="option"

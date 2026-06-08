@@ -77,7 +77,7 @@ export function MfeNotFoundBoundary({ mfe }: MfeNotFoundBoundaryProps) {
       </h1>
       <p className="text-sm text-[rgb(var(--text-secondary))] max-w-md mb-1">
         We couldn&apos;t find anything at{' '}
-        <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--surface-tertiary))]">
+        <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))]">
           {attemptedPath}
         </code>
         .

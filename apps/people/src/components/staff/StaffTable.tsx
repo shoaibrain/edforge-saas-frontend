@@ -36,8 +36,8 @@ const EMPLOYMENT_STYLES: Record<string, string> = {
   on_leave: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
   suspended: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
   terminated: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
-  retired: 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]',
-  resigned: 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]',
+  retired: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
+  resigned: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
 }
 
 function getEmploymentLabel(status?: string): string {
@@ -114,7 +114,7 @@ export function StaffTable({
           const status = row.original.employmentStatus
           const isActive = status === 'active'
           return (
-            <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-xs font-medium ${isActive ? 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]' : 'bg-[rgb(var(--surface-tertiary))] text-[var(--v2-text-hint)]'}`}>
+            <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-xs font-medium ${isActive ? 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]' : 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]'}`}>
               <span
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${isActive ? 'bg-[var(--v2-success)]' : 'bg-[var(--v2-text-hint)]'}`}
               />
@@ -227,7 +227,7 @@ function ActionBtn({
       title={title}
       aria-label={title}
       onClick={onClick}
-      className={`flex h-7 w-7 items-center justify-center rounded-md text-[var(--v2-text-hint)] transition-colors hover:bg-[rgb(var(--surface-tertiary))] hover:text-[var(--v2-text-secondary)] ${focusRingInset}`}
+      className={`flex h-7 w-7 items-center justify-center rounded-md text-[var(--v2-text-hint)] transition-colors hover:bg-[rgb(var(--background-tertiary))] hover:text-[var(--v2-text-secondary)] ${focusRingInset}`}
     >
       {icon}
     </button>

@@ -184,7 +184,7 @@ function QuickActionCard({ action, index, onClick }: QuickActionCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 + index * 0.05 }}
       onClick={onClick}
-      className="group p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))] hover:shadow-md transition-all duration-200 text-left w-full"
+      className="group p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))] hover:shadow-md transition-all duration-200 text-left w-full"
     >
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/10 to-[rgb(var(--action-primary-bg-hover))]/10 group-hover:from-[rgb(var(--action-primary-bg))]/20 group-hover:to-[rgb(var(--action-primary-bg-hover))]/20 transition-colors">
@@ -284,7 +284,7 @@ export default function HomePage() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + index * 0.05 }}
-                  className="flex items-center gap-4 p-4 hover:bg-[rgb(var(--interactive-hover))] transition-colors cursor-pointer"
+                  className="flex items-center gap-4 p-4 hover:bg-[rgb(var(--background-tertiary))] transition-colors cursor-pointer"
                 >
                   <div className="p-2.5 rounded-xl bg-golden-500/10">
                     <Calendar className="w-5 h-5 text-golden-500" />
@@ -321,7 +321,7 @@ export default function HomePage() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.35 + index * 0.05 }}
-                  className="flex items-center gap-4 p-4 hover:bg-[rgb(var(--interactive-hover))] transition-colors cursor-pointer"
+                  className="flex items-center gap-4 p-4 hover:bg-[rgb(var(--background-tertiary))] transition-colors cursor-pointer"
                 >
                   <div className="p-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))]/10">
                     <TrendingUp className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />

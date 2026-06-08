@@ -255,13 +255,13 @@ export function ReviewStep({ data }: WizardStepProps) {
             {guardians.map((g, i) => (
               <div
                 key={i}
-                className="rounded-lg bg-[rgb(var(--surface-secondary))] p-4"
+                className="rounded-lg bg-[rgb(var(--background-secondary))] p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
                     {display(g.firstName)} {display(g.lastName)}
                   </span>
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--surface-primary))] text-[rgb(var(--text-secondary))]">
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]">
                     {labelFor(g.relationship, RELATIONSHIP_OPTIONS)}
                   </span>
                   {g.isPrimary && (

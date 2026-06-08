@@ -186,7 +186,7 @@ function EventCard({ event, index }: EventCardProps) {
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="group flex items-start gap-3 p-3 rounded-xl hover:bg-[rgb(var(--interactive-hover))] transition-colors cursor-pointer"
+      className="group flex items-start gap-3 p-3 rounded-xl hover:bg-[rgb(var(--background-tertiary))] transition-colors cursor-pointer"
     >
       {/* Event Icon */}
       <div className={`
@@ -209,7 +209,7 @@ function EventCard({ event, index }: EventCardProps) {
 
         <div className="flex items-center gap-2 mt-1 text-xs text-[rgb(var(--text-tertiary))]">
           {event.platform && (
-            <span className="px-1.5 py-0.5 rounded bg-[rgb(var(--surface-tertiary))]">
+            <span className="px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))]">
               {getPlatformLabel(event.platform)}
             </span>
           )}
@@ -256,7 +256,7 @@ function DayGroup({ dateKey, events, dayIndex }: DayGroupProps) {
           px-2.5 py-1 rounded-lg text-xs font-semibold
           ${isToday
             ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  '
-            : 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'
+            : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'
           }
         `}>
           {relativeDate}
@@ -298,7 +298,7 @@ export function UpcomingEventsSection({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="p-8 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] text-center"
+        className="p-8 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] text-center"
       >
         <Calendar className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))]" />
         <p className="text-[rgb(var(--text-secondary))]">No upcoming events</p>
@@ -338,7 +338,7 @@ export function UpcomingEventsSection({
         {dayGroups.map(([dateKey, dayEvents], dayIndex) => (
           <div
             key={dateKey}
-            className="p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]"
+            className="p-4 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]"
           >
             <DayGroup dateKey={dateKey} events={dayEvents} dayIndex={dayIndex} />
           </div>

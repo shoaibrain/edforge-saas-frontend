@@ -14,11 +14,11 @@ const buttonVariants = cva(
         primary:
           'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] active:bg-[rgb(var(--action-primary-bg-active))] shadow-sm',
         secondary:
-          'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-elevated))] active:opacity-80',
+          'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-elevated))] active:opacity-80',
         outline:
-          'border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-tertiary))] active:opacity-80',
+          'border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] active:opacity-80',
         ghost:
-          'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
+          'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] active:opacity-80',
         danger:
           'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95 active:brightness-90 shadow-sm',
         link: 'text-[rgb(var(--action-secondary-fg))] underline-offset-4 hover:underline',

@@ -27,7 +27,7 @@ const confidenceStyles = {
     label: 'Medium',
   },
   low: {
-    badge: 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
+    badge: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
     label: 'Low',
   },
 }
@@ -134,10 +134,10 @@ export function DuplicateWarning({
               return (
                 <div
                   key={match.studentId}
-                  className="flex items-center justify-between p-3 rounded-lg bg-[rgb(var(--surface-primary))]/60 border border-[rgb(var(--border-tertiary))]"
+                  className="flex items-center justify-between p-3 rounded-lg bg-[rgb(var(--background-primary))]/60 border border-[rgb(var(--border-tertiary))]"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-[rgb(var(--surface-tertiary))] flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[rgb(var(--background-tertiary))] flex items-center justify-center flex-shrink-0">
                       <User className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                     </div>
                     <div className="min-w-0">

@@ -43,8 +43,8 @@ export function LanguageSwitcher({
           'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors',
           focusRing,
           variant === 'default'
-            ? 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--interactive-hover))] border border-[rgb(var(--border-secondary))]'
-            : 'text-[rgb(var(--text-inverted)/0.80)] hover:text-[rgb(var(--text-inverted))] hover:bg-[rgb(var(--surface-primary)/0.10)]'
+            ? 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-secondary))]'
+            : 'text-[rgb(var(--text-inverted)/0.80)] hover:text-[rgb(var(--text-inverted))] hover:bg-[rgb(var(--background-primary)/0.10)]'
         )}
         aria-label="Change language"
       >
@@ -64,7 +64,7 @@ export function LanguageSwitcher({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute right-0 z-50 mt-1.5 w-40 origin-top-right rounded-xl bg-[rgb(var(--surface-elevated))] shadow-popover ring-1 ring-[rgb(var(--border-secondary))] border border-[rgb(var(--border-secondary))] focus:outline-none overflow-hidden">
+        <MenuItems className="absolute right-0 z-50 mt-1.5 w-40 origin-top-right rounded-xl bg-[rgb(var(--background-elevated))] shadow-popover ring-1 ring-[rgb(var(--border-secondary))] border border-[rgb(var(--border-secondary))] focus:outline-none overflow-hidden">
           <div className="py-1">
             {LANGUAGES.map((lang) => (
               <MenuItem key={lang.code}>
@@ -75,7 +75,7 @@ export function LanguageSwitcher({
                     className={cn(
                       'flex items-center gap-2.5 w-full px-3 py-2 text-sm',
                       focusRingInset,
-                      focus && 'bg-[rgb(var(--interactive-hover))]',
+                      focus && 'bg-[rgb(var(--background-tertiary))]',
                       i18n.language === lang.code
                         ? 'text-[rgb(var(--action-secondary-fg))] font-medium'
                         : 'text-[rgb(var(--text-primary))]'

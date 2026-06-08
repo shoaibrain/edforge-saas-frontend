@@ -143,7 +143,7 @@ export function Overview() {
           <button
             type="button"
             onClick={() => modal.openCreate()}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-lg bg-[rgb(var(--brand-primary))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--brand-secondary))] ${focusRing}`}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
           >
             <UserPlus className="h-3.5 w-3.5" />
             Add Staff Member
@@ -162,11 +162,11 @@ export function Overview() {
           {stats.teachers} teacher{stats.teachers !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span className="font-medium text-[rgb(var(--brand-secondary))]">
+        <span className="font-medium text-[rgb(var(--state-info-fg))]">
           {stats.principals} principal{stats.principals !== 1 ? 's' : ''}
         </span>
         {' · '}
-        <span className="font-medium text-[rgb(var(--brand-primary))]">
+        <span className="font-medium text-[rgb(var(--action-primary-bg))]">
           {stats.withAccess} with system access enabled
         </span>
       </Text>

@@ -34,7 +34,7 @@ const LEAVE_STATUS_COLORS: Record<string, string> = {
   pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   approved: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
   rejected: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
-  cancelled: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] ',
+  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] ',
   in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   completed: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ',
 }
@@ -59,7 +59,7 @@ const LEAVE_TYPE_COLORS: Record<string, string> = {
   annual: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   sick: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
   personal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
-  bereavement: 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))] ',
+  bereavement: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] ',
   maternity: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] ',
   paternity: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   family_medical: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] ',
@@ -195,7 +195,7 @@ export function LeaveManagement({
       {/* Leave Balance Summary */}
       {leaveSummary && (
         <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
                 <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))] " />
@@ -206,7 +206,7 @@ export function LeaveManagement({
               </div>
             </div>
           </div>
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]">
                 <CalendarCheck2 className="w-4 h-4 text-[rgb(var(--state-success-fg))] " />
@@ -217,7 +217,7 @@ export function LeaveManagement({
               </div>
             </div>
           </div>
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-amber-500/10">
                 <Hourglass className="w-4 h-4 text-amber-600 dark:text-amber-400" />
@@ -228,7 +228,7 @@ export function LeaveManagement({
               </div>
             </div>
           </div>
-          <div className="bg-[rgb(var(--surface-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
+          <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg))]0/10">
                 <CalendarX2 className="w-4 h-4 text-[rgb(var(--state-danger-fg))] " />
@@ -247,11 +247,11 @@ export function LeaveManagement({
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--surface-secondary))] rounded-xl" />
+              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--background-secondary))] rounded-xl" />
             ))}
           </div>
         ) : !requests || requests.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--surface-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
+          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <CalendarDays className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
             <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Leave Requests</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
@@ -262,7 +262,7 @@ export function LeaveManagement({
           <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-secondary))]">
             <table className="w-full">
               <thead>
-                <tr className="bg-[rgb(var(--surface-tertiary))]">
+                <tr className="bg-[rgb(var(--background-tertiary))]">
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Type</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Dates</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Duration</th>
@@ -278,11 +278,11 @@ export function LeaveManagement({
                   return (
                     <tr
                       key={request.leaveId}
-                      className="bg-[rgb(var(--surface-secondary))] hover:bg-[rgb(var(--surface-tertiary))] transition-colors"
+                      className="bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                     >
                       {/* Type */}
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAVE_TYPE_COLORS[request.leaveType] || 'bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAVE_TYPE_COLORS[request.leaveType] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
                           {LEAVE_TYPE_LABELS[request.leaveType] || request.leaveType}
                         </span>
                       </td>
@@ -350,7 +350,7 @@ export function LeaveManagement({
                             {(request.status === 'pending' || request.status === 'approved') && (
                               <button
                                 onClick={() => handleCancel(request.leaveId)}
-                                className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
                                 title="Cancel"
                               >
                                 <Ban className="w-4 h-4" />

@@ -64,13 +64,13 @@ function getStatusBadge(status: string) {
     case 'active':
       return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] ', text: 'text-[rgb(var(--state-success-fg))] ', icon: CheckCircle2 }
     case 'inactive':
-      return { bg: 'bg-[rgb(var(--surface-tertiary))] dark:bg-[rgb(var(--surface-tertiary))]0/20', text: 'text-[rgb(var(--text-secondary))] ', icon: UserX }
+      return { bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/20', text: 'text-[rgb(var(--text-secondary))] ', icon: UserX }
     case 'suspended':
       return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]', icon: ShieldAlert }
     case 'pending':
       return { bg: 'bg-amber-100 dark:bg-amber-500/20', text: 'text-amber-700 dark:text-amber-400', icon: Clock }
     default:
-      return { bg: 'bg-[rgb(var(--surface-tertiary))] dark:bg-[rgb(var(--surface-tertiary))]0/20', text: 'text-[rgb(var(--text-secondary))] ', icon: Clock }
+      return { bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/20', text: 'text-[rgb(var(--text-secondary))] ', icon: Clock }
   }
 }
 
@@ -99,7 +99,7 @@ function StatCard({
   return (
     <motion.div
       variants={fadeInUp}
-      className="bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] rounded-xl p-4"
+      className="bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-xl p-4"
     >
       <div className="flex items-center gap-3">
         <div className={`p-2.5 rounded-lg ${color}`}>
@@ -139,7 +139,7 @@ function ChangeRoleModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Change Role</h3>
@@ -159,7 +159,7 @@ function ChangeRoleModal({
         <select
           value={newRole}
           onChange={(e) => setNewRole(e.target.value as GlobalRole)}
-          className="w-full px-3 py-2.5 bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] mb-6"
+          className="w-full px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] mb-6"
         >
           {ROLE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -249,7 +249,7 @@ function ConfirmActionModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[rgb(var(--surface-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
+        className="bg-[rgb(var(--background-primary))] rounded-xl border border-[rgb(var(--border-primary))] shadow-xl w-full max-w-md mx-4 p-6"
       >
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20">
@@ -316,7 +316,7 @@ function UserActionsDropdown({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="absolute right-0 top-full mt-1 z-50 w-48 bg-[rgb(var(--surface-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg py-1"
+              className="absolute right-0 top-full mt-1 z-50 w-48 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg py-1"
             >
               <button
                 type="button"
@@ -561,14 +561,14 @@ export default function PeopleSettingsPage() {
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2.5 bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+            className="px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">All Roles</option>
             {ROLE_OPTIONS.map((opt) => (
@@ -579,7 +579,7 @@ export default function PeopleSettingsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+            className="px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">All Statuses</option>
             {STATUS_OPTIONS.map((opt) => (

@@ -106,7 +106,7 @@ function SessionTimeline({
   if (totalMs <= 0) return null
 
   return (
-    <div className="relative h-8 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] overflow-hidden">
+    <div className="relative h-8 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] overflow-hidden">
       {sessions.map((s) => {
         const startMs = Math.max(0, new Date(s.beginDate).getTime() - new Date(yearStart).getTime())
         const endMs = Math.min(totalMs, new Date(s.endDate).getTime() - new Date(yearStart).getTime())
@@ -193,7 +193,7 @@ function SessionForm({
             value={form.sessionName}
             onChange={(e) => setForm(f => ({ ...f, sessionName: e.target.value }))}
             placeholder="e.g., Fall 2026"
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5"
             required
           />
         </div>
@@ -202,7 +202,7 @@ function SessionForm({
           <select
             value={form.termDescriptor}
             onChange={(e) => setForm(f => ({ ...f, termDescriptor: e.target.value }))}
-            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] px-3 py-2.5"
+            className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5"
             required
           >
             <option value="">Select term...</option>
@@ -442,7 +442,7 @@ export function SessionManager({
             <motion.div
               key={session.academicSessionId}
               layout
-              className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]/30 overflow-hidden"
+              className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]/30 overflow-hidden"
             >
               {isEditing ? (
                 <div className="p-4">
@@ -501,7 +501,7 @@ export function SessionManager({
                         <span className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">
                           {session.sessionName}
                         </span>
-                        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))] px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))] px-1.5 py-0.5 rounded">
                           {getTermLabel(session.termDescriptor)}
                         </span>
                       </div>
@@ -523,7 +523,7 @@ export function SessionManager({
                   <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                     <button
                       onClick={() => { setEditingId(session.academicSessionId); setShowCreate(false) }}
-                      className="p-1.5 rounded-lg hover:bg-[rgb(var(--surface-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                       title="Edit session"
                     >
                       <Pencil className="w-3.5 h-3.5" />
@@ -677,7 +677,7 @@ function SessionTemplatePicker({
             key={tpl.id}
             onClick={() => applyTemplate(tpl)}
             disabled={applying !== null}
-            className="text-left p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]/40 hover:border-[rgb(var(--border-focus))] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-left p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]/40 hover:border-[rgb(var(--border-focus))] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-[rgb(var(--text-primary))]">

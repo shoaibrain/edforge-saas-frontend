@@ -86,7 +86,7 @@ export function FeeStructureList({
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-[rgb(var(--text-primary))]">{fee.name}</span>
                   {!fee.isActive && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--surface-tertiary))]  text-[rgb(var(--text-tertiary))]">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))]  text-[rgb(var(--text-tertiary))]">
                       Inactive
                     </span>
                   )}

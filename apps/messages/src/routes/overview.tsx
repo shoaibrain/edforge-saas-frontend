@@ -111,7 +111,7 @@ export function Overview() {
             description: 'Configure messaging options',
             icon: Settings,
             href: '/messages/settings',
-            iconBg: 'bg-[rgb(var(--surface-tertiary))] group-hover:bg-[rgb(var(--interactive-hover))]',
+            iconBg: 'bg-[rgb(var(--background-tertiary))] group-hover:bg-[rgb(var(--background-tertiary))]',
             iconColor: 'text-[rgb(var(--text-secondary))]',
         },
     ]
