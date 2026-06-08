@@ -131,7 +131,7 @@ export function SettingsSection({
       >
         {Icon && (
           <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-            <Icon className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+            <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
           </div>
         )}
         <div className="flex-1">
@@ -350,9 +350,9 @@ export function SettingsToggleRow({
         className={cn(
           'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent',
           'transition-colors duration-200 ease-in-out',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--border-focus))] focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          checked ? 'bg-teal-500' : 'bg-[rgb(var(--surface-tertiary))]'
+          checked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--surface-tertiary))]'
         )}
       >
         <motion.span
@@ -360,7 +360,7 @@ export function SettingsToggleRow({
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
           className={cn(
             'pointer-events-none inline-block h-5 w-5 rounded-full shadow-lg ring-0',
-            'bg-white'
+            'bg-[rgb(var(--surface-secondary))]'
           )}
         >
           {loading && (
@@ -369,7 +369,7 @@ export function SettingsToggleRow({
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="w-3 h-3 border-2 border-teal-500/30 border-t-teal-500 rounded-full" />
+              <div className="w-3 h-3 border-2 border-[rgb(var(--border-focus)/0.35)] border-t-teal-500 rounded-full" />
             </motion.div>
           )}
         </motion.span>
@@ -396,15 +396,15 @@ export interface SettingsAlertProps {
 const alertConfig: Record<AlertType, { icon: LucideIcon; bg: string; border: string; text: string }> = {
   success: {
     icon: CheckCircle2,
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-500/20',
-    text: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
+    border: 'border-[rgb(var(--state-success-border)/0.35)]',
+    text: 'text-[rgb(var(--state-success-fg))] ',
   },
   error: {
     icon: XCircle,
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/20',
-    text: 'text-red-600 dark:text-red-400',
+    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10',
+    border: 'border-[rgb(var(--state-danger-border)/0.35)]',
+    text: 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]',
   },
   warning: {
     icon: AlertCircle,
@@ -414,9 +414,9 @@ const alertConfig: Record<AlertType, { icon: LucideIcon; bg: string; border: str
   },
   info: {
     icon: Info,
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-500/20',
-    text: 'text-blue-600 dark:text-blue-400',
+    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10',
+    border: 'border-[rgb(var(--state-info-border)/0.35)]',
+    text: 'text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]',
   },
 }
 
@@ -454,7 +454,7 @@ export function SettingsAlert({
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          className="p-0.5 rounded hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--surface-primary)/0.05)] transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -480,7 +480,7 @@ export function SaveButton({ isDirty, isSaving, saveSuccess, className }: SaveBu
     variant="outline"
       type="submit" 
       disabled={!isDirty || isSaving} 
-      className={cn('min-w-[110px]', className)}
+      className={cn('min-w-28', className)}
     >
       <AnimatePresence mode="wait">
         {isSaving ? (
@@ -494,7 +494,7 @@ export function SaveButton({ isDirty, isSaving, saveSuccess, className }: SaveBu
             <motion.div 
               animate={{ rotate: 360 }} 
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} 
-              className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full" 
+              className="w-4 h-4 border-2 border-[rgb(var(--border-secondary))] border-t-white rounded-full" 
             />
             Saving...
           </motion.div>
@@ -553,7 +553,7 @@ export function QuickActionPill({ label, icon: Icon, href, delay = 0 }: QuickAct
             'flex items-center gap-2 px-4 py-2.5 rounded-full',
             'border border-[rgb(var(--border-primary))]',
             'bg-[rgb(var(--surface-secondary))]',
-            'hover:bg-[rgb(var(--surface-tertiary))] hover:border-teal-500/30',
+            'hover:bg-[rgb(var(--surface-tertiary))] hover:border-[rgb(var(--border-focus)/0.35)]',
             'transition-colors cursor-pointer'
           )}
         >

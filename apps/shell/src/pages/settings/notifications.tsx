@@ -136,12 +136,12 @@ function DigestSelector({ value, onChange, disabled }: DigestSelectorProps) {
               p-3 rounded-xl border text-left transition-all
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               ${isSelected 
-                ? 'border-teal-500 bg-teal-500/5' 
+                ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))]/5' 
                 : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] hover:border-[rgb(var(--border-secondary))]'
               }
             `}
           >
-            <p className={`text-sm font-medium ${isSelected ? 'text-teal-600 dark:text-cyan-400' : 'text-[rgb(var(--text-primary))]'}`}>
+            <p className={`text-sm font-medium ${isSelected ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-primary))]'}`}>
               {option.label}
             </p>
             <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
@@ -309,7 +309,7 @@ export default function NotificationsPage() {
           </p>
           <button
             onClick={() => refetch()}
-            className="mt-4 text-teal-600 dark:text-cyan-400 hover:underline"
+            className="mt-4 text-[rgb(var(--action-secondary-fg))]  hover:underline"
           >
             Try again
           </button>

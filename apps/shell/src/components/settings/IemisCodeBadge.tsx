@@ -64,7 +64,7 @@ export function IemisCodeBadge({ code, className }: IemisCodeBadgeProps) {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       className={[
-        'relative inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border',
+        'relative inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md border',
         toneClasses,
         className ?? '',
       ].join(' ')}
@@ -87,7 +87,7 @@ export function IemisCodeBadge({ code, className }: IemisCodeBadgeProps) {
       {hovering && (
         <span
           role="tooltip"
-          className="absolute left-0 top-full z-20 mt-1.5 w-64 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] px-3 py-2 text-[11px] font-normal leading-relaxed text-[rgb(var(--text-secondary))] shadow-lg"
+          className="absolute left-0 top-full z-20 mt-1.5 w-64 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-primary))] px-3 py-2 text-xs font-normal leading-relaxed text-[rgb(var(--text-secondary))] shadow-lg"
         >
           {tooltipText}
         </span>

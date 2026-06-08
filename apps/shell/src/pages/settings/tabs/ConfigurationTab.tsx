@@ -63,12 +63,12 @@ function SectionCard({ icon, iconBg = 'bg-[rgba(55,138,221,0.1)]', title, subtit
   return (
     <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2.5">
-        <div className={`w-[26px] h-[26px] rounded-lg ${iconBg} flex items-center justify-center text-[13px]`}>
+        <div className={`w-[26px] h-[26px] rounded-lg ${iconBg} flex items-center justify-center text-sm`}>
           {icon}
         </div>
         <div>
           <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-px">{subtitle}</p>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-px">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -87,7 +87,7 @@ function SectionCard({ icon, iconBg = 'bg-[rgba(55,138,221,0.1)]', title, subtit
 
 const inputClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 text-xs text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgba(55,138,221,0.45)] transition-colors font-[inherit]"
 const selectClass = inputClass
-const labelClass = "text-[11px] font-medium text-[rgb(var(--text-tertiary))] flex items-center gap-1"
+const labelClass = "text-xs font-medium text-[rgb(var(--text-tertiary))] flex items-center gap-1"
 
 // ============================================================================
 // MAIN COMPONENT
@@ -294,14 +294,14 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
             <button
               onClick={() => setIdentity(identityOriginal)}
               disabled={!identityDirty}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={saveIdentity}
               disabled={!identityDirty || updateSchoolMutation.isPending}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-40 transition-all"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-40 transition-all"
             >
               Save Identity
             </button>
@@ -310,7 +310,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
       >
         <div className="grid grid-cols-2 gap-3 p-4">
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Display Name <span className="text-red-500">*</span></label>
+            <label className={labelClass}>Display Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
             <input
               className={inputClass}
               type="text"
@@ -330,7 +330,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>School Type <span className="text-red-500">*</span></label>
+            <label className={labelClass}>School Type <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
             <select
               className={selectClass}
               value={identity.schoolType}
@@ -355,12 +355,12 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
           <div className="flex flex-col gap-1.5 col-span-2">
             <label className={labelClass}>
               Parent LEA (District)
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[rgba(55,138,221,0.08)] text-[#378ADD] font-medium">Ed-Fi</span>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-[rgba(55,138,221,0.08)] text-[#378ADD] font-medium">Ed-Fi</span>
             </label>
             <div className={`${inputClass} bg-[rgba(255,255,255,0.02)] opacity-70 cursor-not-allowed`}>
               {parentLea ? parentLea.name : 'Not assigned'}
             </div>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
               Managed from Organization settings. Schools are assigned to LEAs in the education organization hierarchy.
             </p>
           </div>
@@ -378,14 +378,14 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
             <button
               onClick={() => setLocation(locationOriginal)}
               disabled={!locationDirty}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={saveLocation}
               disabled={!locationDirty || updateSchoolMutation.isPending}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-40 transition-all"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-40 transition-all"
             >
               Save Location
             </button>
@@ -477,14 +477,14 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
             <button
               onClick={() => setSchedule(scheduleOriginal)}
               disabled={!scheduleDirty}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={saveSchedule}
               disabled={!scheduleDirty || updateConfigMutation.isPending}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-40 transition-all"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-40 transition-all"
             >
               Save Schedule
             </button>
@@ -495,7 +495,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
           {/* School Days picker */}
           <div className="space-y-1.5">
             <label className={labelClass}>
-              School Days <span className="text-[10px] text-[rgb(var(--text-tertiary))] ml-1">— tap to toggle</span>
+              School Days <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">— tap to toggle</span>
             </label>
             <div className="flex gap-1.5">
               {DAY_LABELS.map((day, i) => {
@@ -506,7 +506,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
                     key={`${day.key}-${i}`}
                     onClick={() => toggleDay(dayIndex)}
                     className={`
-                      w-8 h-8 rounded-lg border text-[11px] font-semibold
+                      w-8 h-8 rounded-lg border text-xs font-semibold
                       flex items-center justify-center transition-all
                       ${isActive
                         ? 'bg-[rgba(55,138,221,0.15)] border-[rgba(55,138,221,0.3)] text-[#378ADD]'
@@ -519,7 +519,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
                 )
               })}
             </div>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
               {localeDefaults.weekendHint}
             </p>
           </div>
@@ -558,7 +558,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
       </SectionCard>
 
       {/* ── Inherit from Workspace banner ── */}
-      <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-[11px] text-[#378ADD]">
+      <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-xs text-[#378ADD]">
         <span className="flex-shrink-0">ℹ️</span>
         <span>
           <strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings. Changes here will override the workspace defaults for this school only.
@@ -681,7 +681,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
         <span aria-hidden className="text-base">⚠️</span>
         <div>
           <h3 className="text-xs font-semibold text-[#EF4444]">Danger Zone</h3>
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">
             Destructive admin actions. These cannot be undone.
           </p>
         </div>
@@ -693,7 +693,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
             <p className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-1">
               Reset Calendar
             </p>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
               Deletes the current calendar and regenerates it from locale defaults
               (Saturday weekend, {localeHolidays.length || '~30'} public holidays).
               Any manual overrides (teacher in-service days, early releases,
@@ -706,13 +706,13 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
             type="button"
             onClick={() => setConfirmOpen(true)}
             disabled={!isActionable || generateCalendar.isPending}
-            className="flex-shrink-0 px-3 py-1.5 text-[11px] font-medium rounded-lg text-[#EF4444] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.06)] hover:bg-[rgba(239,68,68,0.12)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg text-[#EF4444] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.06)] hover:bg-[rgba(239,68,68,0.12)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Reset Calendar
           </button>
         </div>
         {!isActionable && (
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-2 italic">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-2 italic">
             Disabled because there is no generated calendar to reset for {yearLabel}.
           </p>
         )}
@@ -721,7 +721,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
       {/* Typed-confirmation modal */}
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={closeModal} />
+          <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.05)]5 backdrop-blur-sm" onClick={closeModal} />
           <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(239,68,68,0.35)] rounded-2xl shadow-xl p-5">
             <div className="flex items-start gap-2 mb-3">
               <span aria-hidden className="text-lg">⚠️</span>
@@ -729,13 +729,13 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
                 <h3 className="text-sm font-bold text-[rgb(var(--text-primary))]">
                   Reset Calendar — are you absolutely sure?
                 </h3>
-                <p className="text-[11px] text-[#EF4444] font-medium mt-1">
+                <p className="text-xs text-[#EF4444] font-medium mt-1">
                   This is a destructive action and cannot be undone.
                 </p>
               </div>
             </div>
 
-            <div className="bg-[rgba(239,68,68,0.06)] border border-[rgba(239,68,68,0.15)] rounded-lg p-3 mb-3 text-[11px] text-[rgb(var(--text-secondary))] leading-relaxed">
+            <div className="bg-[rgba(239,68,68,0.06)] border border-[rgba(239,68,68,0.15)] rounded-lg p-3 mb-3 text-xs text-[rgb(var(--text-secondary))] leading-relaxed">
               <p className="mb-2">
                 This will <strong className="text-[#EF4444]">delete the current calendar</strong> for{' '}
                 <strong>{yearLabel}</strong> and regenerate from scratch.
@@ -756,7 +756,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
               </ul>
             </div>
 
-            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1">
+            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">
               Type <code className="text-[10.5px] font-mono text-[#EF4444] bg-[rgba(239,68,68,0.08)] px-1 py-0.5 rounded">{CONFIRM_PHRASE}</code> to confirm:
             </label>
             <input
@@ -774,7 +774,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
                 type="button"
                 onClick={closeModal}
                 disabled={generateCalendar.isPending}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -782,7 +782,7 @@ function CalendarDangerZoneSection({ schoolId }: { schoolId: string }) {
                 type="button"
                 onClick={handleReset}
                 disabled={!canConfirm}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg text-white bg-[#EF4444] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg text-[rgb(var(--action-primary-fg))] bg-[#EF4444] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {generateCalendar.isPending ? 'Resetting…' : 'Delete & Regenerate'}
               </button>

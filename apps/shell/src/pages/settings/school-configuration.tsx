@@ -115,15 +115,15 @@ function ToggleSwitch({ checked, onChange, disabled }: ToggleSwitchProps) {
       disabled={disabled}
       className={`
         relative w-11 h-6 rounded-full transition-colors
-        ${checked ? 'bg-teal-500' : 'bg-[rgb(var(--surface-tertiary))]'}
+        ${checked ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--surface-tertiary))]'}
         ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
-        focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:ring-offset-2
+        focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:ring-offset-2
       `}
       role="switch"
       aria-checked={checked}
     >
       <motion.span
-        className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow"
+        className="absolute top-1 left-1 w-4 h-4 bg-[rgb(var(--surface-secondary))] rounded-full shadow"
         animate={{ x: checked ? 20 : 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       />
@@ -424,7 +424,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             type="text"
             value={formState.displayName}
             onChange={(e) => updateField('displayName', e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </SettingsFieldRow>
 
@@ -432,7 +432,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           <select
             value={formState.schoolType}
             onChange={(e) => updateField('schoolType', e.target.value)}
-            className="min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            className="min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           >
             {SCHOOL_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -446,7 +446,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             value={formState.website}
             onChange={(e) => updateField('website', e.target.value)}
             placeholder="https://www.school.edu"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </SettingsFieldRow>
       </Section>
@@ -460,7 +460,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         {/* Render country-adaptive address fields from country config */}
         {(() => {
           const countryConfig = getCountryConfig(formState.address.country || 'USA');
-          const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all";
+          const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all";
 
           // Group address fields into rows (street1 alone, then remaining in pairs)
           const fields = countryConfig.addressFields.filter(f => f.key !== 'country');
@@ -499,14 +499,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               value={formState.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="Phone number"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
             <input
               type="email"
               value={formState.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="Email address"
-              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all"
+              className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
           </div>
         </SettingsFieldRow>
@@ -574,7 +574,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               min={15}
               max={120}
               disabled={isFieldLocked('periodDuration', hasActiveAcademicYear)}
-              className={`w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all ${isFieldLocked('periodDuration', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('periodDuration', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
             <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
           </div>
@@ -601,7 +601,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             value={formState.termStructure}
             onChange={(e) => updateField('termStructure', e.target.value)}
             disabled={isFieldLocked('academicCalendarType', hasActiveAcademicYear)}
-            className={`min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all ${isFieldLocked('academicCalendarType', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('academicCalendarType', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {TERM_STRUCTURE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -616,7 +616,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             </p>
             <a
               href="/academics/classrooms?tab=gradebook"
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-500/10 hover:bg-teal-100 dark:hover:bg-teal-500/20 rounded-lg transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))]  bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--action-primary-bg))]/10 hover:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--action-primary-bg))]/20 rounded-lg transition-colors"
             >
               <GraduationCap className="w-4 h-4" />
               Manage Grading Policies
@@ -686,10 +686,10 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
       </Section>
 
       {/* Workspace Inheritance Notice */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-        <AlertTriangle className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
+        <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-info-fg))]  flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm text-cyan-700 dark:text-cyan-400">
+          <p className="text-sm text-[rgb(var(--state-info-fg))] ">
             <strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings.
             Changes here will override the workspace defaults for this school only.
           </p>

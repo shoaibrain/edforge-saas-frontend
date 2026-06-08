@@ -89,7 +89,7 @@ function SummarySection({
   return (
     <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] p-4">
       <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+        <Icon className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
         <h4 className="text-sm font-medium text-[rgb(var(--text-primary))]">{title}</h4>
       </div>
       {isEmpty ? (
@@ -138,8 +138,8 @@ export function ReviewStep({ data }: WizardStepProps) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 rounded-xl bg-teal-500/5 border border-teal-500/20">
-        <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+      <div className="flex items-center gap-3 p-4 rounded-xl bg-[rgb(var(--action-primary-bg))]/5 border border-[rgb(var(--border-focus)/0.35)]">
+        <CheckCircle2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]  flex-shrink-0" />
         <div>
           <h3 className="text-sm font-medium text-[rgb(var(--text-primary))]">
             Review your school details

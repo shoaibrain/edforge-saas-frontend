@@ -141,8 +141,8 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center py-12"
       >
-        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-          <User className="w-8 h-8 text-red-500" />
+        <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 flex items-center justify-center mb-4">
+          <User className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
           Failed to Load Profile
@@ -214,7 +214,7 @@ function CopyButton({ text }: { text: string }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
           >
-            <Check className="w-3.5 h-3.5 text-emerald-500" />
+            <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
           </motion.div>
         ) : (
           <motion.div
@@ -403,17 +403,17 @@ export default function AccountPage() {
                   />
                   
                   <div className="flex flex-col items-end gap-2">
-                    <span className="text-sm font-medium text-teal-600 dark:text-cyan-400">
+                    <span className="text-sm font-medium text-[rgb(var(--action-secondary-fg))] ">
                       {displayRole}
                     </span>
                     {userProfile?.status && (
                       <span className={`
                         inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
                         ${userProfile.status === 'active' 
-                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                          ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ' 
                           : userProfile.status === 'pending'
                             ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                            : 'bg-gray-500/10 text-gray-600 dark:text-gray-400'
+                            : 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
                         }
                       `}>
                         {userProfile.status.charAt(0).toUpperCase() + userProfile.status.slice(1)}
@@ -543,7 +543,7 @@ export default function AccountPage() {
                     )}
                     <div className="space-y-1">
                       <span className="text-[rgb(var(--text-tertiary))]">MFA Status</span>
-                      <p className={`font-medium ${userProfile.mfaEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-[rgb(var(--text-secondary))]'}`}>
+                      <p className={`font-medium ${userProfile.mfaEnabled ? 'text-[rgb(var(--state-success-fg))] ' : 'text-[rgb(var(--text-secondary))]'}`}>
                         {userProfile.mfaEnabled ? 'Enabled' : 'Not enabled'}
                       </p>
                     </div>

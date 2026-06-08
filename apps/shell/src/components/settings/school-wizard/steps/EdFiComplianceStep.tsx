@@ -212,14 +212,14 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                     onClick={() => toggleCategory(cat.value)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       isSelected
-                        ? 'bg-teal-500/15 border-teal-500/40 text-teal-700 dark:text-teal-300'
-                        : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-teal-500/30'
+                        ? 'bg-[rgb(var(--action-primary-bg))]/15 border-[rgb(var(--border-focus)/0.40)] text-[rgb(var(--state-info-fg))] '
+                        : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
                     }`}
                   >
                     {isSelected && <Check className="w-3 h-3" />}
                     {cat.label}
                     {isSuggested && !isSelected && (
-                      <span className="text-[10px] text-teal-500 ml-1">(suggested)</span>
+                      <span className="text-xs text-[rgb(var(--action-secondary-fg))] ml-1">(suggested)</span>
                     )}
                   </button>
                 )
@@ -258,7 +258,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                     return (
                       <span
                         key={g}
-                        className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20"
+                        className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))]  border border-[rgb(var(--border-focus)/0.35)]"
                       >
                         {descriptor?.label || g}
                       </span>
@@ -282,8 +282,8 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                         onClick={() => toggleAdditionalGrade(d.value)}
                         className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border transition-all ${
                           isSelected
-                            ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-700 dark:text-cyan-300'
-                            : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:border-cyan-500/30 hover:text-[rgb(var(--text-secondary))]'
+                            ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-[rgb(var(--state-info-border)/0.40)] text-[rgb(var(--state-info-fg))] '
+                            : 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:border-[rgb(var(--state-info-border)/0.35)] hover:text-[rgb(var(--text-secondary))]'
                         }`}
                       >
                         {isSelected && <Check className="w-3 h-3 mr-1" />}
@@ -309,7 +309,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
               <button
                 type="button"
                 onClick={addIdCode}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:bg-[rgb(var(--action-primary-bg))]/10 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Code
@@ -331,7 +331,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       onChange={(e) =>
                         updateIdCode(index, 'educationOrganizationIdentificationSystemDescriptor', e.target.value)
                       }
-                      className="w-48 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                      className="w-48 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     >
                       {EDUCATION_ORGANIZATION_IDENTIFICATION_SYSTEM_DESCRIPTORS.map((d) => (
                         <option key={d.value} value={d.value}>{d.label}</option>
@@ -342,12 +342,12 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       value={code.identificationCode}
                       onChange={(e) => updateIdCode(index, 'identificationCode', e.target.value)}
                       placeholder="e.g., 123456789"
-                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors font-mono"
+                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => removeIdCode(index)}
-                      className="mt-0.5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                      className="mt-0.5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -371,7 +371,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
               <button
                 type="button"
                 onClick={addPhone}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:bg-[rgb(var(--action-primary-bg))]/10 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Phone
@@ -393,7 +393,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       onChange={(e) =>
                         updatePhone(index, 'institutionTelephoneNumberTypeDescriptor', e.target.value)
                       }
-                      className="w-40 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                      className="w-40 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     >
                       {INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS.map((d) => (
                         <option key={d.value} value={d.value}>{d.label}</option>
@@ -404,12 +404,12 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       value={phone.telephoneNumber}
                       onChange={(e) => updatePhone(index, 'telephoneNumber', e.target.value)}
                       placeholder="(555) 123-4567"
-                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                      className="flex-1 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => removePhone(index)}
-                      className="mt-0.5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                      className="mt-0.5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -467,7 +467,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
               <button
                 type="button"
                 onClick={addRating}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:bg-[rgb(var(--action-primary-bg))]/10 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Rating
@@ -491,7 +491,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                       <button
                         type="button"
                         onClick={() => removeRating(index)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-500 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -506,7 +506,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           value={rating.title}
                           onChange={(e) => updateRating(index, 'title', e.target.value)}
                           placeholder="e.g., State Accountability"
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                       <div>
@@ -518,7 +518,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           value={rating.rating}
                           onChange={(e) => updateRating(index, 'rating', e.target.value)}
                           placeholder="e.g., A, Met Standard"
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                       <div>
@@ -530,7 +530,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           value={rating.ratingOrganization}
                           onChange={(e) => updateRating(index, 'ratingOrganization', e.target.value)}
                           placeholder="e.g., Texas Education Agency"
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                       <div>
@@ -544,7 +544,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                           placeholder="2025"
                           min={1900}
                           max={2100}
-                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                         />
                       </div>
                     </div>

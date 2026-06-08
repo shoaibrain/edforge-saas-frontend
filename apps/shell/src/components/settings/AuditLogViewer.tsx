@@ -24,11 +24,11 @@ const ACTION_LABELS: Record<string, string> = {
 }
 
 const ACTION_COLORS: Record<string, string> = {
-  create: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20',
-  update: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20',
-  delete: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20',
+  create: 'text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)]  ',
+  update: 'text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)] dark:text-[rgb(var(--state-info-fg))] ',
+  delete: 'text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))] ',
   status_change: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/20',
-  version_change: 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900/20',
+  version_change: 'text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)]  ',
 }
 
 export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
@@ -57,7 +57,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[rgb(var(--border-focus))] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -71,7 +71,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
         <select
           value={actionFilter}
           onChange={(e) => setActionFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+          className="px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
         >
           <option value="">All Actions</option>
           <option value="create">Create</option>
@@ -129,7 +129,7 @@ function AuditEntry({
     <div className="relative pl-12">
       {/* Timeline dot */}
       <div className={`absolute left-3.5 top-3 w-3 h-3 rounded-full border-2 border-[rgb(var(--surface-primary))] ${
-        entry.severity === 'high' ? 'bg-amber-500' : 'bg-teal-500'
+        entry.severity === 'high' ? 'bg-amber-500' : 'bg-[rgb(var(--action-primary-bg))]'
       }`} />
 
       <div
@@ -185,10 +185,10 @@ function AuditEntry({
                     <td className="py-1.5 pr-4 font-medium text-[rgb(var(--text-secondary))]">
                       {change.field}
                     </td>
-                    <td className="py-1.5 pr-4 text-red-500 line-through">
+                    <td className="py-1.5 pr-4 text-[rgb(var(--state-danger-fg))] line-through">
                       {formatValue(change.oldValue)}
                     </td>
-                    <td className="py-1.5 text-green-600">
+                    <td className="py-1.5 text-[rgb(var(--state-success-fg))]">
                       {formatValue(change.newValue)}
                     </td>
                   </tr>

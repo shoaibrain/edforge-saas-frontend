@@ -158,7 +158,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
         <h3 className="text-sm font-bold text-[rgb(var(--text-primary))]">Departments</h3>
         <button
           onClick={openModal}
-          className="bg-[#1D9E75] text-white text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+          className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
         >
           <Plus className="w-3.5 h-3.5" /> Add Department
         </button>
@@ -204,9 +204,9 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{dept.name}</span>
                     {dept.code && (
-                      <span className="text-[10px] font-mono text-[rgb(var(--text-tertiary))]">{dept.code}</span>
+                      <span className="text-xs font-mono text-[rgb(var(--text-tertiary))]">{dept.code}</span>
                     )}
-                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${
                       isSchool
                         ? 'bg-[rgba(55,138,221,0.1)] text-[#378ADD]'
                         : 'bg-[rgba(127,119,221,0.1)] text-[#7F77DD]'
@@ -224,7 +224,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
                           deleteMutation.mutate(dept.id || dept.departmentId)
                         }
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-500 transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-all"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -254,7 +254,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
       {/* Create Department Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
+          <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={closeModal} />
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -271,7 +271,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
             </div>
             <form onSubmit={handleCreate} className="p-6 space-y-4">
               <div>
-                <label className={labelClass}>Department Name <span className="text-red-500">*</span></label>
+                <label className={labelClass}>Department Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <input
                   type="text"
                   value={formName}
@@ -284,7 +284,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
                 />
               </div>
               <div>
-                <label className={labelClass}>Code <span className="text-red-500">*</span></label>
+                <label className={labelClass}>Code <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <input
                   type="text"
                   value={formCode}
@@ -315,7 +315,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
                 <button
                   type="submit"
                   disabled={createMutation.isPending || !formName.trim() || !formCode.trim()}
-                  className="px-4 py-2 text-sm font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
                 >
                   {createMutation.isPending ? 'Creating...' : 'Create Department'}
                 </button>
@@ -383,7 +383,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
         <h3 className="text-sm font-bold text-[rgb(var(--text-primary))]">Rooms & Locations</h3>
         <button
           onClick={openDrawer}
-          className="bg-[#1D9E75] text-white text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+          className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
         >
           <Plus className="w-3.5 h-3.5" /> Add Room
         </button>
@@ -413,7 +413,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-bold text-[rgb(var(--text-primary))]">{room.roomNumber || room.name}</span>
                     <span
-                      className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+                      className="text-xs font-medium px-1.5 py-0.5 rounded"
                       style={{ background: typeColor.bg, color: typeColor.text }}
                     >
                       {room.locationType || room.roomType || 'Classroom'}
@@ -431,7 +431,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
                         deleteMutation.mutate(room.id || room.locationId)
                       }
                     }}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/10 text-[rgb(var(--text-tertiary))] hover:text-red-500 transition-all"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-all"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -465,7 +465,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
       >
         <div className="p-6 space-y-4">
           <div>
-            <label className={labelClass}>Room Number <span className="text-red-500">*</span></label>
+            <label className={labelClass}>Room Number <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
             <input
               type="text"
               value={form.roomNumber}
@@ -554,7 +554,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
           <button
             onClick={handleSave}
             disabled={createMutation.isPending || !form.roomNumber.trim()}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
           >
             {createMutation.isPending ? 'Creating...' : 'Create Room'}
           </button>

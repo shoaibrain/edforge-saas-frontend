@@ -51,7 +51,7 @@ export default function BillingSettingsPage() {
           </p>
         </div>
 
-        <div className="p-6 rounded-xl bg-gradient-to-br from-teal-500/10 to-cyan-500/10 border border-teal-500/20">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.14)] to-[rgb(var(--state-info-bg)/0.14)] border border-[rgb(var(--border-focus)/0.35)]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-[rgb(var(--text-tertiary))]">Current Plan</p>

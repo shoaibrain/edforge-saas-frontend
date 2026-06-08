@@ -25,9 +25,9 @@ interface CategoryArraySectionProps {
 }
 
 const selectClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors'
+  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
 const labelClass = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1'
-const errorClass = 'mt-0.5 text-[10px] text-red-500'
+const errorClass = 'mt-0.5 text-xs text-[rgb(var(--state-danger-fg))]'
 
 export function CategoryArraySection({ name = 'categories', orgType }: CategoryArraySectionProps) {
   const { control, register, setValue, getValues, formState: { errors } } = useFormContext()
@@ -57,7 +57,7 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
         <div className="flex items-center gap-2">
           <Tag className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            Categories <span className="text-red-500">*</span>
+            Categories <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </span>
           <Tooltip content="Ed-Fi organization category descriptor. Identifies the type of education organization." side="right">
             <Info className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] cursor-help" />
@@ -109,7 +109,7 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
             <button
               type="button"
               onClick={() => remove(index)}
-              className="mt-5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+              className="mt-5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>

@@ -165,7 +165,7 @@ function EntitySelector({
           aria-label={`Preview ${label}`}
           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
             selected === type
-              ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 ring-1 ring-teal-500/30'
+              ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  ring-1 ring-[rgb(var(--border-focus))]/30'
               : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-tertiary))]'
           }`}
         >
@@ -214,7 +214,7 @@ function EntityPicker<T>({
         value={selectedId || ''}
         onChange={(e) => onSelect(e.target.value)}
         aria-label="Select an entity to preview"
-        className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors appearance-none pr-8"
+        className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors appearance-none pr-8"
       >
         <option value="">Select an entity to preview...</option>
         {items.map((item) => (
@@ -276,8 +276,8 @@ function JsonPreviewPanel({
           <span
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
               failCount === 0
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] '
+                : 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]'
             }`}
           >
             {failCount === 0 ? (
@@ -316,11 +316,11 @@ function JsonPreviewPanel({
           {validation.map((v) => (
             <div key={v.field} className="flex items-center gap-2 text-xs">
               {v.status === 'pass' ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))] shrink-0" />
               ) : v.status === 'warn' ? (
                 <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               ) : (
-                <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))] shrink-0" />
               )}
               <span className="font-mono text-[rgb(var(--text-tertiary))]">{v.field}</span>
               <span className="text-[rgb(var(--text-secondary))]">{v.message}</span>
@@ -412,7 +412,7 @@ export default function EdFiExportPreviewPage() {
           {entityType === 'sea' ? (
             sea ? (
               <div className="flex items-center gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))]">
-                <Landmark className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <Landmark className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />
                 <div>
                   <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
                     {sea.nameOfInstitution}

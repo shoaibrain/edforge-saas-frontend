@@ -99,8 +99,8 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
     >
       {copied ? (
         <>
-          <Check className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="text-emerald-500">Copied</span>
+          <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
+          <span className="text-[rgb(var(--state-success-fg))]">Copied</span>
         </>
       ) : (
         <>
@@ -133,7 +133,7 @@ function CollapsibleSection({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full py-3 px-1 text-sm font-medium text-[rgb(var(--text-primary))] hover:text-teal-600 dark:hover:text-cyan-400 transition-colors"
+        className="flex items-center justify-between w-full py-3 px-1 text-sm font-medium text-[rgb(var(--text-primary))] hover:text-[rgb(var(--action-secondary-fg))] dark:hover:text-[rgb(var(--state-info-fg))] transition-colors"
       >
         {title}
         <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -177,7 +177,7 @@ function StatusBadge({
 }) {
   const styles = {
     success:
-      'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+      'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]  border-[rgb(var(--state-success-border)/0.35)]',
     warning:
       'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
     neutral:

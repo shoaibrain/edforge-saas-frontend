@@ -89,8 +89,8 @@ function StatusBadge({ status }: StatusBadgeProps) {
     <span className={`
       inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
       ${status === 'planning' && 'bg-golden-500/10 text-golden-700 dark:text-golden-400'}
-      ${status === 'active' && 'bg-teal-500/10 text-teal-700 dark:text-teal-400'}
-      ${status === 'completed' && 'bg-slate-500/10 text-slate-700 dark:text-slate-400'}
+      ${status === 'active' && 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))] '}
+      ${status === 'completed' && 'bg-[rgb(var(--surface-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]'}
     `}>
       <Icon className="w-3 h-3" />
       {config.label}
@@ -106,7 +106,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
 function CurrentPill() {
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-teal-500/20 text-teal-700 dark:text-teal-400"
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--action-primary-bg))]/20 text-[rgb(var(--state-info-fg))] "
       title="Anchors dashboards, attendance, and grades"
     >
       <Star className="w-3 h-3" />
@@ -165,20 +165,20 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
               {/* Timeline dot */}
               <div className={`
                 relative z-10 w-6 h-6 rounded-full flex items-center justify-center
-                ${isActive && 'bg-teal-500 ring-4 ring-teal-500/20'}
-                ${isCompleted && 'bg-slate-400'}
+                ${isActive && 'bg-[rgb(var(--action-primary-bg))] ring-4 ring-[rgb(var(--border-focus))]/20'}
+                ${isCompleted && 'bg-[rgb(var(--text-tertiary))]'}
                 ${!isActive && !isCompleted && 'bg-golden-500'}
               `}>
-                {isActive && <Play className="w-3 h-3 text-white" />}
-                {isCompleted && <CheckCircle className="w-3 h-3 text-white" />}
-                {!isActive && !isCompleted && <Clock className="w-3 h-3 text-white" />}
+                {isActive && <Play className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
+                {isCompleted && <CheckCircle className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
+                {!isActive && !isCompleted && <Clock className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
               </div>
 
               {/* Year card */}
               <div className={`
                 flex-1 p-4 rounded-xl border transition-all
                 ${isActive
-                  ? 'bg-teal-500/5 border-teal-500/30 shadow-sm'
+                  ? 'bg-[rgb(var(--action-primary-bg))]/5 border-[rgb(var(--border-focus)/0.35)] shadow-sm'
                   : 'bg-[rgb(var(--surface-secondary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
                 }
               `}>
@@ -276,7 +276,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -327,7 +327,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
               onChange={(e) => setName(e.target.value)}
               required
               placeholder={calendarSystem === 'bikram_sambat' ? 'e.g., 2082-2083' : 'e.g., 2025-2026'}
-              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50"
             />
             {calendarSystem === 'bikram_sambat' && (
               <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
@@ -358,7 +358,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
             <button
               type="submit"
               disabled={isLoading || !name || !startDate || !endDate}
-              className="px-4 py-2 rounded-xl bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-medium hover:bg-[rgb(var(--action-primary-bg))] transition-colors disabled:opacity-50"
             >
               {isLoading ? 'Creating...' : 'Create Academic Year'}
             </button>
@@ -412,7 +412,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -443,7 +443,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
               required
               disabled={!canEdit}
               placeholder="e.g., 2025-2026"
-              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -503,7 +503,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
               <button
                 type="submit"
                 disabled={isLoading || !name || !startDate || !endDate}
-                className="px-4 py-2 rounded-xl bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-medium hover:bg-[rgb(var(--action-primary-bg))] transition-colors disabled:opacity-50"
               >
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -532,7 +532,7 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: A
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -577,7 +577,7 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: A
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="px-4 py-2 rounded-xl bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-medium hover:bg-[rgb(var(--action-primary-bg))] transition-colors disabled:opacity-50"
             >
               {isLoading ? 'Activating...' : 'Activate Year'}
             </button>
@@ -845,13 +845,13 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
           icon={Play}
           description="The year that anchors all downstream reads (dashboards, attendance, grades)"
         >
-          <div className="p-4 rounded-xl bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/20">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-[rgb(var(--state-info-bg)/0.14)] to-[rgb(var(--state-info-bg)/0.14)] border border-[rgb(var(--border-focus)/0.35)]">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="text-lg font-bold text-[rgb(var(--text-primary))]">{currentYear.name}</h4>
                   <StatusBadge status={currentYear.status} />
-                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-500/20 text-teal-700 dark:text-teal-400">
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--action-primary-bg))]/20 text-[rgb(var(--state-info-fg))] ">
                     Current
                   </span>
                 </div>

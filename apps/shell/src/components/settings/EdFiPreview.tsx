@@ -31,11 +31,11 @@ function highlightJson(json: string): string {
     // String values (after colon)
     .replace(/"([^"]+)"(\s*:)/g, '<span class="text-[rgb(var(--text-primary))]">"$1"</span>$2')
     // String values
-    .replace(/:\s*"([^"]+)"/g, ': <span class="text-teal-600 dark:text-teal-400">"$1"</span>')
+    .replace(/:\s*"([^"]+)"/g, ': <span class="text-[rgb(var(--action-secondary-fg))] ">"$1"</span>')
     // Numbers
     .replace(/:\s*(\d+)/g, ': <span class="text-amber-600 dark:text-amber-400">$1</span>')
     // Booleans & null
-    .replace(/:\s*(true|false|null)/g, ': <span class="text-purple-600 dark:text-purple-400">$1</span>')
+    .replace(/:\s*(true|false|null)/g, ': <span class="text-[rgb(var(--state-info-fg))] ">$1</span>')
 }
 
 // ============================================================================
@@ -111,9 +111,9 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
   }, [formData])
 
   const validationColors = {
-    valid: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    valid: 'text-[rgb(var(--state-success-fg))]  bg-[rgb(var(--state-success-bg)/0.18)] border-[rgb(var(--state-success-border)/0.35)]',
     partial: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
-    minimal: 'text-slate-500 dark:text-slate-400 bg-slate-500/10 border-slate-500/20',
+    minimal: 'text-[rgb(var(--text-tertiary))] dark:text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-tertiary))]0/10 border-[rgb(var(--border-secondary))]',
   }
 
   const handleCopy = async () => {
@@ -134,8 +134,8 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
         className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[rgb(var(--surface-tertiary))]/50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-            <span className="text-sm font-mono font-bold text-indigo-600 dark:text-indigo-400">{'{}'}</span>
+          <div className="w-8 h-8 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
+            <span className="text-sm font-mono font-bold text-[rgb(var(--state-info-fg))] ">{'{}'}</span>
           </div>
           <div className="text-left">
             <h4 className="text-sm font-medium text-[rgb(var(--text-primary))]">Ed-Fi JSON Preview</h4>
@@ -171,7 +171,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
               {/* Toolbar */}
               <div className="flex items-center justify-between py-3">
                 <p className={`text-xs font-medium ${
-                  validation.level === 'valid' ? 'text-emerald-600 dark:text-emerald-400' :
+                  validation.level === 'valid' ? 'text-[rgb(var(--state-success-fg))] ' :
                   validation.level === 'partial' ? 'text-amber-600 dark:text-amber-400' :
                   'text-[rgb(var(--text-tertiary))]'
                 }`}>
@@ -183,7 +183,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
                       Copied!
                     </>
                   ) : (
@@ -198,7 +198,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
               {/* JSON display */}
               <div className="rounded-xl bg-[rgb(var(--surface-tertiary))] border border-[rgb(var(--border-primary))] overflow-hidden">
                 <pre
-                  className="p-4 text-xs font-mono leading-relaxed overflow-x-auto max-h-[400px] overflow-y-auto"
+                  className="p-4 text-xs font-mono leading-relaxed overflow-x-auto max-h-96 overflow-y-auto"
                   dangerouslySetInnerHTML={{ __html: highlightJson(edfiJson) }}
                 />
               </div>

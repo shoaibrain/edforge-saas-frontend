@@ -105,8 +105,8 @@ export function QuickSchoolReassign({
         {/* Current Assignment Display */}
         {currentLeaName && (
           <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))]">
-            <div className="p-2 rounded-lg bg-cyan-500/10">
-              <School className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+            <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
+              <School className="w-4 h-4 text-[rgb(var(--state-info-fg))] " />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">
@@ -154,7 +154,7 @@ export function QuickSchoolReassign({
                 'w-full px-3 py-2 rounded-lg border',
                 'bg-[rgb(var(--surface-tertiary))] border-[rgb(var(--border-primary))]',
                 'text-sm text-[rgb(var(--text-primary))]',
-                'focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500',
+                'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 'transition-colors'
               )}
@@ -182,9 +182,9 @@ export function QuickSchoolReassign({
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-teal-500/5 border border-teal-500/20">
-                <ArrowRight className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-                <p className="text-xs text-teal-700 dark:text-teal-300">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-[rgb(var(--action-primary-bg))]/5 border border-[rgb(var(--border-focus)/0.35)]">
+                <ArrowRight className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]  shrink-0" />
+                <p className="text-xs text-[rgb(var(--state-info-fg))] ">
                   {selectedLeaId
                     ? `Will be assigned to ${leas.find((l) => l.id === selectedLeaId)?.nameOfInstitution}`
                     : 'Will be unassigned from any district'}

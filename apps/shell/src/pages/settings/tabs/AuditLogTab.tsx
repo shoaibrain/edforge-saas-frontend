@@ -73,7 +73,7 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
         </div>
         <div className="flex items-center gap-2">
           <select
-            className="text-[11px] px-2.5 py-1.5 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] focus:outline-none"
+            className="text-xs px-2.5 py-1.5 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] focus:outline-none"
             value={actionFilter}
             onChange={e => setActionFilter(e.target.value as ActionFilter)}
           >
@@ -87,7 +87,7 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
           <button
             onClick={handleExportCSV}
             disabled={entries.length === 0}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)] disabled:opacity-40 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)] disabled:opacity-40 transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             Export CSV
@@ -112,7 +112,7 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
         ) : entries.length > 0 ? (
           <div>
             {/* Entry count */}
-            <div className="px-4 py-2 border-b border-[rgba(255,255,255,0.04)] text-[10px] text-[rgb(var(--text-tertiary))]">
+            <div className="px-4 py-2 border-b border-[rgba(255,255,255,0.04)] text-xs text-[rgb(var(--text-tertiary))]">
               {entries.length} entries
             </div>
             {entries.map((entry: any, idx: number) => {
@@ -128,14 +128,14 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
                       {entry.action || 'Update'} — {entry.detail || entry.description || entry.message || 'Configuration changed'}
                     </div>
                     {entry.changes && (
-                      <div className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+                      <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
                         {typeof entry.changes === 'string' ? entry.changes : JSON.stringify(entry.changes).slice(0, 100)}
                       </div>
                     )}
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <div className="text-[10px] text-[rgb(var(--text-tertiary))]">{entry.actorName || entry.actor || 'System'}</div>
-                    <div className="text-[10px] text-[rgb(var(--text-tertiary))]">
+                    <div className="text-xs text-[rgb(var(--text-tertiary))]">{entry.actorName || entry.actor || 'System'}</div>
+                    <div className="text-xs text-[rgb(var(--text-tertiary))]">
                       {entry.timestamp || entry.createdAt
                         ? new Date(entry.timestamp || entry.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
                         : ''}
@@ -148,8 +148,8 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
         ) : (
           <div className="p-10 text-center">
             <div className="text-3xl opacity-40 mb-3">🛡️</div>
-            <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No audit entries yet</h3>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
+            <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No audit entries yet</h3>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
               Changes to this school's configuration will appear here with actor, timestamp, and before/after values.
             </p>
           </div>

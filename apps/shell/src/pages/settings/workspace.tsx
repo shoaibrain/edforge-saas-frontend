@@ -151,9 +151,9 @@ const NUMBER_FORMAT_OPTIONS = [
 // ]
 
 // COMING SOON — re-enable when Organization Branding section ships
-// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+// const INPUT_CLASS = 'w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
-const SELECT_CLASS = 'min-w-[200px] px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+const SELECT_CLASS = 'min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed'
 
 // ============================================================================
 // DEFAULT SETTINGS (fallback when API data unavailable)
@@ -242,7 +242,7 @@ function TenantInfoCard({
       >
         <div className="flex items-center gap-3 mb-3">
           <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-            <Building2 className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+            <Building2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
@@ -498,8 +498,8 @@ export default function WorkspaceSettingsPage() {
           icon={Building2}
         />
         <div className="mt-8 flex flex-col items-center justify-center py-12">
-          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-500" />
+          <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 flex items-center justify-center mb-4">
+            <AlertTriangle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
           </div>
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
             Failed to Load Settings
@@ -609,7 +609,7 @@ export default function WorkspaceSettingsPage() {
                     Display-only fields (language, date/time format, number grouping) remain editable.
                   </p>
                   {lockHolders.length > 0 && (
-                    <ul className="mt-2 space-y-0.5 text-[11px] opacity-90">
+                    <ul className="mt-2 space-y-0.5 text-xs opacity-90">
                       {lockHolders.map((h) => (
                         <li key={`${h.schoolId}#${h.yearId}`}>
                           Blocked by <strong className="font-semibold">{h.schoolName}</strong>
@@ -737,14 +737,14 @@ export default function WorkspaceSettingsPage() {
                 aria-checked={displaySettings.regional.enableDualDateDisplay}
                 onClick={() => updateField('regional', 'enableDualDateDisplay', !displaySettings.regional.enableDualDateDisplay)}
                 disabled={lkDualDate.locked}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/40 ${
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] ${
                   displaySettings.regional.enableDualDateDisplay
-                    ? 'bg-teal-600'
+                    ? 'bg-[rgb(var(--action-primary-bg))]'
                     : 'bg-[rgb(var(--border-primary))]'
                 } ${lkDualDate.locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-[rgb(var(--surface-secondary))] transition-transform ${
                     displaySettings.regional.enableDualDateDisplay ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />

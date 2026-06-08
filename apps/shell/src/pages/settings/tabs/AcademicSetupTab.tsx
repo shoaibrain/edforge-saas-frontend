@@ -295,7 +295,7 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
     <div className="grid gap-5" style={{ gridTemplateColumns: '260px 1fr' }}>
       {/* ── Wizard Navigation ── */}
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-3 h-fit sticky top-0">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] px-2.5 pb-2">
+        <p className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] px-2.5 pb-2">
           Setup Steps
         </p>
         {steps.map((step, i) => {
@@ -317,7 +317,7 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
               `}
             >
               <span className={`
-                w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center text-[9px] flex-shrink-0
+                w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center text-xs flex-shrink-0
                 ${isActive
                   ? 'bg-[rgba(55,138,221,0.1)] border-[#378ADD]'
                   : isDone
@@ -333,7 +333,7 @@ export default function AcademicSetupTab({ schoolId, school }: AcademicSetupTabP
         })}
 
         <div className="h-px bg-[rgba(255,255,255,0.06)] my-2.5" />
-        <p className="px-2.5 text-[10px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+        <p className="px-2.5 text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
           Complete these steps in order. Each builds on the previous — you need an academic year before setting up sessions, and sessions before generating a calendar.
         </p>
       </div>
@@ -470,7 +470,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
         <h2 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-3">Create Academic Year</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -514,7 +514,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
             <input
               type="text"
               value={name}
@@ -527,7 +527,7 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
 
           <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
             <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
               The academic year will be created in "Planning" status with no
               sessions yet. Open the next step (<b>Sessions &amp; Terms</b>) to
               define your terms — pick a template or create them individually,
@@ -536,13 +536,13 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
           </div>
 
           <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+            <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading || !name || !startDate || !endDate}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
             >
               {isLoading ? 'Creating...' : 'Create Academic Year'}
             </button>
@@ -587,13 +587,13 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-lg bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-[rgb(var(--text-primary))]">
             {canEdit ? 'Edit Academic Year' : 'View Academic Year'}
           </h2>
-          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
             year.status === 'planning' ? 'bg-[rgba(239,159,39,0.1)] text-[#EF9F27]'
               : year.status === 'active' ? 'bg-[rgba(29,158,117,0.1)] text-[#1D9E75]'
               : 'bg-[rgba(255,255,255,0.06)] text-[rgb(var(--text-tertiary))]'
@@ -604,7 +604,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="block text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
             <input
               type="text"
               value={name}
@@ -641,7 +641,7 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
           {!canEdit && (
             <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
               <Lock className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
-              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
                 This academic year is {year.status} and cannot be modified. Dates are locked to maintain data integrity.
               </p>
             </div>
@@ -650,21 +650,21 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
           {canEdit && (
             <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
               <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
-              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
                 Once this year is activated, dates will be locked and cannot be changed.
               </p>
             </div>
           )}
 
           <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+            <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
               {canEdit ? 'Cancel' : 'Close'}
             </button>
             {canEdit && (
               <button
                 type="submit"
                 disabled={isLoading || !name || !startDate || !endDate}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
               >
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -691,7 +691,7 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
         <h2 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">Activate Academic Year</h2>
         <p className="text-xs text-[rgb(var(--text-secondary))] mb-3">
@@ -714,13 +714,13 @@ function ActivateConfirmModal({ isOpen, year, onClose, onConfirm, isLoading }: {
         </ul>
 
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+          <button onClick={onClose} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
           >
             {isLoading ? 'Activating...' : 'Activate Year'}
           </button>
@@ -766,7 +766,7 @@ function YearsStep({
           <h2 className="text-base font-bold text-[rgb(var(--text-primary))]">Academic Years</h2>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">Define the temporal boundaries for all academic data.</p>
         </div>
-        <button onClick={onCreateYear} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+        <button onClick={onCreateYear} className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
           <Plus className="w-3.5 h-3.5" /> New Academic Year
         </button>
       </div>
@@ -779,17 +779,17 @@ function YearsStep({
         <div className="flex items-start gap-2.5 bg-[rgba(239,159,39,0.08)] border border-[rgba(239,159,39,0.25)] rounded-xl p-3 mb-3">
           <AlertCircle className="w-4 h-4 text-[#EF9F27] flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-[12px] font-semibold text-[rgb(var(--text-primary))]">
+            <p className="text-xs font-semibold text-[rgb(var(--text-primary))]">
               &quot;{driftedActiveYear.name}&quot; is active but no year is designated as current.
             </p>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] mt-0.5">
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
               Dashboards, attendance, and grades depend on a designated current year.
             </p>
             <button
               type="button"
               onClick={() => onSetCurrentYear(driftedActiveYear)}
               disabled={setCurrentPending}
-              className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-lg bg-[#1D9E75] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               <Star className="w-3 h-3" />
               Set as Current
@@ -805,11 +805,11 @@ function YearsStep({
       ) : years.length === 0 ? (
         <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl p-10 text-center">
           <div className="text-3xl opacity-40 mb-3">📅</div>
-          <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No academic years yet</h3>
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
+          <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No academic years yet</h3>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
             Create your first academic year to begin setting up your school's academic structure.
           </p>
-          <button onClick={onCreateYear} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+          <button onClick={onCreateYear} className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
             + Create Academic Year
           </button>
         </div>
@@ -833,11 +833,11 @@ function YearsStep({
                         {isBikramSambat && year.nameBS ? (
                           <>
                             {year.nameBS}
-                            <span className="text-[10px] text-[rgb(var(--text-tertiary))] font-normal ml-1.5">{year.name}</span>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))] font-normal ml-1.5">{year.name}</span>
                           </>
                         ) : year.name}
                       </div>
-                      <div className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+                      <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
                         {year.startDate && year.endDate ? (
                           `${new Date(year.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} – ${new Date(year.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
                         ) : 'Dates not set'}
@@ -845,14 +845,14 @@ function YearsStep({
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${status.bg} ${status.text}`}>
-                      <span className="w-[5px] h-[5px] rounded-full bg-current" />
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${status.bg} ${status.text}`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-current" />
                       {status.label}
                     </span>
                     {/* `Current` pill — designation for downstream reads. */}
                     {year.isCurrent === true && (
                       <span
-                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[rgba(55,138,221,0.12)] text-[#378ADD]"
+                        className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[rgba(55,138,221,0.12)] text-[#378ADD]"
                         title="This year anchors dashboards, attendance, and grades."
                       >
                         <Star className="w-2.5 h-2.5" />
@@ -862,14 +862,14 @@ function YearsStep({
                     {/* Drift pill — active but not designated current. */}
                     {year.status === 'active' && year.isCurrent !== true && (
                       <span
-                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[rgba(239,159,39,0.12)] text-[#EF9F27]"
+                        className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[rgba(239,159,39,0.12)] text-[#EF9F27]"
                         title="This year is active but no year is designated as current. Use 'Set as Current' to fix."
                       >
                         <AlertCircle className="w-2.5 h-2.5" />
                         Not current
                       </span>
                     )}
-                    <button onClick={() => onEditYear(year)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] transition-all">
+                    <button onClick={() => onEditYear(year)} className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] transition-all">
                       Edit
                     </button>
                     {/* Set as Current — operator self-recovery for the
@@ -879,7 +879,7 @@ function YearsStep({
                       <button
                         onClick={() => onSetCurrentYear(year)}
                         disabled={setCurrentPending}
-                        className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(55,138,221,0.25)] text-[#378ADD] hover:bg-[rgba(55,138,221,0.06)] transition-all disabled:opacity-50 inline-flex items-center gap-1"
+                        className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[rgba(55,138,221,0.25)] text-[#378ADD] hover:bg-[rgba(55,138,221,0.06)] transition-all disabled:opacity-50 inline-flex items-center gap-1"
                         title="Designate as the current academic year"
                       >
                         <Star className="w-3 h-3" />
@@ -887,14 +887,14 @@ function YearsStep({
                       </button>
                     )}
                     {year.status === 'planning' && (
-                      <button onClick={() => onActivateYear(year)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 transition-opacity">
+                      <button onClick={() => onActivateYear(year)} className="px-2.5 py-1 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 transition-opacity">
                         Activate
                       </button>
                     )}
                   </div>
                 </div>
                 <div className="px-4 py-2.5">
-                  <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2 text-[11px] text-[#378ADD]">
+                  <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2 text-xs text-[#378ADD]">
                     <span>📌</span>
                     <span>Next step: Add sessions (semesters/trimesters) to this academic year to define grading periods.</span>
                   </div>
@@ -904,7 +904,7 @@ function YearsStep({
           })}
 
           {/* Info banner */}
-          <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-[11px] text-[#378ADD]">
+          <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-xs text-[#378ADD]">
             <span>ℹ️</span>
             <span>Academic years cannot be deleted once created. This preserves historical data integrity. Mark completed years as archived to hide them from active views.</span>
           </div>
@@ -1076,14 +1076,14 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+          className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
         >
           <Plus className="w-3.5 h-3.5" /> Add Session
         </button>
       </div>
 
       {/* Ed-Fi annotation */}
-      <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-[11px] text-[#378ADD] mb-3">
+      <div className="flex items-start gap-2 bg-[rgba(55,138,221,0.05)] border border-[rgba(55,138,221,0.12)] rounded-lg px-3 py-2.5 text-xs text-[#378ADD] mb-3">
         <span>ℹ️</span>
         <span>Sessions define grading periods (e.g., "First Semester", "Q1"). Each session maps to Ed-Fi <strong>GradingPeriodDescriptor</strong>. Students receive report cards per session.</span>
       </div>
@@ -1112,12 +1112,12 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
               type="button"
               onClick={handleApplyTemplate}
               disabled={isTemplateApplying}
-              className="flex-shrink-0 bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg hover:opacity-90 disabled:opacity-50"
+              className="flex-shrink-0 bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg hover:opacity-90 disabled:opacity-50"
             >
               {isTemplateApplying ? 'Applying…' : 'Apply template'}
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
             {pabsonTemplate.map((t, i) => (
               <div
                 key={i}
@@ -1139,10 +1139,10 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-[13px]">📋</div>
+            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📋</div>
             <div>
               <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{yearLabel} Sessions</h3>
-              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">{sessions.length} sessions configured</p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">{sessions.length} sessions configured</p>
             </div>
           </div>
         </div>
@@ -1153,11 +1153,11 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
             <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Session</h4>
             <div className="grid grid-cols-2 gap-2.5 mb-2.5">
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Session Name <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Session Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <input className={inputClass} value={sessionName} onChange={e => setSessionName(e.target.value)} placeholder="e.g., First Semester" />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Term Descriptor <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Term Descriptor <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <select className={inputClass} value={termType} onChange={e => setTermType(e.target.value)}>
                   <option value="">Select term descriptor...</option>
                   <option value="fall_semester">Fall Semester</option>
@@ -1171,7 +1171,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
                 </select>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Begin Date <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Begin Date <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <DateInput
                   value={beginDate}
                   onChange={(iso) => { setBeginDate(iso); setFormError(null) }}
@@ -1179,7 +1179,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">End Date <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">End Date <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <DateInput
                   value={endDate}
                   onChange={(iso) => { setEndDate(iso); setFormError(null) }}
@@ -1188,13 +1188,13 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
               </div>
             </div>
             {formError && (
-              <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-1">
+              <div className="text-xs text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)]0/10 border border-[rgb(var(--state-danger-border)/0.35)] rounded-lg px-3 py-2 mb-1">
                 {formError}
               </div>
             )}
             <div className="flex justify-end gap-2">
-              <button onClick={() => { setShowForm(false); setFormError(null) }} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
-              <button onClick={handleCreate} disabled={createSession.isPending} className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50">{createSession.isPending ? 'Creating...' : 'Create Session'}</button>
+              <button onClick={() => { setShowForm(false); setFormError(null) }} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
+              <button onClick={handleCreate} disabled={createSession.isPending} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50">{createSession.isPending ? 'Creating...' : 'Create Session'}</button>
             </div>
           </div>
         )}
@@ -1223,8 +1223,8 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
         ) : (
           <div className="p-6 text-center">
             <div className="text-2xl opacity-40 mb-2">📋</div>
-            <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1">No sessions yet</h3>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
+            <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1">No sessions yet</h3>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed">
               Create your first session above — e.g., "First Semester" covering April through September. Sessions define when report cards are generated.
             </p>
           </div>
@@ -1234,7 +1234,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
       {/* Nepal suggestions panel */}
       {isNepal && sessions.length === 0 && (
         <div className="mt-2 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-lg p-3">
-          <p className="text-[11px] font-semibold text-[rgb(var(--text-tertiary))] mb-2">Suggested for Nepal schools (Semester system):</p>
+          <p className="text-xs font-semibold text-[rgb(var(--text-tertiary))] mb-2">Suggested for Nepal schools (Semester system):</p>
           <div className="space-y-1.5">
             {[
               { label: 'First Semester', detail: 'Baishakh – Ashwin  (Apr – Oct)', type: 'first' as const },
@@ -1243,9 +1243,9 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
               <div key={s.type} className="flex items-center justify-between px-3 py-2 bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.1)] rounded-lg">
                 <div>
                   <span className="text-xs font-medium text-[rgb(var(--text-primary))]">{s.label}</span>
-                  <span className="text-[10px] text-[rgb(var(--text-tertiary))] ml-2">{s.detail}</span>
+                  <span className="text-xs text-[rgb(var(--text-tertiary))] ml-2">{s.detail}</span>
                 </div>
-                <button onClick={() => prefillNepalSemester(s.type)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+                <button onClick={() => prefillNepalSemester(s.type)} className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
                   + Use
                 </button>
               </div>
@@ -1387,14 +1387,14 @@ function SessionRowWithExamForm({
           <span className="text-xs font-medium text-[rgb(var(--text-primary))]">
             {session.sessionName || session.name}
           </span>
-          <span className="text-[10px] text-[rgb(var(--text-tertiary))]">
+          <span className="text-xs text-[rgb(var(--text-tertiary))]">
             {session.beginDate && session.endDate
               ? `${new Date(session.beginDate).toLocaleDateString()} – ${new Date(session.endDate).toLocaleDateString()}`
               : ''}
           </span>
           {hasExamDates && (
             <span
-              className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+              className="text-xs font-medium px-1.5 py-0.5 rounded"
               style={{
                 background: 'rgba(249,115,22,0.08)',
                 color: '#F97316',
@@ -1407,7 +1407,7 @@ function SessionRowWithExamForm({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] px-1.5 py-px rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.04)] text-[rgb(var(--text-tertiary))]">
+          <span className="text-xs px-1.5 py-px rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.04)] text-[rgb(var(--text-tertiary))]">
             {session.termDescriptor || session.termType || 'Session'}
           </span>
           {associatedGp && (
@@ -1417,7 +1417,7 @@ function SessionRowWithExamForm({
                 setIsEditing(p => !p)
                 setErrorMessage(null)
               }}
-              className="text-[10px] font-medium text-[#378ADD] hover:underline"
+              className="text-xs font-medium text-[#378ADD] hover:underline"
             >
               {isEditing ? 'Close' : hasExamDates ? 'Edit exam window' : 'Set exam window'}
             </button>
@@ -1428,13 +1428,13 @@ function SessionRowWithExamForm({
       {/* Inline edit form */}
       {isEditing && associatedGp && (
         <div className="px-3 py-3 border-t border-[rgba(55,138,221,0.12)] bg-[rgba(55,138,221,0.03)]">
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mb-2">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mb-2">
             Exam dates must be inside the session range ({session.beginDate} – {session.endDate}).
             Saving auto-generates orange exam-window markers on the calendar.
           </p>
           <div className="grid grid-cols-2 gap-2.5 mb-2.5">
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">
+              <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 Exam Start Date
               </label>
               <DateInput
@@ -1447,7 +1447,7 @@ function SessionRowWithExamForm({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">
+              <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 Exam End Date
               </label>
               <DateInput
@@ -1461,7 +1461,7 @@ function SessionRowWithExamForm({
             </div>
           </div>
           {errorMessage && (
-            <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-2">
+            <div className="text-xs text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)]0/10 border border-[rgb(var(--state-danger-border)/0.35)] rounded-lg px-3 py-2 mb-2">
               {errorMessage}
             </div>
           )}
@@ -1474,7 +1474,7 @@ function SessionRowWithExamForm({
                 setExamStart(associatedGp?.examStartDate ?? '')
                 setExamEnd(associatedGp?.examEndDate ?? '')
               }}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
             >
               Cancel
             </button>
@@ -1482,7 +1482,7 @@ function SessionRowWithExamForm({
               type="button"
               onClick={() => updateGp.mutate()}
               disabled={updateGp.isPending || !examStart || !examEnd}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
             >
               {updateGp.isPending ? 'Saving…' : 'Save exam dates'}
             </button>
@@ -1493,7 +1493,7 @@ function SessionRowWithExamForm({
       {/* Holiday-overlap warnings (S2.1 consumer) */}
       {warnings.length > 0 && !isEditing && (
         <div className="px-3 py-2.5 border-t border-[rgba(239,159,39,0.18)] bg-[rgba(239,159,39,0.05)]">
-          <p className="text-[11px] font-medium text-[#EF9F27] mb-1 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-[#EF9F27] mb-1 flex items-center gap-1.5">
             <span aria-hidden>⚠</span>
             Heads up — {warnings.length} date{warnings.length > 1 ? 's' : ''} in this exam window
             overlap{warnings.length > 1 ? '' : 's'} a holiday:
@@ -1506,7 +1506,7 @@ function SessionRowWithExamForm({
               </li>
             ))}
           </ul>
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1.5">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1.5">
             Saved as-is. Adjust dates above or clear the warning by setting the exam window outside the holidays.
           </p>
         </div>
@@ -1574,18 +1574,18 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
     <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
       {/* Month navigation */}
       <div className="px-4 py-2.5 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
-        <button onClick={prevMonth} className="px-2 py-1 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+        <button onClick={prevMonth} className="px-2 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
           ← Prev
         </button>
         <div className="text-center">
           {isBSCalendar && bsTitle && (
             <h3 className="text-xs font-bold text-[rgb(var(--text-primary))]">{bsTitle}</h3>
           )}
-          <h3 className={`font-bold text-[rgb(var(--text-${isBSCalendar ? 'tertiary' : 'primary'}))] ${isBSCalendar ? 'text-[10px]' : 'text-xs'}`}>
+          <h3 className={`font-bold text-[rgb(var(--text-${isBSCalendar ? 'tertiary' : 'primary'}))] ${isBSCalendar ? 'text-xs' : 'text-xs'}`}>
             {MONTH_NAMES[month]} {year}
           </h3>
         </div>
-        <button onClick={nextMonth} className="px-2 py-1 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+        <button onClick={nextMonth} className="px-2 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
           Next →
         </button>
       </div>
@@ -1593,7 +1593,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
       {/* Day of week headers */}
       <div className="grid grid-cols-7 px-3 pt-2 pb-1">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-          <div key={d} className="text-[9px] font-bold uppercase text-center text-[rgb(var(--text-tertiary))] py-1">
+          <div key={d} className="text-xs font-bold uppercase text-center text-[rgb(var(--text-tertiary))] py-1">
             {d}
           </div>
         ))}
@@ -1639,7 +1639,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
               title={cellTitle}
               onClick={() => inRange && entry ? onSelectDate(isSelected ? null : dateStr) : undefined}
               disabled={!inRange || !entry}
-              className={`${isBSCalendar ? 'h-10' : 'h-8'} rounded-md text-[11px] font-medium relative flex ${isBSCalendar ? 'flex-col' : ''} items-center justify-center transition-all ${
+              className={`${isBSCalendar ? 'h-10' : 'h-8'} rounded-md text-xs font-medium relative flex ${isBSCalendar ? 'flex-col' : ''} items-center justify-center transition-all ${
                 !inRange ? 'opacity-20 cursor-default'
                   : isSelected ? 'ring-1 ring-[#378ADD] bg-[rgba(55,138,221,0.15)] text-[#378ADD]'
                   : isWeekend ? 'text-[rgb(var(--text-tertiary))] opacity-50'
@@ -1650,8 +1650,8 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
             >
               {isBSCalendar && bsDay != null ? (
                 <>
-                  <span className="text-[11px] font-semibold leading-none">{bsDay}</span>
-                  <span className="text-[8px] opacity-50 leading-none">{day}</span>
+                  <span className="text-xs font-semibold leading-none">{bsDay}</span>
+                  <span className="text-xs opacity-50 leading-none">{day}</span>
                 </>
               ) : (
                 day
@@ -1679,7 +1679,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
       </div>
 
       {/* Quick stats for this month */}
-      <div className="px-4 py-2 border-t border-[rgba(255,255,255,0.04)] flex gap-3 text-[10px] text-[rgb(var(--text-tertiary))]">
+      <div className="px-4 py-2 border-t border-[rgba(255,255,255,0.04)] flex gap-3 text-xs text-[rgb(var(--text-tertiary))]">
         <span>{cells.filter(c => c.entry?.isInstructionalDay).length} instructional</span>
         <span>{cells.filter(c => c.entry?.isHoliday).length} holidays</span>
         <span>{cells.filter(c => c.entry?.isWeekend).length} weekends</span>
@@ -1820,31 +1820,31 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
       <div className="rounded-lg px-3 py-2 mb-2.5" style={{ background: isWeekendWithHoliday || isWeekend ? 'rgba(148,163,184,0.06)' : colorCfg.bg, border: `1px solid ${infoBorderColor}` }}>
         {/* Date display */}
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-medium text-[rgb(var(--text-secondary))]">{dateLabel}</span>
-          <span className="text-[9px] font-medium px-1.5 py-0.5 rounded" style={{ background: colorCfg.bg, color: colorCfg.dot }}>
+          <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{dateLabel}</span>
+          <span className="text-xs font-medium px-1.5 py-0.5 rounded" style={{ background: colorCfg.bg, color: colorCfg.dot }}>
             {colorCfg.label}
           </span>
         </div>
 
         {/* BS date for Nepal schools */}
         {bsDateLabel && (
-          <p className="text-[11px] font-medium text-teal-600 dark:text-teal-400 mb-1">{bsDateLabel}</p>
+          <p className="text-xs font-medium text-[rgb(var(--action-secondary-fg))]  mb-1">{bsDateLabel}</p>
         )}
 
         {/* Holiday name — shown prominently for proper holidays */}
         {!isWeekend && holidayName && currentEventType === 'holiday' && (
-          <p className="text-[11px] font-medium text-[rgb(var(--text-primary))]">{holidayName}</p>
+          <p className="text-xs font-medium text-[rgb(var(--text-primary))]">{holidayName}</p>
         )}
 
         {/* Weekend + Holiday overlap explanation */}
         {isWeekendWithHoliday && holidayName && (
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
             {holidayName} falls on this {dateEntry.dayOfWeek} — counted as weekend, not holiday
           </p>
         )}
 
         {/* Day metadata */}
-        <div className="flex items-center gap-2 text-[10px] text-[rgb(var(--text-tertiary))] mt-1">
+        <div className="flex items-center gap-2 text-xs text-[rgb(var(--text-tertiary))] mt-1">
           {dateEntry?.dayOfWeek && (
             <span>{dateEntry.dayOfWeek.charAt(0).toUpperCase() + dateEntry.dayOfWeek.slice(1)}{isWeekend ? ' (Weekend)' : ''}</span>
           )}
@@ -1860,7 +1860,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
           <div className="w-full border-t border-[rgba(255,255,255,0.06)]" />
         </div>
         <div className="relative flex justify-center">
-          <span className="px-2 text-[9px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-primary))]">Edit</span>
+          <span className="px-2 text-xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--surface-primary))]">Edit</span>
         </div>
       </div>
 
@@ -1868,12 +1868,12 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
           of a multi-day block). Server-side denormalization (PR A)
           exposes blockId/blockName on the date row. */}
       {dateEntry?.blockId && (
-        <div className="bg-[rgba(127,119,221,0.06)] border border-[rgba(127,119,221,0.15)] rounded-lg px-3 py-2 mb-2.5 text-[11px] text-[rgb(var(--text-secondary))]">
+        <div className="bg-[rgba(127,119,221,0.06)] border border-[rgba(127,119,221,0.15)] rounded-lg px-3 py-2 mb-2.5 text-xs text-[rgb(var(--text-secondary))]">
           <span className="font-medium">Part of:</span> {dateEntry.blockName ?? 'Multi-day block'}
           {dateEntry.subEventName && (
             <span className="text-[rgb(var(--text-tertiary))]"> · {dateEntry.subEventName}</span>
           )}
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
             Saving an override here keeps the block link but customizes this single day.
           </p>
         </div>
@@ -1886,7 +1886,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
           single-day-curated-options.ts. */}
       <div className="grid grid-cols-2 gap-2.5 mb-2.5">
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Event Type</label>
+          <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Event Type</label>
           <select
             className={inputClass}
             value={curatedKey}
@@ -1911,12 +1911,12 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
             <option key="other" value="other">────────</option>
             <option key="other-real" value="other">Other (advanced)…</option>
           </select>
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] leading-tight">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] leading-tight">
             {curatedKey === 'other' ? 'Pick a raw type below' : getCuratedMeta(curatedKey).description}
           </p>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Instructional Day</label>
+          <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Instructional Day</label>
           <label className="flex items-center gap-2 py-1.5">
             <input
               type="checkbox"
@@ -1924,7 +1924,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
               onChange={e => setIsInstructional(e.target.checked)}
               className="w-3.5 h-3.5 rounded"
             />
-            <span className="text-[11px] text-[rgb(var(--text-secondary))]">
+            <span className="text-xs text-[rgb(var(--text-secondary))]">
               {isInstructional ? 'Yes — counts toward instruction hours' : 'No — non-instructional'}
             </span>
           </label>
@@ -1934,7 +1934,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
       {/* "Other" escape hatch — raw eventType dropdown */}
       {curatedKey === 'other' && (
         <div className="mb-2.5">
-          <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))] block mb-1">
+          <label className="text-xs font-medium text-[rgb(var(--text-tertiary))] block mb-1">
             Raw Event Type
           </label>
           <select
@@ -1956,7 +1956,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
       {/* Optional description (operator notes — stored as the event's
           `description` field; appears in tooltips and reports). */}
       <div className="flex flex-col gap-1 mb-2.5">
-        <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">
+        <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
           Description (optional)
         </label>
         <input
@@ -1970,7 +1970,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
       </div>
 
       <div className="flex justify-end gap-2">
-        <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
+        <button onClick={onClose} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
           Cancel
         </button>
         <button
@@ -1991,7 +1991,7 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
               description === (currentEvent?.description ?? '') &&
               (curatedKey !== 'other' || rawOverride === (currentEvent?.eventType ?? rawOverride)))
           }
-          className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
         >
           {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
@@ -2120,7 +2120,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{yearLabel} Calendar Management</p>
         </div>
         <div className="flex gap-2 items-center">
-          <button className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
+          <button className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
             Sessions
           </button>
           {calendarExists ? (
@@ -2135,7 +2135,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
               only — no destructive action exposed.
             */
             <span
-              className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#1D9E75] bg-[rgba(29,158,117,0.08)] border border-[rgba(29,158,117,0.2)] rounded-md px-2.5 py-1"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1D9E75] bg-[rgba(29,158,117,0.08)] border border-[rgba(29,158,117,0.2)] rounded-md px-2.5 py-1"
               title="To reset the calendar, use Configuration → Danger Zone"
             >
               <span aria-hidden>✓</span>
@@ -2145,7 +2145,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
             <button
               onClick={() => setShowGenPanel(true)}
               disabled={!yearId || generateCalendar.isPending}
-              className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
+              className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 disabled:opacity-50"
             >
               Generate Calendar
             </button>
@@ -2157,19 +2157,19 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3">
         <div className="grid grid-cols-3 gap-2 p-3.5">
           <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Academic Year</p>
-            <p className="text-[13px] font-semibold text-[rgb(var(--text-primary))]">{yearLabel}</p>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">0 of {totalDays} days elapsed</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Academic Year</p>
+            <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">{yearLabel}</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">0 of {totalDays} days elapsed</p>
           </div>
           <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Instructional Days</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Instructional Days</p>
             <p className="text-xl font-semibold text-[#378ADD]">{instructionalDays}</p>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">0 completed · {instructionalDays} remaining</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">0 completed · {instructionalDays} remaining</p>
           </div>
           <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-lg px-3 py-2.5">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Holidays</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">Holidays</p>
             <p className="text-xl font-semibold text-[#EF9F27]">{holidays}</p>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">{holidays === 0 ? 'No holidays scheduled' : `${holidays} scheduled`}</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{holidays === 0 ? 'No holidays scheduled' : `${holidays} scheduled`}</p>
           </div>
         </div>
       </div>
@@ -2178,7 +2178,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
       {generationWarnings.length > 0 && (
         <div className="mb-3 space-y-1.5">
           {generationWarnings.map((w, i) => (
-            <div key={i} className="flex items-start gap-2 bg-[rgba(217,119,6,0.06)] border border-[rgba(217,119,6,0.15)] rounded-lg p-2.5 text-[11px] text-[#D97706] leading-relaxed">
+            <div key={i} className="flex items-start gap-2 bg-[rgba(217,119,6,0.06)] border border-[rgba(217,119,6,0.15)] rounded-lg p-2.5 text-xs text-[#D97706] leading-relaxed">
               <span className="shrink-0 mt-0.5">&#9888;</span>
               <span>{w}</span>
             </div>
@@ -2262,12 +2262,12 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-1">
             Generate Calendar
           </h3>
-          <p className="text-[11px] text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
             Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.
           </p>
 
           {/* Locale chip — accurate description, no false BS claim */}
-          <div className="inline-flex items-center gap-1.5 text-[10px] text-[#378ADD] bg-[rgba(55,138,221,0.08)] border border-[rgba(55,138,221,0.15)] rounded-md px-2 py-1 mb-3">
+          <div className="inline-flex items-center gap-1.5 text-xs text-[#378ADD] bg-[rgba(55,138,221,0.08)] border border-[rgba(55,138,221,0.15)] rounded-md px-2 py-1 mb-3">
             {localeDefaults.isNepal
               ? `Detected locale: Nepal (NP) · Saturday weekend · ${localeHolidays.length} public holidays loaded`
               : 'Detected locale: International · Gregorian calendar'}
@@ -2276,7 +2276,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           {/* Locale row */}
           <div className="grid grid-cols-2 gap-2.5 mb-3">
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Country / Locale</label>
+              <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Country / Locale</label>
               <select className={inputClass} defaultValue={localeDefaults.isNepal ? 'NP' : 'US'}>
                 <option value="NP">Nepal (NP)</option>
                 <option value="US">United States (US)</option>
@@ -2285,7 +2285,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Weekends</label>
+              <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Weekends</label>
               <select
                 className={inputClass}
                 value={weekendOption}
@@ -2311,7 +2311,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
 
           {/* School days picker */}
           <div className="mb-3">
-            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))] mb-1.5 block">School Days</label>
+            <label className="text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1.5 block">School Days</label>
             <div className="flex gap-1.5">
               {DAY_LABELS.map((day, i) => {
                 const dayIndex = dayToIndex(day.key)
@@ -2320,7 +2320,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
                   <button
                     key={`cal-${day.key}-${i}`}
                     onClick={() => toggleCalDay(dayIndex)}
-                    className={`w-8 h-8 rounded-lg border text-[11px] font-semibold flex items-center justify-center transition-all ${
+                    className={`w-8 h-8 rounded-lg border text-xs font-semibold flex items-center justify-center transition-all ${
                       isActive
                         ? 'bg-[rgba(55,138,221,0.15)] border-[rgba(55,138,221,0.3)] text-[#378ADD]'
                         : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]'
@@ -2331,12 +2331,12 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
                 )
               })}
             </div>
-            <p className="text-[10px] text-[rgb(var(--text-tertiary))] mt-1.5">{localeDefaults.weekendHint}</p>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1.5">{localeDefaults.weekendHint}</p>
           </div>
 
           {/* Preview */}
           {activeYear && (
-            <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)] rounded-lg p-3 mb-3 text-[11px] text-[rgb(var(--text-tertiary))] leading-relaxed">
+            <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)] rounded-lg p-3 mb-3 text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
               <strong className="text-[rgb(var(--text-primary))]">Preview:</strong>{' '}
               Will generate dates from{' '}
               <strong className="text-[#378ADD]">{activeYear.startDate ? new Date(activeYear.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}</strong>{' '}
@@ -2356,14 +2356,14 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setShowGenPanel(false)}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
             >
               Cancel
             </button>
             <button
               onClick={() => setShowConfirm(true)}
               disabled={!yearId || generateCalendar.isPending}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 bg-[#1D9E75]"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50 bg-[#1D9E75]"
             >
               Generate Calendar
             </button>
@@ -2379,7 +2379,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
       */}
       {showConfirm && !calendarExists && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
+          <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
           <div className="relative w-full max-w-md bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.1)] rounded-2xl shadow-xl p-5">
             <h3 className="text-sm font-bold text-[rgb(var(--text-primary))] mb-2">
               Generate Calendar
@@ -2393,7 +2393,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
                 {endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '...'}
               </strong>.
             </p>
-            <div className="space-y-1.5 text-[11px] text-[rgb(var(--text-tertiary))] mb-4">
+            <div className="space-y-1.5 text-xs text-[rgb(var(--text-tertiary))] mb-4">
               <p>✔ Active days will be marked as instructional</p>
               <p>✔ Weekend days will be marked as non-instructional</p>
               {localeHolidays.length > 0 && (
@@ -2404,14 +2404,14 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleGenerate}
                 disabled={generateCalendar.isPending}
-                className="px-3 py-1.5 text-[11px] font-medium rounded-lg text-white hover:opacity-90 disabled:opacity-50 bg-[#1D9E75]"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50 bg-[#1D9E75]"
               >
                 {generateCalendar.isPending ? 'Generating...' : 'Confirm & Generate'}
               </button>
@@ -2424,11 +2424,11 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           DAY_TYPE_LEGEND_CHIPS automatically excludes server-managed types
           (exam_window) per S2.5 so operators only see types they can pick. */}
       <div className="flex flex-wrap gap-1.5 items-center">
-        <span className="text-[10px] text-[rgb(var(--text-tertiary))] mr-1">Day types:</span>
+        <span className="text-xs text-[rgb(var(--text-tertiary))] mr-1">Day types:</span>
         {DAY_TYPE_LEGEND_CHIPS.map(dt => (
           <span
             key={dt.label}
-            className="text-[9px] font-medium px-1.5 py-0.5 rounded"
+            className="text-xs font-medium px-1.5 py-0.5 rounded"
             style={{ background: dt.color, color: dt.text, border: `1px solid ${dt.border}` }}
           >
             {dt.label}
@@ -2575,10 +2575,10 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">Define class periods and time slots for each type of school day.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setShowTemplatesOverride(!showTemplates)} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
+          <button onClick={() => setShowTemplatesOverride(!showTemplates)} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.09)] bg-[rgba(255,255,255,0.05)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.08)]">
             Use Template
           </button>
-          <button onClick={() => setShowCreateForm(true)} className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+          <button onClick={() => setShowCreateForm(true)} className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
             <Plus className="w-3.5 h-3.5" /> New Schedule
           </button>
         </div>
@@ -2588,10 +2588,10 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
         <div className="px-4 py-3 flex items-center justify-between border-b border-[rgba(255,255,255,0.05)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-[13px]">💡</div>
+            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(239,159,39,0.1)] flex items-center justify-center text-sm">💡</div>
             <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">How bell schedules work</h3>
           </div>
-          <button onClick={() => setShowHowItWorksOverride(!showHowItWorks)} className="px-2.5 py-1 text-[10px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]">
+          <button onClick={() => setShowHowItWorksOverride(!showHowItWorks)} className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))]">
             {showHowItWorks ? '▲ Collapse' : '▼ Expand'}
           </button>
         </div>
@@ -2604,8 +2604,8 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
             ].map(s => (
               <div key={s.step} className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-lg p-3 text-center">
                 <div className="text-lg mb-1.5">{s.step}</div>
-                <div className="text-[11px] font-semibold text-[rgb(var(--text-primary))] mb-0.5">{s.title}</div>
-                <div className="text-[10px] text-[rgb(var(--text-tertiary))]">{s.desc}</div>
+                <div className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-0.5">{s.title}</div>
+                <div className="text-xs text-[rgb(var(--text-tertiary))]">{s.desc}</div>
               </div>
             ))}
           </div>
@@ -2617,14 +2617,14 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
         <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 p-4">
           <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Bell Schedule</h4>
           <div className="flex flex-col gap-1 mb-2.5">
-            <label className="text-[11px] font-medium text-[rgb(var(--text-tertiary))]">Schedule Name <span className="text-red-500">*</span></label>
+            <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Schedule Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
             <input className={inputClass} value={newName} onChange={e => setNewName(e.target.value)} placeholder='e.g., "Regular Day", "Early Release"' />
           </div>
-          <p className="text-[10px] text-[rgb(var(--text-tertiary))] mb-2.5">
+          <p className="text-xs text-[rgb(var(--text-tertiary))] mb-2.5">
             Create an empty schedule, then add periods to it. Or use a template above to start with pre-built periods.
           </p>
           <div className="flex justify-end gap-2">
-            <button onClick={() => { setShowCreateForm(false); setNewName('') }} className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
+            <button onClick={() => { setShowCreateForm(false); setNewName('') }} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">Cancel</button>
             <button
               onClick={() => {
                 if (!newName.trim()) return
@@ -2653,7 +2653,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                 })
               }}
               disabled={!newName.trim() || createBellSchedule.isPending}
-              className="px-3 py-1.5 text-[11px] font-medium rounded-lg bg-[#1D9E75] text-white hover:opacity-90 disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-50"
             >
               {createBellSchedule.isPending ? 'Creating...' : 'Create Schedule'}
             </button>
@@ -2666,10 +2666,10 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-[13px]">📄</div>
+            <div className="w-[26px] h-[26px] rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center text-sm">📄</div>
             <div>
               <h3 className="text-xs font-semibold text-[rgb(var(--text-primary))]">Start from Template</h3>
-              <p className="text-[10px] text-[rgb(var(--text-tertiary))]">Pre-built schedules — edit after applying</p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">Pre-built schedules — edit after applying</p>
             </div>
           </div>
         </div>
@@ -2686,17 +2686,17 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
             }`}>
               <div>
                 <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{t.name}</div>
-                <div className="text-[10px] text-[rgb(var(--text-tertiary))] mt-0.5">{t.desc}</div>
+                <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{t.desc}</div>
               </div>
               {alreadyApplied ? (
-                <span className="px-3 py-1.5 text-[11px] font-medium text-[#1D9E75]">✓ Applied</span>
+                <span className="px-3 py-1.5 text-xs font-medium text-[#1D9E75]">✓ Applied</span>
               ) : (
               <button
                 onClick={() => applyTemplate(t.name, t.preset, t.dayType ?? 'regular')}
                 disabled={createBellSchedule.isPending}
-                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg transition-all ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                   t.primary
-                    ? 'bg-[#1D9E75] text-white hover:opacity-90'
+                    ? 'bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90'
                     : 'border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]'
                 } disabled:opacity-50`}
               >
@@ -2716,7 +2716,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
           {!hasRealDefaultBell && (
             <div
               data-testid="bell-schedule-no-default-banner"
-              className="bg-[rgba(239,159,39,0.06)] border border-[rgba(239,159,39,0.35)] text-[#EF9F27] rounded-lg px-3 py-2.5 flex items-start gap-2 text-[11px] leading-relaxed"
+              className="bg-[rgba(239,159,39,0.06)] border border-[rgba(239,159,39,0.35)] text-[#EF9F27] rounded-lg px-3 py-2.5 flex items-start gap-2 text-xs leading-relaxed"
             >
               <span aria-hidden className="text-sm leading-none mt-px">⚠</span>
               <div className="flex-1">
@@ -2740,13 +2740,13 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">{sched.bellScheduleName || sched.name}</span>
                   {sched.isDefault && (
-                    <span className="text-[9px] font-medium px-1.5 py-px rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.2)]">Default</span>
+                    <span className="text-xs font-medium px-1.5 py-px rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.2)]">Default</span>
                   )}
                   {isPlaceholderDefault && (
                     <span
                       data-testid="bell-schedule-placeholder-chip"
                       title="This default schedule has only one period. Set a real schedule before activating the academic year."
-                      className="text-[9px] font-medium px-1.5 py-px rounded bg-[rgba(239,159,39,0.12)] text-[#EF9F27] border border-[rgba(239,159,39,0.35)]"
+                      className="text-xs font-medium px-1.5 py-px rounded bg-[rgba(239,159,39,0.12)] text-[#EF9F27] border border-[rgba(239,159,39,0.35)]"
                     >
                       Placeholder — set a real schedule before activating AY
                     </span>
@@ -2766,12 +2766,12 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                         if (id) setDefaultBell.mutate(id)
                       }}
                       disabled={setDefaultBell.isPending}
-                      className="text-[10px] font-medium px-2 py-0.5 rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.25)] hover:bg-[rgba(29,158,117,0.14)] disabled:opacity-50 transition-colors"
+                      className="text-xs font-medium px-2 py-0.5 rounded bg-[rgba(29,158,117,0.08)] text-[#1D9E75] border border-[rgba(29,158,117,0.25)] hover:bg-[rgba(29,158,117,0.14)] disabled:opacity-50 transition-colors"
                     >
                       Set as default
                     </button>
                   )}
-                  <span className="text-[10px] text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
+                  <span className="text-xs text-[rgb(var(--text-tertiary))]">{sched.dayType || 'Regular'}</span>
                 </div>
               </div>
               {(sched.classPeriods || sched.periods)?.length > 0 && (
@@ -2781,10 +2781,10 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                     return (
                       <div key={idx} className="flex items-center gap-2.5 px-3 py-1.5">
                         <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: colors.text }} />
-                        <span className="text-[11px] text-[rgb(var(--text-secondary))] min-w-[80px]">{period.classPeriodName || period.name}</span>
-                        <span className="text-[11px] text-[rgb(var(--text-tertiary))] tabular-nums">{period.startTime} – {period.endTime}</span>
+                        <span className="text-xs text-[rgb(var(--text-secondary))] min-w-[80px]">{period.classPeriodName || period.name}</span>
+                        <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">{period.startTime} – {period.endTime}</span>
                         <span
-                          className="text-[9px] font-medium px-1.5 py-px rounded ml-auto"
+                          className="text-xs font-medium px-1.5 py-px rounded ml-auto"
                           style={{ background: colors.bg, color: colors.text }}
                         >
                           {period.periodType}
@@ -2802,11 +2802,11 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
         <div className="bg-[rgb(var(--surface-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
           <div className="p-10 text-center">
             <div className="text-3xl opacity-40 mb-3">🕐</div>
-            <h3 className="text-[13px] font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No bell schedules yet</h3>
-            <p className="text-[11px] text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
+            <h3 className="text-sm font-semibold text-[rgb(var(--text-secondary))] mb-1.5">No bell schedules yet</h3>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-[280px] mx-auto leading-relaxed mb-4">
               Apply a template above or create your first schedule to define how each type of school day is structured.
             </p>
-            <button className="bg-[#1D9E75] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+            <button className="bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
               + Create First Schedule
             </button>
           </div>

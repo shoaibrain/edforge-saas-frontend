@@ -187,7 +187,7 @@ export default function GradeLevelsTab({ schoolId, school }: GradeLevelsTabProps
             type="button"
             onClick={save}
             disabled={saveDisabled}
-            className="text-xs px-3 py-1.5 rounded-md bg-[#1D9E75] text-white hover:bg-[#168862] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="text-xs px-3 py-1.5 rounded-md bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:bg-[#168862] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
           >
             <Save size={12} /> {mutation.isPending ? 'Saving…' : 'Save changes'}
           </button>
@@ -270,7 +270,7 @@ function GradeLevelOption({ code, checked, disabled, onToggle }: GradeLevelOptio
       </span>
       {descriptor && (
         <span
-          className="shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-[rgba(127,119,221,0.1)] text-[#7F77DD]"
+          className="shrink-0 text-xs uppercase tracking-wide px-1.5 py-0.5 rounded bg-[rgba(127,119,221,0.1)] text-[#7F77DD]"
           title={`Ed-Fi descriptor for ${code}`}
         >
           → {descriptor}

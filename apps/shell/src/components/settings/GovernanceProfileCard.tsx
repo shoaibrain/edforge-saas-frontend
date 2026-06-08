@@ -117,7 +117,7 @@ export function GovernanceProfileCard({ archetype, country }: GovernanceProfileC
       >
         <div className="flex items-center gap-3 mb-3">
           <div className="p-2 rounded-lg bg-[rgb(var(--surface-tertiary))]">
-            <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+            <ShieldCheck className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">

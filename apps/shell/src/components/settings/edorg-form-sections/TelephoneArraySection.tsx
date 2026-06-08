@@ -15,10 +15,10 @@ interface TelephoneArraySectionProps {
 }
 
 const inputClass =
-  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors'
+  'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--surface-tertiary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
 const selectClass = inputClass
 const labelClass = 'block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1'
-const errorClass = 'mt-0.5 text-[10px] text-red-500'
+const errorClass = 'mt-0.5 text-xs text-[rgb(var(--state-danger-fg))]'
 
 export function TelephoneArraySection({ name = 'telephones' }: TelephoneArraySectionProps) {
   const { control, register, formState: { errors } } = useFormContext()
@@ -90,7 +90,7 @@ export function TelephoneArraySection({ name = 'telephones' }: TelephoneArraySec
           <button
             type="button"
             onClick={() => remove(index)}
-            className="mt-5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-red-500 hover:bg-red-500/10 transition-colors"
+            className="mt-5 p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
