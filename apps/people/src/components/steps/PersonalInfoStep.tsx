@@ -244,7 +244,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
           'w-32 h-32 rounded-2xl border-2 border-dashed',
           'bg-[rgb(var(--surface-tertiary))]',
           'transition-colors cursor-pointer',
-          dragOver && 'bg-teal-500/10 dark:bg-cyan-500/10'
+          dragOver && 'bg-[rgb(var(--state-info-bg)/0.18)]'
         )}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -269,7 +269,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
                 e.stopPropagation()
                 onChange(undefined)
               }}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rust-500 text-white flex items-center justify-center shadow-md hover:bg-rust-600 transition-colors"
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] flex items-center justify-center shadow-md hover:brightness-95 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
