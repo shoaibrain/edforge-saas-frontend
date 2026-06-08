@@ -125,7 +125,7 @@ export function Drawer({
           leaveTo="opacity-0"
         >
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-[rgb(var(--background-overlay)/0.40)] backdrop-blur-sm"
             aria-hidden="true"
           />
         </TransitionChild>
