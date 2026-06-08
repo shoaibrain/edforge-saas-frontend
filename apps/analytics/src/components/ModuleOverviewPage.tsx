@@ -137,8 +137,8 @@ function StatCard({ stat, index }: { stat: ModuleStat; index: number }) {
     const TrendIcon = stat.changeType === 'positive' ? TrendingUp : stat.changeType === 'negative' ? TrendingDown : Minus
     return (
         <motion.div className="flex-shrink-0" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: 0.3 }}>
-            <div className="group relative flex flex-col w-[180px] h-[140px] p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+            <div className="group relative flex flex-col w-44 h-36 p-4 rounded-2xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--surface-elevated)/0.10)] to-transparent pointer-events-none" />
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
                 </div>
@@ -147,7 +147,7 @@ function StatCard({ stat, index }: { stat: ModuleStat; index: number }) {
                     <div className="flex items-baseline gap-2">
                         <span className="text-xl font-bold text-[rgb(var(--text-primary))]">{stat.value}</span>
                         {stat.change && (
-                            <div className={`flex items-center gap-0.5 text-xs ${stat.changeType === 'positive' ? 'text-emerald-600' : stat.changeType === 'negative' ? 'text-rose-600' : 'text-[rgb(var(--text-tertiary))]'}`}>
+                            <div className={`flex items-center gap-0.5 text-xs ${stat.changeType === 'positive' ? 'text-[rgb(var(--state-success-fg))]' : stat.changeType === 'negative' ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                                 <TrendIcon className="w-3 h-3" /><span>{stat.change}</span>
                             </div>
                         )}
@@ -206,7 +206,7 @@ function ActionCard({ card, delay = 0 }: { card: ModuleActionCard; delay?: numbe
         <animated.div style={{ transform: springProps.scale.to(s => `scale(${s}) translateY(${springProps.y.get()}px)`) }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
                 <Link to={card.href}>
-                    <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-violet-500/30 dark:hover:border-violet-400/30">
+                    <Card className="p-6 h-full hover:shadow-overlay transition-shadow duration-base ease-standard cursor-pointer group border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus))]">
                         <div className="flex items-start justify-between mb-4">
                             <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
                                 <card.icon className={`w-6 h-6 ${card.iconColor}`} />
@@ -215,7 +215,7 @@ function ActionCard({ card, delay = 0 }: { card: ModuleActionCard; delay?: numbe
                                 <ArrowRight className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
                             </animated.div>
                         </div>
-                        <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">{card.title}</h3>
+                        <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1 group-hover:text-[rgb(var(--action-secondary-fg))] transition-colors">{card.title}</h3>
                         <p className="text-sm text-[rgb(var(--text-tertiary))]">{card.description}</p>
                     </Card>
                 </Link>
