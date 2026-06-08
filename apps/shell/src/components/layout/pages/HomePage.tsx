@@ -149,14 +149,14 @@ function StatCard({ stat, index }: StatCardProps) {
                 className={`text-sm font-medium ${
                   stat.trend === 'up' 
                     ? 'text-emerald-600 dark:text-emerald-400' 
-                    : 'text-red-600 dark:text-red-400'
+                    : 'text-[rgb(var(--state-danger-fg))] '
                 }`}
               >
                 {stat.change}
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/10 to-cyan-500/10">
-              <Icon className="w-6 h-6 text-teal-600 dark:text-cyan-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/10 to-[rgb(var(--action-primary-bg-hover))]/10">
+              <Icon className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
             </div>
           </div>
         </CardContent>
@@ -187,8 +187,8 @@ function QuickActionCard({ action, index, onClick }: QuickActionCardProps) {
       className="group p-4 rounded-xl bg-[rgb(var(--surface-secondary))] border border-[rgb(var(--border-primary))] hover:border-teal-500 hover:shadow-md transition-all duration-200 text-left w-full"
     >
       <div className="flex items-start gap-4">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/10 to-cyan-500/10 group-hover:from-teal-500/20 group-hover:to-cyan-500/20 transition-colors">
-          <Icon className="w-5 h-5 text-teal-600 dark:text-cyan-400" />
+        <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/10 to-[rgb(var(--action-primary-bg-hover))]/10 group-hover:from-[rgb(var(--action-primary-bg))]/20 group-hover:to-[rgb(var(--action-primary-bg-hover))]/20 transition-colors">
+          <Icon className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-medium text-[rgb(var(--text-primary))]">{action.label}</p>
@@ -269,7 +269,7 @@ export default function HomePage() {
               <h3 className="font-semibold text-[rgb(var(--text-primary))]">Upcoming Events</h3>
               <button 
                 onClick={() => navigate('/academics/schoolcalendar')}
-                className="text-sm text-teal-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
+                className="text-sm text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400 hover:underline flex items-center gap-1"
               >
                 View All
                 <ChevronRight className="w-4 h-4" />
@@ -307,7 +307,7 @@ export default function HomePage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-[rgb(var(--text-primary))]">Recent Activity</h3>
-              <button className="text-sm text-teal-600 dark:text-cyan-400 hover:underline flex items-center gap-1">
+              <button className="text-sm text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400 hover:underline flex items-center gap-1">
                 View All
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -343,11 +343,11 @@ export default function HomePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="p-6 rounded-2xl bg-gradient-to-br from-teal-500/5 via-cyan-500/5 to-teal-500/5 border border-teal-500/20"
+        className="p-6 rounded-2xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/5 via-cyan-500/5 to-teal-500/5 border border-teal-500/20"
       >
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-teal-500/10">
-            <Sparkles className="w-6 h-6 text-teal-600 dark:text-cyan-400" />
+          <div className="p-3 rounded-xl bg-[rgb(var(--action-primary-bg))]/10">
+            <Sparkles className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] dark:text-cyan-400" />
           </div>
           <div>
             <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1">

@@ -70,7 +70,7 @@ export function SchoolTransitionOverlay() {
                   <button
                     type="button"
                     onClick={handleRetry}
-                    className="px-4 py-1.5 text-xs font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                    className="px-4 py-1.5 text-xs font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
                   >
                     Retry
                   </button>
@@ -89,7 +89,7 @@ export function SchoolTransitionOverlay() {
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className="w-2 h-2 rounded-full bg-teal-500 dark:bg-cyan-400"
+                      className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] dark:bg-cyan-400"
                       animate={{ opacity: [0.3, 1, 0.3] }}
                       transition={{
                         duration: 0.8,

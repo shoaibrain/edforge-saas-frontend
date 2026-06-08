@@ -57,7 +57,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
   )
 
   return (
-    <div className="min-h-[400px] flex items-center justify-center p-6">
+    <div className="min-h-96 flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
         {/* Error Icon */}
         <div className="flex justify-center mb-6">
@@ -84,10 +84,10 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
             onClick={isDeploymentError ? () => window.location.reload() : resetError}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-xl',
-              'bg-teal-500 hover:bg-teal-600 dark:bg-cyan-500 dark:hover:bg-cyan-600',
-              'text-white font-medium text-sm',
+              'bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg))]  dark:hover:bg-cyan-600',
+              'text-[rgb(var(--action-primary-fg))] font-medium text-sm',
               'transition-colors duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:ring-offset-2'
             )}
           >
             <RefreshCw className="w-4 h-4" />
@@ -101,7 +101,7 @@ function ErrorFallback({ error, errorInfo, resetError, showDetails }: ErrorFallb
               'text-[rgb(var(--text-primary))] font-medium text-sm',
               'border border-[rgb(var(--border-primary))]',
               'transition-colors duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:ring-offset-2'
             )}
           >
             <Home className="w-4 h-4" />

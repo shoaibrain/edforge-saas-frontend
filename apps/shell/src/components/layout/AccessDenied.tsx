@@ -45,8 +45,8 @@ export function AccessDenied() {
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
-          <ShieldX className="w-8 h-8 text-red-600 dark:text-red-400" />
+        <div className="w-16 h-16 rounded-2xl bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center mx-auto mb-6">
+          <ShieldX className="w-8 h-8 text-[rgb(var(--state-danger-fg))] " />
         </div>
 
         <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">

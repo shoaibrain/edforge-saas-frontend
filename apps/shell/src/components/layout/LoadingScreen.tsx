@@ -25,7 +25,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
         {/* Animated Logo */}
         <div className="relative w-16 h-16">
           <motion.div
-            className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500"
+            className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))]"
             animate={{
               scale: [1, 1.1, 1],
               rotate: [0, 5, 0, -5, 0],
@@ -47,7 +47,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
               ease: 'easeInOut',
             }}
           >
-            <span className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] bg-clip-text text-transparent">
               E
             </span>
           </motion.div>
@@ -61,7 +61,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
           {[0, 1, 2].map((i) => (
             <motion.div
               key={i}
-              className="w-2 h-2 rounded-full bg-teal-500"
+              className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))]"
               animate={{
                 y: [0, -8, 0],
                 opacity: [0.5, 1, 0.5],

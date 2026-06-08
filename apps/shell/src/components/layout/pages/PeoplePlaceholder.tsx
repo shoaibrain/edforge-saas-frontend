@@ -30,7 +30,7 @@ export default function PeoplePlaceholder() {
           <h4 className="font-semibold text-cyan-600 dark:text-cyan-400 mb-1">
             People Federated Module
           </h4>
-          <p className="text-cyan-700 dark:text-cyan-300 text-sm">
+          <p className="text-cyan-700  text-sm">
             This placeholder will be replaced with the People remote module containing
             Staff Management, Parent Portal, Departments, and Communications.
           </p>

@@ -209,7 +209,7 @@ function NavItemLink({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="ml-auto px-2 py-0.5 text-[10px] font-semibold rounded-full bg-golden-400/20 text-golden-600 dark:text-golden-400 relative z-10"
+              className="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-golden-400/20 text-golden-600 dark:text-golden-400 relative z-10"
             >
               {item.badge}
             </motion.span>
