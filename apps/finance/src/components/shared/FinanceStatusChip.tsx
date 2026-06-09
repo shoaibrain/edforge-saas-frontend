@@ -1,36 +1,39 @@
 /**
- * FinanceStatusChip — V2 status chip with dot indicator.
+ * FinanceStatusChip — status chip for invoices, payments, and ledger entries.
  *
- * Replaces StatusBadge across finance pages with V2-styled dots + text.
- * Supports invoice statuses, payment statuses, and ledger entry types.
+ * Thin wrapper over the design-system StatusBadge: maps each domain status to a
+ * semantic tone and renders the canonical dotted pill. The `size` prop is kept
+ * for call-site compatibility (the badge renders at a single compact size).
  */
+
+import { StatusBadge, type StatusTone } from '@edforge/ui'
 
 export interface FinanceStatusChipProps {
   status: string
   size?: 'xs' | 'sm'
 }
 
-const STATUS_COLORS: Record<string, string> = {
+const STATUS_TONE: Record<string, StatusTone> = {
   // Invoice statuses
-  paid: '#1D9E75',
-  issued: '#378ADD',
-  overdue: '#E24B4A',
-  draft: 'var(--v2-text-hint, #4a5068)',
-  partially_paid: '#EF9F27',
-  cancelled: 'var(--v2-text-ghost, #2a3045)',
-  written_off: 'var(--v2-text-ghost, #2a3045)',
+  paid: 'success',
+  issued: 'info',
+  overdue: 'danger',
+  draft: 'neutral',
+  partially_paid: 'warning',
+  cancelled: 'neutral',
+  written_off: 'neutral',
 
   // Payment statuses
-  completed: '#1D9E75',
-  failed: '#E24B4A',
-  refunded: '#EF9F27',
-  partially_refunded: '#EF9F27',
-  pending: '#EF9F27',
-  processing: '#378ADD',
+  completed: 'success',
+  failed: 'danger',
+  refunded: 'warning',
+  partially_refunded: 'warning',
+  pending: 'warning',
+  processing: 'info',
 
   // Ledger entry types
-  debit: '#E24B4A',
-  credit: '#1D9E75',
+  debit: 'danger',
+  credit: 'success',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -47,41 +50,14 @@ function getStatusLabel(normalized: string, original: string): string {
   return STATUS_LABELS[normalized] ?? original.replace(/_/g, ' ')
 }
 
-export function FinanceStatusChip({ status, size = 'sm' }: FinanceStatusChipProps) {
+export function FinanceStatusChip({ status }: FinanceStatusChipProps) {
   const normalized = normalizeStatus(status)
-  const color = STATUS_COLORS[normalized] ?? 'var(--v2-text-hint, #4a5068)'
+  const tone = STATUS_TONE[normalized] ?? 'neutral'
   const label = getStatusLabel(normalized, status)
 
-  const dotSize = size === 'xs' ? 5 : 6
-  const fontSize = size === 'xs' ? '10px' : '11px'
-  const gap = size === 'xs' ? 4 : 5
-
   return (
-    <span
-      className="inline-flex items-center"
-      style={{ gap }}
-    >
-      <span
-        style={{
-          width: dotSize,
-          height: dotSize,
-          borderRadius: '50%',
-          background: color,
-          flexShrink: 0,
-          display: 'inline-block',
-        }}
-      />
-      <span
-        style={{
-          fontSize,
-          fontWeight: 500,
-          color,
-          textTransform: 'capitalize',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </span>
-    </span>
+    <StatusBadge tone={tone} dot size="sm" className="capitalize">
+      {label}
+    </StatusBadge>
   )
 }

@@ -21,8 +21,8 @@ export function ExportCsvButton({ onClick, isExporting }: ExportCsvButtonProps) 
         fontWeight: 500,
         padding: '4px 10px',
         borderRadius: 6,
-        border: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))',
-        color: 'var(--v2-text-secondary, #c8ccd8)',
+        border: '1px solid rgb(var(--border-primary) / 0.35)',
+        color: 'rgb(var(--text-secondary))',
         background: 'transparent',
         cursor: isExporting ? 'not-allowed' : 'pointer',
       }}

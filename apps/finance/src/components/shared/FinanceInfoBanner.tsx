@@ -68,11 +68,11 @@ export function FinanceInfoBanner({
         strokeWidth={2}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+        <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
           {message}
         </p>
         {subtitle && (
-          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
             {subtitle}
           </p>
         )}
@@ -93,7 +93,7 @@ export function FinanceInfoBanner({
         <button
           onClick={() => setDismissed(true)}
           className="flex-shrink-0 p-0.5 rounded hover:opacity-70 transition-opacity"
-          style={{ color: 'var(--v2-text-hint)' }}
+          style={{ color: 'rgb(var(--text-tertiary))' }}
         >
           <X className="w-3.5 h-3.5" />
         </button>
