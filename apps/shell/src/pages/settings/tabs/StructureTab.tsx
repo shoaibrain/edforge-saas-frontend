@@ -16,7 +16,7 @@ import {
   useCreateLocation,
   useDeleteLocation,
 } from '@/hooks/useLocations'
-import { Drawer, DrawerFooter } from '@edforge/ui'
+import { Drawer, DrawerFooter, Field, Input, Textarea, Checkbox, Select } from '@edforge/ui'
 
 // ============================================================================
 // TYPES & CONSTANTS
@@ -64,9 +64,6 @@ const EMPTY_ROOM_FORM: RoomFormState = {
   isActive: true,
   description: '',
 }
-
-const inputClass = 'w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 focus:border-[#1D9E75] transition-all'
-const labelClass = 'block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5'
 
 // ============================================================================
 // MAIN COMPONENT
@@ -180,15 +177,18 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
               <p className="text-xs text-[rgb(var(--text-tertiary))]">Academic and administrative departments</p>
             </div>
           </div>
-          <select
-            className="text-xs px-2.5 py-1 rounded-md bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] focus:outline-none"
+          <Select
+            aria-label="Filter by scope"
+            size="sm"
+            className="w-36"
             value={scopeFilter}
-            onChange={e => setScopeFilter(e.target.value as ScopeFilter)}
-          >
-            <option value="all">All Scopes</option>
-            <option value="school">School Only</option>
-            <option value="organization">Organization</option>
-          </select>
+            onChange={v => { if (v) setScopeFilter(v as ScopeFilter) }}
+            options={[
+              { value: 'all', label: 'All Scopes' },
+              { value: 'school', label: 'School Only' },
+              { value: 'organization', label: 'Organization' },
+            ]}
+          />
         </div>
 
         {isLoading ? (
@@ -270,44 +270,37 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
               </button>
             </div>
             <form onSubmit={handleCreate} className="p-6 space-y-4">
-              <div>
-                <label className={labelClass}>Department Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-                <input
-                  type="text"
+              <Field label="Department Name" required>
+                <Input
                   value={formName}
                   onChange={e => setFormName(e.target.value)}
-                  className={inputClass}
                   placeholder="e.g., Science"
                   required
                   minLength={2}
                   maxLength={100}
                 />
-              </div>
-              <div>
-                <label className={labelClass}>Code <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-                <input
-                  type="text"
+              </Field>
+              <Field label="Code" required helperText="2-10 characters. Cannot be changed after creation.">
+                <Input
                   value={formCode}
                   onChange={e => setFormCode(e.target.value.toUpperCase())}
-                  className={`${inputClass} font-mono`}
+                  className="font-mono"
                   placeholder="e.g., SCI"
                   required
                   minLength={2}
                   maxLength={10}
                 />
-                <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">2-10 characters. Cannot be changed after creation.</p>
-              </div>
-              <div>
-                <label className={labelClass}>Description <span className="text-[rgb(var(--text-tertiary))] font-normal">(optional)</span></label>
-                <textarea
+              </Field>
+              <Field label="Description" optionalText="optional">
+                <Textarea
                   value={formDescription}
                   onChange={e => setFormDescription(e.target.value)}
-                  className={`${inputClass} resize-none`}
                   rows={3}
                   maxLength={500}
+                  resize="none"
                   placeholder="Brief description of the department"
                 />
-              </div>
+              </Field>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]">
                   Cancel
@@ -464,85 +457,65 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
         size="sm"
       >
         <div className="p-6 space-y-4">
-          <div>
-            <label className={labelClass}>Room Number <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-            <input
-              type="text"
+          <Field label="Room Number" required>
+            <Input
               value={form.roomNumber}
               onChange={e => updateField('roomNumber', e.target.value)}
-              className={inputClass}
               placeholder="e.g., 101"
               maxLength={20}
             />
-          </div>
-          <div>
-            <label className={labelClass}>Building Name</label>
-            <input
-              type="text"
+          </Field>
+          <Field label="Building Name" optionalText={null}>
+            <Input
               value={form.buildingName}
               onChange={e => updateField('buildingName', e.target.value)}
-              className={inputClass}
               placeholder="e.g., Main Building"
               maxLength={100}
             />
-          </div>
+          </Field>
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Floor</label>
-              <input
+            <Field label="Floor" optionalText={null}>
+              <Input
                 type="number"
                 value={form.floorNumber}
                 onChange={e => updateField('floorNumber', e.target.value)}
-                className={inputClass}
                 placeholder="e.g., 1"
               />
-            </div>
-            <div>
-              <label className={labelClass}>Capacity</label>
-              <input
+            </Field>
+            <Field label="Capacity" optionalText={null}>
+              <Input
                 type="number"
                 value={form.capacity}
                 onChange={e => updateField('capacity', e.target.value)}
-                className={inputClass}
                 placeholder="e.g., 30"
-                min="1"
-                max="500"
+                min={1}
+                max={500}
               />
-            </div>
+            </Field>
           </div>
-          <div>
-            <label className={labelClass}>Location Type</label>
-            <select
-              value={form.locationType}
-              onChange={e => updateField('locationType', e.target.value)}
-              className={inputClass}
-            >
-              {LOCATION_TYPE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className={labelClass}>Description</label>
-            <textarea
+          <Select
+            label="Location Type"
+            optionalText={null}
+            value={form.locationType}
+            onChange={v => updateField('locationType', v ?? 'classroom')}
+            options={LOCATION_TYPE_OPTIONS}
+          />
+          <Field label="Description" optionalText={null}>
+            <Textarea
               value={form.description}
               onChange={e => updateField('description', e.target.value)}
-              className={`${inputClass} resize-none`}
               rows={2}
               maxLength={255}
+              resize="none"
               placeholder="Optional description"
             />
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="room-active"
-              checked={form.isActive}
-              onChange={e => updateField('isActive', e.target.checked)}
-              className="rounded border-[rgb(var(--border-primary))]"
-            />
-            <label htmlFor="room-active" className="text-sm text-[rgb(var(--text-secondary))]">Active</label>
-          </div>
+          </Field>
+          <Checkbox
+            id="room-active"
+            label="Active"
+            checked={form.isActive}
+            onChange={e => updateField('isActive', e.target.checked)}
+          />
         </div>
         <DrawerFooter>
           <button
