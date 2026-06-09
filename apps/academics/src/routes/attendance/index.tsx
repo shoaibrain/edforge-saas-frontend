@@ -8,7 +8,7 @@
  * Sprint 5 — Rostering & Attendance
  */
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePermission } from '@edforge/abac'
 import {
@@ -287,7 +287,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   // ABAC: check if user can create/edit attendance
   const canCreateAttendance = usePermission('create', 'attendance')
-  const exportPortalRef = useRef<HTMLDivElement>(null)
 
   // currentYearId / currentYearName are guaranteed non-empty by the gate in
   // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
@@ -452,8 +451,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
             <span style={{ fontSize: 10, color: 'var(--v2-text-ghost, #2a3045)' }}>
               Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
-            {/* Portal target for dashboard Export button */}
-            <div ref={exportPortalRef} />
           </div>
         </div>
 
@@ -500,7 +497,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                 schoolId={schoolId}
                 academicYearId={currentYearId}
                 currentDate={selectedDate}
-                exportPortalRef={exportPortalRef}
               />
             )}
 

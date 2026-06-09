@@ -15,19 +15,15 @@
  * Data source: single useAttendanceOverview aggregate endpoint.
  */
 
-import { useState, useMemo, useRef, useEffect, type RefObject } from 'react'
-import { createPortal } from 'react-dom'
+import { useState, useMemo } from 'react'
 import {
   AlertTriangle,
   CheckCircle,
-  Download,
-  FileSpreadsheet,
-  FileText,
 } from 'lucide-react'
 import { WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { StudentAttendanceModal } from '../../components/attendance/StudentAttendanceModal'
-import { toBSString, BS_MONTH_NAMES, adToBS } from '../../lib/bikram-sambat'
+import { UserAvatar } from '../../components/common/UserAvatar'
 import { usePermission } from '@edforge/abac'
 import type {
   AttendanceAlert,
@@ -42,20 +38,9 @@ interface AttendanceDashboardProps {
   schoolId: string
   academicYearId: string
   currentDate: string
-  exportPortalRef?: RefObject<HTMLDivElement | null>
 }
 
 type SortDir = 'asc' | 'desc'
-
-/** Natural sort order for grade levels: PK, K, 1-12, then alphabetic */
-function gradeSort(grade: string): number {
-  const g = grade.trim().toUpperCase()
-  if (g === 'PK' || g === 'PRE-K') return -2
-  if (g === 'K' || g === 'KINDERGARTEN') return -1
-  const num = parseInt(g, 10)
-  if (!isNaN(num)) return num
-  return 100
-}
 
 // ============================================================================
 // V2 DESIGN TOKENS
@@ -779,20 +764,23 @@ function AlertsTableV2({
                     borderBottom: i < sorted.length - 1 ? `1px solid ${V2.borderRow}` : 'none',
                   }}
                 >
-                  <div style={{ flex: 1 }}>
-                    <button
-                      type="button"
-                      onClick={() => onStudentClick?.(alert.studentId)}
-                      style={{
-                        background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left',
-                        fontSize: 12, fontWeight: 500, color: V2.textPrimary,
-                      }}
-                    >
-                      {alert.studentName}
-                    </button>
-                    {alert.gradeLevel && (
-                      <span style={{ display: 'block', fontSize: 9, color: V2.textHint }}>{alert.gradeLevel}</span>
-                    )}
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                    <UserAvatar userId={alert.studentId} userName={alert.studentName} size="sm" />
+                    <div style={{ minWidth: 0 }}>
+                      <button
+                        type="button"
+                        onClick={() => onStudentClick?.(alert.studentId)}
+                        style={{
+                          background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left',
+                          fontSize: 12, fontWeight: 500, color: V2.textPrimary,
+                        }}
+                      >
+                        {alert.studentName}
+                      </button>
+                      {alert.gradeLevel && (
+                        <span style={{ display: 'block', fontSize: 9, color: V2.textHint }}>{alert.gradeLevel}</span>
+                      )}
+                    </div>
                   </div>
                   <span style={{ fontSize: 12, fontWeight: 700, width: 60, textAlign: 'right', color: getRateColorHex(alert.attendanceRate) }}>
                     {alert.attendanceRate.toFixed(1)}%
@@ -811,178 +799,6 @@ function AlertsTableV2({
 }
 
 // ============================================================================
-// EXPORT DROPDOWN
-// ============================================================================
-
-function ExportDropdown({
-  data,
-  schoolId,
-}: {
-  data: AttendanceOverviewResponse | undefined
-  schoolId: string
-}) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const dateStr = new Date().toISOString().split('T')[0]
-
-  const downloadCsv = (content: string, filename: string) => {
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-    setOpen(false)
-  }
-
-  const exportAlerts = () => {
-    if (!data?.atRiskStudents?.length) return
-    const header = 'Student Name,Grade Level,Attendance Rate (%),Days Absent,Total Days,Trend\n'
-    const rows = data.atRiskStudents
-      .map((a) => `"${a.studentName}","${a.gradeLevel || ''}",${a.attendanceRate.toFixed(1)},${a.absentDays},${a.totalDays},"${a.trend}"`)
-      .join('\n')
-    downloadCsv(header + rows, `attendance-alerts-${schoolId}-${dateStr}.csv`)
-  }
-
-  const exportDailyRegister = () => {
-    if (!data?.todaySummary) return
-    const s = data.todaySummary
-    const bsDate = toBSString(s.date)
-    let csv = `Daily Attendance Register — ${s.date} (${bsDate} BS)\n`
-    csv += `School ID,${s.schoolId}\n`
-    csv += `Total Students,${s.totalStudents}\n`
-    csv += `Total Recorded,${s.totalRecorded ?? s.totalStudents}\n`
-    csv += `Present,${s.present}\n`
-    csv += `Absent,${s.absent}\n`
-    csv += `Late,${s.late}\n`
-    csv += `Excused,${s.excused}\n`
-    csv += `Half Day,${s.halfDay}\n`
-    csv += `Attendance Rate,${s.attendanceRate}%\n`
-    if (s.byGradeLevel) {
-      csv += '\nGrade Level,Total,Present,Absent,Rate\n'
-      for (const [grade, d] of Object.entries(s.byGradeLevel).sort(([a], [b]) => gradeSort(a) - gradeSort(b))) {
-        csv += `"${grade}",${d.total},${d.present},${d.absent},${d.rate.toFixed(1)}%\n`
-      }
-    }
-    downloadCsv(csv, `daily-register-${schoolId}-${dateStr}.csv`)
-  }
-
-  const exportTrend = () => {
-    if (!data?.trend?.length) return
-    const header = 'Date,BS Date,Total Students,Present,Absent,Late,Excused,Half Day,Rate (%)\n'
-    const rows = data.trend
-      .map((d) => `${d.date},${toBSString(d.date)},${d.totalStudents},${d.present},${d.absent},${d.late},${d.excused},${d.halfDay},${d.attendanceRate.toFixed(1)}`)
-      .join('\n')
-    downloadCsv(header + rows, `attendance-trend-${schoolId}-${dateStr}.csv`)
-  }
-
-  const exportMonthlyRegister = () => {
-    if (!data?.trend?.length || !data?.todaySummary) return
-    const bs = adToBS(data.todaySummary.date)
-    const bsYear = String(bs.year)
-    const bsMonth = String(bs.month).padStart(2, '0')
-    const bsMonthName = BS_MONTH_NAMES[bs.month - 1] || bsMonth
-
-    let csv = `Monthly Attendance Register — Nepal Ministry of Education Format\n`
-    csv += `School ID,${schoolId}\n`
-    csv += `Month,"${bsMonthName} ${bsYear} BS"\n`
-    csv += `Generated,${new Date().toISOString().split('T')[0]}\n\n`
-
-    if (data.todaySummary.byGradeLevel) {
-      const grades = Object.entries(data.todaySummary.byGradeLevel).sort(([a], [b]) => gradeSort(a) - gradeSort(b))
-      csv += `Grade Level Summary\n`
-      csv += `Grade,Total Enrolled,Present Today,Absent Today,Attendance Rate\n`
-      for (const [grade, d] of grades) {
-        csv += `"${grade}",${d.total},${d.present},${d.absent},${d.rate.toFixed(1)}%\n`
-      }
-      csv += '\n'
-    }
-
-    csv += `Daily Attendance Log\n`
-    csv += `AD Date,BS Date,Day,Total Students,Present,Absent,Late,Excused,Half Day,Rate (%)\n`
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    for (const d of data.trend) {
-      const dayOfWeek = dayNames[new Date(d.date).getDay()]
-      csv += `${d.date},${toBSString(d.date)},${dayOfWeek},${d.totalStudents},${d.present},${d.absent},${d.late},${d.excused},${d.halfDay},${d.attendanceRate.toFixed(1)}\n`
-    }
-
-    csv += '\n'
-    csv += `Monthly Summary\n`
-    const totalDays = data.trend.length
-    const avgRate = data.trend.reduce((sum, d) => sum + d.attendanceRate, 0) / (totalDays || 1)
-    const totalPresent = data.trend.reduce((sum, d) => sum + d.present, 0)
-    const totalAbsent = data.trend.reduce((sum, d) => sum + d.absent, 0)
-    csv += `Total Instructional Days,${totalDays}\n`
-    csv += `Average Attendance Rate,${avgRate.toFixed(1)}%\n`
-    csv += `Total Present (student-days),${totalPresent}\n`
-    csv += `Total Absent (student-days),${totalAbsent}\n`
-
-    downloadCsv(csv, `monthly-register-moe-${schoolId}-${bsYear}-${bsMonth}.csv`)
-  }
-
-  const buttonStyle: React.CSSProperties = {
-    height: 32, fontSize: 10, display: 'flex', alignItems: 'center', gap: 6,
-    padding: '0 10px', borderRadius: 6, cursor: 'pointer',
-    background: V2.bgSurface, border: `1px solid ${V2.borderDefault}`,
-    color: V2.textSecondary,
-  }
-
-  const options = [
-    { label: 'Export Alerts CSV', icon: AlertTriangle, onClick: exportAlerts, disabled: !data?.atRiskStudents?.length },
-    { label: 'Export Daily Register', icon: FileSpreadsheet, onClick: exportDailyRegister, disabled: !data?.todaySummary },
-    { label: 'Export Trend Data', icon: FileText, onClick: exportTrend, disabled: !data?.trend?.length },
-    { label: 'Monthly Register (MoE)', icon: FileSpreadsheet, onClick: exportMonthlyRegister, disabled: !data?.trend?.length || !data?.todaySummary },
-  ]
-
-  return (
-    <div style={{ position: 'relative' }} ref={ref}>
-      <button type="button" onClick={() => setOpen(!open)} style={buttonStyle}>
-        <Download style={{ width: 11, height: 11 }} />
-        Export
-      </button>
-
-      {open && (
-        <div style={{
-          position: 'absolute', right: 0, marginTop: 4, width: 220, zIndex: 20, borderRadius: 8, overflow: 'hidden',
-          background: V2.bgSurface, border: `1px solid ${V2.borderDefault}`, boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-        }}>
-          {options.map((opt) => (
-            <button
-              key={opt.label}
-              type="button"
-              onClick={opt.onClick}
-              disabled={opt.disabled}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
-                fontSize: 11, color: V2.textSecondary, background: 'none', border: 'none', cursor: 'pointer',
-                opacity: opt.disabled ? 0.4 : 1,
-              }}
-            >
-              <opt.icon style={{ width: 13, height: 13 }} />
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -990,7 +806,6 @@ export function AttendanceDashboard({
   schoolId,
   academicYearId,
   currentDate,
-  exportPortalRef,
 }: AttendanceDashboardProps) {
   // Student drill-down modal state
   const [selectedStudent, setSelectedStudent] = useState<{
@@ -1036,12 +851,6 @@ export function AttendanceDashboard({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* EXPORT DROPDOWN — portaled into page header */}
-      {exportPortalRef?.current && data && createPortal(
-        <ExportDropdown data={data} schoolId={schoolId} />,
-        exportPortalRef.current,
-      )}
-
       {/* SCOPE INDICATOR */}
       {!isSchoolWide && summary && (
         <div style={{
