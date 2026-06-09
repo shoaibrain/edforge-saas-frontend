@@ -16,7 +16,7 @@ import {
   Search,
   Filter,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, Select } from '@edforge/ui'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { extractApiErrorMessage } from '@edforge/api-client'
@@ -244,24 +244,17 @@ export function SchoolAssignmentManager({
           {/* Filter */}
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-            <select
+            <Select
+              aria-label="Filter schools"
+              className="w-44"
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className={cn(
-                'px-3 py-2 text-sm rounded-lg border',
-                'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))]',
-                'text-[rgb(var(--text-primary))]',
-                'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]'
-              )}
-            >
-              <option value="all">All Schools</option>
-              <option value="unassigned">Unassigned Only</option>
-              {leas.map((lea) => (
-                <option key={lea.id} value={lea.id}>
-                  {lea.nameOfInstitution}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setFilterType(v ?? 'all')}
+              options={[
+                { value: 'all', label: 'All Schools' },
+                { value: 'unassigned', label: 'Unassigned Only' },
+                ...leas.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution })),
+              ]}
+            />
           </div>
 
           {/* Bulk Actions */}
@@ -270,28 +263,17 @@ export function SchoolAssignmentManager({
               <span className="text-xs text-[rgb(var(--text-tertiary))]">
                 {selectedCount} selected
               </span>
-              <select
-                onChange={(e) => {
-                  if (e.target.value) {
-                    bulkAssign(e.target.value || null)
-                    e.target.value = ''
-                  }
+              <Select
+                aria-label="Bulk assign selected schools"
+                size="sm"
+                className="w-48"
+                placeholder="Bulk Assign To..."
+                value={null}
+                onChange={(v) => {
+                  if (v) bulkAssign(v)
                 }}
-                className={cn(
-                  'px-3 py-1.5 text-xs rounded-lg border',
-                  'bg-[rgb(var(--action-primary-bg))]/10 border-[rgb(var(--border-focus)/0.35)]',
-                  'text-[rgb(var(--state-info-fg))] ',
-                  'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]'
-                )}
-              >
-                <option value="">Bulk Assign To...</option>
-                <option value="">None (Unassign)</option>
-                {leas.map((lea) => (
-                  <option key={lea.id} value={lea.id}>
-                    {lea.nameOfInstitution}
-                  </option>
-                ))}
-              </select>
+                options={leas.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution }))}
+              />
             </div>
           )}
         </div>
@@ -374,27 +356,16 @@ export function SchoolAssignmentManager({
                         </span>
                       </td>
                       <td className="p-3">
-                        <select
-                          value={assignment.newLeaId || ''}
-                          onChange={(e) =>
-                            updateAssignment(assignment.schoolId, e.target.value || null)
-                          }
+                        <Select
+                          aria-label={`New district for ${assignment.schoolName}`}
+                          size="sm"
+                          placeholder="None"
+                          clearable
+                          value={assignment.newLeaId || null}
+                          onChange={(v) => updateAssignment(assignment.schoolId, v)}
                           disabled={assignMutation.isPending}
-                          className={cn(
-                            'w-full px-2 py-1.5 text-sm rounded border',
-                            'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))]',
-                            'text-[rgb(var(--text-primary))]',
-                            'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',
-                            'disabled:opacity-50 disabled:cursor-not-allowed'
-                          )}
-                        >
-                          <option value="">None</option>
-                          {leas.map((lea) => (
-                            <option key={lea.id} value={lea.id}>
-                              {lea.nameOfInstitution}
-                            </option>
-                          ))}
-                        </select>
+                          options={leas.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution }))}
+                        />
                       </td>
                       <td className="p-3 text-center">
                         {hasChange && assignment.selected && (
