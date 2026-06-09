@@ -21,8 +21,10 @@ import {
   GraduationCap,
   School,
   FileSpreadsheet,
+  Download,
+  Loader2,
 } from 'lucide-react'
-import { StatCard, WidgetErrorBoundaryV2, Card } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, Card, Button } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useResourcePermissions } from '@edforge/abac'
 import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport, type StudentAttendanceSignal } from '../../components/students'
@@ -559,16 +561,6 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           />
         </motion.div>
 
-        {/* ---- Filter Strip ---- */}
-        <motion.div variants={fadeInUp}>
-          <StudentsFilterRow
-            isExporting={overviewData.isExporting}
-            hasAcademicYear={!!overviewData.academicYear.id}
-            onExport={overviewData.handleExportCSV}
-            schoolId={schoolId}
-          />
-        </motion.div>
-
         {/* ---- Error State ---- */}
         {isError ? (
           <ErrorState onRetry={() => refetch()} />
@@ -673,6 +665,23 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   attendanceByStudent={attendanceByStudent}
                   canViewGuardians={guardianPerms.view}
                   canViewLocation={studentPerms.view}
+                  toolbarStart={<StudentsFilterRow schoolId={schoolId} />}
+                  toolbarExtra={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={overviewData.handleExportCSV}
+                      disabled={overviewData.isExporting || !overviewData.academicYear.id}
+                      aria-label="Export students as CSV"
+                    >
+                      {overviewData.isExporting ? (
+                        <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                      ) : (
+                        <Download className="w-3 h-3 mr-1.5" />
+                      )}
+                      Export CSV
+                    </Button>
+                  }
                   isLoading={studentsLoading}
                   onAddStudent={handleAddStudent}
                   onViewStudent={handleViewStudent}

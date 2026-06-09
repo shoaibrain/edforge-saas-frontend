@@ -11,6 +11,7 @@ interface DataTableToolbarProps<TData> {
   searchPlaceholder?: string
   facetedFilters?: FacetedFilterConfig[]
   enableColumnVisibility?: boolean
+  toolbarStart?: ReactNode
   toolbarExtra?: ReactNode
 }
 
@@ -19,6 +20,7 @@ export function DataTableToolbar<TData>({
   searchPlaceholder,
   facetedFilters,
   enableColumnVisibility,
+  toolbarStart,
   toolbarExtra,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
@@ -27,6 +29,9 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
+      {/* Leading slot (e.g. filter chips / search / selects) */}
+      {toolbarStart}
+
       {/* Search */}
       {searchPlaceholder && (
         <div className="relative flex-1 max-w-sm">

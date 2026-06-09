@@ -177,7 +177,9 @@ export interface DataTableProps<TData> {
   // -- Toolbar --
   searchPlaceholder?: string
   facetedFilters?: FacetedFilterConfig[]
-  /** Extra element to render in the toolbar (e.g., export button) */
+  /** Extra element rendered at the START (left) of the toolbar — e.g. filter chips. */
+  toolbarStart?: ReactNode
+  /** Extra element to render in the toolbar (e.g., export button) — right side. */
   toolbarExtra?: ReactNode
 
   // -- Bulk Actions --

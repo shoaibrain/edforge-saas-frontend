@@ -1,13 +1,15 @@
 /**
- * StudentsFilterRow — V2 Filter Strip for Students Page
+ * StudentsFilterRow — filter presets + search + grade/status for the Students
+ * table toolbar.
  *
- * Quick-select mode chips, search input, grade/status dropdowns,
- * clear button, and Export CSV — matching the V2 overview filter pattern.
+ * Quick-select mode chips, search input, grade/status dropdowns, and a clear
+ * button. Rendered as the table toolbar's leading (left) slot; Export CSV is a
+ * sibling right-slot action owned by the page.
  */
 
 import { useState, useEffect } from 'react'
-import { Search, X, Loader2, Download } from 'lucide-react'
-import { Select, Input, Button } from '@edforge/ui'
+import { Search, X } from 'lucide-react'
+import { Select, Input } from '@edforge/ui'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
@@ -45,9 +47,6 @@ const STATUS_OPTIONS: { value: StudentStatus; label: string }[] = [
 // ============================================================================
 
 interface StudentsFilterRowProps {
-  isExporting: boolean
-  hasAcademicYear: boolean
-  onExport: () => void
   /**
    * Active school. The Grade filter dropdown reads `enabledGradeLevels`
    * (with `gradeRange` fallback) via `useSchoolEnabledGradeOptions`.
@@ -55,12 +54,7 @@ interface StudentsFilterRowProps {
   schoolId: string | null
 }
 
-export function StudentsFilterRow({
-  isExporting,
-  hasAcademicYear,
-  onExport,
-  schoolId,
-}: StudentsFilterRowProps) {
+export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
   const filters = useStudentFilters()
   // Gate dropdown on profile-load — see EnrollmentTable comment.
   const { options: gradeOptions, isLoading: gradeOptionsLoading } =
@@ -93,7 +87,7 @@ export function StudentsFilterRow({
   const isActiveFilters = hasActiveFilters()
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap mb-3.5">
+    <div className="flex items-center gap-2 flex-wrap">
       {/* Mode chips */}
       {MODE_CHIPS.map((chip) => {
         const isActive = filters.filterMode === chip.key
@@ -169,20 +163,6 @@ export function StudentsFilterRow({
           Clear
         </button>
       )}
-
-      {/* Export CSV */}
-      <div className="ml-auto">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onExport}
-          disabled={isExporting || !hasAcademicYear}
-          aria-label="Export students as CSV"
-        >
-          {isExporting ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : <Download className="w-3 h-3 mr-1.5" />}
-          Export CSV
-        </Button>
-      </div>
     </div>
   )
 }

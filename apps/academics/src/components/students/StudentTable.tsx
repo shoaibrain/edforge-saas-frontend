@@ -8,7 +8,7 @@
  * responsively hidden on narrow panes (Columns menu to opt back in).
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
 import {
   TanstackDataTable,
@@ -49,6 +49,9 @@ interface StudentTableProps {
   /** ABAC gates — render Guardian/Location columns only when permitted. */
   canViewGuardians?: boolean
   canViewLocation?: boolean
+  /** Toolbar content: filter presets/search/selects (left) and Export (right). */
+  toolbarStart?: ReactNode
+  toolbarExtra?: ReactNode
   hasMore?: boolean
   isFetchingMore?: boolean
   onLoadMore?: () => void
@@ -152,6 +155,8 @@ export function StudentTable({
   locale,
   canViewGuardians = true,
   canViewLocation = true,
+  toolbarStart,
+  toolbarExtra,
   hasMore,
   isFetchingMore,
   onLoadMore,
@@ -276,6 +281,8 @@ export function StudentTable({
       enableColumnVisibility
       tableId="academics-students-table"
       initialColumnVisibility={initialColumnVisibility}
+      toolbarStart={toolbarStart}
+      toolbarExtra={toolbarExtra}
       pagination={{ pageSize: 20 }}
       serverPagination={serverPagination}
       emptyState={{
