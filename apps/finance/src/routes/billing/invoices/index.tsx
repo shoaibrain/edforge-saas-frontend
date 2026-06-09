@@ -16,6 +16,7 @@ import {
   createActionsColumn,
   StatCard,
   WidgetErrorBoundaryV2,
+  Select,
   type ColumnDef,
 } from '@edforge/ui'
 import { EntityIdDisplay, UuidBadge } from '@edforge/archetype'
@@ -846,23 +847,17 @@ function GenerateInvoiceModal({
 
           {/* Academic Year + Due Date */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                Academic Year *
-              </label>
-              <select
-                value={academicYear}
-                onChange={(e) => setAcademicYear(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
-              >
-                <option value="">Select academic year</option>
-                {academicYears.map((y) => (
-                  <option key={y.yearId} value={y.name}>
-                    {y.name}{y.isCurrent ? ' (Current)' : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Academic Year"
+              required
+              value={academicYear}
+              onChange={(v) => setAcademicYear(v ?? '')}
+              placeholder="Select academic year"
+              options={academicYears.map((y) => ({
+                value: y.name,
+                label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
+              }))}
+            />
             <div>
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
                 Due Date *

@@ -15,6 +15,7 @@ import {
   createActionsColumn,
   StatCard,
   WidgetErrorBoundaryV2,
+  Select,
 } from '@edforge/ui'
 import type { ColumnDef } from '@edforge/ui'
 import { EntityIdDisplay } from '@edforge/archetype'
@@ -836,16 +837,20 @@ export default function PaymentsPage() {
       {/* Filter Strip */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-3 flex-wrap">
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          <select value={gatewayFilter} onChange={(e) => setGatewayFilter(e.target.value)}>
-            {GATEWAY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+          <Select
+            size="sm"
+            className="w-40"
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v ?? '')}
+            options={STATUS_OPTIONS}
+          />
+          <Select
+            size="sm"
+            className="w-44"
+            value={gatewayFilter}
+            onChange={(v) => setGatewayFilter(v ?? '')}
+            options={GATEWAY_OPTIONS}
+          />
         </div>
         <ExportCsvButton
           onClick={() => {

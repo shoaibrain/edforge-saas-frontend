@@ -209,7 +209,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
           ))}
 
           {/* Security note */}
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/5">
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
             <Shield className="w-4 h-4 text-[rgb(var(--state-info-fg))] mt-0.5 shrink-0" />
             <p className="text-xs text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]">
               Credentials are encrypted and stored securely. After saving, values will be masked.

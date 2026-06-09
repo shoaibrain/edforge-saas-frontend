@@ -19,7 +19,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { FeeStructure, FeeType, FeeFrequency, TaxType } from '@edforge/types'
-import { Button } from '@edforge/ui'
+import { Button, Select } from '@edforge/ui'
 import { X } from 'lucide-react'
 
 /* ------------------------------------------------------------------ */
@@ -250,23 +250,35 @@ export function FeeStructureForm({
 
           <div className="grid grid-cols-2 gap-4">
             <Field label="Type" error={errors.feeType?.message}>
-              <select {...register('feeType')} className="input">
-                {FEE_TYPES.map((ft) => (
-                  <option key={ft} value={ft}>
-                    {FEE_TYPE_LABELS[ft]}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="feeType"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={FEE_TYPES.map((ft) => ({ value: ft, label: FEE_TYPE_LABELS[ft] }))}
+                  />
+                )}
+              />
             </Field>
             <Field label="Academic Year" error={errors.academicYearId?.message}>
               {academicYears.length > 0 ? (
-                <select {...register('academicYearId')} className="input">
-                  {academicYears.map((ay) => (
-                    <option key={ay.id} value={ay.id}>
-                      {ay.name}{ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  name="academicYearId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select year..."
+                      options={academicYears.map((ay) => ({
+                        value: ay.id,
+                        label: `${ay.name}${ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}`,
+                      }))}
+                    />
+                  )}
+                />
               ) : (
                 <p className="text-xs text-[rgb(var(--text-tertiary))] py-2">
                   No academic years configured.
@@ -296,23 +308,33 @@ export function FeeStructureForm({
               </div>
             </Field>
             <Field label="Frequency" error={errors.frequency?.message}>
-              <select {...register('frequency')} className="input">
-                {FREQUENCIES.map((freq) => (
-                  <option key={freq} value={freq}>
-                    {FREQUENCY_LABELS[freq]}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="frequency"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={FREQUENCIES.map((freq) => ({ value: freq, label: FREQUENCY_LABELS[freq] }))}
+                  />
+                )}
+              />
             </Field>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Field label="Tax Type" error={errors.taxType?.message}>
-              <select {...register('taxType')} className="input">
-                {TAX_TYPES.map((tt) => (
-                  <option key={tt} value={tt}>{tt === 'none' ? 'None' : tt}</option>
-                ))}
-              </select>
+              <Controller
+                name="taxType"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value ?? 'none'}
+                    onChange={field.onChange}
+                    options={TAX_TYPES.map((tt) => ({ value: tt, label: tt === 'none' ? 'None' : tt }))}
+                  />
+                )}
+              />
             </Field>
             {watchedTaxType !== 'none' && (
               <Field label="Tax Rate (%)" error={errors.taxRate?.message}>
