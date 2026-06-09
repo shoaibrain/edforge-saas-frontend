@@ -8,6 +8,7 @@
 
 import { useRef } from 'react'
 import { Search, X, Download } from 'lucide-react'
+import { Select, Input, Button } from '@edforge/ui'
 import {
   useCourseFilters,
   useCourseFilterActions,
@@ -25,20 +26,6 @@ import {
 interface CourseFiltersProps {
   /** Total count of courses matching current filters */
   totalCount?: number
-}
-
-// ============================================================================
-// SHARED STYLES
-// ============================================================================
-
-const selectStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.04)',
-  border: '1px solid rgba(255, 255, 255, 0.07)',
-  borderRadius: 8,
-  padding: '6px 10px',
-  fontSize: 11,
-  color: 'var(--v2-text-hint, #7a8099)',
-  colorScheme: 'dark',
 }
 
 // ============================================================================
@@ -70,86 +57,47 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {/* Search */}
-      <div className="relative flex-1" style={{ minWidth: 200 }}>
-        <Search
-          className="absolute top-1/2 -translate-y-1/2"
-          style={{
-            left: 10,
-            width: 13,
-            height: 13,
-            color: 'var(--v2-text-hint, #4a5068)',
-            pointerEvents: 'none',
-          }}
-        />
-        <input
-          ref={searchInputRef}
-          type="text"
-          placeholder="Search by course code or name..."
-          defaultValue={filters.searchTerm}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          style={{
-            width: '100%',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.07)',
-            borderRadius: 8,
-            padding: '7px 12px 7px 32px',
-            fontSize: 12,
-            color: 'var(--v2-text-primary, #e8eaf0)',
-            outline: 'none',
-          }}
-        />
-      </div>
+      <Input
+        ref={searchInputRef}
+        prefix={<Search className="w-3.5 h-3.5" />}
+        placeholder="Search by course code or name..."
+        defaultValue={filters.searchTerm}
+        onChange={(e) => handleSearchChange(e.target.value)}
+        className="flex-1 min-w-52"
+      />
 
       {/* Subject Area */}
-      <select
+      <Select
+        aria-label="Subject area"
+        size="sm"
+        className="w-40"
         value={filters.subjectArea ?? ''}
-        onChange={(e) =>
-          actions.setSubjectArea(e.target.value ? (e.target.value as typeof filters.subjectArea) : null)
-        }
-        style={selectStyle}
-      >
-        <option value="">All Subjects</option>
-        {SUBJECT_AREA_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => actions.setSubjectArea(v ? (v as typeof filters.subjectArea) : null)}
+        options={[{ value: '', label: 'All Subjects' }, ...SUBJECT_AREA_OPTIONS]}
+      />
 
       {/* Course Type */}
-      <select
+      <Select
+        aria-label="Course type"
+        size="sm"
+        className="w-40"
         value={filters.courseType ?? ''}
-        onChange={(e) =>
-          actions.setCourseType(e.target.value ? (e.target.value as typeof filters.courseType) : null)
-        }
-        style={selectStyle}
-      >
-        <option value="">All Types</option>
-        {COURSE_TYPE_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => actions.setCourseType(v ? (v as typeof filters.courseType) : null)}
+        options={[{ value: '', label: 'All Types' }, ...COURSE_TYPE_OPTIONS]}
+      />
 
       {/* Credit Type */}
-      <select
+      <Select
+        aria-label="Credit type"
+        size="sm"
+        className="w-44"
         value={filters.creditType ?? ''}
-        onChange={(e) =>
-          actions.setCreditType(e.target.value ? (e.target.value as typeof filters.creditType) : null)
-        }
-        style={selectStyle}
-      >
-        <option value="">All Credit Types</option>
-        {CREDIT_TYPE_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => actions.setCreditType(v ? (v as typeof filters.creditType) : null)}
+        options={[{ value: '', label: 'All Credit Types' }, ...CREDIT_TYPE_OPTIONS]}
+      />
 
       {/* Status chips */}
-      <div style={{ display: 'flex', gap: 5 }}>
+      <div className="flex gap-1.5">
         {statusChips.map((chip) => {
           const isActive = filters.isActive === chip.value
           return (
@@ -157,16 +105,11 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
               key={chip.label}
               type="button"
               onClick={() => actions.setIsActive(chip.value)}
-              style={{
-                padding: '5px 9px',
-                borderRadius: 6,
-                fontSize: 11,
-                fontWeight: 500,
-                border: `1px solid ${isActive ? 'rgba(127,119,221,0.25)' : 'rgba(255,255,255,0.07)'}`,
-                background: isActive ? 'rgba(127,119,221,0.1)' : 'transparent',
-                color: isActive ? '#7F77DD' : 'var(--v2-text-hint, #5a6070)',
-                cursor: 'pointer',
-              }}
+              className={`px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                isActive
+                  ? 'border-[#7F77DD]/40 bg-[#7F77DD]/10 text-[#7F77DD]'
+                  : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
+              }`}
             >
               {chip.label}
             </button>
@@ -182,42 +125,24 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
             actions.resetFilters()
             if (searchInputRef.current) searchInputRef.current.value = ''
           }}
-          className="inline-flex items-center gap-1"
-          style={{
-            padding: '5px 9px',
-            fontSize: 11,
-            fontWeight: 500,
-            color: 'var(--v2-brand-primary, #1D9E75)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#1D9E75] hover:opacity-80 transition-opacity"
         >
-          <X style={{ width: 11, height: 11 }} />
+          <X className="w-3 h-3" />
           Clear ({filterCount})
         </button>
       )}
 
       {/* Export CSV — pushed to far right */}
-      <div style={{ marginLeft: 'auto' }}>
-        <button
+      <div className="ml-auto">
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           aria-label="Export courses as CSV"
-          className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
-          style={{
-            padding: '5px 11px',
-            fontSize: 11,
-            fontWeight: 500,
-            borderRadius: 7,
-            background: 'var(--v2-bg-elevated, rgba(255,255,255,0.05))',
-            border: '1px solid var(--v2-border-default, rgba(255,255,255,0.09))',
-            color: 'var(--v2-text-secondary, #9aa0b8)',
-            cursor: 'pointer',
-          }}
         >
-          <Download style={{ width: 12, height: 12 }} />
+          <Download className="w-3 h-3 mr-1.5" />
           Export CSV
-        </button>
+        </Button>
       </div>
     </div>
   )
