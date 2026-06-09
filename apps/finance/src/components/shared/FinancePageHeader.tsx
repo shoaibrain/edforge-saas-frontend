@@ -35,12 +35,12 @@ export function FinancePageHeader({
           </div>
           <h1
             className="text-sm font-semibold"
-            style={{ color: 'var(--v2-text-primary)' }}
+            style={{ color: 'rgb(var(--text-primary))' }}
           >
             {title}
           </h1>
         </div>
-        <p className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {subtitle}
         </p>
       </div>

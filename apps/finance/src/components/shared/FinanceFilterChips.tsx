@@ -32,8 +32,8 @@ export function FinanceFilterChips({
               borderRadius: 6,
               border: '1px solid',
               background: isActive ? `${accentColor}18` : 'transparent',
-              borderColor: isActive ? `${accentColor}30` : 'var(--v2-border-default, rgba(255,255,255,0.06))',
-              color: isActive ? accentColor : 'var(--v2-text-secondary, #c8ccd8)',
+              borderColor: isActive ? `${accentColor}30` : 'rgb(var(--border-primary) / 0.35)',
+              color: isActive ? accentColor : 'rgb(var(--text-secondary))',
               cursor: 'pointer',
             }}
           >
