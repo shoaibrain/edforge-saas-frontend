@@ -25,7 +25,7 @@ import {
 import { StatCard, WidgetErrorBoundaryV2, Card } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useResourcePermissions } from '@edforge/abac'
-import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport } from '../../components/students'
+import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport, type StudentAttendanceSignal } from '../../components/students'
 import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
@@ -124,6 +124,10 @@ function StudentsInsightStrip({
 // ============================================================================
 
 function TableSkeleton() {
+  // Block colors via semantic tokens (read correctly in light + dark) — the
+  // skeleton mirrors the 8-column roster so there's no load → render jump.
+  const block = 'rgb(var(--text-tertiary)/0.18)'
+  const blockFaint = 'rgb(var(--text-tertiary)/0.10)'
   return (
     <div
       className="rounded-xl border overflow-hidden"
@@ -137,12 +141,8 @@ function TableSkeleton() {
         className="flex items-center gap-4 px-4 py-2.5 border-b"
         style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', background: 'rgb(var(--background-tertiary))' }}
       >
-        {[160, 60, 80, 70, 80, 30].map((w, i) => (
-          <div
-            key={i}
-            className="h-3 rounded v2-skeleton-pulse"
-            style={{ width: w, background: 'rgba(255,255,255,0.06)' }}
-          />
+        {[150, 48, 90, 120, 90, 60, 70, 24].map((w, i) => (
+          <div key={i} className="h-3 rounded v2-skeleton-pulse" style={{ width: w, background: block }} />
         ))}
       </div>
       {/* 8 skeleton rows */}
@@ -152,53 +152,38 @@ function TableSkeleton() {
           className="flex items-center gap-4 px-4 py-3 border-b"
           style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
         >
-          {/* Avatar circle */}
-          <div
-            className="w-9 h-9 rounded-full v2-skeleton-pulse flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.06)' }}
-          />
-          {/* Name + ID */}
-          <div className="flex flex-col gap-1.5" style={{ width: 140 }}>
-            <div
-              className="h-3 rounded v2-skeleton-pulse"
-              style={{ width: 100, background: 'rgba(255,255,255,0.06)' }}
-            />
-            <div
-              className="h-2.5 rounded v2-skeleton-pulse"
-              style={{ width: 70, background: 'rgba(255,255,255,0.04)' }}
-            />
+          {/* Student: avatar + name/id */}
+          <div className="w-9 h-9 rounded-full v2-skeleton-pulse flex-shrink-0" style={{ background: block }} />
+          <div className="flex flex-col gap-1.5" style={{ width: 130 }}>
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 100, background: block }} />
+            <div className="h-2.5 rounded v2-skeleton-pulse" style={{ width: 70, background: blockFaint }} />
           </div>
-          {/* Grade */}
-          <div
-            className="h-3 rounded v2-skeleton-pulse"
-            style={{ width: 40, background: 'rgba(255,255,255,0.06)' }}
-          />
-          {/* Attendance bar */}
+          {/* Grade chip */}
+          <div className="h-5 rounded-[7px] v2-skeleton-pulse" style={{ width: 30, background: block }} />
+          {/* Attendance: spark + % */}
           <div className="flex items-center gap-2" style={{ width: 100 }}>
-            <div
-              className="h-3 rounded v2-skeleton-pulse"
-              style={{ width: 35, background: 'rgba(255,255,255,0.06)' }}
-            />
-            <div
-              className="h-1 rounded-full v2-skeleton-pulse flex-1"
-              style={{ background: 'rgba(255,255,255,0.04)' }}
-            />
+            <div className="h-4 rounded v2-skeleton-pulse flex-1" style={{ background: blockFaint }} />
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 26, background: block }} />
+          </div>
+          {/* Guardian: stacked circles + name */}
+          <div className="flex items-center gap-2" style={{ width: 150 }}>
+            <div className="flex -space-x-2 flex-shrink-0">
+              <div className="w-6 h-6 rounded-full v2-skeleton-pulse" style={{ background: block }} />
+              <div className="w-6 h-6 rounded-full v2-skeleton-pulse" style={{ background: blockFaint }} />
+            </div>
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 64, background: block }} />
+          </div>
+          {/* Location: two lines */}
+          <div className="flex flex-col gap-1.5" style={{ width: 100 }}>
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 80, background: block }} />
+            <div className="h-2.5 rounded v2-skeleton-pulse" style={{ width: 56, background: blockFaint }} />
           </div>
           {/* Status pill */}
-          <div
-            className="h-5 rounded-full v2-skeleton-pulse"
-            style={{ width: 60, background: 'rgba(255,255,255,0.06)' }}
-          />
+          <div className="h-5 rounded-full v2-skeleton-pulse" style={{ width: 56, background: block }} />
           {/* Date */}
-          <div
-            className="h-3 rounded v2-skeleton-pulse"
-            style={{ width: 80, background: 'rgba(255,255,255,0.06)' }}
-          />
+          <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 64, background: block }} />
           {/* Action dot */}
-          <div
-            className="w-4 h-4 rounded v2-skeleton-pulse"
-            style={{ background: 'rgba(255,255,255,0.04)' }}
-          />
+          <div className="w-4 h-4 rounded v2-skeleton-pulse flex-shrink-0" style={{ background: blockFaint }} />
         </div>
       ))}
     </div>
@@ -320,6 +305,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
 
   // ABAC permissions
   const studentPerms = useResourcePermissions('students')
+  const guardianPerms = useResourcePermissions('guardians')
 
   // Student filters from store
   const filters = useStudentFilters()
@@ -349,11 +335,23 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   // V2 overview data (KPIs + alerts)
   const overviewData = useAcademicsOverviewV2(schoolId)
 
-  // Attendance alerts map: studentId → attendanceRate
+  // Attendance alerts map: studentId → attendanceRate (rate-only; drives the
+  // at-risk chip filter + the drawer).
   const alertsMap = useMemo(() => {
     const map = new Map<string, number>()
     for (const alert of overviewData.alerts.students) {
       map.set(alert.studentId, alert.attendanceRate)
+    }
+    return map
+  }, [overviewData.alerts.students])
+
+  // Richer signal (rate + trend) for the table's AttendanceTrend cell. The
+  // alerts endpoint covers at-risk students only; non-flagged rows render "—"
+  // until the Sprint-2 batch endpoint supplies a full-roster daily series.
+  const attendanceByStudent = useMemo(() => {
+    const map = new Map<string, StudentAttendanceSignal>()
+    for (const alert of overviewData.alerts.students) {
+      map.set(alert.studentId, { rate: alert.attendanceRate, trend: alert.trend })
     }
     return map
   }, [overviewData.alerts.students])
@@ -643,7 +641,9 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
               ) : (
                 <StudentTable
                   students={filteredStudents}
-                  alertsMap={alertsMap}
+                  attendanceByStudent={attendanceByStudent}
+                  canViewGuardians={guardianPerms.view}
+                  canViewLocation={studentPerms.view}
                   isLoading={studentsLoading}
                   onAddStudent={handleAddStudent}
                   onViewStudent={handleViewStudent}

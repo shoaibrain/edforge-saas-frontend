@@ -2,7 +2,7 @@
  * Student components barrel export
  */
 
-export { StudentTable } from './StudentTable'
+export { StudentTable, type StudentAttendanceSignal } from './StudentTable'
 export { StudentStatusBadge } from './StudentStatusBadge'
 export { StudentsFilterRow } from './StudentsFilterRow'
 export { StudentDrawer } from './StudentDrawer'
