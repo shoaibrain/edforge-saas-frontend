@@ -26,8 +26,14 @@ function getInitials(name: string): string {
 
 function getInitialsBgColor(name: string): string {
   const colors = [
-    'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-success-bg)/0.18)]0', 'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-warning-fg))]',
-    'bg-[rgb(var(--state-danger-fg))]', 'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-info-fg))]', 'bg-[rgb(var(--state-info-bg)/0.18)]0',
+    'bg-[rgb(var(--state-info-fg))]',
+    'bg-[rgb(var(--state-success-fg))]',
+    'bg-[rgb(var(--state-warning-fg))]',
+    'bg-[rgb(var(--state-danger-fg))]',
+    'bg-[rgb(var(--action-primary-bg))]',
+    'bg-[rgb(var(--action-secondary-fg))]',
+    'bg-[rgb(var(--state-info-fg))]',
+    'bg-[rgb(var(--state-success-fg))]',
   ]
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)

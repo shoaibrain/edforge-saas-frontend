@@ -9,6 +9,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { GraduationCap, Lock, Plus, FileText } from 'lucide-react'
 import { useRecordGrade } from '../../hooks/useGrades'
+import { UserAvatar } from '../common/UserAvatar'
 import type { GradeRecord } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
@@ -340,19 +341,24 @@ export function GradebookGrid({
             return (
               <tr key={student.studentId} className="group hover:bg-surface-secondary/50 transition-colors">
                 {/* Student name */}
-                <td className="sticky left-0 z-10 bg-surface-primary px-4 py-3 border-r border-border-secondary">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-text-primary">
+                <td className="sticky left-0 z-10 bg-surface-primary px-4 py-2.5 border-r border-border-secondary">
+                  <div className="flex items-center gap-2.5">
+                    <UserAvatar
+                      userId={student.studentId}
+                      userName={student.studentName}
+                      size="sm"
+                    />
+                    <span className="font-medium text-text-primary truncate">
                       {student.studentName}
                     </span>
                     {isFinal && (
-                      <Lock className="w-3 h-3 text-text-tertiary" aria-label="Grade finalized" />
+                      <Lock className="w-3 h-3 text-text-tertiary flex-shrink-0" aria-label="Grade finalized" />
                     )}
                     {onViewReportCard && (
                       <button
                         type="button"
                         onClick={() => onViewReportCard(student.studentId, student.studentName)}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--action-secondary-fg))] transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--action-secondary-fg))] transition-all flex-shrink-0"
                         title="View Report Card"
                       >
                         <FileText className="w-3.5 h-3.5" />
