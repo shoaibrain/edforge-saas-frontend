@@ -66,6 +66,22 @@ describe('Select', () => {
     expect(panel.className.split(/\s+/)).not.toContain('w-full')
   })
 
+  it('applies className to the control wrapper even without a label', () => {
+    // Label-less Selects (aria-labelled filters/action menus) must still honor
+    // className for sizing — the no-label branch previously dropped it.
+    render(
+      <Select
+        aria-label="Filter"
+        className="w-44"
+        value={null}
+        onChange={() => undefined}
+        options={schoolOptions}
+      />
+    )
+    const trigger = screen.getByRole('button', { name: /Filter/ })
+    expect(trigger.parentElement?.className).toContain('w-44')
+  })
+
   it('renders invalid field state and error message', () => {
     render(
       <Select

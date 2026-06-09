@@ -19,7 +19,7 @@ import {
   X,
   AlertTriangle,
 } from 'lucide-react'
-import { Button, Modal, ModalFooter, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { Button, Modal, ModalFooter, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
 import type {
   NetworkResponseDto,
@@ -127,9 +127,6 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
     removeMemberMutation.mutate({ networkId: network.id, memberId: member.id })
   }
 
-  const selectClass =
-    'px-3 py-1.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
-
   return (
     <div className="px-4 pb-4 space-y-3">
       <div className="flex items-center justify-between">
@@ -162,37 +159,33 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
             exit={{ opacity: 0, height: 0 }}
             className="flex flex-col sm:flex-row sm:items-end gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
           >
-            <div>
-              <label className="block text-xs text-[rgb(var(--text-tertiary))] mb-1">Type</label>
-              <select
-                value={selectedOrgType}
-                onChange={(e) => {
-                  setSelectedOrgType(e.target.value as any)
-                  setSelectedOrgId('')
-                }}
-                className={selectClass}
-              >
-                <option value="localEducationAgency">District (LEA)</option>
-                <option value="educationServiceCenter">Service Center (ESC)</option>
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs text-[rgb(var(--text-tertiary))] mb-1">Organization</label>
-              <select
-                value={selectedOrgId}
-                onChange={(e) => setSelectedOrgId(e.target.value)}
-                className={`${selectClass} w-full`}
-              >
-                <option value="">Select an organization...</option>
-                {selectedOrgType === 'localEducationAgency'
-                  ? leaOptions.map((l) => (
-                      <option key={l.id} value={l.id}>{l.nameOfInstitution}</option>
-                    ))
-                  : escOptions.map((e) => (
-                      <option key={e.id} value={e.id}>{e.nameOfInstitution}</option>
-                    ))}
-              </select>
-            </div>
+            <Select
+              label="Type"
+              className="sm:w-48"
+              value={selectedOrgType}
+              onChange={(v) => {
+                setSelectedOrgType(
+                  (v ?? 'localEducationAgency') as 'localEducationAgency' | 'educationServiceCenter'
+                )
+                setSelectedOrgId('')
+              }}
+              options={[
+                { value: 'localEducationAgency', label: 'District (LEA)' },
+                { value: 'educationServiceCenter', label: 'Service Center (ESC)' },
+              ]}
+            />
+            <Select
+              label="Organization"
+              className="flex-1"
+              placeholder="Select an organization..."
+              value={selectedOrgId || null}
+              onChange={(v) => setSelectedOrgId(v ?? '')}
+              options={
+                selectedOrgType === 'localEducationAgency'
+                  ? leaOptions.map((l) => ({ value: l.id, label: l.nameOfInstitution }))
+                  : escOptions.map((e) => ({ value: e.id, label: e.nameOfInstitution }))
+              }
+            />
             <Button
               size="sm"
               onClick={handleAddMember}

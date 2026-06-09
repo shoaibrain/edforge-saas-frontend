@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 import { tenantService } from '@/services/tenant.service'
 import type { Department, CreateDepartmentDto } from '@edforge/types'
-import { Button, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { Button, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 
 // ============================================================================
 // DEPARTMENT FORM MODAL
@@ -404,15 +404,17 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
           />
         </div>
 
-        <select
+        <Select
+          aria-label="Filter by scope"
+          className="w-44"
           value={filterScope}
-          onChange={(e) => setFilterScope(e.target.value as typeof filterScope)}
-          className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
-        >
-          <option value="all">All Scopes</option>
-          <option value="school">School Only</option>
-          <option value="tenant">Organization</option>
-        </select>
+          onChange={(v) => { if (v) setFilterScope(v as typeof filterScope) }}
+          options={[
+            { value: 'all', label: 'All Scopes' },
+            { value: 'school', label: 'School Only' },
+            { value: 'tenant', label: 'Organization' },
+          ]}
+        />
       </div>
 
       {/* DataTable */}

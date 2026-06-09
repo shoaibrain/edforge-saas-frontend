@@ -29,6 +29,7 @@ import {
   Lock,
   AlertCircle,
 } from 'lucide-react'
+import { Select } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
 import type { School } from '@edforge/types'
@@ -429,15 +430,13 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         </SettingsFieldRow>
 
         <SettingsFieldRow label="School Type" description="Level of education" inline>
-          <select
+          <Select
+            aria-label="School Type"
+            className="min-w-52"
             value={formState.schoolType}
-            onChange={(e) => updateField('schoolType', e.target.value)}
-            className="min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
-          >
-            {SCHOOL_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            onChange={(v) => { if (v) updateField('schoolType', v) }}
+            options={SCHOOL_TYPE_OPTIONS}
+          />
         </SettingsFieldRow>
 
         <SettingsFieldRow label="Website" description="School's public website">
@@ -468,16 +467,15 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           return fields.map((field: AddressFieldConfig) => (
             <SettingsFieldRow key={field.key} label={field.label}>
               {field.type === 'select' && field.options ? (
-                <select
-                  value={formState.address[field.key] || ''}
-                  onChange={(e) => updateField('address', { ...formState.address, [field.key]: e.target.value })}
-                  className={inputClass}
-                >
-                  <option value="">{field.placeholder || `Select ${field.label}`}</option>
-                  {field.options.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+                <Select
+                  aria-label={field.label}
+                  className="w-full"
+                  clearable
+                  placeholder={field.placeholder || `Select ${field.label}`}
+                  value={formState.address[field.key] || null}
+                  onChange={(v) => updateField('address', { ...formState.address, [field.key]: v ?? '' })}
+                  options={field.options.map((opt) => ({ value: opt.value, label: opt.label }))}
+                />
               ) : (
                 <input
                   type="text"
@@ -597,16 +595,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
             )}
           </span>
         } description="How the academic year is divided" inline>
-          <select
+          <Select
+            aria-label="Term Structure"
+            className="min-w-52"
             value={formState.termStructure}
-            onChange={(e) => updateField('termStructure', e.target.value)}
+            onChange={(v) => { if (v) updateField('termStructure', v) }}
             disabled={isFieldLocked('academicCalendarType', hasActiveAcademicYear)}
-            className={`min-w-52 px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('academicCalendarType', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {TERM_STRUCTURE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            options={TERM_STRUCTURE_OPTIONS}
+          />
         </SettingsFieldRow>
 
         <SettingsFieldRow label="Grading Scale" description="Grading policies are managed in the Grades & Assessments module">
