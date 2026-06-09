@@ -14,6 +14,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { tenantService } from '@/services/tenant.service'
+import { Field, Input, Select } from '@edforge/ui'
 import type { School } from '@edforge/types'
 import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
 import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
@@ -61,7 +62,7 @@ interface SectionCardProps {
 
 function SectionCard({ icon, iconBg = 'bg-[rgba(55,138,221,0.1)]', title, subtitle, children, footer }: SectionCardProps) {
   return (
-    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
       <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2.5">
         <div className={`w-6 h-6 rounded-lg ${iconBg} flex items-center justify-center text-sm`}>
           {icon}
@@ -80,14 +81,6 @@ function SectionCard({ icon, iconBg = 'bg-[rgba(55,138,221,0.1)]', title, subtit
     </div>
   )
 }
-
-// ============================================================================
-// FORM INPUT STYLES
-// ============================================================================
-
-const inputClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 text-xs text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgba(55,138,221,0.45)] transition-colors font-[inherit]"
-const selectClass = inputClass
-const labelClass = "text-xs font-medium text-[rgb(var(--text-tertiary))] flex items-center gap-1"
 
 // ============================================================================
 // MAIN COMPONENT
@@ -309,55 +302,42 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
         }
       >
         <div className="grid grid-cols-2 gap-3 p-4">
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Display Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-            <input
-              className={inputClass}
-              type="text"
+          <Field label="Display Name" required density="compact">
+            <Input
               value={identity.displayName}
               onChange={e => setIdentity(prev => ({ ...prev, displayName: e.target.value }))}
               placeholder="Full name of the school"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Short Code</label>
-            <input
-              className={inputClass}
-              type="text"
+          </Field>
+          <Field label="Short Code" optionalText={null} density="compact">
+            <Input
               value={identity.code}
               disabled
               placeholder="2-4 letter abbreviation"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>School Type <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-            <select
-              className={selectClass}
-              value={identity.schoolType}
-              onChange={e => setIdentity(prev => ({ ...prev, schoolType: e.target.value }))}
-            >
-              {SCHOOL_TYPE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Website</label>
-            <input
-              className={inputClass}
-              type="text"
+          </Field>
+          <Select
+            label="School Type"
+            required
+            size="sm"
+            value={identity.schoolType}
+            onChange={v => { if (v) setIdentity(prev => ({ ...prev, schoolType: v })) }}
+            options={SCHOOL_TYPE_OPTIONS}
+          />
+          <Field label="Website" optionalText={null} density="compact">
+            <Input
               value={identity.website}
               onChange={e => setIdentity(prev => ({ ...prev, website: e.target.value }))}
               placeholder="https://www.school.edu"
             />
-          </div>
+          </Field>
           {/* Ed-Fi: Parent LEA (read-only) */}
-          <div className="flex flex-col gap-1.5 col-span-2">
-            <label className={labelClass}>
+          <div className="col-span-2 space-y-1">
+            <label className="flex items-center gap-1 text-sm font-medium text-[rgb(var(--text-secondary))]">
               Parent LEA (District)
               <span className="text-xs px-1.5 py-0.5 rounded bg-[rgba(55,138,221,0.08)] text-[#378ADD] font-medium">Ed-Fi</span>
             </label>
-            <div className={`${inputClass} bg-[rgba(255,255,255,0.02)] opacity-70 cursor-not-allowed`}>
+            <div className="w-full rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] opacity-70 cursor-not-allowed">
               {parentLea ? parentLea.name : 'Not assigned'}
             </div>
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
@@ -393,76 +373,57 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
         }
       >
         <div className="grid grid-cols-2 gap-3 p-4">
-          <div className="flex flex-col gap-1.5 col-span-2">
-            <label className={labelClass}>Street / Tole</label>
-            <input
-              className={inputClass}
-              type="text"
+          <Field label="Street / Tole" optionalText={null} density="compact" className="col-span-2">
+            <Input
               value={location.street1}
               onChange={e => setLocation(prev => ({ ...prev, street1: e.target.value }))}
               placeholder="Street address"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Municipality / VDC</label>
-            <input
-              className={inputClass}
-              type="text"
+          </Field>
+          <Field label="Municipality / VDC" optionalText={null} density="compact">
+            <Input
               value={location.municipality}
               onChange={e => setLocation(prev => ({ ...prev, municipality: e.target.value }))}
               placeholder="Municipality"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Ward No.</label>
-            <input
-              className={inputClass}
-              type="text"
+          </Field>
+          <Field label="Ward No." optionalText={null} density="compact">
+            <Input
               value={location.wardNumber}
               onChange={e => setLocation(prev => ({ ...prev, wardNumber: e.target.value }))}
               placeholder="Ward number"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>District</label>
-            <input
-              className={inputClass}
-              type="text"
+          </Field>
+          <Field label="District" optionalText={null} density="compact">
+            <Input
               value={location.district}
               onChange={e => setLocation(prev => ({ ...prev, district: e.target.value }))}
               placeholder="District"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Province</label>
-            <input
-              className={inputClass}
-              type="text"
+          </Field>
+          <Field label="Province" optionalText={null} density="compact">
+            <Input
               value={location.province}
               onChange={e => setLocation(prev => ({ ...prev, province: e.target.value }))}
               placeholder="Province"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Phone</label>
-            <input
-              className={inputClass}
+          </Field>
+          <Field label="Phone" optionalText={null} density="compact">
+            <Input
               type="tel"
               value={location.phone}
               onChange={e => setLocation(prev => ({ ...prev, phone: e.target.value }))}
               placeholder="+977-"
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Email</label>
-            <input
-              className={inputClass}
+          </Field>
+          <Field label="Email" optionalText={null} density="compact">
+            <Input
               type="email"
               value={location.email}
               onChange={e => setLocation(prev => ({ ...prev, email: e.target.value }))}
               placeholder="school@email.com"
             />
-          </div>
+          </Field>
         </div>
       </SectionCard>
 
@@ -494,7 +455,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
         <div className="p-4 space-y-4">
           {/* School Days picker */}
           <div className="space-y-1.5">
-            <label className={labelClass}>
+            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
               School Days <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">— tap to toggle</span>
             </label>
             <div className="flex gap-1.5">
@@ -526,33 +487,27 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
 
           {/* Time inputs */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>School Start Time</label>
-              <input
-                className={inputClass}
+            <Field label="School Start Time" optionalText={null} density="compact">
+              <Input
                 type="time"
                 value={schedule.startTime}
                 onChange={e => setSchedule(prev => ({ ...prev, startTime: e.target.value }))}
               />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>School End Time</label>
-              <input
-                className={inputClass}
+            </Field>
+            <Field label="School End Time" optionalText={null} density="compact">
+              <Input
                 type="time"
                 value={schedule.endTime}
                 onChange={e => setSchedule(prev => ({ ...prev, endTime: e.target.value }))}
               />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Period Duration (min)</label>
-              <input
-                className={inputClass}
+            </Field>
+            <Field label="Period Duration (min)" optionalText={null} density="compact">
+              <Input
                 type="number"
                 value={schedule.periodDuration}
                 onChange={e => setSchedule(prev => ({ ...prev, periodDuration: parseInt(e.target.value) || 45 }))}
               />
-            </div>
+            </Field>
           </div>
         </div>
       </SectionCard>
