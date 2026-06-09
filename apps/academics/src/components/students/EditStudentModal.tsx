@@ -9,11 +9,11 @@
  */
 
 import { useEffect, useRef, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, Save } from 'lucide-react'
-import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { Modal, ModalFooter, Button, Field, Input, Select } from '@edforge/ui'
 import { useUpdateStudent } from '../../hooks'
 import { parseApiError } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -85,6 +85,7 @@ export function EditStudentModal({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     setError,
     formState: { errors, isSubmitting, isDirty },
@@ -153,15 +154,6 @@ export function EditStudentModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
-
   return (
     <Modal
       open={open}
@@ -188,149 +180,81 @@ export function EditStudentModal({
 
         {/* Name Row */}
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-1.5">
-              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="firstName"
-              type="text"
+          <Field label="First Name" required error={errors.firstName?.message}>
+            <Input
               {...register('firstName')}
               ref={(e) => {
                 register('firstName').ref(e)
                 if (e) firstInputRef.current = e
               }}
-              className={inputClass(!!errors.firstName)}
               placeholder="First name"
               disabled={isSubmitting}
             />
-            {errors.firstName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="middleName" className="block text-sm font-medium text-text-primary mb-1.5">
-              Middle Name
-            </label>
-            <input
-              id="middleName"
-              type="text"
+          </Field>
+          <Field label="Middle Name" optionalText={null} error={errors.middleName?.message}>
+            <Input
               {...register('middleName')}
-              className={inputClass(!!errors.middleName)}
               placeholder="Middle name"
               disabled={isSubmitting}
             />
-          </div>
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-text-primary mb-1.5">
-              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="lastName"
-              type="text"
+          </Field>
+          <Field label="Last Name" required error={errors.lastName?.message}>
+            <Input
               {...register('lastName')}
-              className={inputClass(!!errors.lastName)}
               placeholder="Last name"
               disabled={isSubmitting}
             />
-            {errors.lastName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastName.message}</p>
-            )}
-          </div>
+          </Field>
         </div>
 
         {/* DOB + Gender */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="dateOfBirth" className="block text-sm font-medium text-text-primary mb-1.5">
-              Date of Birth <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="dateOfBirth"
-              type="date"
-              {...register('dateOfBirth')}
-              className={inputClass(!!errors.dateOfBirth)}
-              disabled={isSubmitting}
-            />
-            {errors.dateOfBirth && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.dateOfBirth.message}</p>
+          <Field label="Date of Birth" required error={errors.dateOfBirth?.message}>
+            <Input type="date" {...register('dateOfBirth')} disabled={isSubmitting} />
+          </Field>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Gender"
+                required
+                value={field.value}
+                onChange={field.onChange}
+                disabled={isSubmitting}
+                error={fieldState.error?.message}
+                options={GENDER_OPTIONS}
+              />
             )}
-          </div>
-          <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-text-primary mb-1.5">
-              Gender <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <select
-              id="gender"
-              {...register('gender')}
-              className={inputClass(!!errors.gender)}
-              disabled={isSubmitting}
-            >
-              {GENDER_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            {errors.gender && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.gender.message}</p>
-            )}
-          </div>
+          />
         </div>
 
         {/* Grade Level */}
-        <div>
-          <label htmlFor="currentGradeLevel" className="block text-sm font-medium text-text-primary mb-1.5">
-            Grade Level <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <select
-            id="currentGradeLevel"
-            {...register('currentGradeLevel')}
-            className={inputClass(!!errors.currentGradeLevel)}
-            disabled={isSubmitting}
-          >
-            <option value="">Select grade...</option>
-            {gradeOptions.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          {errors.currentGradeLevel && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.currentGradeLevel.message}</p>
+        <Controller
+          name="currentGradeLevel"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Select
+              label="Grade Level"
+              required
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              disabled={isSubmitting}
+              error={fieldState.error?.message}
+              placeholder="Select grade..."
+              options={gradeOptions}
+            />
           )}
-        </div>
+        />
 
         {/* Contact Info */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-1.5">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              {...register('email')}
-              className={inputClass(!!errors.email)}
-              placeholder="student@example.com"
-              disabled={isSubmitting}
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.email.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-1.5">
-              Phone
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              {...register('phone')}
-              className={inputClass(!!errors.phone)}
-              placeholder="+1 (555) 123-4567"
-              disabled={isSubmitting}
-            />
-            {errors.phone && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
-            )}
-          </div>
+          <Field label="Email" optionalText={null} error={errors.email?.message}>
+            <Input type="email" {...register('email')} placeholder="student@example.com" disabled={isSubmitting} />
+          </Field>
+          <Field label="Phone" optionalText={null} error={errors.phone?.message}>
+            <Input type="tel" {...register('phone')} placeholder="+1 (555) 123-4567" disabled={isSubmitting} />
+          </Field>
         </div>
 
         {isDirty && (

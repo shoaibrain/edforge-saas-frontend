@@ -9,11 +9,11 @@
  */
 
 import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, Users } from 'lucide-react'
-import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { Modal, ModalFooter, Button, Field, Input, Select, Checkbox } from '@edforge/ui'
 import { useTenantContext } from '@edforge/forms'
 import { phoneFormatForArchetype } from '@aibrains/shared-types'
 import { useUpdateStudent } from '../../../hooks'
@@ -77,6 +77,7 @@ export function AddGuardianModal({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     setError,
     formState: { errors, isSubmitting, isDirty },
@@ -156,15 +157,6 @@ export function AddGuardianModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
-
   return (
     <Modal
       open={open}
@@ -176,131 +168,94 @@ export function AddGuardianModal({
       <form onSubmit={onSubmit} className="space-y-4">
         {/* Name Row */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="guardianFirstName" className="block text-sm font-medium text-text-primary mb-1.5">
-              First Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="guardianFirstName"
-              type="text"
+          <Field label="First Name" required error={errors.firstName?.message}>
+            <Input
               {...register('firstName')}
               ref={(e) => {
                 register('firstName').ref(e)
                 if (e) firstInputRef.current = e
               }}
-              className={inputClass(!!errors.firstName)}
               placeholder="Guardian first name"
               disabled={isSubmitting}
             />
-            {errors.firstName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.firstName.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="guardianLastName" className="block text-sm font-medium text-text-primary mb-1.5">
-              Last Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="guardianLastName"
-              type="text"
+          </Field>
+          <Field label="Last Name" required error={errors.lastName?.message}>
+            <Input
               {...register('lastName')}
-              className={inputClass(!!errors.lastName)}
               placeholder="Guardian last name"
               disabled={isSubmitting}
             />
-            {errors.lastName && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.lastName.message}</p>
-            )}
-          </div>
+          </Field>
         </div>
 
         {/* Relationship */}
-        <div>
-          <label htmlFor="relationship" className="block text-sm font-medium text-text-primary mb-1.5">
-            Relationship <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <select
-            id="relationship"
-            {...register('relationship')}
-            className={inputClass(!!errors.relationship)}
-            disabled={isSubmitting}
-          >
-            {RELATIONSHIP_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          {errors.relationship && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.relationship.message}</p>
+        <Controller
+          name="relationship"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Select
+              label="Relationship"
+              required
+              value={field.value}
+              onChange={field.onChange}
+              disabled={isSubmitting}
+              error={fieldState.error?.message}
+              options={RELATIONSHIP_OPTIONS}
+            />
           )}
-        </div>
+        />
 
         {/* Contact Info */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="guardianPhone" className="block text-sm font-medium text-text-primary mb-1.5">
-              Phone <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary pointer-events-none border-r border-border-primary pr-2">
-                {phoneFmt.dialCode}
-              </span>
-              <input
-                id="guardianPhone"
-                type="tel"
-                {...register('phone')}
-                className={`${inputClass(!!errors.phone)} pl-16`}
-                placeholder={phoneFmt.placeholder}
-                disabled={isSubmitting}
-              />
-            </div>
-            {errors.phone && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.phone.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="guardianEmail" className="block text-sm font-medium text-text-primary mb-1.5">
-              Email
-            </label>
-            <input
-              id="guardianEmail"
+          <Field label="Phone" required error={errors.phone?.message}>
+            <Input
+              type="tel"
+              {...register('phone')}
+              prefix={
+                <span className="border-r border-[rgb(var(--border-primary))] pr-2 text-[rgb(var(--text-secondary))]">
+                  {phoneFmt.dialCode}
+                </span>
+              }
+              placeholder={phoneFmt.placeholder}
+              disabled={isSubmitting}
+            />
+          </Field>
+          <Field label="Email" optionalText={null} error={errors.email?.message}>
+            <Input
               type="email"
               {...register('email')}
-              className={inputClass(!!errors.email)}
               placeholder="guardian@example.com"
               disabled={isSubmitting}
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{errors.email.message}</p>
-            )}
-          </div>
+          </Field>
         </div>
 
         {/* Checkboxes */}
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <input
-              id="isPrimary"
-              type="checkbox"
-              {...register('isPrimary')}
-              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
-              disabled={isSubmitting}
-            />
-            <label htmlFor="isPrimary" className="text-sm text-text-primary">
-              Primary Contact
-            </label>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              id="canPickup"
-              type="checkbox"
-              {...register('canPickup')}
-              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
-              disabled={isSubmitting}
-            />
-            <label htmlFor="canPickup" className="text-sm text-text-primary">
-              Pickup Authorized
-            </label>
-          </div>
+          <Controller
+            name="isPrimary"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                label="Primary Contact"
+                checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                disabled={isSubmitting}
+              />
+            )}
+          />
+          <Controller
+            name="canPickup"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                label="Pickup Authorized"
+                checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                disabled={isSubmitting}
+              />
+            )}
+          />
         </div>
 
         {isDirty && (
