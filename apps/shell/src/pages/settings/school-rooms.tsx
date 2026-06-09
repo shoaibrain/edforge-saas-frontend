@@ -16,7 +16,7 @@ import {
   Search,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button, Drawer, DrawerFooter } from '@edforge/ui'
+import { Button, Drawer, DrawerFooter, Select } from '@edforge/ui'
 import {
   useLocations,
   useCreateLocation,
@@ -401,18 +401,12 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
           </div>
 
           {/* Location Type */}
-          <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Room Type</label>
-            <select
-              value={form.locationType}
-              onChange={(e) => setForm(f => ({ ...f, locationType: e.target.value }))}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
-            >
-              {LOCATION_TYPE_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Room Type"
+            value={form.locationType}
+            onChange={(v) => { if (v) setForm(f => ({ ...f, locationType: v })) }}
+            options={LOCATION_TYPE_OPTIONS}
+          />
 
           {/* Active toggle */}
           <label className="flex items-center gap-2 text-sm cursor-pointer">
