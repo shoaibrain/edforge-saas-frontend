@@ -108,9 +108,24 @@ const FinanceModule = React.lazy(() =>
 const PeopleModule = React.lazy(() =>
   loadRemoteWithRetry('people/PeopleModule')
 )
-const AnalyticsModule = React.lazy(() =>
-  loadRemoteWithRetry('analytics/AnalyticsModule')
-)
+
+// Analytics is PARKED (adoption dashboard fails with a backend 403). The remote
+// is unregistered and the route renders this placeholder instead of loading it.
+// See docs/deferred/parked-mfes.md for the un-park checklist.
+function AnalyticsParked() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center p-6">
+      <div className="max-w-sm rounded-2xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] p-8 text-center">
+        <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+          Analytics is coming soon
+        </h2>
+        <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+          The analytics dashboard is being finalized and is temporarily unavailable.
+        </p>
+      </div>
+    </div>
+  )
+}
 
 // ============================================================================
 // THEME SYNC COMPONENT
@@ -689,12 +704,7 @@ const peopleRoute = createRoute({
 const analyticsRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: '/analytics/$',
-  errorComponent: RemoteModuleError,
-  component: () => (
-    <Suspense fallback={<LoadingScreen />}>
-      <AnalyticsModule />
-    </Suspense>
-  ),
+  component: AnalyticsParked,
 })
 
 

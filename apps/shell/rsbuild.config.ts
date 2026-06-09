@@ -113,7 +113,8 @@ export default defineConfig({
             academics:          remoteUrl('academics', 'academics', 3002),
             people:             remoteUrl('people', 'people', 3006),
             finance:            remoteUrl('finance', 'finance', 3003),
-            analytics:          remoteUrl('analytics', 'analytics', 3008),
+            // analytics: PARKED — the adoption dashboard fails with a backend 403.
+            // Re-register when fixed. See docs/deferred/parked-mfes.md.
           },
           shared: getMFSharedConfig('host'),
         }),

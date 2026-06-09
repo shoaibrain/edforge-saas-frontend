@@ -132,13 +132,8 @@ const homeModule: ModuleConfig = {
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
-        {
-          id: 'analytics',
-          label: 'Analytics',
-          icon: BarChart3,
-          href: '/analytics/dashboard',
-          permission: { action: 'view', resource: 'analytics' },
-        },
+        // Analytics is PARKED (backend 403) — hidden from nav. The /analytics
+        // route renders a placeholder. See docs/deferred/parked-mfes.md.
         {
           id: 'settings',
           label: 'Settings',
