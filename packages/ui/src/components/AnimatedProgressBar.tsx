@@ -46,7 +46,7 @@ export function AnimatedProgressBar({
       className="rounded-sm overflow-hidden"
       style={{
         height,
-        background: trackColor || 'var(--v2-border-default)',
+        background: trackColor || 'rgb(var(--border-primary) / 0.35)',
       }}
       role="progressbar"
       aria-valuenow={Math.round(percentage)}

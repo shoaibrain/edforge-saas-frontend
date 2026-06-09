@@ -21,26 +21,26 @@ export const CategoryBar = forwardRef<HTMLDivElement, CategoryBarProps>(
         <div className="flex items-center justify-between">
           <span
             className="text-xs font-medium"
-            style={{ color: 'var(--v2-text-secondary)' }}
+            style={{ color: 'rgb(var(--text-secondary))' }}
           >
             {label}
           </span>
           <span
             className="text-xs font-mono tabular-nums"
-            style={{ color: 'var(--v2-text-muted)' }}
+            style={{ color: 'rgb(var(--text-tertiary))' }}
           >
             {weight}%
           </span>
         </div>
         <div
           className="h-1.5 rounded-full overflow-hidden"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         >
           <div
             className="h-full rounded-full v2-bar-fill"
             style={{
               width: `${clampedFill}%`,
-              background: color || 'var(--v2-brand-primary)',
+              background: color || '#1D9E75',
               '--v2-bar-fill-duration': '600ms',
             } as React.CSSProperties}
           />

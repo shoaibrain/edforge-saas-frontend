@@ -141,16 +141,16 @@
   --background-overlay: 0 18 25;
   --background-inverse: 0 18 25;
 
-  /* Text colors — neutral slate (was teal) */
+  /* Text colors — neutral slate (was teal); tuned to AA on warm surfaces */
   --text-primary: 26 31 46; /* #1a1f2e */
   --text-secondary: 55 65 81; /* #374151 slate-700 */
-  --text-tertiary: 107 114 128; /* #6b7280 slate-500 */
+  --text-tertiary: 88 95 111; /* #585F6F slate-600, AA on warm tertiary */
   --text-inverted: 250 247 242;
 
-  /* Border colors — warm beige (was vanilla/aqua) */
-  --border-primary: 236 231 216; /* #ECE7D8 warm beige */
-  --border-secondary: 236 231 216;
-  --border-tertiary: 200 192 174; /* #C8C0AE warm strong */
+  /* Border colors — warm taupe, perceptible (>=3:1 on warm surfaces) */
+  --border-primary: 150 143 126; /* #968F7E */
+  --border-secondary: 150 143 126;
+  --border-tertiary: 120 113 96; /* #787160 */
 
   /* Semantic roles */
   --text-muted: var(--text-tertiary);
@@ -162,9 +162,9 @@
   --border-strong: var(--border-tertiary);
   --border-focus: 29 158 117; /* brand green */
 
-  --action-primary-bg: 29 158 117; /* #1D9E75 brand green (was teal) */
-  --action-primary-bg-hover: 15 110 86; /* #0F6E56 brand deep */
-  --action-primary-bg-active: 11 84 66;
+  --action-primary-bg: 15 110 86; /* #0F6E56 brand-deep green (AA with white text) */
+  --action-primary-bg-hover: 12 92 72;
+  --action-primary-bg-active: 9 76 59;
   --action-primary-fg: var(--text-on-accent);
   --action-secondary-bg: var(--background-tertiary);
   --action-secondary-fg: var(--text-secondary);
@@ -209,10 +209,10 @@
   --background-overlay: 0 0 0;
   --background-inverse: 250 247 242;
 
-  /* Text colors — neutral grey (was aqua) */
+  /* Text colors — neutral grey (was aqua); tuned to AA on dark surfaces */
   --text-primary: 232 234 240; /* #e8eaf0 */
   --text-secondary: 200 204 216; /* #c8ccd8 */
-  --text-tertiary: 122 128 153; /* #7a8099 */
+  --text-tertiary: 150 156 178; /* #969CB2, AA on dark tertiary */
   --text-inverted: 26 31 46;
 
   /* Border colors — white at low opacity (was aqua) */
@@ -230,9 +230,9 @@
   --border-strong: var(--border-tertiary);
   --border-focus: 29 158 117; /* brand green */
 
-  --action-primary-bg: 29 158 117; /* #1D9E75 brand green (was teal) */
-  --action-primary-bg-hover: 15 110 86; /* #0F6E56 brand deep */
-  --action-primary-bg-active: 11 84 66;
+  --action-primary-bg: 15 110 86; /* #0F6E56 brand-deep green (AA with white text) */
+  --action-primary-bg-hover: 20 130 100;
+  --action-primary-bg-active: 12 92 72;
   --action-primary-fg: var(--text-on-accent);
   --action-secondary-bg: var(--background-tertiary);
   --action-secondary-fg: var(--text-secondary);

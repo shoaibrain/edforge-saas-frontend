@@ -16,11 +16,11 @@ export const DashedDivider = forwardRef<HTMLDivElement, DashedDividerProps>(
           role="separator"
           {...props}
         >
-          <div className="flex-1 border-t border-dashed border-[var(--v2-border-default)]" />
-          <span className="text-xs font-mono uppercase tracking-[0.06em] text-[var(--v2-text-hint)] shrink-0">
+          <div className="flex-1 border-t border-dashed border-[rgb(var(--border-primary) / 0.35)]" />
+          <span className="text-xs font-mono uppercase tracking-[0.06em] text-[rgb(var(--text-tertiary))] shrink-0">
             {label}
           </span>
-          <div className="flex-1 border-t border-dashed border-[var(--v2-border-default)]" />
+          <div className="flex-1 border-t border-dashed border-[rgb(var(--border-primary) / 0.35)]" />
         </div>
       )
     }
@@ -29,7 +29,7 @@ export const DashedDivider = forwardRef<HTMLDivElement, DashedDividerProps>(
       <div
         ref={ref}
         className={cn(
-          'border-t border-dashed border-[var(--v2-border-default)] my-3',
+          'border-t border-dashed border-[rgb(var(--border-primary) / 0.35)] my-3',
           className
         )}
         role="separator"

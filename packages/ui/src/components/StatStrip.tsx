@@ -38,16 +38,16 @@ function StatTileSkeleton() {
     <div
       className="border"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         borderRadius: '22px',
         padding: '22px 24px',
-        boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+        boxShadow: 'var(--elevation-raised)',
       }}
     >
-      <div className="h-8 w-8 rounded-[10px] v2-skeleton-pulse mb-3" style={{ background: 'var(--v2-bg-elevated)' }} />
-      <div className="h-3 w-14 rounded v2-skeleton-pulse mb-3" style={{ background: 'var(--v2-bg-elevated)' }} />
-      <div className="h-10 w-20 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+      <div className="h-8 w-8 rounded-[10px] v2-skeleton-pulse mb-3" style={{ background: 'rgb(var(--background-tertiary))' }} />
+      <div className="h-3 w-14 rounded v2-skeleton-pulse mb-3" style={{ background: 'rgb(var(--background-tertiary))' }} />
+      <div className="h-10 w-20 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
     </div>
   )
 }
@@ -66,20 +66,20 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
     <div
       className="border transition-all duration-200 motion-safe:hover:-translate-y-0.5"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         borderRadius: '22px',
         padding: '22px 24px',
-        boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+        boxShadow: 'var(--elevation-raised)',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--v2-shadow-hover, 0 4px 12px rgba(0,0,0,0.10))'
+        e.currentTarget.style.boxShadow = 'var(--elevation-overlay)'
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))'
+        e.currentTarget.style.boxShadow = 'var(--elevation-raised)'
       }}
       role="status"
       aria-label={`${label}: ${value}`}
@@ -92,8 +92,8 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
             width: 34,
             height: 34,
             borderRadius: 10,
-            background: iconBgColor || 'var(--v2-surface-interactive)',
-            color: iconColor || 'var(--v2-text-muted)',
+            background: iconBgColor || 'rgb(var(--background-tertiary) / 0.6)',
+            color: iconColor || 'rgb(var(--text-tertiary))',
             marginBottom: 6,
           }}
         >
@@ -107,7 +107,7 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
         style={{
           fontSize: '10px',
           letterSpacing: '0.12em',
-          color: 'var(--v2-text-muted)',
+          color: 'rgb(var(--text-tertiary))',
         }}
       >
         {label}
@@ -118,7 +118,7 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
         <div className="flex items-center gap-2">
           <span
             className="font-display italic"
-            style={{ fontSize: 24, fontWeight: 300, color: 'var(--v2-text-hint)' }}
+            style={{ fontSize: 24, fontWeight: 300, color: 'rgb(var(--text-tertiary))' }}
           >
             —
           </span>
@@ -126,7 +126,7 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
             <button
               onClick={onRetry}
               className="text-xs font-medium px-1.5 py-0.5 rounded"
-              style={{ background: 'var(--v2-warning-bg)', color: 'var(--v2-warning)' }}
+              style={{ background: 'rgb(var(--state-warning-bg))', color: 'rgb(var(--state-warning-fg))' }}
             >
               Retry
             </button>
@@ -139,7 +139,7 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
             fontSize: 40,
             fontWeight: 500,
             letterSpacing: '-0.025em',
-            color: 'var(--v2-text-primary)',
+            color: 'rgb(var(--text-primary))',
           }}
         >
           {displayValue}
@@ -148,7 +148,7 @@ function StatTile({ label, value, subtitle, icon, iconBgColor, iconColor, loadin
 
       {/* Subtitle — 12px, muted */}
       {subtitle && (
-        <p style={{ fontSize: 12, color: 'var(--v2-text-muted)', marginTop: 2 }}>
+        <p style={{ fontSize: 12, color: 'rgb(var(--text-tertiary))', marginTop: 2 }}>
           {subtitle}
         </p>
       )}

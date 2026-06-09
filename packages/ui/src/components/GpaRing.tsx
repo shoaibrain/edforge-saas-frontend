@@ -53,7 +53,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
           style={{
             width: pixelSize,
             height: pixelSize,
-            background: 'var(--v2-bg-elevated)',
+            background: 'rgb(var(--background-tertiary))',
           }}
           role="status"
           aria-label="Loading GPA"
@@ -78,7 +78,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
           cy={center}
           r={radius}
           fill="none"
-          stroke={hasValue ? 'var(--v2-border-default)' : 'var(--v2-border-default)'}
+          stroke={hasValue ? 'rgb(var(--border-primary) / 0.35)' : 'rgb(var(--border-primary) / 0.35)'}
           strokeWidth={config.stroke}
           strokeDasharray={hasValue ? 'none' : '4 6'}
           opacity={0.6}
@@ -91,7 +91,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
             cy={center}
             r={radius}
             fill="none"
-            stroke="var(--v2-brand-primary)"
+            stroke="#1D9E75"
             strokeWidth={config.stroke}
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -107,7 +107,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
           y={center}
           textAnchor="middle"
           dominantBaseline="central"
-          fill="var(--v2-text-primary)"
+          fill="rgb(var(--text-primary))"
           fontSize={config.fontSize}
           fontWeight="500"
           fontFamily="'Fraunces', Georgia, serif"
@@ -123,7 +123,7 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
             y={center + parseInt(config.fontSize) * 0.7}
             textAnchor="middle"
             dominantBaseline="central"
-            fill="var(--v2-text-muted)"
+            fill="rgb(var(--text-tertiary))"
             fontSize={config.subSize}
             fontFamily="inherit"
           >

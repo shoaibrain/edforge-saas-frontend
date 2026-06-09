@@ -79,7 +79,7 @@ export function AttendanceDonutRing({
           cy={half}
           r={radius}
           fill="none"
-          stroke="var(--v2-border-default, rgba(255, 255, 255, 0.08))"
+          stroke="rgb(var(--border-primary) / 0.35)"
           strokeWidth={strokeWidth}
         />
         {/* Progress arc */}

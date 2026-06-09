@@ -42,37 +42,37 @@ function KpiSkeleton() {
     <div
       className="relative overflow-hidden rounded-xl border p-4"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
       }}
     >
       <div className="flex items-center justify-between mb-2.5">
         <div
           className="h-3 w-24 rounded v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
         <div
           className="w-7 h-7 rounded-[7px] v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
       </div>
       <div
         className="h-7 w-16 rounded v2-skeleton-pulse mb-1.5"
-        style={{ background: 'var(--v2-bg-elevated)' }}
+        style={{ background: 'rgb(var(--background-tertiary))' }}
       />
       <div className="flex items-center gap-1.5">
         <div
           className="h-4 w-20 rounded-full v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
         <div
           className="h-3 w-16 rounded v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
       </div>
       <div
         className="absolute bottom-0 left-0 right-0"
-        style={{ height: 'var(--v2-kpi-bar-height, 2px)', background: 'var(--v2-bg-elevated)' }}
+        style={{ height: '2px', background: 'rgb(var(--background-tertiary))' }}
       />
     </div>
   )
@@ -112,16 +112,16 @@ export function StatCard({
       transition={{ duration: 0.3 }}
       className="relative overflow-hidden rounded-xl border cursor-pointer"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: '16px 16px 12px',
-        transition: 'border-color var(--v2-transition-fast, 150ms ease)',
+        transition: 'border-color 150ms ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--v2-border-hover)'
+        e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.5)'
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--v2-border-default)'
+        e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.35)'
       }}
       role="status"
       aria-label={`${label}: ${value}`}
@@ -130,7 +130,7 @@ export function StatCard({
       <div className="flex items-center justify-between mb-2.5">
         <span
           className="text-xs font-medium uppercase tracking-[0.5px]"
-          style={{ color: 'var(--v2-text-faint)' }}
+          style={{ color: 'rgb(var(--text-disabled))' }}
         >
           {label}
         </span>
@@ -150,7 +150,7 @@ export function StatCard({
       {/* Value */}
       {error ? (
         <div className="flex items-center gap-1.5">
-          <span className="text-2xl font-semibold" style={{ color: 'var(--v2-text-hint)' }}>
+          <span className="text-2xl font-semibold" style={{ color: 'rgb(var(--text-tertiary))' }}>
             —
           </span>
           {onRetry && (
@@ -158,8 +158,8 @@ export function StatCard({
               onClick={onRetry}
               className="flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium rounded"
               style={{
-                background: 'var(--v2-warning-bg)',
-                color: 'var(--v2-warning)',
+                background: 'rgb(var(--state-warning-bg))',
+                color: 'rgb(var(--state-warning-fg))',
               }}
               title="Retry loading"
             >
@@ -171,7 +171,7 @@ export function StatCard({
       ) : (
         <span
           className="text-2xl font-semibold leading-none tracking-tight"
-          style={{ color: valueColor || 'var(--v2-text-primary)' }}
+          style={{ color: valueColor || 'rgb(var(--text-primary))' }}
         >
           {displayValue}
         </span>
@@ -188,7 +188,7 @@ export function StatCard({
           </span>
         )}
         {hint && (
-          <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+          <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
             {hint}
           </span>
         )}

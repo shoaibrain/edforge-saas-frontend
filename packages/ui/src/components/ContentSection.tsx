@@ -45,14 +45,14 @@ export const ContentSection = forwardRef<HTMLElement, ContentSectionProps>(
         {...props}
       >
         {eyebrow && (
-          <p className="text-xs font-mono uppercase tracking-[0.08em] text-[var(--v2-text-muted)] mb-1.5">
+          <p className="text-xs font-mono uppercase tracking-[0.08em] text-[rgb(var(--text-tertiary))] mb-1.5">
             {eyebrow}
           </p>
         )}
         {heading && (
           <HeadingTag
             className={cn(
-              'font-display text-[var(--v2-text-primary)] mb-1 tracking-tight',
+              'font-display text-[rgb(var(--text-primary))] mb-1 tracking-tight',
               displayHeading ? 'text-2xl font-medium' : 'text-xl font-medium',
               headingItalic && 'italic'
             )}
@@ -61,7 +61,7 @@ export const ContentSection = forwardRef<HTMLElement, ContentSectionProps>(
           </HeadingTag>
         )}
         {subheading && (
-          <p className="text-sm text-[var(--v2-text-secondary)] mb-4">
+          <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
             {subheading}
           </p>
         )}
