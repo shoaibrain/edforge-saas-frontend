@@ -6,10 +6,19 @@
  * disabilities array, conditional scholarshipCategory, and the final PATCH
  * payload shape (empty strings become undefined; empty disability rows are
  * dropped).
+ *
+ * The form controls are @edforge/ui primitives (Select/Input/Checkbox/Textarea),
+ * so the dropdowns are Headless UI listboxes — assert via the open-and-pick
+ * pattern (`getByRole('button')` → click → `findByRole('option')`), not native
+ * `<select>` DOM. Only Modal/ModalFooter/Button are stubbed; the form controls
+ * are the real primitives.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import type * as EdforgeUi from '@edforge/ui'
+import { getDisplayName, listDescriptorUris } from '@aibrains/shared-types'
 
 // Capture the mutation function so we can assert what the modal submits.
 const mutateAsyncSpy = vi.fn().mockResolvedValue({ studentId: 's-1' })
@@ -20,9 +29,11 @@ vi.mock('../../../../hooks', () => ({
   }),
 }))
 
-// Modal + ModalFooter + Button from @edforge/ui render as simple passthroughs
-// in tests to keep focus on the form behavior.
-vi.mock('@edforge/ui', () => ({
+// Keep the real form primitives (Field/Input/Select/Checkbox/Textarea); only
+// Modal/ModalFooter/Button render as passthroughs to avoid the Dialog portal +
+// focus-trap machinery and keep the test focused on form behavior.
+vi.mock('@edforge/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof EdforgeUi>()),
   Modal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ModalFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Button: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
@@ -44,32 +55,33 @@ describe('EditDemographicsModal', () => {
     mutateAsyncSpy.mockClear()
   })
 
-  it('populates the sex dropdown from listDescriptorUris("SexDescriptor")', () => {
-    const { container } = render(
-      <EditDemographicsModal student={makeStudent()} onClose={() => {}} />,
-    )
-    const sexSelect = container.querySelector<HTMLSelectElement>('#sexDescriptor')
-    expect(sexSelect).not.toBeNull()
-    // First option is the "not specified" placeholder; at least one real
-    // SexDescriptor URI should follow.
-    const options = Array.from(sexSelect!.options).map((o) => o.value)
-    expect(options[0]).toBe('')
-    expect(options.slice(1).every((v) => v.startsWith('uri://ed-fi.org/SexDescriptor'))).toBe(true)
-    expect(options.length).toBeGreaterThanOrEqual(2)
+  it('populates the sex dropdown from listDescriptorUris("SexDescriptor")', async () => {
+    const user = userEvent.setup()
+    render(<EditDemographicsModal student={makeStudent()} onClose={() => {}} />)
+
+    // Open the Sex listbox (the trigger is labelled "Sex" via the Field label).
+    await user.click(screen.getByRole('button', { name: 'Sex' }))
+
+    // The "not specified" placeholder leads, followed by each SexDescriptor URI
+    // rendered through getDisplayName.
+    expect(await screen.findByRole('option', { name: '— Not specified —' })).toBeInTheDocument()
+    const expectedLabels = listDescriptorUris('SexDescriptor').map((uri) => getDisplayName(uri, 'en'))
+    expect(expectedLabels.length).toBeGreaterThanOrEqual(1)
+    for (const label of expectedLabels) {
+      expect(screen.getByRole('option', { name: label })).toBeInTheDocument()
+    }
   })
 
   it('shows scholarshipCategory input only when belowPovertyLine is checked', () => {
-    const { container, getByLabelText } = render(
-      <EditDemographicsModal student={makeStudent()} onClose={() => {}} />,
-    )
-    expect(container.querySelector('#scholarshipCategory')).toBeNull()
+    render(<EditDemographicsModal student={makeStudent()} onClose={() => {}} />)
+    expect(screen.queryByPlaceholderText(/Dalit/i)).toBeNull()
 
-    const below = getByLabelText(/below poverty line/i) as HTMLInputElement
+    const below = screen.getByLabelText(/below poverty line/i)
     fireEvent.click(below)
-    expect(container.querySelector('#scholarshipCategory')).not.toBeNull()
+    expect(screen.queryByPlaceholderText(/Dalit/i)).not.toBeNull()
 
     fireEvent.click(below) // uncheck
-    expect(container.querySelector('#scholarshipCategory')).toBeNull()
+    expect(screen.queryByPlaceholderText(/Dalit/i)).toBeNull()
   })
 
   it('adds and removes disability rows via +/- buttons', () => {
@@ -104,14 +116,14 @@ describe('EditDemographicsModal', () => {
         onClose={() => {}}
       />,
     )
-    const sexSelect = container.querySelector<HTMLSelectElement>('#sexDescriptor')!
-    expect(sexSelect.value).toBe('uri://ed-fi.org/SexDescriptor#Male')
 
-    const ethnicity = container.querySelector<HTMLInputElement>('#ethnicityDescriptor')!
-    expect(ethnicity.value).toBe('uri://ed-fi.org/EthnicityDescriptor#Dalit')
+    // Sex select trigger reflects the hydrated descriptor's display name.
+    const sexLabel = getDisplayName('uri://ed-fi.org/SexDescriptor#Male', 'en')
+    expect(screen.getByRole('button', { name: 'Sex' })).toHaveTextContent(sexLabel)
 
-    const scholar = container.querySelector<HTMLInputElement>('#scholarshipCategory')!
-    expect(scholar.value).toBe('Janajati')
+    // Ethnicity + scholarship inputs hydrate from the student.
+    expect(screen.getByDisplayValue('uri://ed-fi.org/EthnicityDescriptor#Dalit')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Janajati')).toBeInTheDocument()
 
     // One disability row hydrated from the student.
     expect(container.querySelectorAll('[data-testid^="disability-row-"]').length).toBe(1)
@@ -119,7 +131,7 @@ describe('EditDemographicsModal', () => {
 
   it('submits a PATCH payload with empty strings collapsed and empty disability rows dropped', async () => {
     const onClose = vi.fn()
-    const { container, getByTestId, getByLabelText } = render(
+    const { container, getByTestId } = render(
       <EditDemographicsModal
         student={makeStudent({
           sexDescriptor: 'uri://ed-fi.org/SexDescriptor#Female',
@@ -130,7 +142,7 @@ describe('EditDemographicsModal', () => {
 
     // Toggle belowPovertyLine ON then OFF so the form is dirty but the
     // scholarshipCategory field is hidden again (i.e. not included in patch).
-    const below = getByLabelText(/below poverty line/i) as HTMLInputElement
+    const below = screen.getByLabelText(/below poverty line/i)
     fireEvent.click(below)
     fireEvent.click(below)
 
@@ -138,7 +150,7 @@ describe('EditDemographicsModal', () => {
     fireEvent.click(getByTestId('add-disability'))
 
     // Also flip isTransferred ON to prove boolean flags are always present.
-    const transferred = getByLabelText(/transferred from another school/i) as HTMLInputElement
+    const transferred = screen.getByLabelText(/transferred from another school/i)
     fireEvent.click(transferred)
 
     const form = container.querySelector('form')!

@@ -18,7 +18,7 @@
 import { useMemo } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { Loader2, Plus, Save, Trash2 } from 'lucide-react'
-import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { Modal, ModalFooter, Button, Field, Input, Select, Checkbox, Textarea } from '@edforge/ui'
 import {
   getDisplayName,
   listDescriptorUris,
@@ -101,11 +101,6 @@ function formToPatch(form: FormShape): StudentDescriptorPatchInput {
 // COMPONENT
 // ============================================================================
 
-const inputClass =
-  'w-full px-3 py-2 rounded-lg border text-sm bg-surface-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 transition-colors border-border-secondary'
-
-const labelClass = 'block text-sm font-medium text-text-primary mb-1.5'
-
 export function EditDemographicsModal({
   student,
   onClose,
@@ -148,74 +143,76 @@ export function EditDemographicsModal({
             Identity
           </h4>
 
-          <div>
-            <label htmlFor="sexDescriptor" className={labelClass}>Sex</label>
-            <select
-              id="sexDescriptor"
-              {...register('sexDescriptor')}
-              className={inputClass}
-              disabled={isSubmitting}
-            >
-              <option value="">— Not specified —</option>
-              {sexOptions.map((uri) => (
-                <option key={uri} value={uri}>
-                  {getDisplayName(uri, locale)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Controller
+            name="sexDescriptor"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Sex"
+                optionalText={null}
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                disabled={isSubmitting}
+                options={[
+                  { value: '', label: '— Not specified —' },
+                  ...sexOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
+                ]}
+              />
+            )}
+          />
 
-          <div>
-            <label htmlFor="languageDescriptor" className={labelClass}>Primary language</label>
-            <select
-              id="languageDescriptor"
-              {...register('languageDescriptor')}
-              className={inputClass}
-              disabled={isSubmitting}
-            >
-              <option value="">— Not specified —</option>
-              {languageOptions.map((uri) => (
-                <option key={uri} value={uri}>
-                  {getDisplayName(uri, locale)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Controller
+            name="languageDescriptor"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Primary language"
+                optionalText={null}
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                disabled={isSubmitting}
+                options={[
+                  { value: '', label: '— Not specified —' },
+                  ...languageOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
+                ]}
+              />
+            )}
+          />
 
-          <div>
-            <label htmlFor="motherTongueDescriptor" className={labelClass}>Mother tongue</label>
-            <select
-              id="motherTongueDescriptor"
-              {...register('motherTongueDescriptor')}
-              className={inputClass}
-              disabled={isSubmitting}
-            >
-              <option value="">— Not specified —</option>
-              {languageOptions.map((uri) => (
-                <option key={uri} value={uri}>
-                  {getDisplayName(uri, locale)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Controller
+            name="motherTongueDescriptor"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Mother tongue"
+                optionalText={null}
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                disabled={isSubmitting}
+                options={[
+                  { value: '', label: '— Not specified —' },
+                  ...languageOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
+                ]}
+              />
+            )}
+          />
 
-          <div>
-            <label htmlFor="ethnicityDescriptor" className={labelClass}>
-              Ethnicity descriptor URI
-            </label>
-            <input
-              id="ethnicityDescriptor"
-              type="text"
+          <Field
+            label="Ethnicity descriptor URI"
+            optionalText={null}
+            helperText={
+              <>
+                Free-text URI for V1 (the ethnicity catalog ships in Sprint 6).
+                Format: <code>uri://...</code>
+              </>
+            }
+          >
+            <Input
               {...register('ethnicityDescriptor')}
               placeholder="uri://ed-fi.org/EthnicityDescriptor#..."
-              className={inputClass}
               disabled={isSubmitting}
             />
-            <p className="mt-1 text-xs text-text-tertiary">
-              Free-text URI for V1 (the ethnicity catalog ships in Sprint 6).
-              Format: <code>uri://...</code>
-            </p>
-          </div>
+          </Field>
         </section>
 
         {/* Disabilities */}
@@ -250,21 +247,22 @@ export function EditDemographicsModal({
                   control={control}
                   name={`disabilities.${index}.descriptor`}
                   render={({ field: f }) => (
-                    <select {...f} className={inputClass} disabled={isSubmitting}>
-                      <option value="">— Select disability —</option>
-                      {disabilityOptions.map((uri) => (
-                        <option key={uri} value={uri}>
-                          {getDisplayName(uri, locale)}
-                        </option>
-                      ))}
-                    </select>
+                    <Select
+                      aria-label="Disability"
+                      value={f.value ?? ''}
+                      onChange={(v) => f.onChange(v ?? '')}
+                      disabled={isSubmitting}
+                      options={[
+                        { value: '', label: '— Select disability —' },
+                        ...disabilityOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
+                      ]}
+                    />
                   )}
                 />
-                <textarea
+                <Textarea
                   {...register(`disabilities.${index}.notes`)}
                   placeholder="Notes (optional — kept private; stripped before audit emit)"
                   rows={2}
-                  className={inputClass}
                   disabled={isSubmitting}
                 />
               </div>
@@ -285,30 +283,40 @@ export function EditDemographicsModal({
         <section className="space-y-3">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Flags</h4>
 
-          <label className="flex items-center gap-2 text-sm text-text-primary">
-            <input type="checkbox" {...register('isTransferred')} disabled={isSubmitting} />
-            Transferred from another school
-          </label>
-
-          <label className="flex items-center gap-2 text-sm text-text-primary">
-            <input type="checkbox" {...register('belowPovertyLine')} disabled={isSubmitting} />
-            Below poverty line
-          </label>
-
-          {belowPovertyLine && (
-            <div>
-              <label htmlFor="scholarshipCategory" className={labelClass}>
-                Scholarship category
-              </label>
-              <input
-                id="scholarshipCategory"
-                type="text"
-                {...register('scholarshipCategory')}
-                placeholder="e.g. Dalit, Janajati, …"
-                className={inputClass}
+          <Controller
+            name="isTransferred"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                label="Transferred from another school"
+                checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
                 disabled={isSubmitting}
               />
-            </div>
+            )}
+          />
+
+          <Controller
+            name="belowPovertyLine"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                label="Below poverty line"
+                checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                disabled={isSubmitting}
+              />
+            )}
+          />
+
+          {belowPovertyLine && (
+            <Field label="Scholarship category" optionalText={null}>
+              <Input
+                {...register('scholarshipCategory')}
+                placeholder="e.g. Dalit, Janajati, …"
+                disabled={isSubmitting}
+              />
+            </Field>
           )}
         </section>
 
