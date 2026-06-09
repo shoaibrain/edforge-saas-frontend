@@ -245,8 +245,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
         style={{
           maxWidth: 540,
           maxHeight: '85vh',
-          background: 'var(--v2-bg-surface)',
-          border: '1px solid var(--v2-border-default)',
+          background: 'rgb(var(--background-secondary))',
+          border: '1px solid rgb(var(--border-primary) / 0.35)',
           borderRadius: 14,
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
         }}
@@ -254,7 +254,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-4"
-          style={{ borderBottom: '1px solid var(--v2-border-default)' }}
+          style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
         >
           <div className="flex items-center gap-3">
             <div
@@ -271,11 +271,11 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
             <div>
               <h2
                 className="font-semibold"
-                style={{ fontSize: 14, color: 'var(--v2-text-primary)' }}
+                style={{ fontSize: 14, color: 'rgb(var(--text-primary))' }}
               >
                 Import Students
               </h2>
-              <p style={{ fontSize: 11, color: 'var(--v2-text-muted)' }}>
+              <p style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}>
                 {phase === 'upload' && 'Upload a CSV file to bulk import students'}
                 {phase === 'preview' && `${validRows.length} valid, ${invalidRows.length} with errors`}
                 {phase === 'importing' && 'Importing students...'}
@@ -291,12 +291,12 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
             style={{
               width: 26,
               height: 26,
-              background: 'var(--v2-surface-interactive)',
-              border: '1px solid var(--v2-border-default)',
+              background: 'rgb(var(--background-tertiary) / 0.6)',
+              border: '1px solid rgb(var(--border-primary) / 0.35)',
               borderRadius: 6,
             }}
           >
-            <X className="w-3 h-3" style={{ color: 'var(--v2-text-hint)' }} />
+            <X className="w-3 h-3" style={{ color: 'rgb(var(--text-tertiary))' }} />
           </button>
         </div>
 
@@ -333,10 +333,10 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 >
                   <Upload className="w-5 h-5" style={{ color: '#1D9E75' }} />
                 </div>
-                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+                <p style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
                   Drag and drop a CSV file
                 </p>
-                <p style={{ fontSize: 11, color: 'var(--v2-text-muted)', marginTop: 4 }}>
+                <p style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))', marginTop: 4 }}>
                   or{' '}
                   <span style={{ color: '#1D9E75', cursor: 'pointer' }}>click to browse</span>
                 </p>
@@ -354,8 +354,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="flex items-center gap-2 p-3 rounded-lg"
                   style={{
-                    background: 'var(--v2-danger-bg)',
-                    border: '1px solid var(--v2-danger-border)',
+                    background: 'rgb(var(--state-danger-bg))',
+                    border: '1px solid rgb(var(--state-danger-border))',
                   }}
                 >
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#E24B4A' }} />
@@ -367,8 +367,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
               <div
                 className="flex items-center gap-3"
                 style={{
-                  background: 'var(--v2-surface-inset)',
-                  border: '1px solid var(--v2-border-default)',
+                  background: 'rgb(var(--background-tertiary) / 0.5)',
+                  border: '1px solid rgb(var(--border-primary) / 0.35)',
                   borderRadius: 8,
                   padding: '10px 12px',
                 }}
@@ -378,17 +378,17 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   style={{
                     width: 28,
                     height: 28,
-                    background: 'var(--v2-surface-interactive-hover)',
+                    background: 'rgb(var(--background-tertiary) / 0.7)',
                     borderRadius: 6,
                   }}
                 >
                   <FileText className="w-3.5 h-3.5" style={{ color: '#7a8099' }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+                  <p style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
                     CSV Template
                   </p>
-                  <p style={{ fontSize: 10, color: 'var(--v2-text-muted)' }}>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>
                     Download with required columns
                   </p>
                 </div>
@@ -461,9 +461,9 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                           fontWeight: 500,
                           padding: '2px 7px',
                           borderRadius: 5,
-                          background: 'var(--v2-surface-interactive)',
+                          background: 'rgb(var(--background-tertiary) / 0.6)',
                           color: '#5a6070',
-                          border: '1px solid var(--v2-border-default)',
+                          border: '1px solid rgb(var(--border-primary) / 0.35)',
                         }}
                       >
                         {col}
@@ -481,11 +481,11 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
               {/* File info */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint)' }} />
-                  <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--v2-text-primary)' }}>
+                  <FileText className="w-3.5 h-3.5" style={{ color: 'rgb(var(--text-tertiary))' }} />
+                  <span style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--text-primary))' }}>
                     {fileName}
                   </span>
-                  <span style={{ fontSize: 10, color: 'var(--v2-text-hint)' }}>
+                  <span style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>
                     ({parsedData.rows.length} rows)
                   </span>
                 </div>
@@ -493,7 +493,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   type="button"
                   onClick={handleReset}
                   className="flex items-center gap-1 transition-colors hover:opacity-80"
-                  style={{ fontSize: 10, color: 'var(--v2-text-hint)' }}
+                  style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}
                 >
                   <Trash2 className="w-3 h-3" />
                   Remove
@@ -505,8 +505,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="flex items-center gap-2 p-3 rounded-lg"
                   style={{
-                    background: 'var(--v2-danger-bg)',
-                    border: '1px solid var(--v2-danger-border)',
+                    background: 'rgb(var(--state-danger-bg))',
+                    border: '1px solid rgb(var(--state-danger-border))',
                   }}
                 >
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#E24B4A' }} />
@@ -519,8 +519,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="p-3 rounded-lg"
                   style={{
-                    background: 'var(--v2-danger-bg)',
-                    border: '1px solid var(--v2-danger-border)',
+                    background: 'rgb(var(--state-danger-bg))',
+                    border: '1px solid rgb(var(--state-danger-border))',
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
@@ -548,22 +548,22 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 style={{
                   maxHeight: 300,
                   borderRadius: 8,
-                  border: '1px solid var(--v2-border-default)',
+                  border: '1px solid rgb(var(--border-primary) / 0.35)',
                 }}
               >
                 <table className="w-full" style={{ fontSize: 11 }}>
                   <thead
                     className="sticky top-0"
-                    style={{ background: 'var(--v2-bg-elevated)' }}
+                    style={{ background: 'rgb(var(--background-tertiary))' }}
                   >
                     <tr>
-                      <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'var(--v2-text-hint)', textTransform: 'uppercase' }}>#</th>
+                      <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>#</th>
                       {parsedData.headers.slice(0, 5).map((h) => (
-                        <th key={h} className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'var(--v2-text-hint)', textTransform: 'uppercase' }}>
+                        <th key={h} className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
                           {h}
                         </th>
                       ))}
-                      <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'var(--v2-text-hint)', textTransform: 'uppercase' }}>
+                      <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
                         Status
                       </th>
                     </tr>
@@ -575,13 +575,13 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                         <tr
                           key={row.rowNum}
                           style={{
-                            borderTop: '1px solid var(--v2-border-default)',
-                            background: hasErrors ? 'var(--v2-danger-bg)' : 'transparent',
+                            borderTop: '1px solid rgb(var(--border-primary) / 0.35)',
+                            background: hasErrors ? 'rgb(var(--state-danger-bg))' : 'transparent',
                           }}
                         >
-                          <td className="px-3 py-2" style={{ color: 'var(--v2-text-hint)' }}>{row.rowNum}</td>
+                          <td className="px-3 py-2" style={{ color: 'rgb(var(--text-tertiary))' }}>{row.rowNum}</td>
                           {parsedData.headers.slice(0, 5).map((h) => (
-                            <td key={h} className="px-3 py-2 truncate" style={{ color: 'var(--v2-text-primary)', maxWidth: 120 }}>
+                            <td key={h} className="px-3 py-2 truncate" style={{ color: 'rgb(var(--text-primary))', maxWidth: 120 }}>
                               {row.data[h] || '\u2014'}
                             </td>
                           ))}
@@ -611,10 +611,10 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
           {phase === 'importing' && (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin mb-3" style={{ color: '#1D9E75' }} />
-              <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--v2-text-primary)' }}>
+              <p style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--text-primary))' }}>
                 Importing {validRows.length} students...
               </p>
-              <p style={{ fontSize: 10, color: 'var(--v2-text-muted)', marginTop: 4 }}>
+              <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))', marginTop: 4 }}>
                 Please do not close this window.
               </p>
             </div>
@@ -628,41 +628,41 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="text-center py-3 px-2"
                   style={{
-                    background: 'var(--v2-success-bg)',
-                    border: '1px solid var(--v2-success-border)',
+                    background: 'rgb(var(--state-success-bg))',
+                    border: '1px solid rgb(var(--state-success-border))',
                     borderRadius: 8,
                   }}
                 >
                   <p style={{ fontSize: 20, fontWeight: 700, color: '#1D9E75' }}>
                     {importResult.imported}
                   </p>
-                  <p style={{ fontSize: 10, color: 'var(--v2-text-muted)' }}>Imported</p>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>Imported</p>
                 </div>
                 <div
                   className="text-center py-3 px-2"
                   style={{
-                    background: 'var(--v2-warning-bg)',
-                    border: '1px solid var(--v2-warning-border)',
+                    background: 'rgb(var(--state-warning-bg))',
+                    border: '1px solid rgb(var(--state-warning-border))',
                     borderRadius: 8,
                   }}
                 >
                   <p style={{ fontSize: 20, fontWeight: 700, color: '#EF9F27' }}>
                     {importResult.skipped}
                   </p>
-                  <p style={{ fontSize: 10, color: 'var(--v2-text-muted)' }}>Skipped</p>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>Skipped</p>
                 </div>
                 <div
                   className="text-center py-3 px-2"
                   style={{
-                    background: 'var(--v2-danger-bg)',
-                    border: '1px solid var(--v2-danger-border)',
+                    background: 'rgb(var(--state-danger-bg))',
+                    border: '1px solid rgb(var(--state-danger-border))',
                     borderRadius: 8,
                   }}
                 >
                   <p style={{ fontSize: 20, fontWeight: 700, color: '#E24B4A' }}>
                     {importResult.errors.length}
                   </p>
-                  <p style={{ fontSize: 10, color: 'var(--v2-text-muted)' }}>Errors</p>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>Errors</p>
                 </div>
               </div>
 
@@ -671,8 +671,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="flex items-center gap-2 p-3 rounded-lg"
                   style={{
-                    background: 'var(--v2-success-bg)',
-                    border: '1px solid var(--v2-success-border)',
+                    background: 'rgb(var(--state-success-bg))',
+                    border: '1px solid rgb(var(--state-success-border))',
                   }}
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#1D9E75' }} />
@@ -687,8 +687,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="p-3 rounded-lg"
                   style={{
-                    background: 'var(--v2-warning-bg)',
-                    border: '1px solid var(--v2-warning-border)',
+                    background: 'rgb(var(--state-warning-bg))',
+                    border: '1px solid rgb(var(--state-warning-border))',
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
@@ -697,7 +697,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                       Duplicate matches found
                     </span>
                   </div>
-                  <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: 'var(--v2-text-secondary)' }}>
+                  <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: 'rgb(var(--text-secondary))' }}>
                     {importResult.duplicates.slice(0, 10).map((d) => (
                       <li key={d.row}>
                         Row {d.row}: matched {d.matches.map((m) => `${m.firstName} ${m.lastName}`).join(', ')} ({d.matches[0]?.confidence} confidence)
@@ -715,8 +715,8 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <div
                   className="p-3 rounded-lg"
                   style={{
-                    background: 'var(--v2-danger-bg)',
-                    border: '1px solid var(--v2-danger-border)',
+                    background: 'rgb(var(--state-danger-bg))',
+                    border: '1px solid rgb(var(--state-danger-border))',
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
@@ -744,7 +744,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
         {/* Footer */}
         <div
           className="flex items-center justify-between px-5 py-3"
-          style={{ borderTop: '1px solid var(--v2-border-default)' }}
+          style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}
         >
           {/* Left info */}
           <div className="flex items-center gap-1.5">
@@ -762,7 +762,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   type="button"
                   onClick={handleReset}
                   className="transition-colors hover:opacity-80 text-left"
-                  style={{ fontSize: 11, color: 'var(--v2-text-hint)' }}
+                  style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
                 >
                   Upload different file
                 </button>
@@ -799,7 +799,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   className="flex items-center gap-1.5 transition-colors hover:opacity-80"
                   style={{
                     background: 'transparent',
-                    border: '1px solid var(--v2-border-default)',
+                    border: '1px solid rgb(var(--border-primary) / 0.35)',
                     borderRadius: 8,
                     padding: '7px 14px',
                     fontSize: 12,

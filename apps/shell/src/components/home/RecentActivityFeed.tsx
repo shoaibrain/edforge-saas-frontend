@@ -35,23 +35,23 @@ function FeedSkeleton() {
         <div
           key={i}
           className="flex items-start gap-2.5 py-2"
-          style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}
+          style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}
         >
           <div
             className="w-2 h-2 rounded-full flex-shrink-0 mt-1 v2-skeleton-pulse"
-            style={{ background: 'var(--v2-bg-elevated)' }}
+            style={{ background: 'rgb(var(--background-tertiary))' }}
           />
           <div className="flex-1 space-y-1">
             <div
               className="h-3 rounded v2-skeleton-pulse"
               style={{
                 width: `${70 + Math.random() * 30}%`,
-                background: 'var(--v2-bg-elevated)',
+                background: 'rgb(var(--background-tertiary))',
               }}
             />
             <div
               className="h-2.5 w-32 rounded v2-skeleton-pulse"
-              style={{ background: 'var(--v2-bg-elevated)' }}
+              style={{ background: 'rgb(var(--background-tertiary))' }}
             />
           </div>
         </div>
@@ -67,8 +67,8 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
     <div
       className="rounded-xl border"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -76,7 +76,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
       <div className="flex items-center justify-between mb-3">
         <span
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           {t('homeV2.activity.recentActivity')}
         </span>
@@ -84,7 +84,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
           to="/finance/$"
           params={{ _splat: 'billing' }}
           className="text-xs cursor-pointer transition-opacity hover:opacity-80"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          style={{ color: '#1D9E75' }}
         >
           {t('homeV2.activity.viewAll')}
         </Link>
@@ -94,7 +94,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
       {isLoading ? (
         <FeedSkeleton />
       ) : items.length === 0 ? (
-        <p className="text-sm py-6 text-center" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-sm py-6 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('homeV2.activity.noActivity')}
         </p>
       ) : (
@@ -106,7 +106,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
               style={{
                 borderBottom:
                   i < items.length - 1
-                    ? '1px solid var(--v2-border-default)'
+                    ? '1px solid rgb(var(--border-primary) / 0.35)'
                     : 'none',
               }}
             >
@@ -117,13 +117,13 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
               <div className="flex-1 min-w-0">
                 <p
                   className="text-xs leading-snug"
-                  style={{ color: 'var(--v2-text-muted)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {item.text}
                 </p>
                 <p
                   className="text-xs mt-0.5"
-                  style={{ color: 'var(--v2-text-ghost)' }}
+                  style={{ color: 'rgb(var(--text-disabled))' }}
                 >
                   {item.timestamp}
                 </p>

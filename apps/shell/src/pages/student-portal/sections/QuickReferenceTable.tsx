@@ -29,7 +29,7 @@ export function QuickReferenceTable({
   if (loading) {
     return (
       <ContentSection heading={t('schedule.quickReference')} staggerIndex={staggerIndex}>
-        <div className="h-32 rounded bg-[var(--v2-bg-elevated)] v2-skeleton-pulse mt-3" />
+        <div className="h-32 rounded bg-[rgb(var(--background-tertiary))] v2-skeleton-pulse mt-3" />
       </ContentSection>
     )
   }
@@ -41,21 +41,21 @@ export function QuickReferenceTable({
       <div
         className="rounded-xl border mt-3 overflow-x-auto"
         style={{
-          background: 'var(--v2-bg-surface)',
-          borderColor: 'var(--v2-border-default)',
+          background: 'rgb(var(--background-secondary))',
+          borderColor: 'rgb(var(--border-primary) / 0.35)',
         }}
       >
         <table className="w-full text-xs">
           <thead>
             <tr
               className="border-b"
-              style={{ borderColor: 'var(--v2-border-default)' }}
+              style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
             >
               {['Course', 'Section', 'Teacher', 'Period', 'Time', 'Room'].map((h) => (
                 <th
                   key={h}
                   className="text-left px-3 py-2.5 font-medium uppercase tracking-[0.04em]"
-                  style={{ color: 'var(--v2-text-hint)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {h}
                 </th>
@@ -72,35 +72,35 @@ export function QuickReferenceTable({
                 <tr
                   key={section.sectionId}
                   className="border-b last:border-b-0"
-                  style={{ borderColor: 'var(--v2-border-default)' }}
+                  style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
                 >
                   <td
                     className="px-3 py-2.5 font-medium"
-                    style={{ color: 'var(--v2-text-primary)' }}
+                    style={{ color: 'rgb(var(--text-primary))' }}
                   >
                     {section.courseName}
                   </td>
-                  <td style={{ color: 'var(--v2-text-secondary)' }} className="px-3 py-2.5">
+                  <td style={{ color: 'rgb(var(--text-secondary))' }} className="px-3 py-2.5">
                     {section.sectionName ?? '—'}
                   </td>
-                  <td style={{ color: 'var(--v2-text-secondary)' }} className="px-3 py-2.5">
+                  <td style={{ color: 'rgb(var(--text-secondary))' }} className="px-3 py-2.5">
                     {section.teacherName ?? '—'}
                   </td>
                   <td
                     className="px-3 py-2.5 font-mono tabular-nums"
-                    style={{ color: 'var(--v2-text-secondary)' }}
+                    style={{ color: 'rgb(var(--text-secondary))' }}
                   >
                     {period?.classPeriodName ?? '—'}
                   </td>
                   <td
                     className="px-3 py-2.5 font-mono tabular-nums"
-                    style={{ color: 'var(--v2-text-secondary)' }}
+                    style={{ color: 'rgb(var(--text-secondary))' }}
                   >
                     {period
                       ? `${period.startTime}–${period.endTime}`
                       : '—'}
                   </td>
-                  <td style={{ color: 'var(--v2-text-secondary)' }} className="px-3 py-2.5">
+                  <td style={{ color: 'rgb(var(--text-secondary))' }} className="px-3 py-2.5">
                     {section.room ?? '—'}
                   </td>
                 </tr>

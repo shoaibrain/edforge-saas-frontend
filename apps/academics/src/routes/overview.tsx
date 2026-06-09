@@ -76,7 +76,7 @@ function AcademicsInsightStrip({
     return (
       <div
         className="h-5 rounded-lg v2-skeleton-pulse"
-        style={{ background: 'var(--v2-bg-elevated)', width: '60%' }}
+        style={{ background: 'rgb(var(--background-tertiary))', width: '60%' }}
       />
     )
   }
@@ -100,7 +100,7 @@ function AcademicsInsightStrip({
   }
 
   return (
-    <p className="text-xs leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+    <p className="text-xs leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
       {parts.join(' · ')}
     </p>
   )
@@ -199,22 +199,22 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               </div>
               <h1
                 className="text-sm font-semibold"
-                style={{ color: 'var(--v2-text-primary)' }}
+                style={{ color: 'rgb(var(--text-primary))' }}
               >
                 Academics
               </h1>
-              <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-              <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
+              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               {data.academicYear.name && (
                 <>
-                  <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
+                  <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
                   <span
                     className="text-xs px-2.5 py-1 rounded-md"
                     style={{
-                      background: 'var(--v2-bg-elevated)',
-                      color: 'var(--v2-text-hint)',
+                      background: 'rgb(var(--background-tertiary))',
+                      color: 'rgb(var(--text-tertiary))',
                     }}
                   >
                     {data.academicYear.name}
@@ -227,11 +227,11 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <button
                 onClick={() => navigate({ to: '/students/enrollment' })}
                 aria-label="Enroll a student"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
                 style={{
-                  background: 'var(--v2-bg-elevated)',
-                  borderColor: 'var(--v2-border-default)',
-                  color: 'var(--v2-text-secondary)',
+                  background: 'rgb(var(--background-tertiary))',
+                  borderColor: 'rgb(var(--border-primary) / 0.35)',
+                  color: 'rgb(var(--text-secondary))',
                 }}
               >
                 <UserPlus className="w-3.5 h-3.5" />
@@ -240,9 +240,9 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <button
                 onClick={() => navigate({ to: '/classrooms', search: { tab: 'attendance' } })}
                 aria-label="Take attendance"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
                 style={{
-                  background: 'var(--v2-brand-primary)',
+                  background: '#1D9E75',
                   color: '#fff',
                 }}
               >

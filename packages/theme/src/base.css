@@ -184,6 +184,16 @@
   --state-info-fg: 0 95 115;
   --state-info-border: 0 122 147;
 
+  /* Module accent palette — low-opacity tints for module cards/headers.
+     Theme-agnostic hues (the tint reads over any surface). */
+  --accent-academics: 55 138 221; /* blue */
+  --accent-finance: 226 75 74; /* red */
+  --accent-attendance: 239 159 39; /* amber */
+  --accent-enrollment: 29 158 117; /* green */
+  --accent-coral: 216 90 48; /* coral (staff/people) */
+  --accent-reports: 127 119 221; /* purple */
+  --accent-settings: 90 96 112; /* slate */
+
   /* Elevation + motion */
   --elevation-flat: none;
   --elevation-raised: 0 1px 2px rgba(0, 18, 25, 0.08), 0 1px 3px rgba(0, 18, 25, 0.06);

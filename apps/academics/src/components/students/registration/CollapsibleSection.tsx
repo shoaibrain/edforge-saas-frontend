@@ -121,7 +121,7 @@ export function CollapsibleSection({
     <div
       style={{
         borderRadius: 12,
-        border: '1px solid var(--v2-border-default)',
+        border: '1px solid rgb(var(--border-primary) / 0.35)',
         background: isExpanded ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
         overflow: 'hidden',
       }}
@@ -143,14 +143,14 @@ export function CollapsibleSection({
             height: 28,
             borderRadius: 8,
             background: hasErrors
-              ? 'var(--v2-danger-bg)'
+              ? 'rgb(var(--state-danger-bg))'
               : 'rgba(29, 158, 117, 0.08)',
           }}
         >
           <Icon
             className="w-3.5 h-3.5"
             style={{
-              color: hasErrors ? 'var(--v2-danger)' : '#1D9E75',
+              color: hasErrors ? 'rgb(var(--state-danger-fg))' : '#1D9E75',
             }}
           />
         </div>
@@ -161,7 +161,7 @@ export function CollapsibleSection({
             className="block font-semibold"
             style={{
               fontSize: 13,
-              color: 'var(--v2-text-primary)',
+              color: 'rgb(var(--text-primary))',
               letterSpacing: '-0.2px',
             }}
           >
@@ -170,7 +170,7 @@ export function CollapsibleSection({
           {description && (
             <span
               className="block"
-              style={{ fontSize: 11, color: 'var(--v2-text-muted)', marginTop: 1 }}
+              style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))', marginTop: 1 }}
             >
               {description}
             </span>
@@ -182,7 +182,7 @@ export function CollapsibleSection({
           {hasErrors ? (
             <span
               className="flex items-center gap-1"
-              style={{ fontSize: 10, fontWeight: 500, color: 'var(--v2-danger)' }}
+              style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--state-danger-fg))' }}
             >
               <AlertCircle className="w-3 h-3" />
               {errorCount} {errorCount === 1 ? 'error' : 'errors'}
@@ -198,13 +198,13 @@ export function CollapsibleSection({
               </span>
             ) : filled > 0 ? (
               <span
-                style={{ fontSize: 10, fontWeight: 500, color: 'var(--v2-text-hint)' }}
+                style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))' }}
               >
                 {filled} of {total} filled
               </span>
             ) : (
               <span
-                style={{ fontSize: 10, color: 'var(--v2-text-ghost)' }}
+                style={{ fontSize: 10, color: 'rgb(var(--text-disabled))' }}
               >
                 {total} fields
               </span>
@@ -218,7 +218,7 @@ export function CollapsibleSection({
           >
             <ChevronDown
               className="w-4 h-4"
-              style={{ color: 'var(--v2-text-hint)' }}
+              style={{ color: 'rgb(var(--text-tertiary))' }}
             />
           </motion.div>
         </div>
@@ -238,7 +238,7 @@ export function CollapsibleSection({
             <div
               style={{
                 padding: '0 16px 16px',
-                borderTop: '1px solid var(--v2-border-default)',
+                borderTop: '1px solid rgb(var(--border-primary) / 0.35)',
                 paddingTop: 16,
               }}
             >

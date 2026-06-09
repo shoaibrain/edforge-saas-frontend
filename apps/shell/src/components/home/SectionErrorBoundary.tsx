@@ -65,18 +65,18 @@ export class SectionErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center gap-3 py-8 px-4 rounded-xl border border-[var(--v2-border-default)] bg-[var(--v2-bg-surface)]">
+        <div className="flex flex-col items-center justify-center gap-3 py-8 px-4 rounded-xl border border-[rgb(var(--border-primary) / 0.35)] bg-[rgb(var(--background-secondary))]">
           <div className="flex items-center gap-3">
-            <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
+            <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
               {this.props.fallbackMessage || 'Something went wrong'}
             </p>
             <button
               onClick={this.handleRetry}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
               style={{
-                background: 'var(--v2-warning-bg)',
-                color: 'var(--v2-warning)',
-                border: '1px solid var(--v2-warning-border)',
+                background: 'rgb(var(--state-warning-bg))',
+                color: 'rgb(var(--state-warning-fg))',
+                border: '1px solid rgb(var(--state-warning-border))',
               }}
             >
               <RotateCcw className="w-3 h-3" />
@@ -88,15 +88,15 @@ export class SectionErrorBoundary extends Component<Props, State> {
             <details className="w-full max-w-lg text-left mt-2">
               <summary
                 className="text-xs cursor-pointer"
-                style={{ color: 'var(--v2-text-faint)' }}
+                style={{ color: 'rgb(var(--text-disabled))' }}
               >
                 Error details (debug mode)
               </summary>
               <pre
                 className="mt-1 p-2 rounded text-xs overflow-x-auto max-h-32"
                 style={{
-                  background: 'var(--v2-bg-elevated)',
-                  color: 'var(--v2-danger)',
+                  background: 'rgb(var(--background-tertiary))',
+                  color: 'rgb(var(--state-danger-fg))',
                   fontFamily: 'monospace',
                 }}
               >

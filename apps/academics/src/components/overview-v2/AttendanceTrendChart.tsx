@@ -34,7 +34,7 @@ function TrendSkeleton() {
             className="flex-1 rounded-t v2-skeleton-pulse"
             style={{
               height: `${30 + Math.random() * 50}%`,
-              background: 'var(--v2-bg-elevated)',
+              background: 'rgb(var(--background-tertiary))',
             }}
           />
         ))}
@@ -50,21 +50,21 @@ function ChartTooltip({ active, payload }: any) {
     <div
       className="rounded-md shadow-lg px-3 py-2 border text-xs"
       style={{
-        background: 'var(--v2-bg-elevated)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-tertiary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
       }}
     >
-      <p style={{ color: 'var(--v2-text-muted)' }}>
+      <p style={{ color: 'rgb(var(--text-tertiary))' }}>
         {new Date(point.date).toLocaleDateString('en-US', {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
         })}
       </p>
-      <p className="font-semibold mt-0.5" style={{ color: 'var(--v2-text-primary)' }}>
+      <p className="font-semibold mt-0.5" style={{ color: 'rgb(var(--text-primary))' }}>
         {point.rate.toFixed(1)}%
       </p>
-      <p className="mt-0.5" style={{ color: 'var(--v2-text-muted)' }}>
+      <p className="mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
         {point.present} of {point.total} present
       </p>
     </div>
@@ -94,8 +94,8 @@ export function AttendanceTrendChart({
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -104,22 +104,22 @@ export function AttendanceTrendChart({
         <div>
           <h3
             className="text-sm font-medium"
-            style={{ color: 'var(--v2-text-secondary)' }}
+            style={{ color: 'rgb(var(--text-secondary))' }}
           >
             Attendance trend
           </h3>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
             30-day rolling average
           </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="rounded-sm" style={{ width: 8, height: 2, background: '#1D9E75' }} />
-            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>Actual</span>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>Actual</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div style={{ width: 8, height: 0, borderTop: '1px dashed rgba(239, 159, 39, 0.6)' }} />
-            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>{THRESHOLD}% target</span>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>{THRESHOLD}% target</span>
           </div>
           {summary && (
             <span className="text-xs font-semibold" style={{ color: '#1D9E75' }}>
@@ -136,7 +136,7 @@ export function AttendanceTrendChart({
         ) : chartData.length === 0 ? (
           <div
             className="flex items-center justify-center text-sm"
-            style={{ height: 160, color: 'var(--v2-text-hint)' }}
+            style={{ height: 160, color: 'rgb(var(--text-tertiary))' }}
           >
             No attendance data recorded yet
           </div>
@@ -195,12 +195,12 @@ export function AttendanceTrendChart({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 mt-3" style={{ borderTop: '1px solid var(--v2-border-default)' }}>
+      <div className="pt-3 mt-3" style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}>
         <Link
           to="/classrooms"
           search={{ tab: 'attendance' }}
           className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          style={{ color: '#1D9E75' }}
         >
           View Attendance
           <ArrowRight className="w-3 h-3" />

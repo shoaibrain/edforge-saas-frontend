@@ -79,8 +79,8 @@ export function GettingStartedGuide({
         exit="exit"
         className="rounded-xl border overflow-hidden"
         style={{
-          background: 'var(--v2-bg-surface)',
-          borderColor: 'var(--v2-border-default)',
+          background: 'rgb(var(--background-secondary))',
+          borderColor: 'rgb(var(--border-primary) / 0.35)',
         }}
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
@@ -93,24 +93,24 @@ export function GettingStartedGuide({
               style={{
                 width: 28,
                 height: 28,
-                background: 'var(--v2-accent-enrollment)',
+                background: 'rgb(var(--accent-enrollment) / 0.12)',
               }}
             >
               <Sparkles
                 className="w-4 h-4"
-                style={{ color: 'var(--v2-brand-primary)' }}
+                style={{ color: '#1D9E75' }}
               />
             </div>
             <div>
               <h3
                 className="text-sm font-semibold leading-tight"
-                style={{ color: 'var(--v2-text-primary)' }}
+                style={{ color: 'rgb(var(--text-primary))' }}
               >
                 Get started with EdForge
               </h3>
               <p
                 className="text-xs mt-0.5"
-                style={{ color: 'var(--v2-text-faint)' }}
+                style={{ color: 'rgb(var(--text-disabled))' }}
               >
                 {completedCount} of {totalCount} complete
               </p>
@@ -122,7 +122,7 @@ export function GettingStartedGuide({
             className="p-1.5 rounded-lg transition-colors hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--background-primary)/0.05)]"
             aria-label="Dismiss getting started guide"
           >
-            <X className="w-4 h-4" style={{ color: 'var(--v2-text-faint)' }} />
+            <X className="w-4 h-4" style={{ color: 'rgb(var(--text-disabled))' }} />
           </button>
         </div>
 
@@ -130,7 +130,7 @@ export function GettingStartedGuide({
         <div className="px-5 pb-3">
           <div
             className="h-1.5 rounded-full overflow-hidden"
-            style={{ background: 'var(--v2-bg-inset, rgba(0,0,0,0.06))' }}
+            style={{ background: 'rgb(var(--background-tertiary) / 0.5)' }}
           >
             <motion.div
               className="h-full rounded-full"
@@ -158,7 +158,7 @@ export function GettingStartedGuide({
                   className="group flex items-center gap-3 px-2.5 py-2.5 rounded-lg no-underline transition-colors"
                   style={{
                     background: isFirstIncomplete
-                      ? 'var(--v2-accent-enrollment)'
+                      ? 'rgb(var(--accent-enrollment) / 0.12)'
                       : 'transparent',
                     cursor: item.blocked ? 'default' : 'pointer',
                     opacity: item.blocked ? 0.5 : item.completed ? 0.6 : 1,
@@ -168,7 +168,7 @@ export function GettingStartedGuide({
                   }}
                   onMouseEnter={(e) => {
                     if (!item.blocked && !isFirstIncomplete) {
-                      e.currentTarget.style.background = 'var(--v2-bg-hover, rgba(0,0,0,0.03))'
+                      e.currentTarget.style.background = 'rgb(var(--background-tertiary) / 0.6)'
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -187,15 +187,15 @@ export function GettingStartedGuide({
                     ) : item.blocked ? (
                       <Lock
                         className="w-4 h-4 ml-[1.5px]"
-                        style={{ color: 'var(--v2-text-faint)' }}
+                        style={{ color: 'rgb(var(--text-disabled))' }}
                       />
                     ) : (
                       <Circle
                         className="w-5 h-5"
                         style={{
                           color: isFirstIncomplete
-                            ? 'var(--v2-brand-primary)'
-                            : 'var(--v2-text-faint)',
+                            ? '#1D9E75'
+                            : 'rgb(var(--text-disabled))',
                         }}
                       />
                     )}
@@ -209,7 +209,7 @@ export function GettingStartedGuide({
                       height: 28,
                       background: item.completed
                         ? 'rgba(29, 158, 117, 0.08)'
-                        : 'var(--v2-bg-inset, rgba(0,0,0,0.04))',
+                        : 'rgb(var(--background-tertiary) / 0.5)',
                     }}
                   >
                     <Icon
@@ -217,7 +217,7 @@ export function GettingStartedGuide({
                       style={{
                         color: item.completed
                           ? '#1D9E75'
-                          : 'var(--v2-text-secondary)',
+                          : 'rgb(var(--text-secondary))',
                       }}
                     />
                   </div>
@@ -229,8 +229,8 @@ export function GettingStartedGuide({
                         className="text-xs font-medium leading-tight"
                         style={{
                           color: item.completed
-                            ? 'var(--v2-text-faint)'
-                            : 'var(--v2-text-primary)',
+                            ? 'rgb(var(--text-disabled))'
+                            : 'rgb(var(--text-primary))',
                           textDecoration: item.completed ? 'line-through' : 'none',
                         }}
                       >
@@ -240,7 +240,7 @@ export function GettingStartedGuide({
                         <span
                           className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
                           style={{
-                            background: 'var(--v2-brand-primary)',
+                            background: '#1D9E75',
                             color: '#fff',
                           }}
                         >
@@ -250,7 +250,7 @@ export function GettingStartedGuide({
                     </div>
                     <span
                       className="text-xs leading-tight mt-0.5 block"
-                      style={{ color: 'var(--v2-text-faint)' }}
+                      style={{ color: 'rgb(var(--text-disabled))' }}
                     >
                       {item.blocked ? item.blockedHint : item.description}
                     </span>
@@ -260,7 +260,7 @@ export function GettingStartedGuide({
                   {!item.completed && !item.blocked && (
                     <ChevronRight
                       className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ color: 'var(--v2-text-faint)' }}
+                      style={{ color: 'rgb(var(--text-disabled))' }}
                     />
                   )}
                 </Link>

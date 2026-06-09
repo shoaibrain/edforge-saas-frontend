@@ -64,8 +64,8 @@ export function CategoryBreakdown({
       <div
         className="rounded-xl border p-4 mt-3 space-y-3"
         style={{
-          background: 'var(--v2-bg-surface)',
-          borderColor: 'var(--v2-border-default)',
+          background: 'rgb(var(--background-secondary))',
+          borderColor: 'rgb(var(--border-primary) / 0.35)',
         }}
       >
         {categories.map((cat) => (
@@ -73,20 +73,20 @@ export function CategoryBreakdown({
             <div className="flex items-center justify-between mb-1">
               <span
                 className="text-xs font-medium"
-                style={{ color: 'var(--v2-text-secondary)' }}
+                style={{ color: 'rgb(var(--text-secondary))' }}
               >
                 {cat.name}
               </span>
               <span
                 className="text-xs font-mono tabular-nums"
-                style={{ color: 'var(--v2-text-primary)' }}
+                style={{ color: 'rgb(var(--text-primary))' }}
               >
                 {formatCurrency(cat.amount)}
               </span>
             </div>
             <AnimatedProgressBar
               percentage={cat.percentage}
-              color="var(--v2-brand-primary)"
+              color="#1D9E75"
               label={cat.name}
             />
           </div>

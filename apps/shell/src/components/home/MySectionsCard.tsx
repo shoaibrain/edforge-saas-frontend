@@ -34,7 +34,7 @@ function SectionsSkeleton() {
         <div
           key={i}
           className="h-16 rounded-lg v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
       ))}
     </div>
@@ -52,8 +52,8 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
     <div
       className="rounded-xl border"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -62,12 +62,12 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
           <CalendarDays className="w-4 h-4" style={{ color: '#378ADD' }} />
           <h3
             className="text-sm font-medium"
-            style={{ color: 'var(--v2-text-secondary)' }}
+            style={{ color: 'rgb(var(--text-secondary))' }}
           >
             {t('homeV2.teacher.mySections')}
           </h3>
           {!isLoading && (
-            <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
               ({sections.length})
             </span>
           )}
@@ -76,7 +76,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
           to="/academics/$"
           params={{ _splat: 'classrooms' }}
           className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          style={{ color: '#1D9E75' }}
         >
           {t('homeV2.teacher.viewAll')}
           <ArrowRight className="w-3 h-3" />
@@ -87,11 +87,11 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
         <SectionsSkeleton />
       ) : sections.length === 0 ? (
         <div className="py-8 text-center">
-          <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--v2-text-faint)' }} />
-          <p className="text-sm" style={{ color: 'var(--v2-text-muted)' }}>
+          <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'rgb(var(--text-disabled))' }} />
+          <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
             {t('homeV2.teacher.noSectionsAssigned')}
           </p>
-          <p className="text-xs mt-1" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs mt-1" style={{ color: 'rgb(var(--text-tertiary))' }}>
             {t('homeV2.teacher.contactAdmin')}
           </p>
         </div>
@@ -99,7 +99,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
         <>
           <div
             className="flex items-center gap-4 mb-3 text-xs"
-            style={{ color: 'var(--v2-text-hint)' }}
+            style={{ color: 'rgb(var(--text-tertiary))' }}
           >
             <span className="flex items-center gap-1">
               <CalendarDays className="w-3 h-3" />
@@ -120,22 +120,22 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
               <li
                 key={section.sectionId}
                 className="flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors"
-                style={{ background: 'var(--v2-bg-elevated)' }}
+                style={{ background: 'rgb(var(--background-tertiary))' }}
                 aria-label={`${section.courseName || section.courseCode || 'Section'} ${section.sectionNumber}, ${section.currentEnrollment} students`}
               >
                 <div className="min-w-0 flex-1">
                   <p
                     className="text-xs font-medium truncate"
-                    style={{ color: 'var(--v2-text-muted)' }}
+                    style={{ color: 'rgb(var(--text-tertiary))' }}
                   >
                     {section.courseName || section.courseCode || 'Section'}{' '}
-                    <span style={{ color: 'var(--v2-text-hint)', fontWeight: 400 }}>
+                    <span style={{ color: 'rgb(var(--text-tertiary))', fontWeight: 400 }}>
                       — {section.sectionNumber}
                     </span>
                   </p>
                   <p
                     className="text-xs mt-0.5"
-                    style={{ color: 'var(--v2-text-hint)' }}
+                    style={{ color: 'rgb(var(--text-tertiary))' }}
                   >
                     {section.currentEnrollment}/{section.maxEnrollment} students
                     {section.locationRoomNumber &&
@@ -148,7 +148,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
                     to="/academics/$"
                     params={{ _splat: `classrooms/${section.sectionId}?tab=attendance` }}
                     className="p-1.5 rounded-md transition-opacity hover:opacity-70"
-                    style={{ color: 'var(--v2-warning)' }}
+                    style={{ color: 'rgb(var(--state-warning-fg))' }}
                     title={t('homeV2.teacher.takeAttendance')}
                     aria-label={`Take attendance for ${section.courseName || section.sectionNumber}`}
                   >

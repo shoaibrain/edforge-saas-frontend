@@ -129,16 +129,16 @@ export function EnrollmentStep({
           <div
             className="flex items-start gap-3 rounded-lg p-3"
             style={{
-              background: 'var(--v2-danger-bg)',
-              border: '1px solid var(--v2-danger-border)',
+              background: 'rgb(var(--state-danger-bg))',
+              border: '1px solid rgb(var(--state-danger-border))',
             }}
           >
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-danger)' }} />
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'rgb(var(--state-danger-fg))' }} />
             <div>
-              <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--v2-danger)' }}>
+              <p style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--state-danger-fg))' }}>
                 No active academic year available
               </p>
-              <p style={{ fontSize: 11, color: 'var(--v2-text-secondary)', marginTop: 2 }}>
+              <p style={{ fontSize: 11, color: 'rgb(var(--text-secondary))', marginTop: 2 }}>
                 Please configure and activate an academic year in School Settings before enrolling students.
               </p>
             </div>
@@ -176,32 +176,32 @@ export function EnrollmentStep({
             <div>
               {yearsLoading ? (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <label className="block text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
                     Academic Year *
                   </label>
                   <div
                     className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
                     style={{
-                      border: '1px solid var(--v2-border-default)',
+                      border: '1px solid rgb(var(--border-primary) / 0.35)',
                       background: 'rgba(255, 255, 255, 0.04)',
                     }}
                   >
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--v2-text-hint)' }} />
-                    <span style={{ fontSize: 12, color: 'var(--v2-text-hint)' }}>Loading academic years...</span>
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'rgb(var(--text-tertiary))' }} />
+                    <span style={{ fontSize: 12, color: 'rgb(var(--text-tertiary))' }}>Loading academic years...</span>
                   </div>
                 </div>
               ) : yearsError ? (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium" style={{ color: 'var(--v2-danger)' }}>
+                  <label className="block text-sm font-medium" style={{ color: 'rgb(var(--state-danger-fg))' }}>
                     Academic Year *
                   </label>
                   <div
                     className="px-3 py-2.5 rounded-lg"
                     style={{
-                      border: '1px solid var(--v2-danger-border)',
-                      background: 'var(--v2-danger-bg)',
+                      border: '1px solid rgb(var(--state-danger-border))',
+                      background: 'rgb(var(--state-danger-bg))',
                       fontSize: 12,
-                      color: 'var(--v2-danger)',
+                      color: 'rgb(var(--state-danger-fg))',
                     }}
                   >
                     Failed to load academic years. Please refresh.
@@ -248,8 +248,8 @@ export function EnrollmentStep({
                   <div
                     className="flex items-center gap-2 px-3 py-2 rounded-lg"
                     style={{
-                      background: 'var(--v2-success-bg)',
-                      border: '1px solid var(--v2-success-border)',
+                      background: 'rgb(var(--state-success-bg))',
+                      border: '1px solid rgb(var(--state-success-border))',
                     }}
                   >
                     <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#1D9E75' }} />
@@ -304,7 +304,7 @@ export function EnrollmentStep({
               <div
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
                 style={{
-                  border: '1px solid var(--v2-border-default)',
+                  border: '1px solid rgb(var(--border-primary) / 0.35)',
                   background: 'rgba(255, 255, 255, 0.04)',
                 }}
               >
@@ -317,12 +317,12 @@ export function EnrollmentStep({
                 <label
                   htmlFor="enrollment.primarySchool"
                   className="text-sm select-none"
-                  style={{ color: 'var(--v2-text-primary)' }}
+                  style={{ color: 'rgb(var(--text-primary))' }}
                 >
                   Primary School
                 </label>
               </div>
-              <p style={{ fontSize: 10, color: 'var(--v2-text-hint)', paddingLeft: 4 }}>
+              <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))', paddingLeft: 4 }}>
                 Is this the student's primary school of enrollment?
               </p>
             </div>
@@ -338,7 +338,7 @@ export function EnrollmentStep({
               <div
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
                 style={{
-                  border: '1px solid var(--v2-border-default)',
+                  border: '1px solid rgb(var(--border-primary) / 0.35)',
                   background: 'rgba(255, 255, 255, 0.04)',
                 }}
               >
@@ -351,12 +351,12 @@ export function EnrollmentStep({
                 <label
                   htmlFor="enrollment.repeatGradeIndicator"
                   className="text-sm select-none"
-                  style={{ color: 'var(--v2-text-primary)' }}
+                  style={{ color: 'rgb(var(--text-primary))' }}
                 >
                   Repeat Grade
                 </label>
               </div>
-              <p style={{ fontSize: 10, color: 'var(--v2-text-hint)', paddingLeft: 4 }}>
+              <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))', paddingLeft: 4 }}>
                 Check if the student is repeating the current grade level
               </p>
             </div>
@@ -431,11 +431,11 @@ export function EnrollmentStep({
           className="flex items-start gap-3 rounded-lg p-3"
           style={{
             background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid var(--v2-border-default)',
+            border: '1px solid rgb(var(--border-primary) / 0.35)',
           }}
         >
-          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-text-hint)' }} />
-          <p style={{ fontSize: 11, color: 'var(--v2-text-muted)' }}>
+          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }} />
+          <p style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}>
             <span className="font-medium">Auto-populated:</span> School, grade level, and entry grade level descriptor are automatically set based on your school context and Step 1 selections.
           </p>
         </div>

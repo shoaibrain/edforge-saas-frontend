@@ -83,7 +83,7 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
   if (!schoolId) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('homeV2.selectSchoolTeacher')}
         </p>
       </div>
@@ -95,9 +95,9 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
       data-page="home-v2"
       className="flex flex-col"
       style={{
-        gap: 'var(--v2-section-gap, 16px)',
-        padding: 'var(--v2-content-padding-y, 20px) var(--v2-content-padding-x, 28px)',
-        background: 'var(--v2-bg-app)',
+        gap: '16px',
+        padding: '20px 28px',
+        background: 'rgb(var(--background-primary))',
         minHeight: '100%',
       }}
       variants={staggerContainer}
@@ -111,22 +111,22 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
           transition={{ duration: 0.2 }}
           className="rounded-xl border"
           style={{
-            background: 'var(--v2-bg-surface)',
-            borderColor: 'var(--v2-border-default)',
+            background: 'rgb(var(--background-secondary))',
+            borderColor: 'rgb(var(--border-primary) / 0.35)',
             padding: 18,
           }}
         >
           <h2
             className="text-sm font-medium mb-1"
-            style={{ color: 'var(--v2-text-secondary)' }}
+            style={{ color: 'rgb(var(--text-secondary))' }}
           >
             {t('homeV2.student.welcomeTitle')}
           </h2>
-          <p className="text-xs mb-4" style={{ color: 'var(--v2-text-hint)' }}>
+          <p className="text-xs mb-4" style={{ color: 'rgb(var(--text-tertiary))' }}>
             {t('homeV2.student.welcomeDescription')}
           </p>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: 'var(--v2-grid-gap, 12px)' }}>
+          <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: '12px' }}>
             {studentLinks.map((link) => {
               const Icon = link.icon
               return (
@@ -134,7 +134,7 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
                   key={link.label}
                   to={link.href as any}
                   className="flex flex-col gap-2 p-3 rounded-lg transition-colors"
-                  style={{ background: 'var(--v2-bg-elevated)' }}
+                  style={{ background: 'rgb(var(--background-tertiary))' }}
                 >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -143,14 +143,14 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
                     <Icon className="w-4 h-4" style={{ color: link.color }} />
                   </div>
                   <div>
-                    <p className="text-xs font-medium" style={{ color: 'var(--v2-text-muted)' }}>
+                    <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
                       {link.label}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
                       {link.description}
                     </p>
                   </div>
-                  <ArrowRight className="w-3 h-3 mt-auto" style={{ color: 'var(--v2-text-faint)' }} />
+                  <ArrowRight className="w-3 h-3 mt-auto" style={{ color: 'rgb(var(--text-disabled))' }} />
                 </Link>
               )
             })}

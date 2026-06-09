@@ -39,11 +39,11 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
     <article
       className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#378ADD] focus-visible:ring-offset-2"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--v2-border-hover)' }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--v2-border-default)' }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.5)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.35)' }}
       aria-label={`${sectionName} — ${courseName || 'No course'}, ${teacherName}, ${section.currentEnrollment} of ${section.maxEnrollment} students`}
       role="link"
       tabIndex={0}
@@ -69,9 +69,9 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         {/* Title + actions row */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 overflow-hidden">
-            <h3 className="text-sm font-medium truncate" style={{ color: 'var(--v2-text-primary)' }} title={sectionName}>{sectionName}</h3>
+            <h3 className="text-sm font-medium truncate" style={{ color: 'rgb(var(--text-primary))' }} title={sectionName}>{sectionName}</h3>
             {courseName && (
-              <p className="text-xs truncate mt-0.5" style={{ color: 'var(--v2-text-hint)' }} title={courseName}>{courseName}</p>
+              <p className="text-xs truncate mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }} title={courseName}>{courseName}</p>
             )}
           </div>
 
@@ -121,21 +121,21 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         </div>
 
         {/* Teacher */}
-        <p className="text-xs truncate" style={{ color: 'var(--v2-text-muted)' }} title={teacherName}>{teacherName}</p>
+        <p className="text-xs truncate" style={{ color: 'rgb(var(--text-tertiary))' }} title={teacherName}>{teacherName}</p>
 
         {/* Enrollment progress bar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
               {section.currentEnrollment}/{section.maxEnrollment} students
             </span>
             {/* Status dot + text */}
             <div className="flex items-center gap-1.5 text-xs">
               <div
                 className="w-1.5 h-1.5 rounded-full"
-                style={{ background: section.isActive ? '#1D9E75' : 'var(--v2-text-ghost)' }}
+                style={{ background: section.isActive ? '#1D9E75' : 'rgb(var(--text-disabled))' }}
               />
-              <span style={{ color: section.isActive ? 'var(--v2-brand-primary)' : 'var(--v2-text-hint)' }}>
+              <span style={{ color: section.isActive ? '#1D9E75' : 'rgb(var(--text-tertiary))' }}>
                 {section.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>

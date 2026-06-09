@@ -76,26 +76,26 @@ export function PickupInfoStrip({ bellSchedules, staggerIndex = 0 }: PickupInfoS
               key={card.key}
               className="rounded-xl border p-4 flex items-center gap-3 transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:shadow-md"
               style={{
-                background: 'var(--v2-bg-surface)',
-                borderColor: 'var(--v2-border-default)',
+                background: 'rgb(var(--background-secondary))',
+                borderColor: 'rgb(var(--border-primary) / 0.35)',
               }}
             >
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: 'var(--v2-surface-interactive)' }}
+                style={{ background: 'rgb(var(--background-tertiary) / 0.6)' }}
               >
-                <Icon className="w-4 h-4" style={{ color: 'var(--v2-text-muted)' }} />
+                <Icon className="w-4 h-4" style={{ color: 'rgb(var(--text-tertiary))' }} />
               </div>
               <div>
                 <p
                   className="text-xs uppercase tracking-[0.04em]"
-                  style={{ color: 'var(--v2-text-hint)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {card.label}
                 </p>
                 <p
                   className="text-base font-semibold font-mono tabular-nums"
-                  style={{ color: 'var(--v2-text-primary)' }}
+                  style={{ color: 'rgb(var(--text-primary))' }}
                 >
                   {card.time}
                 </p>

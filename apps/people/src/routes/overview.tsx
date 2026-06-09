@@ -201,12 +201,12 @@ export function Overview() {
             value={isLoading ? '—' : stats.support.toString()}
             icon={Briefcase}
             accentColor={stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
-            iconColor={stats.support > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
-            barColor={stats.support > 0 ? '#378ADD' : 'var(--v2-text-ghost, #2a3045)'}
-            valueColor={stats.support > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
+            iconColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
+            barColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
+            valueColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
             tag={{
               text: stats.support > 0 ? 'active' : 'none onboarded',
-              color: stats.support > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)',
+              color: stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))',
               bg: stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
             }}
             loading={isLoading}

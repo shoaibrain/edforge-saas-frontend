@@ -26,13 +26,13 @@ function ListSkeleton() {
         <div key={i} className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0"
-            style={{ background: 'var(--v2-bg-elevated)' }}
+            style={{ background: 'rgb(var(--background-tertiary))' }}
           />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-            <div className="h-2.5 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-2.5 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           </div>
-          <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
         </div>
       ))}
     </div>
@@ -98,8 +98,8 @@ export function AtRiskStudentsCard({
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -107,7 +107,7 @@ export function AtRiskStudentsCard({
       <div className="flex items-center justify-between mb-3">
         <h3
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           At-risk student detail
         </h3>
@@ -123,7 +123,7 @@ export function AtRiskStudentsCard({
         ) : totalAtRisk === 0 ? (
           <div
             className="flex items-center justify-center text-sm py-6"
-            style={{ color: 'var(--v2-text-hint)' }}
+            style={{ color: 'rgb(var(--text-tertiary))' }}
           >
             No at-risk students
           </div>
@@ -135,10 +135,10 @@ export function AtRiskStudentsCard({
                 <div key={student.studentId} className="flex items-center gap-3">
                   <StudentAvatar name={student.studentName} studentId={student.studentId} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <p className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
                       {student.studentName}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
                       {student.gradeLevel ? `Grade ${student.gradeLevel}` : ''}{student.gradeLevel ? ' · ' : ''}{student.absentDays} absent
                     </p>
                   </div>
@@ -162,11 +162,11 @@ export function AtRiskStudentsCard({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 mt-3" style={{ borderTop: '1px solid var(--v2-border-default)' }}>
+      <div className="pt-3 mt-3" style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}>
         <Link
           to="/students"
           className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          style={{ color: '#1D9E75' }}
         >
           View all {totalAtRisk} at-risk students
           <ArrowRight className="w-3 h-3" />

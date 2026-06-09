@@ -227,7 +227,7 @@ function OverviewTab() {
             className="p-1.5 rounded-md transition-colors"
             style={{
               background: viewMode === 'grid' ? 'rgba(55,138,221,0.12)' : 'transparent',
-              color: viewMode === 'grid' ? '#378ADD' : 'var(--v2-text-hint)',
+              color: viewMode === 'grid' ? '#378ADD' : 'rgb(var(--text-tertiary))',
             }}
             aria-label="Grid view"
           >
@@ -239,7 +239,7 @@ function OverviewTab() {
             className="p-1.5 rounded-md transition-colors"
             style={{
               background: viewMode === 'list' ? 'rgba(55,138,221,0.12)' : 'transparent',
-              color: viewMode === 'list' ? '#378ADD' : 'var(--v2-text-hint)',
+              color: viewMode === 'list' ? '#378ADD' : 'rgb(var(--text-tertiary))',
             }}
             aria-label="List view"
           >
@@ -658,7 +658,7 @@ function ContextBanner({
   return (
     <p
       className="px-6 pb-3"
-      style={{ fontSize: 11, color: 'var(--v2-text-muted)', lineHeight: 1.5 }}
+      style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))', lineHeight: 1.5 }}
     >
       {bannerContent}
     </p>
@@ -691,11 +691,11 @@ export function ClassroomsModule() {
   )
 
   return (
-    <div data-v2 className="min-h-full" style={{ background: 'var(--v2-bg-app)' }}>
+    <div data-v2 className="min-h-full" style={{ background: 'rgb(var(--background-primary))' }}>
       {/* Page Header */}
       <div
         className="border-b"
-        style={{ borderColor: 'var(--v2-border-default)', background: 'var(--v2-bg-surface)' }}
+        style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', background: 'rgb(var(--background-secondary))' }}
       >
         <div className="px-6 py-4">
           <div className="flex items-center justify-between" style={{ height: 44 }}>
@@ -708,12 +708,12 @@ export function ClassroomsModule() {
               </div>
               <h1
                 className="text-sm font-semibold"
-                style={{ color: 'var(--v2-text-primary)' }}
+                style={{ color: 'rgb(var(--text-primary))' }}
               >
                 Classrooms
               </h1>
-              <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-              <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
+              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
@@ -723,9 +723,9 @@ export function ClassroomsModule() {
                 <button
                   onClick={() => navigate({ to: '/classrooms/create' })}
                   aria-label="New classroom"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
                   style={{
-                    background: 'var(--v2-brand-primary)',
+                    background: '#1D9E75',
                     color: '#fff',
                   }}
                 >
@@ -766,7 +766,7 @@ export function ClassroomsModule() {
                     padding: '8px 16px',
                     fontSize: 12,
                     fontWeight: isActive ? 500 : 400,
-                    color: isActive ? '#378ADD' : 'var(--v2-text-hint, #5a6070)',
+                    color: isActive ? '#378ADD' : 'rgb(var(--text-tertiary))',
                     cursor: 'pointer',
                     borderBottom: `2px solid ${isActive ? '#378ADD' : 'transparent'}`,
                     marginBottom: -1,
@@ -780,8 +780,8 @@ export function ClassroomsModule() {
                     borderBottomColor: isActive ? '#378ADD' : 'transparent',
                     transition: 'color 150ms ease',
                   }}
-                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--v2-text-secondary)' }}
-                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--v2-text-hint, #5a6070)' }}
+                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'rgb(var(--text-secondary))' }}
+                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'rgb(var(--text-tertiary))' }}
                 >
                   <tab.icon
                     className="w-3 h-3"
@@ -796,7 +796,7 @@ export function ClassroomsModule() {
                         padding: '1px 5px',
                         borderRadius: 8,
                         background: isActive ? 'rgba(55,138,221,0.12)' : 'rgba(255,255,255,0.06)',
-                        color: isActive ? '#378ADD' : 'var(--v2-text-hint, #5a6070)',
+                        color: isActive ? '#378ADD' : 'rgb(var(--text-tertiary))',
                       }}
                     >
                       {sectionCount}

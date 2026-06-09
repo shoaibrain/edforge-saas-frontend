@@ -36,17 +36,17 @@ function ChartSkeleton() {
         <div key={i} className="flex items-center gap-3">
           <div
             className="w-14 h-3 rounded v2-skeleton-pulse"
-            style={{ background: 'var(--v2-bg-elevated)' }}
+            style={{ background: 'rgb(var(--background-tertiary))' }}
           />
           <div className="flex-1">
             <div
               className="h-3.5 rounded-sm v2-skeleton-pulse"
-              style={{ background: 'var(--v2-bg-elevated)', width: `${30 + Math.random() * 50}%` }}
+              style={{ background: 'rgb(var(--background-tertiary))', width: `${30 + Math.random() * 50}%` }}
             />
           </div>
           <div
             className="w-6 h-3 rounded v2-skeleton-pulse"
-            style={{ background: 'var(--v2-bg-elevated)' }}
+            style={{ background: 'rgb(var(--background-tertiary))' }}
           />
         </div>
       ))}
@@ -61,13 +61,13 @@ function CustomTooltip({ active, payload }: any) {
     <div
       className="rounded-lg border px-3 py-2 text-xs shadow-lg"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
-        color: 'var(--v2-text-secondary)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
+        color: 'rgb(var(--text-secondary))',
       }}
     >
       <div className="font-semibold">{d.displayLabel}</div>
-      <div style={{ color: 'var(--v2-text-faint)' }}>
+      <div style={{ color: 'rgb(var(--text-disabled))' }}>
         {d.count} student{d.count !== 1 ? 's' : ''} · {d.percentage}%
       </div>
     </div>
@@ -88,8 +88,8 @@ export function EnrollmentByGradeChart({
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -97,11 +97,11 @@ export function EnrollmentByGradeChart({
       <div className="flex items-center justify-between mb-4">
         <h3
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           Enrollment by grade level
         </h3>
-        <span className="text-xs font-semibold" style={{ color: 'var(--v2-info)' }}>
+        <span className="text-xs font-semibold" style={{ color: 'rgb(var(--state-info-fg))' }}>
           {total} total
         </span>
       </div>
@@ -116,7 +116,7 @@ export function EnrollmentByGradeChart({
         ) : data.length === 0 ? (
           <div
             className="flex items-center justify-center text-sm"
-            style={{ height: 120, color: 'var(--v2-text-hint)' }}
+            style={{ height: 120, color: 'rgb(var(--text-tertiary))' }}
           >
             No enrollment data
           </div>
@@ -170,11 +170,11 @@ export function EnrollmentByGradeChart({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 mt-3" style={{ borderTop: '1px solid var(--v2-border-default)' }}>
+      <div className="pt-3 mt-3" style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}>
         <Link
           to="/students"
           className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          style={{ color: '#1D9E75' }}
         >
           View Enrollment
           <ArrowRight className="w-3 h-3" />

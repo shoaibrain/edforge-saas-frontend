@@ -137,20 +137,20 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
       return {
         text: t('homeV2.kpi.aboveTarget', { diff: (rate - ATTENDANCE_THRESHOLD).toFixed(0) }),
         color: '#1D9E75',
-        bg: 'var(--v2-accent-enrollment)',
+        bg: 'rgb(var(--accent-enrollment) / 0.12)',
       }
     }
     if (rate >= 70) {
       return {
         text: t('homeV2.kpi.belowThreshold'),
         color: '#EF9F27',
-        bg: 'var(--v2-accent-attendance)',
+        bg: 'rgb(var(--accent-attendance) / 0.12)',
       }
     }
     return {
       text: t('homeV2.kpi.critical'),
       color: '#E24B4A',
-      bg: 'var(--v2-accent-finance)',
+      bg: 'rgb(var(--accent-finance) / 0.12)',
     }
   }, [snapshot.todayAttendanceRate, t])
 
@@ -163,9 +163,9 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
           data-page="home-v2"
           className="flex flex-col"
           style={{
-            gap: 'var(--v2-section-gap, 16px)',
-            padding: 'var(--v2-content-padding-y, 20px) var(--v2-content-padding-x, 28px)',
-            background: 'var(--v2-bg-app)',
+            gap: '16px',
+            padding: '20px 28px',
+            background: 'rgb(var(--background-primary))',
             minHeight: '100%',
           }}
           variants={staggerContainer}
@@ -185,7 +185,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
     }
     return (
       <div className="py-16 text-center">
-        <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('homeV2.selectSchool')}
         </p>
       </div>
@@ -197,9 +197,9 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
       data-page="home-v2"
       className="flex flex-col"
       style={{
-        gap: 'var(--v2-section-gap, 16px)',
-        padding: 'var(--v2-content-padding-y, 20px) var(--v2-content-padding-x, 28px)',
-        background: 'var(--v2-bg-app)',
+        gap: '16px',
+        padding: '20px 28px',
+        background: 'rgb(var(--background-primary))',
         minHeight: '100%',
       }}
       variants={staggerContainer}
@@ -215,9 +215,9 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
           role="status"
           aria-live="polite"
           style={{
-            background: 'var(--v2-warning-bg)',
-            border: '1px solid var(--v2-warning-border)',
-            color: 'var(--v2-warning)',
+            background: 'rgb(var(--state-warning-bg))',
+            border: '1px solid rgb(var(--state-warning-border))',
+            color: 'rgb(var(--state-warning-fg))',
           }}
         >
           <WifiOff className="w-3.5 h-3.5 flex-shrink-0" />
@@ -258,7 +258,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
           className="grid grid-cols-2 lg:grid-cols-4"
-          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
+          style={{ gap: '12px' }}
         >
           <HomeStatCard
             label={t('homeV2.kpi.studentsEnrolled')}
@@ -268,7 +268,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
                 : '—'
             }
             icon={Users}
-            accentColor="var(--v2-accent-enrollment)"
+            accentColor="rgb(var(--accent-enrollment) / 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
             hint={t('homeV2.kpi.thisAcademicYear')}
@@ -284,7 +284,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
                 : '—'
             }
             icon={LayoutGrid}
-            accentColor="var(--v2-accent-academics)"
+            accentColor="rgb(var(--accent-academics) / 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
             hint={t('homeV2.kpi.activeClasses')}
@@ -300,7 +300,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
                 : '—'
             }
             icon={ClipboardCheck}
-            accentColor="var(--v2-accent-attendance)"
+            accentColor="rgb(var(--accent-attendance) / 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
             tag={attendanceTag}
@@ -318,7 +318,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
                 : '—'
             }
             icon={Receipt}
-            accentColor="var(--v2-accent-finance)"
+            accentColor="rgb(var(--accent-finance) / 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"
             tag={
@@ -326,7 +326,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
                 ? {
                     text: t('homeV2.kpi.overdue', { amount: formatShort(financeSummary.overdue) }),
                     color: '#E24B4A',
-                    bg: 'var(--v2-accent-finance)',
+                    bg: 'rgb(var(--accent-finance) / 0.12)',
                   }
                 : undefined
             }
@@ -350,7 +350,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
           className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]"
-          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
+          style={{ gap: '12px' }}
         >
           <AttendanceTrendCard
             chartData={trend.chartData}
@@ -379,7 +379,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
           className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]"
-          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
+          style={{ gap: '12px' }}
         >
           <AttendanceBySectionCard
             sections={sectionAttendance.sections}

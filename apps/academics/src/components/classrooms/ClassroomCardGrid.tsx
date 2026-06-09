@@ -45,11 +45,11 @@ export function ClassroomCardGrid({
     return (
       <div
         className="rounded-xl border p-12 text-center"
-        style={{ background: 'var(--v2-bg-surface)', borderColor: 'var(--v2-border-default)' }}
+        style={{ background: 'rgb(var(--background-secondary))', borderColor: 'rgb(var(--border-primary) / 0.35)' }}
       >
-        <School className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--v2-text-hint)' }} />
-        <h4 className="text-lg font-medium mb-2" style={{ color: 'var(--v2-text-primary)' }}>No classes yet</h4>
-        <p className="max-w-md mx-auto" style={{ color: 'var(--v2-text-muted)' }}>
+        <School className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgb(var(--text-tertiary))' }} />
+        <h4 className="text-lg font-medium mb-2" style={{ color: 'rgb(var(--text-primary))' }}>No classes yet</h4>
+        <p className="max-w-md mx-auto" style={{ color: 'rgb(var(--text-tertiary))' }}>
           Create your first class section to get started. Classes will appear here as cards.
         </p>
       </div>
@@ -79,9 +79,9 @@ export function ClassroomCardGrid({
             disabled={isFetchingMore}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
             style={{
-              color: 'var(--v2-text-secondary)',
-              borderColor: 'var(--v2-border-default)',
-              border: '1px solid var(--v2-border-default)',
+              color: 'rgb(var(--text-secondary))',
+              borderColor: 'rgb(var(--border-primary) / 0.35)',
+              border: '1px solid rgb(var(--border-primary) / 0.35)',
             }}
           >
             {isFetchingMore ? (

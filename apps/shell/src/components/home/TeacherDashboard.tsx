@@ -79,7 +79,7 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
   if (!schoolId) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('homeV2.selectSchoolTeacher')}
         </p>
       </div>
@@ -91,9 +91,9 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
       data-page="home-v2"
       className="flex flex-col"
       style={{
-        gap: 'var(--v2-section-gap, 16px)',
-        padding: 'var(--v2-content-padding-y, 20px) var(--v2-content-padding-x, 28px)',
-        background: 'var(--v2-bg-app)',
+        gap: '16px',
+        padding: '20px 28px',
+        background: 'rgb(var(--background-primary))',
         minHeight: '100%',
       }}
       variants={staggerContainer}
@@ -108,13 +108,13 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
           className="grid grid-cols-1 sm:grid-cols-3"
-          style={{ gap: 'var(--v2-grid-gap, 12px)' }}
+          style={{ gap: '12px' }}
         >
           <HomeStatCard
             label={t('homeV2.teacher.mySections')}
             value={isLoading ? '—' : sections.length.toString()}
             icon={CalendarDays}
-            accentColor="var(--v2-accent-academics)"
+            accentColor="rgb(var(--accent-academics) / 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
             hint={t('homeV2.teacher.assignedClasses')}
@@ -124,7 +124,7 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
             label={t('homeV2.teacher.totalStudents')}
             value={isLoading ? '—' : totalStudents.toLocaleString()}
             icon={Users}
-            accentColor="var(--v2-accent-enrollment)"
+            accentColor="rgb(var(--accent-enrollment) / 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
             hint={t('homeV2.teacher.acrossAllSections')}
@@ -138,7 +138,7 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
                 : '—'
             }
             icon={ClipboardCheck}
-            accentColor="var(--v2-accent-attendance)"
+            accentColor="rgb(var(--accent-attendance) / 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
             hint={t('homeV2.teacher.completionRate')}

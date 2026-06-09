@@ -16,12 +16,12 @@ export function NoActiveChild() {
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
           style={{
-            background: 'var(--v2-info-bg)',
+            background: 'rgb(var(--state-info-bg))',
           }}
         >
           <svg
             className="w-7 h-7"
-            style={{ color: 'var(--v2-info)' }}
+            style={{ color: 'rgb(var(--state-info-fg))' }}
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
@@ -36,7 +36,7 @@ export function NoActiveChild() {
         </div>
         <p
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           {t('empty.selectChild')}
         </p>
