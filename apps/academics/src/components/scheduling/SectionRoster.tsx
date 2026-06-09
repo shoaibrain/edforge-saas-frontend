@@ -14,7 +14,7 @@ import {
   UserMinus,
 } from 'lucide-react'
 import type { SectionResponseDto, StudentSectionResponseDto } from '@aibrains/shared-types'
-import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
 import { useSectionRoster, useRemoveStudent } from '../../hooks/useSections'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -232,9 +232,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
         cell: ({ row }) => {
           const gradeLevel = row.original.currentGradeLevel
           return gradeLevel ? (
-            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-secondary">
-              {gradeLevel}
-            </span>
+            <StatusBadge tone="neutral">{gradeLevel}</StatusBadge>
           ) : (
             <span className="text-sm text-text-tertiary">&mdash;</span>
           )
@@ -287,9 +285,9 @@ export function SectionRoster({ section }: SectionRosterProps) {
             </p>
             <p className="text-xs text-text-tertiary">Primary Instructor</p>
           </div>
-          <span className="flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))]  ">
+          <StatusBadge tone="info" className="flex-shrink-0">
             Teacher
-          </span>
+          </StatusBadge>
         </div>
       )}
 

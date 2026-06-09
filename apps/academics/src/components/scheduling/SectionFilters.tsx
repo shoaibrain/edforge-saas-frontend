@@ -1,12 +1,13 @@
 /**
  * SectionFilters Component
  *
- * Clean filter bar with full-width search, compact filter chips,
- * active filter badges, and results count.
+ * Clean filter bar with compact filter selects, active filter badges,
+ * and results count.
  */
 
 import { useMemo } from 'react'
 import { X } from 'lucide-react'
+import { Select } from '@edforge/ui'
 import { useSectionFilters, useSectionFilterActions } from '../../stores/sections.store'
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
@@ -82,65 +83,55 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
     return badges
   }, [filters, courses, teachers, academicYears, actions])
 
-  const selectInactiveStyle = {
-    background: 'var(--v2-bg-surface)',
-    borderColor: 'var(--v2-border-default)',
-    color: 'var(--v2-text-secondary)',
-  }
-  const selectActiveStyle = {
-    background: 'rgba(55,138,221,0.10)',
-    borderColor: 'rgba(55,138,221,0.25)',
-    color: '#378ADD',
-  }
+  const chipClass = (active: boolean) =>
+    `px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+      active
+        ? 'bg-[rgb(var(--state-info-bg))] border-[rgb(var(--state-info-border)/0.4)] text-[rgb(var(--state-info-fg))]'
+        : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
+    }`
 
   return (
     <div className="space-y-2.5">
       {/* Single-row: Filters + Status chips */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Course dropdown */}
-        <select
+        <Select
+          size="sm"
+          className="w-44"
+          clearable
+          placeholder="Course"
           value={filters.courseId || ''}
-          onChange={(e) => actions.setCourseId(e.target.value || null)}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
-          style={filters.courseId ? selectActiveStyle : selectInactiveStyle}
-        >
-          <option value="">Course</option>
-          {courses.map((c) => (
-            <option key={c.courseId} value={c.courseId}>
-              {c.courseCode} — {c.courseName}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => actions.setCourseId(v || null)}
+          options={courses.map((c) => ({
+            value: c.courseId,
+            label: `${c.courseCode} — ${c.courseName}`,
+          }))}
+        />
 
-        {/* Teacher dropdown */}
-        <select
+        <Select
+          size="sm"
+          className="w-44"
+          clearable
+          placeholder="Teacher"
           value={filters.teacherId || ''}
-          onChange={(e) => actions.setTeacherId(e.target.value || null)}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
-          style={filters.teacherId ? selectActiveStyle : selectInactiveStyle}
-        >
-          <option value="">Teacher</option>
-          {teachers.map((t) => (
-            <option key={t.staffId} value={t.staffId}>
-              {getStaffDisplayName(t)}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => actions.setTeacherId(v || null)}
+          options={teachers.map((t) => ({
+            value: t.staffId,
+            label: getStaffDisplayName(t),
+          }))}
+        />
 
-        {/* Academic Year dropdown */}
-        <select
+        <Select
+          size="sm"
+          className="w-40"
+          clearable
+          placeholder="Year"
           value={filters.academicYearId || ''}
-          onChange={(e) => actions.setAcademicYearId(e.target.value || null)}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
-          style={filters.academicYearId ? selectActiveStyle : selectInactiveStyle}
-        >
-          <option value="">Year</option>
-          {(academicYears || []).map((y) => (
-            <option key={y.yearId} value={y.yearId}>
-              {y.name} {y.isCurrent ? '(Current)' : ''}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => actions.setAcademicYearId(v || null)}
+          options={(academicYears || []).map((y) => ({
+            value: y.yearId,
+            label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
+          }))}
+        />
 
         {/* Active status toggle chips */}
         {([null, true, false] as const).map((val) => {
@@ -151,8 +142,7 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
               key={String(val)}
               type="button"
               onClick={() => actions.setIsActive(val)}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors"
-              style={isSelected ? selectActiveStyle : selectInactiveStyle}
+              className={chipClass(isSelected)}
             >
               {label}
             </button>
@@ -161,7 +151,7 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
 
         {/* Results count */}
         {totalResults !== undefined && (
-          <span className="text-xs ml-auto" style={{ color: 'var(--v2-text-hint)' }}>
+          <span className="text-xs ml-auto text-[rgb(var(--text-tertiary))]">
             {totalResults} section{totalResults !== 1 ? 's' : ''}
             {filterCount > 0 ? ' matched' : ''}
           </span>
@@ -174,21 +164,13 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
           {activeFilterBadges.map((badge) => (
             <span
               key={badge.key}
-              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md"
-              style={{
-                background: 'rgba(55,138,221,0.10)',
-                color: '#378ADD',
-                border: '1px solid rgba(55,138,221,0.20)',
-              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))] border border-[rgb(var(--state-info-border)/0.3)]"
             >
               {badge.label}
               <button
                 type="button"
                 onClick={badge.onClear}
-                className="ml-0.5 p-0.5 rounded transition-colors"
-                style={{ opacity: 0.7 }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
+                className="ml-0.5 p-0.5 rounded opacity-70 hover:opacity-100 transition-opacity"
                 aria-label={`Remove ${badge.label} filter`}
               >
                 <X className="w-3 h-3" />
@@ -198,10 +180,7 @@ export function SectionFilters({ schoolId, totalResults }: SectionFiltersProps) 
           <button
             type="button"
             onClick={actions.resetFilters}
-            className="text-xs transition-colors ml-1"
-            style={{ color: 'var(--v2-text-hint)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--v2-text-primary)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--v2-text-hint)' }}
+            className="text-xs ml-1 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
           >
             Clear all
           </button>
