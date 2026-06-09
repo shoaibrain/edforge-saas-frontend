@@ -43,15 +43,16 @@
   outline-offset: 2px;
 }
 
-/* Portal focus ring — scoped to [data-v2] pages, applies to all interactive elements.
-   Uses brand-primary color. Relies on browser-native outline-follows-border-radius
-   (Chrome 94+, Safari 16.2+, Firefox 88+). */
-[data-v2] button:focus-visible,
-[data-v2] a:focus-visible,
-[data-v2] [role="tab"]:focus-visible,
-[data-v2] [role="gridcell"]:focus-visible,
-[data-v2] [tabindex]:focus-visible {
-  outline: 2px solid var(--v2-brand-primary, #1D9E75);
+/* Keyboard focus ring — applies platform-wide to interactive elements that
+   lack their own focus styling. Brand-green outline; only shows on keyboard
+   navigation (:focus-visible). Relies on browser-native outline-follows-
+   border-radius (Chrome 94+, Safari 16.2+, Firefox 88+). */
+button:focus-visible,
+a:focus-visible,
+[role="tab"]:focus-visible,
+[role="gridcell"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid rgb(var(--border-focus));
   outline-offset: 2px;
 }
 

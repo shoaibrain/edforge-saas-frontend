@@ -421,7 +421,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const showEmptyFilterState = !studentsLoading && filteredStudents.length === 0 && students.length > 0
 
   return (
-    <div data-v2 className="relative overflow-hidden min-h-full p-5 pb-10">
+    <div className="relative overflow-hidden min-h-full p-5 pb-10">
       <motion.div
         variants={staggerContainer}
         initial="hidden"

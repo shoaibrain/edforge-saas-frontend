@@ -25,9 +25,35 @@
 @source '../../../packages/*/src/**/*.{ts,tsx}';
 @source '../../../apps/*/src/**/*.{ts,tsx}';
 
-/* Home V2 design tokens and animations */
-@import './styles/home-v2-tokens.css';
+/* Home V2 animations (the V2 design tokens were retired — the canonical theme
+   in @edforge/theme now holds the warm/neutral palette platform-wide). */
 @import './styles/home-v2-animations.css';
+
+/* Native form-input baseline — a low-specificity default for bare native
+   <input>/<select>/<textarea> so they read consistently. @edforge/ui primitives
+   and any utility/inline styling override this (higher specificity). Replaces
+   the former [data-v2] form override now that the palette is unified. */
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='range']):not([type='color']),
+select,
+textarea {
+  background: rgb(var(--background-secondary));
+  border: 1px solid rgb(var(--border-primary) / 0.35);
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 12px;
+  color: rgb(var(--text-primary));
+  outline: none;
+  transition: border-color 150ms ease;
+}
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='range']):not([type='color']):focus,
+select:focus,
+textarea:focus {
+  border-color: rgb(var(--border-focus));
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgb(var(--text-disabled));
+}
 
 /* Landing V2 tokens are imported from @edforge/theme (packages/theme/src/index.css).
    They are scoped to html[data-surface="landing"] so they're inert unless LandingRoot mounts. */

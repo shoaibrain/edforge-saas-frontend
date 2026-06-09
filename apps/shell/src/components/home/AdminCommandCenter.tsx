@@ -160,7 +160,6 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
     if (availableSchools.length === 0 && gettingStarted.show) {
       return (
         <motion.div
-          data-page="home-v2"
           className="flex flex-col"
           style={{
             gap: '16px',
@@ -194,7 +193,6 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
 
   return (
     <motion.div
-      data-page="home-v2"
       className="flex flex-col"
       style={{
         gap: '16px',

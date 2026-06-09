@@ -275,7 +275,7 @@ export function CurriculumModule() {
   })
 
   return (
-    <div data-v2 className="min-h-full" style={{ padding: '18px 20px' }}>
+    <div className="min-h-full" style={{ padding: '18px 20px' }}>
       {/* ---- V2 Page Header ---- */}
       <div className="flex items-center justify-between" style={{ height: 44, marginBottom: 4 }}>
         <div className="flex items-center gap-2.5">

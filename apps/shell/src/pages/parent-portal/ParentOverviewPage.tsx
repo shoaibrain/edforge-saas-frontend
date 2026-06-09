@@ -164,7 +164,7 @@ export default function ParentOverviewPage() {
   const todayLoading = sectionsLoading || bellLoading || periodsLoading
 
   return (
-    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto" data-v2>
+    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto">
       {/* Hero — eyebrow + serif greeting + italic narrative.
            Greeting addresses the parent, narrative is about the child. */}
       <WidgetErrorBoundaryV2>

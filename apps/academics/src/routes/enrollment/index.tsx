@@ -220,7 +220,7 @@ export function EnrollmentModule() {
   }, [summary?.totalEnrolled])
 
   return (
-    <div data-v2="" className="min-h-full">
+    <div className="min-h-full">
       {/* V2 Page Header */}
       <div
         className="px-6 py-4"

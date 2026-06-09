@@ -180,7 +180,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   }
 
   return (
-    <div data-v2 className="p-5 pb-10">
+    <div className="p-5 pb-10">
       <motion.div
         variants={staggerContainer}
         initial="hidden"

@@ -691,7 +691,7 @@ export function ClassroomsModule() {
   )
 
   return (
-    <div data-v2 className="min-h-full" style={{ background: 'rgb(var(--background-primary))' }}>
+    <div className="min-h-full" style={{ background: 'rgb(var(--background-primary))' }}>
       {/* Page Header */}
       <div
         className="border-b"

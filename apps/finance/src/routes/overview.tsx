@@ -184,7 +184,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   const overdueCount = invoicesByStatus['overdue'] ?? 0
 
   return (
-    <div data-v2 className="p-6 space-y-5" style={{ minHeight: '100vh' }}>
+    <div className="p-6 space-y-5" style={{ minHeight: '100vh' }}>
       {/* Compact Header + Insight Strip */}
       <div className="space-y-1">
         <div className="flex items-center justify-between" style={{ height: 44 }}>

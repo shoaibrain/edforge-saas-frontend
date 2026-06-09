@@ -388,7 +388,7 @@ export default function InvoicesPage() {
   ]
 
   return (
-    <div data-v2 className="p-6 space-y-5">
+    <div className="p-6 space-y-5">
       {/* V2 Page Header */}
       <FinancePageHeader
         icon={FileText}
