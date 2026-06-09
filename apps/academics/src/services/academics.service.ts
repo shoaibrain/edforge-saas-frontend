@@ -1809,6 +1809,34 @@ export async function getAttendanceAlerts(
   return Array.isArray(res) ? res : res.alerts
 }
 
+export interface StudentAttendanceTrend {
+  rate: number
+  series: number[]
+  trend: 'improving' | 'declining' | 'stable'
+  totalDays: number
+  absentDays: number
+}
+
+/**
+ * Batch per-student attendance trend for the roster sparkline (Sprint 2).
+ * GET /academics/attendance/student-trends?schoolId=&studentIds=<csv>&startDate=&endDate=
+ * Returns a studentId → trend map (only students with records in the window).
+ */
+export async function getAttendanceStudentTrends(
+  schoolId: string,
+  studentIds: string[],
+  startDate: string,
+  endDate: string,
+): Promise<Record<string, StudentAttendanceTrend>> {
+  if (studentIds.length === 0) return {}
+  if (DEBUG) console.debug('[Academics Service] getAttendanceStudentTrends', { count: studentIds.length })
+  const res = await apiGet<{ trends: Record<string, StudentAttendanceTrend> }>(
+    '/academics/attendance/student-trends',
+    { schoolId, studentIds: studentIds.join(','), startDate, endDate },
+  )
+  return res?.trends ?? {}
+}
+
 // ============================================================================
 // ATTENDANCE OVERVIEW (Task 1.13)
 // ============================================================================

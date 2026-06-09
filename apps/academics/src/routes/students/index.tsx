@@ -36,6 +36,7 @@ import {
 import { useActiveSchoolId } from '../../stores'
 import { useStudentFilters, useStudentFilterActions } from '../../stores/students.store'
 import { useAcademicsOverviewV2 } from '../../hooks/useAcademicsOverviewV2'
+import { useAttendanceStudentTrends } from '../../hooks/useAttendance'
 import { filterStudentsByMode } from '../../utils/student-filters'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 
@@ -345,17 +346,6 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
     return map
   }, [overviewData.alerts.students])
 
-  // Richer signal (rate + trend) for the table's AttendanceTrend cell. The
-  // alerts endpoint covers at-risk students only; non-flagged rows render "—"
-  // until the Sprint-2 batch endpoint supplies a full-roster daily series.
-  const attendanceByStudent = useMemo(() => {
-    const map = new Map<string, StudentAttendanceSignal>()
-    for (const alert of overviewData.alerts.students) {
-      map.set(alert.studentId, { rate: alert.attendanceRate, trend: alert.trend })
-    }
-    return map
-  }, [overviewData.alerts.students])
-
   // Apply filterMode chip to the server-filtered student list.
   // Server-side filters (search/grade/status) have already narrowed `students`
   // upstream via useStudents({ filters }); the chip filter intersects with
@@ -364,6 +354,45 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
     () => filterStudentsByMode(students, filters.filterMode, alertsMap),
     [students, filters.filterMode, alertsMap],
   )
+
+  // ── Attendance trend (Sprint 2) ──────────────────────────────────
+  // Real 30-day daily series for the visible page (≤50) drives the inline
+  // sparkline. Batched in one request keyed to the displayed studentIds.
+  const trendWindow = useMemo(() => {
+    const end = new Date()
+    const start = new Date()
+    start.setDate(start.getDate() - 29)
+    const fmt = (d: Date) => d.toISOString().slice(0, 10)
+    return { startDate: fmt(start), endDate: fmt(end) }
+  }, [])
+
+  const visibleStudentIds = useMemo(
+    () => filteredStudents.slice(0, 50).map((s) => s.studentId),
+    [filteredStudents],
+  )
+
+  const { data: studentTrends } = useAttendanceStudentTrends({
+    schoolId,
+    studentIds: visibleStudentIds,
+    startDate: trendWindow.startDate,
+    endDate: trendWindow.endDate,
+  })
+
+  // Richer per-student signal for the AttendanceTrend cell: at-risk alerts
+  // (rate + trend) as the base, overlaid with the real daily series for the
+  // visible page. Students with neither render "—".
+  const attendanceByStudent = useMemo(() => {
+    const map = new Map<string, StudentAttendanceSignal>()
+    for (const alert of overviewData.alerts.students) {
+      map.set(alert.studentId, { rate: alert.attendanceRate, trend: alert.trend })
+    }
+    if (studentTrends) {
+      for (const [studentId, t] of Object.entries(studentTrends)) {
+        map.set(studentId, { rate: t.rate, trend: t.trend, series: t.series })
+      }
+    }
+    return map
+  }, [overviewData.alerts.students, studentTrends])
 
   // Derive KPI values
   const attendanceRate = overviewData.overview.todayAttendanceRate
