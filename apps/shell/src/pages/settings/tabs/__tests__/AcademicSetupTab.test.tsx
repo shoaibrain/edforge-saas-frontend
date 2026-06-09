@@ -42,6 +42,9 @@ vi.mock('@/services/tenant.service', () => ({
 
 vi.mock('@edforge/ui', () => ({
   DateInput: () => null,
+  Field: ({ children }: { children?: unknown }) => children,
+  Input: () => null,
+  Select: () => null,
 }))
 
 vi.mock('@/hooks/useCalendar', () => ({

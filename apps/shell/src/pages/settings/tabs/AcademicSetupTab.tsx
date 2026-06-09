@@ -15,7 +15,7 @@ import { Plus, AlertCircle, Lock, Star } from 'lucide-react'
 import type { School } from '@edforge/types'
 import type { CreateAcademicYearDto, UpdateAcademicYearDto } from '@aibrains/shared-types'
 import { tenantService, type CreateGradingPeriodDto } from '@/services/tenant.service'
-import { DateInput } from '@edforge/ui'
+import { DateInput, Field, Input, Select } from '@edforge/ui'
 import {
   useAcademicSessions,
   useCalendarStats,
@@ -116,8 +116,6 @@ const NEPAL_EXAM_PRESET = [
 // ============================================================================
 // SHARED UI
 // ============================================================================
-
-const inputClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 text-xs text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:border-[rgba(55,138,221,0.45)] transition-colors font-[inherit]"
 
 const DAY_LABELS: { key: DayOfWeek; short: string }[] = [
   { key: 'sunday', short: 'S' },
@@ -513,17 +511,14 @@ function CreateAcademicYearModal({ isOpen, onClose, onSubmit, isLoading, schoolI
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
-            <input
-              type="text"
+          <Field label="Year Name" required density="compact">
+            <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               placeholder={calendarSystem === 'bikram_sambat' ? 'e.g., 2082-2083' : 'e.g., 2025-2026'}
-              className={inputClass}
             />
-          </div>
+          </Field>
 
           <div className="flex items-start gap-2 p-2.5 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
             <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] mt-0.5 flex-shrink-0" />
@@ -603,17 +598,14 @@ function EditAcademicYearModal({ isOpen, year, onClose, onSubmit, isLoading, cal
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">Year Name</label>
-            <input
-              type="text"
+          <Field label="Year Name" required density="compact">
+            <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               disabled={!canEdit}
-              className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`}
             />
-          </div>
+          </Field>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -1152,24 +1144,27 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
           <div className="mx-4 my-3 bg-[rgba(55,138,221,0.03)] border border-[rgba(55,138,221,0.1)] rounded-lg p-3.5">
             <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Session</h4>
             <div className="grid grid-cols-2 gap-2.5 mb-2.5">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Session Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-                <input className={inputClass} value={sessionName} onChange={e => setSessionName(e.target.value)} placeholder="e.g., First Semester" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Term Descriptor <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-                <select className={inputClass} value={termType} onChange={e => setTermType(e.target.value)}>
-                  <option value="">Select term descriptor...</option>
-                  <option value="fall_semester">Fall Semester</option>
-                  <option value="spring_semester">Spring Semester</option>
-                  <option value="year_round">Year Round</option>
-                  <option value="summer">Summer</option>
-                  <option value="first_quarter">First Quarter</option>
-                  <option value="second_quarter">Second Quarter</option>
-                  <option value="third_quarter">Third Quarter</option>
-                  <option value="fourth_quarter">Fourth Quarter</option>
-                </select>
-              </div>
+              <Field label="Session Name" required density="compact">
+                <Input value={sessionName} onChange={e => setSessionName(e.target.value)} placeholder="e.g., First Semester" />
+              </Field>
+              <Select
+                label="Term Descriptor"
+                required
+                density="compact"
+                value={termType}
+                onChange={v => setTermType(v ?? '')}
+                placeholder="Select term descriptor..."
+                options={[
+                  { value: 'fall_semester', label: 'Fall Semester' },
+                  { value: 'spring_semester', label: 'Spring Semester' },
+                  { value: 'year_round', label: 'Year Round' },
+                  { value: 'summer', label: 'Summer' },
+                  { value: 'first_quarter', label: 'First Quarter' },
+                  { value: 'second_quarter', label: 'Second Quarter' },
+                  { value: 'third_quarter', label: 'Third Quarter' },
+                  { value: 'fourth_quarter', label: 'Fourth Quarter' },
+                ]}
+              />
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Begin Date <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
                 <DateInput
@@ -1886,12 +1881,14 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
           single-day-curated-options.ts. */}
       <div className="grid grid-cols-2 gap-2.5 mb-2.5">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Event Type</label>
-          <select
-            className={inputClass}
+          <Select
+            label="Event Type"
+            optionalText={null}
+            density="compact"
             value={curatedKey}
-            onChange={e => {
-              const newKey = e.target.value as CuratedSingleDayKey
+            onChange={v => {
+              if (!v) return
+              const newKey = v as CuratedSingleDayKey
               setCuratedKey(newKey)
               // Auto-set instructional from the underlying eventType the
               // curated key resolves to.
@@ -1904,13 +1901,12 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
                   getCuratedMeta(newKey).autoInstructional,
               )
             }}
-          >
-            {CURATED_OPTIONS_FOR_DROPDOWN.map(opt => (
-              <option key={opt.key} value={opt.key}>{opt.label}</option>
-            ))}
-            <option key="other" value="other">────────</option>
-            <option key="other-real" value="other">Other (advanced)…</option>
-          </select>
+            options={[
+              ...CURATED_OPTIONS_FOR_DROPDOWN.map(opt => ({ value: opt.key, label: opt.label })),
+              { value: '__divider', label: '────────', disabled: true },
+              { value: 'other', label: 'Other (advanced)…' },
+            ]}
+          />
           <p className="text-xs text-[rgb(var(--text-tertiary))] leading-tight">
             {curatedKey === 'other' ? 'Pick a raw type below' : getCuratedMeta(curatedKey).description}
           </p>
@@ -1934,40 +1930,32 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
       {/* "Other" escape hatch — raw eventType dropdown */}
       {curatedKey === 'other' && (
         <div className="mb-2.5">
-          <label className="text-xs font-medium text-[rgb(var(--text-tertiary))] block mb-1">
-            Raw Event Type
-          </label>
-          <select
-            className={inputClass}
+          <Select
+            label="Raw Event Type"
+            optionalText={null}
+            density="compact"
             value={rawOverride}
-            onChange={e => {
-              const newType = e.target.value as CalendarEventDescriptor
+            onChange={v => {
+              if (!v) return
+              const newType = v as CalendarEventDescriptor
               setRawOverride(newType)
               setIsInstructional((INSTRUCTIONAL_TYPES as string[]).includes(newType))
             }}
-          >
-            {CALENDAR_EVENT_TYPES.map(t => (
-              <option key={t} value={t}>{EVENT_TYPE_COLORS[t]?.label || t}</option>
-            ))}
-          </select>
+            options={CALENDAR_EVENT_TYPES.map(t => ({ value: t, label: EVENT_TYPE_COLORS[t]?.label || t }))}
+          />
         </div>
       )}
 
       {/* Optional description (operator notes — stored as the event's
           `description` field; appears in tooltips and reports). */}
-      <div className="flex flex-col gap-1 mb-2.5">
-        <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
-          Description (optional)
-        </label>
-        <input
-          type="text"
+      <Field label="Description" optionalText="optional" density="compact" className="mb-2.5">
+        <Input
           value={description}
           onChange={e => setDescription(e.target.value)}
           placeholder="e.g., Mid-term Conference Day, Quarter 2 Inservice"
           maxLength={255}
-          className={inputClass}
         />
-      </div>
+      </Field>
 
       <div className="flex justify-end gap-2">
         <button onClick={onClose} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
@@ -2014,6 +2002,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
     localeDefaults.weekendDays.length === 1 ? 'sat' : 'sat-sun'
   )
   const [calSchoolDays, setCalSchoolDays] = useState<number[]>(localeDefaults.schoolDayIndices)
+  const [localeCountry, setLocaleCountry] = useState(localeDefaults.isNepal ? 'NP' : 'US')
   const [showConfirm, setShowConfirm] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -2275,38 +2264,43 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
 
           {/* Locale row */}
           <div className="grid grid-cols-2 gap-2.5 mb-3">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Country / Locale</label>
-              <select className={inputClass} defaultValue={localeDefaults.isNepal ? 'NP' : 'US'}>
-                <option value="NP">Nepal (NP)</option>
-                <option value="US">United States (US)</option>
-                <option value="IN">India (IN)</option>
-                <option value="custom">Custom</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Weekends</label>
-              <select
-                className={inputClass}
-                value={weekendOption}
-                onChange={e => {
-                  setWeekendOption(e.target.value)
-                  const weekendMap: Record<string, number[]> = {
-                    'sat': [6],
-                    'sat-sun': [0, 6],
-                    'fri-sat': [5, 6],
-                    'sun': [0],
-                  }
-                  const weekends = weekendMap[e.target.value] || [0, 6]
-                  setCalSchoolDays([0,1,2,3,4,5,6].filter(d => !weekends.includes(d)))
-                }}
-              >
-                <option value="sat">Saturday only (Nepal default)</option>
-                <option value="sat-sun">Saturday & Sunday</option>
-                <option value="fri-sat">Friday & Saturday</option>
-                <option value="sun">Sunday only</option>
-              </select>
-            </div>
+            <Select
+              label="Country / Locale"
+              optionalText={null}
+              density="compact"
+              value={localeCountry}
+              onChange={v => { if (v) setLocaleCountry(v) }}
+              options={[
+                { value: 'NP', label: 'Nepal (NP)' },
+                { value: 'US', label: 'United States (US)' },
+                { value: 'IN', label: 'India (IN)' },
+                { value: 'custom', label: 'Custom' },
+              ]}
+            />
+            <Select
+              label="Weekends"
+              optionalText={null}
+              density="compact"
+              value={weekendOption}
+              onChange={v => {
+                if (!v) return
+                setWeekendOption(v)
+                const weekendMap: Record<string, number[]> = {
+                  'sat': [6],
+                  'sat-sun': [0, 6],
+                  'fri-sat': [5, 6],
+                  'sun': [0],
+                }
+                const weekends = weekendMap[v] || [0, 6]
+                setCalSchoolDays([0,1,2,3,4,5,6].filter(d => !weekends.includes(d)))
+              }}
+              options={[
+                { value: 'sat', label: 'Saturday only (Nepal default)' },
+                { value: 'sat-sun', label: 'Saturday & Sunday' },
+                { value: 'fri-sat', label: 'Friday & Saturday' },
+                { value: 'sun', label: 'Sunday only' },
+              ]}
+            />
           </div>
 
           {/* School days picker */}
@@ -2616,10 +2610,9 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
       {showCreateForm && (
         <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl mb-3 p-4">
           <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] mb-2.5">New Bell Schedule</h4>
-          <div className="flex flex-col gap-1 mb-2.5">
-            <label className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Schedule Name <span className="text-[rgb(var(--state-danger-fg))]">*</span></label>
-            <input className={inputClass} value={newName} onChange={e => setNewName(e.target.value)} placeholder='e.g., "Regular Day", "Early Release"' />
-          </div>
+          <Field label="Schedule Name" required density="compact" className="mb-2.5">
+            <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder='e.g., "Regular Day", "Early Release"' />
+          </Field>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mb-2.5">
             Create an empty schedule, then add periods to it. Or use a template above to start with pre-built periods.
           </p>
