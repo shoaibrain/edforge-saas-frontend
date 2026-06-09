@@ -80,6 +80,8 @@ interface SelectControlProps
     VariantProps<typeof selectButtonVariants> {
   disabled?: boolean
   invalid?: boolean | null
+  /** Class applied to the control wrapper (e.g. width) when used label-less. */
+  className?: string
 }
 
 const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
@@ -98,6 +100,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
       leadingIcon,
       buttonClassName,
       optionsClassName,
+      className,
       'aria-label': ariaLabel,
     },
     ref
@@ -110,7 +113,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
 
     return (
       <Listbox value={value ?? null} onChange={onChange} disabled={resolvedDisabled}>
-        <div className="relative">
+        <div className={cn('relative', className)}>
           <ListboxButton
             ref={ref}
             id={field?.controlId}
@@ -266,6 +269,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         ref={ref}
         disabled={disabled}
         invalid={Boolean(error)}
+        className={className}
         {...props}
       />
     )
