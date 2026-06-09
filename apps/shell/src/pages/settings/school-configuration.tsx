@@ -29,7 +29,7 @@ import {
   Lock,
   AlertCircle,
 } from 'lucide-react'
-import { Select } from '@edforge/ui'
+import { Select, Input } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { tenantService } from '@/services/tenant.service'
 import type { School } from '@edforge/types'
@@ -459,7 +459,6 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         {/* Render country-adaptive address fields from country config */}
         {(() => {
           const countryConfig = getCountryConfig(formState.address.country || 'USA');
-          const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all";
 
           // Group address fields into rows (street1 alone, then remaining in pairs)
           const fields = countryConfig.addressFields.filter(f => f.key !== 'country');
@@ -477,13 +476,12 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
                   options={field.options.map((opt) => ({ value: opt.value, label: opt.label }))}
                 />
               ) : (
-                <input
-                  type="text"
+                <Input
+                  className="w-full"
                   value={formState.address[field.key] || ''}
                   onChange={(e) => updateField('address', { ...formState.address, [field.key]: e.target.value })}
                   placeholder={field.placeholder}
                   maxLength={field.maxLength}
-                  className={inputClass}
                 />
               )}
             </SettingsFieldRow>

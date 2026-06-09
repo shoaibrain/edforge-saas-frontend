@@ -307,6 +307,23 @@ export default [
     },
   },
   {
+    // Epic T exit gate. Settings + onboarding are fully migrated off native
+    // <select> and local form-style constants, so these two rules are hard
+    // errors on that path — a regression now fails CI instead of adding a
+    // warning. The input/style sweeps (prefer-ui-form-controls /
+    // no-presentation-style-objects) stay warnings until those migrations land.
+    ...pluginConfig,
+    files: [
+      'apps/shell/src/pages/settings/**/*.{ts,tsx}',
+      'apps/shell/src/components/settings/**/*.{ts,tsx}',
+      'apps/shell/src/components/onboarding/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'edforge-design-system/prefer-ui-select': 'error',
+      'edforge-design-system/no-local-form-style-constants': 'error',
+    },
+  },
+  {
     ...pluginConfig,
     files: ['packages/forms/**/*.{ts,tsx}', 'packages/wizard/**/*.{ts,tsx}'],
   rules: {
