@@ -18,8 +18,19 @@ import { UserAvatar } from '../../common/UserAvatar'
 
 const MAX_VISIBLE = 3
 
+const RELATIONSHIP_LABELS: Record<string, string> = {
+  father: 'Father',
+  mother: 'Mother',
+  guardian: 'Legal Guardian',
+  grandparent: 'Grandparent',
+  sibling: 'Sibling',
+  aunt: 'Aunt',
+  uncle: 'Uncle',
+  other: 'Other',
+}
+
 function relationshipLabel(rel: string): string {
-  return rel.charAt(0).toUpperCase() + rel.slice(1)
+  return RELATIONSHIP_LABELS[rel] ?? (rel.charAt(0).toUpperCase() + rel.slice(1))
 }
 
 /** Collision-resistant avatar seed — guardianId is optional and names repeat. */
@@ -129,7 +140,10 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
                   <UserAvatar userId={g.guardianId ?? ''} userName={`${g.firstName} ${g.lastName}`} role="staff" size="sm" seed={guardianSeed(g)} />
                   <div className="min-w-0">
                     <div className="text-xs font-medium truncate text-[rgb(var(--text-primary))]">{g.firstName} {g.lastName}</div>
-                    <GuardianBadges guardian={g} />
+                    <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                      <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{relationshipLabel(g.relationship)}</span>
+                      <GuardianBadges guardian={g} />
+                    </div>
                   </div>
                 </li>
               ))}

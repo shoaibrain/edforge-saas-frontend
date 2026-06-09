@@ -83,6 +83,17 @@ describe('GuardianCell', () => {
     const dialog = getByRole('dialog')
     expect(within(dialog).getByText('Mohan Sah')).toBeTruthy()
     expect(within(dialog).getByText('Gita Sah')).toBeTruthy()
+    // Each guardian's relationship is surfaced (not just Primary/Pickup badges).
+    expect(within(dialog).getByText('Father')).toBeTruthy()
+    expect(within(dialog).getByText('Mother')).toBeTruthy()
     expect(within(dialog).getAllByText(/Primary|Portal|Pickup/i).length).toBeGreaterThan(0)
+  })
+
+  it('maps the "guardian" relationship to "Legal Guardian"', () => {
+    const { getByRole } = render(
+      <GuardianCell guardians={[g({ firstName: 'Ram', relationship: 'guardian', isPrimary: true })]} />,
+    )
+    fireEvent.click(getByRole('button'))
+    expect(within(getByRole('dialog')).getByText('Legal Guardian')).toBeTruthy()
   })
 })
