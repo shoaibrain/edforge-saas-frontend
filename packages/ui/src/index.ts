@@ -211,6 +211,11 @@ export {
   type AttendanceDonutRingProps,
 } from './components/AttendanceDonutRing'
 export {
+  AttendanceTrend,
+  type AttendanceTrendProps,
+  type AttendanceTrendDirection,
+} from './components/AttendanceTrend'
+export {
   QuickDrawer,
   useQuickDrawer,
   type QuickDrawerRootProps,
