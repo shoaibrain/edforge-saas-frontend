@@ -133,38 +133,38 @@
   /* Font */
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  /* Background colors - Light mode uses warm neutrals */
-  --background-primary: 251 249 245; /* warm off-white */
-  --background-secondary: 255 255 255;
-  --background-tertiary: 246 243 235; /* vanilla-100 tint */
+  /* Background colors — warm/neutral palette (unified from the former V2 layer) */
+  --background-primary: 250 247 242; /* #FAF7F2 warm off-white */
+  --background-secondary: 255 255 255; /* pure white cards */
+  --background-tertiary: 244 239 230; /* #F4EFE6 warm elevated */
   --background-elevated: 255 255 255;
   --background-overlay: 0 18 25;
   --background-inverse: 0 18 25;
 
-  /* Text colors */
-  --text-primary: 0 18 25; /* ink-500 */
-  --text-secondary: 0 95 115; /* teal-500 */
-  --text-tertiary: 71 85 105; /* slate-600, AA on warm tertiary surface */
-  --text-inverted: 251 249 245;
+  /* Text colors — neutral slate (was teal) */
+  --text-primary: 26 31 46; /* #1a1f2e */
+  --text-secondary: 55 65 81; /* #374151 slate-700 */
+  --text-tertiary: 107 114 128; /* #6b7280 slate-500 */
+  --text-inverted: 250 247 242;
 
-  /* Border colors */
-  --border-primary: 127 103 32; /* vanilla-700, >=3:1 on warm surfaces */
-  --border-secondary: 63 151 122; /* aqua-700, >=3:1 on warm surfaces */
-  --border-tertiary: 0 122 147; /* teal-400, strong divider/focus-adjacent */
+  /* Border colors — warm beige (was vanilla/aqua) */
+  --border-primary: 236 231 216; /* #ECE7D8 warm beige */
+  --border-secondary: 236 231 216;
+  --border-tertiary: 200 192 174; /* #C8C0AE warm strong */
 
   /* Semantic roles */
   --text-muted: var(--text-tertiary);
-  --text-disabled: 148 163 184;
-  --text-on-accent: 251 249 245;
+  --text-disabled: 176 182 200; /* #B0B6C8 */
+  --text-on-accent: 250 247 242;
 
   --border-subtle: var(--border-secondary);
   --border-default: var(--border-primary);
   --border-strong: var(--border-tertiary);
-  --border-focus: 0 95 115;
+  --border-focus: 29 158 117; /* brand green */
 
-  --action-primary-bg: 0 95 115;
-  --action-primary-bg-hover: 0 78 94;
-  --action-primary-bg-active: 0 59 70;
+  --action-primary-bg: 29 158 117; /* #1D9E75 brand green (was teal) */
+  --action-primary-bg-hover: 15 110 86; /* #0F6E56 brand deep */
+  --action-primary-bg-active: 11 84 66;
   --action-primary-fg: var(--text-on-accent);
   --action-secondary-bg: var(--background-tertiary);
   --action-secondary-fg: var(--text-secondary);
@@ -201,38 +201,38 @@
 }
 
 .dark {
-  /* Background colors - Dark mode uses ink palette */
-  --background-primary: 0 18 25;
-  --background-secondary: 0 39 47;
-  --background-tertiary: 0 59 70;
-  --background-elevated: 0 78 94;
+  /* Background colors — neutral navy (unified from the former V2 layer) */
+  --background-primary: 15 17 23; /* #0f1117 */
+  --background-secondary: 22 27 39; /* #161b27 surface */
+  --background-tertiary: 30 36 54; /* #1e2436 elevated */
+  --background-elevated: 36 43 62; /* #242d3e */
   --background-overlay: 0 0 0;
-  --background-inverse: 251 249 245;
+  --background-inverse: 250 247 242;
 
-  /* Text colors - Dark mode */
-  --text-primary: 251 247 237;
-  --text-secondary: 169 219 202;
-  --text-tertiary: 148 210 189;
-  --text-inverted: 0 18 25;
+  /* Text colors — neutral grey (was aqua) */
+  --text-primary: 232 234 240; /* #e8eaf0 */
+  --text-secondary: 200 204 216; /* #c8ccd8 */
+  --text-tertiary: 122 128 153; /* #7a8099 */
+  --text-inverted: 26 31 46;
 
-  /* Border colors - Dark mode */
-  --border-primary: 97 189 158;
-  --border-secondary: 58 122 138;
-  --border-tertiary: 10 179 182;
+  /* Border colors — white at low opacity (was aqua) */
+  --border-primary: 255 255 255;
+  --border-secondary: 255 255 255;
+  --border-tertiary: 255 255 255;
 
   /* Semantic roles */
   --text-muted: var(--text-tertiary);
-  --text-disabled: 100 116 139;
-  --text-on-accent: 251 249 245;
+  --text-disabled: 74 80 104; /* #4A5068 */
+  --text-on-accent: 250 247 242;
 
   --border-subtle: var(--border-secondary);
   --border-default: var(--border-primary);
   --border-strong: var(--border-tertiary);
-  --border-focus: 10 179 182;
+  --border-focus: 29 158 117; /* brand green */
 
-  --action-primary-bg: 0 95 115;
-  --action-primary-bg-hover: 0 122 147;
-  --action-primary-bg-active: 0 78 94;
+  --action-primary-bg: 29 158 117; /* #1D9E75 brand green (was teal) */
+  --action-primary-bg-hover: 15 110 86; /* #0F6E56 brand deep */
+  --action-primary-bg-active: 11 84 66;
   --action-primary-fg: var(--text-on-accent);
   --action-secondary-bg: var(--background-tertiary);
   --action-secondary-fg: var(--text-secondary);
