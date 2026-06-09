@@ -9,6 +9,7 @@ import { useShell } from '../../../lib/shell-context'
 import { tenantService } from '../../../services/tenant.service'
 import type { OnboardingStepProps } from '../onboarding.types'
 import { ONBOARDING_STEPS } from '../onboarding.types'
+import { GRADE_LEVEL_OPTIONS } from '@aibrains/shared-types'
 
 const SCHOOL_TYPES = [
   { value: 'elementary', label: 'Elementary' },
@@ -16,9 +17,6 @@ const SCHOOL_TYPES = [
   { value: 'high', label: 'High School' },
   { value: 'k12', label: 'K-12' },
 ] as const
-
-const GRADE_OPTIONS = ['PK', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
-const GRADE_SELECT_OPTIONS = GRADE_OPTIONS.map((grade) => ({ value: grade, label: grade }))
 
 export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProps) {
   const { workspaceSettings } = useShell()
@@ -120,7 +118,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
               optionalText={null}
               value={gradeFrom}
               onChange={(value) => value && setGradeFrom(value)}
-              options={GRADE_SELECT_OPTIONS}
+              options={GRADE_LEVEL_OPTIONS}
               buttonClassName="min-w-0"
             />
             <span className="pt-3 text-xs text-[rgb(var(--text-tertiary))]">to</span>
@@ -129,7 +127,7 @@ export function CreateSchoolStep({ setData, onNext, onBack }: OnboardingStepProp
               optionalText={null}
               value={gradeTo}
               onChange={(value) => value && setGradeTo(value)}
-              options={GRADE_SELECT_OPTIONS}
+              options={GRADE_LEVEL_OPTIONS}
               buttonClassName="min-w-0"
             />
           </div>
