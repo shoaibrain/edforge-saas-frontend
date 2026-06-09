@@ -85,7 +85,7 @@ function RowActionMenu({
       <button
         onClick={() => setOpen(!open)}
         className="p-1 rounded-md transition-colors hover:opacity-80"
-        style={{ color: 'var(--v2-text-hint)' }}
+        style={{ color: 'rgb(var(--text-tertiary))' }}
         aria-label="Student actions"
       >
         <MoreVertical className="w-3.5 h-3.5" />
@@ -96,15 +96,15 @@ function RowActionMenu({
           <div
             className="absolute right-0 z-20 mt-1 w-40 rounded-lg border overflow-hidden shadow-lg"
             style={{
-              background: 'var(--v2-bg-elevated)',
-              borderColor: 'var(--v2-border-default)',
+              background: 'rgb(var(--background-tertiary))',
+              borderColor: 'rgb(var(--border-primary))',
             }}
           >
             {onView && (
               <button
                 onClick={() => { onView(student); setOpen(false) }}
                 className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
-                style={{ color: 'var(--v2-text-secondary)' }}
+                style={{ color: 'rgb(var(--text-secondary))' }}
               >
                 <ExternalLink className="w-3 h-3" />
                 View Profile
@@ -162,14 +162,14 @@ export function StudentTable({
               <div className="min-w-0">
                 <p
                   className="text-sm font-medium truncate"
-                  style={{ color: 'var(--v2-text-primary)' }}
+                  style={{ color: 'rgb(var(--text-primary))' }}
                 >
                   {student.fullName}
                 </p>
                 {student.studentNumber && (
                   <p
                     className="text-xs font-mono truncate"
-                    style={{ color: 'var(--v2-text-hint)' }}
+                    style={{ color: 'rgb(var(--text-tertiary))' }}
                   >
                     #{student.studentNumber}
                   </p>
@@ -186,7 +186,7 @@ export function StudentTable({
         cell: ({ row }) => (
           <span
             className="text-xs font-medium"
-            style={{ color: 'var(--v2-text-primary)' }}
+            style={{ color: 'rgb(var(--text-primary))' }}
           >
             {row.original.currentGradeLevel}
           </span>
@@ -203,7 +203,7 @@ export function StudentTable({
             return (
               <span
                 className="text-xs"
-                style={{ color: 'var(--v2-text-hint)' }}
+                style={{ color: 'rgb(var(--text-tertiary))' }}
                 title="No attendance recorded yet"
               >
                 —
@@ -236,7 +236,7 @@ export function StudentTable({
         cell: ({ row }) => (
           <span
             className="text-xs"
-            style={{ color: 'var(--v2-text-secondary)' }}
+            style={{ color: 'rgb(var(--text-secondary))' }}
           >
             {formatDate(row.original.enrollmentDate)}
           </span>

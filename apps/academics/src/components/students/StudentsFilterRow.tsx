@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { Search, X, Loader2, Download } from 'lucide-react'
+import { Select, Input, Button } from '@edforge/ui'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
@@ -38,12 +39,6 @@ const STATUS_OPTIONS: { value: StudentStatus; label: string }[] = [
   { value: 'withdrawn', label: 'Withdrawn' },
   { value: 'suspended', label: 'Suspended' },
 ]
-
-const inputStyle = {
-  background: 'var(--v2-surface-interactive)',
-  borderColor: 'var(--v2-border-default)',
-  color: 'var(--v2-text-secondary)',
-}
 
 // ============================================================================
 // COMPONENT
@@ -98,7 +93,7 @@ export function StudentsFilterRow({
   const isActiveFilters = hasActiveFilters()
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap" style={{ marginBottom: 14 }}>
+    <div className="flex items-center gap-1.5 flex-wrap mb-3.5">
       {/* Mode chips */}
       {MODE_CHIPS.map((chip) => {
         const isActive = filters.filterMode === chip.key
@@ -106,79 +101,69 @@ export function StudentsFilterRow({
           <button
             key={chip.key}
             onClick={() => setFilterMode(chip.key)}
-            className="px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
-            style={{
-              background: isActive ? 'var(--v2-brand-primary)' : 'transparent',
-              borderColor: isActive ? 'var(--v2-brand-primary)' : 'var(--v2-border-default)',
-              color: isActive ? '#fff' : 'var(--v2-text-hint)',
-            }}
+            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-all focus:outline-none ${
+              isActive
+                ? 'bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] border-[#1D9E75]'
+                : 'bg-transparent text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary))] hover:text-[rgb(var(--text-secondary))]'
+            }`}
           >
             {chip.label}
           </button>
         )
       })}
 
-      <span className="text-xs mx-1" style={{ color: 'var(--v2-text-ghost)' }}>or</span>
+      <span className="text-xs mx-1 text-[rgb(var(--text-tertiary))]">or</span>
 
       {/* Search input */}
-      <div className="relative flex-1 min-w-44 max-w-sm">
-        <Search
-          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
-          style={{ color: 'var(--v2-text-hint)' }}
-        />
-        <input
-          type="text"
-          value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search by name or student ID..."
-          className="w-full pl-8 pr-7 py-1.5 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
-          style={inputStyle}
-        />
-        {localSearch && (
-          <button
-            type="button"
-            onClick={() => setLocalSearch('')}
-            className="absolute right-2 top-1/2 -translate-y-1/2"
-            style={{ color: 'var(--v2-text-hint)' }}
-          >
-            <X className="w-3 h-3" />
-          </button>
-        )}
-      </div>
+      <Input
+        size="sm"
+        className="flex-1 min-w-44 max-w-sm"
+        prefix={<Search className="w-3.5 h-3.5" />}
+        suffix={
+          localSearch ? (
+            <button
+              type="button"
+              onClick={() => setLocalSearch('')}
+              aria-label="Clear search"
+              className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          ) : undefined
+        }
+        value={localSearch}
+        onChange={(e) => setLocalSearch(e.target.value)}
+        placeholder="Search by name or student ID..."
+      />
 
       {/* Grade dropdown */}
-      <select
+      <Select
+        aria-label="Grade"
+        size="sm"
+        className="w-36"
         value={filters.gradeLevel ?? ''}
-        onChange={(e) => setGradeLevel(e.target.value || null)}
+        onChange={(v) => setGradeLevel(v || null)}
         disabled={gradeOptionsLoading}
-        className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30 disabled:opacity-60 disabled:cursor-not-allowed"
-        style={inputStyle}
-      >
-        <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
-        {!gradeOptionsLoading && gradeOptions.map((g) => (
-          <option key={g.value} value={g.value}>{g.label}</option>
-        ))}
-      </select>
+        loading={gradeOptionsLoading}
+        placeholder="All Grades"
+        options={gradeOptionsLoading ? [] : [{ value: '', label: 'All Grades' }, ...gradeOptions]}
+      />
 
       {/* Status dropdown */}
-      <select
+      <Select
+        aria-label="Status"
+        size="sm"
+        className="w-36"
         value={filters.status ?? ''}
-        onChange={(e) => setStatus((e.target.value || null) as StudentStatus | null)}
-        className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/30"
-        style={inputStyle}
-      >
-        <option value="">All Status</option>
-        {STATUS_OPTIONS.map((s) => (
-          <option key={s.value} value={s.value}>{s.label}</option>
-        ))}
-      </select>
+        onChange={(v) => setStatus((v || null) as StudentStatus | null)}
+        options={[{ value: '', label: 'All Status' }, ...STATUS_OPTIONS]}
+      />
 
       {/* Clear */}
       {isActiveFilters && (
         <button
           onClick={handleClearFilters}
-          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[#1D9E75] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
           Clear
@@ -187,20 +172,16 @@ export function StudentsFilterRow({
 
       {/* Export CSV */}
       <div className="ml-auto">
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={onExport}
           disabled={isExporting || !hasAcademicYear}
           aria-label="Export students as CSV"
-          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
-          style={{
-            background: 'var(--v2-bg-elevated)',
-            borderColor: 'var(--v2-border-default)',
-            color: 'var(--v2-text-secondary)',
-          }}
         >
-          {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+          {isExporting ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : <Download className="w-3 h-3 mr-1.5" />}
           Export CSV
-        </button>
+        </Button>
       </div>
     </div>
   )
