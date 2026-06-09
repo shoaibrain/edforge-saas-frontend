@@ -17,7 +17,7 @@ import { toast } from 'sonner'
 import type { FeeStructure } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../layouts/FinanceLayout'
-import { Button } from '@edforge/ui'
+import { Button, Select } from '@edforge/ui'
 import {
   Search,
   Users,
@@ -553,23 +553,17 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                    Academic Year *
-                  </label>
-                  <select
-                    value={academicYear}
-                    onChange={(e) => setAcademicYear(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                  >
-                    <option value="">Select academic year</option>
-                    {academicYears.map((y) => (
-                      <option key={y.yearId} value={y.name}>
-                        {y.name}{y.isCurrent ? ' (Current)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label="Academic Year"
+                  required
+                  value={academicYear}
+                  onChange={(v) => setAcademicYear(v ?? '')}
+                  placeholder="Select academic year"
+                  options={academicYears.map((y) => ({
+                    value: y.name,
+                    label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
+                  }))}
+                />
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
                     Due Date *
