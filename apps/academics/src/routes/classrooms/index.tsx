@@ -67,7 +67,7 @@ import { GradeOverview } from '../grades/overview'
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
-import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, Button, Select } from '@edforge/ui'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 
 // ============================================================================
@@ -283,7 +283,10 @@ function GradebookTab() {
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
   const gradePerms = useResourcePermissions('grades')
-  const [analyticsCollapsed, setAnalyticsCollapsed] = useState(false)
+  // Default-collapsed: the gradebook grid is the primary surface; analytics is
+  // opt-in so the page doesn't open with a tall dashboard pushing the grid below
+  // the fold.
+  const [analyticsCollapsed, setAnalyticsCollapsed] = useState(true)
 
   // --- Grade Analytics data ---
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -361,63 +364,38 @@ function GradebookTab() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Grade Analytics (collapsible) */}
-      <div>
-        <button
-          type="button"
-          onClick={() => setAnalyticsCollapsed(!analyticsCollapsed)}
-          className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors mb-3"
-        >
-          <BarChart3 className="w-4 h-4" />
-          Grade Analytics
-          <ChevronDown className={`w-4 h-4 transition-transform ${analyticsCollapsed ? '-rotate-90' : ''}`} />
-        </button>
-        {!analyticsCollapsed && (
-          <GradeOverview
-            schoolId={schoolId}
-            academicYearId={currentYear.yearId}
-            policyWeights={defaultPolicy?.categoryWeights}
-          />
-        )}
-      </div>
-
-      {/* Divider */}
-      {!analyticsCollapsed && <div className="border-t border-border-secondary" />}
-
-      {/* Section & Term Selectors */}
+    <div className="space-y-5">
+      {/* Control toolbar: section / term selectors + actions + analytics toggle */}
       <div className="flex items-center gap-3 flex-wrap">
         {!sectionsLoading && sections.length === 0 ? (
           <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-64">
             No sections assigned. Contact your administrator.
           </div>
         ) : (
-          <select
+          <Select
+            className="min-w-64"
             value={selectedSectionId ?? ''}
-            onChange={(e) => setSelectedSectionId(e.target.value || null)}
+            onChange={(v) => setSelectedSectionId(v || null)}
             disabled={sectionsLoading}
-            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] min-w-64"
-          >
-            <option value="">Select a section...</option>
-            {sections.map((s) => (
-              <option key={s.sectionId} value={s.sectionId}>
-                {s.courseName || s.courseCode || 'Section'} - {s.sectionNumber}
-              </option>
-            ))}
-          </select>
+            placeholder="Select a section..."
+            options={sections.map((s) => ({
+              value: s.sectionId,
+              label: `${s.courseName || s.courseCode || 'Section'} - ${s.sectionNumber}`,
+            }))}
+          />
         )}
 
         {gradingPeriods && gradingPeriods.length > 0 && (
-          <select
+          <Select
+            className="min-w-48"
             value={selectedTermId ?? ''}
-            onChange={(e) => setSelectedTermId(e.target.value || null)}
-            className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-          >
-            <option value="">Select grading period...</option>
-            {gradingPeriods.map((gp: { periodId: string; name: string }) => (
-              <option key={gp.periodId} value={gp.periodId}>{gp.name}</option>
-            ))}
-          </select>
+            onChange={(v) => setSelectedTermId(v || null)}
+            placeholder="Select grading period..."
+            options={gradingPeriods.map((gp) => ({
+              value: gp.termId ?? gp.periodId ?? '',
+              label: gp.name,
+            }))}
+          />
         )}
 
         {selectedSectionId && (
@@ -427,30 +405,53 @@ function GradebookTab() {
               <span className="text-xs text-caramel-300">Select a grading period</span>
             )}
             {gradePerms.create && (
-              <button
-                type="button"
+              <Button
+                size="sm"
                 onClick={() => setShowBulkModal(true)}
                 disabled={!effectiveTermId || !currentYear?.yearId}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Record
-              </button>
+              </Button>
             )}
             {gradePerms.edit && (
-              <button
-                type="button"
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={() => setShowFinalize(true)}
                 disabled={!effectiveTermId || !currentYear?.yearId}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-text-secondary border border-border-primary rounded-lg hover:bg-surface-tertiary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Lock className="w-3.5 h-3.5" />
                 Finalize
-              </button>
+              </Button>
             )}
           </>
         )}
+
+        {/* Analytics toggle — right-aligned, opt-in */}
+        <button
+          type="button"
+          onClick={() => setAnalyticsCollapsed(!analyticsCollapsed)}
+          className="ml-auto flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+          aria-expanded={!analyticsCollapsed}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Grade Analytics
+          <ChevronDown className={`w-4 h-4 transition-transform ${analyticsCollapsed ? '-rotate-90' : ''}`} />
+        </button>
       </div>
+
+      {/* Grade Analytics (collapsible, opt-in) */}
+      {!analyticsCollapsed && (
+        <>
+          <GradeOverview
+            schoolId={schoolId}
+            academicYearId={currentYear.yearId}
+            policyWeights={defaultPolicy?.categoryWeights}
+          />
+          <div className="border-t border-border-secondary" />
+        </>
+      )}
 
       {/* Warnings */}
       {hasNoPolicies && selectedSectionId && (

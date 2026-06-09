@@ -236,9 +236,10 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
             <option value="">Select grading period...</option>
-            {gradingPeriods.map((gp: { periodId: string; name: string }) => (
-              <option key={gp.periodId} value={gp.periodId}>{gp.name}</option>
-            ))}
+            {gradingPeriods.map((gp) => {
+              const id = gp.termId ?? gp.periodId ?? ''
+              return <option key={id} value={id}>{gp.name}</option>
+            })}
           </select>
         )}
         {gradePerms.create && (

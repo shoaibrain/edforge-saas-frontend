@@ -9,6 +9,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { GraduationCap, Lock, Plus, FileText } from 'lucide-react'
 import { useRecordGrade } from '../../hooks/useGrades'
+import { UserAvatar } from '../common/UserAvatar'
 import type { GradeRecord } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
@@ -289,19 +290,19 @@ export function GradebookGrid({
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border-secondary">
+    <div className="overflow-auto max-h-[calc(100vh-15rem)] rounded-xl border border-border-secondary">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-surface-secondary">
-            {/* Frozen student column */}
-            <th className="sticky left-0 z-10 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
+            {/* Frozen student column (sticky on both axes — top-left corner) */}
+            <th className="sticky left-0 top-0 z-20 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
               Student
             </th>
             {/* Assignment columns with tooltips (Ticket 3.1) */}
             {assignmentColumns.map((col) => (
               <th
                 key={col.name}
-                className="px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
+                className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
                 title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
               >
                 <div className="truncate max-w-32">{col.name}</div>
@@ -312,7 +313,7 @@ export function GradebookGrid({
             ))}
             {/* Add Assignment column */}
             {canEdit && onAddAssignment && (
-              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-16">
+              <th className="sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center border-r border-border-secondary min-w-16">
                 <button
                   type="button"
                   onClick={onAddAssignment}
@@ -324,10 +325,10 @@ export function GradebookGrid({
               </th>
             )}
             {/* Overall Grade */}
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
+            <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
               Overall
             </th>
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
+            <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
               Letter
             </th>
           </tr>
@@ -340,19 +341,24 @@ export function GradebookGrid({
             return (
               <tr key={student.studentId} className="group hover:bg-surface-secondary/50 transition-colors">
                 {/* Student name */}
-                <td className="sticky left-0 z-10 bg-surface-primary px-4 py-3 border-r border-border-secondary">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-text-primary">
+                <td className="sticky left-0 z-10 bg-surface-primary px-4 py-2.5 border-r border-border-secondary">
+                  <div className="flex items-center gap-2.5">
+                    <UserAvatar
+                      userId={student.studentId}
+                      userName={student.studentName}
+                      size="sm"
+                    />
+                    <span className="font-medium text-text-primary truncate">
                       {student.studentName}
                     </span>
                     {isFinal && (
-                      <Lock className="w-3 h-3 text-text-tertiary" aria-label="Grade finalized" />
+                      <Lock className="w-3 h-3 text-text-tertiary flex-shrink-0" aria-label="Grade finalized" />
                     )}
                     {onViewReportCard && (
                       <button
                         type="button"
                         onClick={() => onViewReportCard(student.studentId, student.studentName)}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--action-secondary-fg))] transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--action-secondary-fg))] transition-all flex-shrink-0"
                         title="View Report Card"
                       >
                         <FileText className="w-3.5 h-3.5" />

@@ -2,12 +2,15 @@
  * AssignmentEditor Component
  *
  * Slide-over panel for creating assignments and optionally entering grades.
- * Supports bulk paste from spreadsheets (tab-separated values).
+ * Score entry mirrors the exams Scores-tab pattern (avatar rows, `/ max`
+ * inputs, name search). Supports bulk paste from spreadsheets (TSV).
  */
 
 import { useState, useMemo } from 'react'
-import { X, Loader2, Save, Plus, ClipboardPaste, BarChart2 } from 'lucide-react'
+import { X, Loader2, Save, Plus, ClipboardPaste, BarChart2, Search } from 'lucide-react'
+import { Button, Field, Input, Select, Textarea } from '@edforge/ui'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
+import { ScoreEntryRow } from './ScoreEntryRow'
 import type { AssessmentCategory } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
@@ -37,6 +40,12 @@ const DEFAULT_CATEGORY_OPTIONS = [
   { value: 'other', label: 'Other' },
 ]
 
+const PURPOSE_OPTIONS = [
+  { value: '', label: 'Auto-detect' },
+  { value: 'formative', label: 'Formative' },
+  { value: 'summative', label: 'Summative' },
+]
+
 // ============================================================================
 // COMPONENT
 // ============================================================================
@@ -62,6 +71,7 @@ export function AssignmentEditor({
   const [dueDate, setDueDate] = useState('')
   const [showBulkPaste, setShowBulkPaste] = useState(false)
   const [pasteText, setPasteText] = useState('')
+  const [search, setSearch] = useState('')
 
   // Per-student scores
   const [scores, setScores] = useState<Record<string, string>>({})
@@ -72,10 +82,14 @@ export function AssignmentEditor({
 
   // Count filled scores
   const filledCount = useMemo(() => {
-    return Object.values(scores).filter(
-      (v) => v !== '' && !isNaN(Number(v))
-    ).length
+    return Object.values(scores).filter((v) => v !== '' && !isNaN(Number(v))).length
   }, [scores])
+
+  const filteredStudents = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return students
+    return students.filter((s) => (s.studentName || '').toLowerCase().includes(q))
+  }, [students, search])
 
   // Statistics from entered scores
   const stats = useMemo(() => {
@@ -125,7 +139,7 @@ export function AssignmentEditor({
       const student = students.find(
         (s) =>
           s.studentId === nameOrId ||
-          (s.studentName?.toLowerCase() === nameOrId.toLowerCase())
+          s.studentName?.toLowerCase() === nameOrId.toLowerCase()
       )
       if (student && !isNaN(Number(score))) {
         newScores[student.studentId] = score
@@ -204,12 +218,10 @@ export function AssignmentEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-[rgb(var(--background-overlay)/0.50)]">
-      <div className="bg-surface-primary w-full max-w-md h-full shadow-xl flex flex-col overflow-hidden border-l border-border-secondary">
+      <div className="bg-surface-primary w-full max-w-lg h-full shadow-xl flex flex-col overflow-hidden border-l border-border-secondary">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-secondary">
-          <h3 className="text-lg font-semibold text-text-primary">
-            New Assignment
-          </h3>
+          <h3 className="text-lg font-semibold text-text-primary">New Assignment</h3>
           <button
             type="button"
             onClick={onClose}
@@ -223,76 +235,47 @@ export function AssignmentEditor({
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Assignment Details */}
           <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Assignment Name *
-              </label>
-              <input
-                type="text"
+            <Field label="Assignment Name" required>
+              <Input
                 value={assignmentName}
                 onChange={(e) => setAssignmentName(e.target.value)}
                 placeholder="e.g., Chapter 5 Quiz"
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
-            </div>
+            </Field>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-1">
-                  Category
-                </label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                >
-                  {displayCategories.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-1">
-                  Points Possible
-                </label>
-                <input
+              <Select
+                label="Category"
+                optionalText={null}
+                value={categoryId}
+                onChange={(v) => setCategoryId(v ?? 'homework')}
+                options={displayCategories}
+              />
+              <Field label="Points Possible" optionalText={null}>
+                <Input
                   type="number"
                   value={possiblePoints}
                   onChange={(e) => setPossiblePoints(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   min={1}
                 />
-              </div>
+              </Field>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-1">
-                  Assessment Purpose
-                </label>
-                <select
-                  value={assessmentPurpose}
-                  onChange={(e) => setAssessmentPurpose(e.target.value as AssessmentCategory | '')}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                >
-                  <option value="">Auto-detect</option>
-                  <option value="formative">Formative</option>
-                  <option value="summative">Summative</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-1">
-                  Due Date
-                </label>
-                <input
+              <Select
+                label="Assessment Purpose"
+                optionalText={null}
+                value={assessmentPurpose}
+                onChange={(v) => setAssessmentPurpose((v ?? '') as AssessmentCategory | '')}
+                options={PURPOSE_OPTIONS}
+              />
+              <Field label="Due Date" optionalText={null}>
+                <Input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                 />
-              </div>
+              </Field>
             </div>
           </div>
 
@@ -333,34 +316,30 @@ export function AssignmentEditor({
           {/* Bulk Paste */}
           {showBulkPaste ? (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-primary">
-                Paste Scores (Name{'\t'}Score per line)
-              </label>
-              <textarea
-                value={pasteText}
-                onChange={(e) => setPasteText(e.target.value)}
-                placeholder={"John Smith\t95\nJane Doe\t88"}
-                rows={6}
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] font-mono"
-              />
+              <Field label={`Paste Scores (Name${'\t'}Score per line)`} optionalText={null}>
+                <Textarea
+                  value={pasteText}
+                  onChange={(e) => setPasteText(e.target.value)}
+                  placeholder={'John Smith\t95\nJane Doe\t88'}
+                  rows={6}
+                  className="font-mono"
+                />
+              </Field>
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleBulkPaste}
-                  className="flex-1 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
-                >
+                <Button type="button" size="sm" onClick={handleBulkPaste}>
                   Apply
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  size="sm"
+                  variant="ghost"
                   onClick={() => {
                     setShowBulkPaste(false)
                     setPasteText('')
                   }}
-                  className="px-3 py-1.5 text-xs font-medium text-text-secondary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -377,46 +356,47 @@ export function AssignmentEditor({
           {/* Student Scores */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-text-primary">
-                Student Scores
-              </span>
-              <span className="text-xs text-text-tertiary">
+              <span className="text-sm font-medium text-text-primary">Student Scores</span>
+              <span className="text-xs text-text-tertiary tabular-nums">
                 {filledCount} / {students.length} entered
               </span>
             </div>
+
+            {students.length > 8 && (
+              <div className="mb-2">
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search students by name…"
+                  prefix={<Search className="w-4 h-4" />}
+                />
+              </div>
+            )}
 
             {students.length === 0 ? (
               <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center justify-between px-3 py-2.5 animate-pulse">
-                    <div className="h-4 w-28 bg-surface-hover rounded" />
-                    <div className="h-7 w-20 bg-surface-hover rounded" />
+                    <div className="h-7 w-32 bg-surface-hover rounded" />
+                    <div className="h-8 w-20 bg-surface-hover rounded" />
                   </div>
                 ))}
               </div>
+            ) : filteredStudents.length === 0 ? (
+              <div className="border border-border-secondary rounded-lg px-4 py-8 text-center text-sm text-text-tertiary">
+                No students match “{search}”.
+              </div>
             ) : (
               <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary max-h-72 overflow-y-auto">
-                {students.map((student) => (
-                  <div
+                {filteredStudents.map((student) => (
+                  <ScoreEntryRow
                     key={student.studentId}
-                    className="flex items-center justify-between px-3 py-2"
-                  >
-                    <span className="text-sm text-text-primary truncate mr-2">
-                      {student.studentName || student.studentNumber || `Student`}
-                    </span>
-                    <input
-                      type="number"
-                      value={scores[student.studentId] ?? ''}
-                      onChange={(e) =>
-                        handleScoreChange(student.studentId, e.target.value)
-                      }
-                      placeholder="—"
-                      className="w-20 px-2 py-1 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary text-right focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                      min={0}
-                      max={possiblePts * 1.5}
-                      step="any"
-                    />
-                  </div>
+                    studentId={student.studentId}
+                    studentName={student.studentName || student.studentNumber || 'Student'}
+                    value={scores[student.studentId] ?? ''}
+                    onChange={(v) => handleScoreChange(student.studentId, v)}
+                    maxPoints={possiblePts}
+                  />
                 ))}
               </div>
             )}
@@ -425,36 +405,31 @@ export function AssignmentEditor({
 
         {/* Footer */}
         <div className="flex items-center justify-between px-5 py-4 border-t border-border-secondary">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={() => handleSubmit(true)}
             disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || students.length === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
             Create Assignment
-          </button>
+          </Button>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
-            >
+            <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => handleSubmit(false)}
               disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || filledCount === 0}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4 mr-2" />
               )}
               Save with Scores ({filledCount})
-            </button>
+            </Button>
           </div>
         </div>
       </div>
