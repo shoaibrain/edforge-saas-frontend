@@ -1,6 +1,6 @@
 // ... imports
-import { useState, Fragment } from 'react'
-import { Navigate, Link } from '@tanstack/react-router'
+import { useState, useMemo, Fragment } from 'react'
+import { Navigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -10,16 +10,17 @@ import {
   Search,
   Check,
   X,
-  Edit,
   UserPlus,
   ChevronRight,
 } from 'lucide-react'
+import { Avatar, TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { ROLE_PERMISSIONS } from '@edforge/abac'
 import type { SchoolRole } from '@edforge/types'
 import { usersService } from '@/services/users.service'
+import type { UserResponseDto } from '@/services/users.service'
 import AssignUserModal from '@/components/modals/AssignUserModal'
 import {
   SettingsPageHeader,
@@ -220,9 +221,13 @@ function PermissionMatrix({ selectedRole }: { selectedRole: SchoolRole }) {
                       {MATRIX_ACTIONS.map((action) => (
                         <td key={action} className="text-center py-2.5 px-2">
                           {(actions as readonly string[]).includes(action) ? (
-                            <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] mx-auto" />
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[rgb(var(--state-success-bg)/0.6)] mx-auto">
+                              <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" strokeWidth={3} />
+                            </span>
                           ) : (
-                            <X className="w-4 h-4 text-[rgb(var(--text-tertiary))] mx-auto opacity-20" />
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[rgb(var(--state-danger-bg)/0.45)] mx-auto">
+                              <X className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" strokeWidth={3} />
+                            </span>
                           )}
                         </td>
                       ))}
@@ -256,6 +261,50 @@ export default function RBACSecurityPage() {
     queryFn: () => usersService.listUsers({ limit: 100 }),
     staleTime: 5 * 60 * 1000,
   })
+
+  // User Assignments table columns. No row action: this view lists Cognito
+  // system-access accounts, and Staff↔User linking is future work — so there
+  // is intentionally no per-row edit affordance.
+  const userColumns: ColumnDef<UserResponseDto, unknown>[] = useMemo(() => [
+    {
+      id: 'user',
+      accessorFn: (u) => `${u.firstName} ${u.lastName} ${u.email}`,
+      header: 'User',
+      cell: ({ row }) => {
+        const u = row.original
+        const fullName = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || u.email
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar name={fullName} size="sm" className="shrink-0" />
+            <div className="min-w-0">
+              <p className="font-medium text-[rgb(var(--text-primary))] truncate">{u.firstName} {u.lastName}</p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{u.email}</p>
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'globalRole',
+      header: 'Role',
+      size: 170,
+      cell: ({ row }) => {
+        const isAdmin = row.original.globalRole === 'TenantAdmin'
+        return (
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              isAdmin
+                ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-400'
+                : 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]'
+            }`}
+          >
+            <Shield className="w-3 h-3" />
+            {isAdmin ? 'Tenant Admin' : 'Standard User'}
+          </span>
+        )
+      },
+    },
+  ], [])
 
   if (!user) {
     return <Navigate to="/login" />
@@ -411,39 +460,21 @@ export default function RBACSecurityPage() {
                   </div>
 
                   {/* User List */}
-                  <div className="space-y-1">
-                    {isLoadingUsers ? (
-                      <div className="py-8 text-center text-[rgb(var(--text-secondary))]">Loading users...</div>
-                    ) : filteredUsers.length === 0 ? (
-                      <div className="py-8 text-center text-[rgb(var(--text-secondary))]">No users found.</div>
-                    ) : (
-                      filteredUsers.map((user) => (
-                        <div key={user.userId} className="flex items-center justify-between p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))] flex items-center justify-center text-[rgb(var(--action-primary-fg))] font-medium">
-                              {user.firstName?.charAt(0) || user.email.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="font-medium text-[rgb(var(--text-primary))]">{user.firstName} {user.lastName}</p>
-                              <p className="text-sm text-[rgb(var(--text-tertiary))]">{user.email}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                              {user.globalRole === 'TenantAdmin' ? 'Tenant Admin' : 'Standard User'}
-                            </p>
-                            <Link
-                              to="/people/$"
-                              params={{ _splat: `staff/${user.userId}` }}
-                              className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Link>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
+                  <TanstackDataTable
+                    columns={userColumns}
+                    data={filteredUsers}
+                    getRowId={(u) => u.userId}
+                    isLoading={isLoadingUsers}
+                    enableSorting
+                    pagination={{ pageSize: 10 }}
+                    emptyState={{
+                      icon: <Users className="w-10 h-10" />,
+                      title: 'No users found',
+                      description: searchQuery
+                        ? 'Try adjusting your search.'
+                        : 'Assign a user to grant system access.',
+                    }}
+                  />
                 </SettingsSection>
               )}
 
