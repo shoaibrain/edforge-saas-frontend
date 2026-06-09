@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Download } from 'lucide-react'
+import { Select } from '@edforge/ui'
 import { tenantService } from '@/services/tenant.service'
 
 // ============================================================================
@@ -72,18 +73,21 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">All configuration changes for this school</p>
         </div>
         <div className="flex items-center gap-2">
-          <select
-            className="text-xs px-2.5 py-1.5 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] focus:outline-none"
+          <Select
+            aria-label="Filter by action"
+            size="sm"
+            className="w-40"
             value={actionFilter}
-            onChange={e => setActionFilter(e.target.value as ActionFilter)}
-          >
-            <option value="all">All Actions</option>
-            <option value="create">Create</option>
-            <option value="update">Update</option>
-            <option value="delete">Delete</option>
-            <option value="status_change">Status Change</option>
-            <option value="version_change">Version Change</option>
-          </select>
+            onChange={v => { if (v) setActionFilter(v as ActionFilter) }}
+            options={[
+              { value: 'all', label: 'All Actions' },
+              { value: 'create', label: 'Create' },
+              { value: 'update', label: 'Update' },
+              { value: 'delete', label: 'Delete' },
+              { value: 'status_change', label: 'Status Change' },
+              { value: 'version_change', label: 'Version Change' },
+            ]}
+          />
           <button
             onClick={handleExportCSV}
             disabled={entries.length === 0}
