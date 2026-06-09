@@ -8,9 +8,10 @@
  * Sprint 5 — Rostering & Attendance
  */
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePermission } from '@edforge/abac'
+import { Select } from '@edforge/ui'
 import {
   ClipboardCheck,
   Loader2,
@@ -130,7 +131,7 @@ function TabBar({
               borderRadius: 6,
               fontSize: 11,
               fontWeight: 500,
-              color: isActive ? '#378ADD' : 'var(--v2-text-hint, #4a5068)',
+              color: isActive ? '#378ADD' : 'rgb(var(--text-disabled))',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -209,27 +210,18 @@ function SectionSelector({
   }
 
   return (
-    <div className="relative">
-      <select
-        value={selectedId ?? ''}
-        onChange={(e) => onSelect(e.target.value || null)}
-        disabled={isLoading}
-        className="w-full max-w-xs px-3 py-2.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50"
-      >
-        <option value="">Select a section...</option>
-        {sections.map((s) => (
-          <option key={s.sectionId} value={s.sectionId}>
-            {completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}
-            {s.courseName || s.courseCode || 'Section'} - {s.sectionNumber}
-          </option>
-        ))}
-      </select>
-      {isLoading && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <Loader2 className="w-4 h-4 animate-spin text-text-tertiary" />
-        </div>
-      )}
-    </div>
+    <Select
+      className="w-full max-w-xs"
+      value={selectedId ?? ''}
+      onChange={(v) => onSelect(v || null)}
+      disabled={isLoading}
+      loading={isLoading}
+      placeholder="Select a section..."
+      options={sections.map((s) => ({
+        value: s.sectionId,
+        label: `${completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}${s.courseName || s.courseCode || 'Section'} - ${s.sectionNumber}`,
+      }))}
+    />
   )
 }
 
@@ -287,7 +279,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   // ABAC: check if user can create/edit attendance
   const canCreateAttendance = usePermission('create', 'attendance')
-  const exportPortalRef = useRef<HTMLDivElement>(null)
 
   // currentYearId / currentYearName are guaranteed non-empty by the gate in
   // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
@@ -442,18 +433,16 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
               <ClipboardCheck style={{ width: 16, height: 16, color: '#EF9F27' }} />
             </div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px', color: 'var(--v2-text-primary, #e8eaf0)' }}>Attendance</div>
-              <div style={{ fontSize: 10, color: 'var(--v2-text-hint, #4a5068)' }}>
+              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px', color: 'rgb(var(--text-primary))' }}>Attendance</div>
+              <div style={{ fontSize: 10, color: 'rgb(var(--text-disabled))' }}>
                 Record and review attendance by class section · {currentYearName || 'Academic Year'}
               </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 10, color: 'var(--v2-text-ghost, #2a3045)' }}>
+            <span style={{ fontSize: 10, color: 'rgb(var(--text-disabled))' }}>
               Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
-            {/* Portal target for dashboard Export button */}
-            <div ref={exportPortalRef} />
           </div>
         </div>
 
@@ -500,7 +489,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                 schoolId={schoolId}
                 academicYearId={currentYearId}
                 currentDate={selectedDate}
-                exportPortalRef={exportPortalRef}
               />
             )}
 

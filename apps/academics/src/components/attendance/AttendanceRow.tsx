@@ -14,6 +14,7 @@
 
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { MessageSquare, Edit2, X } from 'lucide-react'
+import { Select, Input } from '@edforge/ui'
 import { StatusBadge } from './StatusBadge'
 import type { AttendanceStatus } from '../../services/academics.service'
 
@@ -261,30 +262,27 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
       {/* Task 4.5: Absence Reason Selector */}
       {showReasonSelector && (
         <div className="px-4 pb-2">
-          <select
-            value={excuseType || ''}
-            onChange={(e) => onExcuseTypeChange?.(e.target.value)}
-            className="w-full max-w-xs px-3 py-1.5 text-xs bg-surface-secondary border border-border-secondary rounded-lg text-text-primary appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
+          <Select
+            className="max-w-xs"
+            size="sm"
             aria-label="Absence reason"
-          >
-            {EXCUSE_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </select>
+            value={excuseType || ''}
+            onChange={(v) => onExcuseTypeChange?.(v ?? '')}
+            clearable
+            placeholder="Select reason..."
+            options={EXCUSE_TYPES.filter((t) => t.value !== '')}
+          />
         </div>
       )}
 
       {/* Notes Input */}
       {showNotes && !isViewMode && (
         <div className="px-4 pb-3">
-          <input
+          <Input
             type="text"
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
             placeholder="Add a note..."
-            className="w-full px-3 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
             aria-label="Attendance note"
           />
         </div>
