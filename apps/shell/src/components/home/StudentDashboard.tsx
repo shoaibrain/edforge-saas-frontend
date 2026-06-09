@@ -92,7 +92,6 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
 
   return (
     <motion.div
-      data-page="home-v2"
       className="flex flex-col"
       style={{
         gap: '16px',

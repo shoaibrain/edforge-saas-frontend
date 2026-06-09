@@ -19,7 +19,7 @@
 }
 
 .v2-bar-fill {
-  animation: v2-bar-fill var(--v2-bar-fill-duration, 600ms) ease-out forwards;
+  animation: v2-bar-fill 600ms ease-out forwards;
 }
 
 /* Respect reduced motion */

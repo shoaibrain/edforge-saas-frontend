@@ -120,7 +120,7 @@ export function Overview() {
   }, [staff])
 
   return (
-    <Container data-v2 size="full" padding="lg" className="overflow-auto py-6">
+    <Container size="full" padding="lg" className="overflow-auto py-6">
       {/* PAGE HEADER */}
       <PageHeader
         className="mb-2"

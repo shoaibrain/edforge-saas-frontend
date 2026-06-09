@@ -317,7 +317,7 @@ export default function StaffPage() {
   ) : undefined
 
   return (
-    <Container data-v2 size="full" padding="lg" className="overflow-auto py-6">
+    <Container size="full" padding="lg" className="overflow-auto py-6">
       {/* PAGE HEADER */}
       <PageHeader
         className="mb-2"

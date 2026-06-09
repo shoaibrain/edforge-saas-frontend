@@ -765,7 +765,7 @@ export default function PaymentsPage() {
   }
 
   return (
-    <div data-v2 className="p-6 space-y-5">
+    <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
         icon={CreditCard}

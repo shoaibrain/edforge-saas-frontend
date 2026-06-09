@@ -36,7 +36,7 @@ export default function StudentHomePage() {
   const schoolId = activeSchoolId ?? studentProfile.schoolId
 
   return (
-    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto" data-v2>
+    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto">
       <WidgetErrorBoundaryV2>
         <HeroSection
           name={studentProfile.firstName}

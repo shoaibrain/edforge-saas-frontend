@@ -195,7 +195,7 @@ export default function FeePaymentPage() {
   // ===========================================================================
 
   return (
-    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto" data-v2>
+    <div className="px-7 py-8 space-y-10 max-w-5xl mx-auto">
       <ContentSection
         heading={t('title')}
         subheading={`${activeChild.firstName} — ${t('description')}`}
