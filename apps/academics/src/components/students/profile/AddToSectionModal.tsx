@@ -9,7 +9,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Loader2, BookOpen } from 'lucide-react'
-import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { Modal, ModalFooter, Button, Select } from '@edforge/ui'
 import {
   useSections,
   flattenSectionPages,
@@ -39,7 +39,7 @@ export function AddToSectionModal({
   student,
 }: AddToSectionModalProps) {
   const schoolId = useActiveSchoolId() || ''
-  const selectRef = useRef<HTMLSelectElement>(null)
+  const selectRef = useRef<HTMLButtonElement>(null)
   const enrollStudentMutation = useEnrollStudent()
 
   const [selectedSectionId, setSelectedSectionId] = useState('')
@@ -127,45 +127,26 @@ export function AddToSectionModal({
 
         {/* Section selector */}
         <div>
-          <label
-            htmlFor="sectionId"
-            className="block text-sm font-medium text-text-primary mb-1.5"
-          >
-            Section <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <select
-            id="sectionId"
+          <Select
+            controlId="sectionId"
             ref={selectRef}
+            label="Section"
+            required
             value={selectedSectionId}
-            onChange={(e) => {
-              setSelectedSectionId(e.target.value)
+            onChange={(v) => {
+              setSelectedSectionId(v ?? '')
               setError('')
             }}
             disabled={!hasActiveEnrollment || enrollStudentMutation.isPending}
-            className={`
-              w-full px-3 py-2 rounded-lg border
-              bg-surface-secondary text-text-primary
-              focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-              transition-colors disabled:opacity-50
-              ${error ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-            `}
-          >
-            <option value="">Select a section...</option>
-            {sections.map((section: any) => (
-              <option key={section.sectionId} value={section.sectionId}>
-                {section.sectionName || section.name}
-                {section.courseName ? ` — ${section.courseName}` : ''}
-                {section.primaryTeacherName
-                  ? ` (${section.primaryTeacherName})`
-                  : ''}
-              </option>
-            ))}
-          </select>
-          {error && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">{error}</p>
-          )}
+            error={error || undefined}
+            placeholder="Select a section..."
+            options={sections.map((section: any) => ({
+              value: section.sectionId,
+              label: `${section.sectionName || section.name}${section.courseName ? ` — ${section.courseName}` : ''}${section.primaryTeacherName ? ` (${section.primaryTeacherName})` : ''}`,
+            }))}
+          />
           {sections.length === 0 && hasActiveEnrollment && (
-            <p className="mt-1 text-xs text-text-tertiary">
+            <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
               No sections found. Create sections in Scheduling first.
             </p>
           )}
