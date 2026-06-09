@@ -37,12 +37,13 @@ Branch `claude/students-table-enhancement` (cut from `main`) in **both** repos.
 - **Sprint 1 — table re-architecture** (`apps/academics`): `GradeChip` (numeric-aware sort via `@edforge/types gradeSort` — fixes the `"10" < "2"` regression), `AttendanceTrend` cell (degraded: at-risk rate + trend; header stays "Attendance"), `GuardianCell` (primary-on-top stacked avatars + brand ring, `+N`, portal/pickup badges, **keyboard popover**, empty state), `StudentLocationCell` + shared `formatStudentLocation`/`isNepalAddress` util, ABAC gating (`guardians.view` / `students.view`), responsive visibility (Columns menu; Enrolled xl-only, Guardian/Location < lg via synchronous `matchMedia` initial), `TableSkeleton` resynced + migrated off `--v2-*`. 15 cell/util tests.
 - **D-8 — local DiceBear** (`apps/academics/src/lib/avatar.ts`): `@dicebear/core` + `@dicebear/collection` (9.4.2, pinned-compatible) generate `data:` URIs client-side — no `api.dicebear.com` fetch (resilient on filtered school networks), memo-cached; `UserAvatar` gains an explicit `seed` prop for collision-resistant guardian avatars.
 - **D-1 — slim list DTO** (backend `edforge`): `guardianListItemSchema` + `studentListItemSchema`; list mapper/service/controller drop guardian PII (email/phone/address/employer/occupation) from `GET /students`; single-student GET keeps full detail. 3 new mapper tests; `nest build academics` clean.
+- **Sprint 2 — real attendance sparkline** (backend + frontend): `GET /academics/attendance/student-trends` batch endpoint (mirrors the alerts fetch; scope-filtered; extracted pure `computeStudentTrendFromRecords`; three-way route registration — route-drift lint passes; nginx prefix-covered; no IAM change). Frontend `getAttendanceStudentTrends` + `useAttendanceStudentTrends` (sorted stable key, page-gated) fetch a 30-day batch for the visible page (≤50) and merge the real daily `series` over the at-risk base → the cell renders a true sparkline. Backend `attendance.service.spec` 41/41 (5 new); frontend hook 3 tests; typecheck + lint clean.
 
 **Not yet done (follow-ups):**
 
-- **Sprint 2** — backend `GET /academics/attendance/student-trends` batch endpoint + `useAttendanceStudentTrends` + real full-roster sparkline (the cell already accepts `series`; wiring pending). Until then non-flagged rows render "—" (honest — see §5).
+- **Per-page-precise trends** — trends currently cover the first 50 displayed rows; exact per-page (20) fetching needs `DataTable` page-state exposure.
 - **Frontend type-tightening** — type list items as `StudentListItemDto` (needs a `@aibrains/shared-types` version bump + publish; runtime already correct since slim ⊂ full).
-- **D-2 drawer parity, resize-reactive visibility (ResizeObserver), e2e/a11y smoke, telemetry, i18n string externalization, realistic fixtures.**
+- **D-2 drawer parity (ATT-TREND-2.4), resize-reactive visibility (ResizeObserver), e2e/a11y smoke, telemetry, i18n string externalization, realistic fixtures.**
 
 ---
 
