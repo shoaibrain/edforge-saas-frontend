@@ -23,7 +23,10 @@ import {
 import {
   TanstackDataTable,
   createActionsColumn,
+  StatusBadge as UiStatusBadge,
+  Select,
   type ColumnDef,
+  type StatusTone,
 } from '@edforge/ui'
 import { UuidBadge } from '@edforge/archetype'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
@@ -64,35 +67,23 @@ const statusOptions = [
 ]
 
 // ============================================================================
-// V2 STATUS BADGE
+// STATUS BADGE — domain status -> semantic tone
 // ============================================================================
 
-const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
-  enrolled: { bg: 'rgba(29, 158, 117, 0.10)', color: '#1D9E75' },
-  active: { bg: 'rgba(29, 158, 117, 0.10)', color: '#1D9E75' },
-  pending: { bg: 'rgba(239, 159, 39, 0.10)', color: '#EF9F27' },
-  withdrawn: { bg: 'rgba(226, 75, 74, 0.10)', color: '#E24B4A' },
-  transferred: { bg: 'rgba(55, 138, 221, 0.10)', color: '#378ADD' },
-  graduated: { bg: 'rgba(127, 119, 221, 0.10)', color: '#7F77DD' },
+const STATUS_TONE: Record<string, StatusTone> = {
+  enrolled: 'success',
+  active: 'success',
+  pending: 'warning',
+  withdrawn: 'danger',
+  transferred: 'info',
+  graduated: 'neutral',
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const style = STATUS_STYLES[status] || { bg: 'rgba(255, 255, 255, 0.06)', color: 'var(--v2-text-hint)' }
   return (
-    <span
-      className="inline-flex"
-      style={{
-        background: style.bg,
-        color: style.color,
-        borderRadius: 10,
-        padding: '2px 8px',
-        fontSize: 10,
-        fontWeight: 500,
-        textTransform: 'capitalize',
-      }}
-    >
+    <UiStatusBadge tone={STATUS_TONE[status] ?? 'neutral'} className="capitalize">
       {status}
-    </span>
+    </UiStatusBadge>
   )
 }
 
@@ -356,37 +347,25 @@ export function EnrollmentTable({
       maxHeight="calc(100vh - 13rem)"
       toolbarExtra={
         <div className="flex items-center gap-2">
-          <select
+          <Select
+            size="sm"
+            className="w-40"
+            clearable
             value={gradeLevel ?? ''}
-            onChange={(e) => onGradeLevelChange(e.target.value || null)}
+            onChange={(v) => onGradeLevelChange(v || null)}
             disabled={gradeOptionsLoading}
-            className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
-            style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              color: 'var(--v2-text-secondary)',
-            }}
-          >
-            <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
-            {!gradeOptionsLoading && gradeLevelOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
+            placeholder={gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}
+            options={gradeOptionsLoading ? [] : gradeLevelOptions}
+          />
+          <Select
+            size="sm"
+            className="w-36"
+            clearable
             value={statusFilter ?? ''}
-            onChange={(e) => onStatusChange(e.target.value || null)}
-            className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none"
-            style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              color: 'var(--v2-text-secondary)',
-            }}
-          >
-            <option value="">All Status</option>
-            {statusOptions.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
+            onChange={(v) => onStatusChange(v || null)}
+            placeholder="All Status"
+            options={statusOptions}
+          />
           {(gradeLevel || statusFilter) && (
             <button
               type="button"
