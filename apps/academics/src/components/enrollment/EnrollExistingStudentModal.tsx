@@ -12,11 +12,11 @@
  */
 
 import { useEffect, useRef, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, GraduationCap } from 'lucide-react'
-import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { Modal, ModalFooter, Button, Field, Input, Select, Checkbox } from '@edforge/ui'
 import { useCreateEnrollment, useAcademicYears } from '../../hooks'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -76,7 +76,7 @@ export function EnrollExistingStudentModal({
   student,
 }: EnrollExistingStudentModalProps) {
   const schoolId = useActiveSchoolId() || ''
-  const firstInputRef = useRef<HTMLSelectElement>(null)
+  const firstFieldRef = useRef<HTMLButtonElement>(null)
   const enrollMutation = useCreateEnrollment()
   const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId || null)
 
@@ -98,6 +98,7 @@ export function EnrollExistingStudentModal({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     setError,
     formState: { errors, isSubmitting, isDirty },
@@ -129,10 +130,10 @@ export function EnrollExistingStudentModal({
     }
   }, [open, student.currentGradeLevel, activeYears.length])
 
-  // Auto-focus first input when modal opens
+  // Auto-focus first field when modal opens
   useEffect(() => {
     if (open) {
-      setTimeout(() => firstInputRef.current?.focus(), 100)
+      setTimeout(() => firstFieldRef.current?.focus(), 100)
     }
   }, [open])
 
@@ -184,15 +185,6 @@ export function EnrollExistingStudentModal({
     }
   })
 
-  const inputClass = (hasError: boolean) => `
-    w-full px-3 py-2 rounded-lg border
-    bg-surface-secondary text-text-primary
-    placeholder:text-text-tertiary
-    focus:outline-none focus:ring-2 focus:ring-accent-primary/20
-    transition-colors
-    ${hasError ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-secondary'}
-  `
-
   return (
     <Modal
       open={open}
@@ -222,182 +214,122 @@ export function EnrollExistingStudentModal({
         </div>
 
         {/* Academic Year */}
-        <div>
-          <label
-            htmlFor="academicYearId"
-            className="block text-sm font-medium text-text-primary mb-1.5"
-          >
-            Academic Year <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-          </label>
-          <select
-            id="academicYearId"
-            {...register('academicYearId')}
-            ref={(e) => {
-              register('academicYearId').ref(e)
-              if (e) firstInputRef.current = e
-            }}
-            className={inputClass(!!errors.academicYearId)}
-            disabled={isSubmitting}
-          >
-            <option value="">Select academic year...</option>
-            {activeYears.map((year: any) => (
-              <option key={year.yearId} value={year.yearId}>
-                {year.name || year.yearName || `${year.startYear}-${year.endYear}`}
-                {year.isCurrent ? ' (Current)' : ''}
-              </option>
-            ))}
-          </select>
-          {errors.academicYearId && (
-            <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
-              {errors.academicYearId.message}
-            </p>
+        <Controller
+          name="academicYearId"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Select
+              ref={firstFieldRef}
+              label="Academic Year"
+              required
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              disabled={isSubmitting}
+              error={fieldState.error?.message}
+              placeholder="Select academic year..."
+              helperText={
+                activeYears.length === 0
+                  ? 'No active academic years found. Activate an academic year in Settings first.'
+                  : undefined
+              }
+              options={activeYears.map((year: any) => ({
+                value: year.yearId,
+                label: `${year.name || year.yearName || `${year.startYear}-${year.endYear}`}${year.isCurrent ? ' (Current)' : ''}`,
+              }))}
+            />
           )}
-          {activeYears.length === 0 && (
-            <p className="mt-1 text-xs text-[rgb(var(--state-warning-fg))]">
-              No active academic years found. Activate an academic year in
-              Settings first.
-            </p>
-          )}
-        </div>
+        />
 
         {/* Entry Date + Grade Level */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="enrollmentDate"
-              className="block text-sm font-medium text-text-primary mb-1.5"
-            >
-              Entry Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <input
-              id="enrollmentDate"
-              type="date"
-              {...register('enrollmentDate')}
-              className={inputClass(!!errors.enrollmentDate)}
-              disabled={isSubmitting}
-            />
-            {errors.enrollmentDate && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
-                {errors.enrollmentDate.message}
-              </p>
+          <Field label="Entry Date" required error={errors.enrollmentDate?.message}>
+            <Input type="date" {...register('enrollmentDate')} disabled={isSubmitting} />
+          </Field>
+          <Controller
+            name="gradeLevel"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Grade Level"
+                required
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                disabled={isSubmitting}
+                error={fieldState.error?.message}
+                placeholder="Select grade..."
+                options={gradeOptions}
+              />
             )}
-          </div>
-          <div>
-            <label
-              htmlFor="gradeLevel"
-              className="block text-sm font-medium text-text-primary mb-1.5"
-            >
-              Grade Level <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <select
-              id="gradeLevel"
-              {...register('gradeLevel')}
-              className={inputClass(!!errors.gradeLevel)}
-              disabled={isSubmitting}
-            >
-              <option value="">Select grade...</option>
-              {gradeOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {errors.gradeLevel && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
-                {errors.gradeLevel.message}
-              </p>
-            )}
-          </div>
+          />
         </div>
 
         {/* Enrollment Type + Entry Type */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="enrollmentType"
-              className="block text-sm font-medium text-text-primary mb-1.5"
-            >
-              Enrollment Type <span className="text-[rgb(var(--state-danger-fg))]">*</span>
-            </label>
-            <select
-              id="enrollmentType"
-              {...register('enrollmentType')}
-              className={inputClass(!!errors.enrollmentType)}
-              disabled={isSubmitting}
-            >
-              {ENROLLMENT_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {errors.enrollmentType && (
-              <p className="mt-1 text-sm text-[rgb(var(--state-danger-fg))]">
-                {errors.enrollmentType.message}
-              </p>
+          <Controller
+            name="enrollmentType"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Enrollment Type"
+                required
+                value={field.value}
+                onChange={field.onChange}
+                disabled={isSubmitting}
+                error={fieldState.error?.message}
+                options={ENROLLMENT_TYPE_OPTIONS}
+              />
             )}
-          </div>
-          <div>
-            <label
-              htmlFor="entryTypeDescriptor"
-              className="block text-sm font-medium text-text-primary mb-1.5"
-            >
-              Entry Type
-            </label>
-            <select
-              id="entryTypeDescriptor"
-              {...register('entryTypeDescriptor')}
-              className={inputClass(!!errors.entryTypeDescriptor)}
-              disabled={isSubmitting}
-            >
-              <option value="">Select (optional)...</option>
-              {ENTRY_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          />
+          <Controller
+            name="entryTypeDescriptor"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Entry Type"
+                optionalText={null}
+                clearable
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                disabled={isSubmitting}
+                placeholder="Select (optional)..."
+                options={ENTRY_TYPE_OPTIONS}
+              />
+            )}
+          />
         </div>
 
         {/* Primary School + Residency */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-3 pt-6">
-            <input
-              id="primarySchool"
-              type="checkbox"
-              {...register('primarySchool')}
-              className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
-              disabled={isSubmitting}
+          <div className="pt-7">
+            <Controller
+              name="primarySchool"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  label="Primary School"
+                  checked={!!field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  disabled={isSubmitting}
+                />
+              )}
             />
-            <label
-              htmlFor="primarySchool"
-              className="text-sm font-medium text-text-primary"
-            >
-              Primary School
-            </label>
           </div>
-          <div>
-            <label
-              htmlFor="residencyStatusDescriptor"
-              className="block text-sm font-medium text-text-primary mb-1.5"
-            >
-              Residency Status
-            </label>
-            <select
-              id="residencyStatusDescriptor"
-              {...register('residencyStatusDescriptor')}
-              className={inputClass(false)}
-              disabled={isSubmitting}
-            >
-              <option value="">Select (optional)...</option>
-              {RESIDENCY_STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Controller
+            name="residencyStatusDescriptor"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Residency Status"
+                optionalText={null}
+                clearable
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                disabled={isSubmitting}
+                placeholder="Select (optional)..."
+                options={RESIDENCY_STATUS_OPTIONS}
+              />
+            )}
+          />
         </div>
 
         {isDirty && (
