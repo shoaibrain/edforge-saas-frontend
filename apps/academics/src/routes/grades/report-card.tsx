@@ -154,11 +154,14 @@ export function ReportCardPage() {
                 className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
                 <option value="">All Terms</option>
-                {gradingPeriods.map((gp: { periodId: string; name: string }) => (
-                  <option key={gp.periodId} value={gp.periodId}>
-                    {gp.name}
-                  </option>
-                ))}
+                {gradingPeriods.map((gp) => {
+                  const id = gp.termId ?? gp.periodId ?? ''
+                  return (
+                    <option key={id} value={id}>
+                      {gp.name}
+                    </option>
+                  )
+                })}
               </select>
             )}
             <button
@@ -180,7 +183,7 @@ export function ReportCardPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Student Report Card</h1>
             <p className="text-[rgb(var(--text-tertiary))] mt-1">
-              {currentYear?.name || 'Academic Year'}{selectedTermId ? ` — ${gradingPeriods?.find((gp: { periodId: string }) => gp.periodId === selectedTermId)?.name || 'Term'}` : ''}
+              {currentYear?.name || 'Academic Year'}{selectedTermId ? ` — ${gradingPeriods?.find((gp) => (gp.termId ?? gp.periodId) === selectedTermId)?.name || 'Term'}` : ''}
             </p>
           </div>
           <div className="mt-4 flex justify-between text-sm text-[rgb(var(--text-secondary))]">

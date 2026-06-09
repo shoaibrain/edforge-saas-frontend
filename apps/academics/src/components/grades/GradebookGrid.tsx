@@ -290,19 +290,19 @@ export function GradebookGrid({
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border-secondary">
+    <div className="overflow-auto max-h-[calc(100vh-15rem)] rounded-xl border border-border-secondary">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-surface-secondary">
-            {/* Frozen student column */}
-            <th className="sticky left-0 z-10 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
+            {/* Frozen student column (sticky on both axes — top-left corner) */}
+            <th className="sticky left-0 top-0 z-20 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
               Student
             </th>
             {/* Assignment columns with tooltips (Ticket 3.1) */}
             {assignmentColumns.map((col) => (
               <th
                 key={col.name}
-                className="px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
+                className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
                 title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
               >
                 <div className="truncate max-w-32">{col.name}</div>
@@ -313,7 +313,7 @@ export function GradebookGrid({
             ))}
             {/* Add Assignment column */}
             {canEdit && onAddAssignment && (
-              <th className="px-2 py-3 text-center border-r border-border-secondary min-w-16">
+              <th className="sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center border-r border-border-secondary min-w-16">
                 <button
                   type="button"
                   onClick={onAddAssignment}
@@ -325,10 +325,10 @@ export function GradebookGrid({
               </th>
             )}
             {/* Overall Grade */}
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
+            <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
               Overall
             </th>
-            <th className="px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
+            <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
               Letter
             </th>
           </tr>

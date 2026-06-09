@@ -391,8 +391,8 @@ function GradebookTab() {
             value={selectedTermId ?? ''}
             onChange={(v) => setSelectedTermId(v || null)}
             placeholder="Select grading period..."
-            options={gradingPeriods.map((gp: { periodId: string; name: string }) => ({
-              value: gp.periodId,
+            options={gradingPeriods.map((gp) => ({
+              value: gp.termId ?? gp.periodId ?? '',
               label: gp.name,
             }))}
           />

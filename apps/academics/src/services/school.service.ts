@@ -30,7 +30,12 @@ export interface AcademicYearResponseDto {
  * Grading period / term response
  */
 export interface GradingPeriodResponseDto {
-  periodId: string
+  /**
+   * Canonical id of the grading period. The backend response schema names this
+   * `termId`; some older payloads carried `periodId`. Prefer `termId`.
+   */
+  termId: string
+  periodId?: string
   yearId: string
   schoolId: string
   name: string
